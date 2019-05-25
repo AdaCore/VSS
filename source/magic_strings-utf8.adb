@@ -16,34 +16,41 @@
 ------------------------------------------------------------------------------
 --  Generic implementation of the string which use UTF-8 encoding for data.
 
-with Ada.Strings.UTF_Encoding;
+package body Magic_Strings.UTF8 is
 
-with Magic_Strings.Counted;
-with Magic_Strings.UTF;
+   type UTF8_Segment_Access is access all UTF8_Segment;
 
-private package Magic_Strings.UTF8 is
-
-   pragma Preelaborate;
-
-   type UTF8_Code_Unit_Array is
-     array (UTF.UTF8_Code_Unit_Count range <>) of UTF.UTF8_Code_Unit;
-
-   type UTF8_Segment (Capacity : UTF.UTF8_Code_Unit_Count) is
-     new Magic_Strings.Counted.Abstract_Shared_String with record
-      Data : UTF8_Code_Unit_Array (0 .. Capacity);
-      --  Buffer to store string's data. First unused code unit is set to
-      --  zero, to allow to pass data to C.
-
-      Size : UTF.UTF8_Code_Unit_Count;
-      --  Number of code units in the buffer.
-   end record;
+   -----------------
+   -- From_String --
+   -----------------
 
    procedure From_UTF_8_String
      (Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Segment : out String_Access;
-      Success : out Boolean);
-   --  Converts standard UTF_S_String into internal representation. It checks
-   --  for validity and computes string length in code points. On any error
-   --  Success is set to False and Segment reset to null.
+      Success : out Boolean)
+   is
+      Aux : UTF8_Segment_Access;
+
+   begin
+      if Item'Length = 0 then
+         Segment := null;
+         Success := True;
+
+         return;
+      end if;
+
+      Aux :=
+        new UTF8_Segment (UTF.UTF8_Code_Unit_Count (Item'Length + 1));
+
+      for J in Item'Range loop
+         --  XXX Verification of the UTF-8 format is not implemented.
+
+         Aux.Data (UTF.UTF8_Code_Unit_Count (J - Item'First)) :=
+           Character'Pos (Item (J));
+      end loop;
+
+      Success := True;
+      Segment := String_Access (Aux);
+   end From_UTF_8_String;
 
 end Magic_Strings.UTF8;

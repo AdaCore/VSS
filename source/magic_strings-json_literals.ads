@@ -29,7 +29,7 @@ private package Magic_Strings.JSON_Literals is
 private
 
    type UTF8_Shared_String_Access is
-     access all Magic_Strings.UTF8.UTF8_Shared_String;
+     access all Magic_Strings.UTF8.UTF8_Segment;
 
    type UTF8_Span is record
       First : Magic_Strings.UTF.UTF8_Code_Unit_Count;

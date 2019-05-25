@@ -15,6 +15,8 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
+with Magic_Strings.UTF8;
+
 package body Magic_Strings.Conversions is
 
    ---------------------
@@ -22,9 +24,19 @@ package body Magic_Strings.Conversions is
    ---------------------
 
    function To_Magic_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Magic_String is
+     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Magic_String
+   is
+      Segment : String_Access;
+      Success : Boolean;
+
    begin
-      return Empty_Magic_String;
+      Magic_Strings.UTF8.From_UTF_8_String (Item, Segment, Success);
+
+      if not Success then
+         raise Constraint_Error with "Invalid UTF-8 string";
+      end if;
+
+      return (Ada.Finalization.Controlled with Data => Segment);
    end To_Magic_String;
 
    ---------------------

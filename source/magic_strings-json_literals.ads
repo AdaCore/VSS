@@ -16,7 +16,8 @@
 ------------------------------------------------------------------------------
 --  Implementation of the string which uses slices of JSON text.
 
-with Magic_Strings.UTF8;
+with Magic_Strings.UTF;
+private with Magic_Strings.UTF8;
 
 private package Magic_Strings.JSON_Literals is
 
@@ -31,9 +32,9 @@ private
      access all Magic_Strings.UTF8.UTF8_Shared_String;
 
    type UTF8_Span is record
-      First : Magic_Strings.UTF8.Code_Unit_Count;
+      First : Magic_Strings.UTF.UTF8_Code_Unit_Count;
       --  First points to the begining of the first character.
-      Last  : Magic_Strings.UTF8.Code_Unit_Count;
+      Last  : Magic_Strings.UTF.UTF8_Code_Unit_Count;
       --  Last points to the end of the last character.
    end record;
    --  Indexes of the UTF8 Code_Unit in a shared JSON text.

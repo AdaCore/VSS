@@ -1,0 +1,11 @@
+
+project GNATCOLL_Text is
+
+   for Object_Dir use "../.objs";
+   for Source_Dirs use ("../source");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g", "-O2");
+   end Compiler;
+
+end GNATCOLL_Text;

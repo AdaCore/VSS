@@ -30,12 +30,15 @@ private package Magic_Strings.UTF8 is
 
    type UTF8_Segment (Capacity : UTF.UTF8_Code_Unit_Count) is
      new Magic_Strings.Counted.Abstract_Shared_String with record
-      Data : UTF8_Code_Unit_Array (0 .. Capacity);
+      Data   : UTF8_Code_Unit_Array (0 .. Capacity);
       --  Buffer to store string's data. First unused code unit is set to
       --  zero, to allow to pass data to C.
 
-      Size : UTF.UTF8_Code_Unit_Count;
+      Size   : UTF.UTF8_Code_Unit_Count;
       --  Number of code units in the buffer.
+
+      Length : Character_Count;
+      --  Length of the string in Unicode Code Points.
    end record;
 
    procedure From_UTF_8_String
@@ -44,6 +47,6 @@ private package Magic_Strings.UTF8 is
       Success : out Boolean);
    --  Converts standard UTF_S_String into internal representation. It checks
    --  for validity and computes string length in code points. On any error
-   --  Success is set to False and Segment reset to null.
+   --  Success is set to False and Segment set to null.
 
 end Magic_Strings.UTF8;

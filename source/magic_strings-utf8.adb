@@ -20,6 +20,28 @@ package body Magic_Strings.UTF8 is
 
    type UTF8_Segment_Access is access all UTF8_Segment;
 
+   type Verification_State is
+     (Initial,    --  ASCII or start of multibyte sequence
+      U31,        --  A0 .. BF | UT1
+      U33,        --  80 .. 9F | UT1
+      U41,        --  90 .. BF | UT2
+      U43,        --  80 .. 8F | UT2
+      UT1,        --  1 (80 .. BF)
+      UT2,        --  2 (80 .. BF)
+      UT3,        --  3 (80 .. BF)
+      Ill_Formed);
+   --  Unicode defines well-formed UTF-8 as
+   --
+   --  00 .. 7F
+   --  C2 .. DF | 80 .. BF
+   --  E0       | A0 .. BF | 80 .. BF
+   --  E1 .. EC | 80 .. BF | 80 .. BF
+   --  ED       | 80 .. 9F | 80 .. BF
+   --  EE .. EF | 80 .. BF | 80 .. BF
+   --  F0       | 90 .. BF | 80 .. BF | 80 .. BF
+   --  F1 .. F3 | 80 .. BF | 80 .. BF | 80 .. BF
+   --  F4       | 80 .. 8F | 80 .. BF | 80 .. BF
+
    -----------------
    -- From_String --
    -----------------
@@ -29,7 +51,10 @@ package body Magic_Strings.UTF8 is
       Segment : out String_Access;
       Success : out Boolean)
    is
-      Aux : UTF8_Segment_Access;
+      Aux    : UTF8_Segment_Access;
+      Code   : UTF.UTF8_Code_Unit;
+      State  : Verification_State := Initial;
+      Length : Character_Count := 0;
 
    begin
       if Item'Length = 0 then
@@ -39,18 +64,130 @@ package body Magic_Strings.UTF8 is
          return;
       end if;
 
-      Aux :=
-        new UTF8_Segment (UTF.UTF8_Code_Unit_Count (Item'Length + 1));
+      Aux := new UTF8_Segment (UTF.UTF8_Code_Unit_Count (Item'Length));
 
       for J in Item'Range loop
-         --  XXX Verification of the UTF-8 format is not implemented.
+         Code := Character'Pos (Item (J));
 
-         Aux.Data (UTF.UTF8_Code_Unit_Count (J - Item'First)) :=
-           Character'Pos (Item (J));
+         case State is
+            when Initial =>
+               Length := Length + 1;
+
+               case Code is
+                  when 16#00# .. 16#7F# =>
+                     null;
+
+                  when 16#C2# .. 16#DF# =>
+                     State := UT1;
+
+                  when 16#E0# =>
+                     State := U31;
+
+                  when 16#E1# .. 16#EC# =>
+                     State := UT2;
+
+                  when 16#ED# =>
+                     State := U33;
+
+                  when 16#EE# .. 16#EF# =>
+                     State := UT2;
+
+                  when 16#F0# =>
+                     State := U41;
+
+                  when 16#F1# .. 16#F3# =>
+                     State := UT3;
+
+                  when 16#F4# =>
+                     State := U43;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U31 =>
+               case Code is
+                  when 16#A0# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U33 =>
+               case Code is
+                  when 16#80# .. 16#9F# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U41 =>
+               case Code is
+                  when 16#90# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U43 =>
+               case Code is
+                  when 16#80# .. 16#8F# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT1 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := Initial;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT2 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT3 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when Ill_Formed =>
+               exit;
+         end case;
+
+         Aux.Data (UTF.UTF8_Code_Unit_Count (J - Item'First)) := Code;
       end loop;
 
-      Success := True;
-      Segment := String_Access (Aux);
+      if State = Initial then
+         Aux.Data (UTF.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
+         Aux.Size := Item'Length;
+         Aux.Length := Length;
+
+         Success := True;
+         Segment := String_Access (Aux);
+
+      else
+         Aux.Unreference;
+         Success := False;
+         Segment := null;
+      end if;
    end From_UTF_8_String;
 
 end Magic_Strings.UTF8;

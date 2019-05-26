@@ -33,7 +33,7 @@ package body Magic_Strings.Conversions is
       Magic_Strings.UTF8.From_UTF_8_String (Item, Segment, Success);
 
       if not Success then
-         raise Constraint_Error with "Invalid UTF-8 string";
+         raise Constraint_Error with "Ill-formed UTF-8 data";
       end if;
 
       return (Ada.Finalization.Controlled with Data => Segment);

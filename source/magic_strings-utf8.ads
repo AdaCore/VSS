@@ -49,4 +49,6 @@ private package Magic_Strings.UTF8 is
    --  for validity and computes string length in code points. On any error
    --  Success is set to False and Segment set to null.
 
+   overriding function To_UTF_8_String (Self : UTF8_Segment) return String;
+
 end Magic_Strings.UTF8;

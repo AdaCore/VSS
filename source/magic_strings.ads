@@ -17,6 +17,7 @@
 --  API to process string data as sequences of Unicode Code Points.
 
 private with Ada.Finalization;
+private with Ada.Strings.UTF_Encoding;
 
 package Magic_Strings is
 
@@ -57,6 +58,11 @@ private
    procedure Unreference (Self : in out Abstract_String) is abstract;
    --  Called when some copy of the string is not longer in use. It should
    --  deallocate data when necessary.
+
+   function To_UTF_8_String
+     (Self : Abstract_String)
+      return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
+   --  Converts string data into standard UTF_8_String.
 
    ------------------
    -- Magic_String --

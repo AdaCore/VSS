@@ -190,4 +190,21 @@ package body Magic_Strings.UTF8 is
       end if;
    end From_UTF_8_String;
 
+   ---------------------
+   -- To_UTF_8_String --
+   ---------------------
+
+   overriding function To_UTF_8_String
+     (Self : UTF8_Segment) return Ada.Strings.UTF_Encoding.UTF_8_String is
+   begin
+      return Result : Ada.Strings.UTF_Encoding.UTF_8_String
+                        (1 .. Natural (Self.Size))
+      do
+         for J in Result'Range loop
+            Result (J) :=
+              Character'Val (Self.Data (UTF.UTF8_Code_Unit_Count (J - 1)));
+         end loop;
+      end return;
+   end To_UTF_8_String;
+
 end Magic_Strings.UTF8;

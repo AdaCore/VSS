@@ -46,7 +46,12 @@ package body Magic_Strings.Conversions is
    function To_UTF_8_String
      (Item : Magic_String) return Ada.Strings.UTF_Encoding.UTF_8_String is
    begin
-      return "";
+      if Item.Data = null then
+         return "";
+
+      else
+         return Item.Data.To_UTF_8_String;
+      end if;
    end To_UTF_8_String;
 
 end Magic_Strings.Conversions;

@@ -36,4 +36,8 @@ private
    --  Finalization of the shared slice segment, base buffer should be
    --  unreferenced.
 
+   overriding function To_UTF_8_String
+     (Self : Slice_Shared_String)
+      return Ada.Strings.UTF_Encoding.UTF_8_String;
+
 end Magic_Strings.Slices;

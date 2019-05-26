@@ -44,6 +44,10 @@ begin
 
       begin
          String := Magic_Strings.Conversions.To_Magic_String (Source.all);
+
+         if Magic_Strings.Conversions.To_UTF_8_String (String) /= Source.all then
+            raise Program_Error;
+         end if;
       end;
    end loop;
 end Test_Conversions;

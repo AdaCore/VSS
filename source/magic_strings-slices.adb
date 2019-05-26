@@ -29,4 +29,15 @@ package body Magic_Strings.Slices is
       end if;
    end Finalize;
 
+   ---------------------
+   -- To_UTF_8_String --
+   ---------------------
+
+   overriding function To_UTF_8_String
+     (Self : Slice_Shared_String)
+      return Ada.Strings.UTF_Encoding.UTF_8_String is
+   begin
+      return "";
+   end To_UTF_8_String;
+
 end Magic_Strings.Slices;

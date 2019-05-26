@@ -1,6 +1,7 @@
 
 project GNATCOLL_Text is
 
+   for Languages use ("Ada");
    for Object_Dir use "../.objs";
    for Source_Dirs use ("../source");
 

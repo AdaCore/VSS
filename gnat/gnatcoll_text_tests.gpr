@@ -2,6 +2,7 @@ with "gnatcoll_text";
 
 project GNATCOLL_Text_Tests is
 
+   for Languages use ("Ada");
    for Object_Dir use "../.objs/tests";
    for Source_Dirs use ("../testsuite");
    for Main use ("test_conversions.adb");

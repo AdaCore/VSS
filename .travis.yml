@@ -1,0 +1,9 @@
+os: linux
+
+language: generic
+
+install:
+ - sudo apt-get install gprbuild gnat
+
+script:
+ - make all check

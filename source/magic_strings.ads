@@ -19,6 +19,8 @@
 private with Ada.Finalization;
 private with Ada.Strings.UTF_Encoding;
 
+limited with Magic_Strings.Texts;
+
 package Magic_Strings is
 
    pragma Preelaborate;
@@ -34,6 +36,9 @@ package Magic_Strings is
    pragma Preelaborable_Initialization (Magic_String);
 
    Empty_Magic_String : constant Magic_String;
+
+   function To_Magic_Text
+     (Self : Magic_String) return Magic_Strings.Texts.Magic_Text;
 
 private
 
@@ -63,6 +68,11 @@ private
      (Self : Abstract_String)
       return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
    --  Converts string data into standard UTF_8_String.
+
+   function To_Text
+     (Self : in out Abstract_String) return String_Access is abstract;
+   --  Returns view that supports text operations. Returned value must be
+   --  unreferenced after use.
 
    ------------------
    -- Magic_String --

@@ -40,4 +40,7 @@ private
      (Self : Slice_Shared_String)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
 
+   overriding function To_Text
+     (Self : in out Slice_Shared_String) return String_Access;
+
 end Magic_Strings.Slices;

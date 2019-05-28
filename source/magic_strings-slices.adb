@@ -29,6 +29,18 @@ package body Magic_Strings.Slices is
       end if;
    end Finalize;
 
+   -------------
+   -- To_Text --
+   -------------
+
+   overriding function To_Text
+     (Self : in out Slice_Shared_String) return String_Access is
+   begin
+      --  XXX Not implemented
+
+      return null;
+   end To_Text;
+
    ---------------------
    -- To_UTF_8_String --
    ---------------------

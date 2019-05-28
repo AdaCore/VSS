@@ -190,6 +190,35 @@ package body Magic_Strings.UTF8 is
       end if;
    end From_UTF_8_String;
 
+   -------------
+   -- To_Text --
+   -------------
+
+   overriding function To_Text (Self : in out UTF8_Segment) return String_Access is
+   begin
+      return new UTF8_Text;
+   end To_Text;
+
+   -------------
+   -- To_Text --
+   -------------
+
+   overriding function To_Text (Self : in out UTF8_Text) return String_Access is
+   begin
+      return Self.Reference;
+   end To_Text;
+
+   ---------------------
+   -- To_UTF_8_String --
+   ---------------------
+
+   overriding function To_UTF_8_String (Self : UTF8_Text) return String is
+   begin
+      --  XXX Not implemented.
+
+      return "";
+   end To_UTF_8_String;
+
    ---------------------
    -- To_UTF_8_String --
    ---------------------

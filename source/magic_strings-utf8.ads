@@ -50,5 +50,18 @@ private package Magic_Strings.UTF8 is
    --  Success is set to False and Segment set to null.
 
    overriding function To_UTF_8_String (Self : UTF8_Segment) return String;
+   --  Returns internal data as standard String.
+
+   overriding function To_Text (Self : in out UTF8_Segment) return String_Access;
+   --  Returns text view of the segment.
+
+   type UTF8_Text is
+     new Magic_Strings.Counted.Abstract_Shared_String with null record;
+
+   overriding function To_UTF_8_String (Self : UTF8_Text) return String;
+   --  Returns internal data as standard String.
+
+   overriding function To_Text (Self : in out UTF8_Text) return String_Access;
+   --  Returns itself.
 
 end Magic_Strings.UTF8;

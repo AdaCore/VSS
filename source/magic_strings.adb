@@ -15,6 +15,8 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
+with Magic_Strings.Texts;
+
 package body Magic_Strings is
 
    ------------
@@ -45,5 +47,18 @@ package body Magic_Strings is
          Self.Data := null;
       end if;
    end Finalize;
+
+   -------------------
+   -- To_Magic_Text --
+   -------------------
+
+   function To_Magic_Text
+     (Self : Magic_String) return Magic_Strings.Texts.Magic_Text is
+   begin
+      return (Ada.Finalization.Controlled with
+                Data => (if Self.Data = null
+                         then null
+                         else Self.Data.To_Text));
+   end To_Magic_Text;
 
 end Magic_Strings;

@@ -18,7 +18,7 @@
 
 private with System.Atomic_Counters;
 
-private package Magic_Strings.Counted is
+private package Magic_Strings.Reference_Counted is
 
    pragma Preelaborate;
 
@@ -38,4 +38,4 @@ private
       Counter : System.Atomic_Counters.Atomic_Counter;
    end record;
 
-end Magic_Strings.Counted;
+end Magic_Strings.Reference_Counted;

@@ -16,17 +16,17 @@
 ------------------------------------------------------------------------------
 --  Data type to use reference to "slice" of another string data.
 
-with Magic_Strings.Counted;
+with Magic_Strings.Reference_Counted;
 
 private package Magic_Strings.Slices is
 
    type Slice_Shared_String is
-     new Magic_Strings.Counted.Abstract_Shared_String with private;
+     new Magic_Strings.Reference_Counted.Abstract_Shared_String with private;
 
 private
 
    type Slice_Shared_String is
-     new Magic_Strings.Counted.Abstract_Shared_String with record
+     new Magic_Strings.Reference_Counted.Abstract_Shared_String with record
       Data : String_Access;
       From : Character_Index;
       To   : Character_Count;

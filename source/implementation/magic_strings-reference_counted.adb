@@ -16,7 +16,7 @@
 ------------------------------------------------------------------------------
 with Ada.Unchecked_Deallocation;
 
-package body Magic_Strings.Counted is
+package body Magic_Strings.Reference_Counted is
 
    type Shared_String_Access is access all Abstract_Shared_String'Class;
 
@@ -50,4 +50,4 @@ package body Magic_Strings.Counted is
       end if;
    end Unreference;
 
-end Magic_Strings.Counted;
+end Magic_Strings.Reference_Counted;

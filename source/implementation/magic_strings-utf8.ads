@@ -18,7 +18,7 @@
 
 with Ada.Strings.UTF_Encoding;
 
-with Magic_Strings.Counted;
+with Magic_Strings.Reference_Counted;
 with Magic_Strings.UTF;
 
 private package Magic_Strings.UTF8 is
@@ -29,7 +29,7 @@ private package Magic_Strings.UTF8 is
      array (UTF.UTF8_Code_Unit_Count range <>) of UTF.UTF8_Code_Unit;
 
    type UTF8_Segment (Capacity : UTF.UTF8_Code_Unit_Count) is
-     new Magic_Strings.Counted.Abstract_Shared_String with record
+     new Magic_Strings.Reference_Counted.Abstract_Shared_String with record
       Data   : UTF8_Code_Unit_Array (0 .. Capacity);
       --  Buffer to store string's data. First unused code unit is set to
       --  zero, to allow to pass data to C.
@@ -56,7 +56,7 @@ private package Magic_Strings.UTF8 is
    --  Returns text view of the segment.
 
    type UTF8_Text is
-     new Magic_Strings.Counted.Abstract_Shared_String with null record;
+     new Magic_Strings.Reference_Counted.Abstract_Shared_String with null record;
 
    overriding function To_UTF_8_String (Self : UTF8_Text) return String;
    --  Returns internal data as standard String.

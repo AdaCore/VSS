@@ -1,0 +1,2 @@
+This directory contains only packages of the public API of this library.
+Implementation files are located in subdirectories.

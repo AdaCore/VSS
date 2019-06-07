@@ -2,8 +2,11 @@ os: linux
 
 language: generic
 
+services:
+ - docker
+
 install:
- - sudo apt-get install gprbuild gnat
+ - docker pull ubuntu:18.04
 
 script:
- - make all check
+ - docker build .

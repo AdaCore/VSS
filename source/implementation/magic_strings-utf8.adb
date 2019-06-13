@@ -190,6 +190,25 @@ package body Magic_Strings.UTF8 is
       end if;
    end From_UTF_8_String;
 
+   --------------
+   -- Is_Empty --
+   --------------
+
+   overriding function Is_Empty (Self : UTF8_Segment) return Boolean is
+   begin
+      return Self.Length = 0;
+   end Is_Empty;
+
+   --------------
+   -- Is_Empty --
+   --------------
+
+   overriding function Is_Empty (Self : UTF8_Text) return Boolean is
+   begin
+      raise Program_Error;
+      return False;
+   end Is_Empty;
+
    -------------
    -- To_Text --
    -------------

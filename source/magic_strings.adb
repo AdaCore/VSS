@@ -48,6 +48,15 @@ package body Magic_Strings is
       end if;
    end Finalize;
 
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (Self : Magic_String'Class) return Boolean is
+   begin
+      return Self.Data = null or else Self.Data.Is_Empty;
+   end Is_Empty;
+
    -------------------
    -- To_Magic_Text --
    -------------------

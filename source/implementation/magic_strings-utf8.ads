@@ -49,19 +49,25 @@ private package Magic_Strings.UTF8 is
    --  for validity and computes string length in code points. On any error
    --  Success is set to False and Segment set to null.
 
-   overriding function To_UTF_8_String (Self : UTF8_Segment) return String;
-   --  Returns internal data as standard String.
+   overriding function Is_Empty (Self : UTF8_Segment) return Boolean;
+   --  Return True when string is empty.
 
    overriding function To_Text (Self : in out UTF8_Segment) return String_Access;
    --  Returns text view of the segment.
 
+   overriding function To_UTF_8_String (Self : UTF8_Segment) return String;
+   --  Returns internal data as standard String.
+
    type UTF8_Text is
      new Magic_Strings.Reference_Counted.Abstract_Shared_String with null record;
 
-   overriding function To_UTF_8_String (Self : UTF8_Text) return String;
-   --  Returns internal data as standard String.
+   overriding function Is_Empty (Self : UTF8_Text) return Boolean;
+   --  Return True when string is empty.
 
    overriding function To_Text (Self : in out UTF8_Text) return String_Access;
    --  Returns itself.
+
+   overriding function To_UTF_8_String (Self : UTF8_Text) return String;
+   --  Returns internal data as standard String.
 
 end Magic_Strings.UTF8;

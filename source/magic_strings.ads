@@ -37,6 +37,9 @@ package Magic_Strings is
 
    Empty_Magic_String : constant Magic_String;
 
+   function Is_Empty (Self : Magic_String'Class) return Boolean;
+   --  Return True when string is empty string.
+
    function To_Magic_Text
      (Self : Magic_String) return Magic_Strings.Texts.Magic_Text;
 
@@ -63,6 +66,9 @@ private
    procedure Unreference (Self : in out Abstract_String) is abstract;
    --  Called when some copy of the string is not longer in use. It should
    --  deallocate data when necessary.
+
+   function Is_Empty (Self : Abstract_String) return Boolean is abstract;
+   --  Return True when string is empty.
 
    function To_UTF_8_String
      (Self : Abstract_String)

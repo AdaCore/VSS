@@ -29,6 +29,16 @@ package body Magic_Strings.Slices is
       end if;
    end Finalize;
 
+   --------------
+   -- Is_Empty --
+   --------------
+
+   overriding function Is_Empty (Self : Slice_Shared_String) return Boolean is
+   begin
+      raise Program_Error;
+      return False;
+   end Is_Empty;
+
    -------------
    -- To_Text --
    -------------

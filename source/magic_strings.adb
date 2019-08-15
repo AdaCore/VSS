@@ -57,6 +57,17 @@ package body Magic_Strings is
       return Self.Data = null or else Self.Data.Is_Empty;
    end Is_Empty;
 
+   ----------
+   -- Read --
+   ----------
+
+   procedure Read
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : out Magic_String) is
+   begin
+      raise Program_Error with "Not implemented";
+   end Read;
+
    -------------------
    -- To_Magic_Text --
    -------------------
@@ -69,5 +80,16 @@ package body Magic_Strings is
                          then null
                          else Self.Data.To_Text));
    end To_Magic_Text;
+
+   -----------
+   -- Write --
+   -----------
+
+   procedure Write
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : Magic_String) is
+   begin
+      raise Program_Error with "Not implemented";
+   end Write;
 
 end Magic_Strings;

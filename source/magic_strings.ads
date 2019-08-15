@@ -18,13 +18,14 @@
 
 private with Ada.Finalization;
 private with Ada.Strings.UTF_Encoding;
+private with Ada.Streams;
 
 limited with Magic_Strings.Texts;
 
 package Magic_Strings is
 
    pragma Preelaborate;
---   pragma Remote_Types;
+   pragma Remote_Types;
 
    type Character_Count is new Natural;
    subtype Character_Index is Character_Count range 1 .. Character_Count'Last;
@@ -84,9 +85,18 @@ private
    -- Magic_String --
    ------------------
 
+   procedure Read
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : out Magic_String);
+   procedure Write
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : Magic_String);
+
    type Magic_String is new Ada.Finalization.Controlled with record
       Data : String_Access;
-   end record;
+   end record
+     with Read  => Read,
+          Write => Write;
 
    overriding procedure Adjust (Self : in out Magic_String);
    overriding procedure Finalize (Self : in out Magic_String);

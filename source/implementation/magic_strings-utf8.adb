@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -67,7 +67,7 @@ package body Magic_Strings.UTF8 is
       Aux := new UTF8_Segment (UTF.UTF8_Code_Unit_Count (Item'Length));
 
       for J in Item'Range loop
-         Code := Character'Pos (Item (J));
+         Code := Standard.Character'Pos (Item (J));
 
          case State is
             when Initial =>
@@ -250,7 +250,8 @@ package body Magic_Strings.UTF8 is
       do
          for J in Result'Range loop
             Result (J) :=
-              Character'Val (Self.Data (UTF.UTF8_Code_Unit_Count (J - 1)));
+              Standard.Character'Val
+                (Self.Data (UTF.UTF8_Code_Unit_Count (J - 1)));
          end loop;
       end return;
    end To_UTF_8_String;

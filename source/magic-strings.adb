@@ -15,9 +15,9 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
-with Magic_Strings.Texts;
+with Magic.Strings.Texts;
 
-package body Magic_Strings is
+package body Magic.Strings is
 
    ------------
    -- Adjust --
@@ -161,7 +161,7 @@ package body Magic_Strings is
    -------------------
 
    function To_Magic_Text
-     (Self : Magic_String) return Magic_Strings.Texts.Magic_Text is
+     (Self : Magic_String) return Magic.Strings.Texts.Magic_Text is
    begin
       return (Ada.Finalization.Controlled with
                 Data => (if Self.Data = null
@@ -182,4 +182,4 @@ package body Magic_Strings is
       raise Program_Error with "Not implemented";
    end Write;
 
-end Magic_Strings;
+end Magic.Strings;

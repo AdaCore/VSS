@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,10 +16,10 @@
 ------------------------------------------------------------------------------
 --  Implementation of the string which uses slices of JSON text.
 
-with Magic_Strings.UTF;
-private with Magic_Strings.UTF8;
+with Magic.Strings.UTF;
+private with Magic.Strings.UTF8;
 
-private package Magic_Strings.JSON_Literals is
+private package Magic.Strings.JSON_Literals is
 
    pragma Preelaborate;
 
@@ -29,12 +29,12 @@ private package Magic_Strings.JSON_Literals is
 private
 
    type UTF8_Shared_String_Access is
-     access all Magic_Strings.UTF8.UTF8_Segment;
+     access all Magic.Strings.UTF8.UTF8_Segment;
 
    type UTF8_Span is record
-      First : Magic_Strings.UTF.UTF8_Code_Unit_Count;
+      First : Magic.Strings.UTF.UTF8_Code_Unit_Count;
       --  First points to the begining of the first character.
-      Last  : Magic_Strings.UTF.UTF8_Code_Unit_Count;
+      Last  : Magic.Strings.UTF.UTF8_Code_Unit_Count;
       --  Last points to the end of the last character.
    end record;
    --  Indexes of the UTF8 Code_Unit in a shared JSON text.
@@ -59,4 +59,4 @@ private
 
    overriding procedure Unreference (Self : in out JSON_Literal_String);
 
-end Magic_Strings.JSON_Literals;
+end Magic.Strings.JSON_Literals;

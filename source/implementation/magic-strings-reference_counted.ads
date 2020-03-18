@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -14,27 +14,28 @@
 -- COPYING3.  If not, go to http://www.gnu.org/licenses for a complete copy --
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
+--  Base type for reference counted shared data.
 
-package body Magic_Strings.UTF is
+private with System.Atomic_Counters;
 
-   -----------------------
-   -- To_Grapheme_Index --
-   -----------------------
+private package Magic.Strings.Reference_Counted is
 
-   function To_Grapheme_Index
-     (Item : UTF16_Code_Unit_Index) return Grapheme_Index is
-   begin
-      return 1;
-   end To_Grapheme_Index;
+   pragma Preelaborate;
 
-   ------------------------------
-   -- To_UTF16_Code_Unit_Count --
-   ------------------------------
+   type Abstract_Shared_String is abstract new Abstract_String with private;
 
-   function To_UTF16_Code_Unit_Count
-     (Item : Grapheme_Index) return UTF16_Code_Unit_Index is
-   begin
-      return 0;
-   end To_UTF16_Code_Unit_Count;
+   procedure Finalize (Self : in out Abstract_Shared_String) is null;
+   --  Called before deallocation of the data.
 
-end Magic_Strings.UTF;
+   overriding function Reference
+     (Self : in out Abstract_Shared_String) return String_Access;
+
+   overriding procedure Unreference (Self : in out Abstract_Shared_String);
+
+private
+
+   type Abstract_Shared_String is abstract new Abstract_String with record
+      Counter : System.Atomic_Counters.Atomic_Counter;
+   end record;
+
+end Magic.Strings.Reference_Counted;

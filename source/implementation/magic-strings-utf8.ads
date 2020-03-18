@@ -18,10 +18,10 @@
 
 with Ada.Strings.UTF_Encoding;
 
-with Magic_Strings.Reference_Counted;
-with Magic_Strings.UTF;
+with Magic.Strings.Reference_Counted;
+with Magic.Strings.UTF;
 
-private package Magic_Strings.UTF8 is
+private package Magic.Strings.UTF8 is
 
    pragma Preelaborate;
 
@@ -29,7 +29,7 @@ private package Magic_Strings.UTF8 is
      array (UTF.UTF8_Code_Unit_Count range <>) of UTF.UTF8_Code_Unit;
 
    type UTF8_Segment (Capacity : UTF.UTF8_Code_Unit_Count) is
-     new Magic_Strings.Reference_Counted.Abstract_Shared_String with record
+     new Magic.Strings.Reference_Counted.Abstract_Shared_String with record
       Data   : UTF8_Code_Unit_Array (0 .. Capacity);
       --  Buffer to store string's data. First unused code unit is set to
       --  zero, to allow to pass data to C.
@@ -64,7 +64,7 @@ private package Magic_Strings.UTF8 is
    --  Returns internal data as standard String.
 
    type UTF8_Text is
-     new Magic_Strings.Reference_Counted.Abstract_Shared_String with null record;
+     new Magic.Strings.Reference_Counted.Abstract_Shared_String with null record;
 
    overriding function Is_Empty (Self : UTF8_Text) return Boolean;
    --  Return True when string is empty.
@@ -80,4 +80,4 @@ private package Magic_Strings.UTF8 is
    overriding function To_UTF_8_String (Self : UTF8_Text) return String;
    --  Returns internal data as standard String.
 
-end Magic_Strings.UTF8;
+end Magic.Strings.UTF8;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -14,40 +14,21 @@
 -- COPYING3.  If not, go to http://www.gnu.org/licenses for a complete copy --
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
-with Ada.Unchecked_Deallocation;
+--  Vector of strings and operations on it.
 
-package body Magic_Strings.Reference_Counted is
+private with Ada.Finalization;
 
-   type Shared_String_Access is access all Abstract_Shared_String'Class;
+package Magic.String_Vectors is
 
-   ---------------
-   -- Reference --
-   ---------------
+   pragma Preelaborate;
+--     pragma Remote_Types;
 
-   overriding function Reference
-     (Self : in out Abstract_Shared_String) return String_Access is
-   begin
-      System.Atomic_Counters.Increment (Self.Counter);
+   type Magic_String_Vector is tagged private;
 
-      return Self'Unchecked_Access;
-   end Reference;
+private
 
-   -----------------
-   -- Unreference --
-   -----------------
+   type Magic_String_Vector is new Ada.Finalization.Controlled with record
+      null;
+   end record;
 
-   overriding procedure Unreference (Self : in out Abstract_Shared_String) is
-      procedure Free is
-        new Ada.Unchecked_Deallocation
-              (Abstract_Shared_String'Class, Shared_String_Access);
-
-      Aux : Shared_String_Access := Self'Unchecked_Access;
-
-   begin
-      if System.Atomic_Counters.Decrement (Self.Counter) then
-         Self.Finalize;
-         Free (Aux);
-      end if;
-   end Unreference;
-
-end Magic_Strings.Reference_Counted;
+end Magic.String_Vectors;

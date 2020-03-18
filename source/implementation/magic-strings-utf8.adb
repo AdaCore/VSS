@@ -16,7 +16,7 @@
 ------------------------------------------------------------------------------
 --  Generic implementation of the string which use UTF-8 encoding for data.
 
-package body Magic_Strings.UTF8 is
+package body Magic.Strings.UTF8 is
 
    type UTF8_Segment_Access is access all UTF8_Segment;
 
@@ -278,4 +278,4 @@ package body Magic_Strings.UTF8 is
       end return;
    end To_UTF_8_String;
 
-end Magic_Strings.UTF8;
+end Magic.Strings.UTF8;

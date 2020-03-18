@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -15,28 +15,43 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
-package body Magic_Strings.JSON_Literals is
+with Magic.Strings.UTF8;
 
-   ---------------
-   -- Reference --
-   ---------------
+package body Magic.Strings.Conversions is
 
-   overriding function Reference
-     (Self : in out JSON_Literal_String) return String_Access
+   ---------------------
+   -- To_Magic_String --
+   ---------------------
+
+   function To_Magic_String
+     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Magic_String
    is
+      Segment : String_Access;
+      Success : Boolean;
+
    begin
-      Self.JSON := UTF8_Shared_String_Access (Self.JSON.Reference);
+      Magic.Strings.UTF8.From_UTF_8_String (Item, Segment, Success);
 
-      return Self'Unchecked_Access;
-   end Reference;
+      if not Success then
+         raise Constraint_Error with "Ill-formed UTF-8 data";
+      end if;
 
-   -----------------
-   -- Unreference --
-   -----------------
+      return (Ada.Finalization.Controlled with Data => Segment, others => <>);
+   end To_Magic_String;
 
-   overriding procedure Unreference (Self : in out JSON_Literal_String) is
+   ---------------------
+   -- To_UTF_8_String --
+   ---------------------
+
+   function To_UTF_8_String
+     (Item : Magic_String) return Ada.Strings.UTF_Encoding.UTF_8_String is
    begin
-      Self.JSON.Unreference;
-   end Unreference;
+      if Item.Data = null then
+         return "";
 
-end Magic_Strings.JSON_Literals;
+      else
+         return Item.Data.To_UTF_8_String;
+      end if;
+   end To_UTF_8_String;
+
+end Magic.Strings.Conversions;

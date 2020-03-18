@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -14,16 +14,40 @@
 -- COPYING3.  If not, go to http://www.gnu.org/licenses for a complete copy --
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
---  Conversion between standard string types and Magic_String.
+with Ada.Unchecked_Deallocation;
 
-with Ada.Strings.UTF_Encoding;
+package body Magic.Strings.Reference_Counted is
 
-package Magic_Strings.Conversions is
+   type Shared_String_Access is access all Abstract_Shared_String'Class;
 
-   function To_Magic_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Magic_String;
+   ---------------
+   -- Reference --
+   ---------------
 
-   function To_UTF_8_String
-     (Item : Magic_String) return Ada.Strings.UTF_Encoding.UTF_8_String;
+   overriding function Reference
+     (Self : in out Abstract_Shared_String) return String_Access is
+   begin
+      System.Atomic_Counters.Increment (Self.Counter);
 
-end Magic_Strings.Conversions;
+      return Self'Unchecked_Access;
+   end Reference;
+
+   -----------------
+   -- Unreference --
+   -----------------
+
+   overriding procedure Unreference (Self : in out Abstract_Shared_String) is
+      procedure Free is
+        new Ada.Unchecked_Deallocation
+              (Abstract_Shared_String'Class, Shared_String_Access);
+
+      Aux : Shared_String_Access := Self'Unchecked_Access;
+
+   begin
+      if System.Atomic_Counters.Decrement (Self.Counter) then
+         Self.Finalize;
+         Free (Aux);
+      end if;
+   end Unreference;
+
+end Magic.Strings.Reference_Counted;

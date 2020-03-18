@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,7 +16,7 @@
 ------------------------------------------------------------------------------
 --  API to access to string data using line:column indexing.
 
-package Magic_Strings.Texts is
+package Magic.Strings.Texts is
 
    pragma Preelaborate;
 
@@ -28,4 +28,4 @@ package Magic_Strings.Texts is
 
    type Magic_Text is new Magic_String with null record;
 
-end Magic_Strings.Texts;
+end Magic.Strings.Texts;

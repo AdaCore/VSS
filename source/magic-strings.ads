@@ -20,9 +20,9 @@ private with Ada.Finalization;
 private with Ada.Strings.UTF_Encoding;
 private with Ada.Streams;
 
-limited with Magic_Strings.Texts;
+limited with Magic.Strings.Texts;
 
-package Magic_Strings is
+package Magic.Strings is
 
    pragma Preelaborate;
    pragma Remote_Types;
@@ -42,7 +42,7 @@ package Magic_Strings is
    --  Return True when string is empty string.
 
    function To_Magic_Text
-     (Self : Magic_String) return Magic_Strings.Texts.Magic_Text;
+     (Self : Magic_String) return Magic.Strings.Texts.Magic_Text;
 
    type Character_Iterator is tagged limited private;
 
@@ -178,4 +178,4 @@ private
 
    overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
 
-end Magic_Strings;
+end Magic.Strings;

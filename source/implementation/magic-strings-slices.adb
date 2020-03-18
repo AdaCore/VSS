@@ -15,7 +15,7 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
-package body Magic_Strings.Slices is
+package body Magic.Strings.Slices is
 
    --------------
    -- Finalize --
@@ -73,4 +73,4 @@ package body Magic_Strings.Slices is
       return "";
    end To_UTF_8_String;
 
-end Magic_Strings.Slices;
+end Magic.Strings.Slices;

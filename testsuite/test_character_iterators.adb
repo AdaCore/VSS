@@ -14,24 +14,29 @@ procedure Test_Character_Iterators is
    end record;
 
    S : constant Magic.Strings.Magic_String :=
-     Magic.Strings.Conversions.To_Magic_String ("ASCII Кириллица");
+     Magic.Strings.Conversions.To_Magic_String ("ASCII Кириллица 𝛻𝜕 ");
+   --  XXX There is no test for 3x UTF8 code units characters
 
    D : constant array (Magic.Strings.Character_Index range <>) of Position_Data :=
-    ((0, 0),
-     (1, 1),
-     (2, 2),
-     (3, 3),
-     (4, 4),
-     (5, 5),
-     (6, 6),
-     (8, 7),
-     (10, 8),
-     (12, 9),
-     (14, 10),
-     (16, 11),
-     (18, 12),
-     (20, 13),
-     (22, 14));
+    ((0, 0),     --  'A' 1
+     (1, 1),     --  'S' 2
+     (2, 2),     --  'C' 3
+     (3, 3),     --  'I' 4
+     (4, 4),     --  'I' 5
+     (5, 5),     --  ' ' 6
+     (6, 6),     --  'К' 7
+     (8, 7),     --  'и' 8
+     (10, 8),    --  'р' 9
+     (12, 9),    --  'и' 10
+     (14, 10),   --  'л' 11
+     (16, 11),   --  'л' 12
+     (18, 12),   --  'и' 13
+     (20, 13),   --  'ц' 14
+     (22, 14),   --  'а' 15
+     (24, 15),   --  ' ' 16
+     (25, 16),   --  '𝛻' 17
+     (29, 18),   --  '𝜕' 18
+     (33, 20));  --  ' ' 19
 
    J : Magic.Strings.Iterators.Characters.Character_Iterator :=
      S.First_Character;

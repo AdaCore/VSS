@@ -22,6 +22,9 @@ private with Ada.Streams;
 
 limited with Magic.Strings.Texts;
 
+limited with Magic.Strings.Iterators.Characters;
+private with Magic.Unicode;
+
 package Magic.Strings is
 
    pragma Preelaborate;
@@ -44,12 +47,11 @@ package Magic.Strings is
    function To_Magic_Text
      (Self : Magic_String) return Magic.Strings.Texts.Magic_Text;
 
-   type Character_Iterator is tagged limited private;
-
    type Grapheme_Iterator is tagged limited private;
 
    function First_Character
-     (Self : Magic_String'Class) return Character_Iterator;
+     (Self : Magic_String'Class)
+      return Magic.Strings.Iterators.Characters.Character_Iterator;
 
    --  function Last_Character
    --    (Self : Magic_String'Class) return Character_Iterator;
@@ -59,10 +61,20 @@ package Magic.Strings is
    --
    --  function Last_Grapheme
    --    (Self : Magic_String'Class) return Grapheme_Iterator;
-   --
+
 private
 
    type Magic_String_Access is access all Magic_String'Class;
+
+   ------------
+   -- Cursor --
+   ------------
+
+   type Cursor is record
+      Index        : Character_Index                     := 1;
+      UTF8_Offset  : Magic.Unicode.UTF8_Code_Unit_Index  := 0;
+      UTF16_Offset : Magic.Unicode.UTF16_Code_Unit_Index := 0;
+   end record;
 
    ---------------------
    -- Abstract_String --
@@ -89,10 +101,18 @@ private
    function Is_Empty (Self : Abstract_String) return Boolean is abstract;
    --  Return True when string is empty.
 
+--  function Length (Self : Abstract_String) return Character_Count is abstract;
+   --  Return number of abstract characters in the string.
+
    procedure First_Character
      (Self     : Abstract_String;
-      Iterator : in out Character_Iterator'Class) is abstract;
+      Position : in out Cursor) is abstract;
    --  Initialize iterator to point to first character.
+
+   function Forward
+     (Self     : Abstract_String;
+      Position : in out Cursor) return Boolean is abstract;
+   --  Move cursor one character forward. Return True on success.
 
    function To_UTF_8_String
      (Self : Abstract_String)
@@ -157,16 +177,6 @@ private
    Empty_Magic_String : constant Magic_String :=
      (Ada.Finalization.Controlled with
         Data => null, Head => null, Tail => null);
-
-   ------------------------
-   -- Character_Iterator --
-   ------------------------
-
-   type Character_Iterator is limited new Referal_Limited_Base with record
-      Index : Character_Index := 1;
-   end record;
-
-   overriding procedure Invalidate (Self : in out Character_Iterator) is null;
 
    -----------------------
    -- Grapheme_Iterator --

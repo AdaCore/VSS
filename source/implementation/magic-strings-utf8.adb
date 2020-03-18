@@ -48,9 +48,9 @@ package body Magic.Strings.UTF8 is
 
    overriding procedure First_Character
      (Self     : UTF8_Segment;
-      Iterator : in out Character_Iterator'Class) is
+      Position : in out Cursor) is
    begin
-      Iterator.Index := 1;
+      Position := (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
    end First_Character;
 
    ---------------------
@@ -59,10 +59,69 @@ package body Magic.Strings.UTF8 is
 
    overriding procedure First_Character
      (Self     : UTF8_Text;
-      Iterator : in out Character_Iterator'Class) is
+      Position : in out Cursor) is
    begin
-      Iterator.Index := 1;
+      Position := (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
    end First_Character;
+
+   -------------
+   -- Forward --
+   -------------
+
+   overriding function Forward
+     (Self     : UTF8_Segment;
+      Position : in out Cursor) return Boolean
+   is
+      use type Magic.Unicode.UTF8_Code_Unit_Count;
+      use type Magic.Unicode.UTF16_Code_Unit_Count;
+
+   begin
+      if Position.Index < 1 or else Position.Index > Self.Length then
+         return False;
+      end if;
+
+      declare
+         Code : constant Magic.Unicode.UTF8_Code_Unit :=
+           Self.Data (Position.UTF8_Offset);
+
+      begin
+         Position.Index := Position.Index + 1;
+
+         case Code is
+            when 16#00# .. 16#7F# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#C2# .. 16#DF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 2;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#E0# .. 16#EF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 3;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#F0# .. 16#F4# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 4;
+               Position.UTF16_Offset := Position.UTF16_Offset + 2;
+
+            when others =>
+               raise Program_Error with "string data is corrupted";
+         end case;
+
+         return Position.Index <= Self.Length;
+      end;
+   end Forward;
+
+   -------------
+   -- Forward --
+   -------------
+
+   overriding function Forward
+     (Self     : UTF8_Text;
+      Position : in out Cursor) return Boolean is
+   begin
+      return False;
+   end Forward;
 
    -----------------
    -- From_String --
@@ -74,7 +133,7 @@ package body Magic.Strings.UTF8 is
       Success : out Boolean)
    is
       Aux    : UTF8_Segment_Access;
-      Code   : UTF.UTF8_Code_Unit;
+      Code   : Magic.Unicode.UTF8_Code_Unit;
       State  : Verification_State := Initial;
       Length : Character_Count := 0;
 
@@ -86,7 +145,8 @@ package body Magic.Strings.UTF8 is
          return;
       end if;
 
-      Aux := new UTF8_Segment (UTF.UTF8_Code_Unit_Count (Item'Length));
+      Aux :=
+        new UTF8_Segment (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length));
 
       for J in Item'Range loop
          Code := Standard.Character'Pos (Item (J));
@@ -194,11 +254,11 @@ package body Magic.Strings.UTF8 is
                exit;
          end case;
 
-         Aux.Data (UTF.UTF8_Code_Unit_Count (J - Item'First)) := Code;
+         Aux.Data (Magic.Unicode.UTF8_Code_Unit_Count (J - Item'First)) := Code;
       end loop;
 
       if State = Initial then
-         Aux.Data (UTF.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
+         Aux.Data (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
          Aux.Size := Item'Length;
          Aux.Length := Length;
 
@@ -273,7 +333,7 @@ package body Magic.Strings.UTF8 is
          for J in Result'Range loop
             Result (J) :=
               Standard.Character'Val
-                (Self.Data (UTF.UTF8_Code_Unit_Count (J - 1)));
+                (Self.Data (Magic.Unicode.UTF8_Code_Unit_Count (J - 1)));
          end loop;
       end return;
    end To_UTF_8_String;

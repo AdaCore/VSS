@@ -38,8 +38,13 @@ private
 
    overriding procedure First_Character
      (Self     : Slice_Shared_String;
-      Iterator : in out Character_Iterator'Class);
+      Position : in out Cursor);
    --  Initialize iterator to point to first character of the string
+
+   overriding function Forward
+     (Self     : Slice_Shared_String;
+      Position : in out Cursor) return Boolean;
+   --  Move cursor one character forward. Return True on success.
 
    overriding function Is_Empty (Self : Slice_Shared_String) return Boolean;
    --  Return True when string is empty.

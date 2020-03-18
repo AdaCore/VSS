@@ -35,10 +35,21 @@ package body Magic.Strings.Slices is
 
    overriding procedure First_Character
      (Self     : Slice_Shared_String;
-      Iterator : in out Character_Iterator'Class) is
+      Position : in out Cursor) is
    begin
       null;
    end First_Character;
+
+   -------------
+   -- Forward --
+   -------------
+
+   overriding function Forward
+     (Self     : Slice_Shared_String;
+      Position : in out Cursor) return Boolean is
+   begin
+      return False;
+   end Forward;
 
    --------------
    -- Is_Empty --

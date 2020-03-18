@@ -15,6 +15,7 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
+with Magic.Strings.Iterators.Characters.Internals;
 with Magic.Strings.Texts;
 
 package body Magic.Strings is
@@ -125,15 +126,11 @@ package body Magic.Strings is
    ---------------------
 
    function First_Character
-     (Self : Magic_String'Class) return Character_Iterator is
+     (Self : Magic_String'Class)
+      return Magic.Strings.Iterators.Characters.Character_Iterator is
    begin
-      return Result : Character_Iterator do
-         Result.Connect (Self'Unrestricted_Access);
-
-         if Self.Data /= null then
-            Self.Data.First_Character (Result);
-         end if;
-      end return;
+      return
+        Magic.Strings.Iterators.Characters.Internals.First_Character (Self);
    end First_Character;
 
    --------------

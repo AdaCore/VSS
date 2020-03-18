@@ -19,22 +19,22 @@
 with Ada.Strings.UTF_Encoding;
 
 with Magic.Strings.Reference_Counted;
-with Magic.Strings.UTF;
 
 private package Magic.Strings.UTF8 is
 
    pragma Preelaborate;
 
    type UTF8_Code_Unit_Array is
-     array (UTF.UTF8_Code_Unit_Count range <>) of UTF.UTF8_Code_Unit;
+     array (Magic.Unicode.UTF8_Code_Unit_Count range <>)
+     of Magic.Unicode.UTF8_Code_Unit;
 
-   type UTF8_Segment (Capacity : UTF.UTF8_Code_Unit_Count) is
+   type UTF8_Segment (Capacity : Magic.Unicode.UTF8_Code_Unit_Count) is
      new Magic.Strings.Reference_Counted.Abstract_Shared_String with record
       Data   : UTF8_Code_Unit_Array (0 .. Capacity);
       --  Buffer to store string's data. First unused code unit is set to
       --  zero, to allow to pass data to C.
 
-      Size   : UTF.UTF8_Code_Unit_Count;
+      Size   : Magic.Unicode.UTF8_Code_Unit_Count;
       --  Number of code units in the buffer.
 
       Length : Character_Count;
@@ -54,8 +54,13 @@ private package Magic.Strings.UTF8 is
 
    overriding procedure First_Character
      (Self     : UTF8_Segment;
-      Iterator : in out Character_Iterator'Class);
+      Position : in out Cursor);
    --  Initialize iterator to point to first character of the string
+
+   overriding function Forward
+     (Self     : UTF8_Segment;
+      Position : in out Cursor) return Boolean;
+   --  Move cursor one character forward. Return True on success.
 
    overriding function To_Text (Self : in out UTF8_Segment) return String_Access;
    --  Returns text view of the segment.
@@ -71,8 +76,13 @@ private package Magic.Strings.UTF8 is
 
    overriding procedure First_Character
      (Self     : UTF8_Text;
-      Iterator : in out Character_Iterator'Class);
+      Position : in out Cursor);
    --  Initialize iterator to point to first character of the string
+
+   overriding function Forward
+     (Self     : UTF8_Text;
+      Position : in out Cursor) return Boolean;
+   --  Move cursor one character forward. Return True on success.
 
    overriding function To_Text (Self : in out UTF8_Text) return String_Access;
    --  Returns itself.

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -36,7 +36,7 @@ package body Magic_Strings.Conversions is
          raise Constraint_Error with "Ill-formed UTF-8 data";
       end if;
 
-      return (Ada.Finalization.Controlled with Data => Segment);
+      return (Ada.Finalization.Controlled with Data => Segment, others => <>);
    end To_Magic_String;
 
    ---------------------

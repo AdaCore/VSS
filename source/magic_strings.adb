@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -36,15 +36,87 @@ package body Magic_Strings is
       end if;
    end Adjust;
 
+   -------------
+   -- Connect --
+   -------------
+
+   procedure Connect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : not null Magic_String_Access) is
+   begin
+      if Owner.Head = null then
+         Owner.Head := Self'Unchecked_Access;
+         Owner.Tail := Self'Unchecked_Access;
+
+      else
+         Owner.Tail.Next := Self'Unchecked_Access;
+         Self.Previous := Owner.Tail;
+         Owner.Tail := Self'Unchecked_Access;
+      end if;
+
+      Self.Owner := Owner;
+   end Connect;
+
+   ----------------
+   -- Disconnect --
+   ----------------
+
+   procedure Disconnect
+     (Self : in out Referal_Limited_Base'Class) is
+   begin
+      if Self.Owner /= null then
+         if Self.Owner.Head = Self'Unchecked_Access then
+            Self.Owner.Head := Self.Owner.Head.Next;
+         end if;
+
+         if Self.Owner.Tail = Self'Unchecked_Access then
+            Self.Owner.Tail := Self.Owner.Tail.Previous;
+         end if;
+
+         if Self.Previous /= null then
+            Self.Previous.Next := Self.Next;
+         end if;
+
+         if Self.Next /= null then
+            Self.Next.Previous := Self.Previous;
+         end if;
+
+         Self.Owner    := null;
+         Self.Previous := null;
+         Self.Next     := null;
+      end if;
+   end Disconnect;
+
    --------------
    -- Finalize --
    --------------
 
    overriding procedure Finalize (Self : in out Magic_String) is
    begin
+      --  Invalidate and disconnect all referals
+
+      while Self.Head /= null loop
+         Self.Head.Invalidate;
+         Self.Head.Disconnect;
+      end loop;
+
+      --  Unreference shared data
+
       if Self.Data /= null then
          Self.Data.Unreference;
          Self.Data := null;
+      end if;
+   end Finalize;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding procedure Finalize (Self : in out Referal_Limited_Base) is
+   begin
+      if Self.Owner /= null then
+         Referal_Limited_Base'Class (Self).Invalidate;
+         Self.Disconnect;
       end if;
    end Finalize;
 
@@ -78,7 +150,9 @@ package body Magic_Strings is
       return (Ada.Finalization.Controlled with
                 Data => (if Self.Data = null
                          then null
-                         else Self.Data.To_Text));
+                         else Self.Data.To_Text),
+                Head => null,
+                Tail => null);
    end To_Magic_Text;
 
    -----------

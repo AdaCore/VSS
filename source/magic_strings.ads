@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -44,7 +44,13 @@ package Magic_Strings is
    function To_Magic_Text
      (Self : Magic_String) return Magic_Strings.Texts.Magic_Text;
 
+   type Character_Iterator is tagged limited private;
+
+   type Grapheme_Iterator is tagged limited private;
+
 private
+
+   type Magic_String_Access is access all Magic_String'Class;
 
    ---------------------
    -- Abstract_String --
@@ -81,6 +87,34 @@ private
    --  Returns view that supports text operations. Returned value must be
    --  unreferenced after use.
 
+   --------------------------
+   -- Referal_Limited_Base --
+   --------------------------
+
+   type Referal_Limited_Base is tagged;
+
+   type Referal_Limited_Access is access all Referal_Limited_Base'Class;
+
+   type Referal_Limited_Base is
+     abstract new Ada.Finalization.Limited_Controlled with record
+      Owner    : Magic_String_Access;
+      Next     : Referal_Limited_Access;
+      Previous : Referal_Limited_Access;
+   end record;
+
+   procedure Connect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : not null Magic_String_Access);
+   --  Connect referal to string object
+
+   procedure Disconnect (Self  : in out Referal_Limited_Base'Class);
+   --  Disconnect referel from string object
+
+   procedure Invalidate (Self : in out Referal_Limited_Base) is abstract;
+
+   overriding procedure Finalize (Self : in out Referal_Limited_Base);
+   --  Invalidate referal state and disconnect from the string object.
+
    ------------------
    -- Magic_String --
    ------------------
@@ -94,6 +128,8 @@ private
 
    type Magic_String is new Ada.Finalization.Controlled with record
       Data : String_Access;
+      Head : Referal_Limited_Access;
+      Tail : Referal_Limited_Access;
    end record
      with Read  => Read,
           Write => Write;
@@ -102,6 +138,27 @@ private
    overriding procedure Finalize (Self : in out Magic_String);
 
    Empty_Magic_String : constant Magic_String :=
-     (Ada.Finalization.Controlled with Data => null);
+     (Ada.Finalization.Controlled with
+        Data => null, Head => null, Tail => null);
+
+   ------------------------
+   -- Character_Iterator --
+   ------------------------
+
+   type Character_Iterator is limited new Referal_Limited_Base with record
+      null;
+   end record;
+
+   overriding procedure Invalidate (Self : in out Character_Iterator) is null;
+
+   -----------------------
+   -- Grapheme_Iterator --
+   -----------------------
+
+   type Grapheme_Iterator is limited new Referal_Limited_Base with record
+      null;
+   end record;
+
+   overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
 
 end Magic_Strings;

@@ -5,6 +5,11 @@ project GNATCOLL_Text_Tests is
    for Languages use ("Ada");
    for Object_Dir use "../.objs/tests";
    for Source_Dirs use ("../testsuite");
-   for Main use ("test_conversions.adb");
+   for Main use ("test_conversions.adb",
+                 "test_character_iterators.adb");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g", "-O2");
+   end Compiler;
 
 end GNATCOLL_Text_Tests;

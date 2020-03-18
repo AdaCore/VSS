@@ -5,3 +5,4 @@ all:
 check:
 	gprbuild -p -P gnat/gnatcoll_text_tests.gpr
 	.objs/tests/test_conversions
+	.objs/tests/test_character_iterators

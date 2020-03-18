@@ -42,6 +42,28 @@ package body Magic_Strings.UTF8 is
    --  F1 .. F3 | 80 .. BF | 80 .. BF | 80 .. BF
    --  F4       | 80 .. 8F | 80 .. BF | 80 .. BF
 
+   ---------------------
+   -- First_Character --
+   ---------------------
+
+   overriding procedure First_Character
+     (Self     : UTF8_Segment;
+      Iterator : in out Character_Iterator'Class) is
+   begin
+      Iterator.Index := 1;
+   end First_Character;
+
+   ---------------------
+   -- First_Character --
+   ---------------------
+
+   overriding procedure First_Character
+     (Self     : UTF8_Text;
+      Iterator : in out Character_Iterator'Class) is
+   begin
+      Iterator.Index := 1;
+   end First_Character;
+
    -----------------
    -- From_String --
    -----------------

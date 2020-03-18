@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -28,6 +28,17 @@ package body Magic_Strings.Slices is
          Self.Data := null;
       end if;
    end Finalize;
+
+   ---------------------
+   -- First_Character --
+   ---------------------
+
+   overriding procedure First_Character
+     (Self     : Slice_Shared_String;
+      Iterator : in out Character_Iterator'Class) is
+   begin
+      null;
+   end First_Character;
 
    --------------
    -- Is_Empty --

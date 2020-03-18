@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -35,6 +35,11 @@ private
    overriding procedure Finalize (Self : in out Slice_Shared_String);
    --  Finalization of the shared slice segment, base buffer should be
    --  unreferenced.
+
+   overriding procedure First_Character
+     (Self     : Slice_Shared_String;
+      Iterator : in out Character_Iterator'Class);
+   --  Initialize iterator to point to first character of the string
 
    overriding function Is_Empty (Self : Slice_Shared_String) return Boolean;
    --  Return True when string is empty.

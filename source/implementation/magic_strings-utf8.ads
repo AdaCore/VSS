@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                         Language Server Protocol                         --
 --                                                                          --
---                       Copyright (C) 2019, AdaCore                        --
+--                     Copyright (C) 2019-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -52,6 +52,11 @@ private package Magic_Strings.UTF8 is
    overriding function Is_Empty (Self : UTF8_Segment) return Boolean;
    --  Return True when string is empty.
 
+   overriding procedure First_Character
+     (Self     : UTF8_Segment;
+      Iterator : in out Character_Iterator'Class);
+   --  Initialize iterator to point to first character of the string
+
    overriding function To_Text (Self : in out UTF8_Segment) return String_Access;
    --  Returns text view of the segment.
 
@@ -63,6 +68,11 @@ private package Magic_Strings.UTF8 is
 
    overriding function Is_Empty (Self : UTF8_Text) return Boolean;
    --  Return True when string is empty.
+
+   overriding procedure First_Character
+     (Self     : UTF8_Text;
+      Iterator : in out Character_Iterator'Class);
+   --  Initialize iterator to point to first character of the string
 
    overriding function To_Text (Self : in out UTF8_Text) return String_Access;
    --  Returns itself.

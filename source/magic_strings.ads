@@ -48,6 +48,18 @@ package Magic_Strings is
 
    type Grapheme_Iterator is tagged limited private;
 
+   function First_Character
+     (Self : Magic_String'Class) return Character_Iterator;
+
+   --  function Last_Character
+   --    (Self : Magic_String'Class) return Character_Iterator;
+   --
+   --  function First_Grapheme
+   --    (Self : Magic_String'Class) return Grapheme_Iterator;
+   --
+   --  function Last_Grapheme
+   --    (Self : Magic_String'Class) return Grapheme_Iterator;
+   --
 private
 
    type Magic_String_Access is access all Magic_String'Class;
@@ -76,6 +88,11 @@ private
 
    function Is_Empty (Self : Abstract_String) return Boolean is abstract;
    --  Return True when string is empty.
+
+   procedure First_Character
+     (Self     : Abstract_String;
+      Iterator : in out Character_Iterator'Class) is abstract;
+   --  Initialize iterator to point to first character.
 
    function To_UTF_8_String
      (Self : Abstract_String)
@@ -146,7 +163,7 @@ private
    ------------------------
 
    type Character_Iterator is limited new Referal_Limited_Base with record
-      null;
+      Index : Character_Index := 1;
    end record;
 
    overriding procedure Invalidate (Self : in out Character_Iterator) is null;

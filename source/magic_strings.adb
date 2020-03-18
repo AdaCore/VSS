@@ -120,6 +120,22 @@ package body Magic_Strings is
       end if;
    end Finalize;
 
+   ---------------------
+   -- First_Character --
+   ---------------------
+
+   function First_Character
+     (Self : Magic_String'Class) return Character_Iterator is
+   begin
+      return Result : Character_Iterator do
+         Result.Connect (Self'Unrestricted_Access);
+
+         if Self.Data /= null then
+            Self.Data.First_Character (Result);
+         end if;
+      end return;
+   end First_Character;
+
    --------------
    -- Is_Empty --
    --------------

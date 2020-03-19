@@ -108,6 +108,19 @@ package body Magic.Strings.UTF8 is
                raise Program_Error with "string data is corrupted";
          end case;
 
+         --  XXX case statement above may be rewritten as below to avoid
+         --  use of branch instructions.
+         --
+         --  Position.UTF8_Offset  :=
+         --    Position.UTF8_Offset + 1
+         --      + (if (Code and 2#1000_0000#) = 2#1000_0000# then 1 else 0)
+         --      + (if (Code and 2#1110_0000#) = 2#1110_0000# then 1 else 0)
+         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
+         --
+         --  Position.UTF16_Offset :=
+         --    Position.UTF16_Offset + 1
+         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
+
          return Position.Index <= Self.Length;
       end;
    end Forward;

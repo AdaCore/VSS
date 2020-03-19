@@ -1,7 +1,15 @@
-FROM ubuntu:18.04
-
-RUN apt-get -qq update
-RUN apt-get install -y make gnat gprbuild
+FROM registry.fedoraproject.org/fedora-minimal:32
+RUN microdnf install \
+  make \
+  rpmdevtools \
+  gcc-gnat \
+  gprbuild \
+  git \
+  openssh-server \
+  tar \
+  gzip \
+  ca-certificates && \
+ microdnf clean all
 
 RUN mkdir -p /src/
 WORKDIR /src/

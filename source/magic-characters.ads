@@ -14,34 +14,15 @@
 -- COPYING3.  If not, go to http://www.gnu.org/licenses for a complete copy --
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
---  Utilities to handle strings as code units in UTF-family encodings.
---
---  This package is intended to be used by relatively low level code.
---
---  Opposite to general Ada convention to use '1'-based indexing of the
---  characters in the strings, here '0'-based indexing is used as more
---  appropriate for low level applications and interoparability.
+--  Data type to represent individual abstract character
 
-with Interfaces;
-
-package Magic.Unicode is
+package Magic.Characters is
 
    pragma Preelaborate;
-   --  pragma Remote_Types;
+   pragma Remote_Types;
 
-   type Code_Point is
-     new Interfaces.Unsigned_32 range 16#00_0000# .. 16#10_FFFF#;
+   type Magic_Character is new Wide_Wide_Character
+     range Wide_Wide_Character'Val (16#00_0000#)
+       .. Wide_Wide_Character'Val (16#10_FFFF#);
 
-   type UTF8_Code_Unit is mod 2 ** 8;
-   type UTF8_Code_Unit_Count is new Natural;
-   subtype UTF8_Code_Unit_Index is UTF8_Code_Unit_Count;
-
-   type UTF16_Code_Unit is mod 2 ** 16;
-   type UTF16_Code_Unit_Count is new Natural;
-   subtype UTF16_Code_Unit_Index is UTF16_Code_Unit_Count;
-
-   type UTF32_Code_Unit is mod 2 ** 32; -- range 0 .. 16#10_FFFF#;
-   type UTF32_Code_Unit_Count is new Natural;
-   subtype UTF32_Code_Unit_Index is UTF32_Code_Unit_Count;
-
-end Magic.Unicode;
+end Magic.Characters;

@@ -57,6 +57,10 @@ private package Magic.Strings.UTF8 is
       Position : in out Cursor);
    --  Initialize iterator to point to first character of the string
 
+   overriding function Element
+     (Self     : UTF8_Segment;
+      Position : Cursor) return Magic.Unicode.Code_Point;
+
    overriding function Forward
      (Self     : UTF8_Segment;
       Position : in out Cursor) return Boolean;
@@ -73,6 +77,10 @@ private package Magic.Strings.UTF8 is
 
    overriding function Is_Empty (Self : UTF8_Text) return Boolean;
    --  Return True when string is empty.
+
+   overriding function Element
+     (Self     : UTF8_Text;
+      Position : Cursor) return Magic.Unicode.Code_Point;
 
    overriding procedure First_Character
      (Self     : UTF8_Text;

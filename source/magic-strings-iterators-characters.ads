@@ -21,6 +21,10 @@ package Magic.Strings.Iterators.Characters is
 
    type Character_Iterator is new Abstract_Iterator with private;
 
+   function Element
+     (Self : Character_Iterator'Class) return Magic.Characters.Magic_Character;
+   --  Return character pointed by iterator.
+
 private
 
    type Character_Iterator is new Abstract_Iterator with null record;

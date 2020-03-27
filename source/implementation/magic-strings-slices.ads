@@ -41,6 +41,10 @@ private
       Position : in out Cursor);
    --  Initialize iterator to point to first character of the string
 
+   overriding function Element
+     (Self     : Slice_Shared_String;
+      Position : Cursor) return Magic.Unicode.Code_Point;
+
    overriding function Forward
      (Self     : Slice_Shared_String;
       Position : in out Cursor) return Boolean;

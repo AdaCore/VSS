@@ -18,6 +18,24 @@
 package body Magic.Strings.Iterators.Characters is
 
    -------------
+   -- Element --
+   -------------
+
+   function Element
+     (Self : Character_Iterator'Class) return Magic.Characters.Magic_Character
+   is
+   begin
+      if Self.Owner /= null and then Self.Owner.Data /= null then
+         return
+           Magic.Characters.Magic_Character'Val
+             (Self.Owner.Data.Element (Self.Position));
+
+      else
+         return Magic.Characters.Magic_Character'Val (16#00_0000#);
+      end if;
+   end Element;
+
+   -------------
    -- Forward --
    -------------
 

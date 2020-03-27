@@ -20,9 +20,9 @@ private with Ada.Finalization;
 private with Ada.Strings.UTF_Encoding;
 private with Ada.Streams;
 
-limited with Magic.Strings.Texts;
-
+with Magic.Characters;
 limited with Magic.Strings.Iterators.Characters;
+limited with Magic.Strings.Texts;
 private with Magic.Unicode;
 
 package Magic.Strings is
@@ -113,6 +113,12 @@ private
      (Self     : Abstract_String;
       Position : in out Cursor) return Boolean is abstract;
    --  Move cursor one character forward. Return True on success.
+
+   function Element
+     (Self     : Abstract_String;
+      Position : Cursor) return Magic.Unicode.Code_Point is abstract;
+   --  Return character at given position or NUL is position is not pointing
+   --  to any character.
 
    function To_UTF_8_String
      (Self : Abstract_String)

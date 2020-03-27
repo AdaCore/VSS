@@ -18,6 +18,8 @@
 
 package body Magic.Strings.UTF8 is
 
+   use type Magic.Unicode.UTF8_Code_Unit_Count;
+
    type UTF8_Segment_Access is access all UTF8_Segment;
 
    type Verification_State is
@@ -41,6 +43,91 @@ package body Magic.Strings.UTF8 is
    --  F0       | 90 .. BF | 80 .. BF | 80 .. BF
    --  F1 .. F3 | 80 .. BF | 80 .. BF | 80 .. BF
    --  F4       | 80 .. 8F | 80 .. BF | 80 .. BF
+
+   -------------
+   -- Element --
+   -------------
+
+   overriding function Element
+     (Self     : UTF8_Segment;
+      Position : Cursor) return Magic.Unicode.Code_Point
+   is
+      use type Magic.Unicode.Code_Point;
+      use type Magic.Unicode.UTF8_Code_Unit;
+
+      U1 : Magic.Unicode.Code_Point;
+      U2 : Magic.Unicode.Code_Point;
+      U3 : Magic.Unicode.Code_Point;
+      U4 : Magic.Unicode.Code_Point;
+
+   begin
+      if Position.Index < 1 or else Position.Index > Self.Length then
+         return 16#00_0000#;
+      end if;
+
+      U1 := Magic.Unicode.Code_Point (Self.Data (Position.UTF8_Offset));
+
+      case U1 is
+         when 16#00# .. 16#7F# =>
+            --  1x code units sequence
+
+            return U1;
+
+         when 16#C2# .. 16#DF# =>
+            --  2x code units sequence
+
+            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
+            U2 :=
+              Magic.Unicode.Code_Point
+                (Self.Data (Position.UTF8_Offset + 1) and 2#0011_1111#);
+
+            return U1 or U2;
+
+         when 16#E0# .. 16#EF# =>
+            --  3x code units sequence
+
+            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
+            U2 := Magic.Unicode.Code_Point
+              (Self.Data (Position.UTF8_Offset + 1) and 2#0011_1111#)
+                * 2#0100_0000#;
+            U3 :=
+              Magic.Unicode.Code_Point
+                (Self.Data (Position.UTF8_Offset + 2) and 2#0011_1111#);
+
+            return U1 or U2 or U3;
+
+         when 16#F0# .. 16#F4# =>
+            --  4x code units sequence
+
+            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
+            U2 := Magic.Unicode.Code_Point
+              (Self.Data (Position.UTF8_Offset + 1) and 2#0011_1111#)
+                * 2#010_000_0000_0000#;
+            U3 :=
+              Magic.Unicode.Code_Point
+                (Self.Data (Position.UTF8_Offset + 2) and 2#0011_1111#)
+                * 2#0100_0000#;
+            U4 :=
+              Magic.Unicode.Code_Point
+                (Self.Data (Position.UTF8_Offset + 3) and 2#0011_1111#);
+
+            return U1 or U2 or U3 or U4;
+
+         when others =>
+            raise Program_Error;
+      end case;
+   end Element;
+
+   -------------
+   -- Element --
+   -------------
+
+   overriding function Element
+     (Self     : UTF8_Text;
+      Position : Cursor) return Magic.Unicode.Code_Point is
+   begin
+      return 0;
+   end Element;
 
    ---------------------
    -- First_Character --
@@ -72,7 +159,6 @@ package body Magic.Strings.UTF8 is
      (Self     : UTF8_Segment;
       Position : in out Cursor) return Boolean
    is
-      use type Magic.Unicode.UTF8_Code_Unit_Count;
       use type Magic.Unicode.UTF16_Code_Unit_Count;
 
    begin

@@ -17,6 +17,17 @@
 
 package body Magic.Strings.Slices is
 
+   -------------
+   -- Element --
+   -------------
+
+   overriding function Element
+     (Self     : Slice_Shared_String;
+      Position : Cursor) return Magic.Unicode.Code_Point is
+   begin
+      return 0;
+   end Element;
+
    --------------
    -- Finalize --
    --------------

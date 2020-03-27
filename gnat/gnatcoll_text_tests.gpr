@@ -9,7 +9,8 @@ project GNATCOLL_Text_Tests is
                  "test_character_iterators.adb");
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-O2");
+      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
+      for Switches ("test_conversions.adb") use ("-g", "-O2");
    end Compiler;
 
 end GNATCOLL_Text_Tests;

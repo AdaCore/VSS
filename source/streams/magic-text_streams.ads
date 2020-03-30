@@ -17,7 +17,7 @@
 
 with Magic.Characters;
 
-package Magic.Streams is
+package Magic.Text_Streams is
 
    pragma Preelaborate;
 
@@ -39,4 +39,4 @@ package Magic.Streams is
       Item    : Magic.Characters.Magic_Character;
       Success : in out Boolean) is abstract;
 
-end Magic.Streams;
+end Magic.Text_Streams;

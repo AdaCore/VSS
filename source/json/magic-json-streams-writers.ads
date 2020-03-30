@@ -18,8 +18,8 @@
 with Interfaces;
 
 with Magic.JSON.Streams.Content_Handlers;
-with Magic.Streams;
 with Magic.Strings;
+with Magic.Text_Streams;
 
 package Magic.JSON.Streams.Writers is
 
@@ -29,7 +29,7 @@ package Magic.JSON.Streams.Writers is
 
    procedure Set_Stream
      (Self   : in out JSON_Simple_Writer'Class;
-      Stream : not null Magic.Streams.Output_Text_Stream_Access);
+      Stream : not null Magic.Text_Streams.Output_Text_Stream_Access);
    --  Sets output text stream to be used to generate JSON document. Change of
    --  the stream is effective only before call to Start_Document.
 
@@ -38,8 +38,8 @@ private
    type JSON_Simple_Writer is
      limited new Magic.JSON.Streams.Content_Handlers.JSON_Content_Handler
    with record
-      Configured_Stream : Magic.Streams.Output_Text_Stream_Access;
-      Effective_Stream  : Magic.Streams.Output_Text_Stream_Access;
+      Configured_Stream : Magic.Text_Streams.Output_Text_Stream_Access;
+      Effective_Stream  : Magic.Text_Streams.Output_Text_Stream_Access;
       Open_Parenthesis  : Boolean := False;
    end record;
 

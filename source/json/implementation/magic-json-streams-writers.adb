@@ -21,7 +21,7 @@ with Magic.Unicode;
 
 package body Magic.JSON.Streams.Writers is
 
-   use type Magic.Streams.Output_Text_Stream_Access;
+   use type Magic.Text_Streams.Output_Text_Stream_Access;
 
    procedure Check_Effective_Stream
      (Self : in out JSON_Simple_Writer'Class; Success : in out Boolean);
@@ -593,7 +593,7 @@ package body Magic.JSON.Streams.Writers is
 
    procedure Set_Stream
      (Self   : in out JSON_Simple_Writer'Class;
-      Stream : not null Magic.Streams.Output_Text_Stream_Access) is
+      Stream : not null Magic.Text_Streams.Output_Text_Stream_Access) is
    begin
       Self.Configured_Stream := Stream;
    end Set_Stream;

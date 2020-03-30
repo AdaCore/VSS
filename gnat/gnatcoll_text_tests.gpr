@@ -6,7 +6,8 @@ project GNATCOLL_Text_Tests is
    for Object_Dir use "../.objs/tests";
    for Source_Dirs use ("../testsuite");
    for Main use ("test_conversions.adb",
-                 "test_character_iterators.adb");
+                 "test_character_iterators.adb",
+                 "test_json_writer.adb");
 
    package Compiler is
       for Switches ("Ada") use ("-g", "-O2", "-gnatW8");

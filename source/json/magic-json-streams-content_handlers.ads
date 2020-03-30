@@ -14,6 +14,8 @@
 -- COPYING3.  If not, go to http://www.gnu.org/licenses for a complete copy --
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
+--  This package declares interface type to be used as abstract interface to
+--  process JSON streams in callback style API.
 
 with Interfaces;
 
@@ -27,9 +29,14 @@ package Magic.JSON.Streams.Content_Handlers is
 
    procedure Start_Document
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
+   --  Called when processing of JSON document has been started
 
    procedure End_Document
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
+   --  Called when processing of JSON document has need finished with any
+   --  reason (document processed completely, document is invalid, processing
+   --  is terminated by application). No other subprograms will be called
+   --  before new call of Start_Document.
 
    procedure Start_Array
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
@@ -43,7 +50,7 @@ package Magic.JSON.Streams.Content_Handlers is
    procedure End_Object
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
 
-   procedure Key
+   procedure Key_Name
      (Self    : in out JSON_Content_Handler;
       Name    : Magic.Strings.Magic_String'Class;
       Success : in out Boolean) is null;

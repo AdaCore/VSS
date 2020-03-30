@@ -15,77 +15,78 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
---  with Interfaces;
+with Interfaces;
 
 with Magic.JSON.Streams.Content_Handlers;
 with Magic.Streams;
---  with Magic.Strings;
+with Magic.Strings;
 
 package Magic.JSON.Streams.Writers is
 
-   type JSON_Writer is
+   type JSON_Simple_Writer is
      limited new Magic.JSON.Streams.Content_Handlers.JSON_Content_Handler
        with private;
 
    procedure Set_Stream
-     (Self   : in out JSON_Writer'Class;
+     (Self   : in out JSON_Simple_Writer'Class;
       Stream : not null Magic.Streams.Output_Text_Stream_Access);
    --  Sets output text stream to be used to generate JSON document. Change of
    --  the stream is effective only before call to Start_Document.
 
 private
 
-   type JSON_Writer is
+   type JSON_Simple_Writer is
      limited new Magic.JSON.Streams.Content_Handlers.JSON_Content_Handler
    with record
       Configured_Stream : Magic.Streams.Output_Text_Stream_Access;
       Effective_Stream  : Magic.Streams.Output_Text_Stream_Access;
+      Open_Parenthesis  : Boolean := False;
    end record;
 
    overriding procedure Start_Document
-     (Self : in out JSON_Writer; Success : in out Boolean);
+     (Self : in out JSON_Simple_Writer; Success : in out Boolean);
 
    overriding procedure End_Document
-     (Self : in out JSON_Writer; Success : in out Boolean);
+     (Self : in out JSON_Simple_Writer; Success : in out Boolean);
 
-   --  procedure Start_Array
-   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
-   --
-   --  procedure End_Array
-   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
-   --
-   --  procedure Start_Object
-   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
-   --
-   --  procedure End_Object
-   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
-   --
-   --  procedure Key
-   --    (Self    : in out JSON_Content_Handler;
-   --     Name    : Magic.Strings.Magic_String'Class;
-   --     Success : in out Boolean);
-   --
-   --  procedure String_Value
-   --    (Self    : in out JSON_Content_Handler;
-   --     Value   : Magic.Strings.Magic_String'Class;
-   --     Success : in out Boolean);
-   --
-   --  procedure Integer_Value
-   --    (Self    : in out JSON_Content_Handler;
-   --     Value   : Interfaces.Integer_64;
-   --     Success : in out Boolean);
-   --
-   --  procedure Float_Value
-   --    (Self    : in out JSON_Content_Handler;
-   --     Value   : Interfaces.IEEE_Float_64;
-   --     Success : in out Boolean);
-   --
-   --  procedure Boolean_Value
-   --    (Self    : in out JSON_Content_Handler;
-   --     Value   : Boolean;
-   --     Success : in out Boolean);
-   --
-   --  procedure Null_Value
-   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
+   overriding procedure Start_Array
+     (Self : in out JSON_Simple_Writer; Success : in out Boolean);
+
+   overriding procedure End_Array
+     (Self : in out JSON_Simple_Writer; Success : in out Boolean);
+
+   overriding procedure Start_Object
+     (Self : in out JSON_Simple_Writer; Success : in out Boolean);
+
+   overriding procedure End_Object
+     (Self : in out JSON_Simple_Writer; Success : in out Boolean);
+
+   overriding procedure Key_Name
+     (Self    : in out JSON_Simple_Writer;
+      Name    : Magic.Strings.Magic_String'Class;
+      Success : in out Boolean);
+
+   overriding procedure String_Value
+     (Self    : in out JSON_Simple_Writer;
+      Value   : Magic.Strings.Magic_String'Class;
+      Success : in out Boolean);
+
+   overriding procedure Integer_Value
+     (Self    : in out JSON_Simple_Writer;
+      Value   : Interfaces.Integer_64;
+      Success : in out Boolean);
+
+   overriding procedure Float_Value
+     (Self    : in out JSON_Simple_Writer;
+      Value   : Interfaces.IEEE_Float_64;
+      Success : in out Boolean);
+
+   overriding procedure Boolean_Value
+     (Self    : in out JSON_Simple_Writer;
+      Value   : Boolean;
+      Success : in out Boolean);
+
+   overriding procedure Null_Value
+     (Self : in out JSON_Simple_Writer; Success : in out Boolean);
 
 end Magic.JSON.Streams.Writers;

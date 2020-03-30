@@ -1,0 +1,91 @@
+------------------------------------------------------------------------------
+--                         Language Server Protocol                         --
+--                                                                          --
+--                       Copyright (C) 2020, AdaCore                        --
+--                                                                          --
+-- This is free software;  you can redistribute it  and/or modify it  under --
+-- terms of the  GNU General Public License as published  by the Free Soft- --
+-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+-- sion.  This software is distributed in the hope  that it will be useful, --
+-- but WITHOUT ANY WARRANTY;  without even the implied warranty of MERCHAN- --
+-- TABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public --
+-- License for  more details.  You should have  received  a copy of the GNU --
+-- General  Public  License  distributed  with  this  software;   see  file --
+-- COPYING3.  If not, go to http://www.gnu.org/licenses for a complete copy --
+-- of the license.                                                          --
+------------------------------------------------------------------------------
+
+--  with Interfaces;
+
+with Magic.JSON.Streams.Content_Handlers;
+with Magic.Streams;
+--  with Magic.Strings;
+
+package Magic.JSON.Streams.Writers is
+
+   type JSON_Writer is
+     limited new Magic.JSON.Streams.Content_Handlers.JSON_Content_Handler
+       with private;
+
+   procedure Set_Stream
+     (Self   : in out JSON_Writer'Class;
+      Stream : not null Magic.Streams.Output_Text_Stream_Access);
+   --  Sets output text stream to be used to generate JSON document. Change of
+   --  the stream is effective only before call to Start_Document.
+
+private
+
+   type JSON_Writer is
+     limited new Magic.JSON.Streams.Content_Handlers.JSON_Content_Handler
+   with record
+      Configured_Stream : Magic.Streams.Output_Text_Stream_Access;
+      Effective_Stream  : Magic.Streams.Output_Text_Stream_Access;
+   end record;
+
+   overriding procedure Start_Document
+     (Self : in out JSON_Writer; Success : in out Boolean);
+
+   overriding procedure End_Document
+     (Self : in out JSON_Writer; Success : in out Boolean);
+
+   --  procedure Start_Array
+   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
+   --
+   --  procedure End_Array
+   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
+   --
+   --  procedure Start_Object
+   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
+   --
+   --  procedure End_Object
+   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
+   --
+   --  procedure Key
+   --    (Self    : in out JSON_Content_Handler;
+   --     Name    : Magic.Strings.Magic_String'Class;
+   --     Success : in out Boolean);
+   --
+   --  procedure String_Value
+   --    (Self    : in out JSON_Content_Handler;
+   --     Value   : Magic.Strings.Magic_String'Class;
+   --     Success : in out Boolean);
+   --
+   --  procedure Integer_Value
+   --    (Self    : in out JSON_Content_Handler;
+   --     Value   : Interfaces.Integer_64;
+   --     Success : in out Boolean);
+   --
+   --  procedure Float_Value
+   --    (Self    : in out JSON_Content_Handler;
+   --     Value   : Interfaces.IEEE_Float_64;
+   --     Success : in out Boolean);
+   --
+   --  procedure Boolean_Value
+   --    (Self    : in out JSON_Content_Handler;
+   --     Value   : Boolean;
+   --     Success : in out Boolean);
+   --
+   --  procedure Null_Value
+   --    (Self : in out JSON_Content_Handler; Success : in out Boolean);
+
+end Magic.JSON.Streams.Writers;

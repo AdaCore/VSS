@@ -3,7 +3,12 @@ project GNATCOLL_Text is
 
    for Languages use ("Ada");
    for Object_Dir use "../.objs";
-   for Source_Dirs use ("../source/text", "../source/text/implementation");
+   for Source_Dirs use
+     ("../source/json",
+      "../source/json/implementation",
+      "../source/streams",
+      "../source/text",
+      "../source/text/implementation");
 
    package Compiler is
       for Switches ("Ada") use ("-g", "-O2");

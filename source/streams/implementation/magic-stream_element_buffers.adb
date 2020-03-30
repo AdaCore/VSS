@@ -61,6 +61,7 @@ package body Magic.Stream_Element_Buffers is
              (Ada.Streams.Stream_Element_Offset'Max
                 (Source.Size * 2, Self.Capacity));
          Self.Data.Length := Source.Length;
+         Self.Data.Storage (Source.Storage'Range) := Source.Storage;
       end if;
 
       Self.Data.Length := Self.Data.Length + 1;

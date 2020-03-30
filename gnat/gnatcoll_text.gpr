@@ -7,6 +7,7 @@ project GNATCOLL_Text is
      ("../source/json",
       "../source/json/implementation",
       "../source/streams",
+      "../source/streams/implementation",
       "../source/text",
       "../source/text/implementation");
 

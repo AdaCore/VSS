@@ -47,13 +47,14 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
-      if Self.Open_Parenthesis then
+      if not Self.Open_Parenthesis then
          Self.Effective_Stream.Put (',', Success);
 
          if not Success then
             return;
          end if;
 
+      else
          Self.Open_Parenthesis := False;
       end if;
 
@@ -319,7 +320,7 @@ package body Magic.JSON.Streams.Writers is
                      end if;
 
                   when Magic.Characters.Magic_Character'Val (16#00_000A#) =>
-                     --  Escape form feed
+                     --  Escape line feed
 
                      Self.Effective_Stream.Put ('\', Success);
 
@@ -327,7 +328,7 @@ package body Magic.JSON.Streams.Writers is
                         return;
                      end if;
 
-                     Self.Effective_Stream.Put ('l', Success);
+                     Self.Effective_Stream.Put ('n', Success);
 
                      if not Success then
                         return;
@@ -432,13 +433,14 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
-      if Self.Open_Parenthesis then
+      if not Self.Open_Parenthesis then
          Self.Effective_Stream.Put (',', Success);
 
          if not Success then
             return;
          end if;
 
+      else
          Self.Open_Parenthesis := False;
       end if;
 
@@ -473,13 +475,14 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
-      if Self.Open_Parenthesis then
+      if not Self.Open_Parenthesis then
          Self.Effective_Stream.Put (',', Success);
 
          if not Success then
             return;
          end if;
 
+      else
          Self.Open_Parenthesis := False;
       end if;
 
@@ -510,14 +513,12 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
-      if Self.Open_Parenthesis then
+      if not Self.Open_Parenthesis then
          Self.Effective_Stream.Put (',', Success);
 
          if not Success then
             return;
          end if;
-
-         Self.Open_Parenthesis := False;
       end if;
 
       if Name.Is_Empty then
@@ -537,6 +538,8 @@ package body Magic.JSON.Streams.Writers is
       if not Success then
          return;
       end if;
+
+      Self.Open_Parenthesis := True;
    end Key_Name;
 
    ----------------
@@ -552,13 +555,14 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
-      if Self.Open_Parenthesis then
+      if not Self.Open_Parenthesis then
          Self.Effective_Stream.Put (',', Success);
 
          if not Success then
             return;
          end if;
 
+      else
          Self.Open_Parenthesis := False;
       end if;
 
@@ -611,6 +615,14 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
+      if not Self.Open_Parenthesis then
+         Self.Effective_Stream.Put (',', Success);
+
+         if not Success then
+            return;
+         end if;
+      end if;
+
       Self.Effective_Stream.Put ('[', Success);
 
       if not Success then
@@ -630,7 +642,7 @@ package body Magic.JSON.Streams.Writers is
       if Self.Effective_Stream /= null then
          Success := False;
 
-      elsif Self.Configured_Stream /= null then
+      elsif Self.Configured_Stream = null then
          Success := False;
 
       else
@@ -652,7 +664,7 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
-      if Self.Open_Parenthesis then
+      if not Self.Open_Parenthesis then
          Self.Effective_Stream.Put (',', Success);
 
          if not Success then
@@ -684,13 +696,14 @@ package body Magic.JSON.Streams.Writers is
          return;
       end if;
 
-      if Self.Open_Parenthesis then
+      if not Self.Open_Parenthesis then
          Self.Effective_Stream.Put (',', Success);
 
          if not Success then
             return;
          end if;
 
+      else
          Self.Open_Parenthesis := False;
       end if;
 

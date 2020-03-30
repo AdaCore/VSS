@@ -35,7 +35,7 @@ package Magic.Streams is
    type Output_Text_Stream_Access is access all Output_Text_Stream'Class;
 
    procedure Put
-     (Self    : in out Input_Text_Stream;
+     (Self    : in out Output_Text_Stream;
       Item    : Magic.Characters.Magic_Character;
       Success : in out Boolean) is abstract;
 

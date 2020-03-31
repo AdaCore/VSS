@@ -67,16 +67,6 @@ package Magic.JSON.Streams.Writers is
 
    procedure Null_Value (Self : in out JSON_Simple_Writer'Class);
 
-private
-
-   type JSON_Simple_Writer is
-     limited new Magic.JSON.Streams.Content_Handlers.JSON_Content_Handler
-   with record
-      Configured_Stream : Magic.Text_Streams.Output_Text_Stream_Access;
-      Effective_Stream  : Magic.Text_Streams.Output_Text_Stream_Access;
-      Open_Parenthesis  : Boolean := False;
-   end record;
-
    overriding procedure Start_Document
      (Self : in out JSON_Simple_Writer; Success : in out Boolean);
 
@@ -122,5 +112,15 @@ private
 
    overriding procedure Null_Value
      (Self : in out JSON_Simple_Writer; Success : in out Boolean);
+
+private
+
+   type JSON_Simple_Writer is
+     limited new Magic.JSON.Streams.Content_Handlers.JSON_Content_Handler
+   with record
+      Configured_Stream : Magic.Text_Streams.Output_Text_Stream_Access;
+      Effective_Stream  : Magic.Text_Streams.Output_Text_Stream_Access;
+      Open_Parenthesis  : Boolean := False;
+   end record;
 
 end Magic.JSON.Streams.Writers;

@@ -116,6 +116,24 @@ package body Magic.JSON.Streams.Writers is
       end if;
    end Boolean_Value;
 
+   -------------------
+   -- Boolean_Value --
+   -------------------
+
+   procedure Boolean_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Boolean)
+   is
+      Success : Boolean := True;
+
+   begin
+      Self.Boolean_Value (Value, Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+   end Boolean_Value;
+
    ----------------------------
    -- Check_Effective_Stream --
    ----------------------------
@@ -150,6 +168,21 @@ package body Magic.JSON.Streams.Writers is
       Self.Open_Parenthesis := False;
    end End_Array;
 
+   ---------------
+   -- End_Array --
+   ---------------
+
+   procedure End_Array (Self : in out JSON_Simple_Writer'Class) is
+      Success : Boolean := True;
+
+   begin
+      Self.End_Array (Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+   end End_Array;
+
    ------------------
    -- End_Document --
    ------------------
@@ -164,6 +197,21 @@ package body Magic.JSON.Streams.Writers is
       end if;
 
       Self.Effective_Stream := null;
+   end End_Document;
+
+   ------------------
+   -- End_Document --
+   ------------------
+
+   procedure End_Document (Self : in out JSON_Simple_Writer'Class) is
+      Success : Boolean := True;
+
+   begin
+      Self.End_Document (Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
    end End_Document;
 
    ----------------
@@ -186,6 +234,21 @@ package body Magic.JSON.Streams.Writers is
       end if;
 
       Self.Open_Parenthesis := False;
+   end End_Object;
+
+   ----------------
+   -- End_Object --
+   ----------------
+
+   procedure End_Object (Self : in out JSON_Simple_Writer'Class) is
+      Success : Boolean := True;
+
+   begin
+      Self.End_Object (Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
    end End_Object;
 
    --------------------------
@@ -456,6 +519,24 @@ package body Magic.JSON.Streams.Writers is
       end loop;
    end Float_Value;
 
+   -----------------
+   -- Float_Value --
+   -----------------
+
+   procedure Float_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Interfaces.IEEE_Float_64)
+   is
+      Success : Boolean := True;
+
+   begin
+      Self.Float_Value (Value, Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+   end Float_Value;
+
    -------------------
    -- Integer_Value --
    -------------------
@@ -496,6 +577,24 @@ package body Magic.JSON.Streams.Writers is
             end if;
          end if;
       end loop;
+   end Integer_Value;
+
+   -------------------
+   -- Integer_Value --
+   -------------------
+
+   procedure Integer_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Interfaces.Integer_64)
+   is
+      Success : Boolean := True;
+
+   begin
+      Self.Integer_Value (Value, Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
    end Integer_Value;
 
    --------------
@@ -540,6 +639,24 @@ package body Magic.JSON.Streams.Writers is
       end if;
 
       Self.Open_Parenthesis := True;
+   end Key_Name;
+
+   --------------
+   -- Key_Name --
+   --------------
+
+   procedure Key_Name
+     (Self : in out JSON_Simple_Writer'Class;
+      Name : Magic.Strings.Magic_String'Class)
+   is
+      Success : Boolean := True;
+
+   begin
+      Self.Key_Name (Name, Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
    end Key_Name;
 
    ----------------
@@ -592,6 +709,21 @@ package body Magic.JSON.Streams.Writers is
    end Null_Value;
 
    ----------------
+   -- Null_Value --
+   ----------------
+
+   procedure Null_Value (Self : in out JSON_Simple_Writer'Class) is
+      Success : Boolean := True;
+
+   begin
+      Self.Null_Value (Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+   end Null_Value;
+
+   ----------------
    -- Set_Stream --
    ----------------
 
@@ -632,6 +764,21 @@ package body Magic.JSON.Streams.Writers is
       Self.Open_Parenthesis := True;
    end Start_Array;
 
+   -----------------
+   -- Start_Array --
+   -----------------
+
+   procedure Start_Array (Self : in out JSON_Simple_Writer'Class) is
+      Success : Boolean := True;
+
+   begin
+      Self.Start_Array (Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+   end Start_Array;
+
    --------------------
    -- Start_Document --
    --------------------
@@ -648,6 +795,21 @@ package body Magic.JSON.Streams.Writers is
       else
          Self.Effective_Stream := Self.Configured_Stream;
          Self.Open_Parenthesis := True;
+      end if;
+   end Start_Document;
+
+   --------------------
+   -- Start_Document --
+   --------------------
+
+   procedure Start_Document (Self : in out JSON_Simple_Writer'Class) is
+      Success : Boolean := True;
+
+   begin
+      Self.Start_Document (Success);
+
+      if not Success then
+         raise Program_Error;
       end if;
    end Start_Document;
 
@@ -682,6 +844,21 @@ package body Magic.JSON.Streams.Writers is
    end Start_Object;
 
    ------------------
+   -- Start_Object --
+   ------------------
+
+   procedure Start_Object (Self : in out JSON_Simple_Writer'Class) is
+      Success : Boolean := True;
+
+   begin
+      Self.Start_Object (Success);
+
+      if not Success then
+         raise Program_Error;
+      end if;
+   end Start_Object;
+
+   ------------------
    -- String_Value --
    ------------------
 
@@ -711,6 +888,24 @@ package body Magic.JSON.Streams.Writers is
 
       if not Success then
          return;
+      end if;
+   end String_Value;
+
+   ------------------
+   -- String_Value --
+   ------------------
+
+   procedure String_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Magic.Strings.Magic_String'Class)
+   is
+      Success : Boolean := True;
+
+   begin
+      Self.String_Value (Value, Success);
+
+      if not Success then
+         raise Program_Error;
       end if;
    end String_Value;
 

@@ -33,6 +33,40 @@ package Magic.JSON.Streams.Writers is
    --  Sets output text stream to be used to generate JSON document. Change of
    --  the stream is effective only before call to Start_Document.
 
+   procedure Start_Document (Self : in out JSON_Simple_Writer'Class);
+
+   procedure End_Document (Self : in out JSON_Simple_Writer'Class);
+
+   procedure Start_Array (Self : in out JSON_Simple_Writer'Class);
+
+   procedure End_Array (Self : in out JSON_Simple_Writer'Class);
+
+   procedure Start_Object (Self : in out JSON_Simple_Writer'Class);
+
+   procedure End_Object (Self : in out JSON_Simple_Writer'Class);
+
+   procedure Key_Name
+     (Self : in out JSON_Simple_Writer'Class;
+      Name : Magic.Strings.Magic_String'Class);
+
+   procedure String_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Magic.Strings.Magic_String'Class);
+
+   procedure Integer_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Interfaces.Integer_64);
+
+   procedure Float_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Interfaces.IEEE_Float_64);
+
+   procedure Boolean_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : Boolean);
+
+   procedure Null_Value (Self : in out JSON_Simple_Writer'Class);
+
 private
 
    type JSON_Simple_Writer is

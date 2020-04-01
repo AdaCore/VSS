@@ -19,4 +19,7 @@ package Magic is
 
    pragma Pure;
 
+   Magic_Error : exception;
+   --  Raised in case of any unhandled error
+
 end Magic;

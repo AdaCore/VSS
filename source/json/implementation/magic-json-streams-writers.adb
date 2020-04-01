@@ -15,6 +15,8 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Assertions;
+
 with Magic.Characters;
 with Magic.Strings.Iterators.Characters;
 with Magic.Unicode;
@@ -130,7 +132,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Boolean_Value (Value, Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Boolean_Value;
 
@@ -179,7 +181,7 @@ package body Magic.JSON.Streams.Writers is
       Self.End_Array (Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end End_Array;
 
@@ -210,7 +212,7 @@ package body Magic.JSON.Streams.Writers is
       Self.End_Document (Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end End_Document;
 
@@ -247,7 +249,7 @@ package body Magic.JSON.Streams.Writers is
       Self.End_Object (Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end End_Object;
 
@@ -325,7 +327,7 @@ package body Magic.JSON.Streams.Writers is
                return Magic.Characters.Magic_Character'Val (16#41# + C - 10);
 
             when others =>
-               raise Magic_Error;
+               raise Ada.Assertions.Assertion_Error;
          end case;
       end Hex_Digit;
 
@@ -533,7 +535,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Float_Value (Value, Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Float_Value;
 
@@ -593,7 +595,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Integer_Value (Value, Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Integer_Value;
 
@@ -655,7 +657,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Key_Name (Name, Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Key_Name;
 
@@ -719,7 +721,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Null_Value (Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Null_Value;
 
@@ -775,7 +777,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Start_Array (Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Start_Array;
 
@@ -809,7 +811,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Start_Document (Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Start_Document;
 
@@ -854,7 +856,7 @@ package body Magic.JSON.Streams.Writers is
       Self.Start_Object (Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end Start_Object;
 
@@ -905,7 +907,7 @@ package body Magic.JSON.Streams.Writers is
       Self.String_Value (Value, Success);
 
       if not Success then
-         raise Magic_Error;
+         raise Ada.Assertions.Assertion_Error;
       end if;
    end String_Value;
 

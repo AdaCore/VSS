@@ -30,6 +30,11 @@ package Magic.Stream_Element_Buffers is
       Capacity : Ada.Streams.Stream_Element_Count);
    --  Request to preallocate memory to store given number of stream elements.
 
+   function Length
+     (Self : Stream_Element_Buffer'Class)
+      return Ada.Streams.Stream_Element_Count;
+   --  Return size of accumulated data.
+
    procedure Append
      (Self : in out Stream_Element_Buffer;
       Item : Ada.Streams.Stream_Element);

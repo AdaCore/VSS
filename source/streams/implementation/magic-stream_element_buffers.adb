@@ -82,6 +82,17 @@ package body Magic.Stream_Element_Buffers is
       end if;
    end Finalize;
 
+   ------------
+   -- Length --
+   ------------
+
+   function Length
+     (Self : Stream_Element_Buffer'Class)
+      return Ada.Streams.Stream_Element_Count is
+   begin
+      return (if Self.Data = null then 0 else Self.Data.Length);
+   end Length;
+
    ----------
    -- Read --
    ----------

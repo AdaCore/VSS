@@ -15,38 +15,42 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
-with Interfaces;
+package body Magic.JSON is
 
-package Magic.JSON is
+   --------------
+   -- As_Float --
+   --------------
 
-   pragma Pure;
-
-   type JSON_Number_Kind is (None, JSON_Integer, JSON_Float);
-   --  Format of the number used to represent value. Note, it is only hint in
-   --  most cases, implementation may use other format for some reason.
-
-   type JSON_Number (Kind : JSON_Number_Kind := None) is record
-      case Kind is
+   function As_Float (Self : JSON_Number) return Interfaces.IEEE_Float_64 is
+   begin
+      case Self.Kind is
          when None =>
-            null;
-
-         when JSON_Integer =>
-            Integer_Value : Interfaces.Integer_64;
+            raise Constraint_Error;
 
          when JSON_Float =>
-            Float_Value   : Interfaces.IEEE_Float_64;
+            return Self.Float_Value;
+
+         when JSON_Integer =>
+            return Interfaces.IEEE_Float_64 (Self.Integer_Value);
       end case;
-   end record;
+   end As_Float;
 
-   function As_Integer (Self : JSON_Number) return Interfaces.Integer_64;
-   --  Return number value as integer number. Non-integer value is rounded to
-   --  integer.
-   --  @exception Constraint_Error is raised when value is out of range or not
-   --  present.
+   ----------------
+   -- As_Integer --
+   ----------------
 
-   function As_Float (Self : JSON_Number) return Interfaces.IEEE_Float_64;
-   --  Return number value as floating point value.
-   --  @exception Constraint_Error is raised when value is out of range or not
-   --  present.
+   function As_Integer (Self : JSON_Number) return Interfaces.Integer_64 is
+   begin
+      case Self.Kind is
+         when None =>
+            raise Constraint_Error;
+
+         when JSON_Float =>
+            return Interfaces.Integer_64 (Self.Float_Value);
+
+         when JSON_Integer =>
+            return Self.Integer_Value;
+      end case;
+   end As_Integer;
 
 end Magic.JSON;

@@ -19,6 +19,8 @@ with Ada.Unchecked_Deallocation;
 
 package body Magic.Stream_Element_Buffers is
 
+   use type Ada.Streams.Stream_Element_Offset;
+
    ------------
    -- Adjust --
    ------------
@@ -46,8 +48,6 @@ package body Magic.Stream_Element_Buffers is
      (Self : in out Stream_Element_Buffer;
       Item : Ada.Streams.Stream_Element)
    is
-      use type Ada.Streams.Stream_Element_Offset;
-
       Source : Data_Access := Self.Data;
 
    begin
@@ -67,6 +67,22 @@ package body Magic.Stream_Element_Buffers is
       Self.Data.Length := Self.Data.Length + 1;
       Self.Data.Storage (Self.Data.Length) := Item;
    end Append;
+
+   -------------
+   -- Element --
+   -------------
+
+   function Element
+     (Self  : Stream_Element_Buffer'Class;
+      Index : Ada.Streams.Stream_Element_Count)
+      return Ada.Streams.Stream_Element is
+   begin
+      if Self.Data = null or else Self.Data.Length < Index then
+         raise Constraint_Error;
+      end if;
+
+      return Self.Data.Storage (Index);
+   end Element;
 
    --------------
    -- Finalize --

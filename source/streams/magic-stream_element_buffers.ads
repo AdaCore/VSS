@@ -35,6 +35,12 @@ package Magic.Stream_Element_Buffers is
       return Ada.Streams.Stream_Element_Count;
    --  Return size of accumulated data.
 
+   function Element
+     (Self  : Stream_Element_Buffer'Class;
+      Index : Ada.Streams.Stream_Element_Count)
+      return Ada.Streams.Stream_Element;
+   --  Return element at given index.
+
    procedure Append
      (Self : in out Stream_Element_Buffer;
       Item : Ada.Streams.Stream_Element);

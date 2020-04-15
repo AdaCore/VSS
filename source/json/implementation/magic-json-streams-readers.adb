@@ -17,6 +17,106 @@
 
 package body Magic.JSON.Streams.Readers is
 
+   ----------------------
+   -- Is_Boolean_Value --
+   ----------------------
+
+   function Is_Boolean_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = Boolean_Value;
+   end Is_Boolean_Value;
+
+   ------------------
+   -- Is_End_Array --
+   ------------------
+
+   function Is_End_Array (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = End_Array;
+   end Is_End_Array;
+
+   ---------------------
+   -- Is_End_Document --
+   ---------------------
+
+   function Is_End_Document (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = End_Document;
+   end Is_End_Document;
+
+   -------------------
+   -- Is_End_Object --
+   -------------------
+
+   function Is_End_Object (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = End_Object;
+   end Is_End_Object;
+
+   -----------------
+   -- Is_Key_Name --
+   -----------------
+
+   function Is_Key_Name (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = Key_Name;
+   end Is_Key_Name;
+
+   -------------------
+   -- Is_Null_Value --
+   -------------------
+
+   function Is_Null_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = Null_Value;
+   end Is_Null_Value;
+
+   ---------------------
+   -- Is_Number_Value --
+   ---------------------
+
+   function Is_Number_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = Number_Value;
+   end Is_Number_Value;
+
+   --------------------
+   -- Is_Start_Array --
+   --------------------
+
+   function Is_Start_Array (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = Start_Array;
+   end Is_Start_Array;
+
+   -----------------------
+   -- Is_Start_Document --
+   -----------------------
+
+   function Is_Start_Document
+     (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = Start_Document;
+   end Is_Start_Document;
+
+   ---------------------
+   -- Is_Start_Object --
+   ---------------------
+
+   function Is_Start_Object (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = Start_Object;
+   end Is_Start_Object;
+
+   ---------------------
+   -- Is_String_Value --
+   ---------------------
+
+   function Is_String_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Token_Type = String_Value;
+   end Is_String_Value;
+
    ---------------
    -- Read_Next --
    ---------------

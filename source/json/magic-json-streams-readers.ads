@@ -70,38 +70,27 @@ package Magic.JSON.Streams.Readers is
    function Token_Type
      (Self : JSON_Stream_Reader) return JSON_Token_Kind is abstract;
 
-   function Is_Start_Document
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_Start_Document (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_End_Document
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_End_Document (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_Start_Array
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_Start_Array (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_End_Array
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_End_Array (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_Start_Object
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_Start_Object (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_End_Object
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_End_Object (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_Key_Name
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_Key_Name (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_String_Value
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_String_Value (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_Number_Value
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_Number_Value (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_Boolean_Value
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_Boolean_Value (Self : JSON_Stream_Reader'Class) return Boolean;
 
-   function Is_Null_Value
-     (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Is_Null_Value (Self : JSON_Stream_Reader'Class) return Boolean;
 
    function String_Value
      (Self : JSON_Stream_Reader) return Magic.Strings.Magic_String is abstract;

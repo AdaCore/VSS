@@ -22,7 +22,7 @@ package Magic.JSON.Streams.Readers is
 
    pragma Preelaborate;
 
-   type JSON_Token_Kind is
+   type JSON_Event_Kind is
      (No_Token,
       Invalid,
       Start_Document,
@@ -48,7 +48,7 @@ package Magic.JSON.Streams.Readers is
    function At_End (Self : JSON_Stream_Reader) return Boolean is abstract;
 
    function Read_Next
-     (Self : in out JSON_Stream_Reader) return JSON_Token_Kind is abstract;
+     (Self : in out JSON_Stream_Reader) return JSON_Event_Kind is abstract;
 
    procedure Read_Next (Self : in out JSON_Stream_Reader'Class);
 
@@ -67,8 +67,8 @@ package Magic.JSON.Streams.Readers is
       Message : Magic.Strings.Magic_String := Magic.Strings.Empty_Magic_String)
    is abstract;
 
-   function Token_Type
-     (Self : JSON_Stream_Reader) return JSON_Token_Kind is abstract;
+   function Event_Type
+     (Self : JSON_Stream_Reader) return JSON_Event_Kind is abstract;
 
    function Is_Start_Document (Self : JSON_Stream_Reader'Class) return Boolean;
 

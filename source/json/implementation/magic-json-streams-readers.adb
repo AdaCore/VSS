@@ -17,6 +17,15 @@
 
 package body Magic.JSON.Streams.Readers is
 
+   ---------------
+   -- Has_Error --
+   ---------------
+
+   function Has_Error (Self : JSON_Stream_Reader'Class) return Boolean is
+   begin
+      return Self.Error /= No_Error;
+   end Has_Error;
+
    ----------------------
    -- Is_Boolean_Value --
    ----------------------

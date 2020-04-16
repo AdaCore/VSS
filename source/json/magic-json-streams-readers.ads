@@ -60,7 +60,7 @@ package Magic.JSON.Streams.Readers is
    function Error_Message
      (Self : JSON_Stream_Reader) return Magic.Strings.Magic_String is abstract;
 
-   function Has_Error (Self : JSON_Stream_Reader) return Boolean is abstract;
+   function Has_Error (Self : JSON_Stream_Reader'Class) return Boolean;
 
    procedure Raise_Error
      (Self    : in out JSON_Stream_Reader;

@@ -40,17 +40,6 @@ package Magic.JSON.Implementation.Parsers is
 
 private
 
-   type Parse_Status is (Continue, Data, Token, Error);
-   --  @enum Continue - continue normal parsing
-   --  @enum Data - unexpected end of data, save parsing state for resume
-   --  @enum Token - token has been parsed, save parsing state for resume
-   --  @enum Error - fatal error has been detected, stop parsing
-
-   --  type Parse_Subprogram is
-   --    access procedure (Self   : in out JSON_Parser'Class;
-   --                      Status : in out Parse_Status);
-   --  type Parse_Function is
-   --    access function (Self : in out JSON_Parser'Class) return Boolean;
    type Parse_Subprogram is
      access function (Self : in out JSON_Parser'Class) return Boolean;
 

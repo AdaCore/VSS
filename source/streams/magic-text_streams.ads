@@ -30,6 +30,17 @@ package Magic.Text_Streams is
       Item    : out Magic.Characters.Magic_Character;
       Success : in out Boolean) is abstract;
 
+   function Is_End_Of_Data
+     (Self : Input_Text_Stream) return Boolean is abstract;
+   --  Return True when there is no more data is available now.
+
+   function Is_End_Of_Stream
+     (Self : Input_Text_Stream) return Boolean is abstract;
+   --  Return True when when end of stream is reached.
+
+   --  function Is_Error (Self : Input_Text_Stream) return Boolean is abstract;
+   --  Return True when any error is detected.
+
    type Output_Text_Stream is limited interface;
 
    type Output_Text_Stream_Access is access all Output_Text_Stream'Class;

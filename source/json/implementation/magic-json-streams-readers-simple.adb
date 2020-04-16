@@ -55,8 +55,7 @@ package body Magic.JSON.Streams.Readers.Simple is
      (Self : JSON_Simple_Reader)
       return Magic.JSON.Streams.Readers.JSON_Reader_Error is
    begin
-      raise Program_Error;
-      return No_Error;
+      return Self.Parser.Error;
    end Error;
 
    -------------------

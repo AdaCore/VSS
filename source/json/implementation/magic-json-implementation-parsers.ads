@@ -38,6 +38,11 @@ package Magic.JSON.Implementation.Parsers is
       return Magic.JSON.Streams.Readers.JSON_Event_Kind;
    --  Returns current event.
 
+   function Error
+     (Self : JSON_Parser'Class)
+      return Magic.JSON.Streams.Readers.JSON_Reader_Error;
+   --  Return current error.
+
 private
 
    type Parse_Subprogram is

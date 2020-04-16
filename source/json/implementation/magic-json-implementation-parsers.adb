@@ -74,6 +74,17 @@ package body Magic.JSON.Implementation.Parsers is
    Value_Separator        : constant Wide_Wide_Character := ',';
    Decimal_Point          : constant Wide_Wide_Character := '.';
 
+   -----------
+   -- Error --
+   -----------
+
+   function Error
+     (Self : JSON_Parser'Class)
+      return Magic.JSON.Streams.Readers.JSON_Reader_Error is
+   begin
+      return Self.Error;
+   end Error;
+
    ----------------
    -- Event_Kind --
    ----------------

@@ -67,7 +67,7 @@ package Magic.JSON.Streams.Readers is
       Message : Magic.Strings.Magic_String := Magic.Strings.Empty_Magic_String)
    is abstract;
 
-   function Event_Type
+   function Event_Kind
      (Self : JSON_Stream_Reader) return JSON_Event_Kind is abstract;
 
    function Is_Start_Document (Self : JSON_Stream_Reader'Class) return Boolean;

@@ -23,7 +23,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_Boolean_Value (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = Boolean_Value;
+      return Self.Event_Kind = Boolean_Value;
    end Is_Boolean_Value;
 
    ------------------
@@ -32,7 +32,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_End_Array (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = End_Array;
+      return Self.Event_Kind = End_Array;
    end Is_End_Array;
 
    ---------------------
@@ -41,7 +41,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_End_Document (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = End_Document;
+      return Self.Event_Kind = End_Document;
    end Is_End_Document;
 
    -------------------
@@ -50,7 +50,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_End_Object (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = End_Object;
+      return Self.Event_Kind = End_Object;
    end Is_End_Object;
 
    -----------------
@@ -59,7 +59,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_Key_Name (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = Key_Name;
+      return Self.Event_Kind = Key_Name;
    end Is_Key_Name;
 
    -------------------
@@ -68,7 +68,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_Null_Value (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = Null_Value;
+      return Self.Event_Kind = Null_Value;
    end Is_Null_Value;
 
    ---------------------
@@ -77,7 +77,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_Number_Value (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = Number_Value;
+      return Self.Event_Kind = Number_Value;
    end Is_Number_Value;
 
    --------------------
@@ -86,7 +86,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_Start_Array (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = Start_Array;
+      return Self.Event_Kind = Start_Array;
    end Is_Start_Array;
 
    -----------------------
@@ -96,7 +96,7 @@ package body Magic.JSON.Streams.Readers is
    function Is_Start_Document
      (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = Start_Document;
+      return Self.Event_Kind = Start_Document;
    end Is_Start_Document;
 
    ---------------------
@@ -105,7 +105,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_Start_Object (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = Start_Object;
+      return Self.Event_Kind = Start_Object;
    end Is_Start_Object;
 
    ---------------------
@@ -114,7 +114,7 @@ package body Magic.JSON.Streams.Readers is
 
    function Is_String_Value (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
-      return Self.Event_Type = String_Value;
+      return Self.Event_Kind = String_Value;
    end Is_String_Value;
 
    ---------------

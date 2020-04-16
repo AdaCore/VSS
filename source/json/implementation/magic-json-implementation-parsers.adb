@@ -280,10 +280,7 @@ package body Magic.JSON.Implementation.Parsers is
          Self.Stack.Pop;
 
          if not Self.Stack.Is_Empty then
-            if Self.Stack.Top.Parse (Self) then
-               raise Program_Error;
-
-            else
+            if not Self.Stack.Top.Parse (Self) then
                Self.Stack.Push
                  (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
@@ -300,32 +297,39 @@ package body Magic.JSON.Implementation.Parsers is
       end if;
 
       loop
-         if not Self.Read
-           (Parse_JSON_Text'Access, JSON_Text_State'Pos (State))
-         then
-            return False;
-         end if;
-
          case State is
             when Initial =>
-               State := Value;
+               null;
+
+            when Value =>
+               null;
 
             when others =>
                raise Program_Error;
          end case;
 
-         --  XXX Parse_Value should be called instead
+         if not Self.Read
+           (Parse_JSON_Text'Access, JSON_Text_State'Pos (State))
+         then
+            if Self.Stream.Is_End_Of_Stream then
+               Self.Event := Magic.JSON.Streams.Readers.End_Document;
+               --  Self.Stack.Pop;
+            end if;
 
-         case Self.C is
-            when Begin_Object =>
-               if Self.Parse_Object then
-                  raise Program_Error;
+            return False;
+         end if;
 
-               else
+         case State is
+            when Initial =>
+               if not Self.Parse_Value then
+                  State := Value;
                   Self.Stack.Push
                     (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
                   return False;
+
+               else
+                  raise Program_Error;
                end if;
 
             when others =>
@@ -513,6 +517,7 @@ package body Magic.JSON.Implementation.Parsers is
 
                State := Member_Or_End_Object;
                Self.Event := Magic.JSON.Streams.Readers.Start_Object;
+               Self.Nesting := Self.Nesting + 1;
                Self.Stack.Push (Parse_Object'Access, Object_State'Pos (State));
 
                return False;
@@ -545,6 +550,7 @@ package body Magic.JSON.Implementation.Parsers is
                   when End_Object =>
                      State := Finish;
                      Self.Event := Magic.JSON.Streams.Readers.End_Object;
+                     Self.Nesting := Self.Nesting - 1;
                      Self.Stack.Push
                        (Parse_Object'Access, Object_State'Pos (State));
 
@@ -562,7 +568,16 @@ package body Magic.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Object'Access, Object_State'Pos (State)) then
-            return False;
+            --  XXX Need to be reviewed!!!
+
+            if Self.Stream.Is_End_Of_Stream and Self.Nesting = 0 then
+               Self.Stack.Pop;
+
+               return True;
+
+            else
+               return False;
+            end if;
          end if;
 
          case State is
@@ -759,21 +774,6 @@ package body Magic.JSON.Implementation.Parsers is
                         return False;
                      end if;
 
-                  when Begin_Array =>
-                     if not Self.Parse_Array then
-                        State := Done;
-                        Self.Stack.Push
-                          (Parse_Value'Access, Value_State'Pos (State));
-
-                        return False;
-
-                     else
-                        --  Parse_Array always reeturns False for the first
-                        --  call: it reports Start_Array event.
-
-                        raise Program_Error;
-                     end if;
-
                   when Latin_Small_Letter_F =>
                      State := Value_F;
 
@@ -798,6 +798,36 @@ package body Magic.JSON.Implementation.Parsers is
                           (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
+                     end if;
+
+                  when Begin_Array =>
+                     if not Self.Parse_Array then
+                        State := Done;
+                        Self.Stack.Push
+                          (Parse_Value'Access, Value_State'Pos (State));
+
+                        return False;
+
+                     else
+                        --  Parse_Array always reeturns False for the first
+                        --  call: it reports Start_Array event.
+
+                        raise Program_Error;
+                     end if;
+
+                  when Begin_Object =>
+                     if not Self.Parse_Object then
+                        State := Done;
+                        Self.Stack.Push
+                          (Parse_Value'Access, Value_State'Pos (State));
+
+                        return False;
+
+                     else
+                        --  Parse_Object always reeturns False for the first
+                        --  call: it reports Start_Array event.
+
+                        raise Program_Error;
                      end if;
 
                   when others =>
@@ -1007,7 +1037,6 @@ package body Magic.JSON.Implementation.Parsers is
       if not Success then
          Self.Event := Magic.JSON.Streams.Readers.Invalid;
          Self.Error := Magic.JSON.Streams.Readers.Premature_End_Of_Document;
-
          Self.Stack.Push (Parse, State);
 
          return False;

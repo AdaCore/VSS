@@ -92,6 +92,9 @@ package Magic.JSON.Streams.Readers is
 
    function Is_Null_Value (Self : JSON_Stream_Reader'Class) return Boolean;
 
+   function Key_Name
+     (Self : JSON_Stream_Reader) return Magic.Strings.Magic_String is abstract;
+
    function String_Value
      (Self : JSON_Stream_Reader) return Magic.Strings.Magic_String is abstract;
 

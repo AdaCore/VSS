@@ -1,4 +1,5 @@
 FROM registry.fedoraproject.org/fedora-minimal:32
+ARG CODECOV_TOKEN
 RUN microdnf install \
   make \
   rpmdevtools \
@@ -8,6 +9,8 @@ RUN microdnf install \
   openssh-server \
   tar \
   gzip \
+  bash \
+  curl \
   ca-certificates && \
  microdnf clean all
 
@@ -16,4 +19,6 @@ WORKDIR /src/
 
 COPY . /src/
 
-RUN make all check
+RUN make all check coverage && \
+  curl -s https://codecov.io/bash -o /tmp/codecov.sh && \
+  /bin/bash /tmp/codecov.sh

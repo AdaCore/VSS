@@ -12,7 +12,11 @@ project GNATCOLL_Text is
       "../source/text/implementation");
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-O2");
+      for Switches ("Ada") use ("-g", "-O0", "--coverage");
    end Compiler;
+
+   package Linker is
+      for Linker_Options use ("--coverage");
+   end Linker;
 
 end GNATCOLL_Text;

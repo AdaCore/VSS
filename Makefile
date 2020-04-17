@@ -7,3 +7,6 @@ check:
 	.objs/tests/test_conversions
 	.objs/tests/test_character_iterators
 	.objs/tests/test_json_writer && (cat json.json); rm json.json
+
+coverage:
+	gcov --verbose .objs/*

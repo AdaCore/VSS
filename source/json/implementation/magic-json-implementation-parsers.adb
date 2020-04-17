@@ -16,9 +16,12 @@
 ------------------------------------------------------------------------------
 --  RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange Format"
 
+with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
 with Magic.Characters;
+with Magic.Strings.Conversions;
 
 package body Magic.JSON.Implementation.Parsers is
 
@@ -1452,6 +1455,20 @@ package body Magic.JSON.Implementation.Parsers is
    begin
       Self.Stream := Stream;
    end Set_Stream;
+
+   ------------------
+   -- String_Value --
+   ------------------
+
+   function String_Value
+     (Self : JSON_Parser'Class) return Magic.Strings.Magic_String is
+   begin
+      return
+        Magic.Strings.Conversions.To_Magic_String
+          (Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Encode
+             (Ada.Strings.Wide_Wide_Unbounded.To_Wide_Wide_String
+                (Self.String)));
+   end String_Value;
 
    ---------
    -- Top --

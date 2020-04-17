@@ -87,8 +87,7 @@ package body Magic.JSON.Streams.Readers.Simple is
    overriding function Key_Name
      (Self : JSON_Simple_Reader) return Magic.Strings.Magic_String is
    begin
-      raise Program_Error;
-      return Magic.Strings.Empty_Magic_String;
+      return Self.Parser.String_Value;
    end Key_Name;
 
    ------------------
@@ -175,8 +174,7 @@ package body Magic.JSON.Streams.Readers.Simple is
    overriding function String_Value
      (Self : JSON_Simple_Reader) return Magic.Strings.Magic_String is
    begin
-      raise Program_Error;
-      return Magic.Strings.Empty_Magic_String;
+      return Self.Parser.String_Value;
    end String_Value;
 
 end Magic.JSON.Streams.Readers.Simple;

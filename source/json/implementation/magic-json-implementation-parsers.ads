@@ -22,6 +22,7 @@
 private with Ada.Strings.Wide_Wide_Unbounded;
 
 with Magic.JSON.Streams.Readers;
+with Magic.Strings;
 with Magic.Text_Streams;
 private with Magic.Unicode;
 
@@ -45,6 +46,10 @@ package Magic.JSON.Implementation.Parsers is
      (Self : JSON_Parser'Class)
       return Magic.JSON.Streams.Readers.JSON_Reader_Error;
    --  Return current error.
+
+   function String_Value
+     (Self : JSON_Parser'Class) return Magic.Strings.Magic_String;
+   --  Return string data (key name or string value)
 
 private
 

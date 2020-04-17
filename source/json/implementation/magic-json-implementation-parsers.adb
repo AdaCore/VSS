@@ -463,31 +463,24 @@ package body Magic.JSON.Implementation.Parsers is
       end if;
 
       loop
-         case State is
-            when Int =>
-               null;
-
-            when Int_Digits =>
-               null;
-
-            when Frac_Or_Exp =>
-               null;
-
-            when Frac_Digits =>
-               null;
-
-            when Exp_Sign_Or_Digits =>
-               null;
-
-            when Exp_Digits =>
-               null;
-
-            when others =>
-               raise Program_Error;
-         end case;
-
          if not Self.Read (Parse_Number'Access, Number_State'Pos (State)) then
-            return False;
+            if Self.Stream.Is_End_Of_Stream
+              and Self.Nesting = 0
+              and State in Int_Digits | Frac_Or_Exp | Frac_Digits | Exp_Digits
+              --  XXX allowed states and conditions need to be checked.
+            then
+               --  Simulate successful read when 'string' parsing has been
+               --  finished, 'string' is not nested into another construct,
+               --  and end of stream has been reached.
+
+               Self.Stack.Pop;
+               Self.C := Wide_Wide_Character'Last;
+
+               return True;
+
+            else
+               return False;
+            end if;
          end if;
 
          case State is
@@ -1112,17 +1105,22 @@ package body Magic.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Value'Access, Value_State'Pos (State)) then
-            --  --  XXX Need to be reviewed!!!
-            --
-            --  if Self.Stream.Is_End_Of_Stream and Self.Nesting = 0 then
-            --     Self.Stack.Pop;
-            --
-            --     return True;
-            --
-            --  else
-            --     return False;
-            --  end if;
-            return False;
+            if Self.Stream.Is_End_Of_Stream
+              and Self.Nesting = 0
+              and State = Finish
+            then
+               --  Simulate successful read when 'string' parsing has been
+               --  finished, 'string' is not nested into another construct,
+               --  and end of stream has been reached.
+
+               Self.Stack.Pop;
+               Self.C := Wide_Wide_Character'Last;
+
+               return True;
+
+            else
+               return False;
+            end if;
          end if;
 
          case State is

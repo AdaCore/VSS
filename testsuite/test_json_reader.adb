@@ -3,6 +3,7 @@ with Ada.Command_Line;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
 
+with Magic.Strings.Conversions;
 with Magic.JSON.Streams.Readers.Simple;
 
 with Memory_Text_Streams;
@@ -77,6 +78,28 @@ begin
                   raise Program_Error;
                end if;
             end if;
+
+         when Key_Name =>
+            Count := 0;
+
+            Ada.Text_IO.Put_Line
+              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                 (Reader.Event_Kind)
+               & " """
+               & Magic.Strings.Conversions.To_UTF_8_String
+                 (Reader.Key_Name)
+               & '"');
+
+         when String_Value =>
+            Count := 0;
+
+            Ada.Text_IO.Put_Line
+              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                 (Reader.Event_Kind)
+               & " """
+               & Magic.Strings.Conversions.To_UTF_8_String
+                 (Reader.String_Value)
+               & '"');
 
          when others =>
             Count := 0;

@@ -60,23 +60,28 @@ package body Magic.JSON.Implementation.Parsers is
      Wide_Wide_Character'Val (16#00_000A#);
    Carriage_Return        : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_000D#);
-   Space                  : constant Wide_Wide_Character := ' ';
-   Quotation_Mark         : constant Wide_Wide_Character := '"';
+   Space                  : constant Wide_Wide_Character := ' ';  --  U+0020
+   Quotation_Mark         : constant Wide_Wide_Character := '"';  --  U+0022
    Hyphen_Minus           : constant Wide_Wide_Character := '-';
    Plus_Sign              : constant Wide_Wide_Character := '+';
+   Reverse_Solidus        : constant Wide_Wide_Character := '\';  --  U+005C
+   Solidus                : constant Wide_Wide_Character := '/';  --  U+002F
    Digit_Zero             : constant Wide_Wide_Character := '0';
    Digit_One              : constant Wide_Wide_Character := '1';
    Digit_Nine             : constant Wide_Wide_Character := '9';
-   Latin_Capital_Letter_E : constant Wide_Wide_Character := 'E';
+   Latin_Capital_Letter_A : constant Wide_Wide_Character := 'A';  --  U+0041
+   Latin_Capital_Letter_E : constant Wide_Wide_Character := 'E';  --  U+0045
+   Latin_Capital_Letter_F : constant Wide_Wide_Character := 'F';  --  U+0046
    Latin_Small_Letter_A   : constant Wide_Wide_Character := 'a';
+   Latin_Small_Letter_B   : constant Wide_Wide_Character := 'b';  --  U+0062
    Latin_Small_Letter_E   : constant Wide_Wide_Character := 'e';
-   Latin_Small_Letter_F   : constant Wide_Wide_Character := 'f';
+   Latin_Small_Letter_F   : constant Wide_Wide_Character := 'f';  --  U+0066
    Latin_Small_Letter_L   : constant Wide_Wide_Character := 'l';
-   Latin_Small_Letter_N   : constant Wide_Wide_Character := 'n';
-   Latin_Small_Letter_R   : constant Wide_Wide_Character := 'r';
-   Latin_Small_Letter_S   : constant Wide_Wide_Character := 's';
-   Latin_Small_Letter_T   : constant Wide_Wide_Character := 't';
-   Latin_Small_Letter_U   : constant Wide_Wide_Character := 'u';
+   Latin_Small_Letter_N   : constant Wide_Wide_Character := 'n';  --  U+006E
+   Latin_Small_Letter_R   : constant Wide_Wide_Character := 'r';  --  U+0072
+   Latin_Small_Letter_S   : constant Wide_Wide_Character := 's';  --  U+0071
+   Latin_Small_Letter_T   : constant Wide_Wide_Character := 't';  --  U+0074
+   Latin_Small_Letter_U   : constant Wide_Wide_Character := 'u';  --  U+0075
 
    Begin_Array            : constant Wide_Wide_Character := '[';
    Begin_Object           : constant Wide_Wide_Character := '{';
@@ -782,7 +787,14 @@ package body Magic.JSON.Implementation.Parsers is
    -- Parse_String --
    ------------------
 
-   type String_State is (Initial, Data, Finish, Done);
+   type String_State is
+     (Character_Data,
+      Escape,
+      Escape_U,
+      Escape_UX,
+      Escape_UXX,
+      Escape_UXXX,
+      Finish);
 
    function Parse_String (Self : in out JSON_Parser'Class) return Boolean is
       State : String_State;
@@ -793,58 +805,140 @@ package body Magic.JSON.Implementation.Parsers is
          Self.Stack.Pop;
 
          if not Self.Stack.Is_Empty then
-            --  if Self.Stack.Top.Parse (Self) then
-            --     raise Program_Error;
-            --  end if;
-            --
             raise Program_Error;
          end if;
 
       else
-         State := Initial;
+         if Self.C /= Quotation_Mark then
+            raise Program_Error;
+         end if;
+
+         State := Character_Data;
       end if;
 
       loop
-         case State is
-            when Initial =>
-               if Self.C /= Quotation_Mark then
-                  raise Program_Error;
-               end if;
-
-               State := Data;
-
-            when Data =>
-               null;
-
-            when Finish =>
-               null;
-
-            when Done =>
-               return True;
-         end case;
-
          if not Self.Read (Parse_String'Access, String_State'Pos (State)) then
-            return False;
+            if Self.Stream.Is_End_Of_Stream
+              and Self.Nesting = 0
+              and State = Finish
+            then
+               --  Simulate successful read when 'string' parsing has been
+               --  finished, 'string' is not nested into another construct,
+               --  and end of stream has been reached.
+
+               Self.Stack.Pop;
+               Self.C := Wide_Wide_Character'Last;
+
+               return True;
+
+            else
+               return False;
+            end if;
          end if;
 
-         --  XXX Escape sequences is not supported
-
          case State is
-            when Initial =>
-               raise Program_Error;
-               --  Should never be happen
-
-            when Data =>
+            when Character_Data =>
                case Self.C is
                   when Quotation_Mark =>
                      State := Finish;
+
+                  when Wide_Wide_Character'Val (16#00_0000#)
+                     .. Wide_Wide_Character'Val (16#00_001F#)
+                  =>
+                     raise Program_Error;
+
+                  when Reverse_Solidus =>
+                     State := Escape;
 
                   when others =>
                      null;
                end case;
 
+            when Escape =>
+               case Self.C is
+                  when Quotation_Mark =>
+                     State := Character_Data;
+
+                  when Reverse_Solidus =>
+                     State := Character_Data;
+
+                  when Solidus =>
+                     State := Character_Data;
+
+                  when Latin_Small_Letter_B =>
+                     State := Character_Data;
+
+                  when Latin_Small_Letter_F =>
+                     State := Character_Data;
+
+                  when Latin_Small_Letter_N =>
+                     State := Character_Data;
+
+                  when Latin_Small_Letter_R =>
+                     State := Character_Data;
+
+                  when Latin_Small_Letter_T =>
+                     State := Character_Data;
+
+                  when Latin_Small_Letter_U =>
+                     State := Escape_U;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Escape_U =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
+                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
+                  =>
+                     State := Escape_UX;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Escape_UX =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
+                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
+                  =>
+                     State := Escape_UXX;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Escape_UXX =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
+                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
+                  =>
+                     State := Escape_UXXX;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Escape_UXXX =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
+                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
+                  =>
+                     --  XXX Surrogate pairs are not supported.
+
+                     State := Character_Data;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
             when Finish =>
-               State := Done;
+               return True;
 
             when others =>
                raise Program_Error;
@@ -1018,6 +1112,16 @@ package body Magic.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Value'Access, Value_State'Pos (State)) then
+            --  --  XXX Need to be reviewed!!!
+            --
+            --  if Self.Stream.Is_End_Of_Stream and Self.Nesting = 0 then
+            --     Self.Stack.Pop;
+            --
+            --     return True;
+            --
+            --  else
+            --     return False;
+            --  end if;
             return False;
          end if;
 

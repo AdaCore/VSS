@@ -34,8 +34,7 @@ package body Magic.JSON.Streams.Readers.Simple is
    overriding function Boolean_Value
      (Self : JSON_Simple_Reader) return Boolean is
    begin
-      raise Program_Error;
-      return False;
+      return Self.Parser.Boolean_Value;
    end Boolean_Value;
 
    -----------

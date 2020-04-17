@@ -98,6 +98,15 @@ package body Magic.JSON.Implementation.Parsers is
    Value_Separator        : constant Wide_Wide_Character := ',';
    Decimal_Point          : constant Wide_Wide_Character := '.';
 
+   -------------------
+   -- Boolean_Value --
+   -------------------
+
+   function Boolean_Value (Self : JSON_Parser'Class) return Boolean is
+   begin
+      return Self.Boolean;
+   end Boolean_Value;
+
    -----------
    -- Error --
    -----------
@@ -1294,6 +1303,7 @@ package body Magic.JSON.Implementation.Parsers is
                case Self.C is
                   when Latin_Small_Letter_E =>
                      State := Finish;
+                     Self.Boolean := False;
                      Self.Event := Magic.JSON.Streams.Readers.Boolean_Value;
                      Self.Stack.Push
                        (Parse_Value'Access, Value_State'Pos (State));
@@ -1358,6 +1368,7 @@ package body Magic.JSON.Implementation.Parsers is
                case Self.C is
                   when Latin_Small_Letter_E =>
                      State := Finish;
+                     Self.Boolean := True;
                      Self.Event := Magic.JSON.Streams.Readers.Boolean_Value;
                      Self.Stack.Push
                        (Parse_Value'Access, Value_State'Pos (State));

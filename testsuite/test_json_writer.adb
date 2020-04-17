@@ -1,7 +1,8 @@
 
-with Ada.Streams.Stream_IO;
+with Ada.Text_IO;
 
 with Magic.Stream_Element_Buffers;
+with Magic.Stream_Element_Buffers.Conversions;
 with Magic.Strings.Conversions;
 with Magic.Text_Streams.Memory;
 with Magic.JSON.Streams.Writers;
@@ -9,7 +10,6 @@ with Magic.JSON.Streams.Writers;
 procedure Test_JSON_Writer is
    Stream  : aliased Magic.Text_Streams.Memory.Memory_UTF8_Output_Stream;
    Writer  : aliased Magic.JSON.Streams.Writers.JSON_Simple_Writer;
-   File    : Ada.Streams.Stream_IO.File_Type;
    Success : Boolean := True;
 
 begin
@@ -50,9 +50,7 @@ begin
 
    Writer.End_Document (Success);
 
-   Ada.Streams.Stream_IO.Create
-     (File, Ada.Streams.Stream_IO.Out_File, "json.json");
-   Magic.Stream_Element_Buffers.Stream_Element_Buffer'Write
-     (Ada.Streams.Stream_IO.Stream (File), Stream.Buffer);
-   Ada.Streams.Stream_IO.Close (File);
+   Ada.Text_IO.Put
+     (Magic.Stream_Element_Buffers.Conversions.Unchecked_To_String
+        (Stream.Buffer));
 end Test_JSON_Writer;

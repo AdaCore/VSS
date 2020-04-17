@@ -54,10 +54,14 @@ package body Magic.JSON.Implementation.Parsers is
       Message : Wide_Wide_String) return Boolean;
    --  Set parser into document not valid state. Always return False.
 
+   Backspace              : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_0008#);
    Character_Tabulation   : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_0009#);
    Line_Feed              : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_000A#);
+   Form_Feed              : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_000C#);
    Carriage_Return        : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_000D#);
    Space                  : constant Wide_Wide_Character := ' ';  --  U+0020
@@ -787,9 +791,59 @@ package body Magic.JSON.Implementation.Parsers is
       Escape_UX,
       Escape_UXX,
       Escape_UXXX,
+      Escape_UXXXX,
+      Escape_UXXXX_Escape,
+      Escape_UXXXX_Escape_U,
+      Escape_UXXXX_Escape_UX,
+      Escape_UXXXX_Escape_UXX,
+      Escape_UXXXX_Escape_UXXX,
       Finish);
 
    function Parse_String (Self : in out JSON_Parser'Class) return Boolean is
+
+      use type Magic.Unicode.Code_Point;
+      use type Magic.Unicode.UTF16_Code_Unit;
+
+      function Hex_To_Code
+        (Code : in out Magic.Unicode.UTF16_Code_Unit) return Boolean;
+
+      -----------------
+      -- Hex_To_Code --
+      -----------------
+
+      function Hex_To_Code
+        (Code : in out Magic.Unicode.UTF16_Code_Unit) return Boolean is
+      begin
+         case Self.C is
+            when Digit_Zero .. Digit_Nine =>
+               Code :=
+                 Code * 16#10#
+                   + (Wide_Wide_Character'Pos (Self.C)
+                        - Wide_Wide_Character'Pos (Digit_Zero));
+
+               return True;
+
+            when Latin_Capital_Letter_A .. Latin_Capital_Letter_F =>
+               Code :=
+                 Code * 16#10#
+                   + (Wide_Wide_Character'Pos (Self.C)
+                        - Wide_Wide_Character'Pos (Latin_Capital_Letter_A) + 10);
+
+               return True;
+
+            when Latin_Small_Letter_A .. Latin_Small_Letter_F =>
+               Code :=
+                 Code * 16#10#
+                   + (Wide_Wide_Character'Pos (Self.C)
+                        - Wide_Wide_Character'Pos (Latin_Small_Letter_A) + 10);
+
+               return True;
+
+            when others =>
+               return False;
+         end case;
+      end Hex_To_Code;
+
       State : String_State;
 
    begin
@@ -807,6 +861,8 @@ package body Magic.JSON.Implementation.Parsers is
          end if;
 
          State := Character_Data;
+         Self.String :=
+           Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
       end if;
 
       loop
@@ -844,34 +900,51 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Escape;
 
                   when others =>
-                     null;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
                end case;
 
             when Escape =>
                case Self.C is
                   when Quotation_Mark =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Quotation_Mark);
 
                   when Reverse_Solidus =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Reverse_Solidus);
 
                   when Solidus =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Solidus);
 
                   when Latin_Small_Letter_B =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Backspace);
 
                   when Latin_Small_Letter_F =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Form_Feed);
 
                   when Latin_Small_Letter_N =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Line_Feed);
 
                   when Latin_Small_Letter_R =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Carriage_Return);
 
                   when Latin_Small_Letter_T =>
                      State := Character_Data;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Character_Tabulation);
 
                   when Latin_Small_Letter_U =>
                      State := Escape_U;
@@ -881,54 +954,108 @@ package body Magic.JSON.Implementation.Parsers is
                end case;
 
             when Escape_U =>
-               case Self.C is
-                  when Digit_Zero .. Digit_Nine
-                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
-                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
-                  =>
-                     State := Escape_UX;
+               State := Escape_UX;
+               Self.Code_Unit_1 := 0;
 
-                  when others =>
-                     raise Program_Error;
-               end case;
+               if not Hex_To_Code (Self.Code_Unit_1) then
+                  raise Program_Error;
+               end if;
 
             when Escape_UX =>
-               case Self.C is
-                  when Digit_Zero .. Digit_Nine
-                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
-                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
-                  =>
-                     State := Escape_UXX;
+               State := Escape_UXX;
 
-                  when others =>
-                     raise Program_Error;
-               end case;
+               if not Hex_To_Code (Self.Code_Unit_1) then
+                  raise Program_Error;
+               end if;
 
             when Escape_UXX =>
-               case Self.C is
-                  when Digit_Zero .. Digit_Nine
-                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
-                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
-                  =>
-                     State := Escape_UXXX;
+               State := Escape_UXXX;
 
-                  when others =>
-                     raise Program_Error;
-               end case;
+               if not Hex_To_Code (Self.Code_Unit_1) then
+                  raise Program_Error;
+               end if;
 
             when Escape_UXXX =>
-               case Self.C is
-                  when Digit_Zero .. Digit_Nine
-                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
-                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
-                  =>
-                     --  XXX Surrogate pairs are not supported.
+               if not Hex_To_Code (Self.Code_Unit_1) then
+                  raise Program_Error;
+               end if;
 
-                     State := Character_Data;
+               if Self.Code_Unit_1 not in 16#D800# .. 16#DFFF# then
+                  State := Character_Data;
+                  Ada.Strings.Wide_Wide_Unbounded.Append
+                    (Self.String, Wide_Wide_Character'Val (Self.Code_Unit_1));
+
+               elsif Self.Code_Unit_1 in 16#D800# .. 16#DBFF# then
+                  State := Escape_UXXXX;
+
+               else
+                  raise Program_Error;
+               end if;
+
+            when Escape_UXXXX =>
+               case Self.C is
+                  when Reverse_Solidus =>
+                     State := Escape_UXXXX_Escape;
 
                   when others =>
                      raise Program_Error;
                end case;
+
+            when Escape_UXXXX_Escape =>
+               case Self.C is
+                  when Latin_Small_Letter_U =>
+                     State := Escape_UXXXX_Escape_U;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Escape_UXXXX_Escape_U =>
+               State := Escape_UXXXX_Escape_UX;
+               Self.Code_Unit_2 := 0;
+
+               if not Hex_To_Code (Self.Code_Unit_2) then
+                  raise Program_Error;
+               end if;
+
+            when Escape_UXXXX_Escape_UX =>
+               State := Escape_UXXXX_Escape_UXX;
+
+               if not Hex_To_Code (Self.Code_Unit_2) then
+                  raise Program_Error;
+               end if;
+
+            when Escape_UXXXX_Escape_UXX =>
+               State := Escape_UXXXX_Escape_UXXX;
+
+               if not Hex_To_Code (Self.Code_Unit_2) then
+                  raise Program_Error;
+               end if;
+
+            when Escape_UXXXX_Escape_UXXX =>
+               State := Character_Data;
+
+               if not Hex_To_Code (Self.Code_Unit_2) then
+                  raise Program_Error;
+               end if;
+
+               if Self.Code_Unit_2 not in 16#DC00# .. 16#DFFF# then
+                  raise Program_Error;
+               end if;
+
+               declare
+                  Code : Magic.Unicode.Code_Point := 16#01_0000#;
+
+               begin
+                  Code :=
+                    Code
+                      + Magic.Unicode.Code_Point
+                         (Self.Code_Unit_1 and 16#03FF#) * 16#0400#
+                      + Magic.Unicode.Code_Point
+                         (Self.Code_Unit_2 and 16#03FF#);
+                  Ada.Strings.Wide_Wide_Unbounded.Append
+                    (Self.String, Wide_Wide_Character'Val (Code));
+               end;
 
             when Finish =>
                return True;

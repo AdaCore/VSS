@@ -19,8 +19,11 @@
 --  This parser supports normal parsing model as well as incremental parsing.
 --  It use Input_Text_Stream interface as data source.
 
+private with Ada.Strings.Wide_Wide_Unbounded;
+
 with Magic.JSON.Streams.Readers;
 with Magic.Text_Streams;
+private with Magic.Unicode;
 
 package Magic.JSON.Implementation.Parsers is
 
@@ -72,14 +75,17 @@ private
    procedure Pop (Self : in out Parse_Stack'Class);
 
    type JSON_Parser is tagged limited record
-      Stream  : Magic.Text_Streams.Input_Text_Stream_Access;
-      Stack   : Parse_Stack;
-      Nesting : Natural := 0;
-      Event   : Magic.JSON.Streams.Readers.JSON_Event_Kind :=
+      Stream      : Magic.Text_Streams.Input_Text_Stream_Access;
+      Stack       : Parse_Stack;
+      Nesting     : Natural := 0;
+      Event       : Magic.JSON.Streams.Readers.JSON_Event_Kind :=
         Magic.JSON.Streams.Readers.No_Token;
-      Error   : Magic.JSON.Streams.Readers.JSON_Reader_Error :=
+      Error       : Magic.JSON.Streams.Readers.JSON_Reader_Error :=
         Magic.JSON.Streams.Readers.No_Error;
-      C       : Wide_Wide_Character;
+      C           : Wide_Wide_Character;
+      String      : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
+      Code_Unit_1 : Magic.Unicode.UTF16_Code_Unit;
+      Code_Unit_2 : Magic.Unicode.UTF16_Code_Unit;
    end record;
 
 end Magic.JSON.Implementation.Parsers;

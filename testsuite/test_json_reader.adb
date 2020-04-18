@@ -2,6 +2,7 @@
 with Ada.Command_Line;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
+with Interfaces;
 
 with Magic.Strings.Conversions;
 with Magic.JSON.Streams.Readers.Simple;
@@ -100,6 +101,33 @@ begin
                & Magic.Strings.Conversions.To_UTF_8_String
                  (Reader.String_Value)
                & '"');
+
+         when Number_Value =>
+            Count := 0;
+
+            Ada.Text_IO.Put_Line
+              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                 (Reader.Event_Kind)
+               & ' '
+               & Magic.JSON.JSON_Number_Kind'Image (Reader.Number_Value.Kind)
+               & ' '
+               & (case Reader.Number_Value.Kind is
+                    when Magic.JSON.None => "",
+                    when Magic.JSON.JSON_Integer =>
+                       Interfaces.Integer_64'Image
+                         (Reader.Number_Value.Integer_Value),
+                    when Magic.JSON.JSON_Float =>
+                       Interfaces.IEEE_Float_64'Image
+                         (Reader.Number_Value.Float_Value)));
+
+         when Boolean_Value =>
+            Count := 0;
+
+            Ada.Text_IO.Put_Line
+              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                 (Reader.Event_Kind)
+               & " "
+               & Boolean'Image (Reader.Boolean_Value));
 
          when others =>
             Count := 0;

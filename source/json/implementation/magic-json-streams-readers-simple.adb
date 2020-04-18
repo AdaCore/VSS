@@ -96,8 +96,7 @@ package body Magic.JSON.Streams.Readers.Simple is
    overriding function Number_Value
      (Self : JSON_Simple_Reader) return Magic.JSON.JSON_Number is
    begin
-      raise Program_Error;
-      return (Kind => None);
+      return Self.Parser.Number_Value;
    end Number_Value;
 
    -----------------

@@ -138,6 +138,16 @@ package body Magic.JSON.Implementation.Parsers is
       return Self.Head = 0;
    end Is_Empty;
 
+   ------------------
+   -- Number_Value --
+   ------------------
+
+   function Number_Value
+     (Self : JSON_Parser'Class) return Magic.JSON.JSON_Number is
+   begin
+      return Self.Number;
+   end Number_Value;
+
    -----------
    -- Parse --
    -----------
@@ -451,6 +461,30 @@ package body Magic.JSON.Implementation.Parsers is
       --
       --  zero = %x30                ; 0
 
+      procedure Convert_Number;
+
+      --------------------
+      -- Convert_Number --
+      --------------------
+
+      procedure Convert_Number is
+         Image : constant Wide_Wide_String :=
+           Ada.Strings.Wide_Wide_Unbounded.To_Wide_Wide_String (Self.String);
+
+      begin
+         if not Self.Is_Float then
+            Self.Number :=
+              (Kind          => Magic.JSON.JSON_Integer,
+               Integer_Value => Interfaces.Integer_64'Wide_Wide_Value (Image));
+
+         else
+            Self.Number :=
+              (Kind        => Magic.JSON.JSON_Float,
+               Float_Value =>
+                 Interfaces.IEEE_Float_64'Wide_Wide_Value (Image));
+         end if;
+      end Convert_Number;
+
       State : Number_State;
 
    begin
@@ -463,15 +497,22 @@ package body Magic.JSON.Implementation.Parsers is
          end if;
 
       else
+         Self.String :=
+           Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
+         Self.Is_Float := False;
+
          case Self.C is
             when Hyphen_Minus =>
                State := Int;
+               Ada.Strings.Wide_Wide_Unbounded.Append (Self.String, Self.C);
 
             when Digit_Zero =>
                State := Frac_Or_Exp;
+               Ada.Strings.Wide_Wide_Unbounded.Append (Self.String, Self.C);
 
             when Digit_One .. Digit_Nine =>
                State := Int_Digits;
+               Ada.Strings.Wide_Wide_Unbounded.Append (Self.String, Self.C);
 
             when others =>
                raise Program_Error;
@@ -492,6 +533,8 @@ package body Magic.JSON.Implementation.Parsers is
                Self.Stack.Pop;
                Self.C := Wide_Wide_Character'Last;
 
+               Convert_Number;
+
                return True;
 
             else
@@ -504,9 +547,13 @@ package body Magic.JSON.Implementation.Parsers is
                case Self.C is
                   when Digit_Zero =>
                      State := Frac_Or_Exp;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when Digit_One .. Digit_Nine =>
                      State := Int_Digits;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when others =>
                      raise Program_Error;
@@ -515,15 +562,24 @@ package body Magic.JSON.Implementation.Parsers is
             when Int_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     null;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when Decimal_Point =>
                      State := Frac_Digits;
+                     Self.Is_Float := True;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
+                     Self.Is_Float := True;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when others =>
+                     Convert_Number;
+
                      return True;
                end case;
 
@@ -531,23 +587,36 @@ package body Magic.JSON.Implementation.Parsers is
                case Self.C is
                   when Decimal_Point =>
                      State := Frac_Digits;
+                     Self.Is_Float := True;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
+                     Self.Is_Float := True;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when others =>
+                     Convert_Number;
+
                      return True;
                end case;
 
             when Frac_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     null;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when others =>
+                     Convert_Number;
+
                      return True;
                end case;
 
@@ -555,12 +624,18 @@ package body Magic.JSON.Implementation.Parsers is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Exp_Digits;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when Hyphen_Minus =>
                      State := Exp_Digits;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when Plus_Sign =>
                      State := Exp_Digits;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when others =>
                      raise Program_Error;
@@ -570,8 +645,12 @@ package body Magic.JSON.Implementation.Parsers is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Exp_Digits;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
 
                   when others =>
+                     Convert_Number;
+
                      return True;
                end case;
 

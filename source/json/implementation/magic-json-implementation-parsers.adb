@@ -666,10 +666,11 @@ package body Magic.JSON.Implementation.Parsers is
 
    type Object_State is
      (Initial,
+      Whitespace_Or_Member,
       Member_Or_End_Object,
       Member_String,
-      Whitespace_Or_Member,
       Member_Name_Separator,
+      Member_Value,
       Value_Separator_Or_End_Object,
       Finish);
 
@@ -730,8 +731,15 @@ package body Magic.JSON.Implementation.Parsers is
 
             when Member_Name_Separator =>
                case Self.C is
-                  when Name_Separator =>
+                  when Space
+                     | Character_Tabulation
+                     | Line_Feed
+                     | Carriage_Return
+                  =>
                      null;
+
+                  when Name_Separator =>
+                     State := Member_Value;
 
                   when others =>
                      raise Program_Error;
@@ -822,11 +830,11 @@ package body Magic.JSON.Implementation.Parsers is
                raise Program_Error;
 
             when Member_Name_Separator =>
-               --  State := Member_Value;
+               null;
 
+            when Member_Value =>
                if not Self.Parse_Value then
                   State := Value_Separator_Or_End_Object;
-                  --  State := Object_Value_Separator;
                   Self.Stack.Push
                     (Parse_Object'Access, Object_State'Pos (State));
 

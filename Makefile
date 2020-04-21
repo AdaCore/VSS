@@ -10,11 +10,8 @@ check: build_tests
 	.objs/tests/test_character_iterators
 	.objs/tests/test_json_writer
 	for f in testsuite/JSONTestSuite/test_parsing/*.json testsuite/JSON_checker/test/*.json; \
-		do echo -n "`basename $$f`:"; \
-		.objs/tests/test_json_reader s $$f > /tmp/`basename $$f`-s.log || (echo " (s) FAIL"; false) && \
-		(.objs/tests/test_json_reader i $$f > /tmp/`basename $$f`-i.log || (echo " (i) FAIL"; false)) && \
-		(diff -u /tmp/`basename $$f`-s.log /tmp/`basename $$f`-i.log || (echo " (d) FAIL"; false)) && \
-		echo " PASS"; \
+		do echo -n "`basename $$f`: "; \
+		testsuite/run_json_reader_test $$f; \
 	done
 
 coverage:

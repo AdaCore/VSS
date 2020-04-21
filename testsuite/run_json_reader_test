@@ -1,0 +1,18 @@
+#!/bin/sh
+
+INPUT_FILE=$1
+NAME=`basename $INPUT_FILE`
+LOG_FILE=/tmp/$NAME.log
+ERROR_FILE=/tmp/$NAME.error
+DIFF_FILE=/tmp/$NAME.diff
+EXPECTED_FILE=testsuite/JSON.expected/$NAME.txt
+
+set -e
+
+.objs/tests/test_json_reader s $INPUT_FILE > $LOG_FILE 2> $ERROR_FILE || (echo "(sr) FAIL"; cat $ERROR_FILE; false)
+diff -u $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(sd) FAIL"; cat $DIFF_FILE; false)
+
+.objs/tests/test_json_reader i $INPUT_FILE > $LOG_FILE 2> $ERROR_FILE || (echo "(ir) FAIL"; cat $ERROR_FILE; false)
+diff -u $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(id) FAIL"; cat $DIFF_FILE; false)
+
+echo "PASS"

@@ -1,0 +1,11 @@
+START_DOCUMENT
+START_OBJECT
+KEY_NAME "JSON Test Pattern pass3"
+START_OBJECT
+KEY_NAME "The outermost value"
+STRING_VALUE "must be an object or array."
+KEY_NAME "In this test"
+STRING_VALUE "It is an object."
+END_OBJECT
+END_OBJECT
+END_DOCUMENT

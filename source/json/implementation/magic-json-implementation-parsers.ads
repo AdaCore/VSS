@@ -37,10 +37,13 @@ package Magic.JSON.Implementation.Parsers is
    procedure Parse (Self : in out JSON_Parser'Class);
    --  Parse single token.
 
+   function At_End (Self : JSON_Parser'Class) return Boolean;
+   --  Return True when end of document has been processed.
+
    function Event_Kind
      (Self : JSON_Parser'Class)
       return Magic.JSON.Streams.Readers.JSON_Event_Kind;
-   --  Returns current event.
+   --  Return current event.
 
    function Error
      (Self : JSON_Parser'Class)

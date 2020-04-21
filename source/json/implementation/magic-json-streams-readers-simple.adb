@@ -23,8 +23,7 @@ package body Magic.JSON.Streams.Readers.Simple is
 
    overriding function At_End (Self : JSON_Simple_Reader) return Boolean is
    begin
-      raise Program_Error;
-      return True;
+      return Self.Parser.At_End;
    end At_End;
 
    -------------------

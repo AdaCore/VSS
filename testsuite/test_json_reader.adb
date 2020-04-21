@@ -73,7 +73,9 @@ begin
    begin
       Reader.Set_Stream (Input'Unchecked_Access);
 
-      while Reader.Read_Next /= No_Token loop
+      while not Reader.At_End loop
+         Reader.Read_Next;
+
          case Reader.Event_Kind is
             when Invalid =>
                if Reader.Error /= Premature_End_Of_Document then

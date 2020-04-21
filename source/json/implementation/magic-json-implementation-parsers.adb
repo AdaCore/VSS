@@ -23,9 +23,8 @@ with Magic.Strings.Conversions;
 
 package body Magic.JSON.Implementation.Parsers is
 
-   --  procedure Parse_JSON_Text
-   --    (Self   : in out JSON_Parser'Class;
-   --     Status : in out Parse_Status);
+   use type Magic.JSON.Streams.Readers.JSON_Event_Kind;
+   use type Magic.JSON.Streams.Readers.JSON_Reader_Error;
 
    function Parse_JSON_Text
      (Self : in out JSON_Parser'Class) return Boolean;
@@ -95,6 +94,18 @@ package body Magic.JSON.Implementation.Parsers is
    Name_Separator         : constant Wide_Wide_Character := ':';
    Value_Separator        : constant Wide_Wide_Character := ',';
    Decimal_Point          : constant Wide_Wide_Character := '.';
+
+   ------------
+   -- At_End --
+   ------------
+
+   function At_End (Self : JSON_Parser'Class) return Boolean is
+   begin
+      return
+        Self.Stack.Is_Empty and
+          (Self.Stream.Is_End_Of_Stream
+           or Self.Error = Magic.JSON.Streams.Readers.Not_Valid);
+   end At_End;
 
    -------------------
    -- Boolean_Value --
@@ -169,7 +180,9 @@ package body Magic.JSON.Implementation.Parsers is
 
       else
          if Self.Stack.Top.Parse (Self) then
-            raise Program_Error;
+            if not Self.Stack.Is_Empty then
+               raise Program_Error;
+            end if;
          end if;
       end if;
    end Parse;
@@ -349,7 +362,7 @@ package body Magic.JSON.Implementation.Parsers is
    -- Parse_JSON_Text --
    ---------------------
 
-   type JSON_Text_State is (Initial, Value, End_Of_Stream);
+   type JSON_Text_State is (Initial, Done);
 
    function Parse_JSON_Text
      (Self : in out JSON_Parser'Class) return Boolean
@@ -367,7 +380,17 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+               if Self.Event /= Magic.JSON.Streams.Readers.Invalid
+                 or else Self.Error /= Magic.JSON.Streams.Readers.Not_Valid
+               then
+                  Self.Stack.Push
+                    (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+
+               else
+                  State := Done;
+                  Self.Stack.Push
+                    (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+               end if;
 
                return False;
             end if;
@@ -386,17 +409,10 @@ package body Magic.JSON.Implementation.Parsers is
             when Initial =>
                null;
 
-            when Value =>
-               null;
+            when Done =>
+               Self.Event := Magic.JSON.Streams.Readers.End_Document;
 
-            when End_Of_Stream =>
-               Self.Event := Magic.JSON.Streams.Readers.No_Token;
-               Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
-
-               return False;
-
-            when others =>
-               raise Program_Error;
+               return True;
          end case;
 
          if not Self.Read
@@ -405,9 +421,9 @@ package body Magic.JSON.Implementation.Parsers is
             if Self.Stream.Is_End_Of_Stream then
                Self.Stack.Pop;
 
-               State := End_Of_Stream;
                Self.Event := Magic.JSON.Streams.Readers.End_Document;
-               Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+
+               return True;
             end if;
 
             return False;
@@ -416,7 +432,7 @@ package body Magic.JSON.Implementation.Parsers is
          case State is
             when Initial =>
                if not Self.Parse_Value then
-                  State := Value;
+                  State := Done;
                   Self.Push
                     (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
@@ -1502,11 +1518,7 @@ package body Magic.JSON.Implementation.Parsers is
    procedure Push
      (Self  : in out JSON_Parser'Class;
       Parse : not null Parse_Subprogram;
-      State : Interfaces.Unsigned_32)
-   is
-      use type Magic.JSON.Streams.Readers.JSON_Event_Kind;
-      use type Magic.JSON.Streams.Readers.JSON_Reader_Error;
-
+      State : Interfaces.Unsigned_32) is
    begin
       if Self.Event /= Magic.JSON.Streams.Readers.Invalid
         or else Self.Error

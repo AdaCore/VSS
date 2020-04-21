@@ -72,7 +72,7 @@ private
 
    type Parse_Stack is tagged limited record
       Head  : Natural := 0;
-      Stack : Parse_State_Array (1 .. 32);
+      Stack : Parse_State_Array (1 .. 64);
    end record;
 
    function Is_Empty (Self : Parse_Stack'Class) return Boolean;

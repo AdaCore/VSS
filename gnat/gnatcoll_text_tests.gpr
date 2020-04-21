@@ -1,4 +1,5 @@
 with "gnatcoll_text";
+with "gnatcoll";
 
 project GNATCOLL_Text_Tests is
 
@@ -8,7 +9,9 @@ project GNATCOLL_Text_Tests is
    for Main use ("test_conversions.adb",
                  "test_character_iterators.adb",
                  "test_json_reader.adb",
-                 "test_json_writer.adb");
+                 "test_json_writer.adb",
+
+                 "test_json_reader_gnatcoll.adb");
 
    package Compiler is
       for Switches ("Ada") use ("-g", "-O2", "-gnatW8");

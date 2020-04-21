@@ -15,4 +15,8 @@ project GNATCOLL_Text_Tests is
       for Switches ("test_conversions.adb") use ("-g", "-O2");
    end Compiler;
 
+   package Binder is
+      for Switches ("Ada") use ("-Wb");
+   end Binder;
+
 end GNATCOLL_Text_Tests;

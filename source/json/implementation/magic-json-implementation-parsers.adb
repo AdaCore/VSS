@@ -18,8 +18,6 @@
 
 with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
-with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
-
 with Magic.Characters;
 with Magic.Strings.Conversions;
 
@@ -1522,8 +1520,6 @@ package body Magic.JSON.Implementation.Parsers is
       else
          Self.C := Wide_Wide_Character (Character);
       end if;
-
-      Put_Line (''' & Self.C & ''');
 
       return True;
    end Read;

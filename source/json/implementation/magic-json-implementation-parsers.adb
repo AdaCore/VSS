@@ -199,8 +199,7 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Stack.Push
-                 (Parse_Array'Access, Array_State'Pos (State));
+               Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
                return False;
             end if;
@@ -220,7 +219,7 @@ package body Magic.JSON.Implementation.Parsers is
                State := Value_Or_End_Array;
                Self.Nesting := Self.Nesting + 1;
                Self.Event := Magic.JSON.Streams.Readers.Start_Array;
-               Self.Stack.Push (Parse_Array'Access, Array_State'Pos (State));
+               Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
                return False;
 
@@ -243,8 +242,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Nesting := Self.Nesting - 1;
                      Self.Event := Magic.JSON.Streams.Readers.End_Array;
-                     Self.Stack.Push
-                       (Parse_Array'Access, Array_State'Pos (State));
+                     Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
                      return False;
 
@@ -303,7 +301,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Value_Separator_Or_End_Array;
 
                      if not Self.Parse_Value then
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Array'Access, Array_State'Pos (State));
 
                         return False;
@@ -315,8 +313,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Nesting := Self.Nesting - 1;
                      Self.Event := Magic.JSON.Streams.Readers.End_Array;
-                     Self.Stack.Push
-                       (Parse_Array'Access, Array_State'Pos (State));
+                     Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
                      return False;
 
@@ -328,8 +325,7 @@ package body Magic.JSON.Implementation.Parsers is
                State := Value_Separator_Or_End_Array;
 
                if not Self.Parse_Value then
-                  Self.Stack.Push
-                    (Parse_Array'Access, Array_State'Pos (State));
+                  Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
                   return False;
                end if;
@@ -371,8 +367,7 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Stack.Push
-                 (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+               Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
                return False;
             end if;
@@ -381,7 +376,7 @@ package body Magic.JSON.Implementation.Parsers is
       else
          State := Initial;
          Self.Event := Magic.JSON.Streams.Readers.Start_Document;
-         Self.Stack.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+         Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
          return False;
       end if;
@@ -396,8 +391,7 @@ package body Magic.JSON.Implementation.Parsers is
 
             when End_Of_Stream =>
                Self.Event := Magic.JSON.Streams.Readers.No_Token;
-               Self.Stack.Push
-                 (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+               Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
                return False;
 
@@ -413,8 +407,7 @@ package body Magic.JSON.Implementation.Parsers is
 
                State := End_Of_Stream;
                Self.Event := Magic.JSON.Streams.Readers.End_Document;
-               Self.Stack.Push
-                 (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+               Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
             end if;
 
             return False;
@@ -424,7 +417,7 @@ package body Magic.JSON.Implementation.Parsers is
             when Initial =>
                if not Self.Parse_Value then
                   State := Value;
-                  Self.Stack.Push
+                  Self.Push
                     (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
                   return False;
@@ -718,7 +711,7 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Stack.Push (Parse_Object'Access, Object_State'Pos (State));
+               Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                return False;
             end if;
@@ -738,7 +731,7 @@ package body Magic.JSON.Implementation.Parsers is
                State := Member_Or_End_Object;
                Self.Event := Magic.JSON.Streams.Readers.Start_Object;
                Self.Nesting := Self.Nesting + 1;
-               Self.Stack.Push (Parse_Object'Access, Object_State'Pos (State));
+               Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                return False;
 
@@ -751,8 +744,7 @@ package body Magic.JSON.Implementation.Parsers is
             when Member_String =>
                State := Member_Name_Separator;
                Self.Event := Magic.JSON.Streams.Readers.Key_Name;
-               Self.Stack.Push
-                 (Parse_Object'Access, Object_State'Pos (State));
+               Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                return False;
 
@@ -788,8 +780,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Event := Magic.JSON.Streams.Readers.End_Object;
                      Self.Nesting := Self.Nesting - 1;
-                     Self.Stack.Push
-                       (Parse_Object'Access, Object_State'Pos (State));
+                     Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                      return False;
 
@@ -834,7 +825,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Member_String;
 
                      if not Self.Parse_String then
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Object'Access, Object_State'Pos (State));
 
                         return False;
@@ -844,8 +835,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Event := Magic.JSON.Streams.Readers.End_Object;
                      Self.Nesting := Self.Nesting - 1;
-                     Self.Stack.Push
-                       (Parse_Object'Access, Object_State'Pos (State));
+                     Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                      return False;
 
@@ -862,8 +852,7 @@ package body Magic.JSON.Implementation.Parsers is
             when Member_Value =>
                if not Self.Parse_Value then
                   State := Value_Separator_Or_End_Object;
-                  Self.Stack.Push
-                    (Parse_Object'Access, Object_State'Pos (State));
+                  Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                   return False;
 
@@ -887,7 +876,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Member_String;
 
                      if not Self.Parse_String then
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Object'Access, Object_State'Pos (State));
 
                         return False;
@@ -1224,7 +1213,7 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Stack.Push (Parse_Value'Access, Value_State'Pos (State));
+               Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                return False;
             end if;
@@ -1248,7 +1237,7 @@ package body Magic.JSON.Implementation.Parsers is
                   when Quotation_Mark =>
                      if not Self.Parse_String then
                         State := Value_String;
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
@@ -1256,7 +1245,7 @@ package body Magic.JSON.Implementation.Parsers is
                      else
                         State := Done;
                         Self.Event := Magic.JSON.Streams.Readers.String_Value;
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
@@ -1274,7 +1263,7 @@ package body Magic.JSON.Implementation.Parsers is
                   when Hyphen_Minus | Digit_Zero .. Digit_Nine =>
                      if not Self.Parse_Number then
                         State := Value_Number;
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
@@ -1282,7 +1271,7 @@ package body Magic.JSON.Implementation.Parsers is
                      else
                         State := Done;
                         Self.Event := Magic.JSON.Streams.Readers.Number_Value;
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
@@ -1291,7 +1280,7 @@ package body Magic.JSON.Implementation.Parsers is
                   when Begin_Array =>
                      if not Self.Parse_Array then
                         State := Done;
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
@@ -1306,7 +1295,7 @@ package body Magic.JSON.Implementation.Parsers is
                   when Begin_Object =>
                      if not Self.Parse_Object then
                         State := Done;
-                        Self.Stack.Push
+                        Self.Push
                           (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
@@ -1325,16 +1314,14 @@ package body Magic.JSON.Implementation.Parsers is
             when Value_String =>
                State := Done;
                Self.Event := Magic.JSON.Streams.Readers.String_Value;
-               Self.Stack.Push
-                 (Parse_Value'Access, Value_State'Pos (State));
+               Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                return False;
 
             when Value_Number =>
                State := Done;
                Self.Event := Magic.JSON.Streams.Readers.Number_Value;
-               Self.Stack.Push
-                 (Parse_Value'Access, Value_State'Pos (State));
+               Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                return False;
 
@@ -1419,8 +1406,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Boolean := False;
                      Self.Event := Magic.JSON.Streams.Readers.Boolean_Value;
-                     Self.Stack.Push
-                       (Parse_Value'Access, Value_State'Pos (State));
+                     Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                      return False;
 
@@ -1451,8 +1437,7 @@ package body Magic.JSON.Implementation.Parsers is
                   when Latin_Small_Letter_L =>
                      State := Finish;
                      Self.Event := Magic.JSON.Streams.Readers.Null_Value;
-                     Self.Stack.Push
-                       (Parse_Value'Access, Value_State'Pos (State));
+                     Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                      return False;
 
@@ -1484,8 +1469,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Boolean := True;
                      Self.Event := Magic.JSON.Streams.Readers.Boolean_Value;
-                     Self.Stack.Push
-                       (Parse_Value'Access, Value_State'Pos (State));
+                     Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                      return False;
 
@@ -1510,6 +1494,27 @@ package body Magic.JSON.Implementation.Parsers is
    begin
       Self.Head := Self.Head - 1;
    end Pop;
+
+   ----------
+   -- Push --
+   ----------
+
+   procedure Push
+     (Self  : in out JSON_Parser'Class;
+      Parse : not null Parse_Subprogram;
+      State : Interfaces.Unsigned_32)
+   is
+      use type Magic.JSON.Streams.Readers.JSON_Event_Kind;
+      use type Magic.JSON.Streams.Readers.JSON_Reader_Error;
+
+   begin
+      if Self.Event /= Magic.JSON.Streams.Readers.Invalid
+        or else Self.Error
+          /= Magic.JSON.Streams.Readers.Not_Valid
+      then
+         Self.Stack.Push (Parse, State);
+      end if;
+   end Push;
 
    ----------
    -- Push --
@@ -1542,7 +1547,7 @@ package body Magic.JSON.Implementation.Parsers is
       if not Success then
          Self.Event := Magic.JSON.Streams.Readers.Invalid;
          Self.Error := Magic.JSON.Streams.Readers.Premature_End_Of_Document;
-         Self.Stack.Push (Parse, State);
+         Self.Push (Parse, State);
 
          return False;
 

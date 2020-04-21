@@ -108,4 +108,9 @@ private
       Is_Float    : Standard.Boolean;
    end record;
 
+   procedure Push
+     (Self  : in out JSON_Parser'Class;
+      Parse : not null Parse_Subprogram;
+      State : Interfaces.Unsigned_32);
+
 end Magic.JSON.Implementation.Parsers;

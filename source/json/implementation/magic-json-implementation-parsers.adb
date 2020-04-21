@@ -1120,7 +1120,8 @@ package body Magic.JSON.Implementation.Parsers is
                   State := Escape_UXXXX;
 
                else
-                  return Self.Report_Error ("Alone low surrogate code point");
+                  return
+                    Self.Report_Error ("Low surrogate code point unexpected");
                end if;
 
             when Escape_UXXXX =>
@@ -1129,7 +1130,9 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Escape_UXXXX_Escape;
 
                   when others =>
-                     raise Program_Error;
+                     return
+                       Self.Report_Error
+                         ("Escaped low surrogate code point expected");
                end case;
 
             when Escape_UXXXX_Escape =>
@@ -1138,7 +1141,9 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Escape_UXXXX_Escape_U;
 
                   when others =>
-                     raise Program_Error;
+                     return
+                       Self.Report_Error
+                         ("Escaped low surrogate code point expected");
                end case;
 
             when Escape_UXXXX_Escape_U =>
@@ -1171,7 +1176,8 @@ package body Magic.JSON.Implementation.Parsers is
                end if;
 
                if Self.Code_Unit_2 not in 16#DC00# .. 16#DFFF# then
-                  raise Program_Error;
+                  return
+                    Self.Report_Error ("Low surrogate code point expected");
                end if;
 
                declare

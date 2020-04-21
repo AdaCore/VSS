@@ -1105,7 +1105,7 @@ package body Magic.JSON.Implementation.Parsers is
                   State := Escape_UXXXX;
 
                else
-                  raise Program_Error;
+                  return Self.Report_Error ("Alone low surrogate code point");
                end if;
 
             when Escape_UXXXX =>

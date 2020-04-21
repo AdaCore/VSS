@@ -1,4 +1,4 @@
 START_DOCUMENT
-START_OBJECT
+START_ARRAY
 INVALID NOT_VALID "Low surrogate code point unexpected"
 END_DOCUMENT

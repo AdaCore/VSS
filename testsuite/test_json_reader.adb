@@ -79,14 +79,17 @@ begin
                if Reader.Error /= Premature_End_Of_Document then
                   Ada.Text_IO.Put_Line
                     (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
-                       (Reader.Event_Kind));
+                       (Reader.Event_Kind)
 
-                  if Reader.Error = Not_Valid then
-                     Ada.Command_Line.Set_Exit_Status (1);
+                     & ' '
+                     & Magic.JSON.Streams.Readers.JSON_Reader_Error'Image
+                         (Reader.Error)
+                     & " """
+                     & Magic.Strings.Conversions.To_UTF_8_String
+                         (Reader.Error_Message)
+                     & '"');
 
-                     return;
-
-                  else
+                  if Reader.Error /= Not_Valid then
                      raise Program_Error;
                   end if;
 

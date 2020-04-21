@@ -116,6 +116,16 @@ package body Magic.JSON.Implementation.Parsers is
       return Self.Error;
    end Error;
 
+   -------------------
+   -- Error_Message --
+   -------------------
+
+   function Error_Message
+     (Self : JSON_Parser'Class) return Magic.Strings.Magic_String is
+   begin
+      return Self.Message;
+   end Error_Message;
+
    ----------------
    -- Event_Kind --
    ----------------
@@ -1553,7 +1563,9 @@ package body Magic.JSON.Implementation.Parsers is
    begin
       Self.Event := Magic.JSON.Streams.Readers.Invalid;
       Self.Error := Magic.JSON.Streams.Readers.Not_Valid;
-      --  Self.Message := Magic.Strings.Conversions.To_Magic_String (Message);
+      Self.Message :=
+        Magic.Strings.Conversions.To_Magic_String
+          (Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Encode (Message));
 
       return False;
    end Report_Error;

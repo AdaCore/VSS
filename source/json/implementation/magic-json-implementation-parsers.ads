@@ -47,6 +47,10 @@ package Magic.JSON.Implementation.Parsers is
       return Magic.JSON.Streams.Readers.JSON_Reader_Error;
    --  Return current error.
 
+   function Error_Message
+     (Self : JSON_Parser'Class) return Magic.Strings.Magic_String;
+   --  Return error message.
+
    function String_Value
      (Self : JSON_Parser'Class) return Magic.Strings.Magic_String;
    --  Return string data (key name or string value)
@@ -94,6 +98,7 @@ private
         Magic.JSON.Streams.Readers.No_Token;
       Error       : Magic.JSON.Streams.Readers.JSON_Reader_Error :=
         Magic.JSON.Streams.Readers.No_Error;
+      Message     : Magic.Strings.Magic_String;
       C           : Wide_Wide_Character;
       String      : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
       Boolean     : Standard.Boolean;

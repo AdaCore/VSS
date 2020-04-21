@@ -17,11 +17,13 @@
 
 with Interfaces;
 
+with Magic.Strings;
+
 package Magic.JSON is
 
-   pragma Pure;
+   pragma Preelaborate;
 
-   type JSON_Number_Kind is (None, JSON_Integer, JSON_Float);
+   type JSON_Number_Kind is (None, JSON_Integer, JSON_Float, Out_Of_Range);
    --  Format of the number used to represent value. Note, it is only hint in
    --  most cases, implementation may use other format for some reason.
 
@@ -30,11 +32,19 @@ package Magic.JSON is
          when None =>
             null;
 
-         when JSON_Integer =>
-            Integer_Value : Interfaces.Integer_64;
+         when others =>
+            String_Value : Magic.Strings.Magic_String;
 
-         when JSON_Float =>
-            Float_Value   : Interfaces.IEEE_Float_64;
+            case Kind is
+               when None | Out_Of_Range =>
+                  null;
+
+               when JSON_Integer =>
+                  Integer_Value : Interfaces.Integer_64;
+
+               when JSON_Float =>
+                  Float_Value   : Interfaces.IEEE_Float_64;
+            end case;
       end case;
    end record;
 

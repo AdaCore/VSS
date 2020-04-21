@@ -17,6 +17,6 @@
 
 package Magic.JSON.Implementation is
 
-   pragma Pure;
+   pragma Preelaborate;
 
 end Magic.JSON.Implementation;

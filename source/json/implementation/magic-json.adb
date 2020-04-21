@@ -24,7 +24,7 @@ package body Magic.JSON is
    function As_Float (Self : JSON_Number) return Interfaces.IEEE_Float_64 is
    begin
       case Self.Kind is
-         when None =>
+         when None | Out_Of_Range =>
             raise Constraint_Error;
 
          when JSON_Float =>
@@ -42,7 +42,7 @@ package body Magic.JSON is
    function As_Integer (Self : JSON_Number) return Interfaces.Integer_64 is
    begin
       case Self.Kind is
-         when None =>
+         when None | Out_Of_Range =>
             raise Constraint_Error;
 
          when JSON_Float =>

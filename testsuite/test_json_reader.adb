@@ -137,12 +137,15 @@ begin
                      & ' '
                      & (case Reader.Number_Value.Kind is
                           when Magic.JSON.None => "",
+                          when Magic.JSON.Out_Of_Range =>
+                            Magic.Strings.Conversions.To_UTF_8_String
+                              (Reader.String_Value),
                           when Magic.JSON.JSON_Integer =>
                             Interfaces.Integer_64'Image
-                         (Reader.Number_Value.Integer_Value),
+                              (Reader.Number_Value.Integer_Value),
                           when Magic.JSON.JSON_Float =>
                             Interfaces.IEEE_Float_64'Image
-                         (Reader.Number_Value.Float_Value)));
+                              (Reader.Number_Value.Float_Value)));
                end if;
 
             when Boolean_Value =>

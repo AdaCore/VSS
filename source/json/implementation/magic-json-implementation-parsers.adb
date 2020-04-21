@@ -471,15 +471,34 @@ package body Magic.JSON.Implementation.Parsers is
 
       begin
          if not Self.Is_Float then
-            Self.Number :=
-              (Kind          => Magic.JSON.JSON_Integer,
-               Integer_Value => Interfaces.Integer_64'Wide_Wide_Value (Image));
+            begin
+               Self.Number :=
+                 (Kind          => Magic.JSON.JSON_Integer,
+                  String_Value  => Self.String_Value,
+                  Integer_Value =>
+                    Interfaces.Integer_64'Wide_Wide_Value (Image));
+
+            exception
+               when Constraint_Error =>
+                  Self.Number :=
+                    (Kind         => Magic.JSON.Out_Of_Range,
+                     String_Value => Self.String_Value);
+            end;
 
          else
-            Self.Number :=
-              (Kind        => Magic.JSON.JSON_Float,
-               Float_Value =>
-                 Interfaces.IEEE_Float_64'Wide_Wide_Value (Image));
+            begin
+               Self.Number :=
+                 (Kind         => Magic.JSON.JSON_Float,
+                  String_Value => Self.String_Value,
+                  Float_Value  =>
+                    Interfaces.IEEE_Float_64'Wide_Wide_Value (Image));
+
+            exception
+               when Constraint_Error =>
+                  Self.Number :=
+                    (Kind         => Magic.JSON.Out_Of_Range,
+                     String_Value => Self.String_Value);
+            end;
          end if;
       end Convert_Number;
 

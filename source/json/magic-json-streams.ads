@@ -17,6 +17,6 @@
 
 package Magic.JSON.Streams is
 
-   pragma Pure;
+   pragma Preelaborate;
 
 end Magic.JSON.Streams;

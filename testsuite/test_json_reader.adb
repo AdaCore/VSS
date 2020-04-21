@@ -1,4 +1,5 @@
 
+with Ada.Calendar;
 with Ada.Command_Line;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
@@ -14,9 +15,10 @@ procedure Test_JSON_Reader is
    use all type Magic.JSON.Streams.Readers.JSON_Event_Kind;
    use all type Magic.JSON.Streams.Readers.JSON_Reader_Error;
 
-   Input  : aliased Memory_Text_Streams.Memory_UTF8_Input_Stream;
-   Reader : Magic.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
-   Count  : Natural := 0;
+   Input      : aliased Memory_Text_Streams.Memory_UTF8_Input_Stream;
+   Reader     : Magic.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
+   Count      : Natural := 0;
+   Perfomance : Boolean := False;
 
 begin
    if Ada.Command_Line.Argument_Count /= 2 then
@@ -25,9 +27,19 @@ begin
 
    if Ada.Command_Line.Argument (1) = "s" then
       Input.Set_Incremental (False);
+      Perfomance := False;
+
+   elsif Ada.Command_Line.Argument (1) = "sp" then
+      Input.Set_Incremental (False);
+      Perfomance := True;
 
    elsif Ada.Command_Line.Argument (1) = "i" then
       Input.Set_Incremental (True);
+      Perfomance := False;
+
+   elsif Ada.Command_Line.Argument (1) = "ip" then
+      Input.Set_Incremental (True);
+      Perfomance := True;
 
    else
       raise Program_Error with "incorrect parsing mode";
@@ -53,88 +65,110 @@ begin
       Ada.Streams.Stream_IO.Close (File);
    end;
 
-   Reader.Set_Stream (Input'Unchecked_Access);
+   declare
+      use type Ada.Calendar.Time;
 
-   while Reader.Read_Next /= No_Token loop
-      case Reader.Event_Kind is
-         when Invalid =>
-            if Reader.Error /= Premature_End_Of_Document then
-               Ada.Text_IO.Put_Line
-                 (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
-                    (Reader.Event_Kind));
+      Start : Ada.Calendar.Time := Ada.Calendar.Clock;
 
-               if Reader.Error = Not_Valid then
-                  Ada.Command_Line.Set_Exit_Status (1);
+   begin
+      Reader.Set_Stream (Input'Unchecked_Access);
 
-                  return;
+      while Reader.Read_Next /= No_Token loop
+         case Reader.Event_Kind is
+            when Invalid =>
+               if Reader.Error /= Premature_End_Of_Document then
+                  Ada.Text_IO.Put_Line
+                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                       (Reader.Event_Kind));
 
-               else
-                  raise Program_Error;
-               end if;
+                  if Reader.Error = Not_Valid then
+                     Ada.Command_Line.Set_Exit_Status (1);
+
+                     return;
+
+                  else
+                     raise Program_Error;
+                  end if;
 
             else
-               Count := Count + 1;
+                  Count := Count + 1;
 
-               if Count > 1_000 then
-                  raise Program_Error;
+                  if Count > 1_000 then
+                     raise Program_Error;
+                  end if;
                end if;
-            end if;
 
-         when Key_Name =>
-            Count := 0;
+            when Key_Name =>
+               Count := 0;
 
-            Ada.Text_IO.Put_Line
-              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
-                 (Reader.Event_Kind)
-               & " """
-               & Magic.Strings.Conversions.To_UTF_8_String
-                 (Reader.Key_Name)
-               & '"');
+               if not Perfomance then
+                  Ada.Text_IO.Put_Line
+                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                       (Reader.Event_Kind)
+                     & " """
+                     & Magic.Strings.Conversions.To_UTF_8_String
+                       (Reader.Key_Name)
+                     & '"');
+               end if;
 
-         when String_Value =>
-            Count := 0;
+            when String_Value =>
+               Count := 0;
 
-            Ada.Text_IO.Put_Line
-              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
-                 (Reader.Event_Kind)
-               & " """
-               & Magic.Strings.Conversions.To_UTF_8_String
-                 (Reader.String_Value)
-               & '"');
+               if not Perfomance then
+                  Ada.Text_IO.Put_Line
+                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                       (Reader.Event_Kind)
+                     & " """
+                     & Magic.Strings.Conversions.To_UTF_8_String
+                       (Reader.String_Value)
+                     & '"');
+               end if;
 
-         when Number_Value =>
-            Count := 0;
+            when Number_Value =>
+               Count := 0;
 
-            Ada.Text_IO.Put_Line
-              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
-                 (Reader.Event_Kind)
-               & ' '
-               & Magic.JSON.JSON_Number_Kind'Image (Reader.Number_Value.Kind)
-               & ' '
-               & (case Reader.Number_Value.Kind is
-                    when Magic.JSON.None => "",
-                    when Magic.JSON.JSON_Integer =>
-                       Interfaces.Integer_64'Image
+               if not Perfomance then
+                  Ada.Text_IO.Put_Line
+                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                       (Reader.Event_Kind)
+                     & ' '
+                     & Magic.JSON.JSON_Number_Kind'Image
+                       (Reader.Number_Value.Kind)
+                     & ' '
+                     & (case Reader.Number_Value.Kind is
+                          when Magic.JSON.None => "",
+                          when Magic.JSON.JSON_Integer =>
+                            Interfaces.Integer_64'Image
                          (Reader.Number_Value.Integer_Value),
-                    when Magic.JSON.JSON_Float =>
-                       Interfaces.IEEE_Float_64'Image
+                          when Magic.JSON.JSON_Float =>
+                            Interfaces.IEEE_Float_64'Image
                          (Reader.Number_Value.Float_Value)));
+               end if;
 
-         when Boolean_Value =>
-            Count := 0;
+            when Boolean_Value =>
+               Count := 0;
 
-            Ada.Text_IO.Put_Line
-              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
-                 (Reader.Event_Kind)
-               & " "
-               & Boolean'Image (Reader.Boolean_Value));
+               if not Perfomance then
+                  Ada.Text_IO.Put_Line
+                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                       (Reader.Event_Kind)
+                     & " "
+                     & Boolean'Image (Reader.Boolean_Value));
+               end if;
 
-         when others =>
-            Count := 0;
+            when others =>
+               Count := 0;
 
-            Ada.Text_IO.Put_Line
-              (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
-                 (Reader.Event_Kind));
-      end case;
-   end loop;
+               if not Perfomance then
+                  Ada.Text_IO.Put_Line
+                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                       (Reader.Event_Kind));
+               end if;
+         end case;
+      end loop;
+
+      if Perfomance then
+         Ada.Text_IO.Put_Line (Duration'Image (Ada.Calendar.Clock - Start));
+      end if;
+   end;
 end Test_JSON_Reader;

@@ -230,7 +230,6 @@ package body Magic.JSON.Implementation.Parsers is
                end if;
 
                State := Value_Or_End_Array;
-               Self.Nesting := Self.Nesting + 1;
                Self.Event := Magic.JSON.Streams.Readers.Start_Array;
                Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
@@ -253,7 +252,6 @@ package body Magic.JSON.Implementation.Parsers is
 
                   when End_Array =>
                      State := Finish;
-                     Self.Nesting := Self.Nesting - 1;
                      Self.Event := Magic.JSON.Streams.Readers.End_Array;
                      Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
@@ -329,7 +327,6 @@ package body Magic.JSON.Implementation.Parsers is
 
                   when End_Array =>
                      State := Finish;
-                     Self.Nesting := Self.Nesting - 1;
                      Self.Event := Magic.JSON.Streams.Readers.End_Array;
                      Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
@@ -770,7 +767,6 @@ package body Magic.JSON.Implementation.Parsers is
 
                State := Member_Or_End_Object;
                Self.Event := Magic.JSON.Streams.Readers.Start_Object;
-               Self.Nesting := Self.Nesting + 1;
                Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                return False;
@@ -819,7 +815,6 @@ package body Magic.JSON.Implementation.Parsers is
                   when End_Object =>
                      State := Finish;
                      Self.Event := Magic.JSON.Streams.Readers.End_Object;
-                     Self.Nesting := Self.Nesting - 1;
                      Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                      return False;
@@ -879,7 +874,6 @@ package body Magic.JSON.Implementation.Parsers is
                   when End_Object =>
                      State := Finish;
                      Self.Event := Magic.JSON.Streams.Readers.End_Object;
-                     Self.Nesting := Self.Nesting - 1;
                      Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                      return False;
@@ -1397,7 +1391,6 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Read (Parse_Value'Access, Value_State'Pos (State)) then
             if Self.Stream.Is_End_Of_Stream
-              and Self.Nesting = 0
               and State = Finish
             then
                --  Simulate successful read when 'string' parsing has been

@@ -96,7 +96,6 @@ private
    type JSON_Parser is tagged limited record
       Stream      : Magic.Text_Streams.Input_Text_Stream_Access;
       Stack       : Parse_Stack;
-      Nesting     : Natural := 0;
       Event       : Magic.JSON.Streams.Readers.JSON_Event_Kind :=
         Magic.JSON.Streams.Readers.No_Token;
       Error       : Magic.JSON.Streams.Readers.JSON_Reader_Error :=

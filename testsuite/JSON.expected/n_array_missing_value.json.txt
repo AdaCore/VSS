@@ -1,0 +1,4 @@
+START_DOCUMENT
+START_ARRAY
+INVALID NOT_VALID "value or end array expected"
+END_DOCUMENT

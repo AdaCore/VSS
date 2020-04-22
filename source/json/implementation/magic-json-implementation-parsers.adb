@@ -1390,16 +1390,19 @@ package body Magic.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Value'Access, Value_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream
-              and State = Finish
-            then
-               --  Simulate successful read when 'string' parsing has been
-               --  finished, 'string' is not nested into another construct,
-               --  and end of stream has been reached.
+            if Self.Stream.Is_End_Of_Stream then
+               if State = Finish then
+                  --  Simulate successful read when 'string' parsing has been
+                  --  finished, 'string' is not nested into another construct,
+                  --  and end of stream has been reached.
 
-               Self.Stack.Pop;
+                  Self.Stack.Pop;
 
-               return True;
+                  return True;
+
+               else
+                  raise Program_Error;
+               end if;
 
             else
                return False;
@@ -1454,7 +1457,7 @@ package body Magic.JSON.Implementation.Parsers is
                      return False;
 
                   when others =>
-                     raise Program_Error;
+                     return Self.Report_Error ("false expected");
                end case;
 
             when Value_N =>
@@ -1485,7 +1488,7 @@ package body Magic.JSON.Implementation.Parsers is
                      return False;
 
                   when others =>
-                     raise Program_Error;
+                     return Self.Report_Error ("null expected");
                end case;
 
             when Value_T =>
@@ -1517,7 +1520,7 @@ package body Magic.JSON.Implementation.Parsers is
                      return False;
 
                   when others =>
-                     raise Program_Error;
+                     return Self.Report_Error ("true expected");
                end case;
 
             when Finish =>

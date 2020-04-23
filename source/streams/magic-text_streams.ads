@@ -16,6 +16,7 @@
 ------------------------------------------------------------------------------
 
 with Magic.Characters;
+with Magic.Strings;
 
 package Magic.Text_Streams is
 
@@ -38,8 +39,12 @@ package Magic.Text_Streams is
      (Self : Input_Text_Stream) return Boolean is abstract;
    --  Return True when when end of stream is reached.
 
-   --  function Is_Error (Self : Input_Text_Stream) return Boolean is abstract;
+   function Has_Error (Self : Input_Text_Stream) return Boolean is abstract;
    --  Return True when any error is detected.
+
+   function Error_Message
+     (Self : Input_Text_Stream) return Magic.Strings.Magic_String is abstract;
+   --  Return error message when Has_Error returns True, or 'null' string.
 
    type Output_Text_Stream is limited interface;
 

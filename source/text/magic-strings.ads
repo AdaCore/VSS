@@ -42,7 +42,11 @@ package Magic.Strings is
    Empty_Magic_String : constant Magic_String;
 
    function Is_Empty (Self : Magic_String'Class) return Boolean;
-   --  Return True when string is empty string.
+   --  Return True when string is empty string: it is ether null or has zero
+   --  length.
+
+   function Is_Null (Self : Magic_String'Class) return Boolean;
+   --  Return True when string is null.
 
    function To_Magic_Text
      (Self : Magic_String) return Magic.Strings.Texts.Magic_Text;

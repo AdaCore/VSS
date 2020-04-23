@@ -142,6 +142,15 @@ package body Magic.Strings is
       return Self.Data = null or else Self.Data.Is_Empty;
    end Is_Empty;
 
+   -------------
+   -- Is_Null --
+   -------------
+
+   function Is_Null (Self : Magic_String'Class) return Boolean is
+   begin
+      return Self.Data = null;
+   end Is_Null;
+
    ----------
    -- Read --
    ----------

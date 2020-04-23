@@ -275,10 +275,6 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Read (Parse_Array'Access, Array_State'Pos (State)) then
             if Self.Stream.Is_End_Of_Stream then
-               --  Unwind recovery stack when end of stream has been reached.
-
-               Self.Stack.Pop;
-
                if State = Finish then
                   return True;
 
@@ -441,8 +437,6 @@ package body Magic.JSON.Implementation.Parsers is
            (Parse_JSON_Text'Access, JSON_Text_State'Pos (State))
          then
             if Self.Stream.Is_End_Of_Stream then
-               Self.Stack.Pop;
-
                Self.Event := Magic.JSON.Streams.Readers.End_Document;
 
                return True;
@@ -579,20 +573,26 @@ package body Magic.JSON.Implementation.Parsers is
 
       loop
          if not Self.Read (Parse_Number'Access, Number_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream
-              and State in Int_Digits | Frac_Or_Exp | Frac_Digits | Exp_Digits
-              --  XXX allowed states and conditions need to be checked.
-            then
-               --  Simulate successful read when 'string' parsing has been
-               --  finished, 'string' is not nested into another construct,
-               --  and end of stream has been reached.
+            if Self.Stream.Is_End_Of_Stream then
+               if State
+                    in Int_Digits | Frac_Or_Exp | Frac_Digits | Exp_Digits
+                  --  XXX allowed states and conditions need to be checked.
+               then
+                  --  Simulate successful read when 'string' parsing has been
+                  --  finished, 'string' is not nested into another construct,
+                  --  and end of stream has been reached.
 
-               Self.Stack.Pop;
-               Self.C := Wide_Wide_Character'Last;
+                  Self.C := Wide_Wide_Character'Last;
 
-               Convert_Number;
+                  Convert_Number;
 
-               return True;
+                  return True;
+
+               else
+                  --  XXX Self.Stack.Push???
+
+                  raise Program_Error;
+               end if;
 
             else
                return False;
@@ -832,10 +832,6 @@ package body Magic.JSON.Implementation.Parsers is
 
          if not Self.Read (Parse_Object'Access, Object_State'Pos (State)) then
             if Self.Stream.Is_End_Of_Stream then
-               --  Unwind recovery stack when end of the stream has been
-               --  reached
-               Self.Stack.Pop;
-
                if State = Finish then
                   return True;
 
@@ -1023,11 +1019,6 @@ package body Magic.JSON.Implementation.Parsers is
          if not Self.Read (Parse_String'Access, String_State'Pos (State)) then
             if Self.Stream.Is_End_Of_Stream then
                if State = Finish then
-                  --  Unwind recovery stack and report successful finish of
-                  --  parsing of string when end of stream has been reached.
-
-                  Self.Stack.Pop;
-
                   return True;
 
                else
@@ -1392,12 +1383,6 @@ package body Magic.JSON.Implementation.Parsers is
          if not Self.Read (Parse_Value'Access, Value_State'Pos (State)) then
             if Self.Stream.Is_End_Of_Stream then
                if State = Finish then
-                  --  Simulate successful read when 'string' parsing has been
-                  --  finished, 'string' is not nested into another construct,
-                  --  and end of stream has been reached.
-
-                  Self.Stack.Pop;
-
                   return True;
 
                else
@@ -1591,9 +1576,24 @@ package body Magic.JSON.Implementation.Parsers is
             Self.C := Wide_Wide_Character'Last;
          end if;
 
-         Self.Event := Magic.JSON.Streams.Readers.Invalid;
-         Self.Error := Magic.JSON.Streams.Readers.Premature_End_Of_Document;
-         Self.Push (Parse, State);
+         if Self.Stream.Has_Error then
+            --  In case of IO error save error message and mark document as
+            --  invalid.
+
+            Self.Message := Self.Stream.Error_Message;
+            Self.Event   := Magic.JSON.Streams.Readers.Invalid;
+            Self.Error   := Magic.JSON.Streams.Readers.Not_Valid;
+
+            return False;
+
+         else
+            Self.Event := Magic.JSON.Streams.Readers.Invalid;
+            Self.Error := Magic.JSON.Streams.Readers.Premature_End_Of_Document;
+         end if;
+
+         if not Self.Stream.Is_End_Of_Stream then
+            Self.Push (Parse, State);
+         end if;
 
          return False;
 

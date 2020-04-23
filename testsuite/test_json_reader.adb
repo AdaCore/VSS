@@ -15,10 +15,11 @@ procedure Test_JSON_Reader is
    use all type Magic.JSON.Streams.Readers.JSON_Event_Kind;
    use all type Magic.JSON.Streams.Readers.JSON_Reader_Error;
 
-   Input      : aliased Memory_Text_Streams.Memory_UTF8_Input_Stream;
-   Reader     : Magic.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
-   Count      : Natural := 0;
-   Perfomance : Boolean := False;
+   Input       : aliased Memory_Text_Streams.Memory_UTF8_Input_Stream;
+   Reader      : Magic.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
+   Count       : Natural := 0;
+   Perfomance  : Boolean := False;
+   Incremental : Boolean := False;
 
 begin
    if Ada.Command_Line.Argument_Count /= 2 then
@@ -26,19 +27,19 @@ begin
    end if;
 
    if Ada.Command_Line.Argument (1) = "s" then
-      Input.Set_Incremental (False);
+      Incremental := False;
       Perfomance := False;
 
    elsif Ada.Command_Line.Argument (1) = "sp" then
-      Input.Set_Incremental (False);
+      Incremental := False;
       Perfomance := True;
 
    elsif Ada.Command_Line.Argument (1) = "i" then
-      Input.Set_Incremental (True);
+      Incremental := True;
       Perfomance := False;
 
    elsif Ada.Command_Line.Argument (1) = "ip" then
-      Input.Set_Incremental (True);
+      Incremental := True;
       Perfomance := True;
 
    else
@@ -71,6 +72,7 @@ begin
       Start : Ada.Calendar.Time := Ada.Calendar.Clock;
 
    begin
+      Input.Set_Incremental (Incremental);
       Reader.Set_Stream (Input'Unchecked_Access);
 
       while not Reader.At_End loop
@@ -95,7 +97,10 @@ begin
                      raise Program_Error;
                   end if;
 
-            else
+               elsif not Incremental then
+                  raise Program_Error;
+
+               else
                   Count := Count + 1;
 
                   if Count > 1_000 then

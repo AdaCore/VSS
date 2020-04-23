@@ -9,6 +9,8 @@ EXPECTED_FILE=testsuite/JSON.expected/$NAME.txt
 
 set -e
 
+if [ ! -f $EXPECTED_FILE ]; then echo "SKIP"; exit; fi
+
 .objs/tests/test_json_reader s $INPUT_FILE > $LOG_FILE 2> $ERROR_FILE || (echo "(sr) FAIL"; cat $ERROR_FILE; false)
 diff -u $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(sd) FAIL"; cat $DIFF_FILE; false)
 

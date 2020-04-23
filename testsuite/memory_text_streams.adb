@@ -15,11 +15,22 @@
 -- of the license.                                                          --
 ------------------------------------------------------------------------------
 
+with Magic.Strings.Conversions;
 with Magic.Unicode;
 
 package body Memory_Text_Streams is
 
    use type Ada.Streams.Stream_Element_Offset;
+
+   -------------------
+   -- Error_Message --
+   -------------------
+
+   overriding function Error_Message
+     (Self : Memory_UTF8_Input_Stream) return Magic.Strings.Magic_String is
+   begin
+      return Self.Diagnosis;
+   end Error_Message;
 
    ---------
    -- Get --
@@ -31,6 +42,21 @@ package body Memory_Text_Streams is
       Success : in out Boolean)
    is
       use type Magic.Unicode.Code_Point;
+
+      procedure Report_Error (Message : String);
+
+      ------------------
+      -- Report_Error --
+      ------------------
+
+      procedure Report_Error (Message : String) is
+      begin
+         Success := False;
+         Item    := Magic.Characters.Magic_Character'Val (0);
+
+         Self.Diagnosis :=
+           Magic.Strings.Conversions.To_Magic_String (Message);
+      end Report_Error;
 
       U1 : Magic.Unicode.Code_Point;
       U2 : Magic.Unicode.Code_Point;
@@ -113,13 +139,25 @@ package body Memory_Text_Streams is
               Magic.Unicode.Code_Point (Self.Buffer.Element (Self.Current + 2));
 
             if U1 = 16#E0# and U2 not in 16#A0# .. 16#BF# then
-               raise Program_Error;
+               Report_Error
+                 ("invalid UTF-8 sequence (wrong second code unit of three"
+                     & " code units sequene)");
+
+               return;
 
             elsif U1 in 16#E1# .. 16#EC# and U2 not in 16#80# .. 16#BF# then
-               raise Program_Error;
+               Report_Error
+                 ("invalid UTF-8 sequence (wrong second code unit of three"
+                     & " code units sequene)");
+
+               return;
 
             elsif U1 = 16#ED# and U2 not in 16#80# .. 16#9F# then
-               raise Program_Error;
+               Report_Error
+                 ("invalid UTF-8 sequence (wrong second code unit of three"
+                     & " code units sequene)");
+
+               return;
 
             elsif U1 in 16#EE# .. 16#EF# and U2 not in 16#80# .. 16#BF# then
                raise Program_Error;
@@ -163,7 +201,11 @@ package body Memory_Text_Streams is
                raise Program_Error;
 
             elsif U1 = 16#F4# and U2 not in 16#80# .. 16#8F# then
-               raise Program_Error;
+               Report_Error
+                 ("invalid UTF-8 sequence (wrong second code unit of four"
+                     & " code units sequene)");
+
+               return;
             end if;
 
             if U3 not in 16#80# .. 16#BF# then
@@ -184,10 +226,20 @@ package body Memory_Text_Streams is
             Self.Current := Self.Current + 4;
 
          when others =>
-            --  XXX UTF-8 decoding of mulpibyte sequence need to be added
-            raise Program_Error;
+            Report_Error
+              ("invalid UTF-8 sequence (wrong start code unit)");
       end case;
    end Get;
+
+   ---------------
+   -- Has_Error --
+   ---------------
+
+   overriding function Has_Error
+     (Self : Memory_UTF8_Input_Stream) return Boolean is
+   begin
+      return not Self.Diagnosis.Is_Null;
+   end Has_Error;
 
    --------------------
    -- Is_End_Of_Data --

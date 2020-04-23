@@ -19,6 +19,7 @@ with Ada.Streams;
 
 with Magic.Characters;
 with Magic.Stream_Element_Buffers;
+with Magic.Strings;
 with Magic.Text_Streams;
 
 package Memory_Text_Streams is
@@ -29,6 +30,7 @@ package Memory_Text_Streams is
       Current     : Ada.Streams.Stream_Element_Count := 1;
       Skip        : Boolean := False;
       Incremental : Boolean := False;
+      Diagnosis   : Magic.Strings.Magic_String;
    end record;
 
    overriding procedure Get
@@ -41,6 +43,12 @@ package Memory_Text_Streams is
 
    overriding function Is_End_Of_Stream
      (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Has_Error
+     (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Error_Message
+     (Self : Memory_UTF8_Input_Stream) return Magic.Strings.Magic_String;
 
    procedure Set_Incremental
      (Self : in out Memory_UTF8_Input_Stream'Class;

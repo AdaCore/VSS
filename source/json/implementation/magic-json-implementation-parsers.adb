@@ -1360,9 +1360,6 @@ package body Magic.JSON.Implementation.Parsers is
 
             when Finish =>
                null;
-
-            when others =>
-               null;
          end case;
 
          if not Self.Read (Parse_Value'Access, Value_State'Pos (State)) then

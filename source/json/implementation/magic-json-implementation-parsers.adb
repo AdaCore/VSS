@@ -746,9 +746,6 @@ package body Magic.JSON.Implementation.Parsers is
 
                      return True;
                end case;
-
-            when others =>
-               raise Program_Error;
          end case;
       end loop;
    end Parse_Number;

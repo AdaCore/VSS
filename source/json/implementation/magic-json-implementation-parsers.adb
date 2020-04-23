@@ -477,7 +477,14 @@ package body Magic.JSON.Implementation.Parsers is
    ------------------
 
    type Number_State is
-     (Int, Int_Digits, Frac_Or_Exp, Frac_Digits, Exp_Sign_Or_Digits, Exp_Digits);
+     (Int,
+      Int_Digits,
+      Frac_Or_Exp,
+      Frac_Digit,
+      Frac_Digits,
+      Exp_Sign_Or_Digits,
+      Exp_Digit,
+      Exp_Digits);
 
    function Parse_Number (Self : in out JSON_Parser'Class) return Boolean is
       --  [RFC 8259]
@@ -631,7 +638,7 @@ package body Magic.JSON.Implementation.Parsers is
                        (Self.String, Self.C);
 
                   when Decimal_Point =>
-                     State := Frac_Digits;
+                     State := Frac_Digit;
                      Self.Is_Float := True;
                      Ada.Strings.Wide_Wide_Unbounded.Append
                        (Self.String, Self.C);
@@ -651,7 +658,7 @@ package body Magic.JSON.Implementation.Parsers is
             when Frac_Or_Exp =>
                case Self.C is
                   when Decimal_Point =>
-                     State := Frac_Digits;
+                     State := Frac_Digit;
                      Self.Is_Float := True;
                      Ada.Strings.Wide_Wide_Unbounded.Append
                        (Self.String, Self.C);
@@ -666,6 +673,17 @@ package body Magic.JSON.Implementation.Parsers is
                      Convert_Number;
 
                      return True;
+               end case;
+
+            when Frac_Digit =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine =>
+                     State := Frac_Digits;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
+
+                  when others =>
+                     return Self.Report_Error ("frac digit expected");
                end case;
 
             when Frac_Digits =>
@@ -693,23 +711,33 @@ package body Magic.JSON.Implementation.Parsers is
                        (Self.String, Self.C);
 
                   when Hyphen_Minus =>
-                     State := Exp_Digits;
+                     State := Exp_Digit;
                      Ada.Strings.Wide_Wide_Unbounded.Append
                        (Self.String, Self.C);
 
                   when Plus_Sign =>
+                     State := Exp_Digit;
+                     Ada.Strings.Wide_Wide_Unbounded.Append
+                       (Self.String, Self.C);
+
+                  when others =>
+                     return Self.Report_Error ("plus/minus or digit expected");
+               end case;
+
+            when Exp_Digit =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine =>
                      State := Exp_Digits;
                      Ada.Strings.Wide_Wide_Unbounded.Append
                        (Self.String, Self.C);
 
                   when others =>
-                     raise Program_Error;
+                     return Self.Report_Error ("exp digit expected");
                end case;
 
             when Exp_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     State := Exp_Digits;
                      Ada.Strings.Wide_Wide_Unbounded.Append
                        (Self.String, Self.C);
 

@@ -128,7 +128,9 @@ package body Memory_Text_Streams is
             --  EE .. EF | 80 .. BF | 80 .. BF
 
             if Self.Current + 2 > Self.Buffer.Length then
-               raise Program_Error;
+               Report_Error ("incomplete three code unit sequence");
+
+               return;
             end if;
 
             U1 :=

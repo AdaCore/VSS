@@ -1233,7 +1233,6 @@ package body Magic.JSON.Implementation.Parsers is
      (Initial,
       Value_String,
       Value_Number,
-      Value_Array,
       Value_F,
       Value_FA,
       Value_FAL,
@@ -1244,8 +1243,7 @@ package body Magic.JSON.Implementation.Parsers is
       Value_T,
       Value_TR,
       Value_TRU,
-      Finish,
-      Done);
+      Finish);
 
    function Parse_Value (Self : in out JSON_Parser'Class) return Boolean is
       State : Value_State;
@@ -1287,10 +1285,7 @@ package body Magic.JSON.Implementation.Parsers is
                         return False;
 
                      else
-                        State := Done;
                         Self.Event := Magic.JSON.Streams.Readers.String_Value;
-                        Self.Push
-                          (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
                      end if;
@@ -1313,20 +1308,13 @@ package body Magic.JSON.Implementation.Parsers is
                         return False;
 
                      else
-                        State := Done;
                         Self.Event := Magic.JSON.Streams.Readers.Number_Value;
-                        Self.Push
-                          (Parse_Value'Access, Value_State'Pos (State));
 
                         return False;
                      end if;
 
                   when Begin_Array =>
                      if not Self.Parse_Array then
-                        State := Done;
-                        Self.Push
-                          (Parse_Value'Access, Value_State'Pos (State));
-
                         return False;
 
                      else
@@ -1338,10 +1326,6 @@ package body Magic.JSON.Implementation.Parsers is
 
                   when Begin_Object =>
                      if not Self.Parse_Object then
-                        State := Done;
-                        Self.Push
-                          (Parse_Value'Access, Value_State'Pos (State));
-
                         return False;
 
                      else
@@ -1356,16 +1340,12 @@ package body Magic.JSON.Implementation.Parsers is
                end case;
 
             when Value_String =>
-               State := Done;
                Self.Event := Magic.JSON.Streams.Readers.String_Value;
-               Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                return False;
 
             when Value_Number =>
-               State := Done;
                Self.Event := Magic.JSON.Streams.Readers.Number_Value;
-               Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                return False;
 
@@ -1380,9 +1360,6 @@ package body Magic.JSON.Implementation.Parsers is
 
             when Finish =>
                null;
-
-            when Done =>
-               return True;
 
             when others =>
                null;
@@ -1406,7 +1383,7 @@ package body Magic.JSON.Implementation.Parsers is
             when Initial =>
                null;
 
-            when Value_Array =>
+            when Value_Number =>
                raise Program_Error;
 
             when Value_String =>
@@ -1518,9 +1495,6 @@ package body Magic.JSON.Implementation.Parsers is
 
             when Finish =>
                return True;
-
-            when others =>
-               raise Program_Error;
          end case;
       end loop;
    end Parse_Value;

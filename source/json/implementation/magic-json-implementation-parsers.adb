@@ -448,8 +448,16 @@ package body Magic.JSON.Implementation.Parsers is
          case State is
             when Initial =>
                if not Self.Parse_Value then
-                  State := Whitespace_Or_End;
-                  Self.Push
+                  if Self.Event /= Magic.JSON.Streams.Readers.Invalid
+                    or else Self.Error /= Magic.JSON.Streams.Readers.Not_Valid
+                  then
+                     State := Whitespace_Or_End;
+
+                  else
+                     State := Done;
+                  end if;
+
+                  Self.Stack.Push
                     (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
                   return False;

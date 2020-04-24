@@ -830,7 +830,7 @@ package body Magic.JSON.Implementation.Parsers is
                      State := Member_Value;
 
                   when others =>
-                     raise Program_Error;
+                     return Self.Report_Error ("name separator expected");
                end case;
 
             when Value_Separator_Or_End_Object =>
@@ -853,7 +853,9 @@ package body Magic.JSON.Implementation.Parsers is
                      return False;
 
                   when others =>
-                     raise Program_Error;
+                     return
+                       Self.Report_Error
+                         ("value separator or end object expected");
                end case;
 
             when Finish =>
@@ -869,7 +871,7 @@ package body Magic.JSON.Implementation.Parsers is
                   return True;
 
                else
-                  raise Program_Error;
+                  return Self.Report_Error ("unexpected end of document");
                end if;
 
             else
@@ -908,7 +910,8 @@ package body Magic.JSON.Implementation.Parsers is
                      return False;
 
                   when others =>
-                     raise Program_Error;
+                     return
+                       Self.Report_Error ("string or end object expected");
                end case;
 
             when Member_String =>
@@ -951,7 +954,7 @@ package body Magic.JSON.Implementation.Parsers is
                      end if;
 
                   when others =>
-                     raise Program_Error;
+                     return Self.Report_Error ("string expected");
                end case;
 
             when Finish =>
@@ -1055,7 +1058,7 @@ package body Magic.JSON.Implementation.Parsers is
                   return True;
 
                else
-                  raise Program_Error;
+                  return Self.Report_Error ("premature end of string");
                end if;
 
             else
@@ -1393,7 +1396,7 @@ package body Magic.JSON.Implementation.Parsers is
                   return True;
 
                else
-                  raise Program_Error;
+                  return Self.Report_Error ("premature end of value");
                end if;
 
             else

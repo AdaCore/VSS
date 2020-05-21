@@ -21,52 +21,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Magic.Strings.Configuration;
+with Magic.Strings.UTF8;
 
-package body Magic.Strings.Conversions is
+private package Magic.Strings.Configuration is
 
-   ---------------------
-   -- To_Magic_String --
-   ---------------------
+   UTF8_String_Hanler : aliased Magic.Strings.UTF8.UTF8_String_Handler;
 
-   function To_Magic_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Magic_String
-   is
-      Pointer : System.Address;
-      Success : Boolean;
+   Default_Handler : not null String_Handler_Access :=
+     UTF8_String_Hanler'Access;
 
-   begin
-      Magic.Strings.Configuration.Default_Handler.From_UTF_8_String
-        (Item, Pointer, Success);
-
-      if not Success then
-         raise Constraint_Error with "Ill-formed UTF-8 data";
-      end if;
-
-      return
-        (Ada.Finalization.Controlled with
-           Data =>
-             (In_Place => False,
-              Handler  => Magic.Strings.Configuration.Default_Handler,
-              Pointer  => Pointer),
-           others => <>);
-   end To_Magic_String;
-
-   ---------------------
-   -- To_UTF_8_String --
-   ---------------------
-
-   function To_UTF_8_String
-     (Item : Magic_String) return Ada.Strings.UTF_Encoding.UTF_8_String is
-   begin
-      if Item.Data.In_Place then
-         raise Program_Error;
-
-      elsif Item.Data.Handler /= null then
-         return Item.Data.Handler.To_UTF_8_String (Item.Data.Pointer);
-      end if;
-
-      return "";
-   end To_UTF_8_String;
-
-end Magic.Strings.Conversions;
+end Magic.Strings.Configuration;

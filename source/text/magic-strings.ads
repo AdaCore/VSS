@@ -25,6 +25,8 @@
 private with Ada.Finalization;
 private with Ada.Strings.UTF_Encoding;
 private with Ada.Streams;
+--  private with Interfaces;
+private with System.Storage_Elements;
 
 with Magic.Characters;
 limited with Magic.Strings.Iterators.Characters;
@@ -75,6 +77,10 @@ package Magic.Strings is
 private
 
    type Magic_String_Access is access all Magic_String'Class;
+
+   type Abstract_String_Handler is tagged;
+
+   type String_Handler_Access is access all Abstract_String_Handler'Class;
 
    ------------
    -- Cursor --
@@ -140,6 +146,83 @@ private
    --  Returns view that supports text operations. Returned value must be
    --  unreferenced after use.
 
+   -----------------
+   -- String_Data --
+   -----------------
+
+   --  String_Data is a pair or Handler and pointer to the associated data.
+   --  It is not defined how particular implementation of the String_Handler
+   --  use pointer.
+
+   --  XXX Not implemented:
+   --  However, there is one exception: when In_Place Flag is set it means
+   --  that special predefined handler is used and both Handler and Data
+   --  fields are used as storage. By convention, in place data is always
+   --  use UTF-8 encoding.
+
+   type String_Data (In_Place : Boolean := False) is record
+      Handler : String_Handler_Access;
+      Pointer : System.Address;
+   end record;
+
+   -----------------------------
+   -- Abstract_String_Handler --
+   -----------------------------
+
+   --  Abstract_String_Hanlder is abstract set of operations on string data.
+
+   type Abstract_String_Handler is abstract tagged limited null record;
+
+   not overriding procedure Reference
+     (Self    : Abstract_String_Handler;
+      Pointer : in out System.Address) is abstract;
+   --  Called when new copy of the string is created. It should update pointer
+   --  if necessary.
+
+   not overriding procedure Unreference
+     (Self    : Abstract_String_Handler;
+      Pointer : in out System.Address) is abstract;
+   --  Called when some copy of the string is not longer needed. It should
+   --  release resources when necessary and reset Pointer to safe value.
+
+   not overriding function Is_Empty
+     (Self    : Abstract_String_Handler;
+      Pointer : System.Address) return Boolean is abstract;
+   --  Return True when string is empty.
+
+   not overriding function Element
+     (Self     : Abstract_String_Handler;
+      Pointer  : System.Address;
+      Position : Magic.Strings.Cursor)
+      return Magic.Unicode.Code_Point is abstract;
+   --  Return character at given position or NUL if Position is not pointing
+   --  to any character.
+
+   not overriding procedure First_Character
+     (Self     : Abstract_String_Handler;
+      Pointer  : System.Address;
+      Position : in out Magic.Strings.Cursor) is abstract;
+   --  Initialize iterator to point to first character.
+
+   not overriding function Forward
+     (Self     : Abstract_String_Handler;
+      Pointer  : System.Address;
+      Position : in out Cursor) return Boolean is abstract;
+   --  Move cursor one character forward. Return True on success.
+
+   not overriding procedure From_UTF_8_String
+     (Self    : Abstract_String_Handler;
+      Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Pointer : out System.Address;
+      Success : out Boolean) is abstract;
+   --  Convert UTF_8_String into internal representation.
+
+   not overriding function To_UTF_8_String
+     (Self    : Abstract_String_Handler;
+      Pointer : System.Address)
+      return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
+   --  Converts string data into standard UTF_8_String.
+
    --------------------------
    -- Referal_Limited_Base --
    --------------------------
@@ -180,7 +263,8 @@ private
       Self   : Magic_String);
 
    type Magic_String is new Ada.Finalization.Controlled with record
-      Data : String_Access;
+      --  Data : String_Access;
+      Data : String_Data;
       Head : Referal_Limited_Access;
       Tail : Referal_Limited_Access;
    end record
@@ -192,7 +276,7 @@ private
 
    Empty_Magic_String : constant Magic_String :=
      (Ada.Finalization.Controlled with
-        Data => null, Head => null, Tail => null);
+        Data => <>, Head => null, Tail => null);
 
    -----------------------
    -- Grapheme_Iterator --
@@ -203,5 +287,34 @@ private
    end record;
 
    overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
+
+   --  use type System.Storage_Elements.Storage_Offset;
+   --
+   --  type Unsigned_31 is mod 2**31;
+   --
+   --  type Union_Data (Is_In_Place : Boolean := True) is record
+   --     Capacity : Unsigned_31;
+   --
+   --     Leading  : System.Storage_Elements.Storage_Array
+   --       (0 .. System.Address'Max_Size_In_Storage_Elements - 5);
+   --
+   --     case Is_In_Place is
+   --        when False =>
+   --           Handler : String_Handler;
+   --           Data    : aliased System.Address;
+   --
+   --        when True =>
+   --           Storage : aliased System.Storage_Elements.Storage_Array
+   --             (0 .. 2 * System.Address'Max_Size_In_Storage_Elements - 1);
+   --     end case;
+   --  end record with Pack; --  with Unchecked_Union;
+   --
+   --  type New_Magic_String is new Ada.Finalization.Controlled with record
+   --     --  Capacity    : Unsigned_31;
+   --     --  --  Is_In_Place : Boolean;
+   --     Data        : Union_Data;
+   --     Head : Referal_Limited_Access;
+   --     Tail : Referal_Limited_Access;
+   --  end record with Pack;
 
 end Magic.Strings;

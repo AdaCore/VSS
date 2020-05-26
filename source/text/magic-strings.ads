@@ -102,11 +102,11 @@ private
    --  However, there is one exception: when In_Place Flag is set it means
    --  that special predefined handler is used to process Storage.
    --
-   --  Note: data layout is for x86-64 CPU.
+   --  Note: data layout is optimized for x86-64 CPU.
    --  Note: Storage has 4 bytes alignment.
 
    type String_Data (In_Place : Boolean := False) is record
-      Capacity : Character_Count;
+      Capacity : Character_Count := 0;
 
       case In_Place is
          when True =>
@@ -134,25 +134,25 @@ private
    type Abstract_String_Handler is abstract tagged limited null record;
 
    not overriding procedure Reference
-     (Self    : Abstract_String_Handler;
-      Pointer : in out System.Address) is abstract;
+     (Self : Abstract_String_Handler;
+      Data : in out String_Data) is abstract;
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    not overriding procedure Unreference
-     (Self    : Abstract_String_Handler;
-      Pointer : in out System.Address) is abstract;
+     (Self : Abstract_String_Handler;
+      Data : in out String_Data) is abstract;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 
    not overriding function Is_Empty
-     (Self    : Abstract_String_Handler;
-      Pointer : System.Address) return Boolean is abstract;
+     (Self : Abstract_String_Handler;
+      Data : String_Data) return Boolean is abstract;
    --  Return True when string is empty.
 
    not overriding function Element
      (Self     : Abstract_String_Handler;
-      Pointer  : System.Address;
+      Data     : String_Data;
       Position : Magic.Strings.Cursor)
       return Magic.Unicode.Code_Point is abstract;
    --  Return character at given position or NUL if Position is not pointing
@@ -160,26 +160,26 @@ private
 
    not overriding procedure First_Character
      (Self     : Abstract_String_Handler;
-      Pointer  : System.Address;
+      Data     : String_Data;
       Position : in out Magic.Strings.Cursor) is abstract;
    --  Initialize iterator to point to first character.
 
    not overriding function Forward
      (Self     : Abstract_String_Handler;
-      Pointer  : System.Address;
+      Data     : String_Data;
       Position : in out Cursor) return Boolean is abstract;
    --  Move cursor one character forward. Return True on success.
 
    not overriding procedure From_UTF_8_String
-     (Self    : Abstract_String_Handler;
+     (Self    : in out Abstract_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Pointer : out System.Address;
+      Data    : out String_Data;
       Success : out Boolean) is abstract;
    --  Convert UTF_8_String into internal representation.
 
    not overriding function To_UTF_8_String
-     (Self    : Abstract_String_Handler;
-      Pointer : System.Address)
+     (Self : Abstract_String_Handler;
+      Data : String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
    --  Converts string data into standard UTF_8_String.
 

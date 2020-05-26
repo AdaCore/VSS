@@ -25,9 +25,15 @@ with Magic.Strings.UTF8;
 
 private package Magic.Strings.Configuration is
 
-   UTF8_String_Hanler : aliased Magic.Strings.UTF8.UTF8_String_Handler;
+   pragma Preelaborate;
 
-   Default_Handler : not null String_Handler_Access :=
-     UTF8_String_Hanler'Access;
+   UTF8_String_Handler   : aliased Magic.Strings.UTF8.UTF8_String_Handler;
+   UTF8_In_Place_Handler :
+     aliased Magic.Strings.UTF8.UTF8_In_Place_String_Handler;
+
+   Default_Handler  : not null String_Handler_Access :=
+     UTF8_String_Handler'Access;
+   In_Place_Handler : not null String_Handler_Access :=
+     UTF8_In_Place_Handler'Access;
 
 end Magic.Strings.Configuration;

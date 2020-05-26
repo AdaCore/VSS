@@ -21,6 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Magic.Strings.Configuration;
 with Magic.Strings.Iterators.Characters.Internals;
 with Magic.Strings.Texts;
 
@@ -33,10 +34,10 @@ package body Magic.Strings is
    overriding procedure Adjust (Self : in out Magic_String) is
    begin
       if Self.Data.In_Place then
-         raise Program_Error;
+         Magic.Strings.Configuration.In_Place_Handler.Reference (Self.Data);
 
       elsif Self.Data.Handler /= null then
-         Self.Data.Handler.Reference (Self.Data.Pointer);
+         Self.Data.Handler.Reference (Self.Data);
       end if;
    end Adjust;
 
@@ -107,10 +108,10 @@ package body Magic.Strings is
       --  Unreference shared data
 
       if Self.Data.In_Place then
-         raise Program_Error;
+         Magic.Strings.Configuration.In_Place_Handler.Unreference (Self.Data);
 
       elsif Self.Data.Handler /= null then
-         Self.Data.Handler.Unreference (Self.Data.Pointer);
+         Self.Data.Handler.Unreference (Self.Data);
       end if;
    end Finalize;
 
@@ -146,9 +147,9 @@ package body Magic.Strings is
    begin
       return
         (if Self.Data.In_Place
-         then raise Program_Error
+         then Magic.Strings.Configuration.In_Place_Handler.Is_Empty (Self.Data)
          else Self.Data.Handler = null
-           or else Self.Data.Handler.Is_Empty (Self.Data.Pointer));
+           or else Self.Data.Handler.Is_Empty (Self.Data));
    end Is_Empty;
 
    -------------

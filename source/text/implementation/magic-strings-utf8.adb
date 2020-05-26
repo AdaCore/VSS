@@ -57,14 +57,14 @@ package body Magic.Strings.UTF8 is
 
    overriding function Element
      (Self     : UTF8_String_Handler;
-      Pointer  : System.Address;
+      Data     : String_Data;
       Position : Magic.Strings.Cursor) return Magic.Unicode.Code_Point
    is
       use type Magic.Unicode.Code_Point;
       use type Magic.Unicode.UTF8_Code_Unit;
 
-      Data : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Pointer'Address;
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
 
       U1 : Magic.Unicode.Code_Point;
       U2 : Magic.Unicode.Code_Point;
@@ -72,14 +72,14 @@ package body Magic.Strings.UTF8 is
       U4 : Magic.Unicode.Code_Point;
 
    begin
-      if Pointer = System.Null_Address
+      if Source = null
         or else Position.Index < 1
-        or else Position.Index > Data.Length
+        or else Position.Index > Source.Length
       then
          return 16#00_0000#;
       end if;
 
-      U1 := Magic.Unicode.Code_Point (Data.Storage (Position.UTF8_Offset));
+      U1 := Magic.Unicode.Code_Point (Source.Storage (Position.UTF8_Offset));
 
       case U1 is
          when 16#00# .. 16#7F# =>
@@ -93,7 +93,7 @@ package body Magic.Strings.UTF8 is
             U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
             U2 :=
               Magic.Unicode.Code_Point
-                (Data.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#);
+                (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#);
 
             return U1 or U2;
 
@@ -102,11 +102,11 @@ package body Magic.Strings.UTF8 is
 
             U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
             U2 := Magic.Unicode.Code_Point
-              (Data.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
+              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
                 * 2#0100_0000#;
             U3 :=
               Magic.Unicode.Code_Point
-                (Data.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#);
+                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#);
 
             return U1 or U2 or U3;
 
@@ -115,15 +115,97 @@ package body Magic.Strings.UTF8 is
 
             U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
             U2 := Magic.Unicode.Code_Point
-              (Data.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
+              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
                 * 2#010_000_0000_0000#;
             U3 :=
               Magic.Unicode.Code_Point
-                (Data.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#)
+                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#)
                 * 2#0100_0000#;
             U4 :=
               Magic.Unicode.Code_Point
-                (Data.Storage (Position.UTF8_Offset + 3) and 2#0011_1111#);
+                (Source.Storage (Position.UTF8_Offset + 3) and 2#0011_1111#);
+
+            return U1 or U2 or U3 or U4;
+
+         when others =>
+            raise Program_Error;
+      end case;
+   end Element;
+
+   -------------
+   -- Element --
+   -------------
+
+   overriding function Element
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : String_Data;
+      Position : Magic.Strings.Cursor) return Magic.Unicode.Code_Point
+   is
+      use type Magic.Unicode.Code_Point;
+      use type Magic.Unicode.UTF8_Code_Unit;
+
+      Source : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+      U1 : Magic.Unicode.Code_Point;
+      U2 : Magic.Unicode.Code_Point;
+      U3 : Magic.Unicode.Code_Point;
+      U4 : Magic.Unicode.Code_Point;
+
+   begin
+      --  raise Program_Error;
+
+      if Position.Index < 1
+        or else Position.Index > Character_Index (Source.Length)
+      then
+         return 16#00_0000#;
+      end if;
+
+      U1 := Magic.Unicode.Code_Point (Source.Storage (Position.UTF8_Offset));
+
+      case U1 is
+         when 16#00# .. 16#7F# =>
+            --  1x code units sequence
+
+            return U1;
+
+         when 16#C2# .. 16#DF# =>
+            --  2x code units sequence
+
+            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
+            U2 :=
+              Magic.Unicode.Code_Point
+                (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#);
+
+            return U1 or U2;
+
+         when 16#E0# .. 16#EF# =>
+            --  3x code units sequence
+
+            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
+            U2 := Magic.Unicode.Code_Point
+              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
+                * 2#0100_0000#;
+            U3 :=
+              Magic.Unicode.Code_Point
+                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#);
+
+            return U1 or U2 or U3;
+
+         when 16#F0# .. 16#F4# =>
+            --  4x code units sequence
+
+            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
+            U2 := Magic.Unicode.Code_Point
+              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
+                * 2#010_000_0000_0000#;
+            U3 :=
+              Magic.Unicode.Code_Point
+                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#)
+                * 2#0100_0000#;
+            U4 :=
+              Magic.Unicode.Code_Point
+                (Source.Storage (Position.UTF8_Offset + 3) and 2#0011_1111#);
 
             return U1 or U2 or U3 or U4;
 
@@ -138,7 +220,19 @@ package body Magic.Strings.UTF8 is
 
    overriding procedure First_Character
      (Self     : UTF8_String_Handler;
-      Pointer  : System.Address;
+      Data     : String_Data;
+      Position : in out Magic.Strings.Cursor) is
+   begin
+      Position := (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
+   end First_Character;
+
+   ---------------------
+   -- First_Character --
+   ---------------------
+
+   overriding procedure First_Character
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : String_Data;
       Position : in out Magic.Strings.Cursor) is
    begin
       Position := (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
@@ -150,25 +244,25 @@ package body Magic.Strings.UTF8 is
 
    overriding function Forward
      (Self     : UTF8_String_Handler;
-      Pointer  : System.Address;
+      Data     : String_Data;
       Position : in out Cursor) return Boolean
    is
       use type Magic.Unicode.UTF16_Code_Unit_Count;
 
-      Data : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Pointer'Address;
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
 
    begin
-      if Pointer = System.Null_Address
+      if Source = null
         or else Position.Index < 1
-        or else Position.Index > Data.Length
+        or else Position.Index > Source.Length
       then
          return False;
       end if;
 
       declare
          Code : constant Magic.Unicode.UTF8_Code_Unit :=
-           Data.Storage (Position.UTF8_Offset);
+           Source.Storage (Position.UTF8_Offset);
 
       begin
          Position.Index := Position.Index + 1;
@@ -207,7 +301,75 @@ package body Magic.Strings.UTF8 is
          --    Position.UTF16_Offset + 1
          --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
 
-         return Position.Index <= Data.Length;
+         return Position.Index <= Source.Length;
+      end;
+   end Forward;
+
+   -------------
+   -- Forward --
+   -------------
+
+   overriding function Forward
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : String_Data;
+      Position : in out Cursor) return Boolean
+   is
+      use type Magic.Unicode.UTF16_Code_Unit_Count;
+
+      Source : constant UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      --  raise Program_Error;
+
+      if Position.Index < 1
+        or else Position.Index > Character_Count (Source.Length)
+      then
+         return False;
+      end if;
+
+      declare
+         Code : constant Magic.Unicode.UTF8_Code_Unit :=
+           Source.Storage (Position.UTF8_Offset);
+
+      begin
+         Position.Index := Position.Index + 1;
+
+         case Code is
+            when 16#00# .. 16#7F# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#C2# .. 16#DF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 2;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#E0# .. 16#EF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 3;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#F0# .. 16#F4# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 4;
+               Position.UTF16_Offset := Position.UTF16_Offset + 2;
+
+            when others =>
+               raise Program_Error with "string data is corrupted";
+         end case;
+
+         --  XXX case statement above may be rewritten as below to avoid
+         --  use of branch instructions.
+         --
+         --  Position.UTF8_Offset  :=
+         --    Position.UTF8_Offset + 1
+         --      + (if (Code and 2#1000_0000#) = 2#1000_0000# then 1 else 0)
+         --      + (if (Code and 2#1110_0000#) = 2#1110_0000# then 1 else 0)
+         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
+         --
+         --  Position.UTF16_Offset :=
+         --    Position.UTF16_Offset + 1
+         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
+
+         return Position.Index <= Character_Count (Source.Length);
       end;
    end Forward;
 
@@ -216,35 +378,43 @@ package body Magic.Strings.UTF8 is
    -----------------------
 
    overriding procedure From_UTF_8_String
-     (Self    : UTF8_String_Handler;
+     (Self    : in out UTF8_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Pointer : out System.Address;
+      Data    : out String_Data;
       Success : out Boolean)
    is
-      Data : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Pointer'Address;
-
-      --  Data   : UTF8_String_Data;
       Code   : Magic.Unicode.UTF8_Code_Unit;
       State  : Verification_State := Initial;
       Length : Character_Count    := 0;
 
    begin
-      if Item'Length = 0 then
-         Data    := null;
-         Success := True;
+      Data :=
+        (In_Place => False,
+         Capacity => 0,
+         Handler  => Self'Unchecked_Access,
+         Pointer  => System.Null_Address);
+      --  Initialize data.
 
-         return;
+      if Item'Length = 0 then
+         --  Success := True;
+         --
+         --  return;
+         raise Program_Error;
       end if;
 
-      Data :=
-        new UTF8_String_Data
-          (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length));
+      declare
+         Destination : UTF8_String_Data_Access
+           with Import, Convention => Ada, Address => Data.Pointer'Address;
 
-      for J in Item'Range loop
-         Code := Standard.Character'Pos (Item (J));
+      begin
+         Destination :=
+           new UTF8_String_Data
+             (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length));
 
-         case State is
+         for J in Item'Range loop
+            Code := Standard.Character'Pos (Item (J));
+
+            case State is
             when Initial =>
                Length := Length + 1;
 
@@ -345,24 +515,187 @@ package body Magic.Strings.UTF8 is
 
             when Ill_Formed =>
                exit;
-         end case;
+            end case;
 
-         Data.Storage (Magic.Unicode.UTF8_Code_Unit_Count (J - Item'First)) :=
-           Code;
-      end loop;
+            Destination.Storage
+              (Magic.Unicode.UTF8_Code_Unit_Count (J - Item'First)) := Code;
+         end loop;
 
-      if State = Initial then
-         Data.Storage (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length)) :=
-           16#00#;
-         Data.Size := Item'Length;
-         Data.Length := Length;
+         if State = Initial then
+            Destination.Storage
+              (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
+            Destination.Size := Item'Length;
+            Destination.Length := Length;
 
-         Success := True;
+            Success := True;
 
-      else
-         Self.Unreference (Pointer);
-         Success := False;
-      end if;
+         else
+            Self.Unreference (Data);
+            Success := False;
+         end if;
+      end;
+   end From_UTF_8_String;
+
+   -----------------------
+   -- From_UTF_8_String --
+   -----------------------
+
+   overriding procedure From_UTF_8_String
+     (Self    : in out UTF8_In_Place_String_Handler;
+      Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Data    : out String_Data;
+      Success : out Boolean)
+   is
+      Code   : Magic.Unicode.UTF8_Code_Unit;
+      State  : Verification_State := Initial;
+      Length : Character_Count    := 0;
+
+   begin
+      Data :=
+        (In_Place => True,
+         Capacity => 0,
+         Storage  => <>);
+      --  Initialize data.
+
+      declare
+         Destination : UTF8_In_Place_Data
+           with Import, Convention => Ada, Address => Data.Storage'Address;
+
+      begin
+         if Item'Length >= Destination.Storage'Length then
+            --  There is not enoght space to store data
+
+            Success := False;
+
+            return;
+         end if;
+
+         --  Destination :=
+         --    new UTF8_String_Data
+         --      (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length));
+
+         for J in Item'Range loop
+            Code := Standard.Character'Pos (Item (J));
+
+            case State is
+            when Initial =>
+               Length := Length + 1;
+
+               case Code is
+                  when 16#00# .. 16#7F# =>
+                     null;
+
+                  when 16#C2# .. 16#DF# =>
+                     State := UT1;
+
+                  when 16#E0# =>
+                     State := U31;
+
+                  when 16#E1# .. 16#EC# =>
+                     State := UT2;
+
+                  when 16#ED# =>
+                     State := U33;
+
+                  when 16#EE# .. 16#EF# =>
+                     State := UT2;
+
+                  when 16#F0# =>
+                     State := U41;
+
+                  when 16#F1# .. 16#F3# =>
+                     State := UT3;
+
+                  when 16#F4# =>
+                     State := U43;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U31 =>
+               case Code is
+                  when 16#A0# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U33 =>
+               case Code is
+                  when 16#80# .. 16#9F# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U41 =>
+               case Code is
+                  when 16#90# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U43 =>
+               case Code is
+                  when 16#80# .. 16#8F# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT1 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := Initial;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT2 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT3 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when Ill_Formed =>
+               exit;
+            end case;
+
+            Destination.Storage
+              (Magic.Unicode.UTF8_Code_Unit_Count (J - Item'First)) := Code;
+         end loop;
+
+         if State = Initial then
+            Destination.Storage
+              (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
+            Destination.Size := Item'Length;
+            Destination.Length := Interfaces.Unsigned_8 (Length);
+
+            Success := True;
+
+         else
+            Success := False;
+         end if;
+      end;
    end From_UTF_8_String;
 
    --------------
@@ -370,14 +703,31 @@ package body Magic.Strings.UTF8 is
    --------------
 
    overriding function Is_Empty
-     (Self    : UTF8_String_Handler;
-      Pointer : System.Address) return Boolean
+     (Self : UTF8_String_Handler;
+      Data : String_Data) return Boolean
    is
-      Data : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Pointer'Address;
+      Destination : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
 
    begin
-      return Data = null or else Data.Length = 0;
+      return Destination = null or else Destination.Length = 0;
+   end Is_Empty;
+
+   --------------
+   -- Is_Empty --
+   --------------
+
+   overriding function Is_Empty
+     (Self : UTF8_In_Place_String_Handler;
+      Data : String_Data) return Boolean
+   is
+      use type Interfaces.Unsigned_8;
+
+      Destination : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      return Destination.Length = 0;
    end Is_Empty;
 
    ---------------
@@ -385,15 +735,15 @@ package body Magic.Strings.UTF8 is
    ---------------
 
    overriding procedure Reference
-     (Self    : UTF8_String_Handler;
-      Pointer : in out System.Address)
+     (Self : UTF8_String_Handler;
+      Data : in out String_Data)
    is
-      Data : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Pointer'Address;
+      Destination : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
 
    begin
-      if Data /= null then
-         System.Atomic_Counters.Increment (Data.Counter);
+      if Destination /= null then
+         System.Atomic_Counters.Increment (Destination.Counter);
       end if;
    end Reference;
 
@@ -402,21 +752,46 @@ package body Magic.Strings.UTF8 is
    ---------------------
 
    overriding function To_UTF_8_String
-     (Self    : UTF8_String_Handler;
-      Pointer : System.Address)
+     (Self : UTF8_String_Handler;
+      Data : String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String
    is
-      Data : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Pointer'Address;
+      Destination : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
 
    begin
       return Result : Ada.Strings.UTF_Encoding.UTF_8_String
-                        (1 .. (if Data = null then 0 else Natural (Data.Size)))
+        (1 .. (if Destination = null then 0 else Natural (Destination.Size)))
       do
          for J in Result'Range loop
             Result (J) :=
               Standard.Character'Val
-                (Data.Storage (Magic.Unicode.UTF8_Code_Unit_Count (J - 1)));
+                (Destination.Storage (Magic.Unicode.UTF8_Code_Unit_Count (J - 1)));
+         end loop;
+      end return;
+   end To_UTF_8_String;
+
+   ---------------------
+   -- To_UTF_8_String --
+   ---------------------
+
+   overriding function To_UTF_8_String
+     (Self : UTF8_In_Place_String_Handler;
+      Data : String_Data)
+      return Ada.Strings.UTF_Encoding.UTF_8_String
+   is
+      Destination : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      return Result : Ada.Strings.UTF_Encoding.UTF_8_String
+                        (1 .. Natural (Destination.Size))
+      do
+         for J in Result'Range loop
+            Result (J) :=
+              Standard.Character'Val
+                (Destination.Storage
+                   (Magic.Unicode.UTF8_Code_Unit_Count (J - 1)));
          end loop;
       end return;
    end To_UTF_8_String;
@@ -426,21 +801,21 @@ package body Magic.Strings.UTF8 is
    -----------------
 
    overriding procedure Unreference
-     (Self    : UTF8_String_Handler;
-      Pointer : in out System.Address)
+     (Self : UTF8_String_Handler;
+      Data : in out String_Data)
    is
       procedure Free is
         new Ada.Unchecked_Deallocation
               (UTF8_String_Data, UTF8_String_Data_Access);
 
-      Data : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Pointer'Address;
+      Destination : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
 
    begin
-      if Data /= null
-        and then System.Atomic_Counters.Decrement (Data.Counter)
+      if Destination /= null
+        and then System.Atomic_Counters.Decrement (Destination.Counter)
       then
-         Free (Data);
+         Free (Destination);
       end if;
    end Unreference;
 

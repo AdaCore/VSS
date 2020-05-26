@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Magic.Strings.Configuration;
+
 package body Magic.Strings.Iterators.Characters is
 
    -------------
@@ -33,13 +35,16 @@ package body Magic.Strings.Iterators.Characters is
    begin
       if Self.Owner /= null then
          if Self.Owner.Data.In_Place then
-            raise Program_Error;
+            return
+              Magic.Characters.Magic_Character'Val
+                (Magic.Strings.Configuration.In_Place_Handler.Element
+                   (Self.Owner.Data, Self.Position));
 
          elsif Self.Owner.Data.Handler /= null then
             return
               Magic.Characters.Magic_Character'Val
                 (Self.Owner.Data.Handler.Element
-                   (Self.Owner.Data.Pointer, Self.Position));
+                   (Self.Owner.Data, Self.Position));
 
          end if;
       end if;
@@ -56,12 +61,13 @@ package body Magic.Strings.Iterators.Characters is
    begin
       if Self.Owner /= null then
          if Self.Owner.Data.In_Place then
-            raise Program_Error;
+            return
+              Magic.Strings.Configuration.In_Place_Handler.Forward
+                (Self.Owner.Data, Self.Position);
 
          elsif Self.Owner.Data.Handler /= null then
             return
-              Self.Owner.Data.Handler.Forward
-                (Self.Owner.Data.Pointer, Self.Position);
+              Self.Owner.Data.Handler.Forward (Self.Owner.Data, Self.Position);
          end if;
       end if;
 

@@ -95,7 +95,7 @@ private
    -- String_Data --
    -----------------
 
-   --  String_Data is a pair or Handler and pointer to the associated data.
+   --  String_Data is a pair of Handler and pointer to the associated data.
    --  It is not defined how particular implementation of the String_Handler
    --  use pointer.
    --

@@ -27,6 +27,9 @@ package body Magic.Stream_Element_Buffers is
 
    use type Ada.Streams.Stream_Element_Offset;
 
+   procedure Free is
+     new Ada.Unchecked_Deallocation (Data_Record, Data_Access);
+
    ------------
    -- Adjust --
    ------------
@@ -68,6 +71,7 @@ package body Magic.Stream_Element_Buffers is
                 (Source.Size * 2, Self.Capacity));
          Self.Data.Length := Source.Length;
          Self.Data.Storage (Source.Storage'Range) := Source.Storage;
+         Free (Source);
       end if;
 
       Self.Data.Length := Self.Data.Length + 1;
@@ -95,9 +99,6 @@ package body Magic.Stream_Element_Buffers is
    --------------
 
    overriding procedure Finalize (Self : in out Stream_Element_Buffer) is
-      procedure Free is
-        new Ada.Unchecked_Deallocation (Data_Record, Data_Access);
-
    begin
       if Self.Data /= null then
          Free (Self.Data);

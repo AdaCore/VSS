@@ -37,10 +37,10 @@ package Magic.Strings is
    pragma Preelaborate;
    pragma Remote_Types;
 
-   type Character_Count is new Natural;
+   type Character_Count is range 0 .. 2 ** 30 - 1;
    subtype Character_Index is Character_Count range 1 .. Character_Count'Last;
 
-   type Grapheme_Count is new Natural;
+   type Grapheme_Count is range 0 .. 2 ** 30 - 1;
    subtype Grapheme_Index is Grapheme_Count range 1 .. Grapheme_Count'Last;
 
    type Magic_String is tagged private;

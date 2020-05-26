@@ -47,6 +47,7 @@ package body Magic.Strings.Conversions is
         (Ada.Finalization.Controlled with
            Data =>
              (In_Place => False,
+              Capacity => 0,
               Handler  => Magic.Strings.Configuration.Default_Handler,
               Pointer  => Pointer),
            others => <>);

@@ -98,16 +98,31 @@ private
    --  String_Data is a pair or Handler and pointer to the associated data.
    --  It is not defined how particular implementation of the String_Handler
    --  use pointer.
-
-   --  XXX Not implemented:
+   --
    --  However, there is one exception: when In_Place Flag is set it means
-   --  that special predefined handler is used and both Handler and Data
-   --  fields are used as storage. By convention, in place data is always
-   --  use UTF-8 encoding.
+   --  that special predefined handler is used to process Storage.
+   --
+   --  Note: data layout is for x86-64 CPU.
+   --  Note: Storage has 4 bytes alignment.
 
    type String_Data (In_Place : Boolean := False) is record
-      Handler : String_Handler_Access;
-      Pointer : System.Address;
+      Capacity : Character_Count;
+
+      case In_Place is
+         when True =>
+            Storage : System.Storage_Elements.Storage_Array (0 .. 19);
+
+         when False =>
+            Handler : String_Handler_Access;
+            Pointer : System.Address;
+      end case;
+   end record;
+   for String_Data use record
+      Storage  at 0  range  0 .. 159;
+      Handler  at 0  range  0 ..  63;
+      Pointer  at 8  range  0 ..  63;
+      Capacity at 20 range  0 ..  29;
+      In_Place at 20 range 31 ..  31;
    end record;
 
    -----------------------------
@@ -208,10 +223,9 @@ private
       Self   : Magic_String);
 
    type Magic_String is new Ada.Finalization.Controlled with record
-      --  Data : String_Access;
-      Data : String_Data;
       Head : Referal_Limited_Access;
       Tail : Referal_Limited_Access;
+      Data : String_Data;
    end record
      with Read  => Read,
           Write => Write;
@@ -232,34 +246,5 @@ private
    end record;
 
    overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
-
-   --  use type System.Storage_Elements.Storage_Offset;
-   --
-   --  type Unsigned_31 is mod 2**31;
-   --
-   --  type Union_Data (Is_In_Place : Boolean := True) is record
-   --     Capacity : Unsigned_31;
-   --
-   --     Leading  : System.Storage_Elements.Storage_Array
-   --       (0 .. System.Address'Max_Size_In_Storage_Elements - 5);
-   --
-   --     case Is_In_Place is
-   --        when False =>
-   --           Handler : String_Handler;
-   --           Data    : aliased System.Address;
-   --
-   --        when True =>
-   --           Storage : aliased System.Storage_Elements.Storage_Array
-   --             (0 .. 2 * System.Address'Max_Size_In_Storage_Elements - 1);
-   --     end case;
-   --  end record with Pack; --  with Unchecked_Union;
-   --
-   --  type New_Magic_String is new Ada.Finalization.Controlled with record
-   --     --  Capacity    : Unsigned_31;
-   --     --  --  Is_In_Place : Boolean;
-   --     Data        : Union_Data;
-   --     Head : Referal_Limited_Access;
-   --     Tail : Referal_Limited_Access;
-   --  end record with Pack;
 
 end Magic.Strings;

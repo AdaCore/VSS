@@ -25,7 +25,6 @@
 private with Ada.Finalization;
 private with Ada.Strings.UTF_Encoding;
 private with Ada.Streams;
---  private with Interfaces;
 private with System.Storage_Elements;
 
 with Magic.Characters;
@@ -91,60 +90,6 @@ private
       UTF8_Offset  : Magic.Unicode.UTF8_Code_Unit_Index  := 0;
       UTF16_Offset : Magic.Unicode.UTF16_Code_Unit_Index := 0;
    end record;
-
-   ---------------------
-   -- Abstract_String --
-   ---------------------
-
-   --  Abstract_String is an internal representation of the data and common
-   --  set of operations to process data. It is designed to allow to use
-   --  impicit data sharing (also known as copy-on-write), while
-   --  implementations may avoid this if necessary.
-
-   type Abstract_String is abstract tagged limited null record;
-
-   type String_Access is access all Abstract_String'Class;
-
-   function Reference
-     (Self : in out Abstract_String) return String_Access is abstract;
-   --  Called when new copy of the string is created. It can return parameter
-   --  or new allocted data object.
-
-   procedure Unreference (Self : in out Abstract_String) is abstract;
-   --  Called when some copy of the string is not longer in use. It should
-   --  deallocate data when necessary.
-
-   function Is_Empty (Self : Abstract_String) return Boolean is abstract;
-   --  Return True when string is empty.
-
---  function Length (Self : Abstract_String) return Character_Count is abstract;
-   --  Return number of abstract characters in the string.
-
-   procedure First_Character
-     (Self     : Abstract_String;
-      Position : in out Cursor) is abstract;
-   --  Initialize iterator to point to first character.
-
-   function Forward
-     (Self     : Abstract_String;
-      Position : in out Cursor) return Boolean is abstract;
-   --  Move cursor one character forward. Return True on success.
-
-   function Element
-     (Self     : Abstract_String;
-      Position : Cursor) return Magic.Unicode.Code_Point is abstract;
-   --  Return character at given position or NUL is position is not pointing
-   --  to any character.
-
-   function To_UTF_8_String
-     (Self : Abstract_String)
-      return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
-   --  Converts string data into standard UTF_8_String.
-
-   function To_Text
-     (Self : in out Abstract_String) return String_Access is abstract;
-   --  Returns view that supports text operations. Returned value must be
-   --  unreferenced after use.
 
    -----------------
    -- String_Data --

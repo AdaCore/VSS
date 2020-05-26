@@ -32,8 +32,7 @@ with Interfaces;
 
 package Magic.Unicode is
 
-   pragma Preelaborate;
-   --  pragma Remote_Types;
+   pragma Pure;
 
    type Code_Point is
      new Interfaces.Unsigned_32 range 16#00_0000# .. 16#10_FFFF#;

@@ -42,9 +42,10 @@ procedure Test_JSON_Reader is
    Count       : Natural := 0;
    Perfomance  : Boolean := False;
    Incremental : Boolean := False;
+   Log_File    : Ada.Text_IO.File_Type;
 
 begin
-   if Ada.Command_Line.Argument_Count /= 2 then
+   if Ada.Command_Line.Argument_Count /= 3 then
       raise Program_Error with "incorrect command line arguments";
    end if;
 
@@ -68,6 +69,12 @@ begin
       raise Program_Error with "incorrect parsing mode";
    end if;
 
+   Ada.Text_IO.Create
+     (Log_File,
+      Ada.Text_IO.Out_File,
+      Ada.Command_Line.Argument (3),
+      "text_translation=no");
+
    declare
       File : Ada.Streams.Stream_IO.File_Type;
       Aux  : Ada.Streams.Stream_Element_Array (1 .. 1_024);
@@ -75,7 +82,10 @@ begin
 
    begin
       Ada.Streams.Stream_IO.Open
-        (File, Ada.Streams.Stream_IO.In_File, Ada.Command_Line.Argument (2));
+        (File,
+         Ada.Streams.Stream_IO.In_File,
+         Ada.Command_Line.Argument (2),
+         "text_translation=no");
 
       while not Ada.Streams.Stream_IO.End_Of_File (File) loop
          Ada.Streams.Stream_IO.Read (File, Aux, Last);
@@ -104,7 +114,8 @@ begin
             when Invalid =>
                if Reader.Error /= Premature_End_Of_Document then
                   Ada.Text_IO.Put_Line
-                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                    (Log_File,
+                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
 
                      & ' '
@@ -135,7 +146,8 @@ begin
 
                if not Perfomance then
                   Ada.Text_IO.Put_Line
-                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                    (Log_File,
+                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " """
                      & Magic.Strings.Conversions.To_UTF_8_String
@@ -148,7 +160,8 @@ begin
 
                if not Perfomance then
                   Ada.Text_IO.Put_Line
-                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                    (Log_File,
+                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " """
                      & Magic.Strings.Conversions.To_UTF_8_String
@@ -161,7 +174,8 @@ begin
 
                if not Perfomance then
                   Ada.Text_IO.Put_Line
-                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                    (Log_File,
+                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & ' '
                      & Magic.JSON.JSON_Number_Kind'Image
@@ -185,7 +199,8 @@ begin
 
                if not Perfomance then
                   Ada.Text_IO.Put_Line
-                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                    (Log_File,
+                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " "
                      & Boolean'Image (Reader.Boolean_Value));
@@ -196,7 +211,8 @@ begin
 
                if not Perfomance then
                   Ada.Text_IO.Put_Line
-                    (Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                    (Log_File,
+                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind));
                end if;
          end case;
@@ -206,4 +222,6 @@ begin
          Ada.Text_IO.Put_Line (Duration'Image (Ada.Calendar.Clock - Start));
       end if;
    end;
+
+   Ada.Text_IO.Close (Log_File);
 end Test_JSON_Reader;

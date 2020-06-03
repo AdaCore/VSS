@@ -1,0 +1,21 @@
+on: [push, pull_request]
+name: Build
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: Build
+    steps:
+      - name: Get VSS
+        uses: actions/checkout@v2
+      - name: Get GNAT Community 2020 toolchain
+        uses: ada-actions/toolchain@b55aaa7
+        with:
+          distrib: community
+      - name: Build and test
+        run: make all check coverage
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1

@@ -1,6 +1,6 @@
 # gnatcoll-texts
 
-![Build](https://github.com/AdaCore/VSS/workflows/Build/badge.svg)
+[![Build](https://github.com/AdaCore/VSS/workflows/Build/badge.svg)](https://github.com/AdaCore/VSS/actions)
 [![codecov](https://codecov.io/gh/AdaCore/VSS/branch/master/graph/badge.svg)](https://codecov.io/gh/AdaCore/VSS)
 
 High level string and text processing library

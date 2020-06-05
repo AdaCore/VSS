@@ -15,6 +15,6 @@ if [ ! -f $EXPECTED_FILE ]; then echo "SKIP"; exit; fi
 diff -u --strip-trailing-cr $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(sd) FAIL"; cat $DIFF_FILE; false)
 
 .objs/tests/test_json_reader i $INPUT_FILE $LOG_FILE 2> $ERROR_FILE || (echo "(ir) FAIL"; cat $ERROR_FILE; false)
-diff -u --strip-trailing-cr $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(id) FAIL"; cat $DIFF_FILE; false)
+diff -u $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(id) FAIL"; cat $DIFF_FILE; false)
 
 echo "PASS"

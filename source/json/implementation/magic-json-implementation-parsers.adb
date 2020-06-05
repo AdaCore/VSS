@@ -472,8 +472,14 @@ package body Magic.JSON.Implementation.Parsers is
                   raise Program_Error;
                end if;
 
+            when Whitespace_Or_End =>
+               --  Analysis will be done at the beginning of the next
+               --  iteration
+
+               null;
+
             when others =>
-               raise Program_Error;
+               raise Program_Error with JSON_Text_State'Image (State);
          end case;
       end loop;
    end Parse_JSON_Text;

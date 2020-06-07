@@ -27,7 +27,7 @@ package VSS.Characters is
    pragma Preelaborate;
    pragma Remote_Types;
 
-   type Magic_Character is new Wide_Wide_Character
+   type Virtual_Character is new Wide_Wide_Character
      range Wide_Wide_Character'Val (16#00_0000#)
        .. Wide_Wide_Character'Val (16#10_FFFF#);
 

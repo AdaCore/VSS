@@ -34,7 +34,7 @@ package VSS.Text_Streams is
 
    procedure Get
      (Self    : in out Input_Text_Stream;
-      Item    : out VSS.Characters.Magic_Character;
+      Item    : out VSS.Characters.Virtual_Character;
       Success : in out Boolean) is abstract;
 
    function Is_End_Of_Data
@@ -58,7 +58,7 @@ package VSS.Text_Streams is
 
    procedure Put
      (Self    : in out Output_Text_Stream;
-      Item    : VSS.Characters.Magic_Character;
+      Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean) is abstract;
 
 end VSS.Text_Streams;

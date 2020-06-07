@@ -28,7 +28,7 @@ package VSS.Strings.Iterators.Characters is
    type Character_Iterator is new Abstract_Iterator with private;
 
    function Element
-     (Self : Character_Iterator'Class) return VSS.Characters.Magic_Character;
+     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
    --  Return character pointed by iterator.
 
 private

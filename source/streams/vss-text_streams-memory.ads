@@ -32,7 +32,7 @@ package VSS.Text_Streams.Memory is
 
    procedure Put
      (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Magic_Character;
+      Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean);
 
 end VSS.Text_Streams.Memory;

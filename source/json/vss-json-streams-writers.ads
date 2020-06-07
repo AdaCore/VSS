@@ -53,11 +53,11 @@ package VSS.JSON.Streams.Writers is
 
    procedure Key_Name
      (Self : in out JSON_Simple_Writer'Class;
-      Name : VSS.Strings.Magic_String'Class);
+      Name : VSS.Strings.Virtual_String'Class);
 
    procedure String_Value
      (Self  : in out JSON_Simple_Writer'Class;
-      Value : VSS.Strings.Magic_String'Class);
+      Value : VSS.Strings.Virtual_String'Class);
 
    procedure Integer_Value
      (Self  : in out JSON_Simple_Writer'Class;
@@ -93,12 +93,12 @@ package VSS.JSON.Streams.Writers is
 
    overriding procedure Key_Name
      (Self    : in out JSON_Simple_Writer;
-      Name    : VSS.Strings.Magic_String'Class;
+      Name    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean);
 
    overriding procedure String_Value
      (Self    : in out JSON_Simple_Writer;
-      Value   : VSS.Strings.Magic_String'Class;
+      Value   : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean);
 
    overriding procedure Integer_Value

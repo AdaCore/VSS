@@ -36,7 +36,7 @@ package Memory_Text_Streams is
       Current     : Ada.Streams.Stream_Element_Count := 1;
       Skip        : Boolean := False;
       Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
+      Diagnosis   : VSS.Strings.Virtual_String;
    end record;
 
    overriding procedure Get
@@ -54,7 +54,7 @@ package Memory_Text_Streams is
      (Self : Memory_UTF8_Input_Stream) return Boolean;
 
    overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
+     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Virtual_String;
 
    procedure Set_Incremental
      (Self : in out Memory_UTF8_Input_Stream'Class;

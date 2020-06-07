@@ -43,25 +43,25 @@ package VSS.Strings is
    type Grapheme_Count is range 0 .. 2 ** 30 - 1;
    subtype Grapheme_Index is Grapheme_Count range 1 .. Grapheme_Count'Last;
 
-   type Magic_String is tagged private;
-   pragma Preelaborable_Initialization (Magic_String);
+   type Virtual_String is tagged private;
+   pragma Preelaborable_Initialization (Virtual_String);
 
-   Empty_Magic_String : constant Magic_String;
+   Empty_Magic_String : constant Virtual_String;
 
-   function Is_Empty (Self : Magic_String'Class) return Boolean;
+   function Is_Empty (Self : Virtual_String'Class) return Boolean;
    --  Return True when string is empty string: it is ether null or has zero
    --  length.
 
-   function Is_Null (Self : Magic_String'Class) return Boolean;
+   function Is_Null (Self : Virtual_String'Class) return Boolean;
    --  Return True when string is null.
 
    function To_Magic_Text
-     (Self : Magic_String) return VSS.Strings.Texts.Magic_Text;
+     (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text;
 
    type Grapheme_Iterator is tagged limited private;
 
    function First_Character
-     (Self : Magic_String'Class)
+     (Self : Virtual_String'Class)
       return VSS.Strings.Iterators.Characters.Character_Iterator;
 
    --  function Last_Character
@@ -75,7 +75,7 @@ package VSS.Strings is
 
 private
 
-   type Magic_String_Access is access all Magic_String'Class;
+   type Magic_String_Access is access all Virtual_String'Class;
 
    type Abstract_String_Handler is tagged;
 
@@ -217,12 +217,12 @@ private
 
    procedure Read
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Magic_String);
+      Self   : out Virtual_String);
    procedure Write
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Magic_String);
+      Self   : Virtual_String);
 
-   type Magic_String is new Ada.Finalization.Controlled with record
+   type Virtual_String is new Ada.Finalization.Controlled with record
       Head : Referal_Limited_Access;
       Tail : Referal_Limited_Access;
       Data : String_Data;
@@ -230,10 +230,10 @@ private
      with Read  => Read,
           Write => Write;
 
-   overriding procedure Adjust (Self : in out Magic_String);
-   overriding procedure Finalize (Self : in out Magic_String);
+   overriding procedure Adjust (Self : in out Virtual_String);
+   overriding procedure Finalize (Self : in out Virtual_String);
 
-   Empty_Magic_String : constant Magic_String :=
+   Empty_Magic_String : constant Virtual_String :=
      (Ada.Finalization.Controlled with
         Data => <>, Head => null, Tail => null);
 

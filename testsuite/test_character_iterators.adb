@@ -40,7 +40,7 @@ procedure Test_Character_Iterators is
    end record;
 
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
-   S : constant VSS.Strings.Magic_String :=
+   S : constant VSS.Strings.Virtual_String :=
      VSS.Strings.Conversions.To_Magic_String
        ((Character'Val(16#41#),
         Character'Val(16#53#),

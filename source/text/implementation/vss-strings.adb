@@ -31,7 +31,7 @@ package body VSS.Strings is
    -- Adjust --
    ------------
 
-   overriding procedure Adjust (Self : in out Magic_String) is
+   overriding procedure Adjust (Self : in out Virtual_String) is
    begin
       if Self.Data.In_Place then
          VSS.Strings.Configuration.In_Place_Handler.Reference (Self.Data);
@@ -96,7 +96,7 @@ package body VSS.Strings is
    -- Finalize --
    --------------
 
-   overriding procedure Finalize (Self : in out Magic_String) is
+   overriding procedure Finalize (Self : in out Virtual_String) is
    begin
       --  Invalidate and disconnect all referals
 
@@ -132,7 +132,7 @@ package body VSS.Strings is
    ---------------------
 
    function First_Character
-     (Self : Magic_String'Class)
+     (Self : Virtual_String'Class)
       return VSS.Strings.Iterators.Characters.Character_Iterator is
    begin
       return
@@ -143,7 +143,7 @@ package body VSS.Strings is
    -- Is_Empty --
    --------------
 
-   function Is_Empty (Self : Magic_String'Class) return Boolean is
+   function Is_Empty (Self : Virtual_String'Class) return Boolean is
    begin
       return
         (if Self.Data.In_Place
@@ -156,7 +156,7 @@ package body VSS.Strings is
    -- Is_Null --
    -------------
 
-   function Is_Null (Self : Magic_String'Class) return Boolean is
+   function Is_Null (Self : Virtual_String'Class) return Boolean is
    begin
       return
         (if Self.Data.In_Place
@@ -171,7 +171,7 @@ package body VSS.Strings is
 
    procedure Read
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Magic_String) is
+      Self   : out Virtual_String) is
    begin
       raise Program_Error with "Not implemented";
    end Read;
@@ -181,7 +181,7 @@ package body VSS.Strings is
    -------------------
 
    function To_Magic_Text
-     (Self : Magic_String) return VSS.Strings.Texts.Magic_Text is
+     (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text is
    begin
       return (Ada.Finalization.Controlled with
                 Data => <>,
@@ -198,7 +198,7 @@ package body VSS.Strings is
 
    procedure Write
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Magic_String) is
+      Self   : Virtual_String) is
    begin
       raise Program_Error with "Not implemented";
    end Write;

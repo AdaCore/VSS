@@ -138,7 +138,7 @@ package body VSS.JSON.Implementation.Parsers is
    -------------------
 
    function Error_Message
-     (Self : JSON_Parser'Class) return VSS.Strings.Magic_String is
+     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String is
    begin
       return Self.Message;
    end Error_Message;
@@ -1656,7 +1656,7 @@ package body VSS.JSON.Implementation.Parsers is
    ------------------
 
    function String_Value
-     (Self : JSON_Parser'Class) return VSS.Strings.Magic_String is
+     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String is
    begin
       return
         VSS.Strings.Conversions.To_Magic_String

@@ -50,21 +50,21 @@ private
       return VSS.JSON.Streams.Readers.JSON_Reader_Error;
 
    overriding function Error_Message
-     (Self : JSON_Simple_Reader) return VSS.Strings.Magic_String;
+     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String;
 
    overriding function Event_Kind
      (Self : JSON_Simple_Reader)
       return VSS.JSON.Streams.Readers.JSON_Event_Kind;
 
    overriding function Key_Name
-     (Self : JSON_Simple_Reader) return VSS.Strings.Magic_String;
+     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String;
 
    overriding function Number_Value
      (Self : JSON_Simple_Reader) return VSS.JSON.JSON_Number;
 
    overriding procedure Raise_Error
      (Self    : in out JSON_Simple_Reader;
-      Message : VSS.Strings.Magic_String :=
+      Message : VSS.Strings.Virtual_String :=
         VSS.Strings.Empty_Magic_String);
 
    overriding function Read_Next
@@ -78,6 +78,6 @@ private
    overriding procedure Skip_Current_Value (Self : in out JSON_Simple_Reader);
 
    overriding function String_Value
-     (Self : JSON_Simple_Reader) return VSS.Strings.Magic_String;
+     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String;
 
 end VSS.JSON.Streams.Readers.Simple;

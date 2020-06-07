@@ -64,13 +64,13 @@ package VSS.JSON.Streams.Readers is
      (Self : JSON_Stream_Reader) return JSON_Reader_Error is abstract;
 
    function Error_Message
-     (Self : JSON_Stream_Reader) return VSS.Strings.Magic_String is abstract;
+     (Self : JSON_Stream_Reader) return VSS.Strings.Virtual_String is abstract;
 
    function Has_Error (Self : JSON_Stream_Reader'Class) return Boolean;
 
    procedure Raise_Error
      (Self    : in out JSON_Stream_Reader;
-      Message : VSS.Strings.Magic_String := VSS.Strings.Empty_Magic_String)
+      Message : VSS.Strings.Virtual_String := VSS.Strings.Empty_Magic_String)
    is abstract;
 
    function Event_Kind
@@ -99,10 +99,10 @@ package VSS.JSON.Streams.Readers is
    function Is_Null_Value (Self : JSON_Stream_Reader'Class) return Boolean;
 
    function Key_Name
-     (Self : JSON_Stream_Reader) return VSS.Strings.Magic_String is abstract;
+     (Self : JSON_Stream_Reader) return VSS.Strings.Virtual_String is abstract;
 
    function String_Value
-     (Self : JSON_Stream_Reader) return VSS.Strings.Magic_String is abstract;
+     (Self : JSON_Stream_Reader) return VSS.Strings.Virtual_String is abstract;
 
    function Number_Value
      (Self : JSON_Stream_Reader) return VSS.JSON.JSON_Number is abstract;

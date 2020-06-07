@@ -36,7 +36,7 @@ package body VSS.JSON.Streams.Writers is
 
    procedure Escaped_String_Value
      (Self    : in out JSON_Simple_Writer'Class;
-      Item    : VSS.Strings.Magic_String'Class;
+      Item    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean);
    --  Outputs escaped string value
 
@@ -265,7 +265,7 @@ package body VSS.JSON.Streams.Writers is
 
    procedure Escaped_String_Value
      (Self    : in out JSON_Simple_Writer'Class;
-      Item    : VSS.Strings.Magic_String'Class;
+      Item    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean)
    is
       procedure Escaped_Control_Character
@@ -611,7 +611,7 @@ package body VSS.JSON.Streams.Writers is
 
    overriding procedure Key_Name
      (Self    : in out JSON_Simple_Writer;
-      Name    : VSS.Strings.Magic_String'Class;
+      Name    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean) is
    begin
       Self.Check_Effective_Stream (Success);
@@ -655,7 +655,7 @@ package body VSS.JSON.Streams.Writers is
 
    procedure Key_Name
      (Self : in out JSON_Simple_Writer'Class;
-      Name : VSS.Strings.Magic_String'Class)
+      Name : VSS.Strings.Virtual_String'Class)
    is
       Success : Boolean := True;
 
@@ -872,7 +872,7 @@ package body VSS.JSON.Streams.Writers is
 
    overriding procedure String_Value
      (Self    : in out JSON_Simple_Writer;
-      Value   : VSS.Strings.Magic_String'Class;
+      Value   : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean) is
    begin
       Self.Check_Effective_Stream (Success);
@@ -905,7 +905,7 @@ package body VSS.JSON.Streams.Writers is
 
    procedure String_Value
      (Self  : in out JSON_Simple_Writer'Class;
-      Value : VSS.Strings.Magic_String'Class)
+      Value : VSS.Strings.Virtual_String'Class)
    is
       Success : Boolean := True;
 

@@ -21,43 +21,48 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+with Interfaces;
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
 with VSS.Strings;
-with VSS.Text_Streams;
 
-package Memory_Text_Streams is
+package VSS.JSON is
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
+   pragma Preelaborate;
+
+   type JSON_Number_Kind is (None, JSON_Integer, JSON_Float, Out_Of_Range);
+   --  Format of the number used to represent value. Note, it is only hint in
+   --  most cases, implementation may use other format for some reason.
+
+   type JSON_Number (Kind : JSON_Number_Kind := None) is record
+      case Kind is
+         when None =>
+            null;
+
+         when others =>
+            String_Value : VSS.Strings.Magic_String;
+
+            case Kind is
+               when None | Out_Of_Range =>
+                  null;
+
+               when JSON_Integer =>
+                  Integer_Value : Interfaces.Integer_64;
+
+               when JSON_Float =>
+                  Float_Value   : Interfaces.IEEE_Float_64;
+            end case;
+      end case;
    end record;
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+   function As_Integer (Self : JSON_Number) return Interfaces.Integer_64;
+   --  Return number value as integer number. Non-integer value is rounded to
+   --  integer.
+   --  @exception Constraint_Error is raised when value is out of range or not
+   --  present.
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   function As_Float (Self : JSON_Number) return Interfaces.IEEE_Float_64;
+   --  Return number value as floating point value.
+   --  @exception Constraint_Error is raised when value is out of range or not
+   --  present.
 
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
-
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
-
-end Memory_Text_Streams;
+end VSS.JSON;

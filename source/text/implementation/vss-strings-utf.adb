@@ -21,43 +21,26 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+package body VSS.Strings.UTF is
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
-with VSS.Strings;
-with VSS.Text_Streams;
+   -----------------------
+   -- To_Grapheme_Index --
+   -----------------------
 
-package Memory_Text_Streams is
+   function To_Grapheme_Index
+     (Item : UTF16_Code_Unit_Index) return Grapheme_Index is
+   begin
+      return 1;
+   end To_Grapheme_Index;
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+   ------------------------------
+   -- To_UTF16_Code_Unit_Count --
+   ------------------------------
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+   function To_UTF16_Code_Unit_Count
+     (Item : Grapheme_Index) return UTF16_Code_Unit_Index is
+   begin
+      return 0;
+   end To_UTF16_Code_Unit_Count;
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
-
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
-
-end Memory_Text_Streams;
+end VSS.Strings.UTF;

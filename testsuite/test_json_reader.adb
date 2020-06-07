@@ -27,18 +27,18 @@ with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
 with Interfaces;
 
-with Magic.Strings.Conversions;
-with Magic.JSON.Streams.Readers.Simple;
+with VSS.Strings.Conversions;
+with VSS.JSON.Streams.Readers.Simple;
 
 with Memory_Text_Streams;
 
 procedure Test_JSON_Reader is
 
-   use all type Magic.JSON.Streams.Readers.JSON_Event_Kind;
-   use all type Magic.JSON.Streams.Readers.JSON_Reader_Error;
+   use all type VSS.JSON.Streams.Readers.JSON_Event_Kind;
+   use all type VSS.JSON.Streams.Readers.JSON_Reader_Error;
 
    Input       : aliased Memory_Text_Streams.Memory_UTF8_Input_Stream;
-   Reader      : Magic.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
+   Reader      : VSS.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
    Count       : Natural := 0;
    Perfomance  : Boolean := False;
    Incremental : Boolean := False;
@@ -115,14 +115,14 @@ begin
                if Reader.Error /= Premature_End_Of_Document then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
 
                      & ' '
-                     & Magic.JSON.Streams.Readers.JSON_Reader_Error'Image
+                     & VSS.JSON.Streams.Readers.JSON_Reader_Error'Image
                          (Reader.Error)
                      & " """
-                     & Magic.Strings.Conversions.To_UTF_8_String
+                     & VSS.Strings.Conversions.To_UTF_8_String
                          (Reader.Error_Message)
                      & '"');
 
@@ -147,10 +147,10 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " """
-                     & Magic.Strings.Conversions.To_UTF_8_String
+                     & VSS.Strings.Conversions.To_UTF_8_String
                        (Reader.Key_Name)
                      & '"');
                end if;
@@ -161,10 +161,10 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " """
-                     & Magic.Strings.Conversions.To_UTF_8_String
+                     & VSS.Strings.Conversions.To_UTF_8_String
                        (Reader.String_Value)
                      & '"');
                end if;
@@ -175,21 +175,21 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & ' '
-                     & Magic.JSON.JSON_Number_Kind'Image
+                     & VSS.JSON.JSON_Number_Kind'Image
                        (Reader.Number_Value.Kind)
                      & ' '
                      & (case Reader.Number_Value.Kind is
-                          when Magic.JSON.None => "",
-                          when Magic.JSON.Out_Of_Range =>
-                            Magic.Strings.Conversions.To_UTF_8_String
+                          when VSS.JSON.None => "",
+                          when VSS.JSON.Out_Of_Range =>
+                            VSS.Strings.Conversions.To_UTF_8_String
                               (Reader.String_Value),
-                          when Magic.JSON.JSON_Integer =>
+                          when VSS.JSON.JSON_Integer =>
                             Interfaces.Integer_64'Image
                               (Reader.Number_Value.Integer_Value),
-                          when Magic.JSON.JSON_Float =>
+                          when VSS.JSON.JSON_Float =>
                             Interfaces.IEEE_Float_64'Image
                               (Reader.Number_Value.Float_Value)));
                end if;
@@ -200,7 +200,7 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " "
                      & Boolean'Image (Reader.Boolean_Value));
@@ -212,7 +212,7 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     Magic.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind));
                end if;
          end case;

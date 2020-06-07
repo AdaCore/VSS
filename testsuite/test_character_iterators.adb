@@ -21,27 +21,27 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Magic.Characters;
-with Magic.Strings.Conversions;
-with Magic.Strings.Iterators.Characters;
-with Magic.Unicode;
+with VSS.Characters;
+with VSS.Strings.Conversions;
+with VSS.Strings.Iterators.Characters;
+with VSS.Unicode;
 
 procedure Test_Character_Iterators is
 
-   use type Magic.Characters.Magic_Character;
-   use type Magic.Strings.Character_Count;
-   use type Magic.Unicode.UTF8_Code_Unit_Count;
-   use type Magic.Unicode.UTF16_Code_Unit_Count;
+   use type VSS.Characters.Magic_Character;
+   use type VSS.Strings.Character_Count;
+   use type VSS.Unicode.UTF8_Code_Unit_Count;
+   use type VSS.Unicode.UTF16_Code_Unit_Count;
 
    type Position_Data is record
-      Character    : Magic.Characters.Magic_Character;
-      UTF8_Offset  : Magic.Unicode.UTF8_Code_Unit_Count;
-      UTF16_Offset : Magic.Unicode.UTF16_Code_Unit_Count;
+      Character    : VSS.Characters.Magic_Character;
+      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Count;
+      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Count;
    end record;
 
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
-   S : constant Magic.Strings.Magic_String :=
-     Magic.Strings.Conversions.To_Magic_String
+   S : constant VSS.Strings.Magic_String :=
+     VSS.Strings.Conversions.To_Magic_String
        ((Character'Val(16#41#),
         Character'Val(16#53#),
         Character'Val(16#43#),
@@ -84,7 +84,7 @@ procedure Test_Character_Iterators is
         Character'Val(16#95#),
         Character'Val(16#20#)));
 
-   D : constant array (Magic.Strings.Character_Index range <>) of Position_Data :=
+   D : constant array (VSS.Strings.Character_Index range <>) of Position_Data :=
     (('A', 0, 0),     --  'A' 1
      ('S', 1, 1),     --  'S' 2
      ('C', 2, 2),     --  'C' 3
@@ -108,9 +108,9 @@ procedure Test_Character_Iterators is
      ('𝜕', 36, 21),   --  '𝜕' 18
      (' ', 40, 23));  --  ' ' 19
 
-   J : Magic.Strings.Iterators.Characters.Character_Iterator :=
+   J : VSS.Strings.Iterators.Characters.Character_Iterator :=
      S.First_Character;
-   C : Magic.Strings.Character_Index := 1;
+   C : VSS.Strings.Character_Index := 1;
 
 begin
    loop

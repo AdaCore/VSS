@@ -23,7 +23,7 @@
 
 with Ada.Strings.UTF_Encoding;
 
-with Magic.Strings.Conversions;
+with VSS.Strings.Conversions;
 
 procedure Test_Conversions is
 
@@ -63,12 +63,12 @@ begin
 
    for Source of Hellos loop
       declare
-         String : Magic.Strings.Magic_String;
+         String : VSS.Strings.Magic_String;
 
       begin
-         String := Magic.Strings.Conversions.To_Magic_String (Source.all);
+         String := VSS.Strings.Conversions.To_Magic_String (Source.all);
 
-         if Magic.Strings.Conversions.To_UTF_8_String (String) /= Source.all then
+         if VSS.Strings.Conversions.To_UTF_8_String (String) /= Source.all then
             raise Program_Error;
          end if;
       end;

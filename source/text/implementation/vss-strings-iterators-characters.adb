@@ -21,43 +21,57 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+with VSS.Strings.Configuration;
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
-with VSS.Strings;
-with VSS.Text_Streams;
+package body VSS.Strings.Iterators.Characters is
 
-package Memory_Text_Streams is
+   -------------
+   -- Element --
+   -------------
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+   function Element
+     (Self : Character_Iterator'Class) return VSS.Characters.Magic_Character
+   is
+   begin
+      if Self.Owner /= null then
+         if Self.Owner.Data.In_Place then
+            return
+              VSS.Characters.Magic_Character'Val
+                (VSS.Strings.Configuration.In_Place_Handler.Element
+                   (Self.Owner.Data, Self.Position));
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+         elsif Self.Owner.Data.Handler /= null then
+            return
+              VSS.Characters.Magic_Character'Val
+                (Self.Owner.Data.Handler.Element
+                   (Self.Owner.Data, Self.Position));
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+         end if;
+      end if;
 
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+      return VSS.Characters.Magic_Character'Val (16#00_0000#);
+   end Element;
 
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   -------------
+   -- Forward --
+   -------------
 
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
+   overriding function Forward
+     (Self : in out Character_Iterator) return Boolean is
+   begin
+      if Self.Owner /= null then
+         if Self.Owner.Data.In_Place then
+            return
+              VSS.Strings.Configuration.In_Place_Handler.Forward
+                (Self.Owner.Data, Self.Position);
 
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
+         elsif Self.Owner.Data.Handler /= null then
+            return
+              Self.Owner.Data.Handler.Forward (Self.Owner.Data, Self.Position);
+         end if;
+      end if;
 
-end Memory_Text_Streams;
+      return False;
+   end Forward;
+
+end VSS.Strings.Iterators.Characters;

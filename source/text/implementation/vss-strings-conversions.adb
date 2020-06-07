@@ -21,43 +21,59 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+with VSS.Strings.Configuration;
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
-with VSS.Strings;
-with VSS.Text_Streams;
+package body VSS.Strings.Conversions is
 
-package Memory_Text_Streams is
+   ---------------------
+   -- To_Magic_String --
+   ---------------------
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+   function To_Magic_String
+     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Magic_String
+   is
+      Success : Boolean;
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+   begin
+      return Result : Magic_String do
+         --  First, attempt to place data in the storage inside the object of
+         --  Magic_String type.
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+         VSS.Strings.Configuration.In_Place_Handler.From_UTF_8_String
+           (Item, Result.Data, Success);
 
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+         if not Success then
+            --  Operation may fail for two reasons: source data is not
+            --  well-formed UTF-8 or there is not enoght memory to store
+            --  string in in-place storage.
 
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+            VSS.Strings.Configuration.Default_Handler.From_UTF_8_String
+              (Item, Result.Data, Success);
+         end if;
 
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
+         if not Success then
+            raise Constraint_Error with "Ill-formed UTF-8 data";
+         end if;
+      end return;
+   end To_Magic_String;
 
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
+   ---------------------
+   -- To_UTF_8_String --
+   ---------------------
 
-end Memory_Text_Streams;
+   function To_UTF_8_String
+     (Item : Magic_String) return Ada.Strings.UTF_Encoding.UTF_8_String is
+   begin
+      if Item.Data.In_Place then
+         return
+           VSS.Strings.Configuration.In_Place_Handler.To_UTF_8_String
+             (Item.Data);
+
+      elsif Item.Data.Handler /= null then
+         return Item.Data.Handler.To_UTF_8_String (Item.Data);
+      end if;
+
+      return "";
+   end To_UTF_8_String;
+
+end VSS.Strings.Conversions;

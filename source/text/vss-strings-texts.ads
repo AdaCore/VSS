@@ -20,44 +20,18 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  API to access to string data using line:column indexing.
 
-with Ada.Streams;
+package VSS.Strings.Texts is
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
-with VSS.Strings;
-with VSS.Text_Streams;
+   pragma Preelaborate;
 
-package Memory_Text_Streams is
+   type Line_Count is new Natural;
+   subtype Line_Index is Line_Count range 1 .. Line_Count'Last;
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+   type Column_Count is new Grapheme_Count;
+   subtype Column_Index is Column_Count range 1 .. Column_Count'Last;
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+   type Magic_Text is new Magic_String with null record;
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
-
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
-
-end Memory_Text_Streams;
+end VSS.Strings.Texts;

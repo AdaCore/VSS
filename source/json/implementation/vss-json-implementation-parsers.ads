@@ -57,11 +57,11 @@ package VSS.JSON.Implementation.Parsers is
    --  Return current error.
 
    function Error_Message
-     (Self : JSON_Parser'Class) return VSS.Strings.Magic_String;
+     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String;
    --  Return error message.
 
    function String_Value
-     (Self : JSON_Parser'Class) return VSS.Strings.Magic_String;
+     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String;
    --  Return string data (key name or string value)
 
    function Boolean_Value (Self : JSON_Parser'Class) return Boolean;
@@ -106,7 +106,7 @@ private
         VSS.JSON.Streams.Readers.No_Token;
       Error       : VSS.JSON.Streams.Readers.JSON_Reader_Error :=
         VSS.JSON.Streams.Readers.No_Error;
-      Message     : VSS.Strings.Magic_String;
+      Message     : VSS.Strings.Virtual_String;
       C           : Wide_Wide_Character;
       String      : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
       Boolean     : Standard.Boolean;

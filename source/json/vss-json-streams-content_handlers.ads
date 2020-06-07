@@ -58,12 +58,12 @@ package VSS.JSON.Streams.Content_Handlers is
 
    procedure Key_Name
      (Self    : in out JSON_Content_Handler;
-      Name    : VSS.Strings.Magic_String'Class;
+      Name    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean) is null;
 
    procedure String_Value
      (Self    : in out JSON_Content_Handler;
-      Value   : VSS.Strings.Magic_String'Class;
+      Value   : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean) is null;
 
    procedure Integer_Value

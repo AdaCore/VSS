@@ -26,7 +26,7 @@ package VSS.Strings.Iterators.Characters.Internals is
    pragma Preelaborate;
 
    function First_Character
-     (Self : Magic_String'Class)
+     (Self : Virtual_String'Class)
       return VSS.Strings.Iterators.Characters.Character_Iterator;
 
 end VSS.Strings.Iterators.Characters.Internals;

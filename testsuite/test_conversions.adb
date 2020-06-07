@@ -63,7 +63,7 @@ begin
 
    for Source of Hellos loop
       declare
-         String : VSS.Strings.Magic_String;
+         String : VSS.Strings.Virtual_String;
 
       begin
          String := VSS.Strings.Conversions.To_Magic_String (Source.all);

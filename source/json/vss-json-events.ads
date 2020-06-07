@@ -48,10 +48,10 @@ package VSS.JSON.Events is
             null;
 
          when Key_Name =>
-            Key : VSS.Strings.Magic_String;
+            Key : VSS.Strings.Virtual_String;
 
          when String_Value =>
-            String_Value : VSS.Strings.Magic_String;
+            String_Value : VSS.Strings.Virtual_String;
 
          when Number_Value =>
             Number_Value : VSS.JSON.JSON_Number;

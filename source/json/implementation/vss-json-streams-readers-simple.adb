@@ -67,7 +67,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    -------------------
 
    overriding function Error_Message
-     (Self : JSON_Simple_Reader) return VSS.Strings.Magic_String is
+     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String is
    begin
       return Self.Parser.Error_Message;
    end Error_Message;
@@ -88,7 +88,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    --------------
 
    overriding function Key_Name
-     (Self : JSON_Simple_Reader) return VSS.Strings.Magic_String is
+     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String is
    begin
       return Self.Parser.String_Value;
    end Key_Name;
@@ -109,7 +109,7 @@ package body VSS.JSON.Streams.Readers.Simple is
 
    overriding procedure Raise_Error
      (Self    : in out JSON_Simple_Reader;
-      Message : VSS.Strings.Magic_String :=
+      Message : VSS.Strings.Virtual_String :=
         VSS.Strings.Empty_Magic_String) is
    begin
       raise Program_Error;
@@ -174,7 +174,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    ------------------
 
    overriding function String_Value
-     (Self : JSON_Simple_Reader) return VSS.Strings.Magic_String is
+     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String is
    begin
       return Self.Parser.String_Value;
    end String_Value;

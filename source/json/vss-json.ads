@@ -39,7 +39,7 @@ package VSS.JSON is
             null;
 
          when others =>
-            String_Value : VSS.Strings.Magic_String;
+            String_Value : VSS.Strings.Virtual_String;
 
             case Kind is
                when None | Out_Of_Range =>

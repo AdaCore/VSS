@@ -30,12 +30,12 @@ package body VSS.Strings.Conversions is
    ---------------------
 
    function To_Magic_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Magic_String
+     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String
    is
       Success : Boolean;
 
    begin
-      return Result : Magic_String do
+      return Result : Virtual_String do
          --  First, attempt to place data in the storage inside the object of
          --  Magic_String type.
 
@@ -62,7 +62,7 @@ package body VSS.Strings.Conversions is
    ---------------------
 
    function To_UTF_8_String
-     (Item : Magic_String) return Ada.Strings.UTF_Encoding.UTF_8_String is
+     (Item : Virtual_String) return Ada.Strings.UTF_Encoding.UTF_8_String is
    begin
       if Item.Data.In_Place then
          return

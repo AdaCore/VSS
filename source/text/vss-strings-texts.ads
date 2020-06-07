@@ -32,6 +32,6 @@ package VSS.Strings.Texts is
    type Column_Count is new Grapheme_Count;
    subtype Column_Index is Column_Count range 1 .. Column_Count'Last;
 
-   type Magic_Text is new Magic_String with null record;
+   type Magic_Text is new Virtual_String with null record;
 
 end VSS.Strings.Texts;

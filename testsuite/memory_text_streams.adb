@@ -33,7 +33,7 @@ package body Memory_Text_Streams is
    -------------------
 
    overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String is
+     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Virtual_String is
    begin
       return Self.Diagnosis;
    end Error_Message;

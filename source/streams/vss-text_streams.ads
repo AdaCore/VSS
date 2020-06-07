@@ -49,7 +49,7 @@ package VSS.Text_Streams is
    --  Return True when any error is detected.
 
    function Error_Message
-     (Self : Input_Text_Stream) return VSS.Strings.Magic_String is abstract;
+     (Self : Input_Text_Stream) return VSS.Strings.Virtual_String is abstract;
    --  Return error message when Has_Error returns True, or 'null' string.
 
    type Output_Text_Stream is limited interface;

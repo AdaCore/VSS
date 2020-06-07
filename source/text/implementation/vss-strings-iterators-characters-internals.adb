@@ -30,7 +30,7 @@ package body VSS.Strings.Iterators.Characters.Internals is
    ---------------------
 
    function First_Character
-     (Self : Magic_String'Class)
+     (Self : Virtual_String'Class)
       return VSS.Strings.Iterators.Characters.Character_Iterator is
    begin
       return Result : VSS.Strings.Iterators.Characters.Character_Iterator do

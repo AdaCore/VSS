@@ -33,14 +33,14 @@ package body VSS.Text_Streams.Memory is
 
    procedure Put
      (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Magic_Character;
+      Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean)
    is
       use type Ada.Streams.Stream_Element;
       use type VSS.Unicode.Code_Point;
 
       Code : constant VSS.Unicode.Code_Point :=
-        VSS.Characters.Magic_Character'Pos (Item);
+        VSS.Characters.Virtual_Character'Pos (Item);
 
    begin
       case Code is

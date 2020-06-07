@@ -269,11 +269,11 @@ package body VSS.JSON.Streams.Writers is
       Success : in out Boolean)
    is
       procedure Escaped_Control_Character
-        (Item : VSS.Characters.Magic_Character);
+        (Item : VSS.Characters.Virtual_Character);
       --  Outputs escape sequence for given control character using hex format
 
       function Hex_Digit
-        (C : VSS.Unicode.Code_Point) return VSS.Characters.Magic_Character;
+        (C : VSS.Unicode.Code_Point) return VSS.Characters.Virtual_Character;
       --  Returns hexadecimal digit for given code point.
 
       -------------------------------
@@ -281,12 +281,12 @@ package body VSS.JSON.Streams.Writers is
       -------------------------------
 
       procedure Escaped_Control_Character
-        (Item : VSS.Characters.Magic_Character)
+        (Item : VSS.Characters.Virtual_Character)
       is
          use type VSS.Unicode.Code_Point;
 
          C  : constant VSS.Unicode.Code_Point :=
-           VSS.Characters.Magic_Character'Pos (Item);
+           VSS.Characters.Virtual_Character'Pos (Item);
          D4 : constant VSS.Unicode.Code_Point := C and 16#00_000F#;
          D3 : constant VSS.Unicode.Code_Point :=
            C and 16#00_00F0# / 16#00_0010#;
@@ -320,17 +320,17 @@ package body VSS.JSON.Streams.Writers is
       ---------------
 
       function Hex_Digit
-        (C : VSS.Unicode.Code_Point) return VSS.Characters.Magic_Character
+        (C : VSS.Unicode.Code_Point) return VSS.Characters.Virtual_Character
       is
          use type VSS.Unicode.Code_Point;
 
       begin
          case C is
             when 16#0# .. 16#9# =>
-               return VSS.Characters.Magic_Character'Val (16#30# + C);
+               return VSS.Characters.Virtual_Character'Val (16#30# + C);
 
             when 16#A# .. 16#F# =>
-               return VSS.Characters.Magic_Character'Val (16#41# + C - 10);
+               return VSS.Characters.Virtual_Character'Val (16#41# + C - 10);
 
             when others =>
                raise Ada.Assertions.Assertion_Error;
@@ -352,15 +352,15 @@ package body VSS.JSON.Streams.Writers is
          begin
             loop
                case J.Element is
-                  when VSS.Characters.Magic_Character'Val (16#00_0000#)
-                     .. VSS.Characters.Magic_Character'Val (16#00_0007#)
-                     | VSS.Characters.Magic_Character'Val (16#00_000B#)
-                     | VSS.Characters.Magic_Character'Val (16#00_000E#)
-                     .. VSS.Characters.Magic_Character'Val (16#00_001F#)
+                  when VSS.Characters.Virtual_Character'Val (16#00_0000#)
+                     .. VSS.Characters.Virtual_Character'Val (16#00_0007#)
+                     | VSS.Characters.Virtual_Character'Val (16#00_000B#)
+                     | VSS.Characters.Virtual_Character'Val (16#00_000E#)
+                     .. VSS.Characters.Virtual_Character'Val (16#00_001F#)
                   =>
                      null;
 
-                  when VSS.Characters.Magic_Character'Val (16#00_0008#) =>
+                  when VSS.Characters.Virtual_Character'Val (16#00_0008#) =>
                      --  Escape backspace
 
                      Self.Effective_Stream.Put ('\', Success);
@@ -375,7 +375,7 @@ package body VSS.JSON.Streams.Writers is
                         return;
                      end if;
 
-                  when VSS.Characters.Magic_Character'Val (16#00_0009#) =>
+                  when VSS.Characters.Virtual_Character'Val (16#00_0009#) =>
                      --  Escape character tabulation
 
                      Self.Effective_Stream.Put ('\', Success);
@@ -390,7 +390,7 @@ package body VSS.JSON.Streams.Writers is
                         return;
                      end if;
 
-                  when VSS.Characters.Magic_Character'Val (16#00_000A#) =>
+                  when VSS.Characters.Virtual_Character'Val (16#00_000A#) =>
                      --  Escape line feed
 
                      Self.Effective_Stream.Put ('\', Success);
@@ -405,7 +405,7 @@ package body VSS.JSON.Streams.Writers is
                         return;
                      end if;
 
-                  when VSS.Characters.Magic_Character'Val (16#00_000C#) =>
+                  when VSS.Characters.Virtual_Character'Val (16#00_000C#) =>
                      --  Escape form feed
 
                      Self.Effective_Stream.Put ('\', Success);
@@ -420,7 +420,7 @@ package body VSS.JSON.Streams.Writers is
                         return;
                      end if;
 
-                  when VSS.Characters.Magic_Character'Val (16#00_000D#) =>
+                  when VSS.Characters.Virtual_Character'Val (16#00_000D#) =>
                      --  Escape carriage return
 
                      Self.Effective_Stream.Put ('\', Success);
@@ -518,7 +518,7 @@ package body VSS.JSON.Streams.Writers is
       for C of Image loop
          if C /= ' ' then
             Self.Effective_Stream.Put
-              (VSS.Characters.Magic_Character (C), Success);
+              (VSS.Characters.Virtual_Character (C), Success);
 
             if not Success then
                return;
@@ -578,7 +578,7 @@ package body VSS.JSON.Streams.Writers is
       for C of Image loop
          if C /= ' ' then
             Self.Effective_Stream.Put
-              (VSS.Characters.Magic_Character (C), Success);
+              (VSS.Characters.Virtual_Character (C), Success);
 
             if not Success then
                return;

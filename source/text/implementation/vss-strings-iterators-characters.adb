@@ -30,26 +30,26 @@ package body VSS.Strings.Iterators.Characters is
    -------------
 
    function Element
-     (Self : Character_Iterator'Class) return VSS.Characters.Magic_Character
+     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character
    is
    begin
       if Self.Owner /= null then
          if Self.Owner.Data.In_Place then
             return
-              VSS.Characters.Magic_Character'Val
+              VSS.Characters.Virtual_Character'Val
                 (VSS.Strings.Configuration.In_Place_Handler.Element
                    (Self.Owner.Data, Self.Position));
 
          elsif Self.Owner.Data.Handler /= null then
             return
-              VSS.Characters.Magic_Character'Val
+              VSS.Characters.Virtual_Character'Val
                 (Self.Owner.Data.Handler.Element
                    (Self.Owner.Data, Self.Position));
 
          end if;
       end if;
 
-      return VSS.Characters.Magic_Character'Val (16#00_0000#);
+      return VSS.Characters.Virtual_Character'Val (16#00_0000#);
    end Element;
 
    -------------

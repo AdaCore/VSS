@@ -44,7 +44,7 @@ package body Memory_Text_Streams is
 
    procedure Get
      (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
+      Item    : out VSS.Characters.Virtual_Character;
       Success : in out Boolean)
    is
       use type VSS.Unicode.Code_Point;
@@ -58,7 +58,7 @@ package body Memory_Text_Streams is
       procedure Report_Error (Message : String) is
       begin
          Success := False;
-         Item    := VSS.Characters.Magic_Character'Val (0);
+         Item    := VSS.Characters.Virtual_Character'Val (0);
 
          Self.Diagnosis :=
            VSS.Strings.Conversions.To_Magic_String (Message);
@@ -72,7 +72,7 @@ package body Memory_Text_Streams is
    begin
       if Self.Current > Self.Buffer.Length then
          Success := False;
-         Item := VSS.Characters.Magic_Character'Val (0);
+         Item := VSS.Characters.Virtual_Character'Val (0);
 
          return;
       end if;
@@ -81,7 +81,7 @@ package body Memory_Text_Streams is
          if Self.Skip then
             Self.Skip := False;
             Success := False;
-            Item := VSS.Characters.Magic_Character'Val (0);
+            Item := VSS.Characters.Virtual_Character'Val (0);
 
             return;
 
@@ -97,7 +97,7 @@ package body Memory_Text_Streams is
             --  00 .. 7F
 
             Item :=
-              VSS.Characters.Magic_Character'Val
+              VSS.Characters.Virtual_Character'Val
                 (Self.Buffer.Element (Self.Current));
             Self.Current := Self.Current + 1;
 
@@ -122,7 +122,7 @@ package body Memory_Text_Streams is
             U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
             U2 := U2 and 2#0011_1111#;
 
-            Item := VSS.Characters.Magic_Character'Val (U1 or U2);
+            Item := VSS.Characters.Virtual_Character'Val (U1 or U2);
             Self.Current := Self.Current + 2;
 
          when 16#E0# .. 16#EF# =>
@@ -179,7 +179,7 @@ package body Memory_Text_Streams is
             U2 := (U2 and 2#0011_1111#) * 2#0100_0000#;
             U3 := U3 and 2#0011_1111#;
 
-            Item := VSS.Characters.Magic_Character'Val (U1 or U2 or U3);
+            Item := VSS.Characters.Virtual_Character'Val (U1 or U2 or U3);
             Self.Current := Self.Current + 3;
 
          when 16#F0# .. 16#F4# =>
@@ -230,7 +230,7 @@ package body Memory_Text_Streams is
             U4 := U4 and 2#0011_1111#;
 
             Item :=
-              VSS.Characters.Magic_Character'Val (U1 or U2 or U3 or U4);
+              VSS.Characters.Virtual_Character'Val (U1 or U2 or U3 or U4);
             Self.Current := Self.Current + 4;
 
          when others =>

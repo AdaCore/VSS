@@ -1585,7 +1585,7 @@ package body VSS.JSON.Implementation.Parsers is
       State : Interfaces.Unsigned_32) return Boolean
    is
       Success   : Boolean := True;
-      Character : VSS.Characters.Magic_Character;
+      Character : VSS.Characters.Virtual_Character;
 
    begin
       Self.Stream.Get (Character, Success);

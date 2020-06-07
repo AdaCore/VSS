@@ -28,13 +28,13 @@ with VSS.Unicode;
 
 procedure Test_Character_Iterators is
 
-   use type VSS.Characters.Magic_Character;
+   use type VSS.Characters.Virtual_Character;
    use type VSS.Strings.Character_Count;
    use type VSS.Unicode.UTF8_Code_Unit_Count;
    use type VSS.Unicode.UTF16_Code_Unit_Count;
 
    type Position_Data is record
-      Character    : VSS.Characters.Magic_Character;
+      Character    : VSS.Characters.Virtual_Character;
       UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Count;
       UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Count;
    end record;

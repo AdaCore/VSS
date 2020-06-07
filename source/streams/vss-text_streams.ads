@@ -21,43 +21,44 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
-
 with VSS.Characters;
-with VSS.Stream_Element_Buffers;
 with VSS.Strings;
-with VSS.Text_Streams;
 
-package Memory_Text_Streams is
+package VSS.Text_Streams is
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+   pragma Preelaborate;
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
+   type Input_Text_Stream is limited interface;
+
+   type Input_Text_Stream_Access is access all Input_Text_Stream'Class;
+
+   procedure Get
+     (Self    : in out Input_Text_Stream;
       Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+      Success : in out Boolean) is abstract;
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   function Is_End_Of_Data
+     (Self : Input_Text_Stream) return Boolean is abstract;
+   --  Return True when there is no more data is available now.
 
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   function Is_End_Of_Stream
+     (Self : Input_Text_Stream) return Boolean is abstract;
+   --  Return True when when end of stream is reached.
 
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   function Has_Error (Self : Input_Text_Stream) return Boolean is abstract;
+   --  Return True when any error is detected.
 
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
+   function Error_Message
+     (Self : Input_Text_Stream) return VSS.Strings.Magic_String is abstract;
+   --  Return error message when Has_Error returns True, or 'null' string.
 
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
+   type Output_Text_Stream is limited interface;
 
-end Memory_Text_Streams;
+   type Output_Text_Stream_Access is access all Output_Text_Stream'Class;
+
+   procedure Put
+     (Self    : in out Output_Text_Stream;
+      Item    : VSS.Characters.Magic_Character;
+      Success : in out Boolean) is abstract;
+
+end VSS.Text_Streams;

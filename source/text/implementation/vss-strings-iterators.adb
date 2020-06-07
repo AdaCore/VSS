@@ -21,43 +21,47 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+package body VSS.Strings.Iterators is
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
-with VSS.Strings;
-with VSS.Text_Streams;
+   ---------------------
+   -- Character_Index --
+   ---------------------
 
-package Memory_Text_Streams is
+   function Character_Index
+     (Self : Abstract_Iterator'Class) return VSS.Strings.Character_Index is
+   begin
+      return Self.Position.Index;
+   end Character_Index;
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+   ----------------
+   -- Invalidate --
+   ----------------
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+   overriding procedure Invalidate (Self : in out Abstract_Iterator) is
+   begin
+      Self.Position := (1, 0, 0);
+   end Invalidate;
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   ------------------
+   -- UTF16_Offset --
+   ------------------
 
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   function UTF16_Offset
+     (Self : Abstract_Iterator'Class)
+      return VSS.Unicode.UTF16_Code_Unit_Index is
+   begin
+      return Self.Position.UTF16_Offset;
+   end UTF16_Offset;
 
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   -----------------
+   -- UTF8_Offset --
+   -----------------
 
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
+   function UTF8_Offset
+     (Self : Abstract_Iterator'Class)
+      return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      return Self.Position.UTF8_Offset;
+   end UTF8_Offset;
 
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
-
-end Memory_Text_Streams;
+end VSS.Strings.Iterators;

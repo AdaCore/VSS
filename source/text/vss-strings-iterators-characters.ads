@@ -21,43 +21,21 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+package VSS.Strings.Iterators.Characters is
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
-with VSS.Strings;
-with VSS.Text_Streams;
+   pragma Preelaborate;
 
-package Memory_Text_Streams is
+   type Character_Iterator is new Abstract_Iterator with private;
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+   function Element
+     (Self : Character_Iterator'Class) return VSS.Characters.Magic_Character;
+   --  Return character pointed by iterator.
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+private
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   type Character_Iterator is new Abstract_Iterator with null record;
 
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   overriding function Forward
+     (Self : in out Character_Iterator) return Boolean;
 
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
-
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
-
-end Memory_Text_Streams;
+end VSS.Strings.Iterators.Characters;

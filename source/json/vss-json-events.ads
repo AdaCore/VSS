@@ -21,43 +21,47 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
-
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
 with VSS.Strings;
-with VSS.Text_Streams;
 
-package Memory_Text_Streams is
+package VSS.JSON.Events is
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
+   pragma Preelaborate;
+
+   type JSON_Event_Kind is
+     (None,
+      Start_Array,
+      End_Array,
+      Start_Object,
+      End_Object,
+      Key_Name,
+      String_Value,
+      Number_Value,
+      Boolean_Value,
+      Null_Value);
+
+   type JSON_Event (Kind : JSON_Event_Kind := None) is record
+      case Kind is
+         when None =>
+            null;
+
+         when Start_Array | End_Array | Start_Object | End_Object =>
+            null;
+
+         when Key_Name =>
+            Key : VSS.Strings.Magic_String;
+
+         when String_Value =>
+            String_Value : VSS.Strings.Magic_String;
+
+         when Number_Value =>
+            Number_Value : VSS.JSON.JSON_Number;
+
+         when Boolean_Value =>
+            Boolean_Value : Boolean;
+
+         when Null_Value =>
+            null;
+      end case;
    end record;
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
-
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
-
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
-
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
-
-end Memory_Text_Streams;
+end VSS.JSON.Events;

@@ -21,43 +21,42 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+package body VSS.JSON is
 
-with VSS.Characters;
-with VSS.Stream_Element_Buffers;
-with VSS.Strings;
-with VSS.Text_Streams;
+   --------------
+   -- As_Float --
+   --------------
 
-package Memory_Text_Streams is
+   function As_Float (Self : JSON_Number) return Interfaces.IEEE_Float_64 is
+   begin
+      case Self.Kind is
+         when None | Out_Of_Range =>
+            raise Constraint_Error;
 
-   type Memory_UTF8_Input_Stream is
-   limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current     : Ada.Streams.Stream_Element_Count := 1;
-      Skip        : Boolean := False;
-      Incremental : Boolean := False;
-      Diagnosis   : VSS.Strings.Magic_String;
-   end record;
+         when JSON_Float =>
+            return Self.Float_Value;
 
-   overriding procedure Get
-     (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Magic_Character;
-      Success : in out Boolean);
+         when JSON_Integer =>
+            return Interfaces.IEEE_Float_64 (Self.Integer_Value);
+      end case;
+   end As_Float;
 
-   overriding function Is_End_Of_Data
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   ----------------
+   -- As_Integer --
+   ----------------
 
-   overriding function Is_End_Of_Stream
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+   function As_Integer (Self : JSON_Number) return Interfaces.Integer_64 is
+   begin
+      case Self.Kind is
+         when None | Out_Of_Range =>
+            raise Constraint_Error;
 
-   overriding function Has_Error
-     (Self : Memory_UTF8_Input_Stream) return Boolean;
+         when JSON_Float =>
+            return Interfaces.Integer_64 (Self.Float_Value);
 
-   overriding function Error_Message
-     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Magic_String;
+         when JSON_Integer =>
+            return Self.Integer_Value;
+      end case;
+   end As_Integer;
 
-   procedure Set_Incremental
-     (Self : in out Memory_UTF8_Input_Stream'Class;
-      To   : Boolean);
-
-end Memory_Text_Streams;
+end VSS.JSON;

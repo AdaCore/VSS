@@ -158,6 +158,12 @@ private
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
 
+   not overriding function Has_Character
+     (Self     : Abstract_String_Handler;
+      Data     : String_Data;
+      Position : VSS.Strings.Cursor) return Boolean is abstract;
+   --  Return True when position points to the character.
+
    not overriding procedure First_Character
      (Self     : Abstract_String_Handler;
       Data     : String_Data;

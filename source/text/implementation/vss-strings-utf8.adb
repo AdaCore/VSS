@@ -698,6 +698,43 @@ package body VSS.Strings.UTF8 is
       end;
    end From_UTF_8_String;
 
+   -------------------
+   -- Has_Character --
+   -------------------
+
+   overriding function Has_Character
+     (Self     : UTF8_String_Handler;
+      Data     : String_Data;
+      Position : VSS.Strings.Cursor) return Boolean
+   is
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      return
+        Source /= null
+          and then Position.Index > 0
+          and then Position.Index <= Source.Length;
+   end Has_Character;
+
+   -------------------
+   -- Has_Character --
+   -------------------
+
+   overriding function Has_Character
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : String_Data;
+      Position : VSS.Strings.Cursor) return Boolean
+   is
+      Source : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      return
+        Position.Index > 0
+          and then Position.Index <= Character_Index (Source.Length);
+   end Has_Character;
+
    --------------
    -- Is_Empty --
    --------------

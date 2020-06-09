@@ -45,12 +45,34 @@ package body VSS.Strings.Iterators.Characters is
               VSS.Characters.Virtual_Character'Val
                 (Self.Owner.Data.Handler.Element
                    (Self.Owner.Data, Self.Position));
-
          end if;
       end if;
 
       return VSS.Characters.Virtual_Character'Val (16#00_0000#);
    end Element;
+
+   -----------------
+   -- Has_Element --
+   -----------------
+
+   overriding function Has_Element
+     (Self : Character_Iterator) return Boolean is
+   begin
+      if Self.Owner /= null then
+         if Self.Owner.Data.In_Place then
+            return
+              VSS.Strings.Configuration.In_Place_Handler.Has_Character
+                (Self.Owner.Data, Self.Position);
+
+         elsif Self.Owner.Data.Handler /= null then
+            return
+              Self.Owner.Data.Handler.Has_Character
+                (Self.Owner.Data, Self.Position);
+         end if;
+      end if;
+
+      return False;
+   end Has_Element;
 
    -------------
    -- Forward --

@@ -156,7 +156,7 @@ package body VSS.Strings.UTF8 is
       --  raise Program_Error;
 
       if Position.Index < 1
-        or else Position.Index > Character_Index (Source.Length)
+        or else Position.Index > Character_Count (Source.Length)
       then
          return 16#00_0000#;
       end if;
@@ -732,7 +732,7 @@ package body VSS.Strings.UTF8 is
    begin
       return
         Position.Index > 0
-          and then Position.Index <= Character_Index (Source.Length);
+          and then Position.Index <= Character_Count (Source.Length);
    end Has_Character;
 
    --------------

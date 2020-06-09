@@ -79,6 +79,11 @@ private package VSS.Strings.UTF8 is
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
 
+   overriding function Has_Character
+     (Self     : UTF8_String_Handler;
+      Data     : String_Data;
+      Position : VSS.Strings.Cursor) return Boolean;
+
    overriding procedure First_Character
      (Self     : UTF8_String_Handler;
       Data     : String_Data;
@@ -136,6 +141,11 @@ private package VSS.Strings.UTF8 is
       return VSS.Unicode.Code_Point;
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
+
+   overriding function Has_Character
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : String_Data;
+      Position : VSS.Strings.Cursor) return Boolean;
 
    overriding procedure First_Character
      (Self     : UTF8_In_Place_String_Handler;

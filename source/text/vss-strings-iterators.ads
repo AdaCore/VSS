@@ -43,6 +43,9 @@ package VSS.Strings.Iterators is
    function Forward
      (Self : in out Abstract_Iterator) return Boolean is abstract;
 
+   function Has_Element (Self : Abstract_Iterator) return Boolean is abstract;
+   --  Returns True when iterator points to the text element
+
 private
 
    type Abstract_Iterator is abstract new Referal_Limited_Base with record

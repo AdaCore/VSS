@@ -38,4 +38,6 @@ private
    overriding function Forward
      (Self : in out Character_Iterator) return Boolean;
 
+   overriding function Has_Element (Self : Character_Iterator) return Boolean;
+
 end VSS.Strings.Iterators.Characters;

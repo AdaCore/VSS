@@ -114,6 +114,10 @@ procedure Test_Character_Iterators is
 
 begin
    loop
+      if not J.Has_Element then
+         raise Program_Error;
+      end if;
+
       if C /= J.Character_Index then
          raise Program_Error;
       end if;
@@ -137,6 +141,10 @@ begin
       C := C + 1;
 
       if not J.Forward then
+         if J.Has_Element then
+            raise Program_Error;
+         end if;
+
          if C <= D'Last then
             raise Program_Error;
          end if;

@@ -73,6 +73,11 @@ package VSS.Strings is
    --  function Last_Grapheme
    --    (Self : Magic_String'Class) return Grapheme_Iterator;
 
+   function "="
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean;
+   --  Compare two string for equality
+
 private
 
    type Magic_String_Access is access all Virtual_String'Class;
@@ -175,6 +180,16 @@ private
       Data     : String_Data;
       Position : in out Cursor) return Boolean is abstract;
    --  Move cursor one character forward. Return True on success.
+
+   not overriding function Is_Equal
+     (Self       : Abstract_String_Handler;
+      Data       : String_Data;
+      Other      : Abstract_String_Handler'Class;
+      Other_Data : String_Data) return Boolean;
+   --  Compare two strings for binary equivalence of code point sequences.
+   --  This is generic implementation and can work with any string handlers
+   --  in cost of performance. Derived types may provide better implementation
+   --  for particular case, but always should fallback to this implementation.
 
    not overriding procedure From_UTF_8_String
      (Self    : in out Abstract_String_Handler;

@@ -8,6 +8,7 @@ build_tests:
 check: build_tests
 	.objs/tests/test_conversions
 	.objs/tests/test_character_iterators
+	.objs/tests/test_string_equal
 	.objs/tests/test_json_writer
 	rm -f .objs/tests/.fails
 	for f in testsuite/JSONTestSuite/test_parsing/*.json testsuite/JSON_checker/test/*.json; \

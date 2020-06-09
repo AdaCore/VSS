@@ -12,7 +12,7 @@ jobs:
       - name: Get VSS
         uses: actions/checkout@v2
       - name: Get GNAT Community 2020 toolchain
-        uses: ada-actions/toolchain@b55aaa7
+        uses: ada-actions/toolchain@v0.2.0
         with:
           distrib: community
       - name: Build and test

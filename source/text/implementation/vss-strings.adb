@@ -27,6 +27,36 @@ with VSS.Strings.Texts;
 
 package body VSS.Strings is
 
+   ---------
+   -- "=" --
+   ---------
+
+   function "="
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean
+   is
+      Left_Handler  : constant access Abstract_String_Handler'Class
+        := (if Left.Data.In_Place
+            then VSS.Strings.Configuration.In_Place_Handler
+            else Left.Data.Handler);
+      Right_Handler : constant access Abstract_String_Handler'Class
+        := (if Right.Data.In_Place
+            then VSS.Strings.Configuration.In_Place_Handler
+            else Right.Data.Handler);
+
+   begin
+      if Left_Handler = null and Right_Handler = null then
+         return True;
+
+      elsif Left_Handler = null xor Right_Handler = null then
+         return Left.Is_Empty and Right.Is_Empty;
+
+      else
+         return
+           Left_Handler.Is_Equal (Left.Data, Right_Handler.all, Right.Data);
+      end if;
+   end "=";
+
    ------------
    -- Adjust --
    ------------
@@ -151,6 +181,54 @@ package body VSS.Strings is
          else Self.Data.Handler = null
            or else Self.Data.Handler.Is_Empty (Self.Data));
    end Is_Empty;
+
+   --------------
+   -- Is_Equal --
+   --------------
+
+   not overriding function Is_Equal
+     (Self       : Abstract_String_Handler;
+      Data       : String_Data;
+      Other      : Abstract_String_Handler'Class;
+      Other_Data : String_Data) return Boolean
+   is
+      use type VSS.Unicode.Code_Point;
+
+      Left_Handler   : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Left_Data      : String_Data renames Data;
+      Right_Handler  : Abstract_String_Handler'Class renames Other;
+      Right_Data     : String_Data renames Other_Data;
+
+      Left_Position  : VSS.Strings.Cursor;
+      Right_Position : VSS.Strings.Cursor;
+
+   begin
+      Left_Handler.First_Character (Left_Data, Left_Position);
+      Right_Handler.First_Character (Right_Data, Right_Position);
+
+      if not Left_Handler.Has_Character (Left_Data, Left_Position)
+        or not Right_Handler.Has_Character (Right_Data, Right_Position)
+      then
+         return True;
+      end if;
+
+      loop
+         if Left_Handler.Element (Left_Data, Left_Position)
+           /= Right_Handler.Element (Right_Data, Right_Position)
+         then
+            return False;
+         end if;
+
+         exit when
+           not Left_Handler.Forward (Left_Data, Left_Position)
+             or not Right_Handler.Forward (Right_Data, Right_Position);
+      end loop;
+
+      return
+        not Left_Handler.Has_Character (Left_Data, Left_Position)
+          and not Right_Handler.Has_Character (Right_Data, Right_Position);
+   end Is_Equal;
 
    -------------
    -- Is_Null --

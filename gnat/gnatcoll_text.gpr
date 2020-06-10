@@ -23,6 +23,48 @@
 
 project GNATCOLL_Text is
 
+   type Build_Mode_Type is ("dev", "prod", "coverage");
+   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
+
+   Ada_Switches := ();
+   Linker_Options := ();
+
+   case Build_Mode is
+      when "prod" =>
+         Ada_Switches := (
+            --  Compile with optimizations
+            "-O2",
+
+            --  Generate debug information: this is useful to get meaningful
+            --  tracebacks.
+            "-g"
+         );
+
+      when "dev" =>
+         Ada_Switches := (
+            --  Compile with no optimization and with debug information to ease
+            --  investigation in debuggers.
+            "-O0", "-g",
+
+            --  Enable all warnings and GNAT stylechecks (plus O: check for
+            --  overriding indicators).
+            "-gnatwa", "-gnatygO",
+
+            --  Enable assertions and all validity checking options
+            "-gnata", "-gnatVa"
+         );
+
+      when "coverage" =>
+         Ada_Switches := (
+            --  Compile with no optimization and with debug information to ease
+            --  investigation in debuggers.
+            "-O0", "-g",
+            --  Enable coverage code instrumentation.
+            "--coverage");
+
+         Linker_Options := ("--coverage");
+   end case;
+
    for Languages use ("Ada");
    for Object_Dir use "../.objs";
    for Source_Dirs use
@@ -34,11 +76,11 @@ project GNATCOLL_Text is
       "../source/text/implementation");
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-O0", "--coverage");
+      for Switches ("Ada") use Ada_Switches;
    end Compiler;
 
    package Linker is
-      for Linker_Options use ("--coverage");
+      for Linker_Options use Linker_Options;
    end Linker;
 
 end GNATCOLL_Text;

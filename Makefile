@@ -1,6 +1,6 @@
 
 all:
-	gprbuild -p -P gnat/gnatcoll_text.gpr -cargs $(ADAFLAGS)
+	gprbuild -p -P gnat/gnatcoll_text.gpr -XBUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 
 build_tests:
 	gprbuild -p -P gnat/gnatcoll_text_tests.gpr

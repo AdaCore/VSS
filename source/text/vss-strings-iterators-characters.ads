@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Characters;
+
 package VSS.Strings.Iterators.Characters is
 
    pragma Preelaborate;

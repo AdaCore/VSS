@@ -30,7 +30,7 @@ package VSS.Text_Streams.Memory is
       Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
    end record;
 
-   procedure Put
+   overriding procedure Put
      (Self    : in out Memory_UTF8_Output_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean);

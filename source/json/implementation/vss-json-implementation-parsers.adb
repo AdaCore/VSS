@@ -274,9 +274,6 @@ package body VSS.JSON.Implementation.Parsers is
 
             when Finish =>
                null;
-
-            when others =>
-               raise Program_Error;
          end case;
 
          if not Self.Read (Parse_Array'Access, Array_State'Pos (State)) then
@@ -355,9 +352,6 @@ package body VSS.JSON.Implementation.Parsers is
 
             when Finish =>
                return True;
-
-            when others =>
-               raise Program_Error;
          end case;
       end loop;
    end Parse_Array;
@@ -971,9 +965,6 @@ package body VSS.JSON.Implementation.Parsers is
 
             when Finish =>
                return True;
-
-            when others =>
-               raise Program_Error;
          end case;
       end loop;
    end Parse_Object;
@@ -1025,7 +1016,7 @@ package body VSS.JSON.Implementation.Parsers is
                Code :=
                  Code * 16#10#
                    + (Wide_Wide_Character'Pos (Self.C)
-                        - Wide_Wide_Character'Pos (Latin_Capital_Letter_A) + 10);
+                      - Wide_Wide_Character'Pos (Latin_Capital_Letter_A) + 10);
 
                return True;
 
@@ -1258,9 +1249,6 @@ package body VSS.JSON.Implementation.Parsers is
 
             when Finish =>
                return True;
-
-            when others =>
-               raise Program_Error;
          end case;
       end loop;
    end Parse_String;

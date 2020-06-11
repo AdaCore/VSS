@@ -31,7 +31,7 @@ package body VSS.Strings is
    -- "=" --
    ---------
 
-   function "="
+   overriding function "="
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean
    is

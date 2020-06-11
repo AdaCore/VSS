@@ -27,7 +27,6 @@ with Ada.Unchecked_Deallocation;
 package body VSS.Strings.UTF8 is
 
    use type VSS.Unicode.UTF8_Code_Unit_Count;
-   use type System.Address;
 
    type Verification_State is
      (Initial,    --  ASCII or start of multibyte sequence
@@ -385,7 +384,8 @@ package body VSS.Strings.UTF8 is
          for J in Result'Range loop
             Result (J) :=
               Standard.Character'Val
-                (Destination.Storage (VSS.Unicode.UTF8_Code_Unit_Count (J - 1)));
+                (Destination.Storage
+                   (VSS.Unicode.UTF8_Code_Unit_Count (J - 1)));
          end loop;
       end return;
    end To_UTF_8_String;

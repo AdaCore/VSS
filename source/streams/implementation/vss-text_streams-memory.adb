@@ -31,11 +31,13 @@ package body VSS.Text_Streams.Memory is
    -- Put --
    ---------
 
-   procedure Put
+   overriding procedure Put
      (Self    : in out Memory_UTF8_Output_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean)
    is
+      pragma Unreferenced (Success);
+
       use type Ada.Streams.Stream_Element;
       use type VSS.Unicode.Code_Point;
 
@@ -75,11 +77,13 @@ package body VSS.Text_Streams.Memory is
             Self.Buffer.Append
               (2#1111_0000#
                or Ada.Streams.Stream_Element
-                 ((Code and 2#1_1100_0000_0000_0000_0000#) / 2#100_0000_0000_0000_0000#));
+                 ((Code and 2#1_1100_0000_0000_0000_0000#)
+                    / 2#100_0000_0000_0000_0000#));
             Self.Buffer.Append
               (2#1000_0000#
                or Ada.Streams.Stream_Element
-                 ((Code and 2#0_0011_1111_0000_0000_0000#) / 2#1_0000_0000_0000#));
+                 ((Code and 2#0_0011_1111_0000_0000_0000#)
+                    / 2#1_0000_0000_0000#));
             Self.Buffer.Append
               (2#1000_0000#
                or Ada.Streams.Stream_Element

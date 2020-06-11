@@ -27,7 +27,6 @@ private with Ada.Strings.UTF_Encoding;
 private with Ada.Streams;
 private with System.Storage_Elements;
 
-with VSS.Characters;
 limited with VSS.Strings.Iterators.Characters;
 limited with VSS.Strings.Texts;
 private with VSS.Unicode;
@@ -73,7 +72,7 @@ package VSS.Strings is
    --  function Last_Grapheme
    --    (Self : Magic_String'Class) return Grapheme_Iterator;
 
-   function "="
+   overriding function "="
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean;
    --  Compare two string for equality

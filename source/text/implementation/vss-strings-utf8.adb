@@ -51,6 +51,12 @@ package body VSS.Strings.UTF8 is
    --  F1 .. F3 | 80 .. BF | 80 .. BF | 80 .. BF
    --  F4       | 80 .. 8F | 80 .. BF | 80 .. BF
 
+   function Unchecked_Decode
+     (Storage : UTF8_Code_Unit_Array;
+      Offset  : VSS.Unicode.UTF8_Code_Unit_Index)
+      return VSS.Unicode.Code_Point;
+   --  Decode UTF8 encoded character started at given offset
+
    -------------
    -- Element --
    -------------
@@ -60,16 +66,8 @@ package body VSS.Strings.UTF8 is
       Data     : String_Data;
       Position : VSS.Strings.Cursor) return VSS.Unicode.Code_Point
    is
-      use type VSS.Unicode.Code_Point;
-      use type VSS.Unicode.UTF8_Code_Unit;
-
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
-
-      U1 : VSS.Unicode.Code_Point;
-      U2 : VSS.Unicode.Code_Point;
-      U3 : VSS.Unicode.Code_Point;
-      U4 : VSS.Unicode.Code_Point;
 
    begin
       if Source = null
@@ -79,57 +77,7 @@ package body VSS.Strings.UTF8 is
          return 16#00_0000#;
       end if;
 
-      U1 := VSS.Unicode.Code_Point (Source.Storage (Position.UTF8_Offset));
-
-      case U1 is
-         when 16#00# .. 16#7F# =>
-            --  1x code units sequence
-
-            return U1;
-
-         when 16#C2# .. 16#DF# =>
-            --  2x code units sequence
-
-            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
-            U2 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#);
-
-            return U1 or U2;
-
-         when 16#E0# .. 16#EF# =>
-            --  3x code units sequence
-
-            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
-            U2 := VSS.Unicode.Code_Point
-              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
-                * 2#0100_0000#;
-            U3 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#);
-
-            return U1 or U2 or U3;
-
-         when 16#F0# .. 16#F4# =>
-            --  4x code units sequence
-
-            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
-            U2 := VSS.Unicode.Code_Point
-              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
-                * 2#010_000_0000_0000#;
-            U3 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#)
-                * 2#0100_0000#;
-            U4 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 3) and 2#0011_1111#);
-
-            return U1 or U2 or U3 or U4;
-
-         when others =>
-            raise Program_Error;
-      end case;
+      return Unchecked_Decode (Source.Storage, Position.UTF8_Offset);
    end Element;
 
    -------------
@@ -141,16 +89,8 @@ package body VSS.Strings.UTF8 is
       Data     : String_Data;
       Position : VSS.Strings.Cursor) return VSS.Unicode.Code_Point
    is
-      use type VSS.Unicode.Code_Point;
-      use type VSS.Unicode.UTF8_Code_Unit;
-
       Source : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
-
-      U1 : VSS.Unicode.Code_Point;
-      U2 : VSS.Unicode.Code_Point;
-      U3 : VSS.Unicode.Code_Point;
-      U4 : VSS.Unicode.Code_Point;
 
    begin
       --  raise Program_Error;
@@ -161,57 +101,7 @@ package body VSS.Strings.UTF8 is
          return 16#00_0000#;
       end if;
 
-      U1 := VSS.Unicode.Code_Point (Source.Storage (Position.UTF8_Offset));
-
-      case U1 is
-         when 16#00# .. 16#7F# =>
-            --  1x code units sequence
-
-            return U1;
-
-         when 16#C2# .. 16#DF# =>
-            --  2x code units sequence
-
-            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
-            U2 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#);
-
-            return U1 or U2;
-
-         when 16#E0# .. 16#EF# =>
-            --  3x code units sequence
-
-            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
-            U2 := VSS.Unicode.Code_Point
-              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
-                * 2#0100_0000#;
-            U3 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#);
-
-            return U1 or U2 or U3;
-
-         when 16#F0# .. 16#F4# =>
-            --  4x code units sequence
-
-            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
-            U2 := VSS.Unicode.Code_Point
-              (Source.Storage (Position.UTF8_Offset + 1) and 2#0011_1111#)
-                * 2#010_000_0000_0000#;
-            U3 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 2) and 2#0011_1111#)
-                * 2#0100_0000#;
-            U4 :=
-              VSS.Unicode.Code_Point
-                (Source.Storage (Position.UTF8_Offset + 3) and 2#0011_1111#);
-
-            return U1 or U2 or U3 or U4;
-
-         when others =>
-            raise Program_Error;
-      end case;
+      return Unchecked_Decode (Source.Storage, Position.UTF8_Offset);
    end Element;
 
    ---------------------
@@ -832,6 +722,69 @@ package body VSS.Strings.UTF8 is
          end loop;
       end return;
    end To_UTF_8_String;
+
+   ----------------------
+   -- Unchecked_Decode --
+   ----------------------
+
+   function Unchecked_Decode
+     (Storage : UTF8_Code_Unit_Array;
+      Offset  : VSS.Unicode.UTF8_Code_Unit_Index)
+      return VSS.Unicode.Code_Point
+   is
+      use type VSS.Unicode.Code_Point;
+      use type VSS.Unicode.UTF8_Code_Unit;
+
+      U1 : VSS.Unicode.Code_Point := VSS.Unicode.Code_Point (Storage (Offset));
+      U2 : VSS.Unicode.Code_Point;
+      U3 : VSS.Unicode.Code_Point;
+      U4 : VSS.Unicode.Code_Point;
+
+   begin
+      case U1 is
+         when 16#00# .. 16#7F# =>
+            --  1x code units sequence
+
+            return U1;
+
+         when 16#C2# .. 16#DF# =>
+            --  2x code units sequence
+
+            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
+            U2 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 1) and 2#0011_1111#);
+
+            return U1 or U2;
+
+         when 16#E0# .. 16#EF# =>
+            --  3x code units sequence
+
+            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#0100_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 2) and 2#0011_1111#);
+
+            return U1 or U2 or U3;
+
+         when 16#F0# .. 16#F4# =>
+            --  4x code units sequence
+
+            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#010_000_0000_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point
+                (Storage (Offset + 2) and 2#0011_1111#) * 2#0100_0000#;
+            U4 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 3) and 2#0011_1111#);
+
+            return U1 or U2 or U3 or U4;
+
+         when others =>
+            raise Program_Error;
+      end case;
+   end Unchecked_Decode;
 
    -----------------
    -- Unreference --

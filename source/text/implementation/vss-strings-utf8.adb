@@ -62,6 +62,15 @@ package body VSS.Strings.UTF8 is
       Position : in out VSS.Strings.Cursor);
    --  Move cursor to position of the next character
 
+   procedure Validate_And_Copy
+     (Source      : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Destination : out UTF8_Code_Unit_Array;
+      Length      : out Character_Count;
+      Success     : out Boolean);
+   --  Validate UTF-8 encoding and copy validated part of the data to
+   --  Destination. Length is set to the length of the text in characters.
+   --  Success is set False when validation is failed and to True otherwise.
+
    -------------
    -- Element --
    -------------
@@ -190,12 +199,7 @@ package body VSS.Strings.UTF8 is
      (Self    : in out UTF8_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Data    : out String_Data;
-      Success : out Boolean)
-   is
-      Code   : VSS.Unicode.UTF8_Code_Unit;
-      State  : Verification_State := Initial;
-      Length : Character_Count    := 0;
-
+      Success : out Boolean) is
    begin
       Data :=
         (In_Place => False,
@@ -214,133 +218,23 @@ package body VSS.Strings.UTF8 is
       declare
          Destination : UTF8_String_Data_Access
            with Import, Convention => Ada, Address => Data.Pointer'Address;
+         Length      : Character_Count := 0;
 
       begin
          Destination :=
            new UTF8_String_Data
              (VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
 
-         for J in Item'Range loop
-            Code := Standard.Character'Pos (Item (J));
+         Validate_And_Copy (Item, Destination.Storage, Length, Success);
 
-            case State is
-            when Initial =>
-               Length := Length + 1;
-
-               case Code is
-                  when 16#00# .. 16#7F# =>
-                     null;
-
-                  when 16#C2# .. 16#DF# =>
-                     State := UT1;
-
-                  when 16#E0# =>
-                     State := U31;
-
-                  when 16#E1# .. 16#EC# =>
-                     State := UT2;
-
-                  when 16#ED# =>
-                     State := U33;
-
-                  when 16#EE# .. 16#EF# =>
-                     State := UT2;
-
-                  when 16#F0# =>
-                     State := U41;
-
-                  when 16#F1# .. 16#F3# =>
-                     State := UT3;
-
-                  when 16#F4# =>
-                     State := U43;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U31 =>
-               case Code is
-                  when 16#A0# .. 16#BF# =>
-                     State := UT1;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U33 =>
-               case Code is
-                  when 16#80# .. 16#9F# =>
-                     State := UT1;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U41 =>
-               case Code is
-                  when 16#90# .. 16#BF# =>
-                     State := UT2;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U43 =>
-               case Code is
-                  when 16#80# .. 16#8F# =>
-                     State := UT2;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when UT1 =>
-               case Code is
-                  when 16#80# .. 16#BF# =>
-                     State := Initial;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when UT2 =>
-               case Code is
-                  when 16#80# .. 16#BF# =>
-                     State := UT1;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when UT3 =>
-               case Code is
-                  when 16#80# .. 16#BF# =>
-                     State := UT2;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when Ill_Formed =>
-               exit;
-            end case;
-
-            Destination.Storage
-              (VSS.Unicode.UTF8_Code_Unit_Count (J - Item'First)) := Code;
-         end loop;
-
-         if State = Initial then
+         if Success then
             Destination.Storage
               (VSS.Unicode.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
             Destination.Size := Item'Length;
             Destination.Length := Length;
 
-            Success := True;
-
          else
             Self.Unreference (Data);
-            Success := False;
          end if;
       end;
    end From_UTF_8_String;
@@ -353,12 +247,7 @@ package body VSS.Strings.UTF8 is
      (Self    : in out UTF8_In_Place_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Data    : out String_Data;
-      Success : out Boolean)
-   is
-      Code   : VSS.Unicode.UTF8_Code_Unit;
-      State  : Verification_State := Initial;
-      Length : Character_Count    := 0;
-
+      Success : out Boolean) is
    begin
       Data :=
         (In_Place => True,
@@ -369,6 +258,7 @@ package body VSS.Strings.UTF8 is
       declare
          Destination : UTF8_In_Place_Data
            with Import, Convention => Ada, Address => Data.Storage'Address;
+         Length      : Character_Count;
 
       begin
          if Item'Length >= Destination.Storage'Length then
@@ -379,130 +269,13 @@ package body VSS.Strings.UTF8 is
             return;
          end if;
 
-         --  Destination :=
-         --    new UTF8_String_Data
-         --      (Magic.Unicode.UTF8_Code_Unit_Count (Item'Length));
+         Validate_And_Copy (Item, Destination.Storage, Length, Success);
 
-         for J in Item'Range loop
-            Code := Standard.Character'Pos (Item (J));
-
-            case State is
-            when Initial =>
-               Length := Length + 1;
-
-               case Code is
-                  when 16#00# .. 16#7F# =>
-                     null;
-
-                  when 16#C2# .. 16#DF# =>
-                     State := UT1;
-
-                  when 16#E0# =>
-                     State := U31;
-
-                  when 16#E1# .. 16#EC# =>
-                     State := UT2;
-
-                  when 16#ED# =>
-                     State := U33;
-
-                  when 16#EE# .. 16#EF# =>
-                     State := UT2;
-
-                  when 16#F0# =>
-                     State := U41;
-
-                  when 16#F1# .. 16#F3# =>
-                     State := UT3;
-
-                  when 16#F4# =>
-                     State := U43;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U31 =>
-               case Code is
-                  when 16#A0# .. 16#BF# =>
-                     State := UT1;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U33 =>
-               case Code is
-                  when 16#80# .. 16#9F# =>
-                     State := UT1;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U41 =>
-               case Code is
-                  when 16#90# .. 16#BF# =>
-                     State := UT2;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when U43 =>
-               case Code is
-                  when 16#80# .. 16#8F# =>
-                     State := UT2;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when UT1 =>
-               case Code is
-                  when 16#80# .. 16#BF# =>
-                     State := Initial;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when UT2 =>
-               case Code is
-                  when 16#80# .. 16#BF# =>
-                     State := UT1;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when UT3 =>
-               case Code is
-                  when 16#80# .. 16#BF# =>
-                     State := UT2;
-
-                  when others =>
-                     State := Ill_Formed;
-               end case;
-
-            when Ill_Formed =>
-               exit;
-            end case;
-
-            Destination.Storage
-              (VSS.Unicode.UTF8_Code_Unit_Count (J - Item'First)) := Code;
-         end loop;
-
-         if State = Initial then
+         if Success then
             Destination.Storage
               (VSS.Unicode.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
             Destination.Size := Item'Length;
             Destination.Length := Interfaces.Unsigned_8 (Length);
-
-            Success := True;
-
-         else
-            Success := False;
          end if;
       end;
    end From_UTF_8_String;
@@ -778,5 +551,134 @@ package body VSS.Strings.UTF8 is
          Free (Destination);
       end if;
    end Unreference;
+
+   -----------------------
+   -- Validate_And_Copy --
+   -----------------------
+
+   procedure Validate_And_Copy
+     (Source      : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Destination : out UTF8_Code_Unit_Array;
+      Length      : out Character_Count;
+      Success     : out Boolean)
+   is
+      State : Verification_State := Initial;
+      Code  : VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      Length := 0;
+
+      for J in Source'Range loop
+         Code := Standard.Character'Pos (Source (J));
+
+         case State is
+            when Initial =>
+               Length := Length + 1;
+
+               case Code is
+                  when 16#00# .. 16#7F# =>
+                     null;
+
+                  when 16#C2# .. 16#DF# =>
+                     State := UT1;
+
+                  when 16#E0# =>
+                     State := U31;
+
+                  when 16#E1# .. 16#EC# =>
+                     State := UT2;
+
+                  when 16#ED# =>
+                     State := U33;
+
+                  when 16#EE# .. 16#EF# =>
+                     State := UT2;
+
+                  when 16#F0# =>
+                     State := U41;
+
+                  when 16#F1# .. 16#F3# =>
+                     State := UT3;
+
+                  when 16#F4# =>
+                     State := U43;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U31 =>
+               case Code is
+                  when 16#A0# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U33 =>
+               case Code is
+                  when 16#80# .. 16#9F# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U41 =>
+               case Code is
+                  when 16#90# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U43 =>
+               case Code is
+                  when 16#80# .. 16#8F# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT1 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := Initial;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT2 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT3 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when Ill_Formed =>
+               exit;
+         end case;
+
+         Destination
+           (VSS.Unicode.UTF8_Code_Unit_Count (J - Source'First)) := Code;
+      end loop;
+
+      Success := State = Initial;
+   end Validate_And_Copy;
 
 end VSS.Strings.UTF8;

@@ -57,6 +57,11 @@ package body VSS.Strings.UTF8 is
       return VSS.Unicode.Code_Point;
    --  Decode UTF8 encoded character started at given offset
 
+   procedure Unchecked_Forward
+     (Storage  : UTF8_Code_Unit_Array;
+      Position : in out VSS.Strings.Cursor);
+   --  Move cursor to position of the next character
+
    -------------
    -- Element --
    -------------
@@ -137,8 +142,6 @@ package body VSS.Strings.UTF8 is
       Data     : String_Data;
       Position : in out Cursor) return Boolean
    is
-      use type VSS.Unicode.UTF16_Code_Unit_Count;
-
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
 
@@ -150,49 +153,9 @@ package body VSS.Strings.UTF8 is
          return False;
       end if;
 
-      declare
-         Code : constant VSS.Unicode.UTF8_Code_Unit :=
-           Source.Storage (Position.UTF8_Offset);
+      Unchecked_Forward (Source.Storage, Position);
 
-      begin
-         Position.Index := Position.Index + 1;
-
-         case Code is
-            when 16#00# .. 16#7F# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 1;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#C2# .. 16#DF# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 2;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#E0# .. 16#EF# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 3;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#F0# .. 16#F4# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 4;
-               Position.UTF16_Offset := Position.UTF16_Offset + 2;
-
-            when others =>
-               raise Program_Error with "string data is corrupted";
-         end case;
-
-         --  XXX case statement above may be rewritten as below to avoid
-         --  use of branch instructions.
-         --
-         --  Position.UTF8_Offset  :=
-         --    Position.UTF8_Offset + 1
-         --      + (if (Code and 2#1000_0000#) = 2#1000_0000# then 1 else 0)
-         --      + (if (Code and 2#1110_0000#) = 2#1110_0000# then 1 else 0)
-         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
-         --
-         --  Position.UTF16_Offset :=
-         --    Position.UTF16_Offset + 1
-         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
-
-         return Position.Index <= Source.Length;
-      end;
+      return Position.Index <= Source.Length;
    end Forward;
 
    -------------
@@ -204,63 +167,19 @@ package body VSS.Strings.UTF8 is
       Data     : String_Data;
       Position : in out Cursor) return Boolean
    is
-      use type VSS.Unicode.UTF16_Code_Unit_Count;
-
       Source : constant UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
 
    begin
-      --  raise Program_Error;
-
       if Position.Index < 1
         or else Position.Index > Character_Count (Source.Length)
       then
          return False;
       end if;
 
-      declare
-         Code : constant VSS.Unicode.UTF8_Code_Unit :=
-           Source.Storage (Position.UTF8_Offset);
+      Unchecked_Forward (Source.Storage, Position);
 
-      begin
-         Position.Index := Position.Index + 1;
-
-         case Code is
-            when 16#00# .. 16#7F# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 1;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#C2# .. 16#DF# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 2;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#E0# .. 16#EF# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 3;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#F0# .. 16#F4# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 4;
-               Position.UTF16_Offset := Position.UTF16_Offset + 2;
-
-            when others =>
-               raise Program_Error with "string data is corrupted";
-         end case;
-
-         --  XXX case statement above may be rewritten as below to avoid
-         --  use of branch instructions.
-         --
-         --  Position.UTF8_Offset  :=
-         --    Position.UTF8_Offset + 1
-         --      + (if (Code and 2#1000_0000#) = 2#1000_0000# then 1 else 0)
-         --      + (if (Code and 2#1110_0000#) = 2#1110_0000# then 1 else 0)
-         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
-         --
-         --  Position.UTF16_Offset :=
-         --    Position.UTF16_Offset + 1
-         --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
-
-         return Position.Index <= Character_Count (Source.Length);
-      end;
+      return Position.Index <= Character_Count (Source.Length);
    end Forward;
 
    -----------------------
@@ -785,6 +704,57 @@ package body VSS.Strings.UTF8 is
             raise Program_Error;
       end case;
    end Unchecked_Decode;
+
+   -----------------------
+   -- Unchecked_Forward --
+   -----------------------
+
+   procedure Unchecked_Forward
+     (Storage  : UTF8_Code_Unit_Array;
+      Position : in out VSS.Strings.Cursor)
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Count;
+
+      Code : constant VSS.Unicode.UTF8_Code_Unit :=
+        Storage (Position.UTF8_Offset);
+
+   begin
+      Position.Index := Position.Index + 1;
+
+      case Code is
+         when 16#00# .. 16#7F# =>
+            Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+         when 16#C2# .. 16#DF# =>
+            Position.UTF8_Offset  := Position.UTF8_Offset + 2;
+            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+         when 16#E0# .. 16#EF# =>
+            Position.UTF8_Offset  := Position.UTF8_Offset + 3;
+            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+         when 16#F0# .. 16#F4# =>
+            Position.UTF8_Offset  := Position.UTF8_Offset + 4;
+            Position.UTF16_Offset := Position.UTF16_Offset + 2;
+
+         when others =>
+            raise Program_Error with "string data is corrupted";
+      end case;
+
+      --  XXX case statement above may be rewritten as below to avoid
+      --  use of branch instructions.
+      --
+      --  Position.UTF8_Offset  :=
+      --    Position.UTF8_Offset + 1
+      --      + (if (Code and 2#1000_0000#) = 2#1000_0000# then 1 else 0)
+      --      + (if (Code and 2#1110_0000#) = 2#1110_0000# then 1 else 0)
+      --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
+      --
+      --  Position.UTF16_Offset :=
+      --    Position.UTF16_Offset + 1
+      --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
+   end Unchecked_Forward;
 
    -----------------
    -- Unreference --

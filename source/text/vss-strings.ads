@@ -54,6 +54,10 @@ package VSS.Strings is
    function Is_Null (Self : Virtual_String'Class) return Boolean;
    --  Return True when string is null.
 
+   function Character_Length
+     (Self : Virtual_String'Class) return Character_Count;
+   --  Return number of characters.
+
    function To_Magic_Text
      (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text;
 
@@ -153,6 +157,11 @@ private
      (Self : Abstract_String_Handler;
       Data : String_Data) return Boolean is abstract;
    --  Return True when string is empty.
+
+   not overriding function Length
+     (Self : Abstract_String_Handler;
+      Data : String_Data) return VSS.Strings.Character_Count is abstract;
+   --  Return number of characters in the text
 
    not overriding function Element
      (Self     : Abstract_String_Handler;

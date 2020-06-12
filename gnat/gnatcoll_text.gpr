@@ -51,7 +51,10 @@ project GNATCOLL_Text is
             "-gnatwa", "-gnatygO",
 
             --  Enable assertions and all validity checking options
-            "-gnata", "-gnatVa"
+            "-gnata", "-gnatVa",
+
+            --  Enable stack overflow checks
+            "-fstack-check"
          );
 
       when "coverage" =>

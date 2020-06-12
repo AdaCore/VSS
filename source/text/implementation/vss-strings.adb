@@ -71,6 +71,23 @@ package body VSS.Strings is
       end if;
    end Adjust;
 
+   ----------------------
+   -- Character_Length --
+   ----------------------
+
+   function Character_Length
+     (Self : Virtual_String'Class) return Character_Count is
+   begin
+      if Self.Data.In_Place then
+         return VSS.Strings.Configuration.In_Place_Handler.Length (Self.Data);
+
+      elsif Self.Data.Handler /= null then
+         return Self.Data.Handler.Length (Self.Data);
+      end if;
+
+      return 0;
+   end Character_Length;
+
    -------------
    -- Connect --
    -------------

@@ -71,6 +71,10 @@ private package VSS.Strings.UTF8 is
      (Self : UTF8_String_Handler;
       Data : String_Data) return Boolean;
 
+   overriding function Length
+     (Self : UTF8_String_Handler;
+      Data : String_Data) return VSS.Strings.Character_Count;
+
    overriding function Element
      (Self     : UTF8_String_Handler;
       Data     : String_Data;
@@ -133,6 +137,10 @@ private package VSS.Strings.UTF8 is
    overriding function Is_Empty
      (Self : UTF8_In_Place_String_Handler;
       Data : String_Data) return Boolean;
+
+   overriding function Length
+     (Self : UTF8_In_Place_String_Handler;
+      Data : String_Data) return VSS.Strings.Character_Count;
 
    overriding function Element
      (Self     : UTF8_In_Place_String_Handler;

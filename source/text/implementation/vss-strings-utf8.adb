@@ -348,6 +348,36 @@ package body VSS.Strings.UTF8 is
       return Destination.Length = 0;
    end Is_Empty;
 
+   ------------
+   -- Length --
+   ------------
+
+   overriding function Length
+     (Self : UTF8_String_Handler;
+      Data : String_Data) return VSS.Strings.Character_Count
+   is
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      return (if Source = null then 0 else Source.Length);
+   end Length;
+
+   ------------
+   -- Length --
+   ------------
+
+   overriding function Length
+     (Self : UTF8_In_Place_String_Handler;
+      Data : String_Data) return VSS.Strings.Character_Count
+   is
+      Source : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      return VSS.Strings.Character_Count (Source.Length);
+   end Length;
+
    ---------------
    -- Reference --
    ---------------

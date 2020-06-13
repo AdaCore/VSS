@@ -27,6 +27,11 @@ with VSS.Strings.Texts;
 
 package body VSS.Strings is
 
+   function Handler
+     (Self : Virtual_String'Class) return access Abstract_String_Handler'Class;
+   --  Returns string data handler should be used to process data of given
+   --  object.
+
    ---------
    -- "=" --
    ---------
@@ -35,14 +40,10 @@ package body VSS.Strings is
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean
    is
-      Left_Handler  : constant access Abstract_String_Handler'Class
-        := (if Left.Data.In_Place
-            then VSS.Strings.Configuration.In_Place_Handler
-            else Left.Data.Handler);
-      Right_Handler : constant access Abstract_String_Handler'Class
-        := (if Right.Data.In_Place
-            then VSS.Strings.Configuration.In_Place_Handler
-            else Right.Data.Handler);
+      Left_Handler  : constant access Abstract_String_Handler'Class :=
+        Left.Handler;
+      Right_Handler : constant access Abstract_String_Handler'Class :=
+        Right.Handler;
 
    begin
       if Left_Handler = null and Right_Handler = null then
@@ -62,12 +63,11 @@ package body VSS.Strings is
    ------------
 
    overriding procedure Adjust (Self : in out Virtual_String) is
-   begin
-      if Self.Data.In_Place then
-         VSS.Strings.Configuration.In_Place_Handler.Reference (Self.Data);
+      Handler : constant access Abstract_String_Handler'Class := Self.Handler;
 
-      elsif Self.Data.Handler /= null then
-         Self.Data.Handler.Reference (Self.Data);
+   begin
+      if Handler /= null then
+         Handler.Reference (Self.Data);
       end if;
    end Adjust;
 
@@ -76,16 +76,12 @@ package body VSS.Strings is
    ----------------------
 
    function Character_Length
-     (Self : Virtual_String'Class) return Character_Count is
+     (Self : Virtual_String'Class) return Character_Count
+   is
+      Handler : constant access Abstract_String_Handler'Class := Self.Handler;
+
    begin
-      if Self.Data.In_Place then
-         return VSS.Strings.Configuration.In_Place_Handler.Length (Self.Data);
-
-      elsif Self.Data.Handler /= null then
-         return Self.Data.Handler.Length (Self.Data);
-      end if;
-
-      return 0;
+      return (if Handler = null then 0 else Handler.Length (Self.Data));
    end Character_Length;
 
    -------------
@@ -144,6 +140,8 @@ package body VSS.Strings is
    --------------
 
    overriding procedure Finalize (Self : in out Virtual_String) is
+      Handler : constant access Abstract_String_Handler'Class := Self.Handler;
+
    begin
       --  Invalidate and disconnect all referals
 
@@ -154,11 +152,8 @@ package body VSS.Strings is
 
       --  Unreference shared data
 
-      if Self.Data.In_Place then
-         VSS.Strings.Configuration.In_Place_Handler.Unreference (Self.Data);
-
-      elsif Self.Data.Handler /= null then
-         Self.Data.Handler.Unreference (Self.Data);
+      if Handler /= null then
+         Handler.Unreference (Self.Data);
       end if;
    end Finalize;
 
@@ -186,17 +181,31 @@ package body VSS.Strings is
         VSS.Strings.Iterators.Characters.Internals.First_Character (Self);
    end First_Character;
 
+   -------------
+   -- Handler --
+   -------------
+
+   function Handler
+     (Self : Virtual_String'Class)
+      return access Abstract_String_Handler'Class is
+   begin
+      if Self.Data.In_Place then
+         return VSS.Strings.Configuration.In_Place_Handler;
+
+      else
+         return Self.Data.Handler;
+      end if;
+   end Handler;
+
    --------------
    -- Is_Empty --
    --------------
 
    function Is_Empty (Self : Virtual_String'Class) return Boolean is
+      Handler : constant access Abstract_String_Handler'Class := Self.Handler;
+
    begin
-      return
-        (if Self.Data.In_Place
-         then VSS.Strings.Configuration.In_Place_Handler.Is_Empty (Self.Data)
-         else Self.Data.Handler = null
-           or else Self.Data.Handler.Is_Empty (Self.Data));
+      return Handler = null or else Handler.Is_Empty (Self.Data);
    end Is_Empty;
 
    --------------
@@ -253,11 +262,7 @@ package body VSS.Strings is
 
    function Is_Null (Self : Virtual_String'Class) return Boolean is
    begin
-      return
-        (if Self.Data.In_Place
-         then raise Program_Error
-         else Self.Data.Handler = null);
-      --  return Self.Data = null;
+      return Self.Handler = null;
    end Is_Null;
 
    ----------

@@ -27,11 +27,6 @@ with VSS.Strings.Texts;
 
 package body VSS.Strings is
 
-   function Handler
-     (Self : Virtual_String'Class) return access Abstract_String_Handler'Class;
-   --  Returns string data handler should be used to process data of given
-   --  object.
-
    ---------
    -- "=" --
    ---------
@@ -230,25 +225,18 @@ package body VSS.Strings is
       Right_Position : VSS.Strings.Cursor;
 
    begin
-      Left_Handler.First_Character (Left_Data, Left_Position);
-      Right_Handler.First_Character (Right_Data, Right_Position);
+      Left_Handler.Before_First_Character (Left_Data, Left_Position);
+      Right_Handler.Before_First_Character (Right_Data, Right_Position);
 
-      if not Left_Handler.Has_Character (Left_Data, Left_Position)
-        or not Right_Handler.Has_Character (Right_Data, Right_Position)
-      then
-         return True;
-      end if;
-
+      while
+        Left_Handler.Forward (Left_Data, Left_Position)
+          and Right_Handler.Forward (Right_Data, Right_Position)
       loop
          if Left_Handler.Element (Left_Data, Left_Position)
            /= Right_Handler.Element (Right_Data, Right_Position)
          then
             return False;
          end if;
-
-         exit when
-           not Left_Handler.Forward (Left_Data, Left_Position)
-             or not Right_Handler.Forward (Right_Data, Right_Position);
       end loop;
 
       return

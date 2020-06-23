@@ -21,8 +21,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Configuration;
-
 package body VSS.Strings.Iterators.Characters.Internals is
 
    ---------------------
@@ -31,17 +29,18 @@ package body VSS.Strings.Iterators.Characters.Internals is
 
    function First_Character
      (Self : Virtual_String'Class)
-      return VSS.Strings.Iterators.Characters.Character_Iterator is
+      return VSS.Strings.Iterators.Characters.Character_Iterator
+   is
+      Handler : constant access Abstract_String_Handler'Class := Self.Handler;
+      Dummy   : Boolean;
+
    begin
       return Result : VSS.Strings.Iterators.Characters.Character_Iterator do
          Result.Connect (Self'Unrestricted_Access);
 
-         if Self.Data.In_Place then
-            VSS.Strings.Configuration.In_Place_Handler.First_Character
-              (Self.Data, Result.Position);
-
-         elsif Self.Data.Handler /= null then
-            Self.Data.Handler.First_Character (Self.Data, Result.Position);
+         if Handler /= null then
+            Handler.Before_First_Character (Self.Data, Result.Position);
+            Dummy := Handler.Forward (Self.Data, Result.Position);
          end if;
       end return;
    end First_Character;

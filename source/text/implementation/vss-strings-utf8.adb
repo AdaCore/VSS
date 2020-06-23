@@ -70,6 +70,30 @@ package body VSS.Strings.UTF8 is
    --  Destination. Length is set to the length of the text in characters.
    --  Success is set False when validation is failed and to True otherwise.
 
+   ----------------------------
+   -- Before_First_Character --
+   ----------------------------
+
+   overriding procedure Before_First_Character
+     (Self     : UTF8_String_Handler;
+      Data     : String_Data;
+      Position : in out VSS.Strings.Cursor) is
+   begin
+      Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
+   end Before_First_Character;
+
+   ----------------------------
+   -- Before_First_Character --
+   ----------------------------
+
+   overriding procedure Before_First_Character
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : String_Data;
+      Position : in out VSS.Strings.Cursor) is
+   begin
+      Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
+   end Before_First_Character;
+
    -------------
    -- Element --
    -------------
@@ -117,30 +141,6 @@ package body VSS.Strings.UTF8 is
       return Unchecked_Decode (Source.Storage, Position.UTF8_Offset);
    end Element;
 
-   ---------------------
-   -- First_Character --
-   ---------------------
-
-   overriding procedure First_Character
-     (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : in out VSS.Strings.Cursor) is
-   begin
-      Position := (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
-   end First_Character;
-
-   ---------------------
-   -- First_Character --
-   ---------------------
-
-   overriding procedure First_Character
-     (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : in out VSS.Strings.Cursor) is
-   begin
-      Position := (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
-   end First_Character;
-
    -------------
    -- Forward --
    -------------
@@ -154,14 +154,15 @@ package body VSS.Strings.UTF8 is
         with Import, Convention => Ada, Address => Data.Pointer'Address;
 
    begin
-      if Source = null
-        or else Position.Index < 1
-        or else Position.Index > Source.Length
-      then
+      if Source = null or else Position.Index > Source.Length then
          return False;
-      end if;
 
-      Unchecked_Forward (Source.Storage, Position);
+      elsif Position.Index = 0 then
+         Position.Index := 1;
+
+      else
+         Unchecked_Forward (Source.Storage, Position);
+      end if;
 
       return Position.Index <= Source.Length;
    end Forward;
@@ -179,13 +180,15 @@ package body VSS.Strings.UTF8 is
         with Import, Convention => Ada, Address => Data'Address;
 
    begin
-      if Position.Index < 1
-        or else Position.Index > Character_Count (Source.Length)
-      then
+      if Position.Index > Character_Count (Source.Length) then
          return False;
-      end if;
 
-      Unchecked_Forward (Source.Storage, Position);
+      elsif Position.Index = 0 then
+         Position.Index := 1;
+
+      else
+         Unchecked_Forward (Source.Storage, Position);
+      end if;
 
       return Position.Index <= Character_Count (Source.Length);
    end Forward;

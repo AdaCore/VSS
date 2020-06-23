@@ -94,9 +94,11 @@ private
    ------------
 
    type Cursor is record
-      Index        : Character_Index                     := 1;
-      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Index  := 0;
-      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Index := 0;
+      Index        : Character_Count                   := 0;
+      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Index  :=
+        VSS.Unicode.UTF8_Code_Unit_Index'Last;
+      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Index :=
+        VSS.Unicode.UTF16_Code_Unit_Index'Last;
    end record;
 
    -----------------
@@ -177,7 +179,7 @@ private
       Position : VSS.Strings.Cursor) return Boolean is abstract;
    --  Return True when position points to the character.
 
-   not overriding procedure First_Character
+   not overriding procedure Before_First_Character
      (Self     : Abstract_String_Handler;
       Data     : String_Data;
       Position : in out VSS.Strings.Cursor) is abstract;
@@ -275,5 +277,10 @@ private
    end record;
 
    overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
+
+   function Handler
+     (Self : Virtual_String'Class) return access Abstract_String_Handler'Class;
+   --  Returns string data handler should be used to process data of given
+   --  object.
 
 end VSS.Strings;

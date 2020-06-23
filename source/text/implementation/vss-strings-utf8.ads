@@ -88,7 +88,7 @@ private package VSS.Strings.UTF8 is
       Data     : String_Data;
       Position : VSS.Strings.Cursor) return Boolean;
 
-   overriding procedure First_Character
+   overriding procedure Before_First_Character
      (Self     : UTF8_String_Handler;
       Data     : String_Data;
       Position : in out VSS.Strings.Cursor);
@@ -155,7 +155,7 @@ private package VSS.Strings.UTF8 is
       Data     : String_Data;
       Position : VSS.Strings.Cursor) return Boolean;
 
-   overriding procedure First_Character
+   overriding procedure Before_First_Character
      (Self     : UTF8_In_Place_String_Handler;
       Data     : String_Data;
       Position : in out VSS.Strings.Cursor);

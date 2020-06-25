@@ -30,6 +30,24 @@ package body VSS.Stream_Element_Buffers is
    procedure Free is
      new Ada.Unchecked_Deallocation (Data_Record, Data_Access);
 
+   package Iterators is
+
+      type Forward_Iterator is
+        new Stream_Element_Buffer_Iterator_Interfaces.Forward_Iterator
+      with record
+         Buffer : Stream_Element_Buffer_Access;
+      end record;
+
+      overriding function First
+        (Self : Forward_Iterator) return Stream_Element_Buffer_Cursor;
+
+      overriding function Next
+        (Self     : Forward_Iterator;
+         Position : Stream_Element_Buffer_Cursor)
+         return Stream_Element_Buffer_Cursor;
+
+   end Iterators;
+
    ------------
    -- Adjust --
    ------------
@@ -78,6 +96,19 @@ package body VSS.Stream_Element_Buffers is
       Self.Data.Storage (Self.Data.Length) := Item;
    end Append;
 
+   -------------------------
+   -- Each_Stream_Element --
+   -------------------------
+
+   function Each_Stream_Element
+     (Self : Stream_Element_Buffer'Class)
+      return Stream_Element_Buffer_Iterator_Interfaces.Forward_Iterator'Class
+   is
+   begin
+      return
+        Iterators.Forward_Iterator'(Buffer => Self'Unrestricted_Access);
+   end Each_Stream_Element;
+
    -------------
    -- Element --
    -------------
@@ -94,6 +125,23 @@ package body VSS.Stream_Element_Buffers is
       return Self.Data.Storage (Index);
    end Element;
 
+   -------------
+   -- Element --
+   -------------
+
+   function Element
+     (Self : Stream_Element_Buffer_Cursor'Class)
+      return Ada.Streams.Stream_Element
+   is
+   begin
+      if Self.Has_Element then
+         return Self.Buffer.Data.Storage (Self.Index);
+
+      else
+         raise Constraint_Error;
+      end if;
+   end Element;
+
    --------------
    -- Finalize --
    --------------
@@ -104,6 +152,49 @@ package body VSS.Stream_Element_Buffers is
          Free (Self.Data);
       end if;
    end Finalize;
+
+   -----------------
+   -- Has_Element --
+   -----------------
+
+   function Has_Element (Self : Stream_Element_Buffer_Cursor) return Boolean is
+   begin
+      return
+        Self.Buffer /= null
+          and then Self.Buffer.Data /= null
+          and then Self.Index > 0
+          and then Self.Buffer.Data.Length <= Self.Index;
+   end Has_Element;
+
+   ---------------
+   -- Iterators --
+   ---------------
+
+   package body Iterators is
+
+      -----------
+      -- First --
+      -----------
+
+      overriding function First
+        (Self : Forward_Iterator) return Stream_Element_Buffer_Cursor is
+      begin
+         return (Buffer => Self.Buffer, Index => 1);
+      end First;
+
+      ----------
+      -- Next --
+      ----------
+
+      overriding function Next
+        (Self     : Forward_Iterator;
+         Position : Stream_Element_Buffer_Cursor)
+         return Stream_Element_Buffer_Cursor is
+      begin
+         return (Buffer => Position.Buffer, Index => Position.Index + 1);
+      end Next;
+
+   end Iterators;
 
    ------------
    -- Length --
@@ -125,6 +216,17 @@ package body VSS.Stream_Element_Buffers is
       Item   : out Stream_Element_Buffer) is
    begin
       null;
+   end Read;
+
+   ----------
+   -- Read --
+   ----------
+
+   procedure Read
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : out Stream_Element_Buffer_Cursor) is
+   begin
+      raise Program_Error;
    end Read;
 
    ------------------
@@ -150,6 +252,17 @@ package body VSS.Stream_Element_Buffers is
          Ada.Streams.Stream_Element_Array'Write
            (Stream, Item.Data.Storage (1 .. Item.Data.Length));
       end if;
+   end Write;
+
+   -----------
+   -- Write --
+   -----------
+
+   procedure Write
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : Stream_Element_Buffer_Cursor) is
+   begin
+      raise Program_Error;
    end Write;
 
 end VSS.Stream_Element_Buffers;

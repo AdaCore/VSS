@@ -21,6 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Iterator_Interfaces;
 private with Ada.Finalization;
 with Ada.Streams;
 
@@ -51,6 +52,25 @@ package VSS.Stream_Element_Buffers is
      (Self : in out Stream_Element_Buffer;
       Item : Ada.Streams.Stream_Element);
    --  Append stream element to the end of the buffer
+
+   ------------------------------------
+   -- Support for Ada 2012 iterators --
+   ------------------------------------
+
+   type Stream_Element_Buffer_Cursor is tagged private;
+
+   function Has_Element (Self : Stream_Element_Buffer_Cursor) return Boolean;
+
+   function Element
+     (Self : Stream_Element_Buffer_Cursor'Class)
+      return Ada.Streams.Stream_Element;
+
+   package Stream_Element_Buffer_Iterator_Interfaces is
+     new Ada.Iterator_Interfaces (Stream_Element_Buffer_Cursor, Has_Element);
+
+   function Each_Stream_Element
+     (Self : Stream_Element_Buffer'Class)
+      return Stream_Element_Buffer_Iterator_Interfaces.Forward_Iterator'Class;
 
 private
 
@@ -90,5 +110,27 @@ private
    overriding procedure Adjust (Self : in out Stream_Element_Buffer);
 
    overriding procedure Finalize (Self : in out Stream_Element_Buffer);
+
+   ----------------------------------
+   -- Stream_Element_Buffer_Cursor --
+   ----------------------------------
+
+   type Stream_Element_Buffer_Access is access all Stream_Element_Buffer'Class;
+
+   type Stream_Element_Buffer_Cursor is tagged record
+      Buffer : Stream_Element_Buffer_Access;
+      Index  : Ada.Streams.Stream_Element_Offset := 0;
+   end record;
+
+   procedure Read
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : out Stream_Element_Buffer_Cursor);
+
+   procedure Write
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Self   : Stream_Element_Buffer_Cursor);
+
+   for Stream_Element_Buffer_Cursor'Read use Read;
+   for Stream_Element_Buffer_Cursor'Write use Write;
 
 end VSS.Stream_Element_Buffers;

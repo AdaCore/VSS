@@ -20,28 +20,36 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Data package for testing.
 
-with "gnatcoll_text";
+with VSS.Strings;
 
-project GNATCOLL_Text_Tests is
+package Hello_World_Data is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_conversions.adb",
-                 "test_character_iterators.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_equal",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb");
+   type Language is
+     (Arabic,
+      Chinese,
+      English,
+      French,
+      German,
+      Greek,
+      Hebrew,
+      Japanse,
+      Korean,
+      Russian,
+      Thai,
+      Turkish);
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   function Name (Self : Language) return String;
+   --  Return name of the language.
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   function Name (Self : Language) return VSS.Strings.Virtual_String;
+   --  Return name of the language.
 
-end GNATCOLL_Text_Tests;
+   function Hello (Self : Language) return String;
+   --  Return "Hello, world" translated to given language.
+
+   function Hello (Self : Language) return VSS.Strings.Virtual_String;
+   --  Return "Hello, world" translated to given language.
+
+end Hello_World_Data;

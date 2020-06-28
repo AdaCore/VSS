@@ -164,6 +164,13 @@ begin
          Character'Val (16#1F#))),
       Success);
 
+   --  Backslash and quotation mark inside string value
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("others"), Success);
+   Writer.String_Value
+     (VSS.Strings.Conversions.To_Magic_String ("\"""), Success);
+
    writer.End_Object (Success);
 
    Writer.End_Document (Success);

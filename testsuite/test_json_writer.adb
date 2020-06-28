@@ -124,6 +124,46 @@ begin
    Writer.End_Object (Success);
    Writer.End_Array (Success);
 
+   --  All control characters inside string value
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("controls"), Success);
+   Writer.String_Value
+     (VSS.Strings.Conversions.To_Magic_String
+        ((Character'Val (16#00#),
+         Character'Val (16#01#),
+         Character'Val (16#02#),
+         Character'Val (16#03#),
+         Character'Val (16#04#),
+         Character'Val (16#05#),
+         Character'Val (16#06#),
+         Character'Val (16#07#),
+         Character'Val (16#08#),
+         Character'Val (16#09#),
+         Character'Val (16#0A#),
+         Character'Val (16#0B#),
+         Character'Val (16#0C#),
+         Character'Val (16#0D#),
+         Character'Val (16#0E#),
+         Character'Val (16#0F#),
+         Character'Val (16#10#),
+         Character'Val (16#11#),
+         Character'Val (16#12#),
+         Character'Val (16#13#),
+         Character'Val (16#14#),
+         Character'Val (16#15#),
+         Character'Val (16#16#),
+         Character'Val (16#17#),
+         Character'Val (16#18#),
+         Character'Val (16#19#),
+         Character'Val (16#1A#),
+         Character'Val (16#1B#),
+         Character'Val (16#1C#),
+         Character'Val (16#1D#),
+         Character'Val (16#1E#),
+         Character'Val (16#1F#))),
+      Success);
+
    writer.End_Object (Success);
 
    Writer.End_Document (Success);

@@ -30,8 +30,41 @@ procedure Test_Stream_Element_Buffer is
    use type Ada.Streams.Stream_Element;
    use type Ada.Streams.Stream_Element_Offset;
 
+   procedure Test_Assignment_And_Modification;
+   --  Test assignment of the buffer's variables and modification of both
+   --  buffers.
+
    procedure Test_Element_Iterator;
    --  Test element iterator.
+
+   --------------------------------------
+   -- Test_Assignment_And_Modification --
+   --------------------------------------
+
+   procedure Test_Assignment_And_Modification is
+      Buffer_1 : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Buffer_2 : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+
+   begin
+      --  Fill buffer
+
+      for C in reverse Character'('A') .. Character'('Z') loop
+         Buffer_1.Append (Character'Pos (C));
+      end loop;
+
+      Buffer_2 := Buffer_1;
+
+      Buffer_1.Append (Character'Pos ('1'));
+      Buffer_2.Append (Character'Pos ('2'));
+
+      if Buffer_1.Element (Buffer_1.Length) /= Character'Pos ('1') then
+         raise Program_Error;
+      end if;
+
+      if Buffer_2.Element (Buffer_2.Length) /= Character'Pos ('2') then
+         raise Program_Error;
+      end if;
+   end Test_Assignment_And_Modification;
 
    ---------------------------
    -- Test_Element_Iterator --
@@ -72,5 +105,6 @@ procedure Test_Stream_Element_Buffer is
    end Test_Element_Iterator;
 
 begin
+   Test_Assignment_And_Modification;
    Test_Element_Iterator;
 end Test_Stream_Element_Buffer;

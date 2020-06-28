@@ -21,27 +21,56 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "gnatcoll_text";
+with Ada.Streams;
 
-project GNATCOLL_Text_Tests is
+with VSS.Stream_Element_Buffers;
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_conversions.adb",
-                 "test_character_iterators.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_equal",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb");
+procedure Test_Stream_Element_Buffer is
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("test_conversions.adb") use ("-g", "-O2");
-   end Compiler;
+   use type Ada.Streams.Stream_Element;
+   use type Ada.Streams.Stream_Element_Offset;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   procedure Test_Element_Iterator;
+   --  Test element iterator.
 
-end GNATCOLL_Text_Tests;
+   ---------------------------
+   -- Test_Element_Iterator --
+   ---------------------------
+
+   procedure Test_Element_Iterator is
+      Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Count  : Ada.Streams.Stream_Element_Offset := 0;
+
+   begin
+      --  Fill buffer
+
+      for C in reverse Character'('A') .. Character'('Z') loop
+         Buffer.Append (Character'Pos (C));
+      end loop;
+
+      if Buffer.Length /= Character'Pos ('Z') - Character'Pos ('A') + 1 then
+         raise Program_Error;
+      end if;
+
+      --  Check content of the buffer
+
+      for C in Buffer.Each_Stream_Element loop
+         Count := Count + 1;
+
+         if C.Element
+           /= Ada.Streams.Stream_Element (Character'Pos ('Z') - C.Index + 1)
+         then
+            raise Program_Error;
+         end if;
+      end loop;
+
+      --  Chech that previous loop has been executed expected number of times.
+
+      if Count /= Buffer.Length then
+         raise Program_Error;
+      end if;
+   end Test_Element_Iterator;
+
+begin
+   Test_Element_Iterator;
+end Test_Stream_Element_Buffer;

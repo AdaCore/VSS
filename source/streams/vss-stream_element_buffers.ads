@@ -65,6 +65,10 @@ package VSS.Stream_Element_Buffers is
      (Self : Stream_Element_Buffer_Cursor'Class)
       return Ada.Streams.Stream_Element;
 
+   function Index
+     (Self : Stream_Element_Buffer_Cursor'Class)
+      return Ada.Streams.Stream_Element_Offset;
+
    package Stream_Element_Buffer_Iterator_Interfaces is
      new Ada.Iterator_Interfaces (Stream_Element_Buffer_Cursor, Has_Element);
 

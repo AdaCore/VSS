@@ -21,15 +21,21 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
+with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
+with Interfaces;
 
-with VSS.Stream_Element_Buffers;
 with VSS.Stream_Element_Buffers.Conversions;
 with VSS.Strings.Conversions;
 with VSS.Text_Streams.Memory;
 with VSS.JSON.Streams.Writers;
 
 procedure Test_JSON_Writer is
+
+   use type Interfaces.IEEE_Float_64;
+   use type Interfaces.Integer_64;
+
    Stream  : aliased VSS.Text_Streams.Memory.Memory_UTF8_Output_Stream;
    Writer  : aliased VSS.JSON.Streams.Writers.JSON_Simple_Writer;
    Success : Boolean := True;
@@ -39,6 +45,8 @@ begin
    Writer.Start_Document (Success);
 
    Writer.Start_Object (Success);
+
+   --  Some usual constructs.
 
    Writer.Key_Name
      (VSS.Strings.Conversions.To_Magic_String ("name"), Success);
@@ -68,11 +76,90 @@ begin
      (VSS.Strings.Conversions.To_Magic_String ("float"), Success);
    Writer.Float_Value (20.5, Success);
 
+   --  Arrays of different types
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("booleans"), Success);
+   Writer.Start_Array (Success);
+   Writer.Boolean_Value (False, Success);
+   Writer.Boolean_Value (True, Success);
+   Writer.End_Array (Success);
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("nulls"), Success);
+   Writer.Start_Array (Success);
+   Writer.Null_Value (Success);
+   Writer.Null_Value (Success);
+   Writer.End_Array (Success);
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("floats"), Success);
+   Writer.Start_Array (Success);
+   Writer.Float_Value (-1.0, Success);
+   Writer.Float_Value (1.0, Success);
+   Writer.End_Array (Success);
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("integers"), Success);
+   Writer.Start_Array (Success);
+   Writer.Integer_Value (-1, Success);
+   Writer.Integer_Value (1, Success);
+   Writer.End_Array (Success);
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("arrays"), Success);
+   Writer.Start_Array (Success);
+   Writer.Start_Array (Success);
+   Writer.End_Array (Success);
+   Writer.Start_Array (Success);
+   Writer.End_Array (Success);
+   Writer.End_Array (Success);
+
+   Writer.Key_Name
+     (VSS.Strings.Conversions.To_Magic_String ("objects"), Success);
+   Writer.Start_Array (Success);
+   Writer.Start_Object (Success);
+   Writer.End_Object (Success);
+   Writer.Start_Object (Success);
+   Writer.End_Object (Success);
+   Writer.End_Array (Success);
+
    writer.End_Object (Success);
 
    Writer.End_Document (Success);
 
-   Ada.Text_IO.Put
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_To_String
-        (Stream.Buffer));
+   declare
+      File : Ada.Streams.Stream_IO.File_Type;
+
+   begin
+      Ada.Streams.Stream_IO.Open
+        (File, Ada.Streams.Stream_IO.In_File, Ada.Command_Line.Argument (1));
+
+      declare
+         use type Ada.Streams.Stream_Element;
+         use type Ada.Streams.Stream_Element_Offset;
+
+         Expected : Ada.Streams.Stream_Element_Array
+           (1 .. Ada.Streams.Stream_Element_Count
+                   (Ada.Streams.Stream_IO.Size (File)));
+         Last     : Ada.Streams.Stream_Element_Count;
+
+      begin
+         Ada.Streams.Stream_IO.Read (File, Expected, Last);
+
+         if Last /= Expected'Last or Last = 0 then
+            raise Program_Error;
+         end if;
+
+         for J in Expected'Range loop
+            if Expected (J) /= Stream.Buffer.Element (J) then
+               Ada.Text_IO.Put
+                 (VSS.Stream_Element_Buffers.Conversions.Unchecked_To_String
+                    (Stream.Buffer));
+
+               raise Program_Error;
+            end if;
+         end loop;
+      end;
+   end;
 end Test_JSON_Writer;

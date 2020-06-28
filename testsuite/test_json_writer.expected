@@ -1,0 +1,1 @@
+{"name":"Some name","names":["Some","name"],"is":false,"no":true,"empty":null,"integer":15,"float":2.05000000000000E+01,"booleans":[false,true],"nulls":[null,null],"floats":[-1.00000000000000E+00,1.00000000000000E+00],"integers":[-1,1],"arrays":[[],[]],"objects":[{},{}]}

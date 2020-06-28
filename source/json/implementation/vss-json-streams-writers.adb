@@ -289,11 +289,11 @@ package body VSS.JSON.Streams.Writers is
            VSS.Characters.Virtual_Character'Pos (Item);
          D4 : constant VSS.Unicode.Code_Point := C and 16#00_000F#;
          D3 : constant VSS.Unicode.Code_Point :=
-           C and 16#00_00F0# / 16#00_0010#;
+           (C / 16#00_0010#) and 16#00_000F#;
          D2 : constant VSS.Unicode.Code_Point :=
-           C and 16#00_0F00# / 16#00_0100#;
+           (C / 16#00_0100#) and 16#00_000F#;
          D1 : constant VSS.Unicode.Code_Point :=
-           C and 16#00_F000# / 16#00_1000#;
+           (C / 16#00_1000#) and 16#00_F000#;
 
       begin
          Self.Effective_Stream.Put ('\', Success);
@@ -309,6 +309,24 @@ package body VSS.JSON.Streams.Writers is
          end if;
 
          Self.Effective_Stream.Put (Hex_Digit (D1), Success);
+
+         if not Success then
+            return;
+         end if;
+
+         Self.Effective_Stream.Put (Hex_Digit (D2), Success);
+
+         if not Success then
+            return;
+         end if;
+
+         Self.Effective_Stream.Put (Hex_Digit (D3), Success);
+
+         if not Success then
+            return;
+         end if;
+
+         Self.Effective_Stream.Put (Hex_Digit (D4), Success);
 
          if not Success then
             return;
@@ -358,7 +376,11 @@ package body VSS.JSON.Streams.Writers is
                      | VSS.Characters.Virtual_Character'Val (16#00_000E#)
                      .. VSS.Characters.Virtual_Character'Val (16#00_001F#)
                   =>
-                     null;
+                     Escaped_Control_Character (J.Element);
+
+                     if not Success then
+                        return;
+                     end if;
 
                   when VSS.Characters.Virtual_Character'Val (16#00_0008#) =>
                      --  Escape backspace

@@ -166,6 +166,17 @@ package body VSS.Stream_Element_Buffers is
           and then Self.Buffer.Data.Length >= Self.Index;
    end Has_Element;
 
+   -----------
+   -- Index --
+   -----------
+
+   function Index
+     (Self : Stream_Element_Buffer_Cursor'Class)
+      return Ada.Streams.Stream_Element_Offset is
+   begin
+      return Self.Index;
+   end Index;
+
    ---------------
    -- Iterators --
    ---------------

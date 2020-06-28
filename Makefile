@@ -11,6 +11,7 @@ check: build_tests
 	.objs/tests/test_conversions
 	.objs/tests/test_character_iterators
 	.objs/tests/test_stream_element_buffer
+	.objs/tests/test_text_streams
 	.objs/tests/test_string_equal
 	.objs/tests/test_json_writer testsuite/test_json_writer.expected
 	rm -f .objs/tests/.fails

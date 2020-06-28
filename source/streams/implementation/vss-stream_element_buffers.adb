@@ -163,7 +163,7 @@ package body VSS.Stream_Element_Buffers is
         Self.Buffer /= null
           and then Self.Buffer.Data /= null
           and then Self.Index > 0
-          and then Self.Buffer.Data.Length <= Self.Index;
+          and then Self.Buffer.Data.Length >= Self.Index;
    end Has_Element;
 
    ---------------

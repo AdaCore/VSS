@@ -93,6 +93,11 @@ package VSS.Strings is
       Right : Virtual_String) return Boolean;
    --  Compare two strings in binary order of code points.
 
+   function Starts
+     (Self   : Virtual_String'Class;
+      Prefix : Virtual_String'Class) return Boolean;
+   --  Return True when Self starts with Prefix.
+
 private
 
    type Magic_String_Access is access all Virtual_String'Class;
@@ -223,6 +228,18 @@ private
    --  work with any string handlers in cost of performance. Derived types may
    --  provide better implementation for particular case, but always should
    --  fallback to this implementation.
+
+   not overriding function Starts
+     (Self           : Abstract_String_Handler;
+      Data           : String_Data;
+      Prefix_Handler : Abstract_String_Handler'Class;
+      Prefix_Data    : String_Data) return Boolean
+     with Pre'Class =>
+       Abstract_String_Handler'Class (Self).Length (Data)
+         >= Prefix_Handler.Length (Prefix_Data);
+   --  Return True when string starts with given prefix. This subprogram
+   --  provides generic implementation and can work with any string handlers
+   --  in cost of performance.
 
    not overriding procedure From_UTF_8_String
      (Self    : in out Abstract_String_Handler;

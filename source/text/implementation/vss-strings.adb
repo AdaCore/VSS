@@ -456,6 +456,72 @@ package body VSS.Strings is
       raise Program_Error with "Not implemented";
    end Read;
 
+   ------------
+   -- Starts --
+   ------------
+
+   function Starts
+     (Self   : Virtual_String'Class;
+      Prefix : Virtual_String'Class) return Boolean
+   is
+      Self_Handler   : constant access Abstract_String_Handler'Class :=
+        Self.Handler;
+      Prefix_Handler : constant access Abstract_String_Handler'Class :=
+        Prefix.Handler;
+
+   begin
+      if Prefix_Handler = null then
+         return True;
+
+      elsif Self_Handler = null then
+         return Prefix_Handler.Is_Empty (Prefix.Data);
+
+      elsif Self_Handler.Length (Self.Data)
+              < Prefix_Handler.Length (Prefix.Data)
+      then
+         return False;
+
+      else
+         return
+           Self_Handler.Starts (Self.Data, Prefix_Handler.all, Prefix.Data);
+      end if;
+   end Starts;
+
+   ------------
+   -- Starts --
+   ------------
+
+   not overriding function Starts
+     (Self           : Abstract_String_Handler;
+      Data           : String_Data;
+      Prefix_Handler : Abstract_String_Handler'Class;
+      Prefix_Data    : String_Data) return Boolean
+   is
+      Self_Handler   : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Self_Data      : String_Data renames Data;
+
+      Self_Position   : VSS.Strings.Cursor;
+      Prefix_Position : VSS.Strings.Cursor;
+
+   begin
+      Self_Handler.Before_First_Character (Self_Data, Self_Position);
+      Prefix_Handler.Before_First_Character (Prefix_Data, Prefix_Position);
+
+      while
+        Self_Handler.Forward (Self_Data, Self_Position)
+          and Prefix_Handler.Forward (Prefix_Data, Prefix_Position)
+      loop
+         if Self_Handler.Element (Self_Data, Self_Position)
+              /= Prefix_Handler.Element (Prefix_Data, Prefix_Position)
+         then
+            return False;
+         end if;
+      end loop;
+
+      return True;
+   end Starts;
+
    -------------------
    -- To_Magic_Text --
    -------------------

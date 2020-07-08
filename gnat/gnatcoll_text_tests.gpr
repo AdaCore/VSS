@@ -33,7 +33,7 @@ project GNATCOLL_Text_Tests is
                  "test_json_reader.adb",
                  "test_json_writer.adb",
                  "test_stream_element_buffer.adb",
-                 "test_string_equal",
+                 "test_string_compare",
                  "test_text_streams");
 
    package Compiler is

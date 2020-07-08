@@ -173,6 +173,31 @@ procedure Test_String_Compare is
    SD2 : VSS.Strings.Virtual_String;
    pragma Warnings (Off, SD2);
 
+   --  "ASCII"
+   Prefix_1 : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.Conversions.To_Magic_String ("ASCII");
+   --  "Кириллица"
+   Prefix_2 : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.Conversions.To_Magic_String
+       ((Character'Val(16#D0#),
+        Character'Val(16#9A#),
+        Character'Val(16#D0#),
+        Character'Val(16#B8#),
+        Character'Val(16#D1#),
+        Character'Val(16#80#),
+        Character'Val(16#D0#),
+        Character'Val(16#B8#),
+        Character'Val(16#D0#),
+        Character'Val(16#BB#),
+        Character'Val(16#D0#),
+        Character'Val(16#BB#),
+        Character'Val(16#D0#),
+        Character'Val(16#B8#),
+        Character'Val(16#D1#),
+        Character'Val(16#86#),
+        Character'Val(16#D0#),
+        Character'Val(16#B0#)));
+
 begin
    ---------
    -- "=" --
@@ -401,4 +426,61 @@ begin
    if not (S1 >= S2) then
       raise Program_Error;
    end if;
+
+   ------------
+   -- Starts --
+   ------------
+
+   if not SD1.Starts (SD2) then
+      raise Program_Error;
+   end if;
+
+   if not SD1.Starts (SE1) then
+      raise Program_Error;
+   end if;
+
+   if SD1.Starts (Prefix_1) then
+      raise Program_Error;
+   end if;
+
+   if SD1.Starts (Prefix_2) then
+      raise Program_Error;
+   end if;
+
+   if not SE1.Starts (SD1) then
+      raise Program_Error;
+   end if;
+
+   if not SE1.Starts (SE1) then
+      raise Program_Error;
+   end if;
+
+   if not SE1.Starts (SE2) then
+      raise Program_Error;
+   end if;
+
+   if not S1.Starts (SD1) then
+      raise Program_Error;
+   end if;
+
+   if not S1.Starts (SE1) then
+      raise Program_Error;
+   end if;
+
+   if not S1.Starts (Prefix_1) then
+      raise Program_Error;
+   end if;
+
+   if S1.Starts (Prefix_2) then
+      raise Program_Error;
+   end if;
+
+   if Prefix_1.Starts (S1) then
+      raise Program_Error;
+   end if;
+
+   if Prefix_2.Starts (S1) then
+      raise Program_Error;
+   end if;
+
 end Test_String_Compare;

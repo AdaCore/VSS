@@ -31,7 +31,9 @@ package body VSS.Strings.Iterators.Characters.Internals is
      (Self : Virtual_String'Class)
       return VSS.Strings.Iterators.Characters.Character_Iterator
    is
-      Handler : constant access Abstract_String_Handler'Class := Self.Handler;
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          Self.Handler;
       Dummy   : Boolean;
 
    begin

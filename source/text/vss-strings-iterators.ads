@@ -49,7 +49,7 @@ package VSS.Strings.Iterators is
 private
 
    type Abstract_Iterator is abstract new Referal_Limited_Base with record
-      Position : Cursor;
+      Position : VSS.Implementation.Strings.Cursor;
    end record;
 
    overriding procedure Invalidate (Self : in out Abstract_Iterator);

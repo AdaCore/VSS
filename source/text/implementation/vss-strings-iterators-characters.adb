@@ -25,6 +25,8 @@ with VSS.Strings.Configuration;
 
 package body VSS.Strings.Iterators.Characters is
 
+   use type VSS.Implementation.Strings.String_Handler_Access;
+
    -------------
    -- Element --
    -------------

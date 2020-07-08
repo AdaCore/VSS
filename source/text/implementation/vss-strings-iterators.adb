@@ -30,7 +30,7 @@ package body VSS.Strings.Iterators is
    function Character_Index
      (Self : Abstract_Iterator'Class) return VSS.Strings.Character_Index is
    begin
-      return Self.Position.Index;
+      return VSS.Strings.Character_Index (Self.Position.Index);
    end Character_Index;
 
    ----------------

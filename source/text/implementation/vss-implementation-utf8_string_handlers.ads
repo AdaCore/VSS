@@ -26,7 +26,11 @@ with Ada.Strings.UTF_Encoding;
 with Interfaces;
 with System.Atomic_Counters;
 
-private package VSS.Strings.UTF8 is
+with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Strings;
+with VSS.Unicode;
+
+package VSS.Implementation.UTF8_String_Handlers is
 
    pragma Preelaborate;
 
@@ -46,70 +50,72 @@ private package VSS.Strings.UTF8 is
       Size    : VSS.Unicode.UTF8_Code_Unit_Count;
       --  Number of code units in the buffer.
 
-      Length  : Character_Count;
+      Length  : VSS.Implementation.Strings.Character_Count;
       --  Length of the string in Unicode Code Points.
    end record;
 
    type UTF8_String_Data_Access is access all UTF8_String_Data;
 
    type UTF8_String_Handler is
-     new VSS.Strings.Abstract_String_Handler with null record;
+     new VSS.Implementation.String_Handlers.Abstract_String_Handler
+       with null record;
 
    overriding procedure Reference
      (Self : UTF8_String_Handler;
-      Data : in out String_Data);
+      Data : in out VSS.Implementation.Strings.String_Data);
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    overriding procedure Unreference
      (Self : UTF8_String_Handler;
-      Data : in out String_Data);
+      Data : in out VSS.Implementation.Strings.String_Data);
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 
    overriding function Is_Empty
      (Self : UTF8_String_Handler;
-      Data : String_Data) return Boolean;
+      Data : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding function Length
      (Self : UTF8_String_Handler;
-      Data : String_Data) return VSS.Strings.Character_Count;
+      Data : VSS.Implementation.Strings.String_Data)
+      return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor)
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point;
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
 
    overriding function Has_Character
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor) return Boolean;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor) return Boolean;
 
    overriding procedure Before_First_Character
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : in out VSS.Strings.Cursor);
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor);
    --  Initialize iterator to point to first character.
 
    overriding function Forward
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : in out Cursor) return Boolean;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
 
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out String_Data;
+      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
    --  Convert UTF_8_String into internal representation.
 
    overriding function To_UTF_8_String
      (Self : UTF8_String_Handler;
-      Data : String_Data)
+      Data : VSS.Implementation.Strings.String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
    --  Converts string data into standard UTF_8_String.
 
@@ -120,64 +126,66 @@ private package VSS.Strings.UTF8 is
    end record;
 
    type UTF8_In_Place_String_Handler is
-     new VSS.Strings.Abstract_String_Handler with null record;
+     new VSS.Implementation.String_Handlers.Abstract_String_Handler
+       with null record;
 
    overriding procedure Reference
      (Self : UTF8_In_Place_String_Handler;
-      Data : in out String_Data) is null;
+      Data : in out VSS.Implementation.Strings.String_Data) is null;
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    overriding procedure Unreference
      (Self : UTF8_In_Place_String_Handler;
-      Data : in out String_Data) is null;
+      Data : in out VSS.Implementation.Strings.String_Data) is null;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 
    overriding function Is_Empty
      (Self : UTF8_In_Place_String_Handler;
-      Data : String_Data) return Boolean;
+      Data : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding function Length
      (Self : UTF8_In_Place_String_Handler;
-      Data : String_Data) return VSS.Strings.Character_Count;
+      Data : VSS.Implementation.Strings.String_Data)
+      return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor)
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point;
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
 
    overriding function Has_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor) return Boolean;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor) return Boolean;
 
    overriding procedure Before_First_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : in out VSS.Strings.Cursor);
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor);
    --  Initialize iterator to point to first character.
 
    overriding function Forward
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : in out Cursor) return Boolean;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
 
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_In_Place_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out String_Data;
+      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
    --  Convert UTF_8_String into internal representation.
 
    overriding function To_UTF_8_String
      (Self : UTF8_In_Place_String_Handler;
-      Data : String_Data)
+      Data : VSS.Implementation.Strings.String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
    --  Converts string data into standard UTF_8_String.
 
-end VSS.Strings.UTF8;
+end VSS.Implementation.UTF8_String_Handlers;

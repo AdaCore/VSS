@@ -20,56 +20,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Root of hierarhy of the internal implementation units. All code in this
+--  hierarchy is subject to change. Applications MUST NOT use this package and
+--  its children packages.
 
-with VSS.Strings.Configuration;
+package VSS.Implementation is
 
-package body VSS.Strings.Conversions is
+   pragma Pure;
 
-   ---------------------
-   -- To_Magic_String --
-   ---------------------
-
-   function To_Magic_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String
-   is
-      Success : Boolean;
-
-   begin
-      return Result : Virtual_String do
-         --  First, attempt to place data in the storage inside the object of
-         --  Magic_String type.
-
-         VSS.Strings.Configuration.In_Place_Handler.From_UTF_8_String
-           (Item, Result.Data, Success);
-
-         if not Success then
-            --  Operation may fail for two reasons: source data is not
-            --  well-formed UTF-8 or there is not enoght memory to store
-            --  string in in-place storage.
-
-            VSS.Strings.Configuration.Default_Handler.From_UTF_8_String
-              (Item, Result.Data, Success);
-         end if;
-
-         if not Success then
-            raise Constraint_Error with "Ill-formed UTF-8 data";
-         end if;
-      end return;
-   end To_Magic_String;
-
-   ---------------------
-   -- To_UTF_8_String --
-   ---------------------
-
-   function To_UTF_8_String
-     (Item : Virtual_String) return Ada.Strings.UTF_Encoding.UTF_8_String
-   is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Item.Handler;
-
-   begin
-      return Handler.To_UTF_8_String (Item.Data);
-   end To_UTF_8_String;
-
-end VSS.Strings.Conversions;
+end VSS.Implementation;

@@ -24,8 +24,9 @@
 
 with Ada.Unchecked_Deallocation;
 
-package body VSS.Strings.UTF8 is
+package body VSS.Implementation.UTF8_String_Handlers is
 
+   use type VSS.Implementation.Strings.Character_Count;
    use type VSS.Unicode.UTF8_Code_Unit_Count;
 
    type Verification_State is
@@ -58,13 +59,13 @@ package body VSS.Strings.UTF8 is
 
    procedure Unchecked_Forward
      (Storage  : UTF8_Code_Unit_Array;
-      Position : in out VSS.Strings.Cursor);
+      Position : in out VSS.Implementation.Strings.Cursor);
    --  Move cursor to position of the next character
 
    procedure Validate_And_Copy
      (Source      : Ada.Strings.UTF_Encoding.UTF_8_String;
       Destination : out UTF8_Code_Unit_Array;
-      Length      : out Character_Count;
+      Length      : out VSS.Implementation.Strings.Character_Count;
       Success     : out Boolean);
    --  Validate UTF-8 encoding and copy validated part of the data to
    --  Destination. Length is set to the length of the text in characters.
@@ -76,8 +77,8 @@ package body VSS.Strings.UTF8 is
 
    overriding procedure Before_First_Character
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : in out VSS.Strings.Cursor) is
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) is
    begin
       Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
    end Before_First_Character;
@@ -88,8 +89,8 @@ package body VSS.Strings.UTF8 is
 
    overriding procedure Before_First_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : in out VSS.Strings.Cursor) is
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) is
    begin
       Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
    end Before_First_Character;
@@ -100,8 +101,9 @@ package body VSS.Strings.UTF8 is
 
    overriding function Element
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor) return VSS.Unicode.Code_Point
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.Code_Point
    is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -123,8 +125,9 @@ package body VSS.Strings.UTF8 is
 
    overriding function Element
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor) return VSS.Unicode.Code_Point
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.Code_Point
    is
       Source : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
@@ -133,7 +136,8 @@ package body VSS.Strings.UTF8 is
       --  raise Program_Error;
 
       if Position.Index < 1
-        or else Position.Index > Character_Count (Source.Length)
+        or else Position.Index
+                  > VSS.Implementation.Strings.Character_Count (Source.Length)
       then
          return 16#00_0000#;
       end if;
@@ -147,8 +151,8 @@ package body VSS.Strings.UTF8 is
 
    overriding function Forward
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : in out Cursor) return Boolean
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
    is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -173,14 +177,16 @@ package body VSS.Strings.UTF8 is
 
    overriding function Forward
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : in out Cursor) return Boolean
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
    is
       Source : constant UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
 
    begin
-      if Position.Index > Character_Count (Source.Length) then
+      if Position.Index
+           > VSS.Implementation.Strings.Character_Count (Source.Length)
+      then
          return False;
 
       elsif Position.Index = 0 then
@@ -190,7 +196,9 @@ package body VSS.Strings.UTF8 is
          Unchecked_Forward (Source.Storage, Position);
       end if;
 
-      return Position.Index <= Character_Count (Source.Length);
+      return
+        Position.Index
+          <= VSS.Implementation.Strings.Character_Count (Source.Length);
    end Forward;
 
    -----------------------
@@ -200,7 +208,7 @@ package body VSS.Strings.UTF8 is
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out String_Data;
+      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean) is
    begin
       Data :=
@@ -220,7 +228,7 @@ package body VSS.Strings.UTF8 is
       declare
          Destination : UTF8_String_Data_Access
            with Import, Convention => Ada, Address => Data.Pointer'Address;
-         Length      : Character_Count := 0;
+         Length      : VSS.Implementation.Strings.Character_Count := 0;
 
       begin
          Destination :=
@@ -248,7 +256,7 @@ package body VSS.Strings.UTF8 is
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_In_Place_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out String_Data;
+      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean) is
    begin
       Data :=
@@ -260,7 +268,7 @@ package body VSS.Strings.UTF8 is
       declare
          Destination : UTF8_In_Place_Data
            with Import, Convention => Ada, Address => Data.Storage'Address;
-         Length      : Character_Count;
+         Length      : VSS.Implementation.Strings.Character_Count;
 
       begin
          if Item'Length >= Destination.Storage'Length then
@@ -288,8 +296,8 @@ package body VSS.Strings.UTF8 is
 
    overriding function Has_Character
      (Self     : UTF8_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor) return Boolean
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -307,8 +315,8 @@ package body VSS.Strings.UTF8 is
 
    overriding function Has_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor) return Boolean
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Source : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
@@ -316,7 +324,8 @@ package body VSS.Strings.UTF8 is
    begin
       return
         Position.Index > 0
-          and then Position.Index <= Character_Count (Source.Length);
+          and then Position.Index
+            <= VSS.Implementation.Strings.Character_Count (Source.Length);
    end Has_Character;
 
    --------------
@@ -325,7 +334,7 @@ package body VSS.Strings.UTF8 is
 
    overriding function Is_Empty
      (Self : UTF8_String_Handler;
-      Data : String_Data) return Boolean
+      Data : VSS.Implementation.Strings.String_Data) return Boolean
    is
       Destination : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -340,7 +349,7 @@ package body VSS.Strings.UTF8 is
 
    overriding function Is_Empty
      (Self : UTF8_In_Place_String_Handler;
-      Data : String_Data) return Boolean
+      Data : VSS.Implementation.Strings.String_Data) return Boolean
    is
       use type Interfaces.Unsigned_8;
 
@@ -357,7 +366,8 @@ package body VSS.Strings.UTF8 is
 
    overriding function Length
      (Self : UTF8_String_Handler;
-      Data : String_Data) return VSS.Strings.Character_Count
+      Data : VSS.Implementation.Strings.String_Data)
+      return VSS.Implementation.Strings.Character_Count
    is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -372,13 +382,14 @@ package body VSS.Strings.UTF8 is
 
    overriding function Length
      (Self : UTF8_In_Place_String_Handler;
-      Data : String_Data) return VSS.Strings.Character_Count
+      Data : VSS.Implementation.Strings.String_Data)
+      return VSS.Implementation.Strings.Character_Count
    is
       Source : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
 
    begin
-      return VSS.Strings.Character_Count (Source.Length);
+      return VSS.Implementation.Strings.Character_Count (Source.Length);
    end Length;
 
    ---------------
@@ -387,7 +398,7 @@ package body VSS.Strings.UTF8 is
 
    overriding procedure Reference
      (Self : UTF8_String_Handler;
-      Data : in out String_Data)
+      Data : in out VSS.Implementation.Strings.String_Data)
    is
       Destination : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -404,7 +415,7 @@ package body VSS.Strings.UTF8 is
 
    overriding function To_UTF_8_String
      (Self : UTF8_String_Handler;
-      Data : String_Data)
+      Data : VSS.Implementation.Strings.String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String
    is
       Destination : UTF8_String_Data_Access
@@ -429,7 +440,7 @@ package body VSS.Strings.UTF8 is
 
    overriding function To_UTF_8_String
      (Self : UTF8_In_Place_String_Handler;
-      Data : String_Data)
+      Data : VSS.Implementation.Strings.String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String
    is
       Destination : UTF8_In_Place_Data
@@ -517,7 +528,7 @@ package body VSS.Strings.UTF8 is
 
    procedure Unchecked_Forward
      (Storage  : UTF8_Code_Unit_Array;
-      Position : in out VSS.Strings.Cursor)
+      Position : in out VSS.Implementation.Strings.Cursor)
    is
       use type VSS.Unicode.UTF16_Code_Unit_Count;
 
@@ -568,7 +579,7 @@ package body VSS.Strings.UTF8 is
 
    overriding procedure Unreference
      (Self : UTF8_String_Handler;
-      Data : in out String_Data)
+      Data : in out VSS.Implementation.Strings.String_Data)
    is
       procedure Free is
         new Ada.Unchecked_Deallocation
@@ -592,7 +603,7 @@ package body VSS.Strings.UTF8 is
    procedure Validate_And_Copy
      (Source      : Ada.Strings.UTF_Encoding.UTF_8_String;
       Destination : out UTF8_Code_Unit_Array;
-      Length      : out Character_Count;
+      Length      : out VSS.Implementation.Strings.Character_Count;
       Success     : out Boolean)
    is
       State : Verification_State := Initial;
@@ -714,4 +725,4 @@ package body VSS.Strings.UTF8 is
       Success := State = Initial;
    end Validate_And_Copy;
 
-end VSS.Strings.UTF8;
+end VSS.Implementation.UTF8_String_Handlers;

@@ -23,13 +23,12 @@
 --  API to process string data as sequences of Unicode Code Points.
 
 private with Ada.Finalization;
-private with Ada.Strings.UTF_Encoding;
 private with Ada.Streams;
-private with System.Storage_Elements;
 
+private with VSS.Implementation.String_Handlers;
+private with VSS.Implementation.Strings;
 limited with VSS.Strings.Iterators.Characters;
 limited with VSS.Strings.Texts;
-private with VSS.Unicode;
 
 package VSS.Strings is
 
@@ -102,158 +101,6 @@ private
 
    type Magic_String_Access is access all Virtual_String'Class;
 
-   type Abstract_String_Handler is tagged;
-
-   type String_Handler_Access is access all Abstract_String_Handler'Class;
-
-   ------------
-   -- Cursor --
-   ------------
-
-   type Cursor is record
-      Index        : Character_Count                   := 0;
-      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Index  :=
-        VSS.Unicode.UTF8_Code_Unit_Index'Last;
-      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Index :=
-        VSS.Unicode.UTF16_Code_Unit_Index'Last;
-   end record;
-
-   -----------------
-   -- String_Data --
-   -----------------
-
-   --  String_Data is a pair of Handler and pointer to the associated data.
-   --  It is not defined how particular implementation of the String_Handler
-   --  use pointer.
-   --
-   --  However, there is one exception: when In_Place Flag is set it means
-   --  that special predefined handler is used to process Storage.
-   --
-   --  Note: data layout is optimized for x86-64 CPU.
-   --  Note: Storage has 4 bytes alignment.
-
-   type String_Data (In_Place : Boolean := False) is record
-      Capacity : Character_Count := 0;
-
-      case In_Place is
-         when True =>
-            Storage : System.Storage_Elements.Storage_Array (0 .. 19);
-
-         when False =>
-            Handler : String_Handler_Access;
-            Pointer : System.Address;
-      end case;
-   end record;
-   for String_Data use record
-      Storage  at 0  range  0 .. 159;
-      Handler  at 0  range  0 ..  63;
-      Pointer  at 8  range  0 ..  63;
-      Capacity at 20 range  0 ..  29;
-      In_Place at 20 range 31 ..  31;
-   end record;
-
-   -----------------------------
-   -- Abstract_String_Handler --
-   -----------------------------
-
-   --  Abstract_String_Hanlder is abstract set of operations on string data.
-
-   type Abstract_String_Handler is abstract tagged limited null record;
-
-   not overriding procedure Reference
-     (Self : Abstract_String_Handler;
-      Data : in out String_Data) is abstract;
-   --  Called when new copy of the string is created. It should update pointer
-   --  if necessary.
-
-   not overriding procedure Unreference
-     (Self : Abstract_String_Handler;
-      Data : in out String_Data) is abstract;
-   --  Called when some copy of the string is not longer needed. It should
-   --  release resources when necessary and reset Pointer to safe value.
-
-   not overriding function Is_Empty
-     (Self : Abstract_String_Handler;
-      Data : String_Data) return Boolean is abstract;
-   --  Return True when string is empty.
-
-   not overriding function Length
-     (Self : Abstract_String_Handler;
-      Data : String_Data) return VSS.Strings.Character_Count is abstract;
-   --  Return number of characters in the text
-
-   not overriding function Element
-     (Self     : Abstract_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor)
-      return VSS.Unicode.Code_Point is abstract;
-   --  Return character at given position or NUL if Position is not pointing
-   --  to any character.
-
-   not overriding function Has_Character
-     (Self     : Abstract_String_Handler;
-      Data     : String_Data;
-      Position : VSS.Strings.Cursor) return Boolean is abstract;
-   --  Return True when position points to the character.
-
-   not overriding procedure Before_First_Character
-     (Self     : Abstract_String_Handler;
-      Data     : String_Data;
-      Position : in out VSS.Strings.Cursor) is abstract;
-   --  Initialize iterator to point to first character.
-
-   not overriding function Forward
-     (Self     : Abstract_String_Handler;
-      Data     : String_Data;
-      Position : in out Cursor) return Boolean is abstract;
-   --  Move cursor one character forward. Return True on success.
-
-   not overriding function Is_Equal
-     (Self       : Abstract_String_Handler;
-      Data       : String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : String_Data) return Boolean;
-   not overriding function Is_Less
-     (Self       : Abstract_String_Handler;
-      Data       : String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : String_Data) return Boolean;
-   not overriding function Is_Less_Or_Equal
-     (Self       : Abstract_String_Handler;
-      Data       : String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : String_Data) return Boolean;
-   --  Compare two strings for binary equivalence/less/greater of code point
-   --  sequences. These subprograms provides generic implementation and can
-   --  work with any string handlers in cost of performance. Derived types may
-   --  provide better implementation for particular case, but always should
-   --  fallback to this implementation.
-
-   not overriding function Starts
-     (Self           : Abstract_String_Handler;
-      Data           : String_Data;
-      Prefix_Handler : Abstract_String_Handler'Class;
-      Prefix_Data    : String_Data) return Boolean
-     with Pre'Class =>
-       Abstract_String_Handler'Class (Self).Length (Data)
-         >= Prefix_Handler.Length (Prefix_Data);
-   --  Return True when string starts with given prefix. This subprogram
-   --  provides generic implementation and can work with any string handlers
-   --  in cost of performance.
-
-   not overriding procedure From_UTF_8_String
-     (Self    : in out Abstract_String_Handler;
-      Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out String_Data;
-      Success : out Boolean) is abstract;
-   --  Convert UTF_8_String into internal representation.
-
-   not overriding function To_UTF_8_String
-     (Self : Abstract_String_Handler;
-      Data : String_Data)
-      return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
-   --  Converts string data into standard UTF_8_String.
-
    --------------------------
    -- Referal_Limited_Base --
    --------------------------
@@ -296,7 +143,7 @@ private
    type Virtual_String is new Ada.Finalization.Controlled with record
       Head : Referal_Limited_Access;
       Tail : Referal_Limited_Access;
-      Data : String_Data;
+      Data : VSS.Implementation.Strings.String_Data;
    end record
      with Read  => Read,
           Write => Write;
@@ -319,7 +166,9 @@ private
    overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
 
    function Handler
-     (Self : Virtual_String'Class) return access Abstract_String_Handler'Class;
+     (Self : Virtual_String'Class)
+      return access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
    --  Returns string data handler should be used to process data of given
    --  object.
 

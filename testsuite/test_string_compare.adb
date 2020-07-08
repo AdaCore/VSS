@@ -23,7 +23,7 @@
 
 with VSS.Strings.Conversions;
 
-procedure Test_String_Equal is
+procedure Test_String_Compare is
 
    use type VSS.Strings.Virtual_String;
 
@@ -174,6 +174,10 @@ procedure Test_String_Equal is
    pragma Warnings (Off, SD2);
 
 begin
+   ---------
+   -- "=" --
+   ---------
+
    if SD1 /= SD2 then
       raise Program_Error;
    end if;
@@ -205,4 +209,196 @@ begin
    if S1 = SA then
       raise Program_Error;
    end if;
-end Test_String_Equal;
+
+   ---------
+   -- "<" --
+   ---------
+
+   if SD1 < SD2 then
+      raise Program_Error;
+   end if;
+
+   if SE1 < SE2 then
+      raise Program_Error;
+   end if;
+
+   if SD1 < SE1 then
+      raise Program_Error;
+   end if;
+
+   if SE1 < SD1 then
+      raise Program_Error;
+   end if;
+
+   if S1 < SD1 then
+      raise Program_Error;
+   end if;
+
+   if not (SD1 < S1) then
+      raise Program_Error;
+   end if;
+
+   if S1 < SE1 then
+      raise Program_Error;
+   end if;
+
+   if not (SE1 < S1) then
+      raise Program_Error;
+   end if;
+
+   if S1 < SA then
+      raise Program_Error;
+   end if;
+
+   if not (SA < S1) then
+      raise Program_Error;
+   end if;
+
+   if S1 < S2 then
+      raise Program_Error;
+   end if;
+
+   ----------
+   -- "<=" --
+   ----------
+
+   if not (SD1 <= SD2) then
+      raise Program_Error;
+   end if;
+
+   if not (SE1 <= SE2) then
+      raise Program_Error;
+   end if;
+
+   if not (SD1 <= SE1) then
+      raise Program_Error;
+   end if;
+
+   if not (SE1 <= SD1) then
+      raise Program_Error;
+   end if;
+
+   if S1 <= SD1 then
+      raise Program_Error;
+   end if;
+
+   if not (SD1 <= S1) then
+      raise Program_Error;
+   end if;
+
+   if S1 <= SE1 then
+      raise Program_Error;
+   end if;
+
+   if not (SE1 <= S1) then
+      raise Program_Error;
+   end if;
+
+   if S1 <= SA then
+      raise Program_Error;
+   end if;
+
+   if not (SA <= S1) then
+      raise Program_Error;
+   end if;
+
+   if not (S1 <= S2) then
+      raise Program_Error;
+   end if;
+
+   ---------
+   -- ">" --
+   ---------
+
+   if SD1 > SD2 then
+      raise Program_Error;
+   end if;
+
+   if SE1 > SE2 then
+      raise Program_Error;
+   end if;
+
+   if SD1 > SE1 then
+      raise Program_Error;
+   end if;
+
+   if SE1 > SD1 then
+      raise Program_Error;
+   end if;
+
+   if not (S1 > SD1) then
+      raise Program_Error;
+   end if;
+
+   if SD1 > S1 then
+      raise Program_Error;
+   end if;
+
+   if not (S1 > SE1) then
+      raise Program_Error;
+   end if;
+
+   if SE1 > S1 then
+      raise Program_Error;
+   end if;
+
+   if not (S1 > SA) then
+      raise Program_Error;
+   end if;
+
+   if SA > S1 then
+      raise Program_Error;
+   end if;
+
+   if S1 > S2 then
+      raise Program_Error;
+   end if;
+
+   ----------
+   -- ">=" --
+   ----------
+
+   if not (SD1 >= SD2) then
+      raise Program_Error;
+   end if;
+
+   if not (SE1 >= SE2) then
+      raise Program_Error;
+   end if;
+
+   if not (SD1 >= SE1) then
+      raise Program_Error;
+   end if;
+
+   if not (SE1 >= SD1) then
+      raise Program_Error;
+   end if;
+
+   if not (S1 >= SD1) then
+      raise Program_Error;
+   end if;
+
+   if SD1 >= S1 then
+      raise Program_Error;
+   end if;
+
+   if not (S1 >= SE1) then
+      raise Program_Error;
+   end if;
+
+   if SE1 >= S1 then
+      raise Program_Error;
+   end if;
+
+   if not (S1 >= SA) then
+      raise Program_Error;
+   end if;
+
+   if SA >= S1 then
+      raise Program_Error;
+   end if;
+
+   if not (S1 >= S2) then
+      raise Program_Error;
+   end if;
+end Test_String_Compare;

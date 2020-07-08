@@ -27,6 +27,61 @@ with VSS.Strings.Texts;
 
 package body VSS.Strings is
 
+   use type VSS.Unicode.Code_Point;
+
+   ---------
+   -- "<" --
+   ---------
+
+   function "<"
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean
+   is
+      Left_Handler  : constant access Abstract_String_Handler'Class :=
+        Left.Handler;
+      Right_Handler : constant access Abstract_String_Handler'Class :=
+        Right.Handler;
+
+   begin
+      if Right_Handler = null then
+         return False;
+
+      elsif Left_Handler = null then
+         return not Right_Handler.Is_Empty (Right.Data);
+
+      else
+         return
+           Left_Handler.Is_Less (Left.Data, Right_Handler.all, Right.Data);
+      end if;
+   end "<";
+
+   ----------
+   -- "<=" --
+   ----------
+
+   function "<="
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean
+   is
+      Left_Handler  : constant access Abstract_String_Handler'Class :=
+        Left.Handler;
+      Right_Handler : constant access Abstract_String_Handler'Class :=
+        Right.Handler;
+
+   begin
+      if Left_Handler = null then
+         return True;
+
+      elsif Right_Handler = null then
+         return Left_Handler.Is_Empty (Left.Data);
+
+      else
+         return
+           Left_Handler.Is_Less_Or_Equal
+             (Left.Data, Right_Handler.all, Right.Data);
+      end if;
+   end "<=";
+
    ---------
    -- "=" --
    ---------
@@ -52,6 +107,60 @@ package body VSS.Strings is
            Left_Handler.Is_Equal (Left.Data, Right_Handler.all, Right.Data);
       end if;
    end "=";
+
+   ---------
+   -- ">" --
+   ---------
+
+   function ">"
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean
+   is
+      Left_Handler  : constant access Abstract_String_Handler'Class :=
+        Left.Handler;
+      Right_Handler : constant access Abstract_String_Handler'Class :=
+        Right.Handler;
+
+   begin
+      if Left_Handler = null then
+         return False;
+
+      elsif Right_Handler = null then
+         return not Left_Handler.Is_Empty (Left.Data);
+
+      else
+         return
+           not Left_Handler.Is_Less_Or_Equal
+                 (Left.Data, Right_Handler.all, Right.Data);
+      end if;
+   end ">";
+
+   ----------
+   -- ">=" --
+   ----------
+
+   function ">="
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean
+   is
+      Left_Handler  : constant access Abstract_String_Handler'Class :=
+        Left.Handler;
+      Right_Handler : constant access Abstract_String_Handler'Class :=
+        Right.Handler;
+
+   begin
+      if Right_Handler = null then
+         return True;
+
+      elsif Left_Handler = null then
+         return Right_Handler.Is_Empty (Right.Data);
+
+      else
+         return
+           not Left_Handler.Is_Less
+                 (Left.Data, Right_Handler.all, Right.Data);
+      end if;
+   end ">=";
 
    ------------
    -- Adjust --
@@ -213,8 +322,6 @@ package body VSS.Strings is
       Other      : Abstract_String_Handler'Class;
       Other_Data : String_Data) return Boolean
    is
-      use type VSS.Unicode.Code_Point;
-
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
       Left_Data      : String_Data renames Data;
@@ -223,6 +330,8 @@ package body VSS.Strings is
 
       Left_Position  : VSS.Strings.Cursor;
       Right_Position : VSS.Strings.Cursor;
+      Left_Code      : VSS.Unicode.Code_Point;
+      Right_Code     : VSS.Unicode.Code_Point;
 
    begin
       Left_Handler.Before_First_Character (Left_Data, Left_Position);
@@ -232,9 +341,10 @@ package body VSS.Strings is
         Left_Handler.Forward (Left_Data, Left_Position)
           and Right_Handler.Forward (Right_Data, Right_Position)
       loop
-         if Left_Handler.Element (Left_Data, Left_Position)
-           /= Right_Handler.Element (Right_Data, Right_Position)
-         then
+         Left_Code  := Left_Handler.Element (Left_Data, Left_Position);
+         Right_Code := Right_Handler.Element (Right_Data, Right_Position);
+
+         if Left_Code /= Right_Code then
             return False;
          end if;
       end loop;
@@ -243,6 +353,88 @@ package body VSS.Strings is
         not Left_Handler.Has_Character (Left_Data, Left_Position)
           and not Right_Handler.Has_Character (Right_Data, Right_Position);
    end Is_Equal;
+
+   -------------
+   -- Is_Less --
+   -------------
+
+   not overriding function Is_Less
+     (Self       : Abstract_String_Handler;
+      Data       : String_Data;
+      Other      : Abstract_String_Handler'Class;
+      Other_Data : String_Data) return Boolean
+   is
+      Left_Handler   : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Left_Data      : String_Data renames Data;
+      Right_Handler  : Abstract_String_Handler'Class renames Other;
+      Right_Data     : String_Data renames Other_Data;
+
+      Left_Position  : VSS.Strings.Cursor;
+      Right_Position : VSS.Strings.Cursor;
+      Left_Code      : VSS.Unicode.Code_Point;
+      Right_Code     : VSS.Unicode.Code_Point;
+
+   begin
+      Left_Handler.Before_First_Character (Left_Data, Left_Position);
+      Right_Handler.Before_First_Character (Right_Data, Right_Position);
+
+      while
+        Left_Handler.Forward (Left_Data, Left_Position)
+          and Right_Handler.Forward (Right_Data, Right_Position)
+      loop
+         Left_Code  := Left_Handler.Element (Left_Data, Left_Position);
+         Right_Code := Right_Handler.Element (Right_Data, Right_Position);
+
+         if Left_Code /= Right_Code then
+            return Left_Code < Right_Code;
+         end if;
+      end loop;
+
+      return Right_Handler.Has_Character (Right_Data, Right_Position);
+   end Is_Less;
+
+   ----------------------
+   -- Is_Less_Or_Equal --
+   ----------------------
+
+   not overriding function Is_Less_Or_Equal
+     (Self       : Abstract_String_Handler;
+      Data       : String_Data;
+      Other      : Abstract_String_Handler'Class;
+      Other_Data : String_Data) return Boolean
+   is
+      Left_Handler   : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Left_Data      : String_Data renames Data;
+      Right_Handler  : Abstract_String_Handler'Class renames Other;
+      Right_Data     : String_Data renames Other_Data;
+
+      Left_Position  : VSS.Strings.Cursor;
+      Right_Position : VSS.Strings.Cursor;
+      Left_Code      : VSS.Unicode.Code_Point;
+      Right_Code     : VSS.Unicode.Code_Point;
+
+   begin
+      Left_Handler.Before_First_Character (Left_Data, Left_Position);
+      Right_Handler.Before_First_Character (Right_Data, Right_Position);
+
+      while
+        Left_Handler.Forward (Left_Data, Left_Position)
+          and Right_Handler.Forward (Right_Data, Right_Position)
+      loop
+         Left_Code  := Left_Handler.Element (Left_Data, Left_Position);
+         Right_Code := Right_Handler.Element (Right_Data, Right_Position);
+
+         if Left_Code /= Right_Code then
+            return Left_Code < Right_Code;
+         end if;
+      end loop;
+
+      return
+        Right_Handler.Has_Character (Right_Data, Right_Position)
+          or not Left_Handler.Has_Character (Left_Data, Left_Position);
+   end Is_Less_Or_Equal;
 
    -------------
    -- Is_Null --

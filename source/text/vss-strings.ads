@@ -79,7 +79,19 @@ package VSS.Strings is
    overriding function "="
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean;
-   --  Compare two string for equality
+   function "<"
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean;
+   function "<="
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean;
+   function ">"
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean;
+   function ">="
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Boolean;
+   --  Compare two strings in binary order of code points.
 
 private
 
@@ -196,10 +208,21 @@ private
       Data       : String_Data;
       Other      : Abstract_String_Handler'Class;
       Other_Data : String_Data) return Boolean;
-   --  Compare two strings for binary equivalence of code point sequences.
-   --  This is generic implementation and can work with any string handlers
-   --  in cost of performance. Derived types may provide better implementation
-   --  for particular case, but always should fallback to this implementation.
+   not overriding function Is_Less
+     (Self       : Abstract_String_Handler;
+      Data       : String_Data;
+      Other      : Abstract_String_Handler'Class;
+      Other_Data : String_Data) return Boolean;
+   not overriding function Is_Less_Or_Equal
+     (Self       : Abstract_String_Handler;
+      Data       : String_Data;
+      Other      : Abstract_String_Handler'Class;
+      Other_Data : String_Data) return Boolean;
+   --  Compare two strings for binary equivalence/less/greater of code point
+   --  sequences. These subprograms provides generic implementation and can
+   --  work with any string handlers in cost of performance. Derived types may
+   --  provide better implementation for particular case, but always should
+   --  fallback to this implementation.
 
    not overriding procedure From_UTF_8_String
      (Self    : in out Abstract_String_Handler;

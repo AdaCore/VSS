@@ -106,6 +106,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
 
+   overriding procedure From_Wide_Wide_String
+     (Self    : in out UTF8_String_Handler;
+      Item    : Wide_Wide_String;
+      Data    : out VSS.Implementation.Strings.String_Data;
+      Success : out Boolean);
+
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
@@ -174,6 +180,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
+
+   overriding procedure From_Wide_Wide_String
+     (Self    : in out UTF8_In_Place_String_Handler;
+      Item    : Wide_Wide_String;
+      Data    : out VSS.Implementation.Strings.String_Data;
+      Success : out Boolean);
 
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_In_Place_String_Handler;

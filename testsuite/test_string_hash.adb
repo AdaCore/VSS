@@ -21,18 +21,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Conversions;
+with VSS.Strings;
 
 procedure Test_String_Hash is
 
    use type VSS.Strings.Hash_Type;
 
-   N : VSS.Strings.Virtual_String;
+   N  : VSS.Strings.Virtual_String;
    pragma Warnings (Off, N);
-   E : VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String ("");
-   V : VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String ("foobar");
+   E  : VSS.Strings.Virtual_String := VSS.Strings.To_Virtual_String ("");
+   S1 : VSS.Strings.Virtual_String := VSS.Strings.To_Virtual_String ("foobar");
+   S2 : VSS.Strings.Virtual_String :=
+     VSS.Strings.To_Virtual_String ("кириллица");
 
 begin
    if N.Hash /= 16#CBF2_9CE4_8422_2325# then
@@ -43,7 +43,11 @@ begin
       raise Program_Error;
    end if;
 
-   if V.Hash /= 16#6314_4B53_BA2E_7122# then
+   if S1.Hash /= 16#6314_4B53_BA2E_7122# then
+      raise Program_Error;
+   end if;
+
+   if S2.Hash /= 16#0FB0_AE54_FCE4_751D# then
       raise Program_Error;
    end if;
 end Test_String_Hash;

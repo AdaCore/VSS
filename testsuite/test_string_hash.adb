@@ -21,29 +21,29 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "gnatcoll_text";
+with VSS.Strings.Conversions;
 
-project GNATCOLL_Text_Tests is
+procedure Test_String_Hash is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_conversions.adb",
-                 "test_character_iterators.adb",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_compare",
-                 "test_string_hash",
-                 "test_text_streams");
+   use type VSS.Strings.Hash_Type;
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   N : VSS.Strings.Virtual_String;
+   pragma Warnings (Off, N);
+   E : VSS.Strings.Virtual_String :=
+     VSS.Strings.Conversions.To_Magic_String ("");
+   V : VSS.Strings.Virtual_String :=
+     VSS.Strings.Conversions.To_Magic_String ("foobar");
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+begin
+   if N.Hash /= 16#CBF2_9CE4_8422_2325# then
+      raise Program_Error;
+   end if;
 
-end GNATCOLL_Text_Tests;
+   if N.Hash /= E.Hash then
+      raise Program_Error;
+   end if;
+
+   if V.Hash /= 16#6314_4B53_BA2E_7122# then
+      raise Program_Error;
+   end if;
+end Test_String_Hash;

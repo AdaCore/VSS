@@ -20,30 +20,33 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  This package provides hash generator for FNV-1a algoriphm.
 
-with "gnatcoll_text";
+with System.Storage_Elements;
 
-project GNATCOLL_Text_Tests is
+package VSS.Implementation.FNV_Hash is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_conversions.adb",
-                 "test_character_iterators.adb",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_compare",
-                 "test_string_hash",
-                 "test_text_streams");
+   pragma Preelaborate;
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   type Hash_64_Type is mod 2 ** 64;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   type FNV_1a_Generator is limited private;
 
-end GNATCOLL_Text_Tests;
+   procedure Hash
+     (Self : in out FNV_1a_Generator;
+      Data : System.Storage_Elements.Storage_Element) with Inline_Always;
+   --  Continue hash computation by adding given byte.
+
+   function Value (Self : FNV_1a_Generator) return Hash_64_Type;
+   --  Return current computed hash value.
+
+private
+
+   Offset_Basis_64 : constant Hash_64_Type := 16#CBF29CE4_84222325#;
+   FNV_Prime_64    : constant Hash_64_Type := 16#00000100_000001B3#;
+
+   type FNV_1a_Generator is limited record
+      Value : Hash_64_Type := Offset_Basis_64;
+   end record;
+
+end VSS.Implementation.FNV_Hash;

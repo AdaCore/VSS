@@ -26,6 +26,7 @@
 
 with Ada.Strings.UTF_Encoding;
 
+with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.Strings;
 with VSS.Unicode;
 
@@ -58,6 +59,13 @@ package VSS.Implementation.String_Handlers is
       Data : VSS.Implementation.Strings.String_Data)
       return Boolean is abstract;
    --  Return True when string is empty.
+
+   not overriding procedure Hash
+     (Self      : Abstract_String_Handler;
+      Data      : VSS.Implementation.Strings.String_Data;
+      Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator);
+   --  Compute hash value of the string as little-endian UTF-32 encoded
+   --  character sequence.
 
    not overriding function Length
      (Self : Abstract_String_Handler;

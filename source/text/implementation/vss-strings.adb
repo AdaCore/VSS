@@ -21,6 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.FNV_Hash;
 with VSS.Strings.Configuration;
 with VSS.Strings.Iterators.Characters.Internals;
 with VSS.Strings.Texts;
@@ -318,6 +319,25 @@ package body VSS.Strings is
          return Self.Data.Handler;
       end if;
    end Handler;
+
+   ----------
+   -- Hash --
+   ----------
+
+   function Hash (Self : Virtual_String'Class) return Hash_Type is
+      Handler   : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          Self.Handler;
+      Generator : VSS.Implementation.FNV_Hash.FNV_1a_Generator;
+
+   begin
+      if Handler /= null then
+         Handler.Hash (Self.Data, Generator);
+      end if;
+
+      return
+        VSS.Strings.Hash_Type (VSS.Implementation.FNV_Hash.Value (Generator));
+   end Hash;
 
    --------------
    -- Is_Empty --

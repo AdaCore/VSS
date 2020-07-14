@@ -290,6 +290,309 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end;
    end From_UTF_8_String;
 
+   ---------------------------
+   -- From_Wide_Wide_String --
+   ---------------------------
+
+   overriding procedure From_Wide_Wide_String
+     (Self    : in out UTF8_String_Handler;
+      Item    : Wide_Wide_String;
+      Data    : out VSS.Implementation.Strings.String_Data;
+      Success : out Boolean)
+   is
+      use type VSS.Unicode.Code_Point;
+      use type VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      Data :=
+        (In_Place => False,
+         Capacity => 0,
+         Handler  => Self'Unchecked_Access,
+         Pointer  => System.Null_Address);
+      --  Initialize data.
+
+      Success := True;
+
+      if Item'Length = 0 then
+         --  Success := True;
+         --
+         --  return;
+         raise Program_Error;
+      end if;
+
+      declare
+         Destination : UTF8_String_Data_Access
+           with Import, Convention => Ada, Address => Data.Pointer'Address;
+         Code        : VSS.Unicode.Code_Point;
+
+      begin
+         Destination :=
+           new UTF8_String_Data
+             (VSS.Unicode.UTF8_Code_Unit_Count (Item'Length + 3));
+         --  Allocated strign is 3 code units longer to simplify checks for
+         --  length for reallocation.
+
+         Destination.Size := 0;
+         Destination.Length := Item'Length;
+
+         for C of Item loop
+            if Wide_Wide_Character'Pos (C) not in VSS.Unicode.Code_Point
+              or else Wide_Wide_Character'Pos (C) in 16#D800# .. 16#DFFF#
+            then
+               Success := False;
+
+               exit;
+
+            else
+               Code := Wide_Wide_Character'Pos (C);
+            end if;
+
+            if Destination.Capacity < Destination.Size + 3 then
+               --  Reallocate memory.
+
+               declare
+                  Aux : constant UTF8_String_Data_Access :=
+                    new UTF8_String_Data
+                      (Destination.Capacity
+                       + VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
+
+               begin
+                  Aux.Storage (Destination.Storage'Range) :=
+                    Destination.Storage;
+                  Aux.Size := Destination.Size;
+                  Aux.Length := Destination.Length;
+                  Self.Unreference (Data);
+                  Destination := Aux;
+               end;
+            end if;
+
+            case Code is
+               when 16#00_0000# .. 16#00_007F# =>
+                  Destination.Storage (Destination.Size) :=
+                    VSS.Unicode.UTF8_Code_Unit (Code and 16#FF#);
+                  Destination.Size := Destination.Size + 1;
+
+               when 16#00_0080# .. 16#00_07FF# =>
+                  Destination.Storage (Destination.Size) :=
+                    2#1100_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      ((Code and 2#111_1100_0000#) / 2#100_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage (Destination.Size) :=
+                    2#1000_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      (Code and 2#000_0011_1111#);
+                  Destination.Size := Destination.Size + 1;
+
+               when 16#00_0800# .. 16#00_FFFF# =>
+                  Destination.Storage (Destination.Size) :=
+                    2#1110_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      ((Code and 2#1111_0000_0000_0000#)
+                       / 2#1_0000_0000_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage (Destination.Size) :=
+                    2#1000_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      ((Code and 2#0000_1111_1100_0000#) / 2#100_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage (Destination.Size) :=
+                    2#1000_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      (Code and 2#0000_0000_0011_1111#);
+                  Destination.Size := Destination.Size + 1;
+
+               when 16#01_0000# .. 16#10_FFFF# =>
+                  Destination.Storage (Destination.Size) :=
+                    2#1111_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      ((Code and 2#1_1100_0000_0000_0000_0000#)
+                       / 2#100_0000_0000_0000_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage (Destination.Size) :=
+                    2#1000_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      ((Code and 2#0_0011_1111_0000_0000_0000#)
+                       / 2#1_0000_0000_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage (Destination.Size) :=
+                    2#1000_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      ((Code and 2#0_0000_0000_1111_1100_0000#) / 2#100_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage (Destination.Size) :=
+                    2#1000_0000#
+                    or VSS.Unicode.UTF8_Code_Unit
+                      (Code and 2#0_0000_0000_0000_0011_1111#);
+                  Destination.Size := Destination.Size + 1;
+            end case;
+         end loop;
+
+         if Success then
+            Destination.Storage (Destination.Size) := 16#00#;
+
+         else
+            Self.Unreference (Data);
+         end if;
+      end;
+   end From_Wide_Wide_String;
+
+   ---------------------------
+   -- From_Wide_Wide_String --
+   ---------------------------
+
+   overriding procedure From_Wide_Wide_String
+     (Self    : in out UTF8_In_Place_String_Handler;
+      Item    : Wide_Wide_String;
+      Data    : out VSS.Implementation.Strings.String_Data;
+      Success : out Boolean)
+   is
+      use type Interfaces.Unsigned_8;
+      use type VSS.Unicode.Code_Point;
+      use type VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      Data :=
+        (In_Place => True,
+         Capacity => 0,
+         Storage  => <>);
+      --  Initialize data.
+
+      Success := True;
+
+      declare
+         Destination : UTF8_In_Place_Data
+           with Import, Convention => Ada, Address => Data.Storage'Address;
+         Code        : VSS.Unicode.Code_Point;
+
+      begin
+         Destination.Size := 0;
+         Destination.Length := Item'Length;
+
+         for C of Item loop
+            if Wide_Wide_Character'Pos (C) not in VSS.Unicode.Code_Point
+              or else Wide_Wide_Character'Pos (C) in 16#D800# .. 16#DFFF#
+            then
+               Success := False;
+
+               exit;
+
+            else
+               Code := Wide_Wide_Character'Pos (C);
+            end if;
+
+            case Code is
+               when 16#00_0000# .. 16#00_007F# =>
+                  if VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)
+                    = Destination.Storage'Last
+                  then
+                     Success := False;
+
+                     exit;
+                  end if;
+
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      VSS.Unicode.UTF8_Code_Unit (Code and 16#7F#);
+                  Destination.Size := Destination.Size + 1;
+
+               when 16#00_0080# .. 16#00_07FF# =>
+                  if VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size) + 1
+                    >= Destination.Storage'Last
+                  then
+                     Success := False;
+
+                     exit;
+                  end if;
+
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1100_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        ((Code and 2#111_1100_0000#) / 2#100_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1000_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        (Code and 2#000_0011_1111#);
+                  Destination.Size := Destination.Size + 1;
+
+               when 16#00_0800# .. 16#00_FFFF# =>
+                  if VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size) + 2
+                    >= Destination.Storage'Last
+                  then
+                     Success := False;
+
+                     exit;
+                  end if;
+
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1110_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        ((Code and 2#1111_0000_0000_0000#)
+                         / 2#1_0000_0000_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1000_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        ((Code and 2#0000_1111_1100_0000#) / 2#100_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1000_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        (Code and 2#0000_0000_0011_1111#);
+                  Destination.Size := Destination.Size + 1;
+
+               when 16#01_0000# .. 16#10_FFFF# =>
+                  if VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size) + 3
+                    >= Destination.Storage'Last
+                  then
+                     Success := False;
+
+                     exit;
+                  end if;
+
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1111_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        ((Code and 2#1_1100_0000_0000_0000_0000#)
+                         / 2#100_0000_0000_0000_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1000_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        ((Code and 2#0_0011_1111_0000_0000_0000#)
+                         / 2#1_0000_0000_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1000_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        ((Code and 2#0_0000_0000_1111_1100_0000#)
+                         / 2#100_0000#);
+                  Destination.Size := Destination.Size + 1;
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) :=
+                      2#1000_0000#
+                      or VSS.Unicode.UTF8_Code_Unit
+                        (Code and 2#0_0000_0000_0000_0011_1111#);
+                  Destination.Size := Destination.Size + 1;
+            end case;
+         end loop;
+
+         if Success then
+            Destination.Storage
+              (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) := 16#00#;
+         end if;
+      end;
+   end From_Wide_Wide_String;
+
    -------------------
    -- Has_Character --
    -------------------

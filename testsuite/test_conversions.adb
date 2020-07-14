@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.UTF_Encoding;
+
 with VSS.Strings.Conversions;
 
 with Hello_World_Data;
@@ -47,4 +49,28 @@ begin
          end if;
       end;
    end loop;
+
+   --  Check conversion of one character of each representation length in
+   --  UTF-8.
+
+   declare
+      String  : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.To_Virtual_String ("AБक𐌈");
+      Encoded : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
+        (1  => Character'Val (16#41#),
+         2  => Character'Val (16#D0#),
+         3  => Character'Val (16#91#),
+         4  => Character'Val (16#E0#),
+         5  => Character'Val (16#A4#),
+         6  => Character'Val (16#95#),
+         7  => Character'Val (16#F0#),
+         8  => Character'Val (16#90#),
+         9  => Character'Val (16#8C#),
+         10 => Character'Val (16#88#));
+
+   begin
+      if VSS.Strings.Conversions.To_UTF_8_String (String) /= Encoded then
+         raise Program_Error;
+      end if;
+   end;
 end Test_Conversions;

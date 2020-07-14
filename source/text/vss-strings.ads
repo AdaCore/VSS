@@ -102,6 +102,9 @@ package VSS.Strings is
       Prefix : Virtual_String'Class) return Boolean;
    --  Return True when Self starts with Prefix.
 
+   function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
+   --  Convert given string into virtual string.
+
 private
 
    type Magic_String_Access is access all Virtual_String'Class;

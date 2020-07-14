@@ -41,6 +41,8 @@ package VSS.Strings is
    type Grapheme_Count is range 0 .. 2 ** 30 - 1;
    subtype Grapheme_Index is Grapheme_Count range 1 .. Grapheme_Count'Last;
 
+   type Hash_Type is mod 2**64;
+
    type Virtual_String is tagged private;
    pragma Preelaborable_Initialization (Virtual_String);
 
@@ -52,6 +54,9 @@ package VSS.Strings is
 
    function Is_Null (Self : Virtual_String'Class) return Boolean;
    --  Return True when string is null.
+
+   function Hash (Self : Virtual_String'Class) return Hash_Type;
+   --  Return hash value for the given string.
 
    function Character_Length
      (Self : Virtual_String'Class) return Character_Count;

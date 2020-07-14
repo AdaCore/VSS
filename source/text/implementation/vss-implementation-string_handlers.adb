@@ -21,9 +21,49 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with System.Storage_Elements;
+
 package body VSS.Implementation.String_Handlers is
 
    use type VSS.Unicode.Code_Point;
+
+   ----------
+   -- Hash --
+   ----------
+
+   not overriding procedure Hash
+     (Self      : Abstract_String_Handler;
+      Data      : VSS.Implementation.Strings.String_Data;
+      Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator)
+   is
+      Handler  : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Position : VSS.Implementation.Strings.Cursor;
+      Code     : VSS.Unicode.Code_Point;
+
+   begin
+      Handler.Before_First_Character (Data, Position);
+
+      while Handler.Forward (Data, Position) loop
+         Code := Handler.Element (Data, Position);
+
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+         Code := Code / 16#0000_0100#;
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+         Code := Code / 16#0000_0100#;
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+         Code := Code / 16#0000_0100#;
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+      end loop;
+   end Hash;
 
    --------------
    -- Is_Equal --

@@ -21,29 +21,27 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "gnatcoll_text";
+package body VSS.Implementation.FNV_Hash is
 
-project GNATCOLL_Text_Tests is
+   ----------
+   -- Hash --
+   ----------
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_conversions.adb",
-                 "test_character_iterators.adb",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_compare",
-                 "test_string_hash",
-                 "test_text_streams");
+   procedure Hash
+     (Self : in out FNV_1a_Generator;
+      Data : System.Storage_Elements.Storage_Element) is
+   begin
+      Self.Value := Self.Value xor Hash_64_Type (Data);
+      Self.Value := Self.Value * FNV_Prime_64;
+   end Hash;
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   -----------
+   -- Value --
+   -----------
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   function Value (Self : FNV_1a_Generator) return Hash_64_Type is
+   begin
+      return Self.Value;
+   end Value;
 
-end GNATCOLL_Text_Tests;
+end VSS.Implementation.FNV_Hash;

@@ -27,7 +27,7 @@ with VSS.Strings.Conversions;
 
 with Hello_World_Data;
 
-procedure Test_Conversions is
+procedure Test_String_Conversions is
 begin
    --  Check conversion of "Hello, world!" in different languages. It is known
    --  all strings are well-formed, there should be no exceptions. Note, it is
@@ -105,4 +105,4 @@ begin
          raise Program_Error;
       end if;
    end;
-end Test_Conversions;
+end Test_String_Conversions;

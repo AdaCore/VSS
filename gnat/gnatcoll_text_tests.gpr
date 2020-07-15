@@ -28,12 +28,12 @@ project GNATCOLL_Text_Tests is
    for Languages use ("Ada");
    for Object_Dir use "../.objs/tests";
    for Source_Dirs use ("../testsuite");
-   for Main use ("test_conversions.adb",
-                 "test_character_iterators.adb",
+   for Main use ("test_character_iterators.adb",
                  "test_json_reader.adb",
                  "test_json_writer.adb",
                  "test_stream_element_buffer.adb",
                  "test_string_compare",
+                 "test_string_conversions.adb",
                  "test_string_hash",
                  "test_text_streams");
 

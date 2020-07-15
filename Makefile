@@ -8,11 +8,11 @@ build_tests:
 	gprbuild -p -P gnat/gnatcoll_text_tests.gpr
 
 check: build_tests
-	.objs/tests/test_conversions
 	.objs/tests/test_character_iterators
 	.objs/tests/test_stream_element_buffer
 	.objs/tests/test_text_streams
 	.objs/tests/test_string_compare
+	.objs/tests/test_string_conversions
 	.objs/tests/test_string_hash
 	.objs/tests/test_json_writer testsuite/test_json_writer.expected
 	rm -f .objs/tests/.fails

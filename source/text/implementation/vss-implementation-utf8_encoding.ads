@@ -20,51 +20,30 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Utilities to encode/decode UTF-8 encoded data.
 
-with Ada.Streams;
-
-with VSS.Implementation.UTF8_Encoding;
 with VSS.Unicode;
 
-package body VSS.Text_Streams.Memory is
+package VSS.Implementation.UTF8_Encoding is
 
-   ---------
-   -- Put --
-   ---------
+   pragma Preelaborate;
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean)
-   is
-      pragma Unreferenced (Success);
+   type UTF8_Code_Unit_Array is
+     array (VSS.Unicode.UTF8_Code_Unit_Count range <>)
+     of VSS.Unicode.UTF8_Code_Unit;
 
-      use type VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+   subtype UTF8_Sequence_Length
+     is VSS.Unicode.UTF8_Code_Unit_Count range 1 .. 4;
 
-      Code : constant VSS.Unicode.Code_Point :=
-        VSS.Characters.Virtual_Character'Pos (Item);
-      L    : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
-      U1   : VSS.Unicode.UTF8_Code_Unit;
-      U2   : VSS.Unicode.UTF8_Code_Unit;
-      U3   : VSS.Unicode.UTF8_Code_Unit;
-      U4   : VSS.Unicode.UTF8_Code_Unit;
+   procedure Encode
+     (Code   : VSS.Unicode.Code_Point;
+      Length : out UTF8_Sequence_Length;
+      Unit_1 : out VSS.Unicode.UTF8_Code_Unit;
+      Unit_2 : out VSS.Unicode.UTF8_Code_Unit;
+      Unit_3 : out VSS.Unicode.UTF8_Code_Unit;
+      Unit_4 : out VSS.Unicode.UTF8_Code_Unit)
+     with Inline_Always, Pre => Code not in 16#D800# .. 16#DFFF#;
+   --  Encode code point. Size is actual number of code units, U1 .. U4 values
+   --  of code units.
 
-   begin
-      VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
-
-      Self.Buffer.Append (Ada.Streams.Stream_Element (U1));
-
-      if L >= 2 then
-         Self.Buffer.Append (Ada.Streams.Stream_Element (U2));
-
-         if L >= 3 then
-            Self.Buffer.Append (Ada.Streams.Stream_Element (U3));
-
-            if L = 4 then
-               Self.Buffer.Append (Ada.Streams.Stream_Element (U4));
-            end if;
-         end if;
-      end if;
-   end Put;
-
-end VSS.Text_Streams.Memory;
+end VSS.Implementation.UTF8_Encoding;

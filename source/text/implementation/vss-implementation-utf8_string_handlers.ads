@@ -28,22 +28,20 @@ with System.Atomic_Counters;
 
 with VSS.Implementation.String_Handlers;
 with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Encoding;
 with VSS.Unicode;
 
 package VSS.Implementation.UTF8_String_Handlers is
 
    pragma Preelaborate;
 
-   type UTF8_Code_Unit_Array is
-     array (VSS.Unicode.UTF8_Code_Unit_Count range <>)
-     of VSS.Unicode.UTF8_Code_Unit;
-
    type UTF8_String_Data
      (Capacity : VSS.Unicode.UTF8_Code_Unit_Count) is
    record
       Counter : System.Atomic_Counters.Atomic_Counter;
 
-      Storage : UTF8_Code_Unit_Array (0 .. Capacity);
+      Storage :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. Capacity);
       --  Buffer to store string's data. First unused code unit is set to
       --  zero, to allow to pass data to C.
 
@@ -126,7 +124,8 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Converts string data into standard UTF_8_String.
 
    type UTF8_In_Place_Data is record
-      Storage : UTF8_Code_Unit_Array (0 .. 17);
+      Storage :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. 17);
       Size    : Interfaces.Unsigned_8;
       Length  : Interfaces.Unsigned_8;
    end record;

@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 --  RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange Format"
 
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+with Ada.Strings.UTF_Encoding;
 
 with VSS.Characters;
 with VSS.Strings.Conversions;
@@ -522,8 +522,8 @@ package body VSS.JSON.Implementation.Parsers is
       --------------------
 
       procedure Convert_Number is
-         Image : constant Wide_Wide_String :=
-           Ada.Strings.Wide_Wide_Unbounded.To_Wide_Wide_String (Self.String);
+         Image : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
+           VSS.Strings.Conversions.To_UTF_8_String (Self.Buffer);
 
       begin
          if not Self.Is_Float then
@@ -531,8 +531,7 @@ package body VSS.JSON.Implementation.Parsers is
                Self.Number :=
                  (Kind          => VSS.JSON.JSON_Integer,
                   String_Value  => Self.String_Value,
-                  Integer_Value =>
-                    Interfaces.Integer_64'Wide_Wide_Value (Image));
+                  Integer_Value => Interfaces.Integer_64'Value (Image));
 
             exception
                when Constraint_Error =>
@@ -546,8 +545,7 @@ package body VSS.JSON.Implementation.Parsers is
                Self.Number :=
                  (Kind         => VSS.JSON.JSON_Float,
                   String_Value => Self.String_Value,
-                  Float_Value  =>
-                    Interfaces.IEEE_Float_64'Wide_Wide_Value (Image));
+                  Float_Value  => Interfaces.IEEE_Float_64'Value (Image));
 
             exception
                when Constraint_Error =>
@@ -570,22 +568,21 @@ package body VSS.JSON.Implementation.Parsers is
          end if;
 
       else
-         Self.String :=
-           Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
+         Self.Buffer.Clear;
          Self.Is_Float := False;
 
          case Self.C is
             when Hyphen_Minus =>
                State := Int;
-               Ada.Strings.Wide_Wide_Unbounded.Append (Self.String, Self.C);
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
 
             when Digit_Zero =>
                State := Frac_Or_Exp;
-               Ada.Strings.Wide_Wide_Unbounded.Append (Self.String, Self.C);
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
 
             when Digit_One .. Digit_Nine =>
                State := Int_Digits;
-               Ada.Strings.Wide_Wide_Unbounded.Append (Self.String, Self.C);
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
 
             when others =>
                raise Program_Error;
@@ -625,13 +622,13 @@ package body VSS.JSON.Implementation.Parsers is
                case Self.C is
                   when Digit_Zero =>
                      State := Frac_Or_Exp;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Digit_One .. Digit_Nine =>
                      State := Int_Digits;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      return Self.Report_Error ("digit expected");
@@ -640,20 +637,20 @@ package body VSS.JSON.Implementation.Parsers is
             when Int_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Decimal_Point =>
                      State := Frac_Digit;
                      Self.Is_Float := True;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
                      Self.Is_Float := True;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      Convert_Number;
@@ -666,14 +663,14 @@ package body VSS.JSON.Implementation.Parsers is
                   when Decimal_Point =>
                      State := Frac_Digit;
                      Self.Is_Float := True;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
                      Self.Is_Float := True;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      Convert_Number;
@@ -685,8 +682,8 @@ package body VSS.JSON.Implementation.Parsers is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Frac_Digits;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      return Self.Report_Error ("frac digit expected");
@@ -695,13 +692,13 @@ package body VSS.JSON.Implementation.Parsers is
             when Frac_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      Convert_Number;
@@ -713,18 +710,18 @@ package body VSS.JSON.Implementation.Parsers is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Exp_Digits;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Hyphen_Minus =>
                      State := Exp_Digit;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Plus_Sign =>
                      State := Exp_Digit;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      return Self.Report_Error ("plus/minus or digit expected");
@@ -734,8 +731,8 @@ package body VSS.JSON.Implementation.Parsers is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Exp_Digits;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      return Self.Report_Error ("exp digit expected");
@@ -744,8 +741,8 @@ package body VSS.JSON.Implementation.Parsers is
             when Exp_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
                      Convert_Number;
@@ -1050,8 +1047,7 @@ package body VSS.JSON.Implementation.Parsers is
          end if;
 
          State := Character_Data;
-         Self.String :=
-           Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
+         Self.Buffer.Clear;
       end if;
 
       loop
@@ -1084,51 +1080,52 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Escape;
 
                   when others =>
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Self.C);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
                end case;
 
             when Escape =>
                case Self.C is
                   when Quotation_Mark =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Quotation_Mark);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Quotation_Mark));
 
                   when Reverse_Solidus =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Reverse_Solidus);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Reverse_Solidus));
 
                   when Solidus =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Solidus);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Solidus));
 
                   when Latin_Small_Letter_B =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Backspace);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Backspace));
 
                   when Latin_Small_Letter_F =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Form_Feed);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Form_Feed));
 
                   when Latin_Small_Letter_N =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Line_Feed);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Line_Feed));
 
                   when Latin_Small_Letter_R =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Carriage_Return);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Carriage_Return));
 
                   when Latin_Small_Letter_T =>
                      State := Character_Data;
-                     Ada.Strings.Wide_Wide_Unbounded.Append
-                       (Self.String, Character_Tabulation);
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character
+                          (Character_Tabulation));
 
                   when Latin_Small_Letter_U =>
                      State := Escape_U;
@@ -1166,8 +1163,8 @@ package body VSS.JSON.Implementation.Parsers is
 
                if Self.Code_Unit_1 not in 16#D800# .. 16#DFFF# then
                   State := Character_Data;
-                  Ada.Strings.Wide_Wide_Unbounded.Append
-                    (Self.String, Wide_Wide_Character'Val (Self.Code_Unit_1));
+                  Self.Buffer.Append
+                    (VSS.Characters.Virtual_Character'Val (Self.Code_Unit_1));
 
                elsif Self.Code_Unit_1 in 16#D800# .. 16#DBFF# then
                   State := Escape_UXXXX;
@@ -1243,8 +1240,8 @@ package body VSS.JSON.Implementation.Parsers is
                          (Self.Code_Unit_1 and 16#03FF#) * 16#0400#
                       + VSS.Unicode.Code_Point
                          (Self.Code_Unit_2 and 16#03FF#);
-                  Ada.Strings.Wide_Wide_Unbounded.Append
-                    (Self.String, Wide_Wide_Character'Val (Code));
+                  Self.Buffer.Append
+                    (VSS.Characters.Virtual_Character'Val (Code));
                end;
 
             when Finish =>
@@ -1644,11 +1641,7 @@ package body VSS.JSON.Implementation.Parsers is
    function String_Value
      (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String is
    begin
-      return
-        VSS.Strings.Conversions.To_Magic_String
-          (Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Encode
-             (Ada.Strings.Wide_Wide_Unbounded.To_Wide_Wide_String
-                (Self.String)));
+      return VSS.Strings.Virtual_String (Self.Buffer);
    end String_Value;
 
    ---------

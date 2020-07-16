@@ -25,10 +25,8 @@
 --  This parser supports normal parsing model as well as incremental parsing.
 --  It use Input_Text_Stream interface as data source.
 
-private with Ada.Strings.Wide_Wide_Unbounded;
-
 with VSS.JSON.Streams.Readers;
-with VSS.Strings;
+with VSS.Strings.Buffers;
 with VSS.Text_Streams;
 private with VSS.Unicode;
 
@@ -108,7 +106,7 @@ private
         VSS.JSON.Streams.Readers.No_Error;
       Message     : VSS.Strings.Virtual_String;
       C           : Wide_Wide_Character;
-      String      : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
+      Buffer      : VSS.Strings.Buffers.Virtual_String_Buffer;
       Boolean     : Standard.Boolean;
       Number      : VSS.JSON.JSON_Number;
       Code_Unit_1 : VSS.Unicode.UTF16_Code_Unit;

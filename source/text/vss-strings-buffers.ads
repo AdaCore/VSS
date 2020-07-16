@@ -33,6 +33,9 @@ package VSS.Strings.Buffers is
    type Virtual_String_Buffer is
      new VSS.Strings.Virtual_String with private;
 
+   procedure Clear (Self : in out Virtual_String_Buffer'Class);
+   --  Remove all data.
+
    procedure Append
      (Self : in out Virtual_String_Buffer'Class;
       Item : VSS.Characters.Virtual_Character);

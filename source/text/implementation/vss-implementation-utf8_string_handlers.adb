@@ -71,6 +71,80 @@ package body VSS.Implementation.UTF8_String_Handlers is
    --  Destination. Length is set to the length of the text in characters.
    --  Success is set False when validation is failed and to True otherwise.
 
+   Growth_Factor            : constant := 32;
+   --  The growth factor controls how much extra space is allocated when
+   --  we have to increase the size of an allocated unbounded string. By
+   --  allocating extra space, we avoid the need to reallocate on every
+   --  append, particularly important when a string is built up by repeated
+   --  append operations of small pieces. This is expressed as a factor so
+   --  32 means add 1/32 of the length of the string as growth space.
+
+   Minimal_Allocation_Block : constant := Standard'Maximum_Alignment;
+   --  Allocation will be done by a multiple of Minimal_Allocation_Block.
+   --  This causes no memory loss as most (all?) malloc implementations are
+   --  obliged to align the returned memory on the maximum alignment as malloc
+   --  does not know the target alignment.
+
+   function Aligned_Capacity
+     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count)
+      return VSS.Unicode.UTF8_Code_Unit_Count;
+   --  Returns recommended capacity of the string data storage which is greater
+   --  or equal to the specified requested capacity. Calculation take in sense
+   --  alignment of the allocated memory segments to use memory effectively by
+   --  sequential operations which extends size of the buffer.
+
+   function Allocate
+     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+      return UTF8_String_Data_Access;
+   --  Allocate storage block to store at least given amount of the data.
+
+   procedure Reallocate
+     (Data     : in out UTF8_String_Data_Access;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+   --  Reallocates storage block to store at least given amount of the data.
+   --  Content of the data will be copied, and old storage block will be
+   --  unreferenced (and deallocated if it is no longer used).
+
+   procedure Unreference (Data : in out UTF8_String_Data_Access);
+   --  Decrement reference counter and deallocate storage block when reference
+   --  counter reach zero.
+
+   ----------------------
+   -- Aligned_Capacity --
+   ----------------------
+
+   function Aligned_Capacity
+     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count)
+      return VSS.Unicode.UTF8_Code_Unit_Count
+   is
+      subtype Empty_UTF8_String_Data is UTF8_String_Data (0);
+
+      Static_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+        Empty_UTF8_String_Data'Max_Size_In_Storage_Elements;
+
+   begin
+      return
+        ((Static_Size + Capacity) / Minimal_Allocation_Block + 1)
+          * Minimal_Allocation_Block - Static_Size;
+   end Aligned_Capacity;
+
+   --------------
+   -- Allocate --
+   --------------
+
+   function Allocate
+     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+      return UTF8_String_Data_Access is
+   begin
+      return
+        new UTF8_String_Data
+              (Aligned_Capacity
+                 (VSS.Unicode.UTF8_Code_Unit_Count'Max (Capacity, Size)));
+   end Allocate;
+
    ----------------------------
    -- Before_First_Character --
    ----------------------------
@@ -232,8 +306,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       begin
          Destination :=
-           new UTF8_String_Data
-             (VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
+           Allocate (0, VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
 
          Validate_And_Copy (Item, Destination.Storage, Length, Success);
 
@@ -331,8 +404,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       begin
          Destination :=
-           new UTF8_String_Data
-             (VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
+           Allocate (0, VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
 
          Destination.Size := 0;
          Destination.Length := Item'Length;
@@ -352,22 +424,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
             VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
             if Destination.Capacity < Destination.Size + L then
-               --  Reallocate memory.
+               --  There is no enough storage to store character, reallocate
+               --  memory.
 
-               declare
-                  Aux : constant UTF8_String_Data_Access :=
-                    new UTF8_String_Data
-                      (Destination.Capacity
-                       + VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
-
-               begin
-                  Aux.Storage (Destination.Storage'Range) :=
-                    Destination.Storage;
-                  Aux.Size := Destination.Size;
-                  Aux.Length := Destination.Length;
-                  Self.Unreference (Data);
-                  Destination := Aux;
-               end;
+               Reallocate
+                 (Destination,
+                  VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
+                  Destination.Size + L);
             end if;
 
             Destination.Storage (Destination.Size) := U1;
@@ -590,6 +653,44 @@ package body VSS.Implementation.UTF8_String_Handlers is
       return VSS.Implementation.Strings.Character_Count (Source.Length);
    end Length;
 
+   ----------------
+   -- Reallocate --
+   ----------------
+
+   procedure Reallocate
+     (Data     : in out UTF8_String_Data_Access;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+   is
+      Minimal_Capacity : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+        (if Capacity >= Size
+         then Capacity
+         else (if Data = null
+               then Size
+               else (if Data.Capacity > Size
+                     then Size
+                     else Size + Size / Growth_Factor)));
+
+      Aux : UTF8_String_Data_Access := Data;
+
+   begin
+      Data := Allocate (0, Minimal_Capacity);
+
+      if Aux /= null then
+         declare
+            Last : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              VSS.Unicode.UTF8_Code_Unit_Count'Min
+                (Data.Capacity, Aux.Capacity);
+
+         begin
+            Data.Storage (0 .. Last) := Aux.Storage (0 .. Last);
+            Data.Size := Aux.Size;
+            Data.Length := Aux.Length;
+            Unreference (Aux);
+         end;
+      end if;
+   end Reallocate;
+
    ---------------
    -- Reference --
    ---------------
@@ -775,23 +876,35 @@ package body VSS.Implementation.UTF8_String_Handlers is
    -- Unreference --
    -----------------
 
-   overriding procedure Unreference
-     (Self : UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data)
-   is
+   procedure Unreference (Data : in out UTF8_String_Data_Access) is
       procedure Free is
         new Ada.Unchecked_Deallocation
               (UTF8_String_Data, UTF8_String_Data_Access);
 
+   begin
+      if Data /= null then
+         if System.Atomic_Counters.Decrement (Data.Counter) then
+            Free (Data);
+
+         else
+            Data := null;
+         end if;
+      end if;
+   end Unreference;
+
+   -----------------
+   -- Unreference --
+   -----------------
+
+   overriding procedure Unreference
+     (Self : UTF8_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data)
+   is
       Destination : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
 
    begin
-      if Destination /= null
-        and then System.Atomic_Counters.Decrement (Destination.Counter)
-      then
-         Free (Destination);
-      end if;
+      Unreference (Destination);
    end Unreference;
 
    -----------------------

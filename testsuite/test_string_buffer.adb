@@ -21,30 +21,23 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "gnatcoll_text";
+with VSS.Strings.Buffers;
 
-project GNATCOLL_Text_Tests is
+procedure Test_String_Buffer is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_character_iterators.adb",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_buffer",
-                 "test_text_streams");
+   use type VSS.Strings.Virtual_String;
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   Buffer : VSS.Strings.Buffers.Virtual_String_Buffer;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+begin
+   Buffer.Append ('A');
+   Buffer.Append ('Б');
+   Buffer.Append ('क');
+   Buffer.Append ('𐌈');
 
-end GNATCOLL_Text_Tests;
+   if VSS.Strings.Virtual_String (Buffer)
+     /= VSS.Strings.To_Virtual_String ("AБक𐌈")
+   then
+      raise Program_Error;
+   end if;
+end Test_String_Buffer;

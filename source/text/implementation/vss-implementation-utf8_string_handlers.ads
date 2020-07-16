@@ -26,6 +26,7 @@ with Ada.Strings.UTF_Encoding;
 with Interfaces;
 with System.Atomic_Counters;
 
+with VSS.Implementation.String_Buffer_Handlers;
 with VSS.Implementation.String_Handlers;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UTF8_Encoding;
@@ -45,18 +46,19 @@ package VSS.Implementation.UTF8_String_Handlers is
       --  Buffer to store string's data. First unused code unit is set to
       --  zero, to allow to pass data to C.
 
-      Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count           := 0;
       --  Number of code units in the buffer.
 
-      Length  : VSS.Implementation.Strings.Character_Count;
+      Length  : VSS.Implementation.Strings.Character_Count := 0;
       --  Length of the string in Unicode Code Points.
    end record;
 
    type UTF8_String_Data_Access is access all UTF8_String_Data;
 
    type UTF8_String_Handler is
-     new VSS.Implementation.String_Handlers.Abstract_String_Handler
-       with null record;
+     new VSS.Implementation.String_Buffer_Handlers
+       .Abstract_String_Buffer_Handler
+         with null record;
 
    overriding procedure Reference
      (Self : UTF8_String_Handler;
@@ -122,6 +124,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data : VSS.Implementation.Strings.String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
    --  Converts string data into standard UTF_8_String.
+
+   overriding procedure Append
+     (Self : UTF8_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      Code : VSS.Unicode.Code_Point);
+   --  Append single code point to the data.
 
    type UTF8_In_Place_Data is record
       Storage :

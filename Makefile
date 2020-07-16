@@ -14,6 +14,7 @@ check: build_tests
 	.objs/tests/test_string_compare
 	.objs/tests/test_string_conversions
 	.objs/tests/test_string_hash
+	.objs/tests/test_string_buffer
 	.objs/tests/test_json_writer testsuite/test_json_writer.expected
 	rm -f .objs/tests/.fails
 	for f in testsuite/JSONTestSuite/test_parsing/*.json testsuite/JSON_checker/test/*.json; \

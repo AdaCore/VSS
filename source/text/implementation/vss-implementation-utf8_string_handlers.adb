@@ -111,6 +111,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
    --  Decrement reference counter and deallocate storage block when reference
    --  counter reach zero.
 
+   procedure Mutate
+     (Data     : in out UTF8_String_Data_Access;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+   --  Reallocate storage block when it is shared or not enough to store given
+   --  amount of data.
+
    ----------------------
    -- Aligned_Capacity --
    ----------------------
@@ -144,6 +151,69 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Aligned_Capacity
                  (VSS.Unicode.UTF8_Code_Unit_Count'Max (Capacity, Size)));
    end Allocate;
+
+   ------------
+   -- Mutate --
+   ------------
+
+   procedure Mutate
+     (Data     : in out UTF8_String_Data_Access;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
+   begin
+      if Data = null then
+         Data := Allocate (Capacity, Size);
+
+      elsif not System.Atomic_Counters.Is_One (Data.Counter)
+        or else Size > Data.Capacity
+      then
+         Reallocate (Data, Capacity, Size);
+      end if;
+   end Mutate;
+
+   ------------
+   -- Append --
+   ------------
+
+   overriding procedure Append
+     (Self : UTF8_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      Code : VSS.Unicode.Code_Point)
+   is
+      Destination : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      U1          : VSS.Unicode.UTF8_Code_Unit;
+      U2          : VSS.Unicode.UTF8_Code_Unit;
+      U3          : VSS.Unicode.UTF8_Code_Unit;
+      U4          : VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+      Mutate
+        (Destination,
+         VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
+         (if Destination = null then 0 else Destination.Size) + L);
+
+      Destination.Storage (Destination.Size) := U1;
+
+      if L >= 2 then
+         Destination.Storage (Destination.Size + 1) := U2;
+
+         if L >= 3 then
+            Destination.Storage (Destination.Size + 2) := U3;
+
+            if L = 4 then
+               Destination.Storage (Destination.Size + 3) := U4;
+            end if;
+         end if;
+      end if;
+
+      Destination.Size := Destination.Size + L;
+      Destination.Length := Destination.Length + 1;
+      Destination.Storage (Destination.Size) := 16#00#;
+   end Append;
 
    ----------------------------
    -- Before_First_Character --
@@ -406,9 +476,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Destination :=
            Allocate (0, VSS.Unicode.UTF8_Code_Unit_Count (Item'Length));
 
-         Destination.Size := 0;
-         Destination.Length := Item'Length;
-
          for C of Item loop
             if Wide_Wide_Character'Pos (C) not in VSS.Unicode.Code_Point
               or else Wide_Wide_Character'Pos (C) in 16#D800# .. 16#DFFF#
@@ -452,6 +519,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          if Success then
             Destination.Storage (Destination.Size) := 16#00#;
+            Destination.Length := Item'Length;
 
          else
             Self.Unreference (Data);

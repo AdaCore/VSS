@@ -1,4 +1,4 @@
-------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
 --                       Copyright (C) 2020, AdaCore                        --
@@ -20,31 +20,27 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Abstract_String_Buffer_Hanlder is abstract set of operations on string
+--  buffer data. It provides default generic implementation of some operations
+--  which derived handlers may override to provide better implementation.
 
-with "gnatcoll_text";
+with VSS.Implementation.Strings;
+with VSS.Implementation.String_Handlers;
+with VSS.Unicode;
 
-project GNATCOLL_Text_Tests is
+package VSS.Implementation.String_Buffer_Handlers is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_character_iterators.adb",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_buffer",
-                 "test_text_streams");
+   pragma Preelaborate;
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   type Abstract_String_Buffer_Handler is
+     abstract new VSS.Implementation.String_Handlers.Abstract_String_Handler
+       with null record;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   not overriding procedure Append
+     (Self : Abstract_String_Buffer_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      Code : VSS.Unicode.Code_Point) is abstract
+     with Pre'Class => Code not in 16#D800# .. 16#DFFF#;
+   --  Append single code point to the data.
 
-end GNATCOLL_Text_Tests;
+end VSS.Implementation.String_Buffer_Handlers;

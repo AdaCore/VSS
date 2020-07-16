@@ -1621,9 +1621,7 @@ package body VSS.JSON.Implementation.Parsers is
    begin
       Self.Event := VSS.JSON.Streams.Readers.Invalid;
       Self.Error := VSS.JSON.Streams.Readers.Not_Valid;
-      Self.Message :=
-        VSS.Strings.Conversions.To_Magic_String
-          (Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Encode (Message));
+      Self.Message := VSS.Strings.To_Virtual_String (Message);
 
       return False;
    end Report_Error;

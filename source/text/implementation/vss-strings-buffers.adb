@@ -56,6 +56,23 @@ package body VSS.Strings.Buffers is
       Handler.Append (Self.Data, VSS.Characters.Virtual_Character'Pos (Item));
    end Append;
 
+   -----------
+   -- Clear --
+   -----------
+
+   procedure Clear (Self : in out Virtual_String_Buffer'Class) is
+      Handler : constant access
+        VSS.Implementation.String_Buffer_Handlers
+          .Abstract_String_Buffer_Handler'Class := Self.Handler;
+
+   begin
+      if Handler /= null then
+         Handler.Unreference (Self.Data);
+
+         Self.Data := (others => <>);
+      end if;
+   end Clear;
+
    -------------
    -- Handler --
    -------------

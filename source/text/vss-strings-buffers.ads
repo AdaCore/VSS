@@ -20,31 +20,34 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  String buffers
 
-with "gnatcoll_text";
+with VSS.Characters;
 
-project GNATCOLL_Text_Tests is
+private with VSS.Implementation.String_Buffer_Handlers;
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_character_iterators.adb",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb",
-                 "test_stream_element_buffer.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_buffer",
-                 "test_text_streams");
+package VSS.Strings.Buffers is
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   pragma Preelaborate;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   type Virtual_String_Buffer is
+     new VSS.Strings.Virtual_String with private;
 
-end GNATCOLL_Text_Tests;
+   procedure Append
+     (Self : in out Virtual_String_Buffer'Class;
+      Item : VSS.Characters.Virtual_Character);
+
+private
+
+   type Virtual_String_Buffer is
+     new VSS.Strings.Virtual_String with null record;
+
+   function Handler
+     (Self : Virtual_String_Buffer'Class)
+      return access
+        VSS.Implementation.String_Buffer_Handlers
+          .Abstract_String_Buffer_Handler'Class;
+   --  Returns string data handler should be used to process data of given
+   --  object.
+
+end VSS.Strings.Buffers;

@@ -106,6 +106,18 @@ begin
       end if;
    end;
 
+   --  Check that null string is handled properly.
+
+   declare
+      N : VSS.Strings.Virtual_String;
+      pragma Warnings (Off, N);
+
+   begin
+      if VSS.Strings.Conversions.To_UTF_8_String (N) /= "" then
+         raise Program_Error;
+      end if;
+   end;
+
    --  T717-008 Check that conversion of quite large Wide_Wide_String is
    --  successful.
 

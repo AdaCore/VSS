@@ -30,6 +30,8 @@ package VSS.Strings.Conversions is
      (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String;
 
    function To_UTF_8_String
-     (Item : Virtual_String) return Ada.Strings.UTF_Encoding.UTF_8_String;
+     (Item : Virtual_String'Class)
+      return Ada.Strings.UTF_Encoding.UTF_8_String;
+   --  Convert virtual string into UTF-8 encoded string.
 
 end VSS.Strings.Conversions;

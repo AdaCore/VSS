@@ -62,14 +62,20 @@ package body VSS.Strings.Conversions is
    ---------------------
 
    function To_UTF_8_String
-     (Item : Virtual_String) return Ada.Strings.UTF_Encoding.UTF_8_String
+     (Item : Virtual_String'Class)
+      return Ada.Strings.UTF_Encoding.UTF_8_String
    is
       Handler : constant access
         VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
           Item.Handler;
 
    begin
-      return Handler.To_UTF_8_String (Item.Data);
+      if Handler = null then
+         return "";
+
+      else
+         return Handler.To_UTF_8_String (Item.Data);
+      end if;
    end To_UTF_8_String;
 
 end VSS.Strings.Conversions;

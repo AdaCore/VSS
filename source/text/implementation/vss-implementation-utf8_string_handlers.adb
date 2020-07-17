@@ -165,7 +165,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Data := Allocate (Capacity, Size);
 
       elsif not System.Atomic_Counters.Is_One (Data.Counter)
-        or else Size > Data.Capacity
+        or else Size > Data.Bulk
       then
          Reallocate (Data, Capacity, Size);
       end if;
@@ -490,7 +490,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
             VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
-            if Destination.Capacity < Destination.Size + L then
+            if Destination.Bulk < Destination.Size + L then
                --  There is no enough storage to store character, reallocate
                --  memory.
 
@@ -735,7 +735,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          then Capacity
          else (if Data = null
                then Size
-               else (if Data.Capacity > Size
+               else (if Data.Bulk > Size
                      then Size
                      else Size + Size / Growth_Factor)));
 
@@ -747,8 +747,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       if Aux /= null then
          declare
             Last : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-              VSS.Unicode.UTF8_Code_Unit_Count'Min
-                (Data.Capacity, Aux.Capacity);
+              VSS.Unicode.UTF8_Code_Unit_Count'Min (Data.Bulk, Aux.Bulk);
 
          begin
             Data.Storage (0 .. Last) := Aux.Storage (0 .. Last);

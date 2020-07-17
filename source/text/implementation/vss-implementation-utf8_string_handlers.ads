@@ -36,13 +36,11 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    pragma Preelaborate;
 
-   type UTF8_String_Data
-     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count) is
-   record
+   type UTF8_String_Data (Bulk : VSS.Unicode.UTF8_Code_Unit_Count) is record
       Counter : System.Atomic_Counters.Atomic_Counter;
 
       Storage :
-        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. Capacity);
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. Bulk);
       --  Buffer to store string's data. First unused code unit is set to
       --  zero, to allow to pass data to C.
 

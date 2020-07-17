@@ -105,4 +105,21 @@ begin
          raise Program_Error;
       end if;
    end;
+
+   --  T717-008 Check that conversion of quite large Wide_Wide_String is
+   --  successful.
+
+   declare
+      S : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.To_Virtual_String
+          ("This is large string literal to test conversion from "
+           & " Wide_Wide_String to Virtual_String. At the time of initial "
+           & "development this string literal requires to have at least "
+           & "256 (two hundreds fithty six) characters to overflow unsigned "
+           & "8 (eight) bit wide Length member of the UTF-8 ib place string "
+           & "handler.");
+
+   begin
+      null;
+   end;
 end Test_String_Conversions;

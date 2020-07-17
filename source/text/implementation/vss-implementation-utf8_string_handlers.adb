@@ -430,7 +430,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       begin
          Destination.Size := 0;
-         Destination.Length := Item'Length;
 
          for C of Item loop
             if Wide_Wide_Character'Pos (C) not in VSS.Unicode.Code_Point
@@ -482,6 +481,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end loop;
 
          if Success then
+            Destination.Length := Item'Length;
             Destination.Storage
               (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) := 16#00#;
          end if;

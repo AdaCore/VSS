@@ -29,7 +29,7 @@ procedure Test_String_Compare is
 
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
    S1 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String
+     VSS.Strings.Conversions.To_Virtual_String
        ((Character'Val(16#41#),
         Character'Val(16#53#),
         Character'Val(16#43#),
@@ -74,7 +74,7 @@ procedure Test_String_Compare is
 
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
    S2 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String
+     VSS.Strings.Conversions.To_Virtual_String
        ((Character'Val(16#41#),
         Character'Val(16#53#),
         Character'Val(16#43#),
@@ -119,7 +119,7 @@ procedure Test_String_Compare is
 
    --  "ASCII КириллицА ⊗∬ 𝛻𝜕 "
    SA : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String
+     VSS.Strings.Conversions.To_Virtual_String
        ((Character'Val(16#41#),
         Character'Val(16#53#),
         Character'Val(16#43#),
@@ -163,10 +163,10 @@ procedure Test_String_Compare is
         Character'Val(16#20#)));
 
    SE1 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String ("");
+     VSS.Strings.Conversions.To_Virtual_String ("");
 
    SE2 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String ("");
+     VSS.Strings.Conversions.To_Virtual_String ("");
 
    SD1 : VSS.Strings.Virtual_String;
    pragma Warnings (Off, SD1);
@@ -175,10 +175,10 @@ procedure Test_String_Compare is
 
    --  "ASCII"
    Prefix_1 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String ("ASCII");
+     VSS.Strings.Conversions.To_Virtual_String ("ASCII");
    --  "Кириллица"
    Prefix_2 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String
+     VSS.Strings.Conversions.To_Virtual_String
        ((Character'Val(16#D0#),
         Character'Val(16#9A#),
         Character'Val(16#D0#),

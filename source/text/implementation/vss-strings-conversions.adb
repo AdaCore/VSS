@@ -26,10 +26,31 @@ with VSS.Strings.Configuration;
 package body VSS.Strings.Conversions is
 
    ---------------------
-   -- To_Magic_String --
+   -- To_UTF_8_String --
    ---------------------
 
-   function To_Magic_String
+   function To_UTF_8_String
+     (Item : Virtual_String'Class)
+      return Ada.Strings.UTF_Encoding.UTF_8_String
+   is
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          Item.Handler;
+
+   begin
+      if Handler = null then
+         return "";
+
+      else
+         return Handler.To_UTF_8_String (Item.Data);
+      end if;
+   end To_UTF_8_String;
+
+   -----------------------
+   -- To_Virtual_String --
+   -----------------------
+
+   function To_Virtual_String
      (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String
    is
       Success : Boolean;
@@ -55,27 +76,6 @@ package body VSS.Strings.Conversions is
             raise Constraint_Error with "Ill-formed UTF-8 data";
          end if;
       end return;
-   end To_Magic_String;
-
-   ---------------------
-   -- To_UTF_8_String --
-   ---------------------
-
-   function To_UTF_8_String
-     (Item : Virtual_String'Class)
-      return Ada.Strings.UTF_Encoding.UTF_8_String
-   is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Item.Handler;
-
-   begin
-      if Handler = null then
-         return "";
-
-      else
-         return Handler.To_UTF_8_String (Item.Data);
-      end if;
-   end To_UTF_8_String;
+   end To_Virtual_String;
 
 end VSS.Strings.Conversions;

@@ -39,7 +39,7 @@ begin
 
       begin
          String :=
-           VSS.Strings.Conversions.To_Magic_String
+           VSS.Strings.Conversions.To_Virtual_String
              (Hello_World_Data.Hello (Language));
 
          if VSS.Strings.Conversions.To_UTF_8_String (String)

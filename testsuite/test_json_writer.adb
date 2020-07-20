@@ -49,65 +49,65 @@ begin
    --  Some usual constructs.
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("name"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("name"), Success);
    Writer.String_Value
-     (VSS.Strings.Conversions.To_Magic_String ("Some name"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("Some name"), Success);
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("names"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("names"), Success);
    Writer.Start_Array (Success);
    Writer.String_Value
-     (VSS.Strings.Conversions.To_Magic_String ("Some"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("Some"), Success);
    Writer.String_Value
-     (VSS.Strings.Conversions.To_Magic_String ("name"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("name"), Success);
    Writer.End_Array (Success);
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("is"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("is"), Success);
    Writer.Boolean_Value (False, Success);
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("no"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("no"), Success);
    Writer.Boolean_Value (True, Success);
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("empty"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("empty"), Success);
    Writer.Null_Value (Success);
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("integer"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("integer"), Success);
    Writer.Integer_Value (15, Success);
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("float"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("float"), Success);
    Writer.Float_Value (20.5, Success);
 
    --  Arrays of different types
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("booleans"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("booleans"), Success);
    Writer.Start_Array (Success);
    Writer.Boolean_Value (False, Success);
    Writer.Boolean_Value (True, Success);
    Writer.End_Array (Success);
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("nulls"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("nulls"), Success);
    Writer.Start_Array (Success);
    Writer.Null_Value (Success);
    Writer.Null_Value (Success);
    Writer.End_Array (Success);
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("floats"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("floats"), Success);
    Writer.Start_Array (Success);
    Writer.Float_Value (-1.0, Success);
    Writer.Float_Value (1.0, Success);
    Writer.End_Array (Success);
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("integers"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("integers"), Success);
    Writer.Start_Array (Success);
    Writer.Integer_Value (-1, Success);
    Writer.Integer_Value (1, Success);
    Writer.End_Array (Success);
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("arrays"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("arrays"), Success);
    Writer.Start_Array (Success);
    Writer.Start_Array (Success);
    Writer.End_Array (Success);
@@ -116,7 +116,7 @@ begin
    Writer.End_Array (Success);
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("objects"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("objects"), Success);
    Writer.Start_Array (Success);
    Writer.Start_Object (Success);
    Writer.End_Object (Success);
@@ -127,9 +127,9 @@ begin
    --  All control characters inside string value
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("controls"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("controls"), Success);
    Writer.String_Value
-     (VSS.Strings.Conversions.To_Magic_String
+     (VSS.Strings.Conversions.To_Virtual_String
         ((Character'Val (16#00#),
          Character'Val (16#01#),
          Character'Val (16#02#),
@@ -167,9 +167,9 @@ begin
    --  Backslash and quotation mark inside string value
 
    Writer.Key_Name
-     (VSS.Strings.Conversions.To_Magic_String ("others"), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("others"), Success);
    Writer.String_Value
-     (VSS.Strings.Conversions.To_Magic_String ("\"""), Success);
+     (VSS.Strings.Conversions.To_Virtual_String ("\"""), Success);
 
    writer.End_Object (Success);
 

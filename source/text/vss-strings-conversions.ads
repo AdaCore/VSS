@@ -26,7 +26,7 @@ with Ada.Strings.UTF_Encoding;
 
 package VSS.Strings.Conversions is
 
-   function To_Magic_String
+   function To_Virtual_String
      (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String;
 
    function To_UTF_8_String

@@ -98,7 +98,7 @@ package body Hello_World_Data is
 
    function Hello (Self : Language) return VSS.Strings.Virtual_String is
    begin
-      return VSS.Strings.Conversions.To_Magic_String (Hellos (Self).all);
+      return VSS.Strings.Conversions.To_Virtual_String (Hellos (Self).all);
    end Hello;
 
    ----------
@@ -116,7 +116,7 @@ package body Hello_World_Data is
 
    function Name (Self : Language) return VSS.Strings.Virtual_String is
    begin
-      return VSS.Strings.Conversions.To_Magic_String (Languages (Self).all);
+      return VSS.Strings.Conversions.To_Virtual_String (Languages (Self).all);
    end Name;
 
 end Hello_World_Data;

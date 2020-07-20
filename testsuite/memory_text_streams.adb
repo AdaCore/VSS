@@ -60,8 +60,7 @@ package body Memory_Text_Streams is
          Success := False;
          Item    := VSS.Characters.Virtual_Character'Val (0);
 
-         Self.Diagnosis :=
-           VSS.Strings.Conversions.To_Magic_String (Message);
+         Self.Diagnosis := VSS.Strings.Conversions.To_Virtual_String (Message);
       end Report_Error;
 
       U1 : VSS.Unicode.Code_Point;

@@ -41,7 +41,7 @@ procedure Test_Character_Iterators is
 
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
    S : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Magic_String
+     VSS.Strings.Conversions.To_Virtual_String
        ((Character'Val(16#41#),
         Character'Val(16#53#),
         Character'Val(16#43#),

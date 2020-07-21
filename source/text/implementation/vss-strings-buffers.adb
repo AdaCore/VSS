@@ -69,7 +69,10 @@ package body VSS.Strings.Buffers is
       if Handler /= null then
          Handler.Unreference (Self.Data);
 
-         Self.Data := (others => <>);
+         Self.Data := (In_Place => False,
+                       Capacity => 0,
+                       Handler  => null,
+                       Pointer  => System.Null_Address);
       end if;
    end Clear;
 

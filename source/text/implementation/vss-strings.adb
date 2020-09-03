@@ -21,8 +21,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with System;
-
 with VSS.Implementation.FNV_Hash;
 with VSS.Strings.Configuration;
 with VSS.Strings.Iterators.Characters.Internals;
@@ -196,24 +194,20 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character)
    is
-      Handler : access
+      Handler : constant access
         VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
           Self.Handler;
 
    begin
       if Handler = null then
-         --  XXX Should in-place form be tried first?
+         Self :=
+           To_Virtual_String
+             (Wide_Wide_String'(1 .. 1 => Wide_Wide_Character (Item)));
 
-         Self.Data :=
-           (In_Place => False,
-            Handler  => VSS.Strings.Configuration.Default_Handler,
-            Pointer  => System.Null_Address,
-            others   => <>);
-
-         Handler := VSS.Strings.Configuration.Default_Handler;
+      else
+         Handler.Append
+           (Self.Data, VSS.Characters.Virtual_Character'Pos (Item));
       end if;
-
-      Handler.Append (Self.Data, VSS.Characters.Virtual_Character'Pos (Item));
    end Append;
 
    ----------------------

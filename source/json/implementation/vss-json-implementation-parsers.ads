@@ -26,7 +26,7 @@
 --  It use Input_Text_Stream interface as data source.
 
 with VSS.JSON.Streams.Readers;
-with VSS.Strings.Buffers;
+with VSS.Strings;
 with VSS.Text_Streams;
 private with VSS.Unicode;
 
@@ -106,7 +106,7 @@ private
         VSS.JSON.Streams.Readers.No_Error;
       Message     : VSS.Strings.Virtual_String;
       C           : Wide_Wide_Character;
-      Buffer      : VSS.Strings.Buffers.Virtual_String_Buffer;
+      Buffer      : VSS.Strings.Virtual_String;
       Boolean     : Standard.Boolean;
       Number      : VSS.JSON.JSON_Number;
       Code_Unit_1 : VSS.Unicode.UTF16_Code_Unit;

@@ -21,6 +21,9 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with System;
+
+with VSS.Characters;
 with VSS.Implementation.FNV_Hash;
 with VSS.Strings.Configuration;
 with VSS.Strings.Iterators.Characters.Internals;
@@ -186,6 +189,34 @@ package body VSS.Strings is
       end if;
    end Adjust;
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (Self : in out Virtual_String'Class;
+      Item : VSS.Characters.Virtual_Character)
+   is
+      Handler : access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          Self.Handler;
+
+   begin
+      if Handler = null then
+         --  XXX Should in-place form be tried first?
+
+         Self.Data :=
+           (In_Place => False,
+            Handler  => VSS.Strings.Configuration.Default_Handler,
+            Pointer  => System.Null_Address,
+            others   => <>);
+
+         Handler := VSS.Strings.Configuration.Default_Handler;
+      end if;
+
+      Handler.Append (Self.Data, VSS.Characters.Virtual_Character'Pos (Item));
+   end Append;
+
    ----------------------
    -- Character_Length --
    ----------------------
@@ -203,6 +234,23 @@ package body VSS.Strings is
          then 0
          else Character_Count (Handler.Length (Self.Data)));
    end Character_Length;
+
+   -----------
+   -- Clear --
+   -----------
+
+   procedure Clear (Self : in out Virtual_String'Class) is
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          Self.Handler;
+
+   begin
+      if Handler /= null then
+         Handler.Unreference (Self.Data);
+
+         Self.Data := (others => <>);
+      end if;
+   end Clear;
 
    -------------
    -- Connect --

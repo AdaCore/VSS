@@ -215,6 +215,18 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Destination.Storage (Destination.Size) := 16#00#;
    end Append;
 
+   ------------
+   -- Append --
+   ------------
+
+   overriding procedure Append
+     (Self : UTF8_In_Place_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      Code : VSS.Unicode.Code_Point) is
+   begin
+      raise Program_Error;
+   end Append;
+
    ----------------------------
    -- Before_First_Character --
    ----------------------------

@@ -15,9 +15,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ./cached_gnat
-          key: ${{ runner.os }}-gnat-2020
+          key: ${{ runner.os }}-gnat-2020.1
+          restore-keys: ${{ runner.os }}-gnat-2020.1
       - name: Get GNAT Community 2020 toolchain
-        uses: ada-actions/toolchain@9a1aede7759ac41b2678410dbf20a90235812913
+        uses: ada-actions/toolchain@3f69585
         with:
           distrib: community
           install_dir: ./cached_gnat

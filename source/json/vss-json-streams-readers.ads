@@ -112,7 +112,8 @@ package VSS.JSON.Streams.Readers is
 
    procedure Skip_Current_Array (Self : in out JSON_Stream_Reader) is abstract;
 
-   procedure Skip_Current_Object (Self : in out JSON_Stream_Reader) is abstract;
+   procedure Skip_Current_Object
+     (Self : in out JSON_Stream_Reader) is abstract;
 
    procedure Skip_Current_Value (Self : in out JSON_Stream_Reader) is abstract;
 

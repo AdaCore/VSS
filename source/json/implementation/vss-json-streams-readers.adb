@@ -36,7 +36,8 @@ package body VSS.JSON.Streams.Readers is
    -- Is_Boolean_Value --
    ----------------------
 
-   function Is_Boolean_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_Boolean_Value
+     (Self : JSON_Stream_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Boolean_Value;
    end Is_Boolean_Value;

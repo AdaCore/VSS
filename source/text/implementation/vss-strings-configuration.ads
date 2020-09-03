@@ -27,14 +27,13 @@ private package VSS.Strings.Configuration is
 
    pragma Preelaborate;
 
-   UTF8_String_Handler   : aliased
-     VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
    UTF8_In_Place_Handler : aliased
      VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
 
    Default_Handler  : not null
      VSS.Implementation.Strings.String_Handler_Access :=
-       UTF8_String_Handler'Access;
+       VSS.Implementation.UTF8_String_Handlers
+         .Global_UTF8_String_Handler'Access;
    In_Place_Handler : not null
      VSS.Implementation.Strings.String_Handler_Access :=
        UTF8_In_Place_Handler'Access;

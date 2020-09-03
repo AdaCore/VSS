@@ -222,9 +222,97 @@ package body VSS.Implementation.UTF8_String_Handlers is
    overriding procedure Append
      (Self : UTF8_In_Place_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
-      Code : VSS.Unicode.Code_Point) is
+      Code : VSS.Unicode.Code_Point)
+   is
+      use type Interfaces.Unsigned_8;
+
+      Destination : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      U1          : VSS.Unicode.UTF8_Code_Unit;
+      U2          : VSS.Unicode.UTF8_Code_Unit;
+      U3          : VSS.Unicode.UTF8_Code_Unit;
+      U4          : VSS.Unicode.UTF8_Code_Unit;
+
    begin
-      raise Program_Error;
+      VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+      if Destination.Size + Interfaces.Unsigned_8 (L)
+           < Destination.Storage'Length
+      then
+         --  There are enough space to store data in place.
+
+         Destination.Storage
+           (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) := U1;
+
+         if L >= 2 then
+            Destination.Storage
+              (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size) + 1) := U2;
+
+            if L >= 3 then
+               Destination.Storage
+                 (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size) + 2) :=
+                   U3;
+
+               if L = 4 then
+                  Destination.Storage
+                    (VSS.Unicode.UTF8_Code_Unit_Count
+                       (Destination.Size + 3)) := U4;
+               end if;
+            end if;
+         end if;
+
+         Destination.Size := Destination.Size + Interfaces.Unsigned_8 (L);
+         Destination.Length := Destination.Length + 1;
+         Destination.Storage
+           (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) := 16#00#;
+
+      else
+         --  Data can't be stored "in place" and need to be converted into
+         --  shared data.
+
+         declare
+            Source      : UTF8_In_Place_Data
+              with Import, Convention => Ada, Address => Data'Address;
+            Destination : constant UTF8_String_Data_Access :=
+              Allocate
+                (VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
+                 VSS.Unicode.UTF8_Code_Unit_Count (Source.Size) + L);
+
+         begin
+            Destination.Storage
+              (0 .. VSS.Unicode.UTF8_Code_Unit_Count (Source.Size)) :=
+                Source.Storage
+                  (0 .. VSS.Unicode.UTF8_Code_Unit_Count (Source.Size));
+            Destination.Size := VSS.Unicode.UTF8_Code_Unit_Count (Source.Size);
+            Destination.Length :=
+              VSS.Implementation.Strings.Character_Count (Source.Length);
+
+            Destination.Storage (Destination.Size) := U1;
+
+            if L >= 2 then
+               Destination.Storage (Destination.Size + 1) := U2;
+
+               if L >= 3 then
+                  Destination.Storage (Destination.Size + 2) := U3;
+
+                  if L = 4 then
+                     Destination.Storage (Destination.Size + 3) := U4;
+                  end if;
+               end if;
+            end if;
+
+            Destination.Size := Destination.Size + L;
+            Destination.Length := Destination.Length + 1;
+            Destination.Storage (Destination.Size) := 16#00#;
+
+            Data :=
+              (In_Place => False,
+               Capacity => Data.Capacity,
+               Handler  => Global_UTF8_String_Handler'Access,
+               Pointer  => Destination.all'Address);
+         end;
+      end if;
    end Append;
 
    ----------------------------

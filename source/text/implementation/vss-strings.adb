@@ -23,7 +23,6 @@
 
 with System;
 
-with VSS.Characters;
 with VSS.Implementation.FNV_Hash;
 with VSS.Strings.Configuration;
 with VSS.Strings.Iterators.Characters.Internals;

@@ -153,4 +153,11 @@ package VSS.Implementation.String_Handlers is
       return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
    --  Converts string data into standard UTF_8_String.
 
+   not overriding procedure Append
+     (Self : Abstract_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      Code : VSS.Unicode.Code_Point) is abstract
+     with Pre'Class => Code not in 16#D800# .. 16#DFFF#;
+   --  Append single code point to the data.
+
 end VSS.Implementation.String_Handlers;

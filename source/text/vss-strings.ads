@@ -25,6 +25,7 @@
 private with Ada.Finalization;
 private with Ada.Streams;
 
+with VSS.Characters;
 private with VSS.Implementation.String_Handlers;
 private with VSS.Implementation.Strings;
 limited with VSS.Strings.Iterators.Characters;
@@ -104,6 +105,14 @@ package VSS.Strings is
 
    function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
    --  Convert given string into virtual string.
+
+   procedure Clear (Self : in out Virtual_String'Class);
+   --  Remove all data.
+
+   procedure Append
+     (Self : in out Virtual_String'Class;
+      Item : VSS.Characters.Virtual_Character);
+   --  Append given abstract character to the end of the string.
 
 private
 

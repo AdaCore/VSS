@@ -21,13 +21,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Buffers;
+with VSS.Characters;
+with VSS.Strings;
 
 procedure Test_String_Buffer is
 
    use type VSS.Strings.Virtual_String;
 
-   Buffer : VSS.Strings.Buffers.Virtual_String_Buffer;
+   Buffer : VSS.Strings.Virtual_String;
 
 begin
    Buffer.Append ('A');
@@ -35,9 +36,7 @@ begin
    Buffer.Append ('क');
    Buffer.Append ('𐌈');
 
-   if VSS.Strings.Virtual_String (Buffer)
-     /= VSS.Strings.To_Virtual_String ("AБक𐌈")
-   then
+   if Buffer /= VSS.Strings.To_Virtual_String ("AБक𐌈") then
       raise Program_Error;
    end if;
 end Test_String_Buffer;

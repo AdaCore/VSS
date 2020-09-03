@@ -209,4 +209,7 @@ package VSS.Implementation.UTF8_String_Handlers is
       Code : VSS.Unicode.Code_Point);
    --  Append single code point to the data.
 
+   Global_UTF8_String_Handler   : aliased
+     VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
+
 end VSS.Implementation.UTF8_String_Handlers;

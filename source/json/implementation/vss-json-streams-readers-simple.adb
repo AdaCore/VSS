@@ -146,7 +146,15 @@ package body VSS.JSON.Streams.Readers.Simple is
    overriding procedure Skip_Current_Array
      (Self : in out JSON_Simple_Reader) is
    begin
-      raise Program_Error;
+      pragma Assert (Self.Is_Start_Array);
+
+      Self.Read_Next;
+
+      while not Self.Is_End_Array loop
+         Self.Skip_Current_Value;
+      end loop;
+
+      Self.Read_Next;  --  Skip End_Array
    end Skip_Current_Array;
 
    -------------------------
@@ -156,7 +164,18 @@ package body VSS.JSON.Streams.Readers.Simple is
    overriding procedure Skip_Current_Object
      (Self : in out JSON_Simple_Reader) is
    begin
-      raise Program_Error;
+      pragma Assert (Self.Is_Start_Object);
+
+      Self.Read_Next;
+
+      while not Self.Is_End_Object loop
+         pragma Assert (Self.Is_Key_Name);
+
+         Self.Read_Next;
+         Self.Skip_Current_Value;
+      end loop;
+
+      Self.Read_Next;  --  Skip End_Object
    end Skip_Current_Object;
 
    ------------------------
@@ -166,7 +185,34 @@ package body VSS.JSON.Streams.Readers.Simple is
    overriding procedure Skip_Current_Value
      (Self : in out JSON_Simple_Reader) is
    begin
-      raise Program_Error;
+      case Self.Event_Kind is
+         when No_Token =>
+            raise Program_Error;
+         when Invalid =>
+            raise Program_Error;
+         when Start_Document =>
+            raise Program_Error;
+         when End_Document =>
+            raise Program_Error;
+         when Start_Array =>
+            Self.Skip_Current_Array;
+         when End_Array =>
+            raise Program_Error;
+         when Start_Object =>
+            Self.Skip_Current_Object;
+         when End_Object =>
+            raise Program_Error;
+         when Key_Name =>
+            raise Program_Error;
+         when String_Value =>
+            Self.Read_Next;
+         when Number_Value =>
+            Self.Read_Next;
+         when Boolean_Value =>
+            Self.Read_Next;
+         when Null_Value =>
+            Self.Read_Next;
+      end case;
    end Skip_Current_Value;
 
    ------------------

@@ -5,7 +5,7 @@ NAME=`basename $INPUT_FILE`
 LOG_FILE=/tmp/$NAME.log
 ERROR_FILE=/tmp/$NAME.error
 DIFF_FILE=/tmp/$NAME.diff
-EXPECTED_FILE=testsuite/JSON.expected/$NAME.txt
+EXPECTED_FILE=testsuite/json/JSON.expected/$NAME.txt
 
 set -e
 

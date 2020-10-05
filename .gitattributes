@@ -1,2 +1,2 @@
 
-testsuite/JSON.expected/*.txt -crlf
+testsuite/json/JSON.expected/*.txt -crlf

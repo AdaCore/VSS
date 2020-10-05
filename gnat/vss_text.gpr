@@ -20,12 +20,22 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Auxiliary project to allow to use all subprojects by single with clause.
+--  VSS: Text processing subproject
 
 with "vss_config";
-with "vss_json";
-with "vss_text";
 
-abstract project GNATCOLL_Text is
+project VSS_Text is
 
-end GNATCOLL_Text;
+   for Languages use ("Ada");
+   for Object_Dir use "../.objs";
+   for Source_Dirs use
+     ("../source/streams",
+      "../source/streams/implementation",
+      "../source/text",
+      "../source/text/implementation");
+
+   package Compiler renames VSS_Config.Compiler;
+
+   package Linker renames VSS_Config.Linker;
+
+end VSS_Text;

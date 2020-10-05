@@ -1,0 +1,84 @@
+------------------------------------------------------------------------------
+--                        M A G I C   R U N T I M E                         --
+--                                                                          --
+--                       Copyright (C) 2020, AdaCore                        --
+--                                                                          --
+-- This library is free software;  you can redistribute it and/or modify it --
+-- under terms of the  GNU General Public License  as published by the Free --
+-- Software  Foundation;  either version 3,  or (at your  option) any later --
+-- version. This library is distributed in the hope that it will be useful, --
+-- but WITHOUT ANY WARRANTY;  without even the implied warranty of MERCHAN- --
+-- TABILITY or FITNESS FOR A PARTICULAR PURPOSE.                            --
+--                                                                          --
+-- As a special exception under Section 7 of GPL version 3, you are granted --
+-- additional permissions described in the GCC Runtime Library Exception,   --
+-- version 3.1, as published by the Free Software Foundation.               --
+--                                                                          --
+-- You should have received a copy of the GNU General Public License and    --
+-- a copy of the GCC Runtime Library Exception along with this program;     --
+-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+-- <http://www.gnu.org/licenses/>.                                          --
+--                                                                          --
+------------------------------------------------------------------------------
+--  Configuration project for all subprojects of the VSS.
+
+abstract project VSS_Config is
+
+   type Build_Mode_Type is ("dev", "prod", "coverage");
+   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
+
+   Ada_Switches := ();
+   Linker_Options := ();
+
+   case Build_Mode is
+      when "prod" =>
+         Ada_Switches := (
+            --  Compile with optimizations
+            "-O2",
+
+            --  Generate debug information: this is useful to get meaningful
+            --  tracebacks.
+            "-g"
+         );
+
+      when "dev" =>
+         Ada_Switches := (
+            --  Compile with no optimization and with debug information to ease
+            --  investigation in debuggers.
+            "-O0", "-g",
+
+            --  Enable all warnings and GNAT stylechecks (plus O: check for
+            --  overriding indicators).
+            "-gnatwa", "-gnatygO",
+
+            --  Enable assertions and all validity checking options
+            "-gnata", "-gnatVa",
+
+            --  Enable stack overflow checks
+            "-fstack-check"
+         );
+
+      when "coverage" =>
+         Ada_Switches := (
+            --  Compile with no optimization and with debug information to ease
+            --  investigation in debuggers.
+            "-O0", "-g",
+            --  Enable coverage code instrumentation.
+            "--coverage");
+
+         Linker_Options := ("--coverage");
+   end case;
+
+   --  All packages below are expected to be used when there is no subproject
+   --  specific switches are necessary. Please keep this packages as simple as
+   --  possible and never hardcode any switches to simplify future support.
+
+   package Compiler is
+      for Switches ("Ada") use Ada_Switches;
+   end Compiler;
+
+   package Linker is
+      for Linker_Options use Linker_Options;
+   end Linker;
+
+end VSS_Config;

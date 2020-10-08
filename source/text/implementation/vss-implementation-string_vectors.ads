@@ -20,36 +20,28 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Vector of strings and operations on it.
 
-private with Ada.Finalization;
-private with Ada.Streams;
+with System.Atomic_Counters;
 
-private with VSS.Implementation.String_Vectors;
+with VSS.Implementation.Strings;
 
-package VSS.String_Vectors is
+package VSS.Implementation.String_Vectors is
 
    pragma Preelaborate;
-   pragma Remote_Types;
 
-   type Virtual_String_Vector is tagged private;
+   type String_Data_Array is
+     array (Positive range <>) of VSS.Implementation.Strings.String_Data;
 
-private
+   type String_Vector_Data (Bulk : Natural) is record
+      Counter : System.Atomic_Counters.Atomic_Counter;
+      Last    : Natural := 0;
+      Data    : String_Data_Array (1 .. Bulk);
+   end record;
 
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Virtual_String_Vector);
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Virtual_String_Vector);
+   type String_Vector_Data_Access is access all String_Vector_Data;
 
-   type Virtual_String_Vector is new Ada.Finalization.Controlled with record
-      Data : aliased
-        VSS.Implementation.String_Vectors.String_Vector_Data_Access;
-   end record
-     with Read => Read, Write => Write;
+   procedure Reference (Self : String_Vector_Data_Access) with Inline;
 
-   overriding procedure Adjust (Self : in out Virtual_String_Vector);
-   overriding procedure Finalize (Self : in out Virtual_String_Vector);
+   procedure Unreference (Self : in out String_Vector_Data_Access);
 
-end VSS.String_Vectors;
+end VSS.Implementation.String_Vectors;

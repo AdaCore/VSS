@@ -20,36 +20,51 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Vector of strings and operations on it.
 
-private with Ada.Finalization;
-private with Ada.Streams;
+with Ada.Unchecked_Deallocation;
 
-private with VSS.Implementation.String_Vectors;
+with VSS.Implementation.String_Handlers;
 
-package VSS.String_Vectors is
+package body VSS.Implementation.String_Vectors is
 
-   pragma Preelaborate;
-   pragma Remote_Types;
+   ---------------
+   -- Reference --
+   ---------------
 
-   type Virtual_String_Vector is tagged private;
+   procedure Reference (Self : String_Vector_Data_Access) is
+   begin
+      if Self /= null then
+         System.Atomic_Counters.Increment (Self.Counter);
+      end if;
+   end Reference;
 
-private
+   -----------------
+   -- Unreference --
+   -----------------
 
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Virtual_String_Vector);
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Virtual_String_Vector);
+   procedure Unreference (Self : in out String_Vector_Data_Access) is
 
-   type Virtual_String_Vector is new Ada.Finalization.Controlled with record
-      Data : aliased
-        VSS.Implementation.String_Vectors.String_Vector_Data_Access;
-   end record
-     with Read => Read, Write => Write;
+      procedure Free is
+        new Ada.Unchecked_Deallocation
+          (VSS.Implementation.String_Vectors.String_Vector_Data,
+           VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
-   overriding procedure Adjust (Self : in out Virtual_String_Vector);
-   overriding procedure Finalize (Self : in out Virtual_String_Vector);
+   begin
+      if System.Atomic_Counters.Decrement (Self.Counter) then
+         for J in 1 .. Self.Last loop
+            declare
+               Handler : constant access
+                 VSS.Implementation.String_Handlers
+                   .Abstract_String_Handler'Class
+                     := VSS.Implementation.Strings.Handler (Self.Data (J));
 
-end VSS.String_Vectors;
+            begin
+               Handler.Unreference (Self.Data (J));
+            end;
+         end loop;
+
+         Free (Self);
+      end if;
+   end Unreference;
+
+end VSS.Implementation.String_Vectors;

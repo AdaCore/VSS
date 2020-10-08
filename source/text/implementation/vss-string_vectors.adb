@@ -20,36 +20,47 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Vector of strings and operations on it.
 
-private with Ada.Finalization;
-private with Ada.Streams;
+package body VSS.String_Vectors is
 
-private with VSS.Implementation.String_Vectors;
+   ------------
+   -- Adjust --
+   ------------
 
-package VSS.String_Vectors is
+   overriding procedure Adjust (Self : in out Virtual_String_Vector) is
+   begin
+      VSS.Implementation.String_Vectors.Reference (Self.Data);
+   end Adjust;
 
-   pragma Preelaborate;
-   pragma Remote_Types;
+   --------------
+   -- Finalize --
+   --------------
 
-   type Virtual_String_Vector is tagged private;
+   overriding procedure Finalize (Self : in out Virtual_String_Vector) is
+   begin
+      VSS.Implementation.String_Vectors.Unreference (Self.Data);
+   end Finalize;
 
-private
+   ----------
+   -- Read --
+   ----------
 
    procedure Read
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Virtual_String_Vector);
+      Self   : out Virtual_String_Vector) is
+   begin
+      raise Program_Error;
+   end Read;
+
+   -----------
+   -- Write --
+   -----------
+
    procedure Write
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Virtual_String_Vector);
-
-   type Virtual_String_Vector is new Ada.Finalization.Controlled with record
-      Data : aliased
-        VSS.Implementation.String_Vectors.String_Vector_Data_Access;
-   end record
-     with Read => Read, Write => Write;
-
-   overriding procedure Adjust (Self : in out Virtual_String_Vector);
-   overriding procedure Finalize (Self : in out Virtual_String_Vector);
+      Self   : Virtual_String_Vector) is
+   begin
+      raise Program_Error;
+   end Write;
 
 end VSS.String_Vectors;

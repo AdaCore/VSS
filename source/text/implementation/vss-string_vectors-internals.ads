@@ -20,36 +20,18 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Vector of strings and operations on it.
+--  This package is for internal use only.
 
-private with Ada.Finalization;
-private with Ada.Streams;
+with VSS.Implementation.String_Vectors;
 
-private with VSS.Implementation.String_Vectors;
-
-package VSS.String_Vectors is
+package VSS.String_Vectors.Internals is
 
    pragma Preelaborate;
-   pragma Remote_Types;
 
-   type Virtual_String_Vector is tagged private;
-
-private
-
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Virtual_String_Vector);
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Virtual_String_Vector);
-
-   type Virtual_String_Vector is new Ada.Finalization.Controlled with record
-      Data : aliased
+   function Data_Access
+     (Self : in out VSS.String_Vectors.Virtual_String_Vector)
+      return access
         VSS.Implementation.String_Vectors.String_Vector_Data_Access;
-   end record
-     with Read => Read, Write => Write;
+   --  Return access to Data member of the given object
 
-   overriding procedure Adjust (Self : in out Virtual_String_Vector);
-   overriding procedure Finalize (Self : in out Virtual_String_Vector);
-
-end VSS.String_Vectors;
+end VSS.String_Vectors.Internals;

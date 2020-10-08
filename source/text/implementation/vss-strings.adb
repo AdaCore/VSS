@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 
 with VSS.Implementation.FNV_Hash;
-with VSS.Strings.Configuration;
+with VSS.Implementation.String_Configuration;
 with VSS.Strings.Iterators.Characters.Internals;
 with VSS.Strings.Texts;
 
@@ -353,12 +353,7 @@ package body VSS.Strings is
       return access
         VSS.Implementation.String_Handlers.Abstract_String_Handler'Class is
    begin
-      if Self.Data.In_Place then
-         return VSS.Strings.Configuration.In_Place_Handler;
-
-      else
-         return Self.Data.Handler;
-      end if;
+      return VSS.Implementation.Strings.Handler (Self.Data);
    end Handler;
 
    ----------
@@ -478,16 +473,18 @@ package body VSS.Strings is
          --  First, attempt to place data in the storage inside the object of
          --  Magic_String type.
 
-         VSS.Strings.Configuration.In_Place_Handler.From_Wide_Wide_String
-           (Item, Result.Data, Success);
+         VSS.Implementation.String_Configuration.In_Place_Handler
+           .From_Wide_Wide_String
+             (Item, Result.Data, Success);
 
          if not Success then
             --  Operation may fail for two reasons: source data is not
             --  well-formed UTF-8 or there is not enoght memory to store
             --  string in in-place storage.
 
-            VSS.Strings.Configuration.Default_Handler.From_Wide_Wide_String
-              (Item, Result.Data, Success);
+            VSS.Implementation.String_Configuration.Default_Handler
+              .From_Wide_Wide_String
+                (Item, Result.Data, Success);
          end if;
 
          if not Success then

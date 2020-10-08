@@ -21,11 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Configuration;
-
 package body VSS.Strings.Iterators.Characters is
-
-   use type VSS.Implementation.Strings.String_Handler_Access;
 
    -------------
    -- Element --
@@ -34,20 +30,16 @@ package body VSS.Strings.Iterators.Characters is
    function Element
      (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character
    is
-   begin
-      if Self.Owner /= null then
-         if Self.Owner.Data.In_Place then
-            return
-              VSS.Characters.Virtual_Character'Val
-                (VSS.Strings.Configuration.In_Place_Handler.Element
-                   (Self.Owner.Data, Self.Position));
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+          := (if Self.Owner = null then null
+              else VSS.Implementation.Strings.Handler (Self.Owner.Data));
 
-         elsif Self.Owner.Data.Handler /= null then
-            return
-              VSS.Characters.Virtual_Character'Val
-                (Self.Owner.Data.Handler.Element
-                   (Self.Owner.Data, Self.Position));
-         end if;
+   begin
+      if Handler /= null then
+         return
+           VSS.Characters.Virtual_Character'Val
+             (Handler.Element (Self.Owner.Data, Self.Position));
       end if;
 
       return VSS.Characters.Virtual_Character'Val (16#00_0000#);
@@ -58,19 +50,16 @@ package body VSS.Strings.Iterators.Characters is
    -----------------
 
    overriding function Has_Element
-     (Self : Character_Iterator) return Boolean is
-   begin
-      if Self.Owner /= null then
-         if Self.Owner.Data.In_Place then
-            return
-              VSS.Strings.Configuration.In_Place_Handler.Has_Character
-                (Self.Owner.Data, Self.Position);
+     (Self : Character_Iterator) return Boolean
+   is
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+          := (if Self.Owner = null then null
+              else VSS.Implementation.Strings.Handler (Self.Owner.Data));
 
-         elsif Self.Owner.Data.Handler /= null then
-            return
-              Self.Owner.Data.Handler.Has_Character
-                (Self.Owner.Data, Self.Position);
-         end if;
+   begin
+      if Handler /= null then
+         return Handler.Has_Character (Self.Owner.Data, Self.Position);
       end if;
 
       return False;
@@ -81,18 +70,16 @@ package body VSS.Strings.Iterators.Characters is
    -------------
 
    overriding function Forward
-     (Self : in out Character_Iterator) return Boolean is
-   begin
-      if Self.Owner /= null then
-         if Self.Owner.Data.In_Place then
-            return
-              VSS.Strings.Configuration.In_Place_Handler.Forward
-                (Self.Owner.Data, Self.Position);
+     (Self : in out Character_Iterator) return Boolean
+   is
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+          := (if Self.Owner = null then null
+              else VSS.Implementation.Strings.Handler (Self.Owner.Data));
 
-         elsif Self.Owner.Data.Handler /= null then
-            return
-              Self.Owner.Data.Handler.Forward (Self.Owner.Data, Self.Position);
-         end if;
+   begin
+      if Handler /= null then
+         return Handler.Forward (Self.Owner.Data, Self.Position);
       end if;
 
       return False;

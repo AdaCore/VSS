@@ -21,63 +21,22 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_String_Handlers;
 
-package body VSS.Strings.Conversions is
+package VSS.Implementation.String_Configuration is
 
-   ---------------------
-   -- To_UTF_8_String --
-   ---------------------
+   pragma Preelaborate;
 
-   function To_UTF_8_String
-     (Item : Virtual_String'Class)
-      return Ada.Strings.UTF_Encoding.UTF_8_String
-   is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Item.Handler;
+   UTF8_In_Place_Handler : aliased
+     VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
 
-   begin
-      if Handler = null then
-         return "";
+   Default_Handler  : not null
+     VSS.Implementation.Strings.String_Handler_Access :=
+       VSS.Implementation.UTF8_String_Handlers
+         .Global_UTF8_String_Handler'Access;
+   In_Place_Handler : not null
+     VSS.Implementation.Strings.String_Handler_Access :=
+       UTF8_In_Place_Handler'Access;
 
-      else
-         return Handler.To_UTF_8_String (Item.Data);
-      end if;
-   end To_UTF_8_String;
-
-   -----------------------
-   -- To_Virtual_String --
-   -----------------------
-
-   function To_Virtual_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String
-   is
-      Success : Boolean;
-
-   begin
-      return Result : Virtual_String do
-         --  First, attempt to place data in the storage inside the object of
-         --  Magic_String type.
-
-         VSS.Implementation.String_Configuration.In_Place_Handler
-           .From_UTF_8_String
-             (Item, Result.Data, Success);
-
-         if not Success then
-            --  Operation may fail for two reasons: source data is not
-            --  well-formed UTF-8 or there is not enoght memory to store
-            --  string in in-place storage.
-
-            VSS.Implementation.String_Configuration.Default_Handler
-              .From_UTF_8_String
-                (Item, Result.Data, Success);
-         end if;
-
-         if not Success then
-            raise Constraint_Error with "Ill-formed UTF-8 data";
-         end if;
-      end return;
-   end To_Virtual_String;
-
-end VSS.Strings.Conversions;
+end VSS.Implementation.String_Configuration;

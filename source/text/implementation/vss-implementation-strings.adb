@@ -21,21 +21,25 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Implementation.UTF8_String_Handlers;
+with VSS.Implementation.String_Configuration;
 
-private package VSS.Strings.Configuration is
+package body VSS.Implementation.Strings is
 
-   pragma Preelaborate;
+   -------------
+   -- Handler --
+   -------------
 
-   UTF8_In_Place_Handler : aliased
-     VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
+   function Handler
+     (Data : String_Data)
+      return access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class is
+   begin
+      if Data.In_Place then
+         return VSS.Implementation.String_Configuration.In_Place_Handler;
 
-   Default_Handler  : not null
-     VSS.Implementation.Strings.String_Handler_Access :=
-       VSS.Implementation.UTF8_String_Handlers
-         .Global_UTF8_String_Handler'Access;
-   In_Place_Handler : not null
-     VSS.Implementation.Strings.String_Handler_Access :=
-       UTF8_In_Place_Handler'Access;
+      else
+         return Data.Handler;
+      end if;
+   end Handler;
 
-end VSS.Strings.Configuration;
+end VSS.Implementation.Strings;

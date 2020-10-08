@@ -86,4 +86,12 @@ package VSS.Implementation.Strings is
       In_Place at 20 range 31 ..  31;
    end record;
 
+   function Handler
+     (Data : String_Data)
+      return access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+          with Inline;
+   --  Return string handler for given string data. Null handler is returned
+   --  for null string.
+
 end VSS.Implementation.Strings;

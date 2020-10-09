@@ -34,7 +34,8 @@ project VSS_Text_Tests is
                  "test_string_compare",
                  "test_string_conversions.adb",
                  "test_string_hash",
-                 "test_string_buffer");
+                 "test_string_buffer",
+                 "test_string_split_lines");
 
    package Compiler is
       for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");

@@ -27,8 +27,10 @@ with Interfaces;
 with System.Atomic_Counters;
 
 with VSS.Implementation.String_Handlers;
+with VSS.Implementation.String_Vectors;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UTF8_Encoding;
+with VSS.Strings;
 with VSS.Unicode;
 
 package VSS.Implementation.UTF8_String_Handlers is
@@ -127,9 +129,24 @@ package VSS.Implementation.UTF8_String_Handlers is
       Code : VSS.Unicode.Code_Point);
    --  Append single code point to the data.
 
+   overriding procedure Split_Lines
+     (Self            : UTF8_String_Handler;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+   --  Splits string into lines using given set of allowed new line
+   --  terminators. Line terminator (character or combination of characters)
+   --  are removed unless Keep_Terminator is set to True.
+
+   In_Place_Storage_Capacity : constant VSS.Unicode.UTF8_Code_Unit_Count := 17;
+   --  Number of code units can be stored in place
+
    type UTF8_In_Place_Data is record
       Storage :
-        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. 17);
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+          (0 .. In_Place_Storage_Capacity);
       Size    : Interfaces.Unsigned_8;
       Length  : Interfaces.Unsigned_8;
    end record;
@@ -208,6 +225,17 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data : in out VSS.Implementation.Strings.String_Data;
       Code : VSS.Unicode.Code_Point);
    --  Append single code point to the data.
+
+   overriding procedure Split_Lines
+     (Self            : UTF8_In_Place_String_Handler;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+   --  Splits string into lines using given set of allowed new line
+   --  terminators. Line terminator (character or combination of characters)
+   --  are removed unless Keep_Terminator is set to True.
 
    Global_UTF8_String_Handler   : aliased
      VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;

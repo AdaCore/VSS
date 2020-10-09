@@ -24,10 +24,20 @@
 
 with Ada.Unchecked_Deallocation;
 
+with VSS.Implementation.String_Configuration;
+
 package body VSS.Implementation.UTF8_String_Handlers is
 
    use type VSS.Implementation.Strings.Character_Count;
    use type VSS.Unicode.UTF8_Code_Unit_Count;
+
+   Line_Feed              : constant VSS.Unicode.Code_Point := 16#00_000A#;
+   Line_Tabulation        : constant VSS.Unicode.Code_Point := 16#00_000B#;
+   Form_Feed              : constant VSS.Unicode.Code_Point := 16#00_000C#;
+   Carriage_Return        : constant VSS.Unicode.Code_Point := 16#00_000D#;
+   Next_Line              : constant VSS.Unicode.Code_Point := 16#00_0085#;
+   Line_Separator         : constant VSS.Unicode.Code_Point := 16#00_2028#;
+   Paragraph_Separator    : constant VSS.Unicode.Code_Point := 16#00_2029#;
 
    type Verification_State is
      (Initial,    --  ASCII or start of multibyte sequence
@@ -117,6 +127,17 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Size     : VSS.Unicode.UTF8_Code_Unit_Count);
    --  Reallocate storage block when it is shared or not enough to store given
    --  amount of data.
+
+   procedure Split_Lines_Common
+     (Handler         :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+   --  Common code of Split_Lines subprogram for on heap and inline handlers.
 
    ----------------------
    -- Aligned_Capacity --
@@ -874,6 +895,275 @@ package body VSS.Implementation.UTF8_String_Handlers is
          System.Atomic_Counters.Increment (Destination.Counter);
       end if;
    end Reference;
+
+   -----------------
+   -- Split_Lines --
+   -----------------
+
+   overriding procedure Split_Lines
+     (Self            : UTF8_String_Handler;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
+   is
+      Source : constant UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      Split_Lines_Common
+        (Handler         => Self,
+         Data            => Data,
+         Storage         => Source.Storage,
+         Terminators     => Terminators,
+         Keep_Terminator => Keep_Terminator,
+         Lines           => Lines);
+   end Split_Lines;
+
+   -----------------
+   -- Split_Lines --
+   -----------------
+
+   overriding procedure Split_Lines
+     (Self            : UTF8_In_Place_String_Handler;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
+   is
+      Source : constant UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      Split_Lines_Common
+        (Handler         => Self,
+         Data            => Data,
+         Storage         => Source.Storage,
+         Terminators     => Terminators,
+         Keep_Terminator => Keep_Terminator,
+         Lines           => Lines);
+   end Split_Lines;
+
+   ------------------------
+   -- Split_Lines_Common --
+   ------------------------
+
+   procedure Split_Lines_Common
+     (Handler         :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
+   is
+      procedure Append
+        (Source_Storage :
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         First          : VSS.Implementation.Strings.Cursor;
+         After_Last     : VSS.Implementation.Strings.Cursor);
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append
+        (Source_Storage :
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         First          : VSS.Implementation.Strings.Cursor;
+         After_Last     : VSS.Implementation.Strings.Cursor)
+      is
+         Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+           After_Last.UTF8_Offset - First.UTF8_Offset;
+         Data : VSS.Implementation.Strings.String_Data;
+
+      begin
+         if Size <= In_Place_Storage_Capacity
+           and then
+             VSS.Implementation.String_Configuration.In_Place_Handler.all
+               in UTF8_In_Place_String_Handler
+         then
+            --  Inplace handler is known, use it for short strings.
+
+            Data :=
+              (In_Place => True,
+               Capacity => 0,
+               Storage  => <>);
+
+            declare
+               Destination : UTF8_In_Place_Data
+                 with Import,
+                      Convention => Ada,
+                      Address    => Data.Storage'Address;
+
+            begin
+               Destination.Storage (0 .. Size - 1) :=
+                 Source_Storage
+                   (First.UTF8_Offset .. After_Last.UTF8_Offset - 1);
+               Destination.Storage (Size) := 0;
+               Destination.Size := Interfaces.Unsigned_8 (Size);
+               Destination.Length :=
+                 Interfaces.Unsigned_8 (After_Last.Index - First.Index);
+            end;
+
+         else
+            Data :=
+              (In_Place => False,
+               Capacity => 0,
+               Handler  => Global_UTF8_String_Handler'Unrestricted_Access,
+               Pointer  => System.Null_Address);
+
+            declare
+               Destination : UTF8_String_Data_Access
+                 with Import,
+                      Convention => Ada,
+                      Address    => Data.Pointer'Address;
+
+            begin
+               Destination := Allocate (0, Size);
+
+               Destination.Storage (0 .. Size - 1) :=
+                 Source_Storage
+                   (First.UTF8_Offset .. After_Last.UTF8_Offset - 1);
+               Destination.Storage (Size) := 0;
+               Destination.Size := Size;
+               Destination.Length := After_Last.Index - First.Index;
+            end;
+         end if;
+
+         VSS.Implementation.String_Vectors.Append_And_Move_Ownership
+           (Lines, Data);
+      end Append;
+
+      At_First   : VSS.Implementation.Strings.Cursor;
+      After_Last : VSS.Implementation.Strings.Cursor;
+      Current    : VSS.Implementation.Strings.Cursor;
+      CR_Found   : Boolean := False;
+      Line_Found : Boolean := False;
+      Set_First  : Boolean := True;
+
+   begin
+      VSS.Implementation.String_Vectors.Unreference (Lines);
+
+      Handler.Before_First_Character (Data, Current);
+
+      while Handler.Forward (Data, Current) loop
+         declare
+            use type VSS.Unicode.Code_Point;
+
+            C : constant VSS.Unicode.Code_Point :=
+              Handler.Element (Data, Current);
+
+         begin
+            if CR_Found then
+               if C /= Line_Feed and Terminators (VSS.Strings.CR) then
+                  --  It is special case to handle single CR when both CR and
+                  --  CRLF are allowed.
+
+                  CR_Found  := False;
+                  Set_First := True;
+
+                  if Keep_Terminator then
+                     After_Last := Current;
+                  end if;
+
+                  Append (Storage, At_First, After_Last);
+               end if;
+            end if;
+
+            if Set_First then
+               Set_First := False;
+               At_First  := Current;
+            end if;
+
+            case C is
+               when Line_Feed =>
+                  if Terminators (VSS.Strings.CRLF) and CR_Found then
+                     if Keep_Terminator then
+                        --  Update After_Last position to point to current
+                        --  character to preserve it.
+
+                        After_Last := Current;
+                     end if;
+
+                     CR_Found   := False;
+                     Line_Found := True;
+
+                  elsif Terminators (VSS.Strings.LF) then
+                     After_Last := Current;
+                     Line_Found := True;
+                  end if;
+
+               when Line_Tabulation =>
+                  if Terminators (VSS.Strings.VT) then
+                     After_Last := Current;
+                     Line_Found := True;
+                  end if;
+
+               when Form_Feed =>
+                  if Terminators (VSS.Strings.FF) then
+                     After_Last := Current;
+                     Line_Found := True;
+                  end if;
+
+               when Carriage_Return =>
+                  if Terminators (VSS.Strings.CRLF) then
+                     After_Last := Current;
+                     CR_Found   := True;
+
+                  elsif Terminators (VSS.Strings.CR) then
+                     After_Last := Current;
+                     Line_Found := True;
+                  end if;
+
+               when Next_Line =>
+                  if Terminators (VSS.Strings.NEL) then
+                     After_Last := Current;
+                     Line_Found := True;
+                  end if;
+
+               when Line_Separator =>
+                  if Terminators (VSS.Strings.LS) then
+                     After_Last := Current;
+                     Line_Found := True;
+                  end if;
+
+               when Paragraph_Separator =>
+                  if Terminators (VSS.Strings.PS) then
+                     After_Last := Current;
+                     Line_Found := True;
+                  end if;
+
+               when others =>
+                  null;
+            end case;
+
+            if Line_Found then
+               Line_Found := False;
+               Set_First  := True;
+
+               if Keep_Terminator then
+                  declare
+                     Dummy : constant Boolean :=
+                       Handler.Forward (Data, After_Last);
+
+                  begin
+                     null;
+                  end;
+               end if;
+
+               Append (Storage, At_First, After_Last);
+            end if;
+         end;
+      end loop;
+
+      if not Set_First then
+         Append (Storage, At_First, Current);
+      end if;
+   end Split_Lines_Common;
 
    ---------------------
    -- To_UTF_8_String --

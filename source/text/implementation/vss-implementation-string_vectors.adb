@@ -27,6 +27,58 @@ with VSS.Implementation.String_Handlers;
 
 package body VSS.Implementation.String_Vectors is
 
+   procedure Mutate
+     (Self   : in out String_Vector_Data_Access;
+      Length : Natural);
+   --  Prepare object to be modified and reserve space for at least given
+   --  number of items.
+
+   -------------------------------
+   -- Append_And_Move_Ownership --
+   -------------------------------
+
+   procedure Append_And_Move_Ownership
+     (Self : in out String_Vector_Data_Access;
+      Item : VSS.Implementation.Strings.String_Data) is
+   begin
+      Mutate (Self, (if Self = null then 1 else Self.Last + 1));
+
+      Self.Last := Self.Last + 1;
+      Self.Data (Self.Last) := Item;
+   end Append_And_Move_Ownership;
+
+   ------------
+   -- Mutate --
+   ------------
+
+   procedure Mutate
+     (Self   : in out String_Vector_Data_Access;
+      Length : Natural)
+   is
+   begin
+      if Self = null then
+         Self := new String_Vector_Data (Length);
+
+      elsif System.Atomic_Counters.Is_One (Self.Counter)
+        or else Self.Bulk < Length
+      then
+         declare
+            Old : String_Vector_Data_Access := Self;
+
+         begin
+            Self := new String_Vector_Data (Length);
+            Self.Last := Old.Last;
+            Self.Data (1 .. Old.Last) := Old.Data (1 .. Old.Last);
+
+            for Data of Self.Data (1 .. Old.Last) loop
+               VSS.Implementation.Strings.Handler (Data).Reference (Data);
+            end loop;
+
+            Unreference (Old);
+         end;
+      end if;
+   end Mutate;
+
    ---------------
    -- Reference --
    ---------------

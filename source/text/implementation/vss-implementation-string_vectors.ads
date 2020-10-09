@@ -44,4 +44,10 @@ package VSS.Implementation.String_Vectors is
 
    procedure Unreference (Self : in out String_Vector_Data_Access);
 
+   procedure Append_And_Move_Ownership
+     (Self : in out String_Vector_Data_Access;
+      Item : VSS.Implementation.Strings.String_Data);
+   --  Appends given string to the end of the string vector with moving of the
+   --  ownership of the string to the string vector.
+
 end VSS.Implementation.String_Vectors;

@@ -45,7 +45,7 @@ package VSS.Implementation.Strings is
    ------------
 
    type Cursor is record
-      Index        : Character_Count       := 0;
+      Index        : Character_Count                   := 0;
       UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Index  :=
         VSS.Unicode.UTF8_Code_Unit_Index'Last;
       UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Index :=

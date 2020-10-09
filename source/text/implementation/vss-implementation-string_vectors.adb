@@ -50,7 +50,9 @@ package body VSS.Implementation.String_Vectors is
            VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
    begin
-      if System.Atomic_Counters.Decrement (Self.Counter) then
+      if Self /= null
+        and then System.Atomic_Counters.Decrement (Self.Counter)
+      then
          for J in 1 .. Self.Last loop
             declare
                Handler : constant access

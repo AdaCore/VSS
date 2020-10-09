@@ -24,6 +24,7 @@
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Strings.Iterators.Characters.Internals;
+with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
 package body VSS.Strings is
@@ -407,6 +408,32 @@ package body VSS.Strings is
    begin
       raise Program_Error with "Not implemented";
    end Read;
+
+   -----------------
+   -- Split_Lines --
+   -----------------
+
+   function Split_Lines
+     (Self            : Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.String_Vectors.Virtual_String_Vector
+   is
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          Self.Handler;
+
+   begin
+      return Result : VSS.String_Vectors.Virtual_String_Vector do
+         if Handler /= null then
+            Handler.Split_Lines
+              (Self.Data,
+               Terminators,
+               Keep_Terminator,
+               VSS.String_Vectors.Internals.Data_Access (Result).all);
+         end if;
+      end return;
+   end Split_Lines;
 
    ------------
    -- Starts --

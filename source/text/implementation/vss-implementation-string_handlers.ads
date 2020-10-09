@@ -28,6 +28,8 @@ with Ada.Strings.UTF_Encoding;
 
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.Strings;
+with VSS.Implementation.String_Vectors;
+limited with VSS.Strings;
 with VSS.Unicode;
 
 package VSS.Implementation.String_Handlers is
@@ -159,5 +161,17 @@ package VSS.Implementation.String_Handlers is
       Code : VSS.Unicode.Code_Point) is abstract
      with Pre'Class => Code not in 16#D800# .. 16#DFFF#;
    --  Append single code point to the data.
+
+   not overriding procedure Split_Lines
+     (Self            : Abstract_String_Handler;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
+      is abstract;
+   --  Splits string into lines using given set of allowed new line
+   --  terminators. Line terminator (character or combination of characters)
+   --  are removed unless Keep_Terminator is set to True.
 
 end VSS.Implementation.String_Handlers;

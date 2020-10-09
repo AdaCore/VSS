@@ -28,6 +28,7 @@ private with Ada.Streams;
 with VSS.Characters;
 private with VSS.Implementation.String_Handlers;
 private with VSS.Implementation.Strings;
+limited with VSS.String_Vectors;
 limited with VSS.Strings.Iterators.Characters;
 limited with VSS.Strings.Texts;
 
@@ -113,6 +114,20 @@ package VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character);
    --  Append given abstract character to the end of the string.
+
+   type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
+
+   type Line_Terminator_Set is array (Line_Terminator) of Boolean
+     with Pack, Default_Component_Value => False;
+
+   New_Line_Function : constant Line_Terminator_Set :=
+     (CR | LF | CRLF | NEL => True, others => False);
+
+   function Split_Lines
+     (Self            : Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.String_Vectors.Virtual_String_Vector;
 
 private
 

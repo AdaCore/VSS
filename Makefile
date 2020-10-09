@@ -19,6 +19,7 @@ check_text:
 	.objs/tests/test_string_conversions
 	.objs/tests/test_string_hash
 	.objs/tests/test_string_buffer
+	.objs/tests/test_string_split_lines
 
 check_json:
 	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected

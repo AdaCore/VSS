@@ -21,68 +21,28 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Internals;
+package body VSS.Strings.Internals is
 
-package body VSS.String_Vectors is
+   -----------------------
+   -- To_Virtual_String --
+   -----------------------
 
-   ------------
-   -- Adjust --
-   ------------
-
-   overriding procedure Adjust (Self : in out Virtual_String_Vector) is
-   begin
-      VSS.Implementation.String_Vectors.Reference (Self.Data);
-   end Adjust;
-
-   -------------
-   -- Element --
-   -------------
-
-   function Element
-     (Self  : Virtual_String_Vector'Class;
-      Index : Positive) return VSS.Strings.Virtual_String
+   function To_Virtual_String
+     (Item : in out VSS.Implementation.Strings.String_Data)
+      return VSS.Strings.Virtual_String
    is
-      use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          VSS.Implementation.Strings.Handler (Item);
 
    begin
-      if Self.Data /= null and then Index <= Self.Data.Last then
-         return
-           VSS.Strings.Internals.To_Virtual_String (Self.Data.Data (Index));
+      return Result : VSS.Strings.Virtual_String do
+         Result.Data := Item;
 
-      else
-         return VSS.Strings.Empty_Virtual_String;
-      end if;
-   end Element;
+         if Handler /= null then
+            Handler.Reference (Result.Data);
+         end if;
+      end return;
+   end To_Virtual_String;
 
-   --------------
-   -- Finalize --
-   --------------
-
-   overriding procedure Finalize (Self : in out Virtual_String_Vector) is
-   begin
-      VSS.Implementation.String_Vectors.Unreference (Self.Data);
-   end Finalize;
-
-   ----------
-   -- Read --
-   ----------
-
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Virtual_String_Vector) is
-   begin
-      raise Program_Error;
-   end Read;
-
-   -----------
-   -- Write --
-   -----------
-
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Virtual_String_Vector) is
-   begin
-      raise Program_Error;
-   end Write;
-
-end VSS.String_Vectors;
+end VSS.Strings.Internals;

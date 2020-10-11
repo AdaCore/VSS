@@ -27,6 +27,11 @@ with VSS.Implementation.String_Handlers;
 
 package body VSS.Implementation.String_Vectors is
 
+   procedure Free is
+     new Ada.Unchecked_Deallocation
+       (VSS.Implementation.String_Vectors.String_Vector_Data,
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+
    procedure Mutate
      (Self   : in out String_Vector_Data_Access;
       Length : Natural);
@@ -59,7 +64,7 @@ package body VSS.Implementation.String_Vectors is
       if Self = null then
          Self := new String_Vector_Data (Length);
 
-      elsif System.Atomic_Counters.Is_One (Self.Counter)
+      elsif not System.Atomic_Counters.Is_One (Self.Counter)
         or else Self.Bulk < Length
       then
          declare
@@ -70,11 +75,26 @@ package body VSS.Implementation.String_Vectors is
             Self.Last := Old.Last;
             Self.Data (1 .. Old.Last) := Old.Data (1 .. Old.Last);
 
-            for Data of Self.Data (1 .. Old.Last) loop
-               VSS.Implementation.Strings.Handler (Data).Reference (Data);
-            end loop;
+            if not System.Atomic_Counters.Is_One (Self.Counter) then
+               for Data of Self.Data (1 .. Old.Last) loop
+                  declare
+                     Handler : constant access
+                       VSS.Implementation.String_Handlers
+                         .Abstract_String_Handler'Class
+                           := VSS.Implementation.Strings.Handler (Data);
 
-            Unreference (Old);
+                  begin
+                     if Handler /= null then
+                        Handler.Reference (Data);
+                     end if;
+                  end;
+               end loop;
+
+               Unreference (Old);
+
+            else
+               Free (Old);
+            end if;
          end;
       end if;
    end Mutate;
@@ -95,12 +115,6 @@ package body VSS.Implementation.String_Vectors is
    -----------------
 
    procedure Unreference (Self : in out String_Vector_Data_Access) is
-
-      procedure Free is
-        new Ada.Unchecked_Deallocation
-          (VSS.Implementation.String_Vectors.String_Vector_Data,
-           VSS.Implementation.String_Vectors.String_Vector_Data_Access);
-
    begin
       if Self /= null
         and then System.Atomic_Counters.Decrement (Self.Counter)

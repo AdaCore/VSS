@@ -35,6 +35,9 @@ package VSS.String_Vectors is
 
    type Virtual_String_Vector is tagged private;
 
+   function Length (Self : Virtual_String_Vector'Class) return Natural;
+   --  Number of elements in the vector.
+
    function Element
      (Self  : Virtual_String_Vector'Class;
       Index : Positive) return VSS.Strings.Virtual_String;

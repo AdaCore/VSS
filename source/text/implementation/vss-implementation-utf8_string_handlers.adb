@@ -981,7 +981,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Data : VSS.Implementation.Strings.String_Data;
 
       begin
-         if Size <= In_Place_Storage_Capacity
+         if Size = 0 then
+            Data :=
+              (In_Place => False,
+               Capacity => 0,
+               Handler  => null,
+               Pointer  => System.Null_Address);
+
+         elsif Size <= In_Place_Storage_Capacity
            and then
              VSS.Implementation.String_Configuration.In_Place_Handler.all
                in UTF8_In_Place_String_Handler

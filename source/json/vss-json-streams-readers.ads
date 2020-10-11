@@ -70,7 +70,7 @@ package VSS.JSON.Streams.Readers is
 
    procedure Raise_Error
      (Self    : in out JSON_Stream_Reader;
-      Message : VSS.Strings.Virtual_String := VSS.Strings.Empty_Magic_String)
+      Message : VSS.Strings.Virtual_String := VSS.Strings.Empty_Virtual_String)
    is abstract;
 
    function Event_Kind

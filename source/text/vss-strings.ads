@@ -47,7 +47,7 @@ package VSS.Strings is
    type Virtual_String is tagged private;
    pragma Preelaborable_Initialization (Virtual_String);
 
-   Empty_Magic_String : constant Virtual_String;
+   Empty_Virtual_String : constant Virtual_String;
 
    function Is_Empty (Self : Virtual_String'Class) return Boolean;
    --  Return True when string is empty string: it is ether null or has zero
@@ -168,7 +168,7 @@ private
    overriding procedure Adjust (Self : in out Virtual_String);
    overriding procedure Finalize (Self : in out Virtual_String);
 
-   Empty_Magic_String : constant Virtual_String :=
+   Empty_Virtual_String : constant Virtual_String :=
      (Ada.Finalization.Controlled with
         Data => <>, Head => null, Tail => null);
 

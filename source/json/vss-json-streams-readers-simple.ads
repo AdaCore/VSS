@@ -64,8 +64,7 @@ private
 
    overriding procedure Raise_Error
      (Self    : in out JSON_Simple_Reader;
-      Message : VSS.Strings.Virtual_String :=
-        VSS.Strings.Empty_Magic_String);
+      Message : VSS.Strings.Virtual_String);
 
    overriding function Read_Next
      (Self : in out JSON_Simple_Reader)

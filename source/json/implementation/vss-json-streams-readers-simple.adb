@@ -109,8 +109,7 @@ package body VSS.JSON.Streams.Readers.Simple is
 
    overriding procedure Raise_Error
      (Self    : in out JSON_Simple_Reader;
-      Message : VSS.Strings.Virtual_String :=
-        VSS.Strings.Empty_Magic_String) is
+      Message : VSS.Strings.Virtual_String) is
    begin
       raise Program_Error;
    end Raise_Error;

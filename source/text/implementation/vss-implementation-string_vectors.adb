@@ -61,7 +61,9 @@ package body VSS.Implementation.String_Vectors is
                      := VSS.Implementation.Strings.Handler (Self.Data (J));
 
             begin
-               Handler.Unreference (Self.Data (J));
+               if Handler /= null then
+                  Handler.Unreference (Self.Data (J));
+               end if;
             end;
          end loop;
 

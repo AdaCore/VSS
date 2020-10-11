@@ -1160,7 +1160,11 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end;
       end loop;
 
-      if not Set_First then
+      if CR_Found then
+         VSS.Implementation.String_Vectors.Append_And_Move_Ownership
+           (Lines, (others => <>));
+
+      elsif not Set_First then
          Append (Storage, At_First, Current);
       end if;
    end Split_Lines_Common;

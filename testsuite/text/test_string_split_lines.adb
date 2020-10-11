@@ -55,6 +55,11 @@ procedure Test_String_Split_Lines is
         & "e" & CR & LF
         & "f" & NEL);
 
+   CRLFCR : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.To_Virtual_String
+       ("a" & CR & LF & CR
+        & "b" & CR & LF & CR);
+
 begin
    --  Check split lines with default set of line terminators and with strip
    --  out of line terminator sequences.
@@ -286,6 +291,36 @@ begin
       end if;
 
       if Result.Element (4) /= VSS.Strings.To_Virtual_String ("f") then
+         raise Program_Error;
+      end if;
+   end;
+
+   --  Check CRLF + CR when both line terminators are enabled
+
+   declare
+      use type VSS.Strings.Virtual_String;
+
+      Result : constant VSS.String_Vectors.Virtual_String_Vector :=
+        CRLFCR.Split_Lines;
+
+   begin
+      --  if Result.Length /= 2 then
+      --     raise Program_Error;
+      --  end if;
+
+      if Result.Element (1) /= VSS.Strings.To_Virtual_String ("a") then
+         raise Program_Error;
+      end if;
+
+      if not Result.Element (2).Is_Empty then
+         raise Program_Error;
+      end if;
+
+      if Result.Element (3) /= VSS.Strings.To_Virtual_String ("b") then
+         raise Program_Error;
+      end if;
+
+      if not Result.Element (4).Is_Empty then
          raise Program_Error;
       end if;
    end;

@@ -20,69 +20,17 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  This package is for internal use only.
 
-with VSS.Strings.Internals;
+with VSS.Implementation.Strings;
 
-package body VSS.String_Vectors is
+package VSS.Strings.Internals is
 
-   ------------
-   -- Adjust --
-   ------------
+   pragma Preelaborate;
 
-   overriding procedure Adjust (Self : in out Virtual_String_Vector) is
-   begin
-      VSS.Implementation.String_Vectors.Reference (Self.Data);
-   end Adjust;
+   function To_Virtual_String
+     (Item : in out VSS.Implementation.Strings.String_Data)
+      return VSS.Strings.Virtual_String;
+   --  Convert string data into virtual string. Data is references.
 
-   -------------
-   -- Element --
-   -------------
-
-   function Element
-     (Self  : Virtual_String_Vector'Class;
-      Index : Positive) return VSS.Strings.Virtual_String
-   is
-      use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
-
-   begin
-      if Self.Data /= null and then Index <= Self.Data.Last then
-         return
-           VSS.Strings.Internals.To_Virtual_String (Self.Data.Data (Index));
-
-      else
-         return VSS.Strings.Empty_Virtual_String;
-      end if;
-   end Element;
-
-   --------------
-   -- Finalize --
-   --------------
-
-   overriding procedure Finalize (Self : in out Virtual_String_Vector) is
-   begin
-      VSS.Implementation.String_Vectors.Unreference (Self.Data);
-   end Finalize;
-
-   ----------
-   -- Read --
-   ----------
-
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Virtual_String_Vector) is
-   begin
-      raise Program_Error;
-   end Read;
-
-   -----------
-   -- Write --
-   -----------
-
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Virtual_String_Vector) is
-   begin
-      raise Program_Error;
-   end Write;
-
-end VSS.String_Vectors;
+end VSS.Strings.Internals;

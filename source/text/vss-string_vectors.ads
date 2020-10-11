@@ -26,6 +26,7 @@ private with Ada.Finalization;
 private with Ada.Streams;
 
 private with VSS.Implementation.String_Vectors;
+with VSS.Strings;
 
 package VSS.String_Vectors is
 
@@ -33,6 +34,11 @@ package VSS.String_Vectors is
    pragma Remote_Types;
 
    type Virtual_String_Vector is tagged private;
+
+   function Element
+     (Self  : Virtual_String_Vector'Class;
+      Index : Positive) return VSS.Strings.Virtual_String;
+   --  Return given element. Return "null" string when index is out of bound.
 
 private
 

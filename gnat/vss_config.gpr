@@ -28,6 +28,7 @@ abstract project VSS_Config is
    Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
 
    Ada_Switches := ();
+   Ada_Coverage_Switches := ();
    Linker_Options := ();
 
    case Build_Mode is
@@ -62,7 +63,9 @@ abstract project VSS_Config is
          Ada_Switches := (
             --  Compile with no optimization and with debug information to ease
             --  investigation in debuggers.
-            "-O0", "-g",
+            "-O0", "-g");
+
+         Ada_Coverage_Switches := (
             --  Enable coverage code instrumentation.
             "--coverage");
 
@@ -74,7 +77,7 @@ abstract project VSS_Config is
    --  possible and never hardcode any switches to simplify future support.
 
    package Compiler is
-      for Switches ("Ada") use Ada_Switches;
+      for Switches ("Ada") use Ada_Switches & Ada_Coverage_Switches;
    end Compiler;
 
    package Linker is

@@ -25,6 +25,8 @@ with VSS.Strings.Internals;
 
 package body VSS.String_Vectors is
 
+   use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
+
    ------------
    -- Adjust --
    ------------
@@ -40,10 +42,7 @@ package body VSS.String_Vectors is
 
    function Element
      (Self  : Virtual_String_Vector'Class;
-      Index : Positive) return VSS.Strings.Virtual_String
-   is
-      use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
-
+      Index : Positive) return VSS.Strings.Virtual_String is
    begin
       if Self.Data /= null and then Index <= Self.Data.Last then
          return
@@ -62,6 +61,15 @@ package body VSS.String_Vectors is
    begin
       VSS.Implementation.String_Vectors.Unreference (Self.Data);
    end Finalize;
+
+   ------------
+   -- Length --
+   ------------
+
+   function Length (Self : Virtual_String_Vector'Class) return Natural is
+   begin
+      return (if Self.Data = null then 0 else Self.Data.Last);
+   end Length;
 
    ----------
    -- Read --

@@ -70,43 +70,43 @@ begin
          raise Program_Error;
       end if;
 
-      if Result.Element (1) /= VSS.Strings.To_Virtual_String ("a") then
+      if Result (1) /= VSS.Strings.To_Virtual_String ("a") then
          raise Program_Error;
       end if;
 
-      if Result.Element (2) /= VSS.Strings.Empty_Virtual_String then
+      if Result (2) /= VSS.Strings.Empty_Virtual_String then
          raise Program_Error;
       end if;
 
-      if Result.Element (3)
+      if Result (3)
         /= VSS.Strings.To_Virtual_String ("b" & VT & VT & "c" & FF & FF & "d")
       then
          raise Program_Error;
       end if;
 
-      if Result.Element (4) /= VSS.Strings.Empty_Virtual_String then
+      if Result (4) /= VSS.Strings.Empty_Virtual_String then
          raise Program_Error;
       end if;
 
-      if Result.Element (5)
+      if Result (5)
         /= VSS.Strings.To_Virtual_String ("e it is intentionaly long line")
       then
          raise Program_Error;
       end if;
 
-      if Result.Element (6) /= VSS.Strings.Empty_Virtual_String then
+      if Result (6) /= VSS.Strings.Empty_Virtual_String then
          raise Program_Error;
       end if;
 
-      if Result.Element (7) /= VSS.Strings.To_Virtual_String ("f") then
+      if Result (7) /= VSS.Strings.To_Virtual_String ("f") then
          raise Program_Error;
       end if;
 
-      if Result.Element (8) /= VSS.Strings.Empty_Virtual_String then
+      if Result (8) /= VSS.Strings.Empty_Virtual_String then
          raise Program_Error;
       end if;
 
-      if Result.Element (9)
+      if Result (9)
         /= VSS.Strings.To_Virtual_String ("g" & LS & LS & "h" & PS & PS & "z")
       then
          raise Program_Error;
@@ -127,47 +127,47 @@ begin
          raise Program_Error;
       end if;
 
-      if Result.Element (1) /= VSS.Strings.To_Virtual_String ("a" & LF) then
+      if Result (1) /= VSS.Strings.To_Virtual_String ("a" & LF) then
          raise Program_Error;
       end if;
 
-      if Result.Element (2) /= VSS.Strings.To_Virtual_String ((1 => LF)) then
+      if Result (2) /= VSS.Strings.To_Virtual_String ((1 => LF)) then
          raise Program_Error;
       end if;
 
-      if Result.Element (3)
+      if Result (3)
         /= VSS.Strings.To_Virtual_String
              ("b" & VT & VT & "c" & FF & FF & "d" & CR)
       then
          raise Program_Error;
       end if;
 
-      if Result.Element (4) /= VSS.Strings.To_Virtual_String ((1 => CR)) then
+      if Result (4) /= VSS.Strings.To_Virtual_String ((1 => CR)) then
          raise Program_Error;
       end if;
 
-      if Result.Element (5) /=
+      if Result (5) /=
         VSS.Strings.To_Virtual_String
           ("e it is intentionaly long line" & CR & LF)
       then
          raise Program_Error;
       end if;
 
-      if Result.Element (6) /= VSS.Strings.To_Virtual_String (CR & LF) then
+      if Result (6) /= VSS.Strings.To_Virtual_String (CR & LF) then
          raise Program_Error;
       end if;
 
-      if Result.Element (7)
+      if Result (7)
         /= VSS.Strings.To_Virtual_String ("f" & NEL)
       then
          raise Program_Error;
       end if;
 
-      if Result.Element (8) /= VSS.Strings.To_Virtual_String ((1 => NEL)) then
+      if Result (8) /= VSS.Strings.To_Virtual_String ((1 => NEL)) then
          raise Program_Error;
       end if;
 
-      if Result.Element (9)
+      if Result (9)
         /= VSS.Strings.To_Virtual_String ("g" & LS & LS & "h" & PS & PS & "z")
       then
          raise Program_Error;
@@ -188,73 +188,73 @@ begin
          raise Program_Error;
       end if;
 
-      if Result.Element (1) /= VSS.Strings.To_Virtual_String ("a") then
+      if Result (1) /= VSS.Strings.To_Virtual_String ("a") then
          raise Program_Error;
       end if;
 
-      if not Result.Element (2).Is_Empty then
+      if not Result (2).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (3) /= VSS.Strings.To_Virtual_String ("b") then
+      if Result (3) /= VSS.Strings.To_Virtual_String ("b") then
          raise Program_Error;
       end if;
 
-      if not Result.Element (4).Is_Empty then
+      if not Result (4).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (5) /= VSS.Strings.To_Virtual_String ("c") then
+      if Result (5) /= VSS.Strings.To_Virtual_String ("c") then
          raise Program_Error;
       end if;
 
-      if not Result.Element (6).Is_Empty then
+      if not Result (6).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (7) /= VSS.Strings.To_Virtual_String ("d") then
+      if Result (7) /= VSS.Strings.To_Virtual_String ("d") then
          raise Program_Error;
       end if;
 
-      if not Result.Element (8).Is_Empty then
+      if not Result (8).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (9) /=
+      if Result (9) /=
         VSS.Strings.To_Virtual_String ("e it is intentionaly long line")
       then
          raise Program_Error;
       end if;
 
-      if not Result.Element (10).Is_Empty then
+      if not Result (10).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (11) /= VSS.Strings.To_Virtual_String ("f") then
+      if Result (11) /= VSS.Strings.To_Virtual_String ("f") then
          raise Program_Error;
       end if;
 
-      if not Result.Element (12).Is_Empty then
+      if not Result (12).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (13) /= VSS.Strings.To_Virtual_String ("g") then
+      if Result (13) /= VSS.Strings.To_Virtual_String ("g") then
          raise Program_Error;
       end if;
 
-      if not Result.Element (14).Is_Empty then
+      if not Result (14).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (15) /= VSS.Strings.To_Virtual_String ("h") then
+      if Result (15) /= VSS.Strings.To_Virtual_String ("h") then
          raise Program_Error;
       end if;
 
-      if not Result.Element (16).Is_Empty then
+      if not Result (16).Is_Empty then
          raise Program_Error;
       end if;
 
-      if Result.Element (17) /= VSS.Strings.To_Virtual_String ("z") then
+      if Result (17) /= VSS.Strings.To_Virtual_String ("z") then
          raise Program_Error;
       end if;
    end;
@@ -273,19 +273,19 @@ begin
          raise Program_Error;
       end if;
 
-      if Result.Element (1) /= VSS.Strings.To_Virtual_String ("a") then
+      if Result (1) /= VSS.Strings.To_Virtual_String ("a") then
          raise Program_Error;
       end if;
 
-      if Result.Element (2) /= VSS.Strings.To_Virtual_String ("d") then
+      if Result (2) /= VSS.Strings.To_Virtual_String ("d") then
          raise Program_Error;
       end if;
 
-      if Result.Element (3) /= VSS.Strings.To_Virtual_String ("e") then
+      if Result (3) /= VSS.Strings.To_Virtual_String ("e") then
          raise Program_Error;
       end if;
 
-      if Result.Element (4) /= VSS.Strings.To_Virtual_String ("f") then
+      if Result (4) /= VSS.Strings.To_Virtual_String ("f") then
          raise Program_Error;
       end if;
    end;

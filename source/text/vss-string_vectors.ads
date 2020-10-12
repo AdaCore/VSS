@@ -33,7 +33,9 @@ package VSS.String_Vectors is
    pragma Preelaborate;
    pragma Remote_Types;
 
-   type Virtual_String_Vector is tagged private;
+   type Virtual_String_Vector is tagged private
+     with
+       Constant_Indexing => Element;
 
    function Length (Self : Virtual_String_Vector'Class) return Natural;
    --  Number of elements in the vector.

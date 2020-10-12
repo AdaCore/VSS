@@ -65,6 +65,15 @@ package body VSS.String_Vectors is
       end if;
    end Element;
 
+   -----------
+   -- First --
+   -----------
+
+   overriding function First (Self : Reversible_Iterator) return Natural is
+   begin
+      return (if Self.Last > 0 then 1 else 0);
+   end First;
+
    --------------
    -- Finalize --
    --------------
@@ -74,6 +83,25 @@ package body VSS.String_Vectors is
       VSS.Implementation.String_Vectors.Unreference (Self.Data);
    end Finalize;
 
+   -------------
+   -- Iterate --
+   -------------
+
+   function Iterate
+     (Self : Virtual_String_Vector'Class) return Reversible_Iterator is
+   begin
+      return (Last => Self.Length);
+   end Iterate;
+
+   ----------
+   -- Last --
+   ----------
+
+   overriding function Last (Self : Reversible_Iterator) return Natural is
+   begin
+      return Self.Last;
+   end Last;
+
    ------------
    -- Length --
    ------------
@@ -82,6 +110,28 @@ package body VSS.String_Vectors is
    begin
       return (if Self.Data = null then 0 else Self.Data.Last);
    end Length;
+
+   ----------
+   -- Next --
+   ----------
+
+   overriding function Next
+     (Self     : Reversible_Iterator;
+      Position : Natural) return Natural is
+   begin
+      return (if Position < Self.Last then Position + 1 else 0);
+   end Next;
+
+   --------------
+   -- Previous --
+   --------------
+
+   overriding function Previous
+     (Self     : Reversible_Iterator;
+      Position : Natural) return Natural is
+   begin
+      return (if Position > 0 then Position - 1 else 0);
+   end Previous;
 
    ----------
    -- Read --

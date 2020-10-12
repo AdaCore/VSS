@@ -21,6 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Strings.Iterators.Characters;
 with VSS.String_Vectors;
 with VSS.Strings;
 
@@ -38,6 +39,7 @@ procedure Test_String_Vector is
    V1 : VSS.String_Vectors.Virtual_String_Vector;
    V2 : VSS.String_Vectors.Virtual_String_Vector;
 
+   Revert : VSS.Strings.Virtual_String;
 begin
    --  Construct vector and check its content
 
@@ -102,6 +104,18 @@ begin
    end if;
 
    if V1 (3) /= S2 then
+      raise Program_Error;
+   end if;
+
+   for Item of V2 loop
+      Revert.Append (Item.First_Character.Element);
+   end loop;
+
+   for Item of reverse V2 loop
+      Revert.Append (Item.First_Character.Element);
+   end loop;
+
+   if Revert /= VSS.Strings.To_Virtual_String ("abccba") then
       raise Program_Error;
    end if;
 

@@ -94,4 +94,13 @@ package VSS.Implementation.Strings is
    --  Return string handler for given string data. Null handler is returned
    --  for null string.
 
+   procedure Reference (Data : in out String_Data) with Inline;
+   --  Reference given string data. It is wrapper around Handler and call of
+   --  its Reference subprogram when handler is not null.
+
+   procedure Unreference (Data : in out String_Data) with Inline;
+   --  Unreference given string data. It is wrapper around Handler and call of
+   --  its Unrteference subprogram when handler is not null. Data is set to
+   --  "null" value before exit for safety.
+
 end VSS.Implementation.Strings;

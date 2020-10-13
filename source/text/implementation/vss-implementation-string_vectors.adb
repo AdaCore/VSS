@@ -38,6 +38,31 @@ package body VSS.Implementation.String_Vectors is
    --  Prepare object to be modified and reserve space for at least given
    --  number of items.
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (Self : in out String_Vector_Data_Access;
+      Item : VSS.Implementation.Strings.String_Data) is
+   begin
+      Mutate (Self, (if Self = null then 1 else Self.Last + 1));
+
+      Self.Last := Self.Last + 1;
+      Self.Data (Self.Last) := Item;
+
+      declare
+         Handler : constant access
+           VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+             := VSS.Implementation.Strings.Handler (Self.Data (Self.Last));
+
+      begin
+         if Handler /= null then
+            Handler.Unreference (Self.Data (Self.Last));
+         end if;
+      end;
+   end Append;
+
    -------------------------------
    -- Append_And_Move_Ownership --
    -------------------------------
@@ -75,8 +100,8 @@ package body VSS.Implementation.String_Vectors is
             Self.Last := Old.Last;
             Self.Data (1 .. Old.Last) := Old.Data (1 .. Old.Last);
 
-            if not System.Atomic_Counters.Is_One (Self.Counter) then
-               for Data of Self.Data (1 .. Old.Last) loop
+            if not System.Atomic_Counters.Is_One (Old.Counter) then
+               for Data of Self.Data (1 .. Self.Last) loop
                   declare
                      Handler : constant access
                        VSS.Implementation.String_Handlers

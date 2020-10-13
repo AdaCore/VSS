@@ -51,16 +51,7 @@ package body VSS.Implementation.String_Vectors is
       Self.Last := Self.Last + 1;
       Self.Data (Self.Last) := Item;
 
-      declare
-         Handler : constant access
-           VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-             := VSS.Implementation.Strings.Handler (Self.Data (Self.Last));
-
-      begin
-         if Handler /= null then
-            Handler.Reference (Self.Data (Self.Last));
-         end if;
-      end;
+      VSS.Implementation.Strings.Reference (Self.Data (Self.Last));
    end Append;
 
    -------------------------------
@@ -102,17 +93,7 @@ package body VSS.Implementation.String_Vectors is
 
             if not System.Atomic_Counters.Is_One (Old.Counter) then
                for Data of Self.Data (1 .. Self.Last) loop
-                  declare
-                     Handler : constant access
-                       VSS.Implementation.String_Handlers
-                         .Abstract_String_Handler'Class
-                           := VSS.Implementation.Strings.Handler (Data);
-
-                  begin
-                     if Handler /= null then
-                        Handler.Reference (Data);
-                     end if;
-                  end;
+                  VSS.Implementation.Strings.Reference (Data);
                end loop;
 
                Unreference (Old);
@@ -145,17 +126,7 @@ package body VSS.Implementation.String_Vectors is
         and then System.Atomic_Counters.Decrement (Self.Counter)
       then
          for J in 1 .. Self.Last loop
-            declare
-               Handler : constant access
-                 VSS.Implementation.String_Handlers
-                   .Abstract_String_Handler'Class
-                     := VSS.Implementation.Strings.Handler (Self.Data (J));
-
-            begin
-               if Handler /= null then
-                  Handler.Unreference (Self.Data (J));
-               end if;
-            end;
+            VSS.Implementation.Strings.Unreference (Self.Data (J));
          end loop;
 
          Free (Self);

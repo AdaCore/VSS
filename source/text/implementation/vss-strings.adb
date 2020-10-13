@@ -177,14 +177,8 @@ package body VSS.Strings is
    ------------
 
    overriding procedure Adjust (Self : in out Virtual_String) is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
-
    begin
-      if Handler /= null then
-         Handler.Reference (Self.Data);
-      end if;
+      VSS.Implementation.Strings.Reference (Self.Data);
    end Adjust;
 
    ------------
@@ -234,16 +228,8 @@ package body VSS.Strings is
    -----------
 
    procedure Clear (Self : in out Virtual_String'Class) is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
-
    begin
-      if Handler /= null then
-         Handler.Unreference (Self.Data);
-
-         Self.Data := (others => <>);
-      end if;
+      VSS.Implementation.Strings.Unreference (Self.Data);
    end Clear;
 
    -------------
@@ -302,10 +288,6 @@ package body VSS.Strings is
    --------------
 
    overriding procedure Finalize (Self : in out Virtual_String) is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
-
    begin
       --  Invalidate and disconnect all referals
 
@@ -316,9 +298,7 @@ package body VSS.Strings is
 
       --  Unreference shared data
 
-      if Handler /= null then
-         Handler.Unreference (Self.Data);
-      end if;
+      VSS.Implementation.Strings.Unreference (Self.Data);
    end Finalize;
 
    --------------

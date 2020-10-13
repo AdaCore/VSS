@@ -40,19 +40,12 @@ package body VSS.Strings.Internals is
 
    function To_Virtual_String
      (Item : in out VSS.Implementation.Strings.String_Data)
-      return VSS.Strings.Virtual_String
-   is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          VSS.Implementation.Strings.Handler (Item);
-
+      return VSS.Strings.Virtual_String is
    begin
       return Result : VSS.Strings.Virtual_String do
          Result.Data := Item;
 
-         if Handler /= null then
-            Handler.Reference (Result.Data);
-         end if;
+         VSS.Implementation.Strings.Reference (Result.Data);
       end return;
    end To_Virtual_String;
 

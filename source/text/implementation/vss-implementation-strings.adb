@@ -42,4 +42,36 @@ package body VSS.Implementation.Strings is
       end if;
    end Handler;
 
+   ---------------
+   -- Reference --
+   ---------------
+
+   procedure Reference (Data : in out String_Data) is
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          VSS.Implementation.Strings.Handler (Data);
+
+   begin
+      if Handler /= null then
+         Handler.Reference (Data);
+      end if;
+   end Reference;
+
+   -----------------
+   -- Unreference --
+   -----------------
+
+   procedure Unreference (Data : in out String_Data) is
+      Handler : constant access
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+          VSS.Implementation.Strings.Handler (Data);
+
+   begin
+      if Handler /= null then
+         Handler.Unreference (Data);
+      end if;
+
+      Data := (others => <>);
+   end Unreference;
+
 end VSS.Implementation.Strings;

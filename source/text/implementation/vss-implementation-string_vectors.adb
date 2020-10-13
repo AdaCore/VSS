@@ -58,7 +58,7 @@ package body VSS.Implementation.String_Vectors is
 
       begin
          if Handler /= null then
-            Handler.Unreference (Self.Data (Self.Last));
+            Handler.Reference (Self.Data (Self.Last));
          end if;
       end;
    end Append;

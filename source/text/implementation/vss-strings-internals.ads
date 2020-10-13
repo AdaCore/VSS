@@ -33,4 +33,9 @@ package VSS.Strings.Internals is
       return VSS.Strings.Virtual_String;
    --  Convert string data into virtual string. Data is references.
 
+   function Data_Access_Constant
+     (Self : VSS.Strings.Virtual_String'Class)
+      return not null access constant VSS.Implementation.Strings.String_Data;
+   --  Return access to string data member of the Virtual_String.
+
 end VSS.Strings.Internals;

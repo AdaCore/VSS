@@ -20,31 +20,89 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "vss_config";
-with "vss_text";
+with VSS.String_Vectors;
+with VSS.Strings;
 
-project VSS_Text_Tests is
+procedure Test_String_Vector is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite/text");
-   for Main use ("test_character_iterators.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_buffer",
-                 "test_string_split_lines",
-                 "test_string_vector");
+   use type VSS.Strings.Virtual_String;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   S1 : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.To_Virtual_String ("a");
+   S2 : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.To_Virtual_String ("b");
+   S3 : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.To_Virtual_String ("c");
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   V1 : VSS.String_Vectors.Virtual_String_Vector;
+   V2 : VSS.String_Vectors.Virtual_String_Vector;
 
-end VSS_Text_Tests;
+begin
+   --  Construct vector and check its content
+
+   V1.Append (S1);
+   V1.Append (VSS.Strings.Empty_Virtual_String);
+   V1.Append (S2);
+
+   if V1.Length /= 3 then
+      raise Program_Error;
+   end if;
+
+   if V1 (1) /= S1 then
+      raise Program_Error;
+   end if;
+
+   if not V1 (2).Is_Empty then
+      raise Program_Error;
+   end if;
+
+   if V1 (3) /= S2 then
+      raise Program_Error;
+   end if;
+
+   --  Copy vector and append more data
+
+   V2 := V1;
+
+   V2.Append (S3);
+
+   if V2.Length /= 4 then
+      raise Program_Error;
+   end if;
+
+   if V2 (1) /= S1 then
+      raise Program_Error;
+   end if;
+
+   if not V2 (2).Is_Empty then
+      raise Program_Error;
+   end if;
+
+   if V2 (3) /= S2 then
+      raise Program_Error;
+   end if;
+
+   if V2 (4) /= S3 then
+      raise Program_Error;
+   end if;
+
+   --  Check that first vector was not modified.
+
+   if V1.Length /= 3 then
+      raise Program_Error;
+   end if;
+
+   if V1 (1) /= S1 then
+      raise Program_Error;
+   end if;
+
+   if not V1 (2).Is_Empty then
+      raise Program_Error;
+   end if;
+
+   if V1 (3) /= S2 then
+      raise Program_Error;
+   end if;
+
+end Test_String_Vector;

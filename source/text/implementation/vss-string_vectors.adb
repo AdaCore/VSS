@@ -36,6 +36,18 @@ package body VSS.String_Vectors is
       VSS.Implementation.String_Vectors.Reference (Self.Data);
    end Adjust;
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (Self : in out Virtual_String_Vector'Class;
+      Item : VSS.Strings.Virtual_String'Class) is
+   begin
+      VSS.Implementation.String_Vectors.Append
+        (Self.Data, VSS.Strings.Internals.Data_Access_Constant (Item).all);
+   end Append;
+
    -------------
    -- Element --
    -------------

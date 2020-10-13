@@ -175,7 +175,7 @@ private
    type Virtual_String is new Ada.Finalization.Controlled with record
       Head : Referal_Limited_Access;
       Tail : Referal_Limited_Access;
-      Data : VSS.Implementation.Strings.String_Data;
+      Data : aliased VSS.Implementation.Strings.String_Data;
    end record
      with Read  => Read,
           Write => Write;

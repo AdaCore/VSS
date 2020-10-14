@@ -22,8 +22,6 @@
 ------------------------------------------------------------------------------
 --  Vector of strings and operations on it.
 
-with Ada.Iterator_Interfaces;
-
 private with Ada.Finalization;
 private with Ada.Streams;
 
@@ -37,9 +35,7 @@ package VSS.String_Vectors is
 
    type Virtual_String_Vector is tagged private
      with
-       Constant_Indexing => Element,
-       Default_Iterator  => Iterate,
-       Iterator_Element  => VSS.Strings.Virtual_String;
+       Constant_Indexing => Element;
 
    function Length (Self : Virtual_String_Vector'Class) return Natural;
    --  Number of elements in the vector.
@@ -53,33 +49,6 @@ package VSS.String_Vectors is
      (Self : in out Virtual_String_Vector'Class;
       Item : VSS.Strings.Virtual_String'Class);
    --  Append string to the end of the vector.
-
-   --  Syntax sugar for Ada 2012 user-defined iterator
-
-   function Has_Element (Index : Natural) return Boolean
-     with Inline;
-
-   package Iterator_Interfaces is new Ada.Iterator_Interfaces
-     (Natural, Has_Element);
-
-   type Reversible_Iterator is
-     limited new Iterator_Interfaces.Reversible_Iterator with private;
-
-   overriding function First (Self : Reversible_Iterator) return Natural;
-
-   overriding function Next
-     (Self     : Reversible_Iterator;
-      Position : Natural) return Natural;
-
-   overriding function Last (Self : Reversible_Iterator) return Natural;
-
-   overriding function Previous
-     (Self     : Reversible_Iterator;
-      Position : Natural) return Natural;
-
-   function Iterate
-     (Self : Virtual_String_Vector'Class) return Reversible_Iterator;
-   --  Return an interator over each element in the vector
 
 private
 
@@ -98,13 +67,5 @@ private
 
    overriding procedure Adjust (Self : in out Virtual_String_Vector);
    overriding procedure Finalize (Self : in out Virtual_String_Vector);
-
-   type Reversible_Iterator is
-     limited new Iterator_Interfaces.Reversible_Iterator with
-   record
-      Last : Natural;
-   end record;
-
-   function Has_Element (Index : Natural) return Boolean is (Index > 0);
 
 end VSS.String_Vectors;

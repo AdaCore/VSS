@@ -304,9 +304,9 @@ begin
         CRLFCR.Split_Lines;
 
    begin
-      --  if Result.Length /= 2 then
-      --     raise Program_Error;
-      --  end if;
+      if Result.Length /= 4 then
+         raise Program_Error;
+      end if;
 
       if Result.Element (1) /= VSS.Strings.To_Virtual_String ("a") then
          raise Program_Error;
@@ -321,6 +321,45 @@ begin
       end if;
 
       if not Result.Element (4).Is_Empty then
+         raise Program_Error;
+      end if;
+   end;
+
+   --  Check CR + LF when CRLF is disabled
+
+   declare
+      use type VSS.Strings.Virtual_String;
+
+      Result : constant VSS.String_Vectors.Virtual_String_Vector :=
+        CRLFCR.Split_Lines
+          ((VSS.Strings.CR | VSS.Strings.LF => True, others => False));
+
+   begin
+      if Result.Length /= 6 then
+         raise Program_Error;
+      end if;
+
+      if Result.Element (1) /= VSS.Strings.To_Virtual_String ("a") then
+         raise Program_Error;
+      end if;
+
+      if not Result.Element (2).Is_Empty then
+         raise Program_Error;
+      end if;
+
+      if not Result.Element (3).Is_Empty then
+         raise Program_Error;
+      end if;
+
+      if Result.Element (4) /= VSS.Strings.To_Virtual_String ("b") then
+         raise Program_Error;
+      end if;
+
+      if not Result.Element (5).Is_Empty then
+         raise Program_Error;
+      end if;
+
+      if not Result.Element (6).Is_Empty then
          raise Program_Error;
       end if;
    end;

@@ -108,15 +108,11 @@ begin
    end if;
 
    for Item of V2 loop
-      if not Item.Is_Empty then
-         Revert.Append (Item.First_Character.Element);
-      end if;
+      Revert.Append (Item.First_Character.Element);
    end loop;
 
    for Item of reverse V2 loop
-      if not Item.Is_Empty then
-         Revert.Append (Item.First_Character.Element);
-      end if;
+      Revert.Append (Item.First_Character.Element);
    end loop;
 
    if Revert /= VSS.Strings.To_Virtual_String ("abccba") then

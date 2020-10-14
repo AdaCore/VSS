@@ -28,7 +28,9 @@ package body VSS.Strings.UTF is
    -----------------------
 
    function To_Grapheme_Index
-     (Item : UTF16_Code_Unit_Index) return Grapheme_Index is
+     (Item : UTF16_Code_Unit_Index) return Grapheme_Index
+   is
+      pragma Unreferenced (Item);
    begin
       return 1;
    end To_Grapheme_Index;
@@ -38,7 +40,9 @@ package body VSS.Strings.UTF is
    ------------------------------
 
    function To_UTF16_Code_Unit_Count
-     (Item : Grapheme_Index) return UTF16_Code_Unit_Index is
+     (Item : Grapheme_Index) return UTF16_Code_Unit_Index
+   is
+      pragma Unreferenced (Item);
    begin
       return 0;
    end To_UTF16_Code_Unit_Count;

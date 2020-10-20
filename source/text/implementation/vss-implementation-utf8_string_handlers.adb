@@ -330,6 +330,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
             Data :=
               (In_Place => False,
                Capacity => Data.Capacity,
+               Padding  => False,
                Handler  => Global_UTF8_String_Handler'Access,
                Pointer  => Destination.all'Address);
          end;
@@ -478,6 +479,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Data :=
         (In_Place => False,
+         Padding  => False,
          Capacity => 0,
          Handler  => Self'Unchecked_Access,
          Pointer  => System.Null_Address);
@@ -525,6 +527,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Data :=
         (In_Place => True,
+         Padding  => False,
          Capacity => 0,
          Storage  => <>);
       --  Initialize data.
@@ -569,6 +572,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Data :=
         (In_Place => False,
+         Padding  => False,
          Capacity => 0,
          Handler  => Self'Unchecked_Access,
          Pointer  => System.Null_Address);
@@ -664,6 +668,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Data :=
         (In_Place => True,
+         Padding  => False,
          Capacity => 0,
          Storage  => <>);
       --  Initialize data.
@@ -984,6 +989,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          if Size = 0 then
             Data :=
               (In_Place => False,
+               Padding  => False,
                Capacity => 0,
                Handler  => null,
                Pointer  => System.Null_Address);
@@ -997,6 +1003,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
             Data :=
               (In_Place => True,
+               Padding  => False,
                Capacity => 0,
                Storage  => <>);
 
@@ -1019,6 +1026,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          else
             Data :=
               (In_Place => False,
+               Padding  => False,
                Capacity => 0,
                Handler  => Global_UTF8_String_Handler'Unrestricted_Access,
                Pointer  => System.Null_Address);

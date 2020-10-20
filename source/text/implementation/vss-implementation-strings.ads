@@ -69,6 +69,10 @@ package VSS.Implementation.Strings is
    type String_Data (In_Place : Boolean := False) is record
       Capacity : Character_Count := 0;
 
+      Padding  : Boolean := False;
+      --  This padding bit is not used in the code, but here for the benefit
+      --  of dynamic memory analysis tools such as valgrind.
+
       case In_Place is
          when True =>
             Storage : System.Storage_Elements.Storage_Array (0 .. 19);
@@ -83,6 +87,7 @@ package VSS.Implementation.Strings is
       Handler  at 0  range  0 ..  63;
       Pointer  at 8  range  0 ..  63;
       Capacity at 20 range  0 ..  29;
+      Padding  at 20 range 30 ..  30;
       In_Place at 20 range 31 ..  31;
    end record;
 

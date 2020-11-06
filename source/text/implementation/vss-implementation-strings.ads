@@ -93,9 +93,8 @@ package VSS.Implementation.Strings is
 
    function Handler
      (Data : String_Data)
-      return access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-          with Inline;
+      return VSS.Implementation.Strings.String_Handler_Access
+        with Inline;
    --  Return string handler for given string data. Null handler is returned
    --  for null string.
 

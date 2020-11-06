@@ -366,17 +366,20 @@ package body VSS.JSON.Streams.Writers is
          declare
             J : VSS.Strings.Iterators.Characters.Character_Iterator :=
               Item.First_Character;
+            C : VSS.Characters.Virtual_Character;
 
          begin
             loop
-               case J.Element is
+               C := J.Element;
+
+               case C is
                   when VSS.Characters.Virtual_Character'Val (16#00_0000#)
                      .. VSS.Characters.Virtual_Character'Val (16#00_0007#)
                      | VSS.Characters.Virtual_Character'Val (16#00_000B#)
                      | VSS.Characters.Virtual_Character'Val (16#00_000E#)
                      .. VSS.Characters.Virtual_Character'Val (16#00_001F#)
                   =>
-                     Escaped_Control_Character (J.Element);
+                     Escaped_Control_Character (C);
 
                      if not Success then
                         return;
@@ -488,7 +491,7 @@ package body VSS.JSON.Streams.Writers is
                      end if;
 
                   when others =>
-                     Self.Effective_Stream.Put (J.Element, Success);
+                     Self.Effective_Stream.Put (C, Success);
 
                      if not Success then
                         return;

@@ -33,9 +33,10 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class)
       return Ada.Strings.UTF_Encoding.UTF_8_String
    is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Item.Handler;
+      use type VSS.Implementation.Strings.String_Handler_Access;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Item.Handler;
 
    begin
       if Handler = null then

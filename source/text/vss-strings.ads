@@ -26,7 +26,6 @@ private with Ada.Finalization;
 private with Ada.Streams;
 
 with VSS.Characters;
-private with VSS.Implementation.String_Handlers;
 private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Iterators.Characters;
@@ -199,8 +198,7 @@ private
 
    function Handler
      (Self : Virtual_String'Class)
-      return access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+      return VSS.Implementation.Strings.String_Handler_Access;
    --  Returns string data handler should be used to process data of given
    --  object.
 

@@ -21,7 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.String_Handlers;
+
 package body VSS.Strings.Iterators.Characters is
+
+   use type VSS.Implementation.Strings.String_Handler_Access;
 
    -------------
    -- Element --
@@ -30,10 +34,9 @@ package body VSS.Strings.Iterators.Characters is
    function Element
      (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character
    is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-          := (if Self.Owner = null then null
-              else VSS.Implementation.Strings.Handler (Self.Owner.Data));
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access
+        := (if Self.Owner = null then null
+            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
 
    begin
       if Handler /= null then
@@ -52,10 +55,9 @@ package body VSS.Strings.Iterators.Characters is
    overriding function Has_Element
      (Self : Character_Iterator) return Boolean
    is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-          := (if Self.Owner = null then null
-              else VSS.Implementation.Strings.Handler (Self.Owner.Data));
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access
+        := (if Self.Owner = null then null
+            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
 
    begin
       if Handler /= null then
@@ -72,10 +74,9 @@ package body VSS.Strings.Iterators.Characters is
    overriding function Forward
      (Self : in out Character_Iterator) return Boolean
    is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-          := (if Self.Owner = null then null
-              else VSS.Implementation.Strings.Handler (Self.Owner.Data));
+      Handler : constant  VSS.Implementation.Strings.String_Handler_Access
+        := (if Self.Owner = null then null
+            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
 
    begin
       if Handler /= null then

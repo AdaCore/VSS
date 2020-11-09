@@ -24,7 +24,9 @@
 with Ada.Assertions;
 
 with VSS.Characters;
-with VSS.Strings.Iterators.Characters;
+with VSS.Implementation.Strings;
+with VSS.Implementation.String_Handlers;
+with VSS.Strings.Internals;
 with VSS.Unicode;
 
 package body VSS.JSON.Streams.Writers is
@@ -268,8 +270,7 @@ package body VSS.JSON.Streams.Writers is
       Item    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean)
    is
-      procedure Escaped_Control_Character
-        (Item : VSS.Characters.Virtual_Character);
+      procedure Escaped_Control_Character (Item : VSS.Unicode.Code_Point);
       --  Outputs escape sequence for given control character using hex format
 
       function Hex_Digit
@@ -280,20 +281,16 @@ package body VSS.JSON.Streams.Writers is
       -- Escaped_Control_Character --
       -------------------------------
 
-      procedure Escaped_Control_Character
-        (Item : VSS.Characters.Virtual_Character)
-      is
+      procedure Escaped_Control_Character (Item : VSS.Unicode.Code_Point) is
          use type VSS.Unicode.Code_Point;
 
-         C  : constant VSS.Unicode.Code_Point :=
-           VSS.Characters.Virtual_Character'Pos (Item);
-         D4 : constant VSS.Unicode.Code_Point := C and 16#00_000F#;
+         D4 : constant VSS.Unicode.Code_Point := Item and 16#00_000F#;
          D3 : constant VSS.Unicode.Code_Point :=
-           (C / 16#00_0010#) and 16#00_000F#;
+           (Item / 16#00_0010#) and 16#00_000F#;
          D2 : constant VSS.Unicode.Code_Point :=
-           (C / 16#00_0100#) and 16#00_000F#;
+           (Item / 16#00_0100#) and 16#00_000F#;
          D1 : constant VSS.Unicode.Code_Point :=
-           (C / 16#00_1000#) and 16#00_F000#;
+           (Item / 16#00_1000#) and 16#00_000F#;
 
       begin
          Self.Effective_Stream.Put ('\', Success);
@@ -362,146 +359,155 @@ package body VSS.JSON.Streams.Writers is
          return;
       end if;
 
-      if not Item.Is_Empty then
-         declare
-            J : VSS.Strings.Iterators.Characters.Character_Iterator :=
-              Item.First_Character;
-            C : VSS.Characters.Virtual_Character;
-
-         begin
-            loop
-               C := J.Element;
-
-               case C is
-                  when VSS.Characters.Virtual_Character'Val (16#00_0000#)
-                     .. VSS.Characters.Virtual_Character'Val (16#00_0007#)
-                     | VSS.Characters.Virtual_Character'Val (16#00_000B#)
-                     | VSS.Characters.Virtual_Character'Val (16#00_000E#)
-                     .. VSS.Characters.Virtual_Character'Val (16#00_001F#)
-                  =>
-                     Escaped_Control_Character (C);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when VSS.Characters.Virtual_Character'Val (16#00_0008#) =>
-                     --  Escape backspace
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                     Self.Effective_Stream.Put ('b', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when VSS.Characters.Virtual_Character'Val (16#00_0009#) =>
-                     --  Escape character tabulation
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                     Self.Effective_Stream.Put ('t', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when VSS.Characters.Virtual_Character'Val (16#00_000A#) =>
-                     --  Escape line feed
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                     Self.Effective_Stream.Put ('n', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when VSS.Characters.Virtual_Character'Val (16#00_000C#) =>
-                     --  Escape form feed
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                     Self.Effective_Stream.Put ('f', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when VSS.Characters.Virtual_Character'Val (16#00_000D#) =>
-                     --  Escape carriage return
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                     Self.Effective_Stream.Put ('r', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when '"' =>
-                     --  Escape double quotation mark
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                     Self.Effective_Stream.Put ('"', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when '\' =>
-                     --  Escape reverse solidus
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                     Self.Effective_Stream.Put ('\', Success);
-
-                     if not Success then
-                        return;
-                     end if;
-
-                  when others =>
-                     Self.Effective_Stream.Put (C, Success);
-
-                     if not Success then
-                        return;
-                     end if;
-               end case;
-
-               exit when not J.Forward;
-            end loop;
-         end;
+      if Item.Is_Empty then
+         return;
       end if;
+
+      --  Code block below use direct access to the internal string API to
+      --  improve performance, check for empty string case was done above,
+      --  thus check for null handler is not necessary here.
+
+      declare
+         Data     : VSS.Implementation.Strings.String_Data
+           renames VSS.Strings.Internals.Data_Access_Constant (Item).all;
+         Handler  : constant not null
+           VSS.Implementation.Strings.String_Handler_Access :=
+             VSS.Implementation.Strings.Handler (Data);
+         Position : VSS.Implementation.Strings.Cursor;
+         Code     : VSS.Unicode.Code_Point;
+
+      begin
+         Handler.Before_First_Character (Data, Position);
+
+         while Handler.Forward (Data, Position) loop
+            Code := Handler.Element (Data, Position);
+
+            case Code is
+               when 16#00_0000# .. 16#00_0007#
+                  | 16#00_000B#
+                  | 16#00_000E# .. 16#00_001F#
+               =>
+                  Escaped_Control_Character (Code);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when 16#00_0008# =>
+                  --  Escape backspace
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+                  Self.Effective_Stream.Put ('b', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when 16#00_0009# =>
+                  --  Escape character tabulation
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+                  Self.Effective_Stream.Put ('t', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when 16#00_000A# =>
+                  --  Escape line feed
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+                  Self.Effective_Stream.Put ('n', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when 16#00_000C# =>
+                  --  Escape form feed
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+                  Self.Effective_Stream.Put ('f', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when 16#00_000D# =>
+                  --  Escape carriage return
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+                  Self.Effective_Stream.Put ('r', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when Wide_Wide_Character'Pos ('"') =>
+                  --  Escape double quotation mark
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+                  Self.Effective_Stream.Put ('"', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when Wide_Wide_Character'Pos ('\') =>
+                  --  Escape reverse solidus
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+                  Self.Effective_Stream.Put ('\', Success);
+
+                  if not Success then
+                     return;
+                  end if;
+
+               when others =>
+                  Self.Effective_Stream.Put
+                    (VSS.Characters.Virtual_Character'Val (Code), Success);
+
+                  if not Success then
+                     return;
+                  end if;
+            end case;
+         end loop;
+      end;
 
       Self.Effective_Stream.Put ('"', Success);
 

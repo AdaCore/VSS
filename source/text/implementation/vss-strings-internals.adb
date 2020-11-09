@@ -29,7 +29,7 @@ package body VSS.Strings.Internals is
 
    function Data_Access_Constant
      (Self : VSS.Strings.Virtual_String'Class)
-      return not null access constant VSS.Implementation.Strings.String_Data is
+      return not null VSS.Strings.Internals.String_Data_Constant_Access is
    begin
       return Self.Data'Unchecked_Access;
    end Data_Access_Constant;

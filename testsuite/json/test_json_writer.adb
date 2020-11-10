@@ -171,8 +171,7 @@ begin
    Writer.String_Value
      (VSS.Strings.Conversions.To_Virtual_String ("\"""), Success);
 
-   writer.End_Object (Success);
-
+   Writer.End_Object (Success);
    Writer.End_Document (Success);
 
    declare

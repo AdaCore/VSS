@@ -171,6 +171,16 @@ begin
    Writer.String_Value
      (VSS.Strings.Conversions.To_Virtual_String ("\"""), Success);
 
+   --  Empty string as value (for both null string and string of zero length
+   --  cases)
+
+   Writer.Key_Name
+     (VSS.Strings.To_Virtual_String ("empty_string"), Success);
+   Writer.String_Value (VSS.Strings.To_Virtual_String (""), Success);
+   Writer.Key_Name
+     (VSS.Strings.To_Virtual_String ("null_string"), Success);
+   Writer.String_Value (VSS.Strings.Empty_Virtual_String, Success);
+
    Writer.End_Object (Success);
    Writer.End_Document (Success);
 

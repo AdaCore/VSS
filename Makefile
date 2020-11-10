@@ -23,13 +23,13 @@ check_text:
 	.objs/tests/test_string_vector
 
 check_json:
-	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected
 	rm -f .objs/tests/.fails
 	for f in testsuite/json/JSONTestSuite/test_parsing/*.json testsuite/json/JSON_checker/test/*.json; \
 		do echo -n "`basename $$f`: "; \
 		testsuite/run_json_reader_test $$f || touch .objs/tests/.fails; \
 	done
 	test ! -e .objs/tests/.fails
+	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected
 
 coverage:
 	gcov --verbose .objs/*

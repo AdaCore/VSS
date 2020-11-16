@@ -91,6 +91,15 @@ package VSS.Implementation.Strings is
       In_Place at 20 range 31 ..  31;
    end record;
 
+   pragma Warnings (Off, "aggregate not fully initialized");
+   Null_String_Data : constant String_Data := (others => <>);
+   pragma Warnings (On, "aggregate not fully initialized");
+   --  Data for "null" string. It is used around the code when null string
+   --  need to be provided, to avoid compiler's warnings about uninitialized
+   --  components. Some components are expected to be not initialized by
+   --  default. Also, System.Null_Address is not static expression and can't be
+   --  used here for initialization.
+
    function Handler
      (Data : String_Data)
       return VSS.Implementation.Strings.String_Handler_Access

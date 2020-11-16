@@ -68,7 +68,7 @@ package body VSS.Implementation.Strings is
          Handler.Unreference (Data);
       end if;
 
-      Data := (others => <>);
+      Data := Null_String_Data;
    end Unreference;
 
 end VSS.Implementation.Strings;

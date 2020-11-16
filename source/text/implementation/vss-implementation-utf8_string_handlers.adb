@@ -1177,7 +1177,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       if CR_Found then
          VSS.Implementation.String_Vectors.Append_And_Move_Ownership
-           (Lines, (others => <>));
+           (Lines, VSS.Implementation.Strings.Null_String_Data);
 
       elsif not Set_First then
          Append (Storage, At_First, Current);

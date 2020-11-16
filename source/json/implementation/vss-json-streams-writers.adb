@@ -200,11 +200,21 @@ package body VSS.JSON.Streams.Writers is
    overriding procedure End_Document
      (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
    begin
-      Self.Check_Effective_Stream (Success);
+      --  End_Document is special exception: it must shutdown processing even
+      --  in case of intermediate failures.
 
-      if not Success then
-         return;
-      end if;
+      declare
+         Aux : Boolean := True;
+
+      begin
+         Self.Check_Effective_Stream (Aux);
+
+         if not Aux then
+            Success := False;
+
+            return;
+         end if;
+      end;
 
       Self.Effective_Stream := null;
    end End_Document;

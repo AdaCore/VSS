@@ -20,23 +20,24 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  VSS: JSON processing subproject tests
 
-with "gnatcoll_text";
+with "vss";
 
-project GNATCOLL_Text_Tests is
+project VSS_JSON_Tests is
 
    for Languages use ("Ada");
    for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
-   for Main use ("test_stream_element_buffer.adb",
-                 "test_text_streams");
+   for Source_Dirs use ("json/");
+   for Main use ("test_json_reader.adb",
+                 "test_json_writer.adb");
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
+      for Switches ("Ada") use VSS.Ada_Switches & ("-gnatW8");
    end Compiler;
 
    package Binder is
       for Switches ("Ada") use ("-Wb");
    end Binder;
 
-end GNATCOLL_Text_Tests;
+end VSS_JSON_Tests;

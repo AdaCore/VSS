@@ -20,12 +20,29 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Configuration project for all subprojects of the VSS.
+--  VSS: Text processing subproject
 
-abstract project VSS_Config is
+library project VSS is
+
+   for Languages use ("Ada");
+   for Object_Dir use ".objs";
+   for Library_Dir use ".lib";
+   for Library_Name use "vss";
+   for Source_Dirs use
+     ("source/streams",
+      "source/streams/implementation",
+      "source/text",
+      "source/text/implementation",
+      "source/json",
+      "source/json/implementation");
 
    type Build_Mode_Type is ("dev", "prod", "coverage");
-   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
+   Build_Mode : Build_Mode_Type := external ("VSS_BUILD_MODE", "dev");
+
+   type Library_Type_Type is ("relocatable", "static", "static-pic");
+   Library_Type : Library_Type_Type :=
+     external ("VSS_LIBRARY_TYPE", external ("LIBRARY_TYPE", "static"));
+   for Library_Kind use Library_Type;
 
    Ada_Switches := ();
    Ada_Coverage_Switches := ();
@@ -84,4 +101,4 @@ abstract project VSS_Config is
       for Linker_Options use Linker_Options;
    end Linker;
 
-end VSS_Config;
+end VSS;

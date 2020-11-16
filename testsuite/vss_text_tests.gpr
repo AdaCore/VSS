@@ -20,12 +20,32 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Auxiliary project to allow to use all subprojects by single with clause.
+--  VSS: text processing subproject tests
 
-with "vss_config";
-with "vss_json";
-with "vss_text";
+with "vss";
 
-abstract project GNATCOLL_Text is
+project VSS_Text_Tests is
 
-end GNATCOLL_Text;
+   for Languages use ("Ada");
+   for Object_Dir use "../.objs/tests";
+   for Source_Dirs use ("text/", ".");
+   for Main use ("test_character_iterators.adb",
+                 "test_string_compare",
+                 "test_string_conversions.adb",
+                 "test_string_hash",
+                 "test_string_buffer",
+                 "test_string_split_lines",
+                 "test_string_vector",
+                 "test_stream_element_buffer.adb",
+                 "test_text_streams");
+
+   package Compiler is
+      for Switches ("Ada") use VSS.Ada_Switches & ("-gnatW8");
+      for Switches ("hello_world_data.adb") use ("-g", "-O2");
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Wb");
+   end Binder;
+
+end VSS_Text_Tests;

@@ -2,12 +2,11 @@
 BUILD_MODE=dev
 
 all:
-	gprbuild -p -P gnat/gnatcoll_text.gpr -XBUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
+	gprbuild -p -P vss.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 
 build_tests:
-	gprbuild -p -P gnat/vss_text_tests.gpr
-	gprbuild -p -P gnat/vss_json_tests.gpr
-	gprbuild -p -P gnat/gnatcoll_text_tests.gpr
+	gprbuild -p -P testsuite/vss_text_tests.gpr
+	gprbuild -p -P testsuite/vss_json_tests.gpr
 
 check: build_tests check_text check_json
 

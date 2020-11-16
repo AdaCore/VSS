@@ -20,6 +20,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Special implementation of text streams to be used for testing.
 
 with Ada.Streams;
 
@@ -28,7 +29,11 @@ with VSS.Stream_Element_Buffers;
 with VSS.Strings;
 with VSS.Text_Streams;
 
-package Memory_Text_Streams is
+package Test_Text_Streams is
+
+   ------------------------------
+   -- Memory_UTF8_Input_Stream --
+   ------------------------------
 
    type Memory_UTF8_Input_Stream is
    limited new VSS.Text_Streams.Input_Text_Stream with record
@@ -60,4 +65,53 @@ package Memory_Text_Streams is
      (Self : in out Memory_UTF8_Input_Stream'Class;
       To   : Boolean);
 
-end Memory_Text_Streams;
+   -------------------------------
+   -- Memory_UTF8_Output_Stream --
+   -------------------------------
+
+   type Memory_UTF8_Output_Stream is
+   limited new VSS.Text_Streams.Output_Text_Stream with record
+      Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Limit  : VSS.Strings.Character_Count := VSS.Strings.Character_Count'Last;
+      Count  : VSS.Strings.Character_Count := 0;
+      --  Count of the processed characters and limiting amount, Put operation
+      --  returns failure when this limit has been reached.
+   end record;
+
+   overriding procedure Put
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
+
+   procedure Set_Limit
+     (Self : in out Memory_UTF8_Output_Stream'Class;
+      To   : VSS.Strings.Character_Count);
+   --  Set limiting number of character that can be consumed by the text stream
+   --  successfully. After reaching of this limit all subsequential Put
+   --  operations will fail.
+
+   --------------------------
+   -- String_Output_Stream --
+   --------------------------
+
+   type String_Output_Stream is
+   limited new VSS.Text_Streams.Output_Text_Stream with record
+      Buffer : VSS.Strings.Virtual_String;
+      Limit  : VSS.Strings.Character_Count := VSS.Strings.Character_Count'Last;
+      --  Limiting amount of accumulated characters, Put operation returns
+      --  failure when this limit has been reached.
+   end record;
+
+   overriding procedure Put
+     (Self    : in out String_Output_Stream;
+      Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
+
+   procedure Set_Limit
+     (Self : in out String_Output_Stream'Class;
+      To   : VSS.Strings.Character_Count);
+   --  Set limiting number of character that can be consumed by the text stream
+   --  successfully. After reaching of this limit all subsequential Put
+   --  operations will fail.
+
+end Test_Text_Streams;

@@ -30,14 +30,14 @@ with Interfaces;
 with VSS.Strings.Conversions;
 with VSS.JSON.Streams.Readers.Simple;
 
-with Memory_Text_Streams;
+with Test_Text_Streams;
 
 procedure Test_JSON_Reader is
 
    use all type VSS.JSON.Streams.Readers.JSON_Event_Kind;
    use all type VSS.JSON.Streams.Readers.JSON_Reader_Error;
 
-   Input       : aliased Memory_Text_Streams.Memory_UTF8_Input_Stream;
+   Input       : aliased Test_Text_Streams.Memory_UTF8_Input_Stream;
    Reader      : VSS.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
    Count       : Natural := 0;
    Perfomance  : Boolean := False;

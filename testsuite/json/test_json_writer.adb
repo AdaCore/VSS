@@ -72,6 +72,9 @@ procedure Test_JSON_Writer is
         Character'Val (16#1F#)));
    --  All control characters required to be escaped
 
+   Escaped : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.Conversions.To_Virtual_String ("\""");
+
    procedure Test_Output_Failure
      (Writer : in out VSS.JSON.Streams.Writers.JSON_Simple_Writer'Class);
 
@@ -250,6 +253,11 @@ procedure Test_JSON_Writer is
            (174, (Kind         => VSS.JSON.Events.String_Value,
                   String_Value => All_Controls)));
 
+      Escaped_Scenario : constant Test_Scenario :=
+        (1 =>
+           (6, (Kind         => VSS.JSON.Events.String_Value,
+                String_Value => Escaped)));
+
    begin
       --  This test cover simplest cases only, content of the generated JSON
       --  is not checked.
@@ -257,6 +265,7 @@ procedure Test_JSON_Writer is
       Run_Test (All_Array_Scenario);
       Run_Test (Object_Key_Scenario);
       Run_Test (All_Controls_Scenario);
+      Run_Test (Escaped_Scenario);
    end Test_Output_Failure;
 
    use type Interfaces.IEEE_Float_64;
@@ -360,8 +369,7 @@ begin
 
    Writer.Key_Name
      (VSS.Strings.Conversions.To_Virtual_String ("others"), Success);
-   Writer.String_Value
-     (VSS.Strings.Conversions.To_Virtual_String ("\"""), Success);
+   Writer.String_Value (Escaped, Success);
 
    --  Empty string as value (for both null string and string of zero length
    --  cases)

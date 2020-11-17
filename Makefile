@@ -24,6 +24,7 @@ check_text:
 	.objs/tests/test_string_vector
 
 check_json:
+	.objs/tests/test_json_content_handler
 	rm -f .objs/tests/.fails
 	for f in testsuite/json/JSONTestSuite/test_parsing/*.json testsuite/json/JSON_checker/test/*.json; \
 		do echo -n "`basename $$f`: "; \

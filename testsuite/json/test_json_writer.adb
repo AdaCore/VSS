@@ -227,6 +227,7 @@ procedure Test_JSON_Writer is
               Boolean_Value => False)),
          (5, (Kind          => VSS.JSON.Events.Boolean_Value,
               Boolean_Value => True)),
+         (5, (Kind => VSS.JSON.Events.Null_Value)),
          (1, (Kind => VSS.JSON.Events.End_Array)));
 
       --  Few key-value pairs in the object to check failure at pairs

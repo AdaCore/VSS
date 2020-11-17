@@ -43,7 +43,7 @@ package body Test_Text_Streams is
    -- Get --
    ---------
 
-   procedure Get
+   overriding procedure Get
      (Self    : in out Memory_UTF8_Input_Stream;
       Item    : out VSS.Characters.Virtual_Character;
       Success : in out Boolean)

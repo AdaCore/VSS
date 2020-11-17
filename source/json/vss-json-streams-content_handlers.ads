@@ -23,8 +23,6 @@
 --  This package declares interface type to be used as abstract interface to
 --  process JSON streams in callback style API.
 
-with Interfaces;
-
 with VSS.Strings;
 
 package VSS.JSON.Streams.Content_Handlers is
@@ -66,14 +64,9 @@ package VSS.JSON.Streams.Content_Handlers is
       Value   : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean) is null;
 
-   procedure Integer_Value
+   procedure Number_Value
      (Self    : in out JSON_Content_Handler;
-      Value   : Interfaces.Integer_64;
-      Success : in out Boolean) is null;
-
-   procedure Float_Value
-     (Self    : in out JSON_Content_Handler;
-      Value   : Interfaces.IEEE_Float_64;
+      Value   : VSS.JSON.JSON_Number;
       Success : in out Boolean) is null;
 
    procedure Boolean_Value

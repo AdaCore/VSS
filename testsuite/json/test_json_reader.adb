@@ -101,7 +101,7 @@ begin
    declare
       use type Ada.Calendar.Time;
 
-      Start : Ada.Calendar.Time := Ada.Calendar.Clock;
+      Start : constant Ada.Calendar.Time := Ada.Calendar.Clock;
 
    begin
       Input.Set_Incremental (Incremental);

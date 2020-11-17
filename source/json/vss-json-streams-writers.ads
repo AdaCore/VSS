@@ -59,9 +59,23 @@ package VSS.JSON.Streams.Writers is
      (Self  : in out JSON_Simple_Writer'Class;
       Value : VSS.Strings.Virtual_String'Class);
 
+   procedure Number_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : VSS.JSON.JSON_Number);
+
+   procedure Integer_Value
+     (Self    : in out JSON_Simple_Writer'Class;
+      Value   : Interfaces.Integer_64;
+      Success : in out Boolean);
+
    procedure Integer_Value
      (Self  : in out JSON_Simple_Writer'Class;
       Value : Interfaces.Integer_64);
+
+   procedure Float_Value
+     (Self    : in out JSON_Simple_Writer'Class;
+      Value   : Interfaces.IEEE_Float_64;
+      Success : in out Boolean);
 
    procedure Float_Value
      (Self  : in out JSON_Simple_Writer'Class;
@@ -101,14 +115,9 @@ package VSS.JSON.Streams.Writers is
       Value   : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean);
 
-   overriding procedure Integer_Value
+   overriding procedure Number_Value
      (Self    : in out JSON_Simple_Writer;
-      Value   : Interfaces.Integer_64;
-      Success : in out Boolean);
-
-   overriding procedure Float_Value
-     (Self    : in out JSON_Simple_Writer;
-      Value   : Interfaces.IEEE_Float_64;
+      Value   : VSS.JSON.JSON_Number;
       Success : in out Boolean);
 
    overriding procedure Boolean_Value

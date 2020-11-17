@@ -528,42 +528,14 @@ package body VSS.JSON.Streams.Writers is
    -- Float_Value --
    -----------------
 
-   overriding procedure Float_Value
-     (Self    : in out JSON_Simple_Writer;
+   procedure Float_Value
+     (Self    : in out JSON_Simple_Writer'Class;
       Value   : Interfaces.IEEE_Float_64;
-      Success : in out Boolean)
-   is
-      Image : constant Wide_Wide_String :=
-        Interfaces.IEEE_Float_64'Wide_Wide_Image (Value);
-
+      Success : in out Boolean) is
    begin
-      Self.Check_Effective_Stream (Success);
-
-      if not Success then
-         return;
-      end if;
-
-      if not Self.Open_Parenthesis then
-         Self.Effective_Stream.Put (',', Success);
-
-         if not Success then
-            return;
-         end if;
-
-      else
-         Self.Open_Parenthesis := False;
-      end if;
-
-      for C of Image loop
-         if C /= ' ' then
-            Self.Effective_Stream.Put
-              (VSS.Characters.Virtual_Character (C), Success);
-
-            if not Success then
-               return;
-            end if;
-         end if;
-      end loop;
+      Self.Number_Value
+        ((VSS.JSON.JSON_Float, VSS.Strings.Empty_Virtual_String, Value),
+         Success);
    end Float_Value;
 
    -----------------
@@ -588,42 +560,14 @@ package body VSS.JSON.Streams.Writers is
    -- Integer_Value --
    -------------------
 
-   overriding procedure Integer_Value
-     (Self    : in out JSON_Simple_Writer;
+   procedure Integer_Value
+     (Self    : in out JSON_Simple_Writer'Class;
       Value   : Interfaces.Integer_64;
-      Success : in out Boolean)
-   is
-      Image : constant Wide_Wide_String :=
-        Interfaces.Integer_64'Wide_Wide_Image (Value);
-
+      Success : in out Boolean) is
    begin
-      Self.Check_Effective_Stream (Success);
-
-      if not Success then
-         return;
-      end if;
-
-      if not Self.Open_Parenthesis then
-         Self.Effective_Stream.Put (',', Success);
-
-         if not Success then
-            return;
-         end if;
-
-      else
-         Self.Open_Parenthesis := False;
-      end if;
-
-      for C of Image loop
-         if C /= ' ' then
-            Self.Effective_Stream.Put
-              (VSS.Characters.Virtual_Character (C), Success);
-
-            if not Success then
-               return;
-            end if;
-         end if;
-      end loop;
+      Self.Number_Value
+        ((VSS.JSON.JSON_Integer, VSS.Strings.Empty_Virtual_String, Value),
+         Success);
    end Integer_Value;
 
    -------------------
@@ -769,6 +713,98 @@ package body VSS.JSON.Streams.Writers is
          raise Ada.Assertions.Assertion_Error;
       end if;
    end Null_Value;
+
+   ------------------
+   -- Number_Value --
+   ------------------
+
+   overriding procedure Number_Value
+     (Self    : in out JSON_Simple_Writer;
+      Value   : VSS.JSON.JSON_Number;
+      Success : in out Boolean) is
+   begin
+      Self.Check_Effective_Stream (Success);
+
+      if not Success then
+         return;
+      end if;
+
+      if not Self.Open_Parenthesis then
+         Self.Effective_Stream.Put (',', Success);
+
+         if not Success then
+            return;
+         end if;
+
+      else
+         Self.Open_Parenthesis := False;
+      end if;
+
+      case Value.Kind is
+         when VSS.JSON.None =>
+            raise Program_Error;
+
+         when VSS.JSON.JSON_Integer =>
+            declare
+               Image : constant Wide_Wide_String :=
+                 Interfaces.Integer_64'Wide_Wide_Image (Value.Integer_Value);
+
+            begin
+               for C of Image loop
+                  if C /= ' ' then
+                     Self.Effective_Stream.Put
+                       (VSS.Characters.Virtual_Character (C), Success);
+
+                     if not Success then
+                        return;
+                     end if;
+                  end if;
+               end loop;
+            end;
+
+         when VSS.JSON.JSON_Float =>
+            declare
+               Image : constant Wide_Wide_String :=
+                 Interfaces.IEEE_Float_64'Wide_Wide_Image (Value.Float_Value);
+
+            begin
+               for C of Image loop
+                  if C /= ' ' then
+                     Self.Effective_Stream.Put
+                       (VSS.Characters.Virtual_Character (C), Success);
+
+                     if not Success then
+                        return;
+                     end if;
+                  end if;
+               end loop;
+            end;
+
+         when VSS.JSON.Out_Of_Range =>
+            --  ??? Not implemented. Note, image must be checked for validity
+            --  first.
+
+            raise Program_Error;
+      end case;
+   end Number_Value;
+
+   ------------------
+   -- Number_Value --
+   ------------------
+
+   procedure Number_Value
+     (Self  : in out JSON_Simple_Writer'Class;
+      Value : VSS.JSON.JSON_Number)
+   is
+      Success : Boolean := True;
+
+   begin
+      Self.Number_Value (Value, Success);
+
+      if not Success then
+         raise Ada.Assertions.Assertion_Error;
+      end if;
+   end Number_Value;
 
    ----------------
    -- Set_Stream --

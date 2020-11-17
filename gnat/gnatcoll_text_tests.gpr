@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "gnatcoll_text";
+with "vss_text";
 
 project GNATCOLL_Text_Tests is
 

@@ -21,10 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Interfaces;
-
 with VSS.JSON.Streams.Content_Handlers;
-with VSS.Strings;
+private with VSS.Strings;
 with VSS.Text_Streams;
 
 package VSS.JSON.Streams.Writers is
@@ -39,53 +37,15 @@ package VSS.JSON.Streams.Writers is
    --  Sets output text stream to be used to generate JSON document. Change of
    --  the stream is effective only before call to Start_Document.
 
-   procedure Start_Document (Self : in out JSON_Simple_Writer'Class);
+private
 
-   procedure End_Document (Self : in out JSON_Simple_Writer'Class);
-
-   procedure Start_Array (Self : in out JSON_Simple_Writer'Class);
-
-   procedure End_Array (Self : in out JSON_Simple_Writer'Class);
-
-   procedure Start_Object (Self : in out JSON_Simple_Writer'Class);
-
-   procedure End_Object (Self : in out JSON_Simple_Writer'Class);
-
-   procedure Key_Name
-     (Self : in out JSON_Simple_Writer'Class;
-      Name : VSS.Strings.Virtual_String'Class);
-
-   procedure String_Value
-     (Self  : in out JSON_Simple_Writer'Class;
-      Value : VSS.Strings.Virtual_String'Class);
-
-   procedure Number_Value
-     (Self  : in out JSON_Simple_Writer'Class;
-      Value : VSS.JSON.JSON_Number);
-
-   procedure Integer_Value
-     (Self    : in out JSON_Simple_Writer'Class;
-      Value   : Interfaces.Integer_64;
-      Success : in out Boolean);
-
-   procedure Integer_Value
-     (Self  : in out JSON_Simple_Writer'Class;
-      Value : Interfaces.Integer_64);
-
-   procedure Float_Value
-     (Self    : in out JSON_Simple_Writer'Class;
-      Value   : Interfaces.IEEE_Float_64;
-      Success : in out Boolean);
-
-   procedure Float_Value
-     (Self  : in out JSON_Simple_Writer'Class;
-      Value : Interfaces.IEEE_Float_64);
-
-   procedure Boolean_Value
-     (Self  : in out JSON_Simple_Writer'Class;
-      Value : Boolean);
-
-   procedure Null_Value (Self : in out JSON_Simple_Writer'Class);
+   type JSON_Simple_Writer is
+     limited new VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler
+   with record
+      Configured_Stream : VSS.Text_Streams.Output_Text_Stream_Access;
+      Effective_Stream  : VSS.Text_Streams.Output_Text_Stream_Access;
+      Open_Parenthesis  : Boolean := False;
+   end record;
 
    overriding procedure Start_Document
      (Self : in out JSON_Simple_Writer; Success : in out Boolean);
@@ -127,15 +87,5 @@ package VSS.JSON.Streams.Writers is
 
    overriding procedure Null_Value
      (Self : in out JSON_Simple_Writer; Success : in out Boolean);
-
-private
-
-   type JSON_Simple_Writer is
-     limited new VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler
-   with record
-      Configured_Stream : VSS.Text_Streams.Output_Text_Stream_Access;
-      Effective_Stream  : VSS.Text_Streams.Output_Text_Stream_Access;
-      Open_Parenthesis  : Boolean := False;
-   end record;
 
 end VSS.JSON.Streams.Writers;

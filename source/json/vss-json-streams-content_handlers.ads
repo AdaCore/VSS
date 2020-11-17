@@ -77,4 +77,59 @@ package VSS.JSON.Streams.Content_Handlers is
    procedure Null_Value
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
 
+   --  Convinience subprograms to report integer and float value using Ada
+   --  types
+
+   procedure Integer_Value
+     (Self    : in out JSON_Content_Handler'Class;
+      Value   : Interfaces.Integer_64;
+      Success : in out Boolean);
+
+   procedure Float_Value
+     (Self    : in out JSON_Content_Handler'Class;
+      Value   : Interfaces.IEEE_Float_64;
+      Success : in out Boolean);
+
+   --  Subprograms below are wrappers around subprograms with same name above
+   --  that raise Assertion_Error exception in case then Success is set to
+   --  False on return.
+
+   procedure Start_Document (Self : in out JSON_Content_Handler'Class);
+
+   procedure End_Document (Self : in out JSON_Content_Handler'Class);
+
+   procedure Start_Array (Self : in out JSON_Content_Handler'Class);
+
+   procedure End_Array (Self : in out JSON_Content_Handler'Class);
+
+   procedure Start_Object (Self : in out JSON_Content_Handler'Class);
+
+   procedure End_Object (Self : in out JSON_Content_Handler'Class);
+
+   procedure Key_Name
+     (Self : in out JSON_Content_Handler'Class;
+      Name : VSS.Strings.Virtual_String'Class);
+
+   procedure String_Value
+     (Self  : in out JSON_Content_Handler'Class;
+      Value : VSS.Strings.Virtual_String'Class);
+
+   procedure Number_Value
+     (Self  : in out JSON_Content_Handler'Class;
+      Value : VSS.JSON.JSON_Number);
+
+   procedure Integer_Value
+     (Self  : in out JSON_Content_Handler'Class;
+      Value : Interfaces.Integer_64);
+
+   procedure Float_Value
+     (Self  : in out JSON_Content_Handler'Class;
+      Value : Interfaces.IEEE_Float_64);
+
+   procedure Boolean_Value
+     (Self  : in out JSON_Content_Handler'Class;
+      Value : Boolean);
+
+   procedure Null_Value (Self : in out JSON_Content_Handler'Class);
+
 end VSS.JSON.Streams.Content_Handlers;

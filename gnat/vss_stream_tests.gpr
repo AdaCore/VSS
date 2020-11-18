@@ -23,11 +23,11 @@
 
 with "vss_text";
 
-project GNATCOLL_Text_Tests is
+project VSS_Stream_Tests is
 
    for Languages use ("Ada");
    for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite");
+   for Source_Dirs use ("../testsuite/stream");
    for Main use ("test_stream_element_buffer.adb",
                  "test_text_streams");
 
@@ -39,4 +39,4 @@ project GNATCOLL_Text_Tests is
       for Switches ("Ada") use ("-Wb");
    end Binder;
 
-end GNATCOLL_Text_Tests;
+end VSS_Stream_Tests;

@@ -8,7 +8,7 @@ all:
 build_tests:
 	gprbuild -p -P gnat/vss_text_tests.gpr
 	gprbuild -p -P gnat/vss_json_tests.gpr
-	gprbuild -p -P gnat/gnatcoll_text_tests.gpr
+	gprbuild -p -P gnat/vss_stream_tests.gpr
 
 check: build_tests check_text check_json
 

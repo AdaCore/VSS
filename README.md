@@ -6,7 +6,8 @@
 High level string and text processing library
 
 Warning: This is experimental work in progress, everything is subject to
-change. It may be or may be not part of GNATCOLL in the future.
+change. It may be or may be not part of GNATCOLL or standard Ada library
+in the future.
 
 ## Install
 

@@ -22,14 +22,14 @@
 ------------------------------------------------------------------------------
 --  VSS: text processing subproject tests
 
-with "vss_config";
-with "vss_text";
+with "../vss_config";
+with "../vss_text";
 
 project VSS_Text_Tests is
 
    for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite/text");
+   for Object_Dir use "../../.objs/tests";
+   for Source_Dirs use ("../../testsuite/text");
    for Main use ("test_character_iterators.adb",
                  "test_string_compare",
                  "test_string_conversions.adb",

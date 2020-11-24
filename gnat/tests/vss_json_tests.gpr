@@ -22,14 +22,14 @@
 ------------------------------------------------------------------------------
 --  VSS: JSON processing subproject tests
 
-with "vss_config";
-with "vss_json";
+with "../vss_config";
+with "../vss_json";
 
 project VSS_JSON_Tests is
 
    for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite/json");
+   for Object_Dir use "../../.objs/tests";
+   for Source_Dirs use ("../../testsuite/json");
    for Main use ("test_json_content_handler.adb",
                  "test_json_reader.adb",
                  "test_json_writer.adb");

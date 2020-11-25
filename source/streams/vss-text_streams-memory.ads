@@ -21,9 +21,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+private with Ada.Streams;
+
 with VSS.Stream_Element_Buffers;
 
 package VSS.Text_Streams.Memory is
+
+   type Memory_UTF8_Input_Stream is
+     limited new VSS.Text_Streams.Input_Text_Stream with private;
+
+   ------------------------------
+   -- Memory_UTF8_Input_Stream --
+   ------------------------------
 
    type Memory_UTF8_Output_Stream is
    limited new VSS.Text_Streams.Output_Text_Stream with record
@@ -34,5 +43,31 @@ package VSS.Text_Streams.Memory is
      (Self    : in out Memory_UTF8_Output_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean);
+
+private
+
+   type Memory_UTF8_Input_Stream is
+     limited new VSS.Text_Streams.Input_Text_Stream with record
+      Buffer    : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Current   : Ada.Streams.Stream_Element_Count := 1;
+      Diagnosis : VSS.Strings.Virtual_String;
+   end record;
+
+   overriding procedure Get
+     (Self    : in out Memory_UTF8_Input_Stream;
+      Item    : out VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
+
+   overriding function Is_End_Of_Data
+     (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Is_End_Of_Stream
+     (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Has_Error
+     (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Error_Message
+     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Virtual_String;
 
 end VSS.Text_Streams.Memory;

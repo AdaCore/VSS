@@ -151,4 +151,27 @@ package body VSS.Text_Streams.Memory_UTF8_Input is
       return Self.Current > Self.Buffer.Length;
    end Is_End_Of_Stream;
 
+   ------------
+   -- Rewind --
+   ------------
+
+   procedure Rewind (Self : in out Memory_UTF8_Input_Stream'Class) is
+   begin
+      Self.Current := 1;
+      Self.Error   := VSS.Implementation.UTF8_Encoding.None;
+   end Rewind;
+
+   --------------
+   -- Set_Data --
+   --------------
+
+   procedure Set_Data
+     (Self : in out Memory_UTF8_Input_Stream'Class;
+      Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer) is
+   begin
+      Self.Buffer  := Data;
+      Self.Current := 1;
+      Self.Error   := VSS.Implementation.UTF8_Encoding.None;
+   end Set_Data;
+
 end VSS.Text_Streams.Memory_UTF8_Input;

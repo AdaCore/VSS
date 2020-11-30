@@ -123,7 +123,7 @@ package VSS.Implementation.String_Handlers is
    --  provide better implementation for particular case, but always should
    --  fallback to this implementation.
 
-   not overriding function Starts
+   not overriding function Starts_With
      (Self           : Abstract_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
       Prefix_Handler : Abstract_String_Handler'Class;

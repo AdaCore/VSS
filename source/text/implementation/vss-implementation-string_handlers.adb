@@ -192,11 +192,11 @@ package body VSS.Implementation.String_Handlers is
           or not Left_Handler.Has_Character (Left_Data, Left_Position);
    end Is_Less_Or_Equal;
 
-   ------------
-   -- Starts --
-   ------------
+   -----------------
+   -- Starts_With --
+   -----------------
 
-   not overriding function Starts
+   not overriding function Starts_With
      (Self           : Abstract_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
       Prefix_Handler : Abstract_String_Handler'Class;
@@ -225,6 +225,6 @@ package body VSS.Implementation.String_Handlers is
       end loop;
 
       return True;
-   end Starts;
+   end Starts_With;
 
 end VSS.Implementation.String_Handlers;

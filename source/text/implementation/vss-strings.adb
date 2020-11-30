@@ -411,11 +411,11 @@ package body VSS.Strings is
       end return;
    end Split_Lines;
 
-   ------------
-   -- Starts --
-   ------------
+   -----------------
+   -- Starts_With --
+   -----------------
 
-   function Starts
+   function Starts_With
      (Self   : Virtual_String'Class;
       Prefix : Virtual_String'Class) return Boolean
    is
@@ -442,9 +442,10 @@ package body VSS.Strings is
 
       else
          return
-           Self_Handler.Starts (Self.Data, Prefix_Handler.all, Prefix.Data);
+           Self_Handler.Starts_With
+             (Self.Data, Prefix_Handler.all, Prefix.Data);
       end if;
-   end Starts;
+   end Starts_With;
 
    -------------------
    -- To_Magic_Text --

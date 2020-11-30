@@ -431,55 +431,55 @@ begin
    -- Starts --
    ------------
 
-   if not SD1.Starts (SD2) then
+   if not SD1.Starts_With (SD2) then
       raise Program_Error;
    end if;
 
-   if not SD1.Starts (SE1) then
+   if not SD1.Starts_With (SE1) then
       raise Program_Error;
    end if;
 
-   if SD1.Starts (Prefix_1) then
+   if SD1.Starts_With (Prefix_1) then
       raise Program_Error;
    end if;
 
-   if SD1.Starts (Prefix_2) then
+   if SD1.Starts_With (Prefix_2) then
       raise Program_Error;
    end if;
 
-   if not SE1.Starts (SD1) then
+   if not SE1.Starts_With (SD1) then
       raise Program_Error;
    end if;
 
-   if not SE1.Starts (SE1) then
+   if not SE1.Starts_With (SE1) then
       raise Program_Error;
    end if;
 
-   if not SE1.Starts (SE2) then
+   if not SE1.Starts_With (SE2) then
       raise Program_Error;
    end if;
 
-   if not S1.Starts (SD1) then
+   if not S1.Starts_With (SD1) then
       raise Program_Error;
    end if;
 
-   if not S1.Starts (SE1) then
+   if not S1.Starts_With (SE1) then
       raise Program_Error;
    end if;
 
-   if not S1.Starts (Prefix_1) then
+   if not S1.Starts_With (Prefix_1) then
       raise Program_Error;
    end if;
 
-   if S1.Starts (Prefix_2) then
+   if S1.Starts_With (Prefix_2) then
       raise Program_Error;
    end if;
 
-   if Prefix_1.Starts (S1) then
+   if Prefix_1.Starts_With (S1) then
       raise Program_Error;
    end if;
 
-   if Prefix_2.Starts (S1) then
+   if Prefix_2.Starts_With (S1) then
       raise Program_Error;
    end if;
 

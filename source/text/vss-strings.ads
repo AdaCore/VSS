@@ -98,7 +98,7 @@ package VSS.Strings is
       Right : Virtual_String) return Boolean;
    --  Compare two strings in binary order of code points.
 
-   function Starts
+   function Starts_With
      (Self   : Virtual_String'Class;
       Prefix : Virtual_String'Class) return Boolean;
    --  Return True when Self starts with Prefix.

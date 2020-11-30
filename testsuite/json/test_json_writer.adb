@@ -30,9 +30,9 @@ with VSS.JSON.Events;
 with VSS.JSON.Streams.Writers;
 with VSS.Stream_Element_Buffers.Conversions;
 with VSS.Strings.Conversions;
-with VSS.Text_Streams.Memory;
+with VSS.Text_Streams.Memory_UTF8_Output;
 
-with Test_Text_Streams;
+with Tests_Text_Streams;
 
 procedure Test_JSON_Writer is
 
@@ -106,7 +106,7 @@ procedure Test_JSON_Writer is
       begin
          loop
             declare
-               Stream  : aliased Test_Text_Streams.String_Output_Stream;
+               Stream  : aliased Tests_Text_Streams.String_Output_Stream;
                Success : Boolean  := True;
                --  Step    : Positive := 1;
                Length  : VSS.Strings.Character_Count := 0;
@@ -271,7 +271,8 @@ procedure Test_JSON_Writer is
    use type Interfaces.IEEE_Float_64;
    use type Interfaces.Integer_64;
 
-   Stream  : aliased VSS.Text_Streams.Memory.Memory_UTF8_Output_Stream;
+   Stream  :
+     aliased VSS.Text_Streams.Memory_UTF8_Output.Memory_UTF8_Output_Stream;
    Writer  : aliased VSS.JSON.Streams.Writers.JSON_Simple_Writer;
    Success : Boolean := True;
 

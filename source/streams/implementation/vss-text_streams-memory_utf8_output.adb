@@ -23,45 +23,48 @@
 
 with Ada.Streams;
 
-with VSS.Text_Streams.Memory_UTF8_Output;
+with VSS.Implementation.UTF8_Encoding;
+with VSS.Unicode;
 
-procedure Test_Text_Streams is
+package body VSS.Text_Streams.Memory_UTF8_Output is
 
-   use type Ada.Streams.Stream_Element;
-   use type Ada.Streams.Stream_Element_Offset;
+   ---------
+   -- Put --
+   ---------
 
-   Stream  : VSS.Text_Streams.Memory_UTF8_Output.Memory_UTF8_Output_Stream;
-   Success : Boolean := True;
+   overriding procedure Put
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean)
+   is
+      pragma Unreferenced (Success);
 
-   Expected : constant Ada.Streams.Stream_Element_Array :=
-     (1  => 16#41#,
-      2  => 16#D0#,
-      3  => 16#91#,
-      4  => 16#E0#,
-      5  => 16#A4#,
-      6  => 16#95#,
-      7  => 16#F0#,
-      8  => 16#90#,
-      9  => 16#8C#,
-      10 => 16#88#);
+      use type VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
 
-begin
-   Stream.Put ('A', Success);
-   Stream.Put ('Б', Success);
-   Stream.Put ('क', Success);
-   Stream.Put ('𐌈', Success);
+      Code : constant VSS.Unicode.Code_Point :=
+        VSS.Characters.Virtual_Character'Pos (Item);
+      L    : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      U1   : VSS.Unicode.UTF8_Code_Unit;
+      U2   : VSS.Unicode.UTF8_Code_Unit;
+      U3   : VSS.Unicode.UTF8_Code_Unit;
+      U4   : VSS.Unicode.UTF8_Code_Unit;
 
-   if not Success then
-      raise Program_Error;
-   end if;
+   begin
+      VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
-   if Stream.Buffer.Length /= Expected'Length then
-      raise Program_Error;
-   end if;
+      Self.Buffer.Append (Ada.Streams.Stream_Element (U1));
 
-   for J in Expected'Range loop
-      if Stream.Buffer.Element (J) /= Expected (J) then
-         raise Program_Error;
+      if L >= 2 then
+         Self.Buffer.Append (Ada.Streams.Stream_Element (U2));
+
+         if L >= 3 then
+            Self.Buffer.Append (Ada.Streams.Stream_Element (U3));
+
+            if L = 4 then
+               Self.Buffer.Append (Ada.Streams.Stream_Element (U4));
+            end if;
+         end if;
       end if;
-   end loop;
-end Test_Text_Streams;
+   end Put;
+
+end VSS.Text_Streams.Memory_UTF8_Output;

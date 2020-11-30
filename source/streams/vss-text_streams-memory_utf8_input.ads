@@ -23,34 +23,21 @@
 
 private with Ada.Streams;
 
+private with VSS.Implementation.UTF8_Encoding;
 with VSS.Stream_Element_Buffers;
 
-package VSS.Text_Streams.Memory is
+package VSS.Text_Streams.Memory_UTF8_Input is
 
    type Memory_UTF8_Input_Stream is
      limited new VSS.Text_Streams.Input_Text_Stream with private;
-
-   ------------------------------
-   -- Memory_UTF8_Input_Stream --
-   ------------------------------
-
-   type Memory_UTF8_Output_Stream is
-   limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-   end record;
-
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
 
 private
 
    type Memory_UTF8_Input_Stream is
      limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer    : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Current   : Ada.Streams.Stream_Element_Count := 1;
-      Diagnosis : VSS.Strings.Virtual_String;
+      Buffer  : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Current : Ada.Streams.Stream_Element_Count := 1;
+      Error   : VSS.Implementation.UTF8_Encoding.UTF8_Decode_Error;
    end record;
 
    overriding procedure Get
@@ -70,4 +57,4 @@ private
    overriding function Error_Message
      (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Virtual_String;
 
-end VSS.Text_Streams.Memory;
+end VSS.Text_Streams.Memory_UTF8_Input;

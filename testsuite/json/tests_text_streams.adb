@@ -21,11 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Conversions;
 with VSS.Implementation.UTF8_Encoding;
+with VSS.Strings.Conversions;
 with VSS.Unicode;
 
-package body VSS.Text_Streams.Memory is
+package body Tests_Text_Streams is
 
    use type Ada.Streams.Stream_Element_Offset;
 
@@ -66,6 +66,19 @@ package body VSS.Text_Streams.Memory is
       Error : VSS.Implementation.UTF8_Encoding.UTF8_Decode_Error;
 
    begin
+      if Self.Incremental then
+         if Self.Skip then
+            Self.Skip := False;
+            Success := False;
+            Item := VSS.Characters.Virtual_Character'Val (0);
+
+            return;
+
+         else
+            Self.Skip := True;
+         end if;
+      end if;
+
       VSS.Implementation.UTF8_Encoding.Decode
         (Self.Buffer, Self.Current, Code, Success, Error);
 
@@ -163,9 +176,8 @@ package body VSS.Text_Streams.Memory is
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean)
    is
-      pragma Unreferenced (Success);
-
       use type VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      use type VSS.Strings.Character_Count;
 
       Code : constant VSS.Unicode.Code_Point :=
         VSS.Characters.Virtual_Character'Pos (Item);
@@ -176,6 +188,15 @@ package body VSS.Text_Streams.Memory is
       U4   : VSS.Unicode.UTF8_Code_Unit;
 
    begin
+      if Self.Count >= Self.Limit then
+         Success := False;
+
+         return;
+
+      else
+         Self.Count := Self.Count + 1;
+      end if;
+
       VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
       Self.Buffer.Append (Ada.Streams.Stream_Element (U1));
@@ -193,4 +214,60 @@ package body VSS.Text_Streams.Memory is
       end if;
    end Put;
 
-end VSS.Text_Streams.Memory;
+   ---------
+   -- Put --
+   ---------
+
+   overriding procedure Put
+     (Self    : in out String_Output_Stream;
+      Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean)
+   is
+      use type VSS.Strings.Character_Count;
+
+   begin
+      if Self.Buffer.Character_Length >= Self.Limit then
+         Success := False;
+
+         return;
+
+      else
+         Self.Buffer.Append (Item);
+      end if;
+   end Put;
+
+   ---------------------
+   -- Set_Incremental --
+   ---------------------
+
+   procedure Set_Incremental
+     (Self : in out Memory_UTF8_Input_Stream'Class;
+      To   : Boolean) is
+   begin
+      Self.Incremental := To;
+      Self.Skip        := True;
+   end Set_Incremental;
+
+   ---------------
+   -- Set_Limit --
+   ---------------
+
+   procedure Set_Limit
+     (Self : in out Memory_UTF8_Output_Stream'Class;
+      To   : VSS.Strings.Character_Count) is
+   begin
+      Self.Limit := To;
+   end Set_Limit;
+
+   ---------------
+   -- Set_Limit --
+   ---------------
+
+   procedure Set_Limit
+     (Self : in out String_Output_Stream'Class;
+      To   : VSS.Strings.Character_Count) is
+   begin
+      Self.Limit := To;
+   end Set_Limit;
+
+end Tests_Text_Streams;

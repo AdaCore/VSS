@@ -29,7 +29,7 @@ with VSS.Stream_Element_Buffers;
 with VSS.Strings;
 with VSS.Text_Streams;
 
-package Test_Text_Streams is
+package Tests_Text_Streams is
 
    ------------------------------
    -- Memory_UTF8_Input_Stream --
@@ -114,4 +114,4 @@ package Test_Text_Streams is
    --  successfully. After reaching of this limit all subsequential Put
    --  operations will fail.
 
-end Test_Text_Streams;
+end Tests_Text_Streams;

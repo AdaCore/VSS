@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Unbounded;
+
 package VSS.Stream_Element_Buffers.Conversions is
 
    pragma Preelaborate;
@@ -29,5 +31,10 @@ package VSS.Stream_Element_Buffers.Conversions is
      (Item : Stream_Element_Buffer'Class) return String;
    --  Convert content of the buffer to standard string. It do binary
    --  conversion without any assumptions or checks.
+
+   function Unchecked_From_Unbounded_String
+     (Item : Ada.Strings.Unbounded.Unbounded_String)
+      return Stream_Element_Buffer;
+   --  Converts Unbounded_String into Stream_Element_Buffer without any checks.
 
 end VSS.Stream_Element_Buffers.Conversions;

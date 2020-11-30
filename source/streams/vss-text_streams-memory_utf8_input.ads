@@ -31,13 +31,22 @@ package VSS.Text_Streams.Memory_UTF8_Input is
    type Memory_UTF8_Input_Stream is
      limited new VSS.Text_Streams.Input_Text_Stream with private;
 
+   procedure Set_Data
+     (Self : in out Memory_UTF8_Input_Stream'Class;
+      Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer);
+   --  Set data to be processed.
+
+   procedure Rewind (Self : in out Memory_UTF8_Input_Stream'Class);
+   --  Move current position to be processed to the begin of the data.
+
 private
 
    type Memory_UTF8_Input_Stream is
      limited new VSS.Text_Streams.Input_Text_Stream with record
       Buffer  : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
       Current : Ada.Streams.Stream_Element_Count := 1;
-      Error   : VSS.Implementation.UTF8_Encoding.UTF8_Decode_Error;
+      Error   : VSS.Implementation.UTF8_Encoding.UTF8_Decode_Error :=
+        VSS.Implementation.UTF8_Encoding.None;
    end record;
 
    overriding procedure Get

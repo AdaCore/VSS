@@ -57,6 +57,10 @@ package VSS.Stream_Element_Buffers is
       Item : Ada.Streams.Stream_Element);
    --  Append stream element to the end of the buffer
 
+   overriding function "="
+     (Left  : Stream_Element_Buffer;
+      Right : Stream_Element_Buffer) return Boolean;
+
    ------------------------------------
    -- Support for Ada 2012 iterators --
    ------------------------------------

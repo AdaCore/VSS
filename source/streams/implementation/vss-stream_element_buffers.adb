@@ -30,6 +30,25 @@ package body VSS.Stream_Element_Buffers is
    procedure Free is
      new Ada.Unchecked_Deallocation (Data_Record, Data_Access);
 
+   ---------
+   -- "=" --
+   ---------
+
+   overriding function "="
+     (Left  : Stream_Element_Buffer;
+      Right : Stream_Element_Buffer) return Boolean
+   is
+      use type Ada.Streams.Stream_Element_Array;
+
+   begin
+      return
+        Left.Data = Right.Data
+        or else (Left.Data /= null and then Right.Data /= null
+                 and then Left.Data.Length = Right.Data.Length
+                 and then Left.Data.Storage (1 .. Left.Data.Length)
+                   = Right.Data.Storage (1 .. Right.Data.Length));
+   end "=";
+
    ------------
    -- Adjust --
    ------------

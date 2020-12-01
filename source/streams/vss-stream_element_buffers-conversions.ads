@@ -37,4 +37,8 @@ package VSS.Stream_Element_Buffers.Conversions is
       return Stream_Element_Buffer;
    --  Converts Unbounded_String into Stream_Element_Buffer without any checks.
 
+   function Unchecked_From_Stream_Element_Array
+     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Buffer;
+   --  Convert Stream_Element_Array into Stream_Element_Buffer.
+
 end VSS.Stream_Element_Buffers.Conversions;

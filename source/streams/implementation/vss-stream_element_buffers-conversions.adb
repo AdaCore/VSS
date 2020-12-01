@@ -27,6 +27,28 @@ pragma Warnings (On, "is an internal GNAT unit");
 
 package body VSS.Stream_Element_Buffers.Conversions is
 
+   -----------------------------------------
+   -- Unchecked_From_Stream_Element_Array --
+   -----------------------------------------
+
+   function Unchecked_From_Stream_Element_Array
+     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Buffer is
+   begin
+      return Result : Stream_Element_Buffer do
+         declare
+            Length : constant Ada.Streams.Stream_Element_Offset :=
+              Ada.Streams.Stream_Element_Offset (Item'Length);
+
+         begin
+            Result.Data :=
+              new Data_Record'
+                (Size    => Length,
+                 Length  => Length,
+                 Storage => Item);
+         end;
+      end return;
+   end Unchecked_From_Stream_Element_Array;
+
    -------------------------------------
    -- Unchecked_From_Unbounded_String --
    -------------------------------------

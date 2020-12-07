@@ -30,7 +30,11 @@ package VSS.Stream_Element_Buffers is
    pragma Preelaborate;
    pragma Remote_Types;
 
-   type Stream_Element_Buffer is tagged private;
+   type Stream_Element_Buffer is tagged private
+     with
+       Constant_Indexing => Element,
+       Default_Iterator  => Iterate,
+       Iterator_Element  => Ada.Streams.Stream_Element;
 
    procedure Set_Capacity
      (Self     : in out Stream_Element_Buffer'Class;
@@ -46,35 +50,55 @@ package VSS.Stream_Element_Buffers is
      (Self  : Stream_Element_Buffer'Class;
       Index : Ada.Streams.Stream_Element_Count)
       return Ada.Streams.Stream_Element;
-   --  Return element at given index.
+   --  Return element at given index (starting from 1).
 
    procedure Append
      (Self : in out Stream_Element_Buffer;
       Item : Ada.Streams.Stream_Element);
    --  Append stream element to the end of the buffer
 
+   overriding function "="
+     (Left  : Stream_Element_Buffer;
+      Right : Stream_Element_Buffer) return Boolean;
+
    ------------------------------------
    -- Support for Ada 2012 iterators --
    ------------------------------------
 
-   type Stream_Element_Buffer_Cursor is tagged private;
+   type Cursor is private;
 
-   function Has_Element (Self : Stream_Element_Buffer_Cursor) return Boolean;
+   function Has_Element (Self : Cursor) return Boolean
+      with Inline;
 
    function Element
-     (Self : Stream_Element_Buffer_Cursor'Class)
-      return Ada.Streams.Stream_Element;
+     (Self     : Stream_Element_Buffer'Class;
+      Position : Cursor)
+      return Ada.Streams.Stream_Element
+        with Inline;
 
-   function Index
-     (Self : Stream_Element_Buffer_Cursor'Class)
-      return Ada.Streams.Stream_Element_Offset;
+   package Iterator_Interfaces is new Ada.Iterator_Interfaces
+     (Cursor, Has_Element);
 
-   package Stream_Element_Buffer_Iterator_Interfaces is
-     new Ada.Iterator_Interfaces (Stream_Element_Buffer_Cursor, Has_Element);
+   type Reversible_Iterator is
+     limited new Iterator_Interfaces.Reversible_Iterator with private;
 
-   function Each_Stream_Element
+   overriding function First (Self : Reversible_Iterator) return Cursor;
+
+   overriding function Next
+     (Self     : Reversible_Iterator;
+      Position : Cursor) return Cursor
+        with Inline;
+
+   overriding function Last (Self : Reversible_Iterator) return Cursor;
+
+   overriding function Previous
+     (Self     : Reversible_Iterator;
+      Position : Cursor) return Cursor
+        with Inline;
+
+   function Iterate
      (Self : Stream_Element_Buffer'Class)
-      return Stream_Element_Buffer_Iterator_Interfaces.Forward_Iterator'Class;
+      return Reversible_Iterator;
 
 private
 
@@ -115,26 +139,14 @@ private
 
    overriding procedure Finalize (Self : in out Stream_Element_Buffer);
 
-   ----------------------------------
-   -- Stream_Element_Buffer_Cursor --
-   ----------------------------------
-
-   type Stream_Element_Buffer_Access is access all Stream_Element_Buffer'Class;
-
-   type Stream_Element_Buffer_Cursor is tagged record
-      Buffer : Stream_Element_Buffer_Access;
-      Index  : Ada.Streams.Stream_Element_Offset := 0;
+   type Reversible_Iterator is
+     limited new Iterator_Interfaces.Reversible_Iterator with
+   record
+      Last : Ada.Streams.Stream_Element_Count;
    end record;
 
-   procedure Read
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : out Stream_Element_Buffer_Cursor);
-
-   procedure Write
-     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Self   : Stream_Element_Buffer_Cursor);
-
-   for Stream_Element_Buffer_Cursor'Read use Read;
-   for Stream_Element_Buffer_Cursor'Write use Write;
+   type Cursor is record
+      Index : Ada.Streams.Stream_Element_Count := 0;
+   end record;
 
 end VSS.Stream_Element_Buffers;

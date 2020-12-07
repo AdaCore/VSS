@@ -87,11 +87,11 @@ procedure Test_Stream_Element_Buffer is
 
       --  Check content of the buffer
 
-      for C in Buffer.Each_Stream_Element loop
+      for J in 1 .. Buffer.Length loop
          Count := Count + 1;
 
-         if C.Element
-           /= Ada.Streams.Stream_Element (Character'Pos ('Z') - C.Index + 1)
+         if Buffer (J)
+           /= Ada.Streams.Stream_Element (Character'Pos ('Z') - J + 1)
          then
             raise Program_Error;
          end if;

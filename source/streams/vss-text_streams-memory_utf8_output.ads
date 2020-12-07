@@ -20,31 +20,19 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "vss_config";
-with "vss_text";
+with VSS.Stream_Element_Buffers;
 
-project VSS_Text_Tests is
+package VSS.Text_Streams.Memory_UTF8_Output is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite/text");
-   for Main use ("test_character_iterators.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_buffer",
-                 "test_string_split_lines",
-                 "test_string_vector");
+   type Memory_UTF8_Output_Stream is
+     limited new VSS.Text_Streams.Output_Text_Stream with record
+      Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+   end record;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   overriding procedure Put
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
-
-end VSS_Text_Tests;
+end VSS.Text_Streams.Memory_UTF8_Output;

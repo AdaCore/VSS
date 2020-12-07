@@ -31,8 +31,7 @@ package body VSS.Implementation.Strings is
 
    function Handler
      (Data : String_Data)
-      return access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class is
+      return VSS.Implementation.Strings.String_Handler_Access is
    begin
       if Data.In_Place then
          return VSS.Implementation.String_Configuration.In_Place_Handler;
@@ -47,9 +46,8 @@ package body VSS.Implementation.Strings is
    ---------------
 
    procedure Reference (Data : in out String_Data) is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        VSS.Implementation.Strings.Handler (Data);
 
    begin
       if Handler /= null then
@@ -62,16 +60,15 @@ package body VSS.Implementation.Strings is
    -----------------
 
    procedure Unreference (Data : in out String_Data) is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        VSS.Implementation.Strings.Handler (Data);
 
    begin
       if Handler /= null then
          Handler.Unreference (Data);
       end if;
 
-      Data := (others => <>);
+      Data := Null_String_Data;
    end Unreference;
 
 end VSS.Implementation.Strings;

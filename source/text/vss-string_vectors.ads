@@ -56,26 +56,34 @@ package VSS.String_Vectors is
 
    --  Syntax sugar for Ada 2012 user-defined iterator
 
-   function Has_Element (Index : Natural) return Boolean
+   type Cursor is private;
+
+   function Element
+     (Self     : Virtual_String_Vector'Class;
+      Position : Cursor) return VSS.Strings.Virtual_String;
+
+   function Has_Element (Self : Cursor) return Boolean
      with Inline;
 
    package Iterator_Interfaces is new Ada.Iterator_Interfaces
-     (Natural, Has_Element);
+     (Cursor, Has_Element);
 
    type Reversible_Iterator is
      limited new Iterator_Interfaces.Reversible_Iterator with private;
 
-   overriding function First (Self : Reversible_Iterator) return Natural;
+   overriding function First (Self : Reversible_Iterator) return Cursor;
 
    overriding function Next
      (Self     : Reversible_Iterator;
-      Position : Natural) return Natural;
+      Position : Cursor) return Cursor
+        with Inline;
 
-   overriding function Last (Self : Reversible_Iterator) return Natural;
+   overriding function Last (Self : Reversible_Iterator) return Cursor;
 
    overriding function Previous
      (Self     : Reversible_Iterator;
-      Position : Natural) return Natural;
+      Position : Cursor) return Cursor
+        with Inline;
 
    function Iterate
      (Self : Virtual_String_Vector'Class) return Reversible_Iterator;
@@ -105,6 +113,10 @@ private
       Last : Natural;
    end record;
 
-   function Has_Element (Index : Natural) return Boolean is (Index > 0);
+   type Cursor is record
+      Index : Natural;
+   end record;
+
+   function Has_Element (Self : Cursor) return Boolean is (Self.Index > 0);
 
 end VSS.String_Vectors;

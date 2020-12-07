@@ -20,25 +20,51 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: JSON processing subproject tests
 
-with "vss_config";
-with "vss_json";
+with Ada.Streams;
 
-project VSS_JSON_Tests is
+with VSS.Implementation.UTF8_Encoding;
+with VSS.Unicode;
 
-   for Languages use ("Ada");
-   for Object_Dir use "../.objs/tests";
-   for Source_Dirs use ("../testsuite/json");
-   for Main use ("test_json_reader.adb",
-                 "test_json_writer.adb");
+package body VSS.Text_Streams.Memory_UTF8_Output is
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-   end Compiler;
+   ---------
+   -- Put --
+   ---------
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   overriding procedure Put
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean)
+   is
+      pragma Unreferenced (Success);
 
-end VSS_JSON_Tests;
+      use type VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+
+      Code : constant VSS.Unicode.Code_Point :=
+        VSS.Characters.Virtual_Character'Pos (Item);
+      L    : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      U1   : VSS.Unicode.UTF8_Code_Unit;
+      U2   : VSS.Unicode.UTF8_Code_Unit;
+      U3   : VSS.Unicode.UTF8_Code_Unit;
+      U4   : VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+      Self.Buffer.Append (Ada.Streams.Stream_Element (U1));
+
+      if L >= 2 then
+         Self.Buffer.Append (Ada.Streams.Stream_Element (U2));
+
+         if L >= 3 then
+            Self.Buffer.Append (Ada.Streams.Stream_Element (U3));
+
+            if L = 4 then
+               Self.Buffer.Append (Ada.Streams.Stream_Element (U4));
+            end if;
+         end if;
+      end if;
+   end Put;
+
+end VSS.Text_Streams.Memory_UTF8_Output;

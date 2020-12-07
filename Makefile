@@ -2,12 +2,13 @@
 BUILD_MODE=dev
 
 all:
-	gprbuild -p -P gnat/gnatcoll_text.gpr -XBUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
+	gprbuild -p -P gnat/vss_text.gpr -XBUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
+	gprbuild -p -P gnat/vss_json.gpr -XBUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 
 build_tests:
-	gprbuild -p -P gnat/vss_text_tests.gpr
-	gprbuild -p -P gnat/vss_json_tests.gpr
-	gprbuild -p -P gnat/gnatcoll_text_tests.gpr
+	gprbuild -p -P gnat/tests/vss_text_tests.gpr
+	gprbuild -p -P gnat/tests/vss_json_tests.gpr
+	gprbuild -p -P gnat/tests/vss_stream_tests.gpr
 
 check: build_tests check_text check_json
 
@@ -23,13 +24,14 @@ check_text:
 	.objs/tests/test_string_vector
 
 check_json:
-	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected
+	.objs/tests/test_json_content_handler
 	rm -f .objs/tests/.fails
 	for f in testsuite/json/JSONTestSuite/test_parsing/*.json testsuite/json/JSON_checker/test/*.json; \
 		do echo -n "`basename $$f`: "; \
 		testsuite/run_json_reader_test $$f || touch .objs/tests/.fails; \
 	done
 	test ! -e .objs/tests/.fails
+	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected
 
 coverage:
 	gcov --verbose .objs/*

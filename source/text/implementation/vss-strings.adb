@@ -29,6 +29,8 @@ with VSS.Strings.Texts;
 
 package body VSS.Strings is
 
+   use type VSS.Implementation.Strings.String_Handler_Access;
+
    ---------
    -- "<" --
    ---------
@@ -37,11 +39,11 @@ package body VSS.Strings is
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean
    is
-      Left_Handler  : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Left_Handler  : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Left.Handler;
-      Right_Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Right_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Right.Handler;
 
    begin
@@ -65,11 +67,11 @@ package body VSS.Strings is
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean
    is
-      Left_Handler  : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Left_Handler  : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Left.Handler;
-      Right_Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Right_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Right.Handler;
 
    begin
@@ -94,11 +96,11 @@ package body VSS.Strings is
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean
    is
-      Left_Handler  : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Left_Handler  : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Left.Handler;
-      Right_Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Right_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Right.Handler;
 
    begin
@@ -122,11 +124,11 @@ package body VSS.Strings is
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean
    is
-      Left_Handler  : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Left_Handler  : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Left.Handler;
-      Right_Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Right_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Right.Handler;
 
    begin
@@ -151,11 +153,11 @@ package body VSS.Strings is
      (Left  : Virtual_String;
       Right : Virtual_String) return Boolean
    is
-      Left_Handler  : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Left_Handler  : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Left.Handler;
-      Right_Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Right_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Right.Handler;
 
    begin
@@ -189,9 +191,8 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character)
    is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
 
    begin
       if Handler = null then
@@ -212,9 +213,8 @@ package body VSS.Strings is
    function Character_Length
      (Self : Virtual_String'Class) return Character_Count
    is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
 
    begin
       return
@@ -331,8 +331,7 @@ package body VSS.Strings is
 
    function Handler
      (Self : Virtual_String'Class)
-      return access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class is
+      return VSS.Implementation.Strings.String_Handler_Access is
    begin
       return VSS.Implementation.Strings.Handler (Self.Data);
    end Handler;
@@ -342,9 +341,8 @@ package body VSS.Strings is
    ----------
 
    function Hash (Self : Virtual_String'Class) return Hash_Type is
-      Handler   : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
+      Handler   : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
       Generator : VSS.Implementation.FNV_Hash.FNV_1a_Generator;
 
    begin
@@ -361,9 +359,8 @@ package body VSS.Strings is
    --------------
 
    function Is_Empty (Self : Virtual_String'Class) return Boolean is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
 
    begin
       return Handler = null or else Handler.Is_Empty (Self.Data);
@@ -399,9 +396,8 @@ package body VSS.Strings is
       Keep_Terminator : Boolean := False)
       return VSS.String_Vectors.Virtual_String_Vector
    is
-      Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
-          Self.Handler;
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
 
    begin
       return Result : VSS.String_Vectors.Virtual_String_Vector do
@@ -415,21 +411,21 @@ package body VSS.Strings is
       end return;
    end Split_Lines;
 
-   ------------
-   -- Starts --
-   ------------
+   -----------------
+   -- Starts_With --
+   -----------------
 
-   function Starts
+   function Starts_With
      (Self   : Virtual_String'Class;
       Prefix : Virtual_String'Class) return Boolean
    is
       use type VSS.Implementation.Strings.Character_Count;
 
-      Self_Handler   : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Self_Handler   : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Self.Handler;
-      Prefix_Handler : constant access
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class :=
+      Prefix_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
           Prefix.Handler;
 
    begin
@@ -446,9 +442,10 @@ package body VSS.Strings is
 
       else
          return
-           Self_Handler.Starts (Self.Data, Prefix_Handler.all, Prefix.Data);
+           Self_Handler.Starts_With
+             (Self.Data, Prefix_Handler.all, Prefix.Data);
       end if;
-   end Starts;
+   end Starts_With;
 
    -------------------
    -- To_Magic_Text --

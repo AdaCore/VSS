@@ -21,47 +21,49 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
+private with Ada.Streams;
 
-with VSS.Text_Streams.Memory;
+private with VSS.Implementation.UTF8_Encoding;
+with VSS.Stream_Element_Buffers;
 
-procedure Test_Text_Streams is
+package VSS.Text_Streams.Memory_UTF8_Input is
 
-   use type Ada.Streams.Stream_Element;
-   use type Ada.Streams.Stream_Element_Offset;
+   type Memory_UTF8_Input_Stream is
+     limited new VSS.Text_Streams.Input_Text_Stream with private;
 
-   Stream  : VSS.Text_Streams.Memory.Memory_UTF8_Output_Stream;
-   Success : Boolean := True;
+   procedure Set_Data
+     (Self : in out Memory_UTF8_Input_Stream'Class;
+      Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer);
+   --  Set data to be processed.
 
-   Expected : constant Ada.Streams.Stream_Element_Array :=
-     (1  => 16#41#,
-      2  => 16#D0#,
-      3  => 16#91#,
-      4  => 16#E0#,
-      5  => 16#A4#,
-      6  => 16#95#,
-      7  => 16#F0#,
-      8  => 16#90#,
-      9  => 16#8C#,
-      10 => 16#88#);
+   procedure Rewind (Self : in out Memory_UTF8_Input_Stream'Class);
+   --  Move current position to be processed to the begin of the data.
 
-begin
-   Stream.Put ('A', Success);
-   Stream.Put ('Б', Success);
-   Stream.Put ('क', Success);
-   Stream.Put ('𐌈', Success);
+private
 
-   if not Success then
-      raise Program_Error;
-   end if;
+   type Memory_UTF8_Input_Stream is
+     limited new VSS.Text_Streams.Input_Text_Stream with record
+      Buffer  : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Current : Ada.Streams.Stream_Element_Count := 1;
+      Error   : VSS.Implementation.UTF8_Encoding.UTF8_Decode_Error :=
+        VSS.Implementation.UTF8_Encoding.None;
+   end record;
 
-   if Stream.Buffer.Length /= Expected'Length then
-      raise Program_Error;
-   end if;
+   overriding procedure Get
+     (Self    : in out Memory_UTF8_Input_Stream;
+      Item    : out VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
 
-   for J in Expected'Range loop
-      if Stream.Buffer.Element (J) /= Expected (J) then
-         raise Program_Error;
-      end if;
-   end loop;
-end Test_Text_Streams;
+   overriding function Is_End_Of_Data
+     (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Is_End_Of_Stream
+     (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Has_Error
+     (Self : Memory_UTF8_Input_Stream) return Boolean;
+
+   overriding function Error_Message
+     (Self : Memory_UTF8_Input_Stream) return VSS.Strings.Virtual_String;
+
+end VSS.Text_Streams.Memory_UTF8_Input;

@@ -23,8 +23,6 @@
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.Implementation.String_Handlers;
-
 package body VSS.Implementation.String_Vectors is
 
    procedure Free is

@@ -22,10 +22,35 @@
 ------------------------------------------------------------------------------
 
 with VSS.Strings.Internals;
+with VSS.Implementation.Strings;
 
 package body VSS.String_Vectors is
 
    use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
+
+   ---------
+   -- "=" --
+   ---------
+
+   overriding function "="
+     (Left  : Virtual_String_Vector;
+      Right : Virtual_String_Vector) return Boolean
+   is
+      use type VSS.Implementation.Strings.String_Data;
+   begin
+      if Left.Length = Right.Length then
+         for J in 1 .. Left.Length loop
+            if Left.Data.Data (J) /= Right.Data.Data (J) then
+               return False;
+            end if;
+         end loop;
+
+         return True;
+
+      else
+         return False;
+      end if;
+   end "=";
 
    ------------
    -- Adjust --

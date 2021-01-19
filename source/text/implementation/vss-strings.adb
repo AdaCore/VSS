@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -94,26 +94,9 @@ package body VSS.Strings is
 
    overriding function "="
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean
-   is
-      Left_Handler  : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Left.Handler;
-      Right_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Right.Handler;
-
+      Right : Virtual_String) return Boolean is
    begin
-      if Left_Handler = null and Right_Handler = null then
-         return True;
-
-      elsif Left_Handler = null xor Right_Handler = null then
-         return Left.Is_Empty and Right.Is_Empty;
-
-      else
-         return
-           Left_Handler.Is_Equal (Left.Data, Right_Handler.all, Right.Data);
-      end if;
+      return VSS.Implementation.Strings."=" (Left.Data, Right.Data);
    end "=";
 
    ---------
@@ -359,11 +342,8 @@ package body VSS.Strings is
    --------------
 
    function Is_Empty (Self : Virtual_String'Class) return Boolean is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-
    begin
-      return Handler = null or else Handler.Is_Empty (Self.Data);
+      return VSS.Implementation.Strings.Is_Empty (Self.Data);
    end Is_Empty;
 
    -------------

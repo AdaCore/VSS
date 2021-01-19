@@ -41,6 +41,11 @@ package VSS.String_Vectors is
        Default_Iterator  => Iterate,
        Iterator_Element  => VSS.Strings.Virtual_String;
 
+   overriding function "="
+     (Left  : Virtual_String_Vector;
+      Right : Virtual_String_Vector) return Boolean;
+   --  Compare two string vectors.
+
    function Length (Self : Virtual_String_Vector'Class) return Natural;
    --  Number of elements in the vector.
 

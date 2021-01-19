@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -28,6 +28,7 @@ with VSS.Strings;
 procedure Test_String_Vector is
 
    use type VSS.Strings.Virtual_String;
+   use type VSS.String_Vectors.Virtual_String_Vector;
 
    S1 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("a");
@@ -120,6 +121,26 @@ begin
    end loop;
 
    if Revert /= VSS.Strings.To_Virtual_String ("abccba") then
+      raise Program_Error;
+   end if;
+
+   --  Check vector "=" operator
+
+   if V1 = V2 then  --  Case with V1.Length /= V2.Length
+      raise Program_Error;
+   end if;
+
+   V1.Append (VSS.Strings.Empty_Virtual_String);
+
+   if V1 = V2 then  --  Case with V1.Length = V2.Length
+      raise Program_Error;
+   end if;
+
+   --  Check replace in a vector
+
+   V1.Replace (4, S3);
+
+   if V1 /= V2 then
       raise Program_Error;
    end if;
 

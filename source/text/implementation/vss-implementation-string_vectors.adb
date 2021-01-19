@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -113,6 +113,21 @@ package body VSS.Implementation.String_Vectors is
          System.Atomic_Counters.Increment (Self.Counter);
       end if;
    end Reference;
+
+   -------------
+   -- Replace --
+   -------------
+
+   procedure Replace
+     (Self  : in out not null String_Vector_Data_Access;
+      Index : Positive;
+      Item  : VSS.Implementation.Strings.String_Data) is
+   begin
+      Mutate (Self, Self.Last);
+      VSS.Implementation.Strings.Unreference (Self.Data (Index));
+      Self.Data (Index) := Item;
+      VSS.Implementation.Strings.Reference (Self.Data (Index));
+   end Replace;
 
    -----------------
    -- Unreference --

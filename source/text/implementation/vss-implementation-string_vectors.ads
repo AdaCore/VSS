@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -54,5 +54,11 @@ package VSS.Implementation.String_Vectors is
       Item : VSS.Implementation.Strings.String_Data);
    --  Appends given string to the end of the string vector with moving of the
    --  ownership of the string to the string vector.
+
+   procedure Replace
+     (Self  : in out not null String_Vector_Data_Access;
+      Index : Positive;
+      Item  : VSS.Implementation.Strings.String_Data);
+   --  Replace a vector item with a given string.
 
 end VSS.Implementation.String_Vectors;

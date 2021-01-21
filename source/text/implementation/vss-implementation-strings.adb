@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -25,6 +25,34 @@ with VSS.Implementation.String_Configuration;
 
 package body VSS.Implementation.Strings is
 
+   ---------
+   -- "=" --
+   ---------
+
+   overriding function "="
+     (Left  : String_Data;
+      Right : String_Data) return Boolean
+   is
+      Left_Handler  : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
+          Handler (Left);
+      Right_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
+          Handler (Right);
+
+   begin
+      if Left_Handler = null and Right_Handler = null then
+         return True;
+
+      elsif Left_Handler = null xor Right_Handler = null then
+         return Is_Empty (Left) and Is_Empty (Right);
+
+      else
+         return
+           Left_Handler.Is_Equal (Left, Right_Handler.all, Right);
+      end if;
+   end "=";
+
    -------------
    -- Handler --
    -------------
@@ -40,6 +68,18 @@ package body VSS.Implementation.Strings is
          return Data.Handler;
       end if;
    end Handler;
+
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (Self : String_Data) return Boolean is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        VSS.Implementation.Strings.Handler (Self);
+
+   begin
+      return Handler = null or else Handler.Is_Empty (Self);
+   end Is_Empty;
 
    ---------------
    -- Reference --

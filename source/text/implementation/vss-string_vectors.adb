@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,10 +22,35 @@
 ------------------------------------------------------------------------------
 
 with VSS.Strings.Internals;
+with VSS.Implementation.Strings;
 
 package body VSS.String_Vectors is
 
    use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
+
+   ---------
+   -- "=" --
+   ---------
+
+   overriding function "="
+     (Left  : Virtual_String_Vector;
+      Right : Virtual_String_Vector) return Boolean
+   is
+      use type VSS.Implementation.Strings.String_Data;
+   begin
+      if Left.Length = Right.Length then
+         for J in 1 .. Left.Length loop
+            if Left.Data.Data (J) /= Right.Data.Data (J) then
+               return False;
+            end if;
+         end loop;
+
+         return True;
+
+      else
+         return False;
+      end if;
+   end "=";
 
    ------------
    -- Adjust --
@@ -159,6 +184,23 @@ package body VSS.String_Vectors is
    begin
       raise Program_Error;
    end Read;
+
+   -------------
+   -- Replace --
+   -------------
+
+   procedure Replace
+     (Self  : in out Virtual_String_Vector'Class;
+      Index : Positive;
+      Item  : VSS.Strings.Virtual_String'Class) is
+   begin
+      if Self.Data /= null and then Index <= Self.Data.Last then
+         VSS.Implementation.String_Vectors.Replace
+           (Self.Data,
+            Index,
+            VSS.Strings.Internals.Data_Access_Constant (Item).all);
+      end if;
+   end Replace;
 
    -----------
    -- Write --

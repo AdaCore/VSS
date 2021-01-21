@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -41,6 +41,11 @@ package VSS.String_Vectors is
        Default_Iterator  => Iterate,
        Iterator_Element  => VSS.Strings.Virtual_String;
 
+   overriding function "="
+     (Left  : Virtual_String_Vector;
+      Right : Virtual_String_Vector) return Boolean;
+   --  Compare two string vectors.
+
    function Length (Self : Virtual_String_Vector'Class) return Natural;
    --  Number of elements in the vector.
 
@@ -53,6 +58,13 @@ package VSS.String_Vectors is
      (Self : in out Virtual_String_Vector'Class;
       Item : VSS.Strings.Virtual_String'Class);
    --  Append string to the end of the vector.
+
+   procedure Replace
+     (Self  : in out Virtual_String_Vector'Class;
+      Index : Positive;
+      Item  : VSS.Strings.Virtual_String'Class)
+        with Pre => Index <= Self.Length;
+   --  Replace a string vector item with given Index by a new value.
 
    --  Syntax sugar for Ada 2012 user-defined iterator
 

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -91,6 +91,11 @@ package VSS.Implementation.Strings is
       In_Place at 20 range 31 ..  31;
    end record;
 
+   overriding function "="
+     (Left  : String_Data;
+      Right : String_Data) return Boolean;
+   --  Compare Left and Right string values.
+
    pragma Warnings (Off, "aggregate not fully initialized");
    Null_String_Data : constant String_Data := (others => <>);
    pragma Warnings (On, "aggregate not fully initialized");
@@ -99,6 +104,11 @@ package VSS.Implementation.Strings is
    --  components. Some components are expected to be not initialized by
    --  default. Also, System.Null_Address is not static expression and can't be
    --  used here for initialization.
+
+   function Is_Empty (Self : String_Data) return Boolean
+     with Inline;
+   --  Return True when string is empty string: it is ether null or has zero
+   --  length.
 
    function Handler
      (Data : String_Data)

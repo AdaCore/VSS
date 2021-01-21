@@ -94,6 +94,13 @@ package VSS.Implementation.String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is abstract;
    --  Initialize iterator to point to first character.
+   not overriding procedure After_Last_Character
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) is abstract;
+   --  Initialize iterator to point to the last character.
+   --  This procedure sets Position.UTF16_Offset to UTF16_Code_Unit_Index'Last
+   --  for now.
 
    not overriding function Forward
      (Self     : Abstract_String_Handler;
@@ -101,6 +108,12 @@ package VSS.Implementation.String_Handlers is
       Position : in out VSS.Implementation.Strings.Cursor)
       return Boolean is abstract;
    --  Move cursor one character forward. Return True on success.
+   not overriding function Backward
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor)
+      return Boolean is abstract;
+   --  Move cursor one character backward. Return True on success.
 
    not overriding function Is_Equal
      (Self       : Abstract_String_Handler;
@@ -132,6 +145,17 @@ package VSS.Implementation.String_Handlers is
        Abstract_String_Handler'Class (Self).Length (Data)
          >= Prefix_Handler.Length (Prefix_Data);
    --  Return True when string starts with given prefix. This subprogram
+   --  provides generic implementation and can work with any string handlers
+   --  in cost of performance.
+   not overriding function Ends_With
+     (Self           : Abstract_String_Handler;
+      Data           : VSS.Implementation.Strings.String_Data;
+      Suffix_Handler : Abstract_String_Handler'Class;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
+     with Pre'Class =>
+       Abstract_String_Handler'Class (Self).Length (Data)
+         >= Suffix_Handler.Length (Suffix_Data);
+   --  Return True when string ends with given suffix. This subprogram
    --  provides generic implementation and can work with any string handlers
    --  in cost of performance.
 

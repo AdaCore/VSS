@@ -27,6 +27,41 @@ package body VSS.Implementation.String_Handlers is
 
    use type VSS.Unicode.Code_Point;
 
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   not overriding function Ends_With
+     (Self           : Abstract_String_Handler;
+      Data           : VSS.Implementation.Strings.String_Data;
+      Suffix_Handler : Abstract_String_Handler'Class;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
+   is
+      Self_Handler   : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Self_Data      : VSS.Implementation.Strings.String_Data renames Data;
+
+      Self_Position   : VSS.Implementation.Strings.Cursor;
+      Suffix_Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Self_Handler.After_Last_Character (Self_Data, Self_Position);
+      Suffix_Handler.After_Last_Character (Suffix_Data, Suffix_Position);
+
+      while
+        Self_Handler.Backward (Self_Data, Self_Position)
+          and Suffix_Handler.Backward (Suffix_Data, Suffix_Position)
+      loop
+         if Self_Handler.Element (Self_Data, Self_Position)
+              /= Suffix_Handler.Element (Suffix_Data, Suffix_Position)
+         then
+            return False;
+         end if;
+      end loop;
+
+      return True;
+   end Ends_With;
+
    ----------
    -- Hash --
    ----------

@@ -102,6 +102,10 @@ package VSS.Strings is
      (Self   : Virtual_String'Class;
       Prefix : Virtual_String'Class) return Boolean;
    --  Return True when Self starts with Prefix.
+   function Ends_With
+     (Self   : Virtual_String'Class;
+      Suffix : Virtual_String'Class) return Boolean;
+   --  Return True when Self has given Suffix.
 
    function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
    --  Convert given string into virtual string.

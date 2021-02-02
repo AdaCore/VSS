@@ -35,3 +35,6 @@ check_json:
 
 coverage:
 	gcov --verbose .objs/*
+
+docs: all
+	make -C docs

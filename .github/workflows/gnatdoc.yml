@@ -1,0 +1,78 @@
+on:
+  push:
+    branches:
+      - master
+      - topic/gnatdoc
+name: Make Docs
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Docs
+    steps:
+      - name: Get VSS
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v2
+        with:
+          path: ./cached_gnat
+          key: ${{ runner.os }}-gnat-2020.1
+          restore-keys: ${{ runner.os }}-gnat-2020.1
+      - uses: actions/cache@v2
+        with:
+          path: ./cached_gnatdoc
+          key: ${{ runner.os }}-gnatdoc-2020.1
+          restore-keys: ${{ runner.os }}-gnatdoc-2020.1
+      - name: Get GNAT Community 2020 toolchain
+        uses: ada-actions/toolchain@ce2020
+        with:
+          distrib: community
+          install_dir: ./cached_gnat
+      - name: Install gnatdoc
+        run: |
+          if [ ! -f cached_gnatdoc/bin/gnatdoc ]; then
+            set -x -e
+            curl --silent -SL --output /tmp/gnat-2020-20200818-x86_64-linux-bin \
+             https://community.download.adacore.com/v1/a639696a9fd3bdf0be21376cc2dc3129323cbe42?filename=gnat-2020-20200818-x86_64-linux-bin
+            chmod +x /tmp/gnat-2020-20200818-x86_64-linux-bin
+            /tmp/gnat-2020-20200818-x86_64-linux-bin --platform minimal --script .github/workflows/gps.qs
+            pushd cached_gnatdoc/
+            mv lib/gnatstudio lib/gnatstudio_
+            mkdir lib/gnatstudio
+            for J in libclang.so.7 libstdc++.so.6 libgnarl-20.20190814.so \
+              libgnat-20.20190814.so libgcc_s.so.1 libz.so.1 ;
+            do
+              mv lib/gnatstudio_/$J lib/gnatstudio/
+            done
+            mv bin bin_
+            mkdir bin
+            mv bin_/gnatdoc bin/
+
+            rm -rf bin_ etc include libexec lib/girepository-1.0 lib/gnatstudio_ lib/gtk-3.0 \
+              share/doc share/examples share/glib-2.0 share/gpr share/icons share/themes \
+              ./lib/python2.7/site-packages/cmsis_pack_manager \
+              maintenancetool*
+            popd
+          fi
+      - name: install ncurses5 and pandoc
+        run: sudo apt-get install -y libncurses5 pandoc
+      - name: Build project and docs
+        run: make all docs
+      - name: Upload to gh-pages branch
+        run: |
+          # Set up .netrc file with GitHub credentials
+          cat << EOF > $HOME/.netrc
+          machine github.com
+          login sync_bot
+          password $GITHUB_ACCESS_TOKEN
+          EOF
+          chmod 600 $HOME/.netrc
+          git config user.email `git log -1 --pretty=format:'%ae'`
+          git config user.name  `git log -1 --pretty=format:'%an'`
+          git checkout gh-pages
+          cp -fr .objs/index.html .objs/gnatdoc/ .
+          git add index.html gnatdoc
+          if git commit --amend -m "" --allow-empty-message; then
+            git push -f
+          fi
+          git status

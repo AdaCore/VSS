@@ -266,6 +266,42 @@ package body VSS.Strings is
       end if;
    end Disconnect;
 
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   function Ends_With
+     (Self   : Virtual_String'Class;
+      Suffix : Virtual_String'Class) return Boolean
+   is
+      use type VSS.Implementation.Strings.Character_Count;
+
+      Self_Handler   : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
+          Self.Handler;
+      Suffix_Handler : constant
+        VSS.Implementation.Strings.String_Handler_Access :=
+          Suffix.Handler;
+
+   begin
+      if Suffix_Handler = null then
+         return True;
+
+      elsif Self_Handler = null then
+         return Suffix_Handler.Is_Empty (Suffix.Data);
+
+      elsif Self_Handler.Length (Self.Data)
+              < Suffix_Handler.Length (Suffix.Data)
+      then
+         return False;
+
+      else
+         return
+           Self_Handler.Ends_With
+             (Self.Data, Suffix_Handler.all, Suffix.Data);
+      end if;
+   end Ends_With;
+
    --------------
    -- Finalize --
    --------------

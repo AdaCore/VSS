@@ -71,6 +71,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Position : in out VSS.Implementation.Strings.Cursor);
    --  Move cursor to position of the next character
+   procedure Unchecked_Backward
+     (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Position : in out VSS.Implementation.Strings.Cursor);
+   --  Move cursor to position of the previous character
 
    procedure Validate_And_Copy
      (Source      : Ada.Strings.UTF_Encoding.UTF_8_String;
@@ -138,6 +142,58 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
    --  Common code of Split_Lines subprogram for on heap and inline handlers.
+
+   --------------------------
+   -- After_Last_Character --
+   --------------------------
+
+   overriding procedure After_Last_Character
+     (Self     : UTF8_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor)
+   is
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+   begin
+      --  Go to the last character
+      Position :=
+        (Index        => Source.Length,
+         UTF8_Offset  => Source.Size,
+         UTF16_Offset => 0);
+
+      if Source.Length > 0 then  --  Move beyond the end
+         Unchecked_Forward (Source.Storage, Position);
+      end if;
+
+      --  FIXME :
+      Position.UTF16_Offset := VSS.Unicode.UTF16_Code_Unit_Index'Last;
+   end After_Last_Character;
+
+   --------------------------
+   -- After_Last_Character --
+   --------------------------
+
+   overriding procedure After_Last_Character
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor)
+   is
+      Source : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+   begin
+      --  Go to the last character
+      Position :=
+        (Index        => Strings.Character_Count (Source.Length),
+         UTF8_Offset  => VSS.Unicode.UTF8_Code_Unit_Index (Source.Size),
+         UTF16_Offset => 0);
+
+      if Position.Index > 0 then  --  Move beyond the end
+         Unchecked_Forward (Source.Storage, Position);
+      end if;
+
+      --  FIXME :
+      Position.UTF16_Offset := VSS.Unicode.UTF16_Code_Unit_Index'Last;
+   end After_Last_Character;
 
    ----------------------
    -- Aligned_Capacity --
@@ -336,6 +392,52 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end;
       end if;
    end Append;
+
+   --------------
+   -- Backward --
+   --------------
+
+   overriding function Backward
+     (Self     : UTF8_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
+   is
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      if Source = null or else Position.Index = 0 then
+         return False;
+
+      else
+         Unchecked_Backward (Source.Storage, Position);
+      end if;
+
+      return Position.Index > 0;
+   end Backward;
+
+   --------------
+   -- Backward --
+   --------------
+
+   overriding function Backward
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
+   is
+      Source : constant UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      if Position.Index = 0 then
+         return False;
+
+      else
+         Unchecked_Backward (Source.Storage, Position);
+      end if;
+
+      return Position.Index > 0;
+   end Backward;
 
    ----------------------------
    -- Before_First_Character --
@@ -1233,6 +1335,47 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end loop;
       end return;
    end To_UTF_8_String;
+
+   -----------------------
+   -- Unchecked_Backward --
+   -----------------------
+
+   procedure Unchecked_Backward
+     (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Position : in out VSS.Implementation.Strings.Cursor)
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Count;
+
+   begin
+      Position.UTF8_Offset  := Position.UTF8_Offset - 1;
+      Position.Index := Position.Index - 1;
+
+      loop
+         declare
+            Code : constant VSS.Unicode.UTF8_Code_Unit :=
+              Storage (Position.UTF8_Offset);
+         begin
+            case Code is
+               when 16#80# .. 16#BF# =>
+                  Position.UTF8_Offset  := Position.UTF8_Offset - 1;
+
+               when 16#00# .. 16#7F#
+                  | 16#C2# .. 16#DF#
+                  | 16#E0# .. 16#EF# =>
+
+                  Position.UTF16_Offset := Position.UTF16_Offset - 1;
+                  exit;
+
+               when 16#F0# .. 16#F4# =>
+                  Position.UTF16_Offset := Position.UTF16_Offset - 2;
+                  exit;
+
+               when others =>
+                  raise Program_Error with "string data is corrupted";
+            end case;
+         end;
+      end loop;
+   end Unchecked_Backward;
 
    ----------------------
    -- Unchecked_Decode --

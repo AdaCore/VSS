@@ -98,11 +98,23 @@ package VSS.Implementation.UTF8_String_Handlers is
       Position : in out VSS.Implementation.Strings.Cursor);
    --  Initialize iterator to point to first character.
 
+   overriding procedure After_Last_Character
+     (Self     : UTF8_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor);
+   --  Initialize iterator to point to the last character.
+
    overriding function Forward
      (Self     : UTF8_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
+
+   overriding function Backward
+     (Self     : UTF8_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
+   --  Move cursor one character backward. Return True on success.
 
    overriding procedure From_Wide_Wide_String
      (Self    : in out UTF8_String_Handler;
@@ -195,11 +207,23 @@ package VSS.Implementation.UTF8_String_Handlers is
       Position : in out VSS.Implementation.Strings.Cursor);
    --  Initialize iterator to point to first character.
 
+   overriding procedure After_Last_Character
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor);
+   --  Initialize iterator to point to the last character.
+
    overriding function Forward
      (Self     : UTF8_In_Place_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
+
+   overriding function Backward
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
+   --  Move cursor one character backward. Return True on success.
 
    overriding procedure From_Wide_Wide_String
      (Self    : in out UTF8_In_Place_String_Handler;

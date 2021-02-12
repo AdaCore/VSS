@@ -45,6 +45,10 @@ Then you can use it as dependency in the project file:
     with "vss_text.gpr";
 
 
+## Documentation
+
+* [API Reference](https://adacore.github.io/VSS/gnatdoc/)
+
 ## Maintainers
 
 [@AdaCore](https://adacore.com/).

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,25 +21,22 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Characters;
-
-package VSS.Strings.Iterators.Characters is
+package VSS.Strings.Cursors.Iterators is
 
    pragma Preelaborate;
 
-   type Character_Iterator is new Abstract_Iterator with private;
+   type Abstract_Iterator is
+     abstract new VSS.Strings.Cursors.Abstract_Cursor with private;
 
-   function Element
-     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
-   --  Return character pointed by iterator.
+   function Forward
+     (Self : in out Abstract_Iterator) return Boolean is abstract;
+
+   function Has_Element (Self : Abstract_Iterator) return Boolean is abstract;
+   --  Returns True when iterator points to the text element
 
 private
 
-   type Character_Iterator is new Abstract_Iterator with null record;
+   type Abstract_Iterator is
+     abstract new VSS.Strings.Cursors.Abstract_Cursor with null record;
 
-   overriding function Forward
-     (Self : in out Character_Iterator) return Boolean;
-
-   overriding function Has_Element (Self : Character_Iterator) return Boolean;
-
-end VSS.Strings.Iterators.Characters;
+end VSS.Strings.Cursors.Iterators;

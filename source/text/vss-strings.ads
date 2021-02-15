@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -28,7 +28,7 @@ private with Ada.Streams;
 with VSS.Characters;
 private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
-limited with VSS.Strings.Iterators.Characters;
+limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Texts;
 
 package VSS.Strings is
@@ -70,7 +70,7 @@ package VSS.Strings is
 
    function First_Character
      (Self : Virtual_String'Class)
-      return VSS.Strings.Iterators.Characters.Character_Iterator;
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
 
    --  function Last_Character
    --    (Self : Magic_String'Class) return Character_Iterator;

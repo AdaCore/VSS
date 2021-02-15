@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,7 +23,7 @@
 
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
-with VSS.Strings.Iterators.Characters.Internals;
+with VSS.Strings.Cursors.Iterators.Characters.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
@@ -353,10 +353,11 @@ package body VSS.Strings is
 
    function First_Character
      (Self : Virtual_String'Class)
-      return VSS.Strings.Iterators.Characters.Character_Iterator is
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
    begin
       return
-        VSS.Strings.Iterators.Characters.Internals.First_Character (Self);
+        VSS.Strings.Cursors.Iterators.Characters.Internals.First_Character
+          (Self);
    end First_Character;
 
    -------------

@@ -21,37 +21,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Unicode;
+with VSS.Strings.Iterators;
 
-package VSS.Strings.Iterators is
+package VSS.Strings.Markers is
 
    pragma Preelaborate;
 
-   type Abstract_Iterator is abstract tagged limited private;
-
-   function Character_Index
-     (Self : Abstract_Iterator'Class) return VSS.Strings.Character_Index;
-
-   function UTF8_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index;
-
-   function UTF16_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF16_Code_Unit_Index;
-
-   function Forward
-     (Self : in out Abstract_Iterator) return Boolean is abstract;
-
-   function Has_Element (Self : Abstract_Iterator) return Boolean is abstract;
-   --  Returns True when iterator points to the text element
+   type Virtual_Marker is
+     new VSS.Strings.Iterators.Abstract_Cursor with private;
 
 private
 
-   type Abstract_Iterator is abstract new Referal_Limited_Base with record
-      Position : VSS.Implementation.Strings.Cursor;
-   end record;
+   type Virtual_Marker is
+     new VSS.Strings.Iterators.Abstract_Cursor with null record;
 
-   overriding procedure Invalidate (Self : in out Abstract_Iterator);
-
-end VSS.Strings.Iterators;
+end VSS.Strings.Markers;

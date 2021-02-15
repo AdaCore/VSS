@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,12 +21,35 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Iterators.Characters.Internals is
+with VSS.Implementation.String_Handlers;
 
-   pragma Preelaborate;
+package body VSS.Strings.Cursors.Iterators.Characters.Internals is
+
+   ---------------------
+   -- First_Character --
+   ---------------------
 
    function First_Character
      (Self : Virtual_String'Class)
-      return VSS.Strings.Iterators.Characters.Character_Iterator;
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+   is
+      use type VSS.Implementation.Strings.String_Handler_Access;
 
-end VSS.Strings.Iterators.Characters.Internals;
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Dummy   : Boolean;
+
+   begin
+      return Result :
+        VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         Result.Connect (Self'Unrestricted_Access);
+
+         if Handler /= null then
+            Handler.Before_First_Character (Self.Data, Result.Position);
+            Dummy := Handler.Forward (Self.Data, Result.Position);
+         end if;
+      end return;
+   end First_Character;
+
+end VSS.Strings.Cursors.Iterators.Characters.Internals;

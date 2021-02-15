@@ -31,14 +31,19 @@ package VSS.Strings.Cursors is
 
    function Character_Index
      (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index;
+   --  Returns index of the logical element's starting character.
 
    function UTF8_Offset
      (Self : Abstract_Cursor'Class)
       return VSS.Unicode.UTF8_Code_Unit_Index;
+   --  Returns offset of the logical element's starting code unit in UTF-8
+   --  encoding.
 
    function UTF16_Offset
      (Self : Abstract_Cursor'Class)
       return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Returns offset of the logical element's starting code unit in UTF-16
+   --  encoding.
 
 private
 

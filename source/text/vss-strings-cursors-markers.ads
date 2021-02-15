@@ -21,18 +21,16 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Iterators;
-
-package VSS.Strings.Markers is
+package VSS.Strings.Cursors.Markers is
 
    pragma Preelaborate;
 
    type Virtual_Marker is
-     new VSS.Strings.Iterators.Abstract_Cursor with private;
+     new VSS.Strings.Cursors.Abstract_Cursor with private;
 
 private
 
    type Virtual_Marker is
-     new VSS.Strings.Iterators.Abstract_Cursor with null record;
+     new VSS.Strings.Cursors.Abstract_Cursor with null record;
 
-end VSS.Strings.Markers;
+end VSS.Strings.Cursors.Markers;

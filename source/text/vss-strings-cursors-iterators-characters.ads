@@ -21,69 +21,25 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Implementation.String_Handlers;
+with VSS.Characters;
 
-package body VSS.Strings.Iterators.Characters is
+package VSS.Strings.Cursors.Iterators.Characters is
 
-   use type VSS.Implementation.Strings.String_Handler_Access;
+   pragma Preelaborate;
 
-   -------------
-   -- Element --
-   -------------
+   type Character_Iterator is new Abstract_Iterator with private;
 
    function Element
-     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character
-   is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access
-        := (if Self.Owner = null then null
-            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
+     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
+   --  Return character pointed by iterator.
 
-   begin
-      if Handler /= null then
-         return
-           VSS.Characters.Virtual_Character'Val
-             (Handler.Element (Self.Owner.Data, Self.Position));
-      end if;
+private
 
-      return VSS.Characters.Virtual_Character'Val (16#00_0000#);
-   end Element;
-
-   -----------------
-   -- Has_Element --
-   -----------------
-
-   overriding function Has_Element
-     (Self : Character_Iterator) return Boolean
-   is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access
-        := (if Self.Owner = null then null
-            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
-
-   begin
-      if Handler /= null then
-         return Handler.Has_Character (Self.Owner.Data, Self.Position);
-      end if;
-
-      return False;
-   end Has_Element;
-
-   -------------
-   -- Forward --
-   -------------
+   type Character_Iterator is new Abstract_Iterator with null record;
 
    overriding function Forward
-     (Self : in out Character_Iterator) return Boolean
-   is
-      Handler : constant  VSS.Implementation.Strings.String_Handler_Access
-        := (if Self.Owner = null then null
-            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
+     (Self : in out Character_Iterator) return Boolean;
 
-   begin
-      if Handler /= null then
-         return Handler.Forward (Self.Owner.Data, Self.Position);
-      end if;
+   overriding function Has_Element (Self : Character_Iterator) return Boolean;
 
-      return False;
-   end Forward;
-
-end VSS.Strings.Iterators.Characters;
+end VSS.Strings.Cursors.Iterators.Characters;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,47 +21,31 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.Strings.Iterators is
+with VSS.Unicode;
 
-   ---------------------
-   -- Character_Index --
-   ---------------------
+package VSS.Strings.Cursors is
+
+   pragma Preelaborate;
+
+   type Abstract_Cursor is abstract tagged limited private;
 
    function Character_Index
-     (Self : Abstract_Iterator'Class) return VSS.Strings.Character_Index is
-   begin
-      return VSS.Strings.Character_Index (Self.Position.Index);
-   end Character_Index;
-
-   ----------------
-   -- Invalidate --
-   ----------------
-
-   overriding procedure Invalidate (Self : in out Abstract_Iterator) is
-   begin
-      Self.Position := (1, 0, 0);
-   end Invalidate;
-
-   ------------------
-   -- UTF16_Offset --
-   ------------------
-
-   function UTF16_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF16_Code_Unit_Index is
-   begin
-      return Self.Position.UTF16_Offset;
-   end UTF16_Offset;
-
-   -----------------
-   -- UTF8_Offset --
-   -----------------
+     (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index;
 
    function UTF8_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index is
-   begin
-      return Self.Position.UTF8_Offset;
-   end UTF8_Offset;
+     (Self : Abstract_Cursor'Class)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
 
-end VSS.Strings.Iterators;
+   function UTF16_Offset
+     (Self : Abstract_Cursor'Class)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+
+private
+
+   type Abstract_Cursor is abstract new Referal_Limited_Base with record
+      Position : VSS.Implementation.Strings.Cursor;
+   end record;
+
+   overriding procedure Invalidate (Self : in out Abstract_Cursor);
+
+end VSS.Strings.Cursors;

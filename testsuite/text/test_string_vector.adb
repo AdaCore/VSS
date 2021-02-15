@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Iterators.Characters;
+with VSS.Strings.Character_Iterators;
 with VSS.String_Vectors;
 with VSS.Strings;
 

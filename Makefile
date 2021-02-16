@@ -16,6 +16,7 @@ check_text:
 	.objs/tests/test_character_iterators
 	.objs/tests/test_stream_element_buffer
 	.objs/tests/test_text_streams
+	.objs/tests/test_string_append
 	.objs/tests/test_string_compare
 	.objs/tests/test_string_conversions
 	.objs/tests/test_string_hash

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -117,6 +117,11 @@ package VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character);
    --  Append given abstract character to the end of the string.
+
+   procedure Append
+     (Self : in out Virtual_String'Class;
+      Item : Virtual_String'Class);
+   --  Append another string to the end of the string.
 
    type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
 

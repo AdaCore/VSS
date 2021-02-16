@@ -189,6 +189,21 @@ package body VSS.Strings is
       end if;
    end Append;
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (Self : in out Virtual_String'Class;
+      Item : Virtual_String'Class) is
+   begin
+      if Self.Is_Empty then
+         Self := Item;
+      elsif not Item.Is_Empty then
+         Self.Handler.Append (Self.Data, Item.Handler.all, Item.Data);
+      end if;
+   end Append;
+
    ----------------------
    -- Character_Length --
    ----------------------

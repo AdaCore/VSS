@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -141,6 +141,14 @@ package VSS.Implementation.UTF8_String_Handlers is
       Code : VSS.Unicode.Code_Point);
    --  Append single code point to the data.
 
+   overriding procedure Append
+     (Self           : UTF8_String_Handler;
+      Data           : in out VSS.Implementation.Strings.String_Data;
+      Suffix_Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data);
+   --  Append another string to the data.
+
    overriding procedure Split_Lines
      (Self            : UTF8_String_Handler;
       Data            : VSS.Implementation.Strings.String_Data;
@@ -249,6 +257,14 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data : in out VSS.Implementation.Strings.String_Data;
       Code : VSS.Unicode.Code_Point);
    --  Append single code point to the data.
+
+   overriding procedure Append
+     (Self           : UTF8_In_Place_String_Handler;
+      Data           : in out VSS.Implementation.Strings.String_Data;
+      Suffix_Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data);
+   --  Append another string to the data.
 
    overriding procedure Split_Lines
      (Self            : UTF8_In_Place_String_Handler;

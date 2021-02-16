@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -185,6 +185,14 @@ package VSS.Implementation.String_Handlers is
       Code : VSS.Unicode.Code_Point) is abstract
      with Pre'Class => Code not in 16#D800# .. 16#DFFF#;
    --  Append single code point to the data.
+
+   not overriding procedure Append
+     (Self           : Abstract_String_Handler;
+      Data           : in out VSS.Implementation.Strings.String_Data;
+      Suffix_Handler : Abstract_String_Handler'Class;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data);
+   --  Append suffix string to the data.
+   --  The default implementatio append string in a character by character way.
 
    not overriding procedure Split_Lines
      (Self            : Abstract_String_Handler;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -226,6 +226,29 @@ package body VSS.Implementation.String_Handlers is
         Right_Handler.Has_Character (Right_Data, Right_Position)
           or not Left_Handler.Has_Character (Left_Data, Left_Position);
    end Is_Less_Or_Equal;
+
+   -----------------
+   -- Slow_Append --
+   -----------------
+
+   procedure Append
+     (Self           : Abstract_String_Handler;
+      Data           : in out VSS.Implementation.Strings.String_Data;
+      Suffix_Handler : Abstract_String_Handler'Class;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+   is
+      Handler  : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Position : VSS.Implementation.Strings.Cursor;
+      Code     : VSS.Unicode.Code_Point;
+   begin
+      Suffix_Handler.Before_First_Character (Suffix_Data, Position);
+
+      while Suffix_Handler.Forward (Suffix_Data, Position) loop
+         Code := Suffix_Handler.Element (Suffix_Data, Position);
+         Handler.Append (Data, Code);
+      end loop;
+   end Append;
 
    -----------------
    -- Starts_With --

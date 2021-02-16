@@ -28,26 +28,51 @@ package body VSS.Strings.Cursors is
    ---------------------
 
    function Character_Index
-     (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index is
+     (Self : Abstract_Character_Cursor'Class)
+      return VSS.Strings.Character_Index is
    begin
       return VSS.Strings.Character_Index (Self.Position.Index);
    end Character_Index;
+
+   ---------------------------
+   -- First_Character_Index --
+   ---------------------------
+
+   function First_Character_Index
+     (Self : Abstract_Segment_Cursor'Class)
+      return VSS.Strings.Character_Index is
+   begin
+      raise Program_Error;
+      return 1;
+   end First_Character_Index;
 
    ----------------
    -- Invalidate --
    ----------------
 
-   overriding procedure Invalidate (Self : in out Abstract_Cursor) is
+   overriding procedure Invalidate (Self : in out Abstract_Character_Cursor) is
    begin
       Self.Position := (1, 0, 0);
    end Invalidate;
+
+   --------------------------
+   -- Last_Character_Index --
+   --------------------------
+
+   function Last_Character_Index
+     (Self : Abstract_Segment_Cursor'Class)
+      return VSS.Strings.Character_Index is
+   begin
+      raise Program_Error;
+      return 1;
+   end Last_Character_Index;
 
    ------------------
    -- UTF16_Offset --
    ------------------
 
    function UTF16_Offset
-     (Self : Abstract_Cursor'Class)
+     (Self : Abstract_Character_Cursor'Class)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
       return Self.Position.UTF16_Offset;
@@ -58,7 +83,7 @@ package body VSS.Strings.Cursors is
    -----------------
 
    function UTF8_Offset
-     (Self : Abstract_Cursor'Class)
+     (Self : Abstract_Character_Cursor'Class)
       return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
       return Self.Position.UTF8_Offset;

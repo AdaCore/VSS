@@ -32,7 +32,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    ------------
 
    overriding function Create
-     (Position : VSS.Strings.Cursors.Abstract_Cursor'Class)
+     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return Character_Iterator is
    begin
       return Result : Character_Iterator do

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -27,7 +27,7 @@ package VSS.Strings.Cursors.Iterators.Characters is
 
    pragma Preelaborate;
 
-   type Character_Iterator is new Abstract_Iterator with private;
+   type Character_Iterator is new Abstract_Character_Iterator with private;
 
    function Element
      (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
@@ -35,7 +35,7 @@ package VSS.Strings.Cursors.Iterators.Characters is
 
 private
 
-   type Character_Iterator is new Abstract_Iterator with null record;
+   type Character_Iterator is new Abstract_Character_Iterator with null record;
 
    overriding function Forward
      (Self : in out Character_Iterator) return Boolean;
@@ -43,7 +43,7 @@ private
    overriding function Has_Element (Self : Character_Iterator) return Boolean;
 
    overriding function Create
-     (Position : VSS.Strings.Cursors.Abstract_Cursor'Class)
+     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return Character_Iterator;
 
 end VSS.Strings.Cursors.Iterators.Characters;

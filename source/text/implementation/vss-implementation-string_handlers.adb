@@ -227,9 +227,9 @@ package body VSS.Implementation.String_Handlers is
           or not Left_Handler.Has_Character (Left_Data, Left_Position);
    end Is_Less_Or_Equal;
 
-   -----------------
-   -- Slow_Append --
-   -----------------
+   ------------
+   -- Append --
+   ------------
 
    procedure Append
      (Self           : Abstract_String_Handler;

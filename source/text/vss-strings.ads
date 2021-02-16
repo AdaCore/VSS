@@ -98,17 +98,19 @@ package VSS.Strings is
       Right : Virtual_String) return Boolean;
    --  Compare two strings in binary order of code points.
 
-   function Starts_With
-     (Self   : Virtual_String'Class;
-      Prefix : Virtual_String'Class) return Boolean;
-   --  Return True when Self starts with Prefix.
-   function Ends_With
-     (Self   : Virtual_String'Class;
-      Suffix : Virtual_String'Class) return Boolean;
-   --  Return True when Self has given Suffix.
-
-   function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
-   --  Convert given string into virtual string.
+   --  function "&"
+   --    (Left  : Virtual_String;
+   --     Right : Virtual_String) return Virtual_String;
+   --  function "&"
+   --    (Left  : Virtual_String;
+   --     Right : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function "&"
+   --    (Left  : VSS.Characters.Virtual_Character;
+   --     Right : Virtual_String) return Virtual_String;
+   --  function "&"
+   --    (Left  : VSS.Characters.Virtual_Character;
+   --     Right : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  --  Concatenation operator for virtual string and virtual characters.
 
    procedure Clear (Self : in out Virtual_String'Class);
    --  Remove all data.
@@ -122,6 +124,231 @@ package VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : Virtual_String'Class);
    --  Append another string to the end of the string.
+
+   --  function Append
+   --    (Self : Virtual_String'Class;
+   --     Item : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  --  Append given abstract character to the end of the string and returns
+   --  --  result.
+   --
+   --  procedure Append
+   --    (Self : in out Virtual_String'Class;
+   --     Item : Virtual_String'Class);
+   --  --  Append given string to the end of the string.
+   --
+   --  function Append
+   --    (Self : Virtual_String'Class;
+   --     Item : Virtual_String'Class) return Virtual_String;
+   --  --  Append given string to the end of the string and returns result.
+
+   --  procedure Prepend
+   --    (Self : in out Virtual_String'Class;
+   --     Item : VSS.Characters.Virtual_Character);
+   --  --  Prepend given character to the begin of the string.
+   --
+   --  procedure Prepend
+   --    (Self : in out Virtual_String'Class;
+   --     Item : Virtual_String'Class);
+   --  --  Prepend given string to the begin of the string.
+   --
+   --  procedure Insert
+   --    (Self     : in out Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     Item     : VSS.Characters.Virtual_Character);
+   --  procedure Insert
+   --    (Self     : in out Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     Item     : Virtual_String'Class);
+   --  procedure Insert
+   --    (Self     : in out Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     Item     : VSS.Characters.Virtual_Character);
+   --  procedure Insert
+   --    (Self     : in out Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     Item     : Virtual_String'Class);
+   --  --  Inserts given item at the given position. Do nothing if the given
+   --  --  position is invalid.
+   --
+   --  function Insert
+   --    (Self     : Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     Item     : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function Insert
+   --    (Self     : Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     Item     : Virtual_String'Class) return Virtual_String;
+   --  function Insert
+   --    (Self     : Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     Item     : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function Insert
+   --    (Self     : Virtual_String'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     Item     : Virtual_String'Class) return Virtual_String;
+   --  --  Inserts given item at the given position and returns result. Returns
+   --  --  source string if the given position is invalid.
+   --
+   --  procedure Remove
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class);
+   --  procedure Remove
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class);
+   --  procedure Remove
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class);
+   --  procedure Remove
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class);
+   --  --  Removes characters from of the string starting from given position to
+   --  --  given position.
+   --
+   --  function Remove
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   --     return Virtual_String;
+   --  function Remove
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     return Virtual_String;
+   --  function Remove
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   --     return Virtual_String;
+   --  function Remove
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     return Virtual_String;
+   --  --  Removes characters from of the string starting from given position to
+   --  --  given position and returns result.
+   --
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character);
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character);
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character);
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character);
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : Virtual_String'Class);
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : Virtual_String'Class);
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : Virtual_String'Class);
+   --  procedure Replace
+   --    (Self : in out Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : Virtual_String'Class);
+   --  --  Replace slice from and to given positions by given item.
+   --
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : Virtual_String'Class) return Virtual_String;
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : Virtual_String'Class) return Virtual_String;
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     By   : Virtual_String'Class) return Virtual_String;
+   --  function Replace
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By   : Virtual_String'Class) return Virtual_String;
+   --  --  Replace slice from and to given positions by given item and returns
+   --  --  result.
+   --
+   --  function Slice
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   --     return Virtual_String;
+   --  function Slice
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     return Virtual_String;
+   --  function Slice
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   --     return Virtual_String;
+   --  function Slice
+   --    (Self : Virtual_String'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     return Virtual_String;
+   --  --  Returns slice of the string.
+
+   function Starts_With
+     (Self   : Virtual_String'Class;
+      Prefix : Virtual_String'Class) return Boolean;
+   --  Return True when Self starts with Prefix.
+   function Ends_With
+     (Self   : Virtual_String'Class;
+      Suffix : Virtual_String'Class) return Boolean;
+   --  Return True when Self has given Suffix.
+
+   function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
+   --  Convert given string into virtual string.
 
    type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
 

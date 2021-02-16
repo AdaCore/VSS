@@ -27,30 +27,52 @@ package VSS.Strings.Cursors is
 
    pragma Preelaborate;
 
-   type Abstract_Cursor is abstract tagged limited private;
+   type Abstract_Character_Cursor is abstract tagged limited private;
+   --  Cursor that points to single character.
 
    function Character_Index
-     (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index;
-   --  Returns index of the logical element's starting character.
+     (Self : Abstract_Character_Cursor'Class)
+      return VSS.Strings.Character_Index;
+   --  Returns index of the character.
 
    function UTF8_Offset
-     (Self : Abstract_Cursor'Class)
+     (Self : Abstract_Character_Cursor'Class)
       return VSS.Unicode.UTF8_Code_Unit_Index;
    --  Returns offset of the logical element's starting code unit in UTF-8
    --  encoding.
 
    function UTF16_Offset
-     (Self : Abstract_Cursor'Class)
+     (Self : Abstract_Character_Cursor'Class)
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Returns offset of the logical element's starting code unit in UTF-16
    --  encoding.
 
+   type Abstract_Segment_Cursor is abstract tagged limited private;
+   --  Cursor that points to some segment of the string.
+
+   function First_Character_Index
+     (Self : Abstract_Segment_Cursor'Class)
+      return VSS.Strings.Character_Index;
+   --  Returns index of the first character of the logical element.
+
+   function Last_Character_Index
+     (Self : Abstract_Segment_Cursor'Class)
+      return VSS.Strings.Character_Index;
+   --  Returns index of the last character of the logical element.
+
 private
 
-   type Abstract_Cursor is abstract new Referal_Limited_Base with record
+   type Abstract_Character_Cursor is
+     abstract new Referal_Limited_Base with record
       Position : VSS.Implementation.Strings.Cursor;
    end record;
 
-   overriding procedure Invalidate (Self : in out Abstract_Cursor);
+   overriding procedure Invalidate (Self : in out Abstract_Character_Cursor);
+
+   type Abstract_Segment_Cursor is
+     abstract new Referal_Limited_Base with null record;
+
+   overriding procedure Invalidate
+     (Self : in out Abstract_Segment_Cursor) is abstract;
 
 end VSS.Strings.Cursors;

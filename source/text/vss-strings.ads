@@ -150,218 +150,100 @@ package VSS.Strings is
    --    (Self : in out Virtual_String'Class;
    --     Item : Virtual_String'Class);
    --  --  Prepend given string to the begin of the string.
-   --
+
    --  procedure Insert
    --    (Self     : in out Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     Item     : VSS.Characters.Virtual_Character);
    --  procedure Insert
    --    (Self     : in out Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     Item     : Virtual_String'Class);
-   --  procedure Insert
-   --    (Self     : in out Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     Item     : VSS.Characters.Virtual_Character);
-   --  procedure Insert
-   --    (Self     : in out Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     Item     : Virtual_String'Class);
    --  --  Inserts given item at the given position. Do nothing if the given
    --  --  position is invalid.
-   --
+
    --  function Insert
    --    (Self     : Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     Item     : VSS.Characters.Virtual_Character) return Virtual_String;
    --  function Insert
    --    (Self     : Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     Item     : Virtual_String'Class) return Virtual_String;
-   --  function Insert
-   --    (Self     : Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     Item     : VSS.Characters.Virtual_Character) return Virtual_String;
-   --  function Insert
-   --    (Self     : Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     Item     : Virtual_String'Class) return Virtual_String;
    --  --  Inserts given item at the given position and returns result. Returns
    --  --  source string if the given position is invalid.
-   --
+
    --  procedure Remove
    --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class);
-   --  procedure Remove
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class);
-   --  procedure Remove
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class);
-   --  procedure Remove
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class);
+   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class);
    --  procedure Remove
    --    (Self    : in out Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class);
+   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class);
    --  --  Removes characters from of the string starting from given position
    --  --  to given position.
-   --
+
    --  function Remove
    --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-   --     return Virtual_String;
-   --  function Remove
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
-   --     return Virtual_String;
-   --  function Remove
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-   --     return Virtual_String;
-   --  function Remove
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
    --     return Virtual_String;
    --  function Remove
    --    (Self    : Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class)
    --     return Virtual_String;
    --  --  Removes characters from of the string starting from given position
    --  --  to given position and returns result.
-   --
+
    --  procedure Replace
    --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By   : VSS.Characters.Virtual_Character);
    --  procedure Replace
    --    (Self    : in out Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : VSS.Characters.Virtual_Character);
    --  procedure Replace
    --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : Virtual_String'Class);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     By   : Virtual_String'Class);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : Virtual_String'Class);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By   : Virtual_String'Class);
    --  procedure Replace
    --    (Self    : in out Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : Virtual_String'Class);
    --  --  Replace slice from and to given positions by given item.
-   --
+
    --  function Replace
    --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
-   --  function Replace
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
-   --  function Replace
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
-   --  function Replace
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
    --  function Replace
    --    (Self    : Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : VSS.Characters.Virtual_Character) return Virtual_String;
    --  function Replace
    --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : Virtual_String'Class) return Virtual_String;
-   --  function Replace
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     By   : Virtual_String'Class) return Virtual_String;
-   --  function Replace
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     By   : Virtual_String'Class) return Virtual_String;
-   --  function Replace
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By   : Virtual_String'Class) return Virtual_String;
    --  function Replace
    --    (Self    : Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : Virtual_String'Class) return Virtual_String;
    --  --  Replace slice from and to given positions by given item and returns
    --  --  result.
-   --
+
    --  function Slice
    --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-   --     return Virtual_String;
-   --  function Slice
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
-   --     return Virtual_String;
-   --  function Slice
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-   --     return Virtual_String;
-   --  function Slice
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
    --     return Virtual_String;
    --  function Slice
    --    (Self    : Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class)
    --     return Virtual_String;
    --  --  Returns slice of the string.
 

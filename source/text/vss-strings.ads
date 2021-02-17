@@ -205,8 +205,11 @@ package VSS.Strings is
    --    (Self : in out Virtual_String'Class;
    --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class);
-   --  --  Removes characters from of the string starting from given position to
-   --  --  given position.
+   --  procedure Remove
+   --    (Self    : in out Virtual_String'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class);
+   --  --  Removes characters from of the string starting from given position
+   --  --  to given position.
    --
    --  function Remove
    --    (Self : Virtual_String'Class;
@@ -228,8 +231,12 @@ package VSS.Strings is
    --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
    --     return Virtual_String;
-   --  --  Removes characters from of the string starting from given position to
-   --  --  given position and returns result.
+   --  function Remove
+   --    (Self    : Virtual_String'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     return Virtual_String;
+   --  --  Removes characters from of the string starting from given position
+   --  --  to given position and returns result.
    --
    --  procedure Replace
    --    (Self : in out Virtual_String'Class;
@@ -252,6 +259,10 @@ package VSS.Strings is
    --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     By   : VSS.Characters.Virtual_Character);
    --  procedure Replace
+   --    (Self    : in out Virtual_String'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By      : VSS.Characters.Virtual_Character);
+   --  procedure Replace
    --    (Self : in out Virtual_String'Class;
    --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
    --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
@@ -271,6 +282,10 @@ package VSS.Strings is
    --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     By   : Virtual_String'Class);
+   --  procedure Replace
+   --    (Self    : in out Virtual_String'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By      : Virtual_String'Class);
    --  --  Replace slice from and to given positions by given item.
    --
    --  function Replace
@@ -294,6 +309,10 @@ package VSS.Strings is
    --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     By   : VSS.Characters.Virtual_Character) return Virtual_String;
    --  function Replace
+   --    (Self    : Virtual_String'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By      : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  function Replace
    --    (Self : Virtual_String'Class;
    --     From : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
    --     To   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
@@ -313,6 +332,10 @@ package VSS.Strings is
    --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     By   : Virtual_String'Class) return Virtual_String;
+   --  function Replace
+   --    (Self    : Virtual_String'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
+   --     By      : Virtual_String'Class) return Virtual_String;
    --  --  Replace slice from and to given positions by given item and returns
    --  --  result.
    --
@@ -335,6 +358,10 @@ package VSS.Strings is
    --    (Self : Virtual_String'Class;
    --     From : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class;
    --     To   : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
+   --     return Virtual_String;
+   --  function Slice
+   --    (Self    : Virtual_String'Class;
+   --     From_To : VSS.Strings.Cursors.Abstract_Segment_Cursor'Class)
    --     return Virtual_String;
    --  --  Returns slice of the string.
 

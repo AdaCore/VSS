@@ -31,7 +31,7 @@ package body VSS.Strings.Cursors is
      (Self : Abstract_Character_Cursor'Class)
       return VSS.Strings.Character_Index is
    begin
-      return VSS.Strings.Character_Index (Self.Position.Index);
+      return Self.First_Character_Index;
    end Character_Index;
 
    ---------------------------
@@ -39,12 +39,42 @@ package body VSS.Strings.Cursors is
    ---------------------------
 
    function First_Character_Index
-     (Self : Abstract_Segment_Cursor'Class)
-      return VSS.Strings.Character_Index is
+     (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index is
    begin
-      raise Program_Error;
-      return 1;
+      return
+        VSS.Strings.Character_Index
+          (if Self.Is_Segment
+           then Self.First_Position.Index
+           else Self.Position.Index);
    end First_Character_Index;
+
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
+   function First_UTF16_Offset
+     (Self : Abstract_Cursor'Class)
+      return VSS.Unicode.UTF16_Code_Unit_Index is
+   begin
+      return
+        (if Self.Is_Segment
+         then Self.First_Position.UTF16_Offset
+         else Self.Position.UTF16_Offset);
+   end First_UTF16_Offset;
+
+   -----------------------
+   -- First_UTF8_Offset --
+   -----------------------
+
+   function First_UTF8_Offset
+     (Self : Abstract_Cursor'Class)
+      return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      return
+        (if Self.Is_Segment
+         then Self.First_Position.UTF8_Offset
+         else Self.Position.UTF8_Offset);
+   end First_UTF8_Offset;
 
    ----------------
    -- Invalidate --
@@ -60,12 +90,42 @@ package body VSS.Strings.Cursors is
    --------------------------
 
    function Last_Character_Index
-     (Self : Abstract_Segment_Cursor'Class)
-      return VSS.Strings.Character_Index is
+     (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index is
    begin
-      raise Program_Error;
-      return 1;
+      return
+        VSS.Strings.Character_Index
+          (if Self.Is_Segment
+           then Self.Last_Position.Index
+           else Self.Position.Index);
    end Last_Character_Index;
+
+   -----------------------
+   -- Last_UTF16_Offset --
+   -----------------------
+
+   function Last_UTF16_Offset
+     (Self : Abstract_Cursor'Class)
+      return VSS.Unicode.UTF16_Code_Unit_Index is
+   begin
+      return
+        (if Self.Is_Segment
+         then Self.Last_Position.UTF16_Offset
+         else Self.Position.UTF16_Offset);
+   end Last_UTF16_Offset;
+
+   ----------------------
+   -- Last_UTF8_Offset --
+   ----------------------
+
+   function Last_UTF8_Offset
+     (Self : Abstract_Cursor'Class)
+      return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      return
+        (if Self.Is_Segment
+         then Self.Last_Position.UTF8_Offset
+         else Self.Position.UTF8_Offset);
+   end Last_UTF8_Offset;
 
    ------------------
    -- UTF16_Offset --
@@ -75,7 +135,7 @@ package body VSS.Strings.Cursors is
      (Self : Abstract_Character_Cursor'Class)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.Position.UTF16_Offset;
+      return Self.First_UTF16_Offset;
    end UTF16_Offset;
 
    -----------------
@@ -86,7 +146,7 @@ package body VSS.Strings.Cursors is
      (Self : Abstract_Character_Cursor'Class)
       return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      return Self.Position.UTF8_Offset;
+      return Self.First_UTF8_Offset;
    end UTF8_Offset;
 
 end VSS.Strings.Cursors;

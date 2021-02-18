@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,12 +21,15 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Iterators.Characters.Internals is
+package VSS.Strings.Cursors.Markers is
 
    pragma Preelaborate;
 
-   function First_Character
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Iterators.Characters.Character_Iterator;
+   type Virtual_Marker is new VSS.Strings.Cursors.Abstract_Cursor with private;
 
-end VSS.Strings.Iterators.Characters.Internals;
+private
+
+   type Virtual_Marker is
+     new VSS.Strings.Cursors.Abstract_Character_Cursor with null record;
+
+end VSS.Strings.Cursors.Markers;

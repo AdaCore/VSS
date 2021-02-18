@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,9 +23,25 @@
 
 with VSS.Implementation.String_Handlers;
 
-package body VSS.Strings.Iterators.Characters is
+package body VSS.Strings.Cursors.Iterators.Characters is
 
    use type VSS.Implementation.Strings.String_Handler_Access;
+
+   ------------
+   -- Create --
+   ------------
+
+   overriding function Create
+     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return Character_Iterator is
+   begin
+      return Result : Character_Iterator do
+         if Position.Owner /= null then
+            Result.First_Position := Position.First_Position;
+            Result.Connect (Position.Owner);
+         end if;
+      end return;
+   end Create;
 
    -------------
    -- Element --
@@ -86,4 +102,4 @@ package body VSS.Strings.Iterators.Characters is
       return False;
    end Forward;
 
-end VSS.Strings.Iterators.Characters;
+end VSS.Strings.Cursors.Iterators.Characters;

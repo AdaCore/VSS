@@ -22,8 +22,8 @@
 ------------------------------------------------------------------------------
 
 with VSS.Characters;
+with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
-with VSS.Strings.Iterators.Characters;
 with VSS.Unicode;
 
 procedure Test_Character_Iterators is
@@ -109,7 +109,7 @@ procedure Test_Character_Iterators is
      ('𝜕', 36, 21),   --  '𝜕' 18
      (' ', 40, 23));  --  ' ' 19
 
-   J : VSS.Strings.Iterators.Characters.Character_Iterator :=
+   J : VSS.Strings.Character_Iterators.Character_Iterator :=
      S.First_Character;
    C : VSS.Strings.Character_Index := 1;
 

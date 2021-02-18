@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,37 +21,35 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Unicode;
+with VSS.Implementation.String_Handlers;
 
-package VSS.Strings.Iterators is
+package body VSS.Strings.Cursors.Iterators.Characters.Internals is
 
-   pragma Preelaborate;
+   ---------------------
+   -- First_Character --
+   ---------------------
 
-   type Abstract_Iterator is abstract tagged limited private;
+   function First_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+   is
+      use type VSS.Implementation.Strings.String_Handler_Access;
 
-   function Character_Index
-     (Self : Abstract_Iterator'Class) return VSS.Strings.Character_Index;
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Dummy   : Boolean;
 
-   function UTF8_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index;
+   begin
+      return Result :
+        VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         Result.Connect (Self'Unrestricted_Access);
 
-   function UTF16_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF16_Code_Unit_Index;
+         if Handler /= null then
+            Handler.Before_First_Character (Self.Data, Result.Position);
+            Dummy := Handler.Forward (Self.Data, Result.Position);
+         end if;
+      end return;
+   end First_Character;
 
-   function Forward
-     (Self : in out Abstract_Iterator) return Boolean is abstract;
-
-   function Has_Element (Self : Abstract_Iterator) return Boolean is abstract;
-   --  Returns True when iterator points to the text element
-
-private
-
-   type Abstract_Iterator is abstract new Referal_Limited_Base with record
-      Position : VSS.Implementation.Strings.Cursor;
-   end record;
-
-   overriding procedure Invalidate (Self : in out Abstract_Iterator);
-
-end VSS.Strings.Iterators;
+end VSS.Strings.Cursors.Iterators.Characters.Internals;

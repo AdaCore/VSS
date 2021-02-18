@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,47 +21,29 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.Strings.Iterators is
+with VSS.Characters;
 
-   ---------------------
-   -- Character_Index --
-   ---------------------
+package VSS.Strings.Cursors.Iterators.Characters is
 
-   function Character_Index
-     (Self : Abstract_Iterator'Class) return VSS.Strings.Character_Index is
-   begin
-      return VSS.Strings.Character_Index (Self.Position.Index);
-   end Character_Index;
+   pragma Preelaborate;
 
-   ----------------
-   -- Invalidate --
-   ----------------
+   type Character_Iterator is new Abstract_Character_Iterator with private;
 
-   overriding procedure Invalidate (Self : in out Abstract_Iterator) is
-   begin
-      Self.Position := (1, 0, 0);
-   end Invalidate;
+   function Element
+     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
+   --  Return character pointed by iterator.
 
-   ------------------
-   -- UTF16_Offset --
-   ------------------
+private
 
-   function UTF16_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF16_Code_Unit_Index is
-   begin
-      return Self.Position.UTF16_Offset;
-   end UTF16_Offset;
+   type Character_Iterator is new Abstract_Character_Iterator with null record;
 
-   -----------------
-   -- UTF8_Offset --
-   -----------------
+   overriding function Forward
+     (Self : in out Character_Iterator) return Boolean;
 
-   function UTF8_Offset
-     (Self : Abstract_Iterator'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index is
-   begin
-      return Self.Position.UTF8_Offset;
-   end UTF8_Offset;
+   overriding function Has_Element (Self : Character_Iterator) return Boolean;
 
-end VSS.Strings.Iterators;
+   overriding function Create
+     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return Character_Iterator;
+
+end VSS.Strings.Cursors.Iterators.Characters;

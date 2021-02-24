@@ -1,6 +1,6 @@
 name = "vss"
 description = "Advanced string and text manipulation with Unicode support"
-version = "21.0.0"
+version = "22.0.0-20210224"
 tags = ["unicode", "json", "text"]
 
 authors = ["AdaCore"]

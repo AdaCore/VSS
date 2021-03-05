@@ -113,21 +113,16 @@ package body VSS.Strings.Cursors is
    --     --  Not implemented
    --     return Self.Last_Position.UTF8_Offset;
    --  end Last_UTF8_Offset;
-   --
-   --  ------------
-   --  -- Marker --
-   --  ------------
-   --
-   --  function Marker
-   --    (Self : Abstract_Character_Cursor'Class)
-   --     return VSS.Strings.Cursors.Markers.Virtual_Marker is
-   --  begin
-   --     return Result : VSS.Strings.Cursors.Markers.Virtual_Marker do
-   --        if Self.Owner /= null then
-   --           Result.Position := Self.Position;
-   --           Result.Connect (Self.Owner);
-   --        end if;
-   --     end return;
-   --  end Marker;
+
+   ------------
+   -- Marker --
+   ------------
+
+   function Marker
+     (Self : Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+   begin
+      return Self.First_Marker;
+   end Marker;
 
 end VSS.Strings.Cursors;

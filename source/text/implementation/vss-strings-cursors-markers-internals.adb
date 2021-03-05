@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,26 +21,21 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Characters;
-private with VSS.Strings.Cursors.Markers;
+package body VSS.Strings.Cursors.Markers.Internals is
 
-package VSS.Strings.Cursors.Iterators.Characters is
+   ------------------------
+   -- New_Virtual_Marker --
+   ------------------------
 
-   pragma Preelaborate;
+   function New_Virtual_Marker
+     (String   : VSS.Strings.Virtual_String'Class;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+   begin
+      return Result : VSS.Strings.Cursors.Markers.Virtual_Marker do
+         Result.Position := Position;
+         Result.Connect (String'Unrestricted_Access);
+      end return;
+   end New_Virtual_Marker;
 
-   type Character_Iterator is new Abstract_Character_Iterator with private;
-
-   function Element
-     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
-   --  Return character pointed by iterator.
-
-private
-
-   type Character_Iterator is new Abstract_Character_Iterator with null record;
-
-   overriding function Forward
-     (Self : in out Character_Iterator) return Boolean;
-
-   overriding function Has_Element (Self : Character_Iterator) return Boolean;
-
-end VSS.Strings.Cursors.Iterators.Characters;
+end VSS.Strings.Cursors.Markers.Internals;

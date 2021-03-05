@@ -31,17 +31,17 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    -- Create --
    ------------
 
-   overriding function Create
-     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return Character_Iterator is
-   begin
-      return Result : Character_Iterator do
-         if Position.Owner /= null then
-            Result.First_Position := Position.First_Position;
-            Result.Connect (Position.Owner);
-         end if;
-      end return;
-   end Create;
+   --  overriding function Create
+   --    (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   --     return Character_Iterator is
+   --  begin
+   --     return Result : Character_Iterator do
+   --        if Position.Owner /= null then
+   --           Result.Position := Position.Position;
+   --           Result.Connect (Position.Owner);
+   --        end if;
+   --     end return;
+   --  end Create;
 
    -------------
    -- Element --

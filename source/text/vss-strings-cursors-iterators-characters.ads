@@ -42,8 +42,4 @@ private
 
    overriding function Has_Element (Self : Character_Iterator) return Boolean;
 
-   overriding function Create
-     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return Character_Iterator;
-
 end VSS.Strings.Cursors.Iterators.Characters;

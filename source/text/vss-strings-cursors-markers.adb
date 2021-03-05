@@ -21,48 +21,77 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Markers is
+package body VSS.Strings.Cursors.Markers is
 
-   pragma Preelaborate;
-
-   type Virtual_Marker is
-     new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
-
-private
-
-   type Virtual_Marker is
-     new VSS.Strings.Cursors.Abstract_Character_Cursor with record
-      Position : aliased VSS.Implementation.Strings.Cursor;
-   end record;
+   ---------------------------
+   -- First_Character_Index --
+   ---------------------------
 
    overriding function First_Character_Index
-     (Self : Virtual_Marker)
-      return VSS.Strings.Character_Index;
-   --  Return index of the first character of the logical element.
+     (Self : Virtual_Marker) return VSS.Strings.Character_Index is
+   begin
+      return VSS.Strings.Character_Index (Self.Position.Index);
+   end First_Character_Index;
+
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
+   overriding function First_UTF16_Offset
+     (Self : Virtual_Marker) return VSS.Unicode.UTF16_Code_Unit_Index is
+   begin
+      return Self.Position.UTF16_Offset;
+   end First_UTF16_Offset;
+
+   -----------------------
+   -- First_UTF8_Offset --
+   -----------------------
+
+   overriding function First_UTF8_Offset
+     (Self : Virtual_Marker) return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      return Self.Position.UTF8_Offset;
+   end First_UTF8_Offset;
+
+   ----------------
+   -- Invalidate --
+   ----------------
+
+   --  overriding procedure Invalidate (Self : in out Virtual_Marker) is
+   --  begin
+   --     Self.Position := (1, 0, 0);
+   --  end Invalidate;
+
+   --------------------------
+   -- Last_Character_Index --
+   --------------------------
 
    overriding function Last_Character_Index
      (Self : Virtual_Marker)
-      return VSS.Strings.Character_Index;
-   --  Return index of the last character of the logical element.
+      return VSS.Strings.Character_Index renames First_Character_Index;
 
-   overriding function First_UTF8_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  Return offset of the first UTF-8 code unit of the logical element.
-
-   overriding function Last_UTF8_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  Return offset of the last UTF-8 code unit of the logical element.
-
-   overriding function First_UTF16_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  Return offset of the first UTF-16 code unit of the logical element.
+   -----------------------
+   -- Last_UTF16_Offset --
+   -----------------------
 
    overriding function Last_UTF16_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  Return offset of the last UTF-16 code unit of the logical element.
+     (Self : Virtual_Marker) return VSS.Unicode.UTF16_Code_Unit_Index is
+   begin
+      raise Program_Error;
+      --  Not implemented
+      return Self.Position.UTF16_Offset;
+   end Last_UTF16_Offset;
+
+   ----------------------
+   -- Last_UTF8_Offset --
+   ----------------------
+
+   overriding function Last_UTF8_Offset
+     (Self : Virtual_Marker) return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      raise Program_Error;
+      --  Not implemented
+      return Self.Position.UTF8_Offset;
+   end Last_UTF8_Offset;
 
 end VSS.Strings.Cursors.Markers;

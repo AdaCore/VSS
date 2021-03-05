@@ -204,6 +204,20 @@ package body VSS.Strings is
       end if;
    end Append;
 
+   ---------------
+   -- Character --
+   ---------------
+
+   function Character
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+   begin
+      return
+        VSS.Strings.Cursors.Iterators.Characters.Internals.Character
+          (Self, Position);
+   end Character;
+
    ----------------------
    -- Character_Length --
    ----------------------

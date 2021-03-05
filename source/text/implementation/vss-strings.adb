@@ -161,6 +161,17 @@ package body VSS.Strings is
    -- Adjust --
    ------------
 
+   overriding procedure Adjust (Self : in out Referal_Base) is
+   begin
+      if Self.Owner /= null then
+         Self.Connect (Self.Owner);
+      end if;
+   end Adjust;
+
+   ------------
+   -- Adjust --
+   ------------
+
    overriding procedure Adjust (Self : in out Virtual_String) is
    begin
       VSS.Implementation.Strings.Reference (Self.Data);
@@ -249,7 +260,7 @@ package body VSS.Strings is
    -------------
 
    procedure Connect
-     (Self  : in out Referal_Limited_Base'Class;
+     (Self  : in out Referal_Base'Class;
       Owner : not null Magic_String_Access) is
    begin
       if Owner.Head = null then
@@ -265,12 +276,32 @@ package body VSS.Strings is
       Self.Owner := Owner;
    end Connect;
 
+   -------------
+   -- Connect --
+   -------------
+
+   procedure Connect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : not null Magic_String_Access) is
+   begin
+      if Owner.Limited_Head = null then
+         Owner.Limited_Head := Self'Unchecked_Access;
+         Owner.Limited_Tail := Self'Unchecked_Access;
+
+      else
+         Owner.Limited_Tail.Next := Self'Unchecked_Access;
+         Self.Previous := Owner.Limited_Tail;
+         Owner.Limited_Tail := Self'Unchecked_Access;
+      end if;
+
+      Self.Owner := Owner;
+   end Connect;
+
    ----------------
    -- Disconnect --
    ----------------
 
-   procedure Disconnect
-     (Self : in out Referal_Limited_Base'Class) is
+   procedure Disconnect (Self : in out Referal_Base'Class) is
    begin
       if Self.Owner /= null then
          if Self.Owner.Head = Self'Unchecked_Access then
@@ -279,6 +310,35 @@ package body VSS.Strings is
 
          if Self.Owner.Tail = Self'Unchecked_Access then
             Self.Owner.Tail := Self.Owner.Tail.Previous;
+         end if;
+
+         if Self.Previous /= null then
+            Self.Previous.Next := Self.Next;
+         end if;
+
+         if Self.Next /= null then
+            Self.Next.Previous := Self.Previous;
+         end if;
+
+         Self.Owner    := null;
+         Self.Previous := null;
+         Self.Next     := null;
+      end if;
+   end Disconnect;
+
+   ----------------
+   -- Disconnect --
+   ----------------
+
+   procedure Disconnect (Self : in out Referal_Limited_Base'Class) is
+   begin
+      if Self.Owner /= null then
+         if Self.Owner.Limited_Head = Self'Unchecked_Access then
+            Self.Owner.Limited_Head := Self.Owner.Limited_Head.Next;
+         end if;
+
+         if Self.Owner.Limited_Tail = Self'Unchecked_Access then
+            Self.Owner.Limited_Tail := Self.Owner.Limited_Tail.Previous;
          end if;
 
          if Self.Previous /= null then
@@ -344,9 +404,26 @@ package body VSS.Strings is
          Self.Head.Disconnect;
       end loop;
 
+      while Self.Limited_Head /= null loop
+         Self.Limited_Head.Invalidate;
+         Self.Limited_Head.Disconnect;
+      end loop;
+
       --  Unreference shared data
 
       VSS.Implementation.Strings.Unreference (Self.Data);
+   end Finalize;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding procedure Finalize (Self : in out Referal_Base) is
+   begin
+      if Self.Owner /= null then
+         Referal_Base'Class (Self).Invalidate;
+         Self.Disconnect;
+      end if;
    end Finalize;
 
    --------------
@@ -501,12 +578,14 @@ package body VSS.Strings is
      (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text is
    begin
       return (Ada.Finalization.Controlled with
-                Data => <>,
+                Data         => <>,
                 --  Data => (if Self.Data = null
                 --           then null
                 --           else Self.Data.To_Text),
-                Head => null,
-                Tail => null);
+                Head         => null,
+                Tail         => null,
+                Limited_Head => null,
+                Limited_Tail => null);
    end To_Magic_Text;
 
    -----------------------

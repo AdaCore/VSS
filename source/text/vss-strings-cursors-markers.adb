@@ -57,10 +57,10 @@ package body VSS.Strings.Cursors.Markers is
    -- Invalidate --
    ----------------
 
-   --  overriding procedure Invalidate (Self : in out Virtual_Marker) is
-   --  begin
-   --     Self.Position := (1, 0, 0);
-   --  end Invalidate;
+   overriding procedure Invalidate (Self : in out Virtual_Marker) is
+   begin
+      Self.Position := (1, 0, 0);
+   end Invalidate;
 
    --------------------------
    -- Last_Character_Index --

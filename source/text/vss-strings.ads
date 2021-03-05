@@ -283,6 +283,36 @@ private
 
    type Magic_String_Access is access all Virtual_String'Class;
 
+   ------------------
+   -- Referal_Base --
+   ------------------
+
+   type Referal_Base is tagged;
+
+   type Referal_Access is access all Referal_Base'Class;
+
+   type Referal_Base is abstract new Ada.Finalization.Controlled with record
+      Owner    : Magic_String_Access;
+      Next     : Referal_Access;
+      Previous : Referal_Access;
+   end record;
+
+   procedure Connect
+     (Self  : in out Referal_Base'Class;
+      Owner : not null Magic_String_Access);
+   --  Connect referal to string object
+
+   procedure Disconnect (Self  : in out Referal_Base'Class);
+   --  Disconnect referel from string object
+
+   procedure Invalidate (Self : in out Referal_Base) is abstract;
+
+   overriding procedure Adjust (Self : in out Referal_Base);
+   --  Connect new object to the string object.
+
+   overriding procedure Finalize (Self : in out Referal_Base);
+   --  Invalidate referal state and disconnect from the string object.
+
    --------------------------
    -- Referal_Limited_Base --
    --------------------------
@@ -292,7 +322,7 @@ private
    type Referal_Limited_Access is access all Referal_Limited_Base'Class;
 
    type Referal_Limited_Base is
-     abstract new Ada.Finalization.Limited_Controlled with record
+     abstract limited new Ada.Finalization.Limited_Controlled with record
       Owner    : Magic_String_Access;
       Next     : Referal_Limited_Access;
       Previous : Referal_Limited_Access;
@@ -323,9 +353,11 @@ private
       Self   : Virtual_String);
 
    type Virtual_String is new Ada.Finalization.Controlled with record
-      Head : Referal_Limited_Access;
-      Tail : Referal_Limited_Access;
-      Data : aliased VSS.Implementation.Strings.String_Data;
+      Limited_Head : Referal_Limited_Access;
+      Limited_Tail : Referal_Limited_Access;
+      Head         : Referal_Access;
+      Tail         : Referal_Access;
+      Data         : aliased VSS.Implementation.Strings.String_Data;
    end record
      with Read  => Read,
           Write => Write;
@@ -335,7 +367,11 @@ private
 
    Empty_Virtual_String : constant Virtual_String :=
      (Ada.Finalization.Controlled with
-        Data => <>, Head => null, Tail => null);
+        Data         => <>,
+        Head         => null,
+        Tail         => null,
+        Limited_Head => null,
+        Limited_Tail => null);
 
    -----------------------
    -- Grapheme_Iterator --

@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Strings.Cursors.Markers;
+
 package body VSS.Strings.Cursors is
 
    ---------------------
@@ -34,119 +36,98 @@ package body VSS.Strings.Cursors is
       return Self.First_Character_Index;
    end Character_Index;
 
-   ---------------------------
-   -- First_Character_Index --
-   ---------------------------
-
-   function First_Character_Index
-     (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index is
-   begin
-      return
-        VSS.Strings.Character_Index
-          (if Self.Is_Segment
-           then Self.First_Position.Index
-           else Self.Position.Index);
-   end First_Character_Index;
-
-   ------------------------
-   -- First_UTF16_Offset --
-   ------------------------
-
-   function First_UTF16_Offset
-     (Self : Abstract_Cursor'Class)
-      return VSS.Unicode.UTF16_Code_Unit_Index is
-   begin
-      return
-        (if Self.Is_Segment
-         then Self.First_Position.UTF16_Offset
-         else Self.Position.UTF16_Offset);
-   end First_UTF16_Offset;
-
-   -----------------------
-   -- First_UTF8_Offset --
-   -----------------------
-
-   function First_UTF8_Offset
-     (Self : Abstract_Cursor'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index is
-   begin
-      return
-        (if Self.Is_Segment
-         then Self.First_Position.UTF8_Offset
-         else Self.Position.UTF8_Offset);
-   end First_UTF8_Offset;
-
-   ----------------
-   -- Invalidate --
-   ----------------
-
-   overriding procedure Invalidate (Self : in out Abstract_Character_Cursor) is
-   begin
-      Self.Position := (1, 0, 0);
-   end Invalidate;
-
-   --------------------------
-   -- Last_Character_Index --
-   --------------------------
-
-   function Last_Character_Index
-     (Self : Abstract_Cursor'Class) return VSS.Strings.Character_Index is
-   begin
-      return
-        VSS.Strings.Character_Index
-          (if Self.Is_Segment
-           then Self.Last_Position.Index
-           else Self.Position.Index);
-   end Last_Character_Index;
-
-   -----------------------
-   -- Last_UTF16_Offset --
-   -----------------------
-
-   function Last_UTF16_Offset
-     (Self : Abstract_Cursor'Class)
-      return VSS.Unicode.UTF16_Code_Unit_Index is
-   begin
-      return
-        (if Self.Is_Segment
-         then Self.Last_Position.UTF16_Offset
-         else Self.Position.UTF16_Offset);
-   end Last_UTF16_Offset;
-
-   ----------------------
-   -- Last_UTF8_Offset --
-   ----------------------
-
-   function Last_UTF8_Offset
-     (Self : Abstract_Cursor'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index is
-   begin
-      return
-        (if Self.Is_Segment
-         then Self.Last_Position.UTF8_Offset
-         else Self.Position.UTF8_Offset);
-   end Last_UTF8_Offset;
-
-   ------------------
-   -- UTF16_Offset --
-   ------------------
-
-   function UTF16_Offset
-     (Self : Abstract_Character_Cursor'Class)
-      return VSS.Unicode.UTF16_Code_Unit_Index is
-   begin
-      return Self.First_UTF16_Offset;
-   end UTF16_Offset;
-
-   -----------------
-   -- UTF8_Offset --
-   -----------------
-
-   function UTF8_Offset
-     (Self : Abstract_Character_Cursor'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index is
-   begin
-      return Self.First_UTF8_Offset;
-   end UTF8_Offset;
+   --  ---------------------------
+   --  -- First_Character_Index --
+   --  ---------------------------
+   --
+   --  function First_Character_Index
+   --    (Self : Abstract_Segment_Cursor'Class) return VSS.Strings.Character_Index is
+   --  begin
+   --     return VSS.Strings.Character_Index (Self.First_Position.Index);
+   --  end First_Character_Index;
+   --
+   --  ------------------------
+   --  -- First_UTF16_Offset --
+   --  ------------------------
+   --
+   --  function First_UTF16_Offset
+   --    (Self : Abstract_Segment_Cursor'Class)
+   --     return VSS.Unicode.UTF16_Code_Unit_Index is
+   --  begin
+   --     return Self.First_Position.UTF16_Offset;
+   --  end First_UTF16_Offset;
+   --
+   --  -----------------------
+   --  -- First_UTF8_Offset --
+   --  -----------------------
+   --
+   --  function First_UTF8_Offset
+   --    (Self : Abstract_Segment_Cursor'Class)
+   --     return VSS.Unicode.UTF8_Code_Unit_Index is
+   --  begin
+   --     return Self.First_Position.UTF8_Offset;
+   --  end First_UTF8_Offset;
+   --
+   --  ----------------
+   --  -- Invalidate --
+   --  ----------------
+   --
+   --  overriding procedure Invalidate (Self : in out Abstract_Segment_Cursor) is
+   --  begin
+   --     Self.First_Position := (1, 0, 0);
+   --     Self.Last_Position  := (1, 0, 0);
+   --  end Invalidate;
+   --
+   --  --------------------------
+   --  -- Last_Character_Index --
+   --  --------------------------
+   --
+   --  function Last_Character_Index
+   --    (Self : Abstract_Segment_Cursor'Class) return VSS.Strings.Character_Index is
+   --  begin
+   --     return VSS.Strings.Character_Index (Self.Last_Position.Index);
+   --  end Last_Character_Index;
+   --
+   --  -----------------------
+   --  -- Last_UTF16_Offset --
+   --  -----------------------
+   --
+   --  function Last_UTF16_Offset
+   --    (Self : Abstract_Segment_Cursor'Class)
+   --     return VSS.Unicode.UTF16_Code_Unit_Index is
+   --  begin
+   --     raise Program_Error;
+   --     --  Not implemented
+   --     return Self.Last_Position.UTF16_Offset;
+   --  end Last_UTF16_Offset;
+   --
+   --  ----------------------
+   --  -- Last_UTF8_Offset --
+   --  ----------------------
+   --
+   --  function Last_UTF8_Offset
+   --    (Self : Abstract_Segment_Cursor'Class)
+   --     return VSS.Unicode.UTF8_Code_Unit_Index is
+   --  begin
+   --     raise Program_Error;
+   --     --  Not implemented
+   --     return Self.Last_Position.UTF8_Offset;
+   --  end Last_UTF8_Offset;
+   --
+   --  ------------
+   --  -- Marker --
+   --  ------------
+   --
+   --  function Marker
+   --    (Self : Abstract_Character_Cursor'Class)
+   --     return VSS.Strings.Cursors.Markers.Virtual_Marker is
+   --  begin
+   --     return Result : VSS.Strings.Cursors.Markers.Virtual_Marker do
+   --        if Self.Owner /= null then
+   --           Result.Position := Self.Position;
+   --           Result.Connect (Self.Owner);
+   --        end if;
+   --     end return;
+   --  end Marker;
 
 end VSS.Strings.Cursors;

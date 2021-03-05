@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -34,9 +34,9 @@ procedure Test_Character_Iterators is
    use type VSS.Unicode.UTF16_Code_Unit_Count;
 
    type Position_Data is record
-      Character    : VSS.Characters.Virtual_Character;
-      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Count;
-      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Count;
+      Character          : VSS.Characters.Virtual_Character;
+      First_UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Count;
+      First_UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Count;
    end record;
 
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
@@ -131,11 +131,11 @@ begin
          raise Program_Error;
       end if;
 
-      if J.UTF8_Offset /= D (C).UTF8_Offset then
+      if J.First_UTF8_Offset /= D (C).First_UTF8_Offset then
          raise Program_Error;
       end if;
 
-      if J.UTF16_Offset /= D (C).UTF16_Offset then
+      if J.First_UTF16_Offset /= D (C).First_UTF16_Offset then
          raise Program_Error;
       end if;
 

@@ -26,7 +26,8 @@ package VSS.Strings.Cursors.Iterators is
    pragma Preelaborate;
 
    type Abstract_Character_Iterator is
-     abstract new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
+     abstract limited new VSS.Strings.Cursors.Abstract_Character_Cursor
+       with private;
 
    function Forward
      (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
@@ -35,18 +36,53 @@ package VSS.Strings.Cursors.Iterators is
      (Self : Abstract_Character_Iterator) return Boolean is abstract;
    --  Returns True when iterator points to the text element
 
-   function Create
-     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return Abstract_Character_Iterator is abstract;
-   --  Creates iterator at given position. When given Position is not valid
-   --  position of iterator's element constructed iterator has another position
-   --  which points to start of logical element pointed by given position. It
-   --  is allowed to return invalidated iterator in such cases too.
+   --  function Create
+   --    (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   --     return Abstract_Character_Iterator is abstract;
+   --  --  Creates iterator at given position. When given Position is not valid
+   --  --  position of iterator's element constructed iterator has another position
+   --  --  which points to start of logical element pointed by given position. It
+   --  --  is allowed to return invalidated iterator in such cases too.
 
 private
 
    type Abstract_Character_Iterator is
-     abstract new VSS.Strings.Cursors.Abstract_Character_Cursor
-       with null record;
+     abstract limited new VSS.Strings.Referal_Limited_Base
+       and VSS.Strings.Cursors.Abstract_Character_Cursor with
+   record
+      Position : aliased VSS.Implementation.Strings.Cursor;
+   end record;
+
+   overriding procedure Invalidate (Self : in out Abstract_Character_Iterator);
+
+   overriding function First_Character_Index
+     (Self : Abstract_Character_Iterator)
+      return VSS.Strings.Character_Index;
+   --  Return index of the first character of the logical element.
+
+   overriding function Last_Character_Index
+     (Self : Abstract_Character_Iterator)
+      return VSS.Strings.Character_Index;
+   --  Return index of the last character of the logical element.
+
+   overriding function First_UTF8_Offset
+     (Self : Abstract_Character_Iterator)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+   --  Return offset of the first UTF-8 code unit of the logical element.
+
+   overriding function Last_UTF8_Offset
+     (Self : Abstract_Character_Iterator)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+   --  Return offset of the last UTF-8 code unit of the logical element.
+
+   overriding function First_UTF16_Offset
+     (Self : Abstract_Character_Iterator)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Return offset of the first UTF-16 code unit of the logical element.
+
+   overriding function Last_UTF16_Offset
+     (Self : Abstract_Character_Iterator)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Return offset of the last UTF-16 code unit of the logical element.
 
 end VSS.Strings.Cursors.Iterators;

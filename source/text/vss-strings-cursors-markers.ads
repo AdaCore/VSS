@@ -31,9 +31,12 @@ package VSS.Strings.Cursors.Markers is
 private
 
    type Virtual_Marker is
-     new VSS.Strings.Cursors.Abstract_Character_Cursor with record
+     new VSS.Strings.Referal_Base
+       and VSS.Strings.Cursors.Abstract_Character_Cursor with record
       Position : aliased VSS.Implementation.Strings.Cursor;
    end record;
+
+   overriding procedure Invalidate (Self : in out Virtual_Marker);
 
    overriding function First_Character_Index
      (Self : Virtual_Marker)

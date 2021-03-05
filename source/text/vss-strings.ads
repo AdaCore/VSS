@@ -73,6 +73,11 @@ package VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
 
+   function Character
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+
    --  function Last_Character
    --    (Self : Magic_String'Class) return Character_Iterator;
    --

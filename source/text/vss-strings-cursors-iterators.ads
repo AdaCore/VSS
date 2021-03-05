@@ -36,14 +36,6 @@ package VSS.Strings.Cursors.Iterators is
      (Self : Abstract_Character_Iterator) return Boolean is abstract;
    --  Returns True when iterator points to the text element
 
-   --  function Create
-   --    (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-   --     return Abstract_Character_Iterator is abstract;
-   --  --  Creates iterator at given position. When given Position is not valid
-   --  --  position of iterator's element constructed iterator has another position
-   --  --  which points to start of logical element pointed by given position. It
-   --  --  is allowed to return invalidated iterator in such cases too.
-
 private
 
    type Abstract_Character_Iterator is

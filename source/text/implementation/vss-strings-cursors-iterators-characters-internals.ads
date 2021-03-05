@@ -29,4 +29,9 @@ package VSS.Strings.Cursors.Iterators.Characters.Internals is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
 
+   function Character
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+
 end VSS.Strings.Cursors.Iterators.Characters.Internals;

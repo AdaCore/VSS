@@ -25,6 +25,45 @@ with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Cursors.Iterators.Characters.Internals is
 
+   use type VSS.Implementation.Strings.String_Handler_Access;
+
+   ---------------
+   -- Character --
+   ---------------
+
+   function Character
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+   begin
+      if Position in Abstract_Character_Iterator'Class then
+         declare
+            P : Abstract_Character_Iterator'Class
+              renames Abstract_Character_Iterator'Class (Position);
+
+         begin
+            if P.Owner /= Self'Unrestricted_Access then
+               raise Program_Error;
+            end if;
+
+            return Result :
+              VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+            do
+               Result.Connect (Self'Unrestricted_Access);
+               Result.Position := P.Position;
+            end return;
+         end;
+
+      else
+         --  Aux : constant VSS.Implementation.Strings.Cursor :=
+         --    (Position.Character_Index,
+         --     Position.First_UTF8_Offset,
+         --     Position.Last_UTF8_Offset);
+
+         raise Program_Error;
+      end if;
+   end Character;
+
    ---------------------
    -- First_Character --
    ---------------------
@@ -33,8 +72,6 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
    is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
       Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
         Self.Handler;
       Dummy   : Boolean;

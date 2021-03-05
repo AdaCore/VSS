@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  limited with VSS.Strings.Cursors.Markers;
+limited with VSS.Strings.Cursors.Markers;
 with VSS.Unicode;
 
 package VSS.Strings.Cursors is
@@ -30,15 +30,15 @@ package VSS.Strings.Cursors is
 
    type Abstract_Cursor is limited interface;
 
-   --  function First_Marker
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Strings.Cursors.Markers.Virtual_Marker;
-   --  --  Return marker of the first character of the logical element.
-   --
-   --  function Last_Marker
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Strings.Cursors.Markers.Virtual_Marker;
-   --  --  Return marker of the last character of the logical element.
+   function First_Marker
+     (Self : Abstract_Cursor)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker is abstract;
+   --  Return marker of the first character of the logical element.
+
+   function Last_Marker
+     (Self : Abstract_Cursor)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker is abstract;
+   --  Return marker of the last character of the logical element.
 
    function First_Character_Index
      (Self : Abstract_Cursor)
@@ -74,10 +74,10 @@ package VSS.Strings.Cursors is
    type Abstract_Character_Cursor is limited interface and Abstract_Cursor;
    --  Cursor that points to single character.
 
-   --  function Marker
-   --    (Self : Abstract_Character_Cursor'Class)
-   --     return VSS.Strings.Cursors.Markers.Virtual_Marker;
-   --  --  Return marker of the character.
+   function Marker
+     (Self : Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+   --  Return marker of the character.
 
    function Character_Index
      (Self : Abstract_Character_Cursor'Class)

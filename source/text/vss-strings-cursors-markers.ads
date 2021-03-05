@@ -38,6 +38,16 @@ private
 
    overriding procedure Invalidate (Self : in out Virtual_Marker);
 
+   overriding function First_Marker
+     (Self : Virtual_Marker)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+   --  Return marker of the first character of the logical element.
+
+   overriding function Last_Marker
+     (Self : Virtual_Marker)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker renames First_Marker;
+   --  Return marker of the last character of the logical element.
+
    overriding function First_Character_Index
      (Self : Virtual_Marker)
       return VSS.Strings.Character_Index;

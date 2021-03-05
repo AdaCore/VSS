@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Strings.Cursors.Markers.Internals;
+
 package body VSS.Strings.Cursors.Markers is
 
    ---------------------------
@@ -32,6 +34,19 @@ package body VSS.Strings.Cursors.Markers is
    begin
       return VSS.Strings.Character_Index (Self.Position.Index);
    end First_Character_Index;
+
+   ------------------
+   -- First_Marker --
+   ------------------
+
+   overriding function First_Marker
+     (Self : Virtual_Marker)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+   begin
+      return
+        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+          (Self.Owner.all, Self.Position);
+   end First_Marker;
 
    ------------------------
    -- First_UTF16_Offset --

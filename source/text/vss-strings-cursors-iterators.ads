@@ -47,6 +47,16 @@ private
 
    overriding procedure Invalidate (Self : in out Abstract_Character_Iterator);
 
+   overriding function First_Marker
+     (Self : Abstract_Character_Iterator)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+   --  Return marker of the first character of the logical element.
+
+   overriding function Last_Marker
+     (Self : Abstract_Character_Iterator)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker renames First_Marker;
+   --  Return marker of the last character of the logical element.
+
    overriding function First_Character_Index
      (Self : Abstract_Character_Iterator)
       return VSS.Strings.Character_Index;

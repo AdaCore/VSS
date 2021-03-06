@@ -199,6 +199,16 @@ package VSS.Implementation.String_Handlers is
    --  Append suffix string to the data.
    --  The default implementatio append string in a character by character way.
 
+   not overriding procedure Slice
+     (Self   : Abstract_String_Handler;
+      Source : VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Target : out VSS.Implementation.Strings.String_Data);
+   --  Return slice of the string.
+   --  Default implementation construct slice by processing individual
+   --  characters.
+
    not overriding procedure Split_Lines
      (Self            : Abstract_String_Handler;
       Data            : VSS.Implementation.Strings.String_Data;

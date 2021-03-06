@@ -250,6 +250,47 @@ package body VSS.Implementation.String_Handlers is
       end loop;
    end Append;
 
+   -----------
+   -- Slice --
+   -----------
+
+   not overriding procedure Slice
+     (Self   : Abstract_String_Handler;
+      Source : VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Target : out VSS.Implementation.Strings.String_Data)
+   is
+      Handler  : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Current  : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if From.Index <= To.Index then
+         Target :=
+           (In_Place => True,
+            Capacity => 0,
+            Storage  => (others => 0),
+            Padding  => <>);
+         --  XXX Should Initialize subprogram be added to string handler to
+         --  be used in cases like this?
+         Current := From;
+
+         VSS.Implementation.Strings.Handler (Target).Append
+           (Target, Handler.Element (Source, Current));
+
+         while Handler.Forward (Source, Current)
+           and then Current.Index <= To.Index
+         loop
+            VSS.Implementation.Strings.Handler (Target).Append
+              (Target, Handler.Element (Source, Current));
+         end loop;
+
+      else
+         Target := VSS.Implementation.Strings.Null_String_Data;
+      end if;
+   end Slice;
+
    -----------------
    -- Starts_With --
    -----------------

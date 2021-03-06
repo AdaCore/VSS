@@ -36,10 +36,28 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
    begin
-      if Position in Abstract_Character_Iterator'Class then
+      if Position in Character_Cursor_Limited_Base'Class then
          declare
-            P : Abstract_Character_Iterator'Class
-              renames Abstract_Character_Iterator'Class (Position);
+            P : Character_Cursor_Limited_Base'Class
+              renames Character_Cursor_Limited_Base'Class (Position);
+
+         begin
+            if P.Owner /= Self'Unrestricted_Access then
+               raise Program_Error;
+            end if;
+
+            return Result :
+              VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+            do
+               Result.Connect (Self'Unrestricted_Access);
+               Result.Position := P.Position;
+            end return;
+         end;
+
+      elsif Position in Character_Cursor_Base'Class then
+         declare
+            P : Character_Cursor_Base'Class
+              renames Character_Cursor_Base'Class (Position);
 
          begin
             if P.Owner /= Self'Unrestricted_Access then

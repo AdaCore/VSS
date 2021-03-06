@@ -31,52 +31,6 @@ package VSS.Strings.Cursors.Markers is
 private
 
    type Virtual_Marker is
-     new VSS.Strings.Referal_Base
-       and VSS.Strings.Cursors.Abstract_Character_Cursor with
-   record
-      Position : aliased VSS.Implementation.Strings.Cursor;
-   end record;
-
-   overriding procedure Invalidate (Self : in out Virtual_Marker);
-
-   overriding function First_Marker
-     (Self : Virtual_Marker)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
-   --  Return marker of the first character of the logical element.
-
-   overriding function Last_Marker
-     (Self : Virtual_Marker)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker renames First_Marker;
-   --  Return marker of the last character of the logical element.
-
-   overriding function First_Character_Index
-     (Self : Virtual_Marker)
-      return VSS.Strings.Character_Index;
-   --  Return index of the first character of the logical element.
-
-   overriding function Last_Character_Index
-     (Self : Virtual_Marker)
-      return VSS.Strings.Character_Index;
-   --  Return index of the last character of the logical element.
-
-   overriding function First_UTF8_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  Return offset of the first UTF-8 code unit of the logical element.
-
-   overriding function Last_UTF8_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  Return offset of the last UTF-8 code unit of the logical element.
-
-   overriding function First_UTF16_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  Return offset of the first UTF-16 code unit of the logical element.
-
-   overriding function Last_UTF16_Offset
-     (Self : Virtual_Marker)
-      return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  Return offset of the last UTF-16 code unit of the logical element.
+     new VSS.Strings.Cursors.Character_Cursor_Base with null record;
 
 end VSS.Strings.Cursors.Markers;

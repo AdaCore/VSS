@@ -98,4 +98,139 @@ package VSS.Strings.Cursors is
    type Abstract_Segment_Cursor is limited interface and Abstract_Cursor;
    --  Cursor that points to some segment of the string.
 
+private
+
+   ---------------------------
+   -- Character_Cursor_Base --
+   ---------------------------
+
+   type Character_Cursor_Base is
+     abstract new VSS.Strings.Referal_Base
+       and VSS.Strings.Cursors.Abstract_Character_Cursor with
+   record
+      Position : aliased VSS.Implementation.Strings.Cursor;
+   end record;
+
+   overriding procedure Invalidate (Self : in out Character_Cursor_Base);
+
+   overriding function First_Marker
+     (Self : Character_Cursor_Base)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+
+   overriding function Last_Marker
+     (Self : Character_Cursor_Base)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker renames First_Marker;
+
+   overriding function First_Character_Index
+     (Self : Character_Cursor_Base)
+      return VSS.Strings.Character_Index;
+
+   overriding function Last_Character_Index
+     (Self : Character_Cursor_Base)
+      return VSS.Strings.Character_Index renames First_Character_Index;
+
+   overriding function First_UTF8_Offset
+     (Self : Character_Cursor_Base) return VSS.Unicode.UTF8_Code_Unit_Index;
+
+   overriding function Last_UTF8_Offset
+     (Self : Character_Cursor_Base) return VSS.Unicode.UTF8_Code_Unit_Index;
+
+   overriding function First_UTF16_Offset
+     (Self : Character_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index;
+
+   overriding function Last_UTF16_Offset
+     (Self : Character_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index;
+
+   -----------------------------------
+   -- Character_Cursor_Limited_Base --
+   -----------------------------------
+
+   type Character_Cursor_Limited_Base is
+     abstract new VSS.Strings.Referal_Limited_Base
+       and VSS.Strings.Cursors.Abstract_Character_Cursor with
+   record
+      Position : aliased VSS.Implementation.Strings.Cursor;
+   end record;
+
+   overriding procedure Invalidate
+     (Self : in out Character_Cursor_Limited_Base);
+
+   overriding function First_Marker
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+
+   overriding function Last_Marker
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker renames First_Marker;
+
+   overriding function First_Character_Index
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Strings.Character_Index;
+
+   overriding function Last_Character_Index
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Strings.Character_Index renames First_Character_Index;
+
+   overriding function First_UTF8_Offset
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+
+   overriding function Last_UTF8_Offset
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+
+   overriding function First_UTF16_Offset
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+
+   overriding function Last_UTF16_Offset
+     (Self : Character_Cursor_Limited_Base)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+
+   ---------------------------------
+   -- Segment_Cursor_Limited_Base --
+   ---------------------------------
+
+   type Segment_Cursor_Limited_Base is
+     abstract limited new VSS.Strings.Referal_Limited_Base
+       and VSS.Strings.Cursors.Abstract_Segment_Cursor with
+   record
+      First_Position : aliased VSS.Implementation.Strings.Cursor;
+      Last_Position  : aliased VSS.Implementation.Strings.Cursor;
+   end record;
+
+   overriding procedure Invalidate (Self : in out Segment_Cursor_Limited_Base);
+
+   overriding function First_Marker
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+
+   overriding function Last_Marker
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+
+   overriding function First_Character_Index
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Strings.Character_Index;
+
+   overriding function Last_Character_Index
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Strings.Character_Index;
+
+   overriding function First_UTF8_Offset
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+
+   overriding function Last_UTF8_Offset
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+
+   overriding function First_UTF16_Offset
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+
+   overriding function Last_UTF16_Offset
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+
 end VSS.Strings.Cursors;

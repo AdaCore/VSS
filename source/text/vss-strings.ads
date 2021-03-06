@@ -242,16 +242,16 @@ package VSS.Strings is
    --  --  Replace slice from and to given positions by given item and returns
    --  --  result.
 
-   --  function Slice
-   --    (Self : Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
-   --     return Virtual_String;
-   --  function Slice
-   --    (Self    : Virtual_String'Class;
-   --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class)
-   --     return Virtual_String;
-   --  --  Returns slice of the string.
+   function Slice
+     (Self : Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String;
+   function Slice
+     (Self    : Virtual_String'Class;
+      Segment : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String;
+   --  Returns slice of the string.
 
    function Starts_With
      (Self   : Virtual_String'Class;

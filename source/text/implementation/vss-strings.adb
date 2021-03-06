@@ -23,6 +23,7 @@
 
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
+with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
@@ -508,6 +509,70 @@ package body VSS.Strings is
    begin
       raise Program_Error with "Not implemented";
    end Read;
+
+   -----------
+   -- Slice --
+   -----------
+
+   function Slice
+     (Self : Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+
+      First_Position : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (From);
+      Last_Position  : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+        VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (To);
+
+   begin
+      --  Check_Owner (From, Self);
+      --  Check_Owner (To, Self);
+
+      return Result : Virtual_String do
+         if Handler /= null then
+            Handler.Slice
+              (Self.Data,
+               First_Position.all,
+               Last_Position.all,
+               Result.Data);
+         end if;
+      end return;
+   end Slice;
+
+   -----------
+   -- Slice --
+   -----------
+
+   function Slice
+     (Self    : Virtual_String'Class;
+      Segment : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+
+      First_Position : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (Segment);
+      Last_Position  : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+        VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (Segment);
+
+   begin
+      --  Check_Owner (Segment, Self);
+
+      return Result : Virtual_String do
+         if Handler /= null then
+            Handler.Slice
+              (Self.Data,
+               First_Position.all,
+               Last_Position.all,
+               Result.Data);
+         end if;
+      end return;
+   end Slice;
 
    -----------------
    -- Split_Lines --

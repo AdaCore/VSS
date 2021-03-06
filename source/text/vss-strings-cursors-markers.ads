@@ -32,7 +32,8 @@ private
 
    type Virtual_Marker is
      new VSS.Strings.Referal_Base
-       and VSS.Strings.Cursors.Abstract_Character_Cursor with record
+       and VSS.Strings.Cursors.Abstract_Character_Cursor with
+   record
       Position : aliased VSS.Implementation.Strings.Cursor;
    end record;
 

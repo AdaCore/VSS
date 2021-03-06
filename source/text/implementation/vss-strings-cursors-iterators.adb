@@ -36,6 +36,16 @@ package body VSS.Strings.Cursors.Iterators is
       return VSS.Strings.Character_Index (Self.Position.Index);
    end First_Character_Index;
 
+   ---------------------------
+   -- First_Character_Index --
+   ---------------------------
+
+   overriding function First_Character_Index
+     (Self : Abstract_Segment_Iterator) return VSS.Strings.Character_Index is
+   begin
+      return VSS.Strings.Character_Index (Self.First_Position.Index);
+   end First_Character_Index;
+
    ------------------
    -- First_Marker --
    ------------------
@@ -49,6 +59,19 @@ package body VSS.Strings.Cursors.Iterators is
           (Self.Owner.all, Self.Position);
    end First_Marker;
 
+   ------------------
+   -- First_Marker --
+   ------------------
+
+   overriding function First_Marker
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+   begin
+      return
+        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+          (Self.Owner.all, Self.First_Position);
+   end First_Marker;
+
    ------------------------
    -- First_UTF16_Offset --
    ------------------------
@@ -58,6 +81,17 @@ package body VSS.Strings.Cursors.Iterators is
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
       return Self.Position.UTF16_Offset;
+   end First_UTF16_Offset;
+
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
+   overriding function First_UTF16_Offset
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Unicode.UTF16_Code_Unit_Index is
+   begin
+      return Self.First_Position.UTF16_Offset;
    end First_UTF16_Offset;
 
    -----------------------
@@ -71,6 +105,17 @@ package body VSS.Strings.Cursors.Iterators is
       return Self.Position.UTF8_Offset;
    end First_UTF8_Offset;
 
+   -----------------------
+   -- First_UTF8_Offset --
+   -----------------------
+
+   overriding function First_UTF8_Offset
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      return Self.First_Position.UTF8_Offset;
+   end First_UTF8_Offset;
+
    ----------------
    -- Invalidate --
    ----------------
@@ -81,6 +126,16 @@ package body VSS.Strings.Cursors.Iterators is
       Self.Position := (1, 0, 0);
    end Invalidate;
 
+   ----------------
+   -- Invalidate --
+   ----------------
+
+   overriding procedure Invalidate (Self : in out Abstract_Segment_Iterator) is
+   begin
+      Self.First_Position := (1, 0, 0);
+      Self.Last_Position  := (1, 0, 0);
+   end Invalidate;
+
    --------------------------
    -- Last_Character_Index --
    --------------------------
@@ -88,6 +143,29 @@ package body VSS.Strings.Cursors.Iterators is
    overriding function Last_Character_Index
      (Self : Abstract_Character_Iterator)
       return VSS.Strings.Character_Index renames First_Character_Index;
+
+   --------------------------
+   -- Last_Character_Index --
+   --------------------------
+
+   overriding function Last_Character_Index
+     (Self : Abstract_Segment_Iterator) return VSS.Strings.Character_Index is
+   begin
+      return VSS.Strings.Character_Index (Self.Last_Position.Index);
+   end Last_Character_Index;
+
+   -----------------
+   -- Last_Marker --
+   -----------------
+
+   overriding function Last_Marker
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+   begin
+      return
+        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+          (Self.Owner.all, Self.Last_Position);
+   end Last_Marker;
 
    -----------------------
    -- Last_UTF16_Offset --
@@ -102,6 +180,19 @@ package body VSS.Strings.Cursors.Iterators is
       return Self.Position.UTF16_Offset;
    end Last_UTF16_Offset;
 
+   -----------------------
+   -- Last_UTF16_Offset --
+   -----------------------
+
+   overriding function Last_UTF16_Offset
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Unicode.UTF16_Code_Unit_Index is
+   begin
+      raise Program_Error;
+      --  Not implemented
+      return Self.Last_Position.UTF16_Offset;
+   end Last_UTF16_Offset;
+
    ----------------------
    -- Last_UTF8_Offset --
    ----------------------
@@ -113,6 +204,19 @@ package body VSS.Strings.Cursors.Iterators is
       raise Program_Error;
       --  Not implemented
       return Self.Position.UTF8_Offset;
+   end Last_UTF8_Offset;
+
+   ----------------------
+   -- Last_UTF8_Offset --
+   ----------------------
+
+   overriding function Last_UTF8_Offset
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      raise Program_Error;
+      --  Not implemented
+      return Self.Last_Position.UTF8_Offset;
    end Last_UTF8_Offset;
 
 end VSS.Strings.Cursors.Iterators;

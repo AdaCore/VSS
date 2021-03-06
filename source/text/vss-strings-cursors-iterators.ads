@@ -36,6 +36,10 @@ package VSS.Strings.Cursors.Iterators is
      (Self : Abstract_Character_Iterator) return Boolean is abstract;
    --  Returns True when iterator points to the text element
 
+   type Abstract_Segment_Iterator is
+     abstract limited new VSS.Strings.Cursors.Abstract_Segment_Cursor
+       with private;
+
 private
 
    type Abstract_Character_Iterator is
@@ -84,6 +88,56 @@ private
 
    overriding function Last_UTF16_Offset
      (Self : Abstract_Character_Iterator)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Return offset of the last UTF-16 code unit of the logical element.
+
+   type Abstract_Segment_Iterator is
+     abstract limited new VSS.Strings.Referal_Limited_Base
+       and VSS.Strings.Cursors.Abstract_Segment_Cursor with
+   record
+      First_Position : aliased VSS.Implementation.Strings.Cursor;
+      Last_Position  : aliased VSS.Implementation.Strings.Cursor;
+   end record;
+
+   overriding procedure Invalidate (Self : in out Abstract_Segment_Iterator);
+
+   overriding function First_Marker
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+   --  Return marker of the first character of the logical element.
+
+   overriding function Last_Marker
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+   --  Return marker of the last character of the logical element.
+
+   overriding function First_Character_Index
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Strings.Character_Index;
+   --  Return index of the first character of the logical element.
+
+   overriding function Last_Character_Index
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Strings.Character_Index;
+   --  Return index of the last character of the logical element.
+
+   overriding function First_UTF8_Offset
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+   --  Return offset of the first UTF-8 code unit of the logical element.
+
+   overriding function Last_UTF8_Offset
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+   --  Return offset of the last UTF-8 code unit of the logical element.
+
+   overriding function First_UTF16_Offset
+     (Self : Abstract_Segment_Iterator)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Return offset of the first UTF-16 code unit of the logical element.
+
+   overriding function Last_UTF16_Offset
+     (Self : Abstract_Segment_Iterator)
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Return offset of the last UTF-16 code unit of the logical element.
 

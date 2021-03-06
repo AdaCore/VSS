@@ -28,6 +28,10 @@ package VSS.Strings.Cursors is
 
    pragma Preelaborate;
 
+   ---------------------
+   -- Abstract_Cursor --
+   ---------------------
+
    type Abstract_Cursor is limited interface;
 
    function First_Marker
@@ -70,6 +74,9 @@ package VSS.Strings.Cursors is
       return VSS.Unicode.UTF16_Code_Unit_Index is abstract;
    --  Return offset of the last UTF-16 code unit of the logical element.
 
+   -------------------------------
+   -- Abstract_Character_Cursor --
+   -------------------------------
 
    type Abstract_Character_Cursor is limited interface and Abstract_Cursor;
    --  Cursor that points to single character.
@@ -84,84 +91,11 @@ package VSS.Strings.Cursors is
       return VSS.Strings.Character_Index;
    --  Returns index of the character.
 
-   --  function First_UTF8_Offset
-   --    (Self : Abstract_Character_Cursor'Class)
-   --     return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  --  Return offset of the first UTF-8 code unit of the logical element.
-   --
-   --  function Last_UTF8_Offset
-   --    (Self : Abstract_Character_Cursor'Class)
-   --     return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  --  Return offset of the last UTF-8 code unit of the logical element.
-   --
-   --  function First_UTF16_Offset
-   --    (Self : Abstract_Character_Cursor'Class)
-   --     return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  --  Return offset of the first UTF-16 code unit of the logical element.
-   --
-   --  function Last_UTF16_Offset
-   --    (Self : Abstract_Character_Cursor'Class)
-   --     return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  --  Return offset of the last UTF-16 code unit of the logical element.
+   -----------------------------
+   -- Abstract_Segment_Cursor --
+   -----------------------------
 
    type Abstract_Segment_Cursor is limited interface and Abstract_Cursor;
    --  Cursor that points to some segment of the string.
-
-   --  --  function First_Marker
-   --  --    (Self : Abstract_Segment_Cursor'Class)
-   --  --     return VSS.Strings.Cursors.Markers.Virtual_Marker;
-   --  --  --  Return marker of the first character of the logical element.
-   --  --
-   --  --  function Last_Marker
-   --  --    (Self : Abstract_Segment_Cursor'Class)
-   --  --     return VSS.Strings.Cursors.Markers.Virtual_Marker;
-   --  --  --  Return marker of the last character of the logical element.
-   --
-   --  function First_Character_Index
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Strings.Character_Index;
-   --  --  Return index of the first character of the logical element.
-   --
-   --  function Last_Character_Index
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Strings.Character_Index;
-   --  --  Return index of the last character of the logical element.
-   --
-   --  function First_UTF8_Offset
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  --  Return offset of the first UTF-8 code unit of the logical element.
-   --
-   --  function Last_UTF8_Offset
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Unicode.UTF8_Code_Unit_Index;
-   --  --  Return offset of the last UTF-8 code unit of the logical element.
-   --
-   --  function First_UTF16_Offset
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  --  Return offset of the first UTF-16 code unit of the logical element.
-   --
-   --  function Last_UTF16_Offset
-   --    (Self : Abstract_Segment_Cursor'Class)
-   --     return VSS.Unicode.UTF16_Code_Unit_Index;
-   --  --  Return offset of the last UTF-16 code unit of the logical element.
-
-private
-
-   --  type Abstract_Character_Cursor is
-   --    abstract new Referal_Limited_Base with record
-   --     Position : aliased VSS.Implementation.Strings.Cursor;
-   --  end record;
-   --
-   --  overriding procedure Invalidate (Self : in out Abstract_Character_Cursor);
-   --
-   --  type Abstract_Segment_Cursor is
-   --    abstract new Referal_Limited_Base with record
-   --     First_Position : aliased VSS.Implementation.Strings.Cursor;
-   --     Last_Position  : aliased VSS.Implementation.Strings.Cursor;
-   --  end record;
-   --
-   --  overriding procedure Invalidate (Self : in out Abstract_Segment_Cursor);
 
 end VSS.Strings.Cursors;

@@ -29,6 +29,7 @@ with VSS.Characters;
 private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
+limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Texts;
 
 package VSS.Strings is
@@ -43,6 +44,14 @@ package VSS.Strings is
    subtype Grapheme_Index is Grapheme_Count range 1 .. Grapheme_Count'Last;
 
    type Hash_Type is mod 2**64;
+
+   type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
+
+   type Line_Terminator_Set is array (Line_Terminator) of Boolean
+     with Pack, Default_Component_Value => False;
+
+   New_Line_Function : constant Line_Terminator_Set :=
+     (CR | LF | CRLF | NEL => True, others => False);
 
    type Virtual_String is tagged private
      with String_Literal => To_Virtual_String;
@@ -72,20 +81,44 @@ package VSS.Strings is
    function First_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing to the first character of the stirng.
 
    function Character
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing to the character at given position. Cursor
+   --  must belong to the same string.
 
    --  function Last_Character
    --    (Self : Magic_String'Class) return Character_Iterator;
-   --
+
    --  function First_Grapheme
    --    (Self : Magic_String'Class) return Grapheme_Iterator;
    --
    --  function Last_Grapheme
    --    (Self : Magic_String'Class) return Grapheme_Iterator;
+
+   function First_Line
+     (Self            : Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+   --  Return iterator pointing to the first logical line of the string.
+
+   function Line
+     (Self            : Virtual_String'Class;
+      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+   --  Return iterator pointing to the line at given position.
+
+   --  function Last_Line
+   --    (Self            : Virtual_String'Class;
+   --     Terminators     : Line_Terminator_Set := New_Line_Function;
+   --     Keep_Terminator : Boolean := False)
+   --     return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
 
    overriding function "="
      (Left  : Virtual_String;
@@ -264,14 +297,6 @@ package VSS.Strings is
 
    function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
    --  Convert given string into virtual string.
-
-   type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
-
-   type Line_Terminator_Set is array (Line_Terminator) of Boolean
-     with Pack, Default_Component_Value => False;
-
-   New_Line_Function : constant Line_Terminator_Set :=
-     (CR | LF | CRLF | NEL => True, others => False);
 
    function Split_Lines
      (Self            : Virtual_String'Class;

@@ -25,6 +25,7 @@ with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
+with VSS.Strings.Cursors.Iterators.Lines;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
@@ -452,6 +453,20 @@ package body VSS.Strings is
           (Self);
    end First_Character;
 
+   ----------------
+   -- First_Line --
+   ----------------
+
+   function First_Line
+     (Self            : Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
+   begin
+      raise Program_Error;
+      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+   end First_Line;
+
    -------------
    -- Handler --
    -------------
@@ -498,6 +513,21 @@ package body VSS.Strings is
    begin
       return Self.Handler = null;
    end Is_Null;
+
+   ----------
+   -- Line --
+   ----------
+
+   function Line
+     (Self            : Virtual_String'Class;
+      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
+   begin
+      raise Program_Error;
+      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+   end Line;
 
    ----------
    -- Read --

@@ -24,8 +24,8 @@
 
 abstract project VSS_Config is
 
-   type Build_Kind is ("dev", "prod", "coverage");
-   Build_Mode : Build_Kind :=
+   type VSS_Build_Kind is ("dev", "prod", "coverage");
+   Build_Mode : VSS_Build_Kind :=
      external ("VSS_BUILD_MODE", external ("BUILD_MODE", "prod"));
 
    Ada_Switches := ();

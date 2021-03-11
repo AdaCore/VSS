@@ -72,8 +72,7 @@ procedure Test_JSON_Writer is
         Character'Val (16#1F#)));
    --  All control characters required to be escaped
 
-   Escaped : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Virtual_String ("\""");
+   Escaped : constant VSS.Strings.Virtual_String := "\""";
 
    procedure Test_Output_Failure
      (Writer : in out VSS.JSON.Streams.Writers.JSON_Simple_Writer'Class);
@@ -238,11 +237,11 @@ procedure Test_JSON_Writer is
       Object_Key_Scenario : constant Test_Scenario :=
         ((1, (Kind => VSS.JSON.Events.Start_Object)),
          (7, (Kind => VSS.JSON.Events.Key_Name,
-              Key  => VSS.Strings.To_Virtual_String ("name"))),
+              Key  => "name")),
          (2, (Kind         => VSS.JSON.Events.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
          (11, (Kind => VSS.JSON.Events.Key_Name,
-              Key  => VSS.Strings.To_Virtual_String ("surname"))),
+               Key  => "surname")),
          (2, (Kind         => VSS.JSON.Events.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
          (1, (Kind => VSS.JSON.Events.End_Object)));
@@ -284,66 +283,51 @@ begin
 
    --  Some usual constructs.
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("name"), Success);
-   Writer.String_Value
-     (VSS.Strings.Conversions.To_Virtual_String ("Some name"), Success);
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("names"), Success);
+   Writer.Key_Name ("name", Success);
+   Writer.String_Value ("Some name", Success);
+   Writer.Key_Name ("names", Success);
    Writer.Start_Array (Success);
-   Writer.String_Value
-     (VSS.Strings.Conversions.To_Virtual_String ("Some"), Success);
-   Writer.String_Value
-     (VSS.Strings.Conversions.To_Virtual_String ("name"), Success);
+   Writer.String_Value ("Some", Success);
+   Writer.String_Value ("name", Success);
    Writer.End_Array (Success);
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("is"), Success);
+   Writer.Key_Name ("is", Success);
    Writer.Boolean_Value (False, Success);
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("no"), Success);
+   Writer.Key_Name ("no", Success);
    Writer.Boolean_Value (True, Success);
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("empty"), Success);
+   Writer.Key_Name ("empty", Success);
    Writer.Null_Value (Success);
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("integer"), Success);
+   Writer.Key_Name ("integer", Success);
    Writer.Integer_Value (15, Success);
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("float"), Success);
+   Writer.Key_Name ("float", Success);
    Writer.Float_Value (20.5, Success);
 
    --  Arrays of different types
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("booleans"), Success);
+   Writer.Key_Name ("booleans", Success);
    Writer.Start_Array (Success);
    Writer.Boolean_Value (False, Success);
    Writer.Boolean_Value (True, Success);
    Writer.End_Array (Success);
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("nulls"), Success);
+   Writer.Key_Name ("nulls", Success);
    Writer.Start_Array (Success);
    Writer.Null_Value (Success);
    Writer.Null_Value (Success);
    Writer.End_Array (Success);
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("floats"), Success);
+   Writer.Key_Name ("floats", Success);
    Writer.Start_Array (Success);
    Writer.Float_Value (-1.0, Success);
    Writer.Float_Value (1.0, Success);
    Writer.End_Array (Success);
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("integers"), Success);
+   Writer.Key_Name ("integers", Success);
    Writer.Start_Array (Success);
    Writer.Integer_Value (-1, Success);
    Writer.Integer_Value (1, Success);
    Writer.End_Array (Success);
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("arrays"), Success);
+   Writer.Key_Name ("arrays", Success);
    Writer.Start_Array (Success);
    Writer.Start_Array (Success);
    Writer.End_Array (Success);
@@ -351,8 +335,7 @@ begin
    Writer.End_Array (Success);
    Writer.End_Array (Success);
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("objects"), Success);
+   Writer.Key_Name ("objects", Success);
    Writer.Start_Array (Success);
    Writer.Start_Object (Success);
    Writer.End_Object (Success);
@@ -362,24 +345,20 @@ begin
 
    --  All control characters inside string value
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("controls"), Success);
+   Writer.Key_Name ("controls", Success);
    Writer.String_Value (All_Controls, Success);
 
    --  Backslash and quotation mark inside string value
 
-   Writer.Key_Name
-     (VSS.Strings.Conversions.To_Virtual_String ("others"), Success);
+   Writer.Key_Name ("others", Success);
    Writer.String_Value (Escaped, Success);
 
    --  Empty string as value (for both null string and string of zero length
    --  cases)
 
-   Writer.Key_Name
-     (VSS.Strings.To_Virtual_String ("empty_string"), Success);
-   Writer.String_Value (VSS.Strings.To_Virtual_String (""), Success);
-   Writer.Key_Name
-     (VSS.Strings.To_Virtual_String ("null_string"), Success);
+   Writer.Key_Name ("empty_string", Success);
+   Writer.String_Value ("", Success);
+   Writer.Key_Name ("null_string", Success);
    Writer.String_Value (VSS.Strings.Empty_Virtual_String, Success);
 
    Writer.End_Object (Success);

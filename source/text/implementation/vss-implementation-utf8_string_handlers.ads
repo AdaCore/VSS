@@ -70,6 +70,10 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 
+   overriding procedure Initialize
+     (Self : UTF8_String_Handler;
+      Data : out VSS.Implementation.Strings.String_Data);
+
    overriding function Is_Empty
      (Self : UTF8_String_Handler;
       Data : VSS.Implementation.Strings.String_Data) return Boolean;
@@ -186,6 +190,10 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data : in out VSS.Implementation.Strings.String_Data) is null;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
+
+   overriding procedure Initialize
+     (Self : UTF8_In_Place_String_Handler;
+      Data : out VSS.Implementation.Strings.String_Data);
 
    overriding function Is_Empty
      (Self : UTF8_In_Place_String_Handler;

@@ -44,7 +44,8 @@ package VSS.Strings is
 
    type Hash_Type is mod 2**64;
 
-   type Virtual_String is tagged private;
+   type Virtual_String is tagged private
+     with String_Literal => To_Virtual_String;
    pragma Preelaborable_Initialization (Virtual_String);
 
    Empty_Virtual_String : constant Virtual_String;

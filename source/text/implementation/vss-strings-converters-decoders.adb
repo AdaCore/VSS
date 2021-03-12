@@ -57,6 +57,22 @@ package body VSS.Strings.Converters.Decoders is
       end return;
    end Decode;
 
+   ------------
+   -- Decode --
+   ------------
+
+   function Decode
+     (Self : in out Virtual_String_Decoder'Class;
+      Data : Ada.Streams.Stream_Element_Array)
+      return VSS.Strings.Virtual_String is
+   begin
+      return Result : VSS.Strings.Virtual_String do
+         if Data'Length /= 0 and Self.Decoder /= null then
+            Self.Decoder.Decode (Data, Result.Data);
+         end if;
+      end return;
+   end Decode;
+
    -------------------
    -- Error_Message --
    -------------------

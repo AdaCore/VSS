@@ -24,6 +24,7 @@
 --  Virtual_String.
 
 private with Ada.Finalization;
+with Ada.Streams;
 
 with VSS.Stream_Element_Buffers;
 private with VSS.Unicode;
@@ -47,6 +48,11 @@ package VSS.Strings.Converters.Decoders is
    function Decode
      (Self : in out Virtual_String_Decoder'Class;
       Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer)
+      return VSS.Strings.Virtual_String;
+
+   function Decode
+     (Self : in out Virtual_String_Decoder'Class;
+      Data : Ada.Streams.Stream_Element_Array)
       return VSS.Strings.Virtual_String;
 
    procedure Reset_State (Self : in out Virtual_String_Decoder'Class);

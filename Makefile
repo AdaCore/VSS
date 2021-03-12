@@ -14,6 +14,7 @@ check: build_tests check_text check_json
 
 check_text:
 	.objs/tests/test_character_iterators
+	.objs/tests/test_converters
 	.objs/tests/test_stream_element_buffer
 	.objs/tests/test_text_streams
 	.objs/tests/test_string_append

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,33 +20,41 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
+--  UTF-8 decoder. Implementation is conformant with W3C/Unicode requirements
+--  to process ill-formed sequences with substitutions of U+FFFD REPLACEMENT
+--  CHARACTER.
 
-with "../vss_config";
-with "../vss_text";
+private package VSS.Strings.Converters.Decoders.UTF8 is
 
-project VSS_Text_Tests is
+   type UTF8_Decoder is new Abstract_Decoder with private;
 
-   for Languages use ("Ada");
-   for Object_Dir use "../../.objs/tests";
-   for Source_Dirs use ("../../testsuite/text");
-   for Main use ("test_character_iterators.adb",
-                 "test_converters.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_buffer",
-                 "test_string_split_lines",
-                 "test_string_vector");
+private
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   type UTF8_Decoder is new Abstract_Decoder with record
+      Flags    : Converter_Flags;
+      Code     : VSS.Unicode.Code_Point;
+      Needed   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Seen     : VSS.Unicode.UTF8_Code_Unit_Count;
+      Lower    : Ada.Streams.Stream_Element;
+      Upper    : Ada.Streams.Stream_Element;
+      Error    : Boolean;
+      Skip_BOM : Boolean;
+   end record;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   overriding procedure Initialize
+     (Self  : in out UTF8_Decoder;
+      Flags : Converter_Flags);
 
-end VSS_Text_Tests;
+   overriding procedure Decode
+     (Self   : in out UTF8_Decoder;
+      Source : Ada.Streams.Stream_Element_Array;
+      Target : out VSS.Implementation.Strings.String_Data);
+
+   overriding function Has_Error (Self : UTF8_Decoder) return Boolean;
+
+   overriding function Error_Message
+     (Self : UTF8_Decoder) return VSS.Strings.Virtual_String;
+
+   overriding procedure Reset_State (Self : in out UTF8_Decoder);
+
+end VSS.Strings.Converters.Decoders.UTF8;

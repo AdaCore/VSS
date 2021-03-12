@@ -23,7 +23,10 @@
 --  This package provides string data decoder from external encoding to
 --  Virtual_String.
 
+private with Ada.Finalization;
+
 with VSS.Stream_Element_Buffers;
+private with VSS.Unicode;
 
 package VSS.Strings.Converters.Decoders is
 
@@ -32,7 +35,7 @@ package VSS.Strings.Converters.Decoders is
    procedure Initialize
      (Self     : in out Virtual_String_Decoder'Class;
       Encoding : VSS.Strings.Virtual_String;
-      Flags    : Converter_Flags);
+      Flags    : Converter_Flags := Default_Converter_Flags);
 
    function Is_Valid (Self : Virtual_String_Decoder'Class) return Boolean;
 
@@ -50,6 +53,35 @@ package VSS.Strings.Converters.Decoders is
 
 private
 
-   type Virtual_String_Decoder is tagged limited null record;
+   Replacement_Character : constant VSS.Unicode.Code_Point := 16#FFFD#;
+
+   type Abstract_Decoder is abstract tagged limited null record;
+
+   type Decoder_Access is access all Abstract_Decoder'Class;
+
+   not overriding procedure Initialize
+     (Self  : in out Abstract_Decoder;
+      Flags : Converter_Flags) is abstract;
+
+   not overriding procedure Decode
+     (Self   : in out Abstract_Decoder;
+      Source : Ada.Streams.Stream_Element_Array;
+      Target : out VSS.Implementation.Strings.String_Data) is abstract;
+
+   not overriding function Has_Error
+     (Self : Abstract_Decoder) return Boolean is abstract;
+
+   not overriding function Error_Message
+     (Self : Abstract_Decoder) return VSS.Strings.Virtual_String is abstract;
+
+   not overriding procedure Reset_State
+     (Self : in out Abstract_Decoder) is abstract;
+
+   type Virtual_String_Decoder is
+     new Ada.Finalization.Limited_Controlled with record
+      Decoder : Decoder_Access;
+   end record;
+
+   overriding procedure Finalize (Self : in out Virtual_String_Decoder);
 
 end VSS.Strings.Converters.Decoders;

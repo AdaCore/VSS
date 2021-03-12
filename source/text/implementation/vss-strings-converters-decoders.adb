@@ -21,7 +21,15 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Unchecked_Deallocation;
+
+with VSS.Stream_Element_Buffers.Internals;
+with VSS.Strings.Converters.Decoders.UTF8;
+
 package body VSS.Strings.Converters.Decoders is
+
+   procedure Free is
+     new Ada.Unchecked_Deallocation (Abstract_Decoder'Class, Decoder_Access);
 
    ------------
    -- Decode --
@@ -30,9 +38,23 @@ package body VSS.Strings.Converters.Decoders is
    function Decode
      (Self : in out Virtual_String_Decoder'Class;
       Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer)
-      return VSS.Strings.Virtual_String is
+      return VSS.Strings.Virtual_String
+   is
+      use type Ada.Streams.Stream_Element_Offset;
+
+      Length  : Ada.Streams.Stream_Element_Count;
+      Storage :
+        VSS.Stream_Element_Buffers.Internals.Stream_Element_Array_Access;
+
    begin
-      return VSS.Strings.Empty_Virtual_String;
+      VSS.Stream_Element_Buffers.Internals.Data_Constant_Access
+        (Data, Length, Storage);
+
+      return Result : VSS.Strings.Virtual_String do
+         if Length /= 0 and Self.Decoder /= null then
+            Self.Decoder.Decode (Storage (1 .. Length), Result.Data);
+         end if;
+      end return;
    end Decode;
 
    -------------------
@@ -42,8 +64,22 @@ package body VSS.Strings.Converters.Decoders is
    function Error_Message
      (Self : Virtual_String_Decoder'Class) return VSS.Strings.Virtual_String is
    begin
-      return VSS.Strings.Empty_Virtual_String;
+      if Self.Decoder /= null then
+         return Self.Decoder.Error_Message;
+
+      else
+         return VSS.Strings.Empty_Virtual_String;
+      end if;
    end Error_Message;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding procedure Finalize (Self : in out Virtual_String_Decoder) is
+   begin
+      Free (Self.Decoder);
+   end Finalize;
 
    ---------------
    -- Has_Error --
@@ -51,7 +87,12 @@ package body VSS.Strings.Converters.Decoders is
 
    function Has_Error (Self : Virtual_String_Decoder'Class) return Boolean is
    begin
-      return True;
+      if Self.Decoder /= null then
+         return Self.Decoder.Has_Error;
+
+      else
+         return False;
+      end if;
    end Has_Error;
 
    ----------------
@@ -61,9 +102,14 @@ package body VSS.Strings.Converters.Decoders is
    procedure Initialize
      (Self     : in out Virtual_String_Decoder'Class;
       Encoding : VSS.Strings.Virtual_String;
-      Flags    : Converter_Flags) is
+      Flags    : Converter_Flags := Default_Converter_Flags) is
    begin
-      null;
+      Free (Self.Decoder);
+
+      if Encoding = "utf-8" then
+         Self.Decoder := new VSS.Strings.Converters.Decoders.UTF8.UTF8_Decoder;
+         Self.Decoder.Initialize (Flags);
+      end if;
    end Initialize;
 
    --------------
@@ -72,7 +118,7 @@ package body VSS.Strings.Converters.Decoders is
 
    function Is_Valid (Self : Virtual_String_Decoder'Class) return Boolean is
    begin
-      return False;
+      return Self.Decoder /= null;
    end Is_Valid;
 
    -----------------
@@ -81,7 +127,9 @@ package body VSS.Strings.Converters.Decoders is
 
    procedure Reset_State (Self : in out Virtual_String_Decoder'Class) is
    begin
-      null;
+      if Self.Decoder /= null then
+         Self.Decoder.Reset_State;
+      end if;
    end Reset_State;
 
 end VSS.Strings.Converters.Decoders;

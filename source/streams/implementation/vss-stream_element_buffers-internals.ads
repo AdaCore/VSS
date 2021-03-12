@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2020, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,33 +20,20 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+with Ada.Streams;
 
-project VSS_Text_Tests is
+package VSS.Stream_Element_Buffers.Internals is
 
-   for Languages use ("Ada");
-   for Object_Dir use "../../.objs/tests";
-   for Source_Dirs use ("../../testsuite/text");
-   for Main use ("test_character_iterators.adb",
-                 "test_converters.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_buffer",
-                 "test_string_split_lines",
-                 "test_string_vector");
+   pragma Preelaborate;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   type Stream_Element_Array_Access is
+     access constant Ada.Streams.Stream_Element_Array
+                      (1 .. Ada.Streams.Stream_Element_Offset'Last);
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   procedure Data_Constant_Access
+     (Self    : Stream_Element_Buffer'Class;
+      Length  : out Ada.Streams.Stream_Element_Count;
+      Storage : out Stream_Element_Array_Access);
 
-end VSS_Text_Tests;
+end VSS.Stream_Element_Buffers.Internals;

@@ -30,13 +30,16 @@ package VSS.Strings.Converters is
       --  Coverter doesn't save state between two conversions, and report an
       --  error when provided data is incomplete.
 
-      Stop_On_Error);
+      Stop_On_Error,
       --  Stop conversion on first found error and report it. Consequential
       --  calls of converter's will do nothing, till its state is reset.
       --
       --  Otherwise, errors of conversion are reported, one or more replacement
       --  characters (uFFFD) are added at place of error and conversion
       --  continues.
+
+      Ignore_BOM);
+      --  Ignore BOM at the beginning if present.
 
    type Converter_Flags is array (Converter_Flag) of Boolean
      with Pack;

@@ -20,18 +20,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Subprograms to simplify transition to VSS for software that use Ada's
---  standard string types.
 
-with VSS.Strings;
+package VSS.Utils is
 
-package String_Utilities is
+   pragma Pure;
 
-   function Decode
-     (Item     : String;
-      Encoding : String) return VSS.Strings.Virtual_String;
-   --  Decode string with given encoding into Virtual_String. Raise
-   --  Constraint_Error when encoding is not supported or some error occurred
-   --  duting data decoding.
-
-end String_Utilities;
+end VSS.Utils;

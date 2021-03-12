@@ -26,7 +26,7 @@ with Ada.Streams;
 with VSS.Strings.Conversions;
 with VSS.Strings.Converters.Decoders;
 
-package body String_Utilities is
+package body VSS.Utils.Conversions is
 
    ------------
    -- Decode --
@@ -62,4 +62,4 @@ package body String_Utilities is
       end return;
    end Decode;
 
-end String_Utilities;
+end VSS.Utils.Conversions;

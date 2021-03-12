@@ -37,25 +37,36 @@ package VSS.Strings.Converters.Decoders is
      (Self     : in out Virtual_String_Decoder'Class;
       Encoding : VSS.Strings.Virtual_String;
       Flags    : Converter_Flags := Default_Converter_Flags);
+   --  Initialize decoder to decode text data in given encoding. Is_Valid
+   --  return True when decoder has been initialized successfully.
 
    function Is_Valid (Self : Virtual_String_Decoder'Class) return Boolean;
+   --  Return True when decoder is initialized successfully.
 
    function Has_Error (Self : Virtual_String_Decoder'Class) return Boolean;
+   --  Return True when some error has been found during decoding.
 
    function Error_Message
      (Self : Virtual_String_Decoder'Class) return VSS.Strings.Virtual_String;
+   --  Return error message for latest detected error.
 
    function Decode
      (Self : in out Virtual_String_Decoder'Class;
       Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer)
       return VSS.Strings.Virtual_String;
-
    function Decode
      (Self : in out Virtual_String_Decoder'Class;
       Data : Ada.Streams.Stream_Element_Array)
       return VSS.Strings.Virtual_String;
+   --  Decode Data and return result. When Stateless flag was set to False,
+   --  it returns only fully decoded portion of the data, and save incomplete
+   --  data to be decoded with next call of Decode. When Stateless flag was
+   --  set to True, incomplete data is not allowed, it will be returned as
+   --  decoding error.
 
    procedure Reset_State (Self : in out Virtual_String_Decoder'Class);
+   --  Reset state of the decoder to initial (after call of Initialize).
+   --  All accumulated incomplete data will be lost.
 
 private
 

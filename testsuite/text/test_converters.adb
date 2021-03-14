@@ -262,6 +262,27 @@ begin
       end if;
    end;
 
+   --  Check conversion of empty data
+
+   declare
+      D : VSS.Strings.Converters.Decoders.Virtual_String_Decoder;
+      S : VSS.Strings.Virtual_String;
+      E : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+
+   begin
+      D.Initialize ("utf-8");
+
+      if not D.Is_Valid then
+         raise Program_Error;
+      end if;
+
+      S := D.Decode (E);
+
+      if not S.Is_Empty then
+         raise Program_Error;
+      end if;
+   end;
+
    --  Check processing of the BOM
 
    declare

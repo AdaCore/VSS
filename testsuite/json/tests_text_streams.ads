@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -25,7 +25,7 @@
 with Ada.Streams;
 
 with VSS.Characters;
-with VSS.Stream_Element_Buffers;
+with VSS.Stream_Element_Vectors;
 with VSS.Strings;
 with VSS.Text_Streams;
 
@@ -37,7 +37,7 @@ package Tests_Text_Streams is
 
    type Memory_UTF8_Input_Stream is
    limited new VSS.Text_Streams.Input_Text_Stream with record
-      Buffer      : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Buffer      : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Current     : Ada.Streams.Stream_Element_Count := 1;
       Skip        : Boolean := False;
       Incremental : Boolean := False;
@@ -71,7 +71,7 @@ package Tests_Text_Streams is
 
    type Memory_UTF8_Output_Stream is
    limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Limit  : VSS.Strings.Character_Count := VSS.Strings.Character_Count'Last;
       Count  : VSS.Strings.Character_Count := 0;
       --  Count of the processed characters and limiting amount, Put operation

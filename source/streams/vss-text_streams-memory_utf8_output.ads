@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,13 +21,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Stream_Element_Buffers;
+with VSS.Stream_Element_Vectors;
 
 package VSS.Text_Streams.Memory_UTF8_Output is
 
    type Memory_UTF8_Output_Stream is
      limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
    end record;
 
    overriding procedure Put

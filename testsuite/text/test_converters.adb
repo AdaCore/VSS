@@ -23,7 +23,7 @@
 
 with Ada.Streams;
 
-with VSS.Stream_Element_Buffers.Conversions;
+with VSS.Stream_Element_Vectors.Conversions;
 with VSS.Strings.Converters.Decoders;
 
 procedure Test_Converters is
@@ -161,7 +161,7 @@ procedure Test_Converters is
 
          Result :=
            Decoder.Decode
-             (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+             (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
                 (Encoded));
 
          if Result /= Decoded then
@@ -229,9 +229,8 @@ procedure Test_Converters is
          for J in Encoded'Range loop
             Result.Append
               (Decoder.Decode
-                 (VSS.Stream_Element_Buffers.Conversions
-                    .Unchecked_From_Stream_Element_Array
-                      ((1 => Encoded (J)))));
+                 (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
+                    ((1 => Encoded (J)))));
          end loop;
 
          if Result /= Decoded then
@@ -267,7 +266,7 @@ begin
    declare
       D : VSS.Strings.Converters.Decoders.Virtual_String_Decoder;
       S : VSS.Strings.Virtual_String;
-      E : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      E : VSS.Stream_Element_Vectors.Stream_Element_Vector;
 
    begin
       D.Initialize ("utf-8");

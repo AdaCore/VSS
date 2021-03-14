@@ -33,14 +33,14 @@ package body File_Utilities is
    ----------
 
    function Load
-     (Name : String) return VSS.Stream_Element_Buffers.Stream_Element_Buffer
+     (Name : String) return VSS.Stream_Element_Vectors.Stream_Element_Vector
    is
       Buffer : Ada.Streams.Stream_Element_Array (1 .. 4_096);
       Last   : Ada.Streams.Stream_Element_Count;
       File   : Ada.Streams.Stream_IO.File_Type;
 
    begin
-      return Result : VSS.Stream_Element_Buffers.Stream_Element_Buffer do
+      return Result : VSS.Stream_Element_Vectors.Stream_Element_Vector do
          Ada.Streams.Stream_IO.Open
            (File, Ada.Streams.Stream_IO.In_File, Name);
 

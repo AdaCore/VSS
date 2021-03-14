@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,22 +23,22 @@
 
 with Ada.Strings.Unbounded;
 
-package VSS.Stream_Element_Buffers.Conversions is
+package VSS.Stream_Element_Vectors.Conversions is
 
    pragma Preelaborate;
 
    function Unchecked_To_String
-     (Item : Stream_Element_Buffer'Class) return String;
+     (Item : Stream_Element_Vector'Class) return String;
    --  Convert content of the buffer to standard string. It do binary
    --  conversion without any assumptions or checks.
 
    function Unchecked_From_Unbounded_String
      (Item : Ada.Strings.Unbounded.Unbounded_String)
-      return Stream_Element_Buffer;
+      return Stream_Element_Vector;
    --  Converts Unbounded_String into Stream_Element_Buffer without any checks.
 
-   function Unchecked_From_Stream_Element_Array
-     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Buffer;
+   function To_Stream_Element_Vector
+     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Vector;
    --  Convert Stream_Element_Array into Stream_Element_Buffer.
 
-end VSS.Stream_Element_Buffers.Conversions;
+end VSS.Stream_Element_Vectors.Conversions;

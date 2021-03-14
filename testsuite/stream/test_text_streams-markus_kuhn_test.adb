@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 
 with VSS.Characters;
-with VSS.Stream_Element_Buffers.Conversions;
+with VSS.Stream_Element_Vectors.Conversions;
 with VSS.Strings;
 
 separate (Test_Text_Streams)
@@ -30,17 +30,17 @@ separate (Test_Text_Streams)
 procedure Markus_Kuhn_Test is
 
    type Correct_Testcase is record
-      Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Data : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Text : VSS.Strings.Virtual_String;
    end record;
 
    type Malformed_Testcase is record
-      Data  : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Data  : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Error : VSS.Strings.Virtual_String;
    end record;
 
    Case_1 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1  => 16#CE#,
           2  => 16#BA#,
           3  => 16#E1#,
@@ -55,25 +55,25 @@ procedure Markus_Kuhn_Test is
       VSS.Strings.To_Virtual_String ("κόσμε"));
 
    Case_2_1_1 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#00#)),
       VSS.Strings.To_Virtual_String ((1 => Wide_Wide_Character'Val (16#00#))));
 
    Case_2_1_2 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#C2#,
           2 => 16#80#)),
       VSS.Strings.To_Virtual_String ((1 => Wide_Wide_Character'Val (16#80#))));
 
    Case_2_1_3 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#E0#,
           2 => 16#A0#,
           3 => 16#80#)),
       VSS.Strings.To_Virtual_String ("ࠀ"));
 
    Case_2_1_4 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F0#,
           2 => 16#90#,
           3 => 16#80#,
@@ -84,18 +84,18 @@ procedure Markus_Kuhn_Test is
    --  are not supported
 
    Case_2_2_1 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#7F#)),
       VSS.Strings.To_Virtual_String ((1 => Wide_Wide_Character'Val (16#7F#))));
 
    Case_2_2_2 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#DF#,
           2 => 16#BF#)),
       VSS.Strings.To_Virtual_String ("߿"));
 
    Case_2_2_3 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#EF#,
           2 => 16#BF#,
           3 => 16#BF#)),
@@ -106,14 +106,14 @@ procedure Markus_Kuhn_Test is
    --  range and are not supported
 
    Case_2_3_1 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#9F#,
           3 => 16#BF#)),
       VSS.Strings.To_Virtual_String ("퟿"));
 
    Case_2_3_2 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#EE#,
           2 => 16#80#,
           3 => 16#80#)),
@@ -121,14 +121,14 @@ procedure Markus_Kuhn_Test is
         ((1 => Wide_Wide_Character'Val (16#E000#))));
 
    Case_2_3_3 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#EF#,
           2 => 16#BF#,
           3 => 16#BD#)),
       VSS.Strings.To_Virtual_String ("�"));
 
    Case_2_3_4 : constant Correct_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F4#,
           2 => 16#8F#,
           3 => 16#BF#,
@@ -165,33 +165,33 @@ procedure Markus_Kuhn_Test is
         & " four code units sequene)");
 
    Case_3_1_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#80#)),
       Error_Invalid_1);
    Case_3_1_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#BF#)),
       Error_Invalid_1);
    Case_3_1_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#80#,
           2 => 16#BF#)),
       Error_Invalid_1);
    Case_3_1_4 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#80#,
           2 => 16#BF#,
           3 => 16#80#)),
       Error_Invalid_1);
    Case_3_1_5 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#80#,
           2 => 16#BF#,
           3 => 16#80#,
           4 => 16#BF#)),
       Error_Invalid_1);
    Case_3_1_6 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#80#,
           2 => 16#BF#,
           3 => 16#80#,
@@ -199,7 +199,7 @@ procedure Markus_Kuhn_Test is
           5 => 16#80#)),
       Error_Invalid_1);
    Case_3_1_7 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#80#,
           2 => 16#BF#,
           3 => 16#80#,
@@ -208,7 +208,7 @@ procedure Markus_Kuhn_Test is
           6 => 16#BF#)),
       Error_Invalid_1);
    Case_3_1_8 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#80#,
           2 => 16#BF#,
           3 => 16#80#,
@@ -218,7 +218,7 @@ procedure Markus_Kuhn_Test is
           7 => 16#80#)),
       Error_Invalid_1);
    Case_3_1_9 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1  => 16#80#,
           2  => 16#81#,
           3  => 16#82#,
@@ -289,7 +289,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_3_2_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1  => 16#C0#,
           2  => 16#20#,
           3  => 16#C1#,
@@ -359,7 +359,7 @@ procedure Markus_Kuhn_Test is
    --  XXX Need to be splitted into 32 separate testcases?
 
    Case_3_2_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1  => 16#E0#,
           2  => 16#20#,
           3  => 16#E1#,
@@ -396,7 +396,7 @@ procedure Markus_Kuhn_Test is
    --  XXX Need to be splitted into 16 separate testcases?
 
    Case_3_2_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1  => 16#F0#,
           2  => 16#20#,
           3  => 16#F1#,
@@ -418,18 +418,18 @@ procedure Markus_Kuhn_Test is
    --  Case_3_2_4 and Case_3_2_5 are not supported
 
    Case_3_3_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#C0#)),
       Error_Invalid_1);
 
    Case_3_3_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#E0#,
           2 => 16#80#)),
       Error_Incomplete_3);
 
    Case_3_3_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F0#,
           2 => 16#80#,
           3 => 16#80#)),
@@ -439,18 +439,18 @@ procedure Markus_Kuhn_Test is
    --  and 6 code unit sequences
 
    Case_3_3_6 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#DF#)),
       Error_Incomplete_2);
 
    Case_3_3_7 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#EF#,
           2 => 16#BF#)),
       Error_Incomplete_3);
 
    Case_3_3_8 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F7#,
           2 => 16#BF#,
           3 => 16#BF#)),
@@ -461,7 +461,7 @@ procedure Markus_Kuhn_Test is
    --  5 and 6 code unit sequences.
 
    Case_3_4 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1  => 16#C0#,
 
           2  => 16#E0#,
@@ -504,17 +504,17 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_3_5_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#FE#)),
       Error_Invalid_1);
 
    Case_3_5_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#FF#)),
       Error_Invalid_1);
 
    Case_3_5_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#FE#,
           2 => 16#FE#,
           3 => 16#FF#,
@@ -522,20 +522,20 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_4_1_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#C0#,
           2 => 16#AF#)),
       Error_Invalid_1);
 
    Case_4_1_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#E0#,
           2 => 16#80#,
           3 => 16#AF#)),
       Error_Invalid_2_3);
 
    Case_4_1_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F0#,
           2 => 16#80#,
           3 => 16#80#,
@@ -543,7 +543,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_4);
 
    Case_4_1_4 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F8#,
           2 => 16#80#,
           3 => 16#80#,
@@ -552,7 +552,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_4_1_5 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#FC#,
           2 => 16#80#,
           3 => 16#80#,
@@ -562,20 +562,20 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_4_2_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#C1#,
           2 => 16#BF#)),
       Error_Invalid_1);
 
    Case_4_2_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#E0#,
           2 => 16#9F#,
           3 => 16#BF#)),
       Error_Invalid_2_3);
 
    Case_4_2_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F0#,
           2 => 16#8F#,
           3 => 16#BF#,
@@ -583,7 +583,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_4);
 
    Case_4_2_4 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F8#,
           2 => 16#87#,
           3 => 16#BF#,
@@ -592,7 +592,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_4_2_5 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#FC#,
           2 => 16#83#,
           3 => 16#BF#,
@@ -602,20 +602,20 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_4_3_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#C0#,
           2 => 16#80#)),
       Error_Invalid_1);
 
    Case_4_3_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#E0#,
           2 => 16#80#,
           3 => 16#80#)),
       Error_Invalid_2_3);
 
    Case_4_3_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F0#,
           2 => 16#80#,
           3 => 16#80#,
@@ -623,7 +623,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_4);
 
    Case_4_3_4 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#F8#,
           2 => 16#80#,
           3 => 16#80#,
@@ -632,7 +632,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_4_3_5 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#FC#,
           2 => 16#80#,
           3 => 16#80#,
@@ -642,56 +642,56 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_1);
 
    Case_5_1_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#A0#,
           3 => 16#80#)),
       Error_Invalid_2_3);
 
    Case_5_1_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AD#,
           3 => 16#BF#)),
       Error_Invalid_2_3);
 
    Case_5_1_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AE#,
           3 => 16#80#)),
       Error_Invalid_2_3);
 
    Case_5_1_4 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AF#,
           3 => 16#BF#)),
       Error_Invalid_2_3);
 
    Case_5_1_5 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#B0#,
           3 => 16#80#)),
       Error_Invalid_2_3);
 
    Case_5_1_6 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#BE#,
           3 => 16#80#)),
       Error_Invalid_2_3);
 
    Case_5_1_7 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#BF#,
           3 => 16#BF#)),
       Error_Invalid_2_3);
 
    Case_5_2_1 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#A0#,
           3 => 16#80#,
@@ -701,7 +701,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_3);
 
    Case_5_2_2 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#A0#,
           3 => 16#80#,
@@ -711,7 +711,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_3);
 
    Case_5_2_3 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AD#,
           3 => 16#BF#,
@@ -721,7 +721,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_3);
 
    Case_5_2_4 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AD#,
           3 => 16#BF#,
@@ -731,7 +731,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_3);
 
    Case_5_2_5 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AE#,
           3 => 16#80#,
@@ -741,7 +741,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_3);
 
    Case_5_2_6 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AE#,
           3 => 16#80#,
@@ -751,7 +751,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_3);
 
    Case_5_2_7 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AF#,
           3 => 16#BF#,
@@ -761,7 +761,7 @@ procedure Markus_Kuhn_Test is
       Error_Invalid_2_3);
 
    Case_5_2_8 : constant Malformed_Testcase :=
-     (VSS.Stream_Element_Buffers.Conversions.Unchecked_From_Stream_Element_Array
+     (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
         ((1 => 16#ED#,
           2 => 16#AF#,
           3 => 16#BF#,
@@ -782,7 +782,7 @@ procedure Markus_Kuhn_Test is
 
    procedure Run_Testcase (Testcase : Correct_Testcase) is
 
-      use type VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      use type VSS.Stream_Element_Vectors.Stream_Element_Vector;
       use type VSS.Strings.Virtual_String;
 
       Input   : VSS.Text_Streams.Memory_UTF8_Input.Memory_UTF8_Input_Stream;

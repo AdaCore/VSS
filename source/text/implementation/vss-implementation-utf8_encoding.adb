@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -28,7 +28,7 @@ package body VSS.Implementation.UTF8_Encoding is
    ------------
 
    procedure Decode
-     (Data    : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+     (Data    : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Index   : in out Ada.Streams.Stream_Element_Count;
       Code    : out VSS.Unicode.Code_Point;
       Success : in out Boolean;

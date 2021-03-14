@@ -39,12 +39,12 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF8_Code_Unit_Count;
 
-      Index  : Ada.Streams.Stream_Element_Count := Source'First;
-      Code   : VSS.Unicode.Code_Point           := Self.Code;
-      Needed : VSS.Unicode.UTF8_Code_Unit_Count := Self.Needed;
-      Seen   : VSS.Unicode.UTF8_Code_Unit_Count := Self.Seen;
-      Lower  : Ada.Streams.Stream_Element       := Self.Lower;
-      Upper  : Ada.Streams.Stream_Element       := Self.Upper;
+      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
+      Code   : VSS.Unicode.Code_Point            := Self.Code;
+      Needed : VSS.Unicode.UTF8_Code_Unit_Count  := Self.Needed;
+      Seen   : VSS.Unicode.UTF8_Code_Unit_Count  := Self.Seen;
+      Lower  : Ada.Streams.Stream_Element        := Self.Lower;
+      Upper  : Ada.Streams.Stream_Element        := Self.Upper;
       Byte   : Ada.Streams.Stream_Element;
 
    begin

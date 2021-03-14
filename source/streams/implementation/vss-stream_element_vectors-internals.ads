@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,7 +23,7 @@
 
 with Ada.Streams;
 
-package VSS.Stream_Element_Buffers.Internals is
+package VSS.Stream_Element_Vectors.Internals is
 
    pragma Preelaborate;
 
@@ -32,8 +32,8 @@ package VSS.Stream_Element_Buffers.Internals is
                       (1 .. Ada.Streams.Stream_Element_Offset'Last);
 
    procedure Data_Constant_Access
-     (Self    : Stream_Element_Buffer'Class;
+     (Self    : Stream_Element_Vector'Class;
       Length  : out Ada.Streams.Stream_Element_Count;
       Storage : out Stream_Element_Array_Access);
 
-end VSS.Stream_Element_Buffers.Internals;
+end VSS.Stream_Element_Vectors.Internals;

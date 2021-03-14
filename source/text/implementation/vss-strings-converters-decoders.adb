@@ -23,7 +23,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.Stream_Element_Buffers.Internals;
+with VSS.Stream_Element_Vectors.Internals;
 with VSS.Strings.Converters.Decoders.UTF8;
 
 package body VSS.Strings.Converters.Decoders is
@@ -37,17 +37,17 @@ package body VSS.Strings.Converters.Decoders is
 
    function Decode
      (Self : in out Virtual_String_Decoder'Class;
-      Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer)
+      Data : VSS.Stream_Element_Vectors.Stream_Element_Vector)
       return VSS.Strings.Virtual_String
    is
       use type Ada.Streams.Stream_Element_Offset;
 
       Length  : Ada.Streams.Stream_Element_Count;
       Storage :
-        VSS.Stream_Element_Buffers.Internals.Stream_Element_Array_Access;
+        VSS.Stream_Element_Vectors.Internals.Stream_Element_Array_Access;
 
    begin
-      VSS.Stream_Element_Buffers.Internals.Data_Constant_Access
+      VSS.Stream_Element_Vectors.Internals.Data_Constant_Access
         (Data, Length, Storage);
 
       return Result : VSS.Strings.Virtual_String do

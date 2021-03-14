@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,7 +23,7 @@
 
 with Ada.Streams;
 
-with VSS.Stream_Element_Buffers;
+with VSS.Stream_Element_Vectors;
 
 procedure Test_Stream_Element_Buffer is
 
@@ -42,8 +42,8 @@ procedure Test_Stream_Element_Buffer is
    --------------------------------------
 
    procedure Test_Assignment_And_Modification is
-      Buffer_1 : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
-      Buffer_2 : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Buffer_1 : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+      Buffer_2 : VSS.Stream_Element_Vectors.Stream_Element_Vector;
 
    begin
       --  Fill buffer
@@ -71,7 +71,7 @@ procedure Test_Stream_Element_Buffer is
    ---------------------------
 
    procedure Test_Element_Iterator is
-      Buffer : VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Count  : Ada.Streams.Stream_Element_Offset := 0;
 
    begin

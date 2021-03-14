@@ -21,13 +21,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Stream_Element_Buffers;
+with VSS.Stream_Element_Vectors;
 with VSS.Strings;
 
 package File_Utilities is
 
    function Load
-     (Name : String) return VSS.Stream_Element_Buffers.Stream_Element_Buffer;
+     (Name : String) return VSS.Stream_Element_Vectors.Stream_Element_Vector;
    --  Load content of the file and return it.
 
    function Load

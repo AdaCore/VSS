@@ -26,7 +26,7 @@ with Ada.Streams.Stream_IO;
 with VSS.Strings.Conversions;
 with VSS.Strings.Converters.Decoders;
 
-package body File_Utilities is
+package body VSS.Utils.File_IO is
 
    ----------
    -- Load --
@@ -94,4 +94,4 @@ package body File_Utilities is
       end return;
    end Load;
 
-end File_Utilities;
+end VSS.Utils.File_IO;

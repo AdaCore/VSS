@@ -24,7 +24,7 @@
 with VSS.Stream_Element_Vectors;
 with VSS.Strings;
 
-package File_Utilities is
+package VSS.Utils.File_IO is
 
    function Load
      (Name : String) return VSS.Stream_Element_Vectors.Stream_Element_Vector;
@@ -36,4 +36,4 @@ package File_Utilities is
    --  Load content of the file, decode it and return result. Raise
    --  Constraint_Error when encoding is not supported or dats decoding fails.
 
-end File_Utilities;
+end VSS.Utils.File_IO;

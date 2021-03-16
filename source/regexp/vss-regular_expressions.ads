@@ -23,7 +23,7 @@
 
 private with Ada.Finalization;
 
-with VSS.Strings.Cursors;
+with VSS.Strings.Cursors.Markers;
 with VSS.String_Vectors;
 
 package VSS.Regular_Expressions is
@@ -117,22 +117,22 @@ package VSS.Regular_Expressions is
    function Captured_Start
      (Self : Regular_Expression_Match'Class;
       Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class;
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
 
    function Captured_Start
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class;
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
 
    function Captured_End
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class;
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
 
    function Captured_End
      (Self : Regular_Expression_Match'Class;
       Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class;
+      return VSS.Strings.Cursors.Markers.Virtual_Marker;
 
    function Captured_Character_Length
      (Self  : Regular_Expression_Match'Class;

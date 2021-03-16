@@ -36,12 +36,12 @@ package VSS.Strings.Cursors is
 
    function First_Marker
      (Self : Abstract_Cursor)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is abstract;
+      return VSS.Strings.Cursors.Markers.Character_Marker is abstract;
    --  Return marker of the first character of the logical element.
 
    function Last_Marker
      (Self : Abstract_Cursor)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is abstract;
+      return VSS.Strings.Cursors.Markers.Character_Marker is abstract;
    --  Return marker of the last character of the logical element.
 
    function First_Character_Index
@@ -83,7 +83,7 @@ package VSS.Strings.Cursors is
 
    function Marker
      (Self : Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
    --  Return marker of the character.
 
    function Character_Index
@@ -115,11 +115,11 @@ private
 
    overriding function First_Marker
      (Self : Character_Cursor_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
 
    overriding function Last_Marker
      (Self : Character_Cursor_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker renames First_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker renames First_Marker;
 
    overriding function First_Character_Index
      (Self : Character_Cursor_Base)
@@ -157,11 +157,11 @@ private
 
    overriding function First_Marker
      (Self : Character_Cursor_Limited_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
 
    overriding function Last_Marker
      (Self : Character_Cursor_Limited_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker renames First_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker renames First_Marker;
 
    overriding function First_Character_Index
      (Self : Character_Cursor_Limited_Base)
@@ -203,11 +203,11 @@ private
 
    overriding function First_Marker
      (Self : Segment_Cursor_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
 
    overriding function Last_Marker
      (Self : Segment_Cursor_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
 
    overriding function First_Character_Index
      (Self : Segment_Cursor_Base)
@@ -249,11 +249,11 @@ private
 
    overriding function First_Marker
      (Self : Segment_Cursor_Limited_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
 
    overriding function Last_Marker
      (Self : Segment_Cursor_Limited_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
 
    overriding function First_Character_Index
      (Self : Segment_Cursor_Limited_Base)

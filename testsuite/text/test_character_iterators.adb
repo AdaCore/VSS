@@ -114,7 +114,7 @@ procedure Test_Character_Iterators is
    J : VSS.Strings.Character_Iterators.Character_Iterator :=
      S.First_Character;
    C : VSS.Strings.Character_Index := 1;
-   M : VSS.Strings.Cursors.Markers.Virtual_Marker;
+   M : VSS.Strings.Cursors.Markers.Character_Marker;
 
 begin
    loop

@@ -84,10 +84,10 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
    function Terminator_First_Marker
      (Self : Line_Iterator'Class)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.Terminator_First);
    end Terminator_First_Marker;
 
@@ -143,10 +143,10 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
    function Terminator_Last_Marker
      (Self : Line_Iterator'Class)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.Terminator_Last);
    end Terminator_Last_Marker;
 

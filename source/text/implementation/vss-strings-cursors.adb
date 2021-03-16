@@ -84,10 +84,10 @@ package body VSS.Strings.Cursors is
 
    overriding function First_Marker
      (Self : Character_Cursor_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.Position);
    end First_Marker;
 
@@ -97,10 +97,10 @@ package body VSS.Strings.Cursors is
 
    overriding function First_Marker
      (Self : Character_Cursor_Limited_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.Position);
    end First_Marker;
 
@@ -110,10 +110,10 @@ package body VSS.Strings.Cursors is
 
    overriding function First_Marker
      (Self : Segment_Cursor_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.First_Position);
    end First_Marker;
 
@@ -123,10 +123,10 @@ package body VSS.Strings.Cursors is
 
    overriding function First_Marker
      (Self : Segment_Cursor_Limited_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.First_Position);
    end First_Marker;
 
@@ -282,10 +282,10 @@ package body VSS.Strings.Cursors is
 
    overriding function Last_Marker
      (Self : Segment_Cursor_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.Last_Position);
    end Last_Marker;
 
@@ -295,10 +295,10 @@ package body VSS.Strings.Cursors is
 
    overriding function Last_Marker
      (Self : Segment_Cursor_Limited_Base)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return
-        VSS.Strings.Cursors.Markers.Internals.New_Virtual_Marker
+        VSS.Strings.Cursors.Markers.Internals.New_Character_Marker
           (Self.Owner.all, Self.Last_Position);
    end Last_Marker;
 
@@ -408,7 +408,7 @@ package body VSS.Strings.Cursors is
 
    function Marker
      (Self : Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return Self.First_Marker;
    end Marker;

@@ -27,10 +27,10 @@ package VSS.Strings.Cursors.Markers.Internals is
 
    pragma Preelaborate;
 
-   function New_Virtual_Marker
+   function New_Character_Marker
      (String   : VSS.Strings.Virtual_String'Class;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
    --  Create new marker for the given string and position.
 
 end VSS.Strings.Cursors.Markers.Internals;

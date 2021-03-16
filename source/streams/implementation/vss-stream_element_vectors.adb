@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,7 +23,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-package body VSS.Stream_Element_Buffers is
+package body VSS.Stream_Element_Vectors is
 
    use type Ada.Streams.Stream_Element_Count;
 
@@ -35,8 +35,8 @@ package body VSS.Stream_Element_Buffers is
    ---------
 
    overriding function "="
-     (Left  : Stream_Element_Buffer;
-      Right : Stream_Element_Buffer) return Boolean
+     (Left  : Stream_Element_Vector;
+      Right : Stream_Element_Vector) return Boolean
    is
       use type Ada.Streams.Stream_Element_Array;
 
@@ -53,7 +53,7 @@ package body VSS.Stream_Element_Buffers is
    -- Adjust --
    ------------
 
-   overriding procedure Adjust (Self : in out Stream_Element_Buffer) is
+   overriding procedure Adjust (Self : in out Stream_Element_Vector) is
       Source : constant Data_Access := Self.Data;
 
    begin
@@ -73,7 +73,7 @@ package body VSS.Stream_Element_Buffers is
    ------------
 
    procedure Append
-     (Self : in out Stream_Element_Buffer;
+     (Self : in out Stream_Element_Vector;
       Item : Ada.Streams.Stream_Element)
    is
       Source : Data_Access := Self.Data;
@@ -102,7 +102,7 @@ package body VSS.Stream_Element_Buffers is
    -------------
 
    function Element
-     (Self  : Stream_Element_Buffer'Class;
+     (Self  : Stream_Element_Vector'Class;
       Index : Ada.Streams.Stream_Element_Count)
       return Ada.Streams.Stream_Element is
    begin
@@ -118,10 +118,8 @@ package body VSS.Stream_Element_Buffers is
    -------------
 
    function Element
-     (Self     : Stream_Element_Buffer'Class;
-      Position : Cursor)
-      return Ada.Streams.Stream_Element
-   is
+     (Self     : Stream_Element_Vector'Class;
+      Position : Cursor) return Ada.Streams.Stream_Element is
    begin
       return Self.Element (Position.Index);
    end Element;
@@ -130,7 +128,7 @@ package body VSS.Stream_Element_Buffers is
    -- Finalize --
    --------------
 
-   overriding procedure Finalize (Self : in out Stream_Element_Buffer) is
+   overriding procedure Finalize (Self : in out Stream_Element_Vector) is
    begin
       if Self.Data /= null then
          Free (Self.Data);
@@ -154,8 +152,7 @@ package body VSS.Stream_Element_Buffers is
    -------------
 
    function Iterate
-     (Self : Stream_Element_Buffer'Class)
-      return Reversible_Iterator is
+     (Self : Stream_Element_Vector'Class) return Reversible_Iterator is
    begin
       return (Last => Self.Length);
    end Iterate;
@@ -201,7 +198,7 @@ package body VSS.Stream_Element_Buffers is
    ------------
 
    function Length
-     (Self : Stream_Element_Buffer'Class)
+     (Self : Stream_Element_Vector'Class)
       return Ada.Streams.Stream_Element_Count is
    begin
       return (if Self.Data = null then 0 else Self.Data.Length);
@@ -213,7 +210,7 @@ package body VSS.Stream_Element_Buffers is
 
    procedure Read
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item   : out Stream_Element_Buffer) is
+      Item   : out Stream_Element_Vector) is
    begin
       null;
    end Read;
@@ -223,7 +220,7 @@ package body VSS.Stream_Element_Buffers is
    ------------------
 
    procedure Set_Capacity
-     (Self     : in out Stream_Element_Buffer'Class;
+     (Self     : in out Stream_Element_Vector'Class;
       Capacity : Ada.Streams.Stream_Element_Count) is
    begin
       Self.Capacity := Capacity;
@@ -235,7 +232,7 @@ package body VSS.Stream_Element_Buffers is
 
    procedure Write
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-      Item   : Stream_Element_Buffer) is
+      Item   : Stream_Element_Vector) is
    begin
       if Item.Data /= null then
          Ada.Streams.Stream_Element_Array'Write
@@ -243,4 +240,4 @@ package body VSS.Stream_Element_Buffers is
       end if;
    end Write;
 
-end VSS.Stream_Element_Buffers;
+end VSS.Stream_Element_Vectors;

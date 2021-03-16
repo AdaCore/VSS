@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,19 +20,18 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Subprograms to simplify transition to VSS for software that use Ada's
+--  standard string types.
 
-with VSS.Stream_Element_Vectors;
+with VSS.Strings;
 
-package VSS.Text_Streams.Memory_UTF8_Output is
+package VSS.Utils.Conversions is
 
-   type Memory_UTF8_Output_Stream is
-     limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
-   end record;
+   function Decode
+     (Item     : String;
+      Encoding : String) return VSS.Strings.Virtual_String;
+   --  Decode string with given encoding into Virtual_String. Raise
+   --  Constraint_Error when encoding is not supported or some error occurred
+   --  duting data decoding.
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
-
-end VSS.Text_Streams.Memory_UTF8_Output;
+end VSS.Utils.Conversions;

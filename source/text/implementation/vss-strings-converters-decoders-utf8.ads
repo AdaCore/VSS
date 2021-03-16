@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,19 +20,41 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  UTF-8 decoder. Implementation is conformant with W3C/Unicode requirements
+--  to process ill-formed sequences with substitutions of U+FFFD REPLACEMENT
+--  CHARACTER.
 
-with VSS.Stream_Element_Vectors;
+private package VSS.Strings.Converters.Decoders.UTF8 is
 
-package VSS.Text_Streams.Memory_UTF8_Output is
+   type UTF8_Decoder is new Abstract_Decoder with private;
 
-   type Memory_UTF8_Output_Stream is
-     limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+private
+
+   type UTF8_Decoder is new Abstract_Decoder with record
+      Flags    : Converter_Flags;
+      Code     : VSS.Unicode.Code_Point;
+      Needed   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Seen     : VSS.Unicode.UTF8_Code_Unit_Count;
+      Lower    : Ada.Streams.Stream_Element;
+      Upper    : Ada.Streams.Stream_Element;
+      Error    : Boolean;
+      Skip_BOM : Boolean;
    end record;
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
+   overriding procedure Initialize
+     (Self  : in out UTF8_Decoder;
+      Flags : Converter_Flags);
 
-end VSS.Text_Streams.Memory_UTF8_Output;
+   overriding procedure Decode
+     (Self   : in out UTF8_Decoder;
+      Source : Ada.Streams.Stream_Element_Array;
+      Target : out VSS.Implementation.Strings.String_Data);
+
+   overriding function Has_Error (Self : UTF8_Decoder) return Boolean;
+
+   overriding function Error_Message
+     (Self : UTF8_Decoder) return VSS.Strings.Virtual_String;
+
+   overriding procedure Reset_State (Self : in out UTF8_Decoder);
+
+end VSS.Strings.Converters.Decoders.UTF8;

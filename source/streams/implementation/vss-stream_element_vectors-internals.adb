@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,24 +21,25 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
+package body VSS.Stream_Element_Vectors.Internals is
 
-package VSS.Stream_Element_Buffers.Conversions is
+   --------------------------
+   -- Data_Constant_Access --
+   --------------------------
 
-   pragma Preelaborate;
+   procedure Data_Constant_Access
+     (Self    : Stream_Element_Vector'Class;
+      Length  : out Ada.Streams.Stream_Element_Count;
+      Storage : out Stream_Element_Array_Access) is
+   begin
+      if Self.Data /= null then
+         Length  := Self.Data.Length;
+         Storage := Self.Data.Storage'Unrestricted_Access;
 
-   function Unchecked_To_String
-     (Item : Stream_Element_Buffer'Class) return String;
-   --  Convert content of the buffer to standard string. It do binary
-   --  conversion without any assumptions or checks.
+      else
+         Length  := 0;
+         Storage := null;
+      end if;
+   end Data_Constant_Access;
 
-   function Unchecked_From_Unbounded_String
-     (Item : Ada.Strings.Unbounded.Unbounded_String)
-      return Stream_Element_Buffer;
-   --  Converts Unbounded_String into Stream_Element_Buffer without any checks.
-
-   function Unchecked_From_Stream_Element_Array
-     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Buffer;
-   --  Convert Stream_Element_Array into Stream_Element_Buffer.
-
-end VSS.Stream_Element_Buffers.Conversions;
+end VSS.Stream_Element_Vectors.Internals;

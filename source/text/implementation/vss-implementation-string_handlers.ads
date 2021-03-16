@@ -56,6 +56,11 @@ package VSS.Implementation.String_Handlers is
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 
+   not overriding procedure Initialize
+     (Self : Abstract_String_Handler;
+      Data : out VSS.Implementation.Strings.String_Data) is abstract;
+   --  Initialize Data to represent empty string.
+
    not overriding function Is_Empty
      (Self : Abstract_String_Handler;
       Data : VSS.Implementation.Strings.String_Data)

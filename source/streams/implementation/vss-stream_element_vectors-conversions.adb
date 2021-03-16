@@ -25,16 +25,16 @@ pragma Warnings (Off, "is an internal GNAT unit");
 with Ada.Strings.Unbounded.Aux;
 pragma Warnings (On, "is an internal GNAT unit");
 
-package body VSS.Stream_Element_Buffers.Conversions is
+package body VSS.Stream_Element_Vectors.Conversions is
 
-   -----------------------------------------
-   -- Unchecked_From_Stream_Element_Array --
-   -----------------------------------------
+   ------------------------------
+   -- To_Stream_Element_Vector --
+   ------------------------------
 
-   function Unchecked_From_Stream_Element_Array
-     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Buffer is
+   function To_Stream_Element_Vector
+     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Vector is
    begin
-      return Result : Stream_Element_Buffer do
+      return Result : Stream_Element_Vector do
          declare
             Length : constant Ada.Streams.Stream_Element_Offset :=
               Ada.Streams.Stream_Element_Offset (Item'Length);
@@ -47,7 +47,7 @@ package body VSS.Stream_Element_Buffers.Conversions is
                  Storage => Item);
          end;
       end return;
-   end Unchecked_From_Stream_Element_Array;
+   end To_Stream_Element_Vector;
 
    -------------------------------------
    -- Unchecked_From_Unbounded_String --
@@ -55,7 +55,7 @@ package body VSS.Stream_Element_Buffers.Conversions is
 
    function Unchecked_From_Unbounded_String
      (Item : Ada.Strings.Unbounded.Unbounded_String)
-      return Stream_Element_Buffer
+      return Stream_Element_Vector
    is
       Source        : Ada.Strings.Unbounded.Aux.Big_String_Access;
       Source_Length : Natural;
@@ -63,7 +63,7 @@ package body VSS.Stream_Element_Buffers.Conversions is
    begin
       Ada.Strings.Unbounded.Aux.Get_String (Item, Source, Source_Length);
 
-      return Result : Stream_Element_Buffer do
+      return Result : Stream_Element_Vector do
          declare
             Length : constant Ada.Streams.Stream_Element_Offset :=
               Ada.Streams.Stream_Element_Offset (Source_Length);
@@ -89,7 +89,7 @@ package body VSS.Stream_Element_Buffers.Conversions is
    -------------------------
 
    function Unchecked_To_String
-     (Item : Stream_Element_Buffer'Class) return String
+     (Item : Stream_Element_Vector'Class) return String
    is
       use type Ada.Streams.Stream_Element_Offset;
 
@@ -107,4 +107,4 @@ package body VSS.Stream_Element_Buffers.Conversions is
       end;
    end Unchecked_To_String;
 
-end VSS.Stream_Element_Buffers.Conversions;
+end VSS.Stream_Element_Vectors.Conversions;

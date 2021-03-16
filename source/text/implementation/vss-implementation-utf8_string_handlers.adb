@@ -1062,6 +1062,47 @@ package body VSS.Implementation.UTF8_String_Handlers is
             <= VSS.Implementation.Strings.Character_Count (Source.Length);
    end Has_Character;
 
+   ----------------
+   -- Initialize --
+   ----------------
+
+   overriding procedure Initialize
+     (Self : UTF8_String_Handler;
+      Data : out VSS.Implementation.Strings.String_Data) is
+   begin
+      Data :=
+        (In_Place => False,
+         Capacity => 0,
+         Handler  => Self'Unrestricted_Access,
+         Pointer  => System.Null_Address,
+         Padding  => False);
+   end Initialize;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   overriding procedure Initialize
+     (Self : UTF8_In_Place_String_Handler;
+      Data : out VSS.Implementation.Strings.String_Data) is
+   begin
+      Data :=
+        (In_Place => True,
+         Capacity => 0,
+         Storage  => <>,
+         --  Handler  => Self'Unrestricted_Access,
+         --  Pointer  => SYstem.Null_Address,
+         Padding  => False);
+
+      declare
+         Target : UTF8_In_Place_Data
+           with Import, Convention => Ada, Address => Data'Address;
+
+      begin
+         Target := (Storage => <>, Size => 0, Length => 0);
+      end;
+   end Initialize;
+
    --------------
    -- Is_Empty --
    --------------

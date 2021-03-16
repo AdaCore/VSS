@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -28,7 +28,7 @@ with Interfaces;
 
 with VSS.JSON.Events;
 with VSS.JSON.Streams.Writers;
-with VSS.Stream_Element_Buffers.Conversions;
+with VSS.Stream_Element_Vectors.Conversions;
 with VSS.Strings.Conversions;
 with VSS.Text_Streams.Memory_UTF8_Output;
 
@@ -390,7 +390,7 @@ begin
          for J in Expected'Range loop
             if Expected (J) /= Stream.Buffer.Element (J) then
                Ada.Text_IO.Put
-                 (VSS.Stream_Element_Buffers.Conversions.Unchecked_To_String
+                 (VSS.Stream_Element_Vectors.Conversions.Unchecked_To_String
                     (Stream.Buffer));
 
                raise Program_Error;

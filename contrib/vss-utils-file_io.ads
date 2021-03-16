@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,17 +22,18 @@
 ------------------------------------------------------------------------------
 
 with VSS.Stream_Element_Vectors;
+with VSS.Strings;
 
-package VSS.Text_Streams.Memory_UTF8_Output is
+package VSS.Utils.File_IO is
 
-   type Memory_UTF8_Output_Stream is
-     limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
-   end record;
+   function Load
+     (Name : String) return VSS.Stream_Element_Vectors.Stream_Element_Vector;
+   --  Load content of the file and return it.
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
+   function Load
+     (Name     : String;
+      Encoding : String) return VSS.Strings.Virtual_String;
+   --  Load content of the file, decode it and return result. Raise
+   --  Constraint_Error when encoding is not supported or dats decoding fails.
 
-end VSS.Text_Streams.Memory_UTF8_Output;
+end VSS.Utils.File_IO;

@@ -31,6 +31,7 @@ project VSS_Text_Tests is
    for Object_Dir use "../../.objs/tests";
    for Source_Dirs use ("../../testsuite/text");
    for Main use ("test_character_iterators.adb",
+                 "test_converters.adb",
                  "test_string_append",
                  "test_string_compare",
                  "test_string_conversions.adb",

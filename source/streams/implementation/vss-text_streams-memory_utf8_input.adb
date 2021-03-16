@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -167,7 +167,7 @@ package body VSS.Text_Streams.Memory_UTF8_Input is
 
    procedure Set_Data
      (Self : in out Memory_UTF8_Input_Stream'Class;
-      Data : VSS.Stream_Element_Buffers.Stream_Element_Buffer) is
+      Data : VSS.Stream_Element_Vectors.Stream_Element_Vector) is
    begin
       Self.Buffer  := Data;
       Self.Current := 1;

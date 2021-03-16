@@ -21,18 +21,19 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Stream_Element_Vectors;
+with Ada.Streams;
 
-package VSS.Text_Streams.Memory_UTF8_Output is
+package VSS.Stream_Element_Vectors.Internals is
 
-   type Memory_UTF8_Output_Stream is
-     limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
-   end record;
+   pragma Preelaborate;
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
+   type Stream_Element_Array_Access is
+     access constant Ada.Streams.Stream_Element_Array
+                      (1 .. Ada.Streams.Stream_Element_Offset'Last);
 
-end VSS.Text_Streams.Memory_UTF8_Output;
+   procedure Data_Constant_Access
+     (Self    : Stream_Element_Vector'Class;
+      Length  : out Ada.Streams.Stream_Element_Count;
+      Storage : out Stream_Element_Array_Access);
+
+end VSS.Stream_Element_Vectors.Internals;

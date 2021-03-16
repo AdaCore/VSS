@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,18 +21,29 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Stream_Element_Vectors;
+package VSS.Strings.Converters is
 
-package VSS.Text_Streams.Memory_UTF8_Output is
+   pragma Preelaborate;
 
-   type Memory_UTF8_Output_Stream is
-     limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
-   end record;
+   type Converter_Flag is
+     (Stateless,
+      --  Coverter doesn't save state between two conversions, and report an
+      --  error when provided data is incomplete.
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
+      Stop_On_Error,
+      --  Stop conversion on first found error and report it. Consequential
+      --  calls of converter's will do nothing, till its state is reset.
+      --
+      --  Otherwise, errors of conversion are reported, one or more replacement
+      --  characters (uFFFD) are added at place of error and conversion
+      --  continues.
 
-end VSS.Text_Streams.Memory_UTF8_Output;
+      Ignore_BOM);
+      --  Ignore BOM at the beginning if present.
+
+   type Converter_Flags is array (Converter_Flag) of Boolean
+     with Pack;
+
+   Default_Converter_Flags : constant Converter_Flags := (others => False);
+
+end VSS.Strings.Converters;

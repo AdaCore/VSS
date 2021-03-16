@@ -21,18 +21,24 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Stream_Element_Vectors;
+with Ada.Strings.Unbounded;
 
-package VSS.Text_Streams.Memory_UTF8_Output is
+package VSS.Stream_Element_Vectors.Conversions is
 
-   type Memory_UTF8_Output_Stream is
-     limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
-   end record;
+   pragma Preelaborate;
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
+   function Unchecked_To_String
+     (Item : Stream_Element_Vector'Class) return String;
+   --  Convert content of the buffer to standard string. It do binary
+   --  conversion without any assumptions or checks.
 
-end VSS.Text_Streams.Memory_UTF8_Output;
+   function Unchecked_From_Unbounded_String
+     (Item : Ada.Strings.Unbounded.Unbounded_String)
+      return Stream_Element_Vector;
+   --  Converts Unbounded_String into Stream_Element_Buffer without any checks.
+
+   function To_Stream_Element_Vector
+     (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Vector;
+   --  Convert Stream_Element_Array into Stream_Element_Buffer.
+
+end VSS.Stream_Element_Vectors.Conversions;

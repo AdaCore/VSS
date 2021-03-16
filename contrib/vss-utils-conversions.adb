@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,18 +21,45 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Stream_Element_Vectors;
+with Ada.Streams;
 
-package VSS.Text_Streams.Memory_UTF8_Output is
+with VSS.Strings.Conversions;
+with VSS.Strings.Converters.Decoders;
 
-   type Memory_UTF8_Output_Stream is
-     limited new VSS.Text_Streams.Output_Text_Stream with record
-      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
-   end record;
+package body VSS.Utils.Conversions is
 
-   overriding procedure Put
-     (Self    : in out Memory_UTF8_Output_Stream;
-      Item    : VSS.Characters.Virtual_Character;
-      Success : in out Boolean);
+   ------------
+   -- Decode --
+   ------------
 
-end VSS.Text_Streams.Memory_UTF8_Output;
+   function Decode
+     (Item     : String;
+      Encoding : String) return VSS.Strings.Virtual_String
+   is
+      Decoder : VSS.Strings.Converters.Decoders.Virtual_String_Decoder;
+      Data    : Ada.Streams.Stream_Element_Array (1 .. Item'Length)
+        with Import, Convention => Ada, Address => Item'Address;
+
+   begin
+      Decoder.Initialize
+        (VSS.Strings.Conversions.To_Virtual_String (Encoding),
+         (VSS.Strings.Converters.Stateless => True, others => False));
+
+      if not Decoder.Is_Valid then
+         --  Encoding is not supported.
+
+         raise Constraint_Error;
+      end if;
+
+      return Result : constant VSS.Strings.Virtual_String :=
+        Decoder.Decode (Data)
+      do
+         if Decoder.Has_Error then
+            --  Decoding error.
+
+            raise Constraint_Error;
+         end if;
+      end return;
+   end Decode;
+
+end VSS.Utils.Conversions;

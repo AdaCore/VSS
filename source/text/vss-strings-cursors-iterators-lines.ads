@@ -31,12 +31,12 @@ package VSS.Strings.Cursors.Iterators.Lines is
 
    function Terminator_First_Marker
      (Self : Line_Iterator'Class)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
    --  Return marker of the first character of the line terminator sequence.
 
    function Terminator_Last_Marker
      (Self : Line_Iterator'Class)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker;
+      return VSS.Strings.Cursors.Markers.Character_Marker;
    --  Return marker of the last character of the line terminator sequence.
 
    function Terminator_First_Character_Index

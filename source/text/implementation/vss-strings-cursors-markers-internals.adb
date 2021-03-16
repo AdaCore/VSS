@@ -23,19 +23,19 @@
 
 package body VSS.Strings.Cursors.Markers.Internals is
 
-   ------------------------
-   -- New_Virtual_Marker --
-   ------------------------
+   --------------------------
+   -- New_Character_Marker --
+   --------------------------
 
-   function New_Virtual_Marker
+   function New_Character_Marker
      (String   : VSS.Strings.Virtual_String'Class;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Strings.Cursors.Markers.Virtual_Marker is
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
-      return Result : VSS.Strings.Cursors.Markers.Virtual_Marker do
+      return Result : VSS.Strings.Cursors.Markers.Character_Marker do
          Result.Position := Position;
          Result.Connect (String'Unrestricted_Access);
       end return;
-   end New_Virtual_Marker;
+   end New_Character_Marker;
 
 end VSS.Strings.Cursors.Markers.Internals;

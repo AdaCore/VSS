@@ -461,10 +461,16 @@ package body VSS.Strings is
      (Self            : Virtual_String'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
+   is
+      pragma Unreferenced (Self);
+      pragma Unreferenced (Terminators);
+      pragma Unreferenced (Keep_Terminator);
+
    begin
-      raise Program_Error;
-      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
+         raise Program_Error;
+      end return;
    end First_Line;
 
    -------------
@@ -523,10 +529,17 @@ package body VSS.Strings is
       Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
+   is
+      pragma Unreferenced (Self);
+      pragma Unreferenced (Position);
+      pragma Unreferenced (Terminators);
+      pragma Unreferenced (Keep_Terminator);
+
    begin
-      raise Program_Error;
-      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
+         raise Program_Error;
+      end return;
    end Line;
 
    ----------
@@ -553,10 +566,12 @@ package body VSS.Strings is
       Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
         Self.Handler;
 
-      First_Position : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (From);
-      Last_Position  : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
-        VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (To);
+      First_Position :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (From);
+      Last_Position  :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (To);
 
    begin
       --  Check_Owner (From, Self);
@@ -585,10 +600,12 @@ package body VSS.Strings is
       Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
         Self.Handler;
 
-      First_Position : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (Segment);
-      Last_Position  : VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
-        VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (Segment);
+      First_Position :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (Segment);
+      Last_Position  :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (Segment);
 
    begin
       --  Check_Owner (Segment, Self);

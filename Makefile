@@ -41,3 +41,6 @@ coverage:
 
 docs: all
 	make -C docs
+
+clean:
+	rm -rf .objs

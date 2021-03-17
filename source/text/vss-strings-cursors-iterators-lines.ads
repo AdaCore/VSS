@@ -21,8 +21,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-private with VSS.Strings.Cursors.Markers;
-
 package VSS.Strings.Cursors.Iterators.Lines is
 
    pragma Preelaborate;

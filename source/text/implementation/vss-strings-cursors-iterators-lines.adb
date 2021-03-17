@@ -53,7 +53,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
      (Self : Line_Iterator'Class) return VSS.Implementation.Strings.Cursor
    is
       Position : VSS.Implementation.Strings.Cursor;
-      Success  : Boolean;
+      Success  : Boolean with Unreferenced;
 
    begin
       if Self.Keep_Terminator then

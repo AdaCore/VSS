@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with System.Storage_Elements;
+
 with Ada.Unchecked_Deallocation;
 
 package body VSS.Implementation.String_Vectors is
@@ -38,6 +40,12 @@ package body VSS.Implementation.String_Vectors is
    --  append operations of an individual items. This is expressed as a
    --  factor so 2 means add 1/2 of the length of the vector as growth space.
 
+   Min_Mul_Alloc : constant := Standard'Maximum_Alignment;
+   --  Allocation will be done by a multiple of Min_Mul_Alloc. This causes
+   --  no memory loss as most (all?) malloc implementations are obliged to
+   --  align the returned memory on the maximum alignment as malloc does not
+   --  know the target alignment.
+
    procedure Mutate
      (Self     : in out String_Vector_Data_Access;
       Required : Natural;
@@ -46,6 +54,50 @@ package body VSS.Implementation.String_Vectors is
    --  number of items and up to additional Reserved number of items.
    --  Parameters Required and Reserve are separated to prevent potential
    --  integer overflow at the caller side.
+
+   function Aligned_Length
+     (Required : Natural;
+      Reserved : Natural) return Natural;
+   --  Return recommended length of the vector storage which is enough to
+   --  store at least Required number of items and up to Reserved number of
+   --  items additionally. Calculation takes into account alignment of the
+   --  allocated memory segments to use memory effectively by
+   --  Append/Insert/etc operations.
+
+   --------------------
+   -- Aligned_Length --
+   --------------------
+
+   function Aligned_Length
+     (Required : Natural;
+      Reserved : Natural) return Natural
+   is
+      use type System.Storage_Elements.Storage_Offset;
+
+      subtype Empty_String_Vector_Data is String_Vector_Data (0);
+
+      Element_Size : constant System.Storage_Elements.Storage_Count :=
+        VSS.Implementation.Strings.String_Data'Max_Size_In_Storage_Elements;
+
+      Static_Size  : constant System.Storage_Elements.Storage_Count :=
+        Empty_String_Vector_Data'Max_Size_In_Storage_Elements;
+
+   begin
+      if Required > Natural'Last - Reserved then
+         --  Total requested number of items is large than maximum number,
+         --  so limit it to maximum number of items.
+
+         return Natural'Last;
+
+      else
+         return
+           Natural
+             ((((Static_Size
+              + System.Storage_Elements.Storage_Count (Required + Reserved)
+              * Element_Size + Min_Mul_Alloc - 1) / Min_Mul_Alloc)
+              * Min_Mul_Alloc - Static_Size) / Element_Size);
+      end if;
+   end Aligned_Length;
 
    ------------
    -- Append --
@@ -98,7 +150,7 @@ package body VSS.Implementation.String_Vectors is
    is
    begin
       if Self = null then
-         Self := new String_Vector_Data (Required + Reserved);
+         Self := new String_Vector_Data (Aligned_Length (Required, Reserved));
 
       elsif not System.Atomic_Counters.Is_One (Self.Counter)
         or else Self.Bulk < Required
@@ -107,7 +159,8 @@ package body VSS.Implementation.String_Vectors is
             Old : String_Vector_Data_Access := Self;
 
          begin
-            Self := new String_Vector_Data (Required + Reserved);
+            Self :=
+              new String_Vector_Data (Aligned_Length (Required, Reserved));
             Self.Last := Old.Last;
             Self.Data (1 .. Old.Last) := Old.Data (1 .. Old.Last);
 

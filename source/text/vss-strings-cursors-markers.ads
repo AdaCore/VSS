@@ -25,11 +25,18 @@ package VSS.Strings.Cursors.Markers is
 
    pragma Preelaborate;
 
-   type Virtual_Marker is new VSS.Strings.Cursors.Abstract_Cursor with private;
+   type Character_Marker is
+     new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
+
+   type Segment_Marker is
+     new VSS.Strings.Cursors.Abstract_Segment_Cursor with private;
 
 private
 
-   type Virtual_Marker is
-     new VSS.Strings.Cursors.Abstract_Character_Cursor with null record;
+   type Character_Marker is
+     new VSS.Strings.Cursors.Character_Cursor_Base with null record;
+
+   type Segment_Marker is
+     new VSS.Strings.Cursors.Segment_Cursor_Base with null record;
 
 end VSS.Strings.Cursors.Markers;

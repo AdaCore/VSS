@@ -23,7 +23,9 @@
 
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
+with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
+with VSS.Strings.Cursors.Iterators.Lines;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
@@ -161,6 +163,17 @@ package body VSS.Strings is
    -- Adjust --
    ------------
 
+   overriding procedure Adjust (Self : in out Referal_Base) is
+   begin
+      if Self.Owner /= null then
+         Self.Connect (Self.Owner);
+      end if;
+   end Adjust;
+
+   ------------
+   -- Adjust --
+   ------------
+
    overriding procedure Adjust (Self : in out Virtual_String) is
    begin
       VSS.Implementation.Strings.Reference (Self.Data);
@@ -204,6 +217,20 @@ package body VSS.Strings is
       end if;
    end Append;
 
+   ---------------
+   -- Character --
+   ---------------
+
+   function Character
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+   begin
+      return
+        VSS.Strings.Cursors.Iterators.Characters.Internals.Character
+          (Self, Position);
+   end Character;
+
    ----------------------
    -- Character_Length --
    ----------------------
@@ -235,7 +262,7 @@ package body VSS.Strings is
    -------------
 
    procedure Connect
-     (Self  : in out Referal_Limited_Base'Class;
+     (Self  : in out Referal_Base'Class;
       Owner : not null Magic_String_Access) is
    begin
       if Owner.Head = null then
@@ -251,12 +278,32 @@ package body VSS.Strings is
       Self.Owner := Owner;
    end Connect;
 
+   -------------
+   -- Connect --
+   -------------
+
+   procedure Connect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : not null Magic_String_Access) is
+   begin
+      if Owner.Limited_Head = null then
+         Owner.Limited_Head := Self'Unchecked_Access;
+         Owner.Limited_Tail := Self'Unchecked_Access;
+
+      else
+         Owner.Limited_Tail.Next := Self'Unchecked_Access;
+         Self.Previous := Owner.Limited_Tail;
+         Owner.Limited_Tail := Self'Unchecked_Access;
+      end if;
+
+      Self.Owner := Owner;
+   end Connect;
+
    ----------------
    -- Disconnect --
    ----------------
 
-   procedure Disconnect
-     (Self : in out Referal_Limited_Base'Class) is
+   procedure Disconnect (Self : in out Referal_Base'Class) is
    begin
       if Self.Owner /= null then
          if Self.Owner.Head = Self'Unchecked_Access then
@@ -265,6 +312,35 @@ package body VSS.Strings is
 
          if Self.Owner.Tail = Self'Unchecked_Access then
             Self.Owner.Tail := Self.Owner.Tail.Previous;
+         end if;
+
+         if Self.Previous /= null then
+            Self.Previous.Next := Self.Next;
+         end if;
+
+         if Self.Next /= null then
+            Self.Next.Previous := Self.Previous;
+         end if;
+
+         Self.Owner    := null;
+         Self.Previous := null;
+         Self.Next     := null;
+      end if;
+   end Disconnect;
+
+   ----------------
+   -- Disconnect --
+   ----------------
+
+   procedure Disconnect (Self : in out Referal_Limited_Base'Class) is
+   begin
+      if Self.Owner /= null then
+         if Self.Owner.Limited_Head = Self'Unchecked_Access then
+            Self.Owner.Limited_Head := Self.Owner.Limited_Head.Next;
+         end if;
+
+         if Self.Owner.Limited_Tail = Self'Unchecked_Access then
+            Self.Owner.Limited_Tail := Self.Owner.Limited_Tail.Previous;
          end if;
 
          if Self.Previous /= null then
@@ -330,9 +406,26 @@ package body VSS.Strings is
          Self.Head.Disconnect;
       end loop;
 
+      while Self.Limited_Head /= null loop
+         Self.Limited_Head.Invalidate;
+         Self.Limited_Head.Disconnect;
+      end loop;
+
       --  Unreference shared data
 
       VSS.Implementation.Strings.Unreference (Self.Data);
+   end Finalize;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding procedure Finalize (Self : in out Referal_Base) is
+   begin
+      if Self.Owner /= null then
+         Referal_Base'Class (Self).Invalidate;
+         Self.Disconnect;
+      end if;
    end Finalize;
 
    --------------
@@ -359,6 +452,26 @@ package body VSS.Strings is
         VSS.Strings.Cursors.Iterators.Characters.Internals.First_Character
           (Self);
    end First_Character;
+
+   ----------------
+   -- First_Line --
+   ----------------
+
+   function First_Line
+     (Self            : Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
+   is
+      pragma Unreferenced (Self);
+      pragma Unreferenced (Terminators);
+      pragma Unreferenced (Keep_Terminator);
+
+   begin
+      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
+         raise Program_Error;
+      end return;
+   end First_Line;
 
    -------------
    -- Handler --
@@ -408,6 +521,28 @@ package body VSS.Strings is
    end Is_Null;
 
    ----------
+   -- Line --
+   ----------
+
+   function Line
+     (Self            : Virtual_String'Class;
+      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
+   is
+      pragma Unreferenced (Self);
+      pragma Unreferenced (Position);
+      pragma Unreferenced (Terminators);
+      pragma Unreferenced (Keep_Terminator);
+
+   begin
+      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
+         raise Program_Error;
+      end return;
+   end Line;
+
+   ----------
    -- Read --
    ----------
 
@@ -417,6 +552,74 @@ package body VSS.Strings is
    begin
       raise Program_Error with "Not implemented";
    end Read;
+
+   -----------
+   -- Slice --
+   -----------
+
+   function Slice
+     (Self : Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+
+      First_Position :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (From);
+      Last_Position  :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (To);
+
+   begin
+      --  Check_Owner (From, Self);
+      --  Check_Owner (To, Self);
+
+      return Result : Virtual_String do
+         if Handler /= null then
+            Handler.Slice
+              (Self.Data,
+               First_Position.all,
+               Last_Position.all,
+               Result.Data);
+         end if;
+      end return;
+   end Slice;
+
+   -----------
+   -- Slice --
+   -----------
+
+   function Slice
+     (Self    : Virtual_String'Class;
+      Segment : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+
+      First_Position :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (Segment);
+      Last_Position  :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (Segment);
+
+   begin
+      --  Check_Owner (Segment, Self);
+
+      return Result : Virtual_String do
+         if Handler /= null then
+            Handler.Slice
+              (Self.Data,
+               First_Position.all,
+               Last_Position.all,
+               Result.Data);
+         end if;
+      end return;
+   end Slice;
 
    -----------------
    -- Split_Lines --
@@ -487,12 +690,14 @@ package body VSS.Strings is
      (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text is
    begin
       return (Ada.Finalization.Controlled with
-                Data => <>,
+                Data         => <>,
                 --  Data => (if Self.Data = null
                 --           then null
                 --           else Self.Data.To_Text),
-                Head => null,
-                Tail => null);
+                Head         => null,
+                Tail         => null,
+                Limited_Head => null,
+                Limited_Tail => null);
    end To_Magic_Text;
 
    -----------------------

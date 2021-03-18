@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2020, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,34 +20,24 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  This package is for internal use only.
 
-package VSS.Strings.Cursors.Iterators is
+with VSS.Implementation.Strings;
+
+package VSS.Strings.Cursors.Internals is
 
    pragma Preelaborate;
 
-   type Abstract_Character_Iterator is
-     abstract limited new VSS.Strings.Cursors.Abstract_Character_Cursor
-       with private;
+   type Cursor_Constant_Access is
+     access constant VSS.Implementation.Strings.Cursor;
+   --  Access type to allow direct access to internal value of the cursor
 
-   function Forward
-     (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
+   function First_Cursor_Access_Constant
+     (Self : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return not null Cursor_Constant_Access;
 
-   function Has_Element
-     (Self : Abstract_Character_Iterator) return Boolean is abstract;
-   --  Returns True when iterator points to the text element
+   function Last_Cursor_Access_Constant
+     (Self : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return not null Cursor_Constant_Access;
 
-   type Abstract_Segment_Iterator is
-     abstract limited new VSS.Strings.Cursors.Abstract_Segment_Cursor
-       with private;
-
-private
-
-   type Abstract_Character_Iterator is
-     abstract limited new VSS.Strings.Cursors.Character_Cursor_Limited_Base
-       with null record;
-
-   type Abstract_Segment_Iterator is
-     abstract limited new VSS.Strings.Cursors.Segment_Cursor_Limited_Base
-       with null record;
-
-end VSS.Strings.Cursors.Iterators;
+end VSS.Strings.Cursors.Internals;

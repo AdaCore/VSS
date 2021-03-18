@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with System.Storage_Elements;
+
 with Ada.Unchecked_Deallocation;
 
 package body VSS.Implementation.String_Vectors is
@@ -30,11 +32,72 @@ package body VSS.Implementation.String_Vectors is
        (VSS.Implementation.String_Vectors.String_Vector_Data,
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
+   Growth_Factor : constant := 2;
+   --  The growth factor controls how much extra space is allocated when
+   --  we have to increase the size of an allocated vector storage. By
+   --  allocating extra space, we avoid the need to reallocate on every
+   --  append, particularly important when a vector is built up by repeated
+   --  append operations of an individual items. This is expressed as a
+   --  factor so 2 means add 1/2 of the length of the vector as growth space.
+
+   Min_Mul_Alloc : constant := Standard'Maximum_Alignment;
+   --  Allocation will be done by a multiple of Min_Mul_Alloc. This causes
+   --  no memory loss as most (all?) malloc implementations are obliged to
+   --  align the returned memory on the maximum alignment as malloc does not
+   --  know the target alignment.
+
    procedure Mutate
-     (Self   : in out String_Vector_Data_Access;
-      Length : Natural);
-   --  Prepare object to be modified and reserve space for at least given
-   --  number of items.
+     (Self     : in out String_Vector_Data_Access;
+      Required : Natural;
+      Reserved : Natural);
+   --  Prepare object to be modified and reserve space for at least Required
+   --  number of items and up to additional Reserved number of items.
+   --  Parameters Required and Reserve are separated to prevent potential
+   --  integer overflow at the caller side.
+
+   function Aligned_Length
+     (Required : Natural;
+      Reserved : Natural) return Natural;
+   --  Return recommended length of the vector storage which is enough to
+   --  store at least Required number of items and up to Reserved number of
+   --  items additionally. Calculation takes into account alignment of the
+   --  allocated memory segments to use memory effectively by
+   --  Append/Insert/etc operations.
+
+   --------------------
+   -- Aligned_Length --
+   --------------------
+
+   function Aligned_Length
+     (Required : Natural;
+      Reserved : Natural) return Natural
+   is
+      use type System.Storage_Elements.Storage_Offset;
+
+      subtype Empty_String_Vector_Data is String_Vector_Data (0);
+
+      Element_Size : constant System.Storage_Elements.Storage_Count :=
+        VSS.Implementation.Strings.String_Data'Max_Size_In_Storage_Elements;
+
+      Static_Size  : constant System.Storage_Elements.Storage_Count :=
+        Empty_String_Vector_Data'Max_Size_In_Storage_Elements;
+
+   begin
+      if Required > Natural'Last - Reserved then
+         --  Total requested number of items is large than maximum number,
+         --  so limit it to maximum number of items.
+
+         return Natural'Last;
+
+      else
+         return
+           Natural
+             ((((Static_Size
+              + System.Storage_Elements.Storage_Count (Required + Reserved)
+              * Element_Size + Min_Mul_Alloc - 1) / Min_Mul_Alloc)
+              * Min_Mul_Alloc - Static_Size) / Element_Size);
+      end if;
+   end Aligned_Length;
 
    ------------
    -- Append --
@@ -44,7 +107,12 @@ package body VSS.Implementation.String_Vectors is
      (Self : in out String_Vector_Data_Access;
       Item : VSS.Implementation.Strings.String_Data) is
    begin
-      Mutate (Self, (if Self = null then 1 else Self.Last + 1));
+      if Self = null then
+         Mutate (Self, 1, 0);
+
+      else
+         Mutate (Self, Self.Last + 1, Self.Last / Growth_Factor);
+      end if;
 
       Self.Last := Self.Last + 1;
       Self.Data (Self.Last) := Item;
@@ -60,7 +128,12 @@ package body VSS.Implementation.String_Vectors is
      (Self : in out String_Vector_Data_Access;
       Item : VSS.Implementation.Strings.String_Data) is
    begin
-      Mutate (Self, (if Self = null then 1 else Self.Last + 1));
+      if Self = null then
+         Mutate (Self, 1, 0);
+
+      else
+         Mutate (Self, Self.Last + 1, Self.Last / Growth_Factor);
+      end if;
 
       Self.Last := Self.Last + 1;
       Self.Data (Self.Last) := Item;
@@ -71,21 +144,23 @@ package body VSS.Implementation.String_Vectors is
    ------------
 
    procedure Mutate
-     (Self   : in out String_Vector_Data_Access;
-      Length : Natural)
+     (Self     : in out String_Vector_Data_Access;
+      Required : Natural;
+      Reserved : Natural)
    is
    begin
       if Self = null then
-         Self := new String_Vector_Data (Length);
+         Self := new String_Vector_Data (Aligned_Length (Required, Reserved));
 
       elsif not System.Atomic_Counters.Is_One (Self.Counter)
-        or else Self.Bulk < Length
+        or else Self.Bulk < Required
       then
          declare
             Old : String_Vector_Data_Access := Self;
 
          begin
-            Self := new String_Vector_Data (Length);
+            Self :=
+              new String_Vector_Data (Aligned_Length (Required, Reserved));
             Self.Last := Old.Last;
             Self.Data (1 .. Old.Last) := Old.Data (1 .. Old.Last);
 
@@ -123,7 +198,7 @@ package body VSS.Implementation.String_Vectors is
       Index : Positive;
       Item  : VSS.Implementation.Strings.String_Data) is
    begin
-      Mutate (Self, Self.Last);
+      Mutate (Self, Self.Last, 0);
       VSS.Implementation.Strings.Unreference (Self.Data (Index));
       Self.Data (Index) := Item;
       VSS.Implementation.Strings.Reference (Self.Data (Index));

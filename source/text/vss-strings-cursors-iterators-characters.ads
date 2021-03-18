@@ -22,6 +22,9 @@
 ------------------------------------------------------------------------------
 
 with VSS.Characters;
+private with VSS.Strings.Cursors.Markers;
+pragma Unreferenced (VSS.Strings.Cursors.Markers);
+--  XXX GNAT 20210308 reports error whithout with clause above.
 
 package VSS.Strings.Cursors.Iterators.Characters is
 
@@ -41,9 +44,5 @@ private
      (Self : in out Character_Iterator) return Boolean;
 
    overriding function Has_Element (Self : Character_Iterator) return Boolean;
-
-   overriding function Create
-     (Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return Character_Iterator;
 
 end VSS.Strings.Cursors.Iterators.Characters;

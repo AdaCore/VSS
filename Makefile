@@ -22,6 +22,7 @@ check_text:
 	.objs/tests/test_string_conversions
 	.objs/tests/test_string_hash
 	.objs/tests/test_string_buffer
+	.objs/tests/test_string_slice
 	.objs/tests/test_string_split_lines
 	.objs/tests/test_string_vector
 
@@ -40,3 +41,6 @@ coverage:
 
 docs: all
 	make -C docs
+
+clean:
+	rm -rf .objs

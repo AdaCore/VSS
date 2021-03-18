@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,30 +21,17 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.Strings.UTF is
+package body Test_Support is
 
-   -----------------------
-   -- To_Grapheme_Index --
-   -----------------------
+   ------------
+   -- Assert --
+   ------------
 
-   function To_Grapheme_Index
-     (Item : UTF16_Code_Unit_Index) return Grapheme_Index
-   is
-      pragma Unreferenced (Item);
+   procedure Assert (Condition : Boolean) is
    begin
-      return 1;
-   end To_Grapheme_Index;
+      if not Condition then
+         raise Test_Failed;
+      end if;
+   end Assert;
 
-   ------------------------------
-   -- To_UTF16_Code_Unit_Count --
-   ------------------------------
-
-   function To_UTF16_Code_Unit_Count
-     (Item : Grapheme_Index) return UTF16_Code_Unit_Index
-   is
-      pragma Unreferenced (Item);
-   begin
-      return 0;
-   end To_UTF16_Code_Unit_Count;
-
-end VSS.Strings.UTF;
+end Test_Support;

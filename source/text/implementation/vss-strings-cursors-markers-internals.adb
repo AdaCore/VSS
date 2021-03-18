@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,33 +21,21 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Iterators is
+package body VSS.Strings.Cursors.Markers.Internals is
 
-   pragma Preelaborate;
+   --------------------------
+   -- New_Character_Marker --
+   --------------------------
 
-   type Abstract_Character_Iterator is
-     abstract limited new VSS.Strings.Cursors.Abstract_Character_Cursor
-       with private;
+   function New_Character_Marker
+     (String   : VSS.Strings.Virtual_String'Class;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Strings.Cursors.Markers.Character_Marker is
+   begin
+      return Result : VSS.Strings.Cursors.Markers.Character_Marker do
+         Result.Position := Position;
+         Result.Connect (String'Unrestricted_Access);
+      end return;
+   end New_Character_Marker;
 
-   function Forward
-     (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
-
-   function Has_Element
-     (Self : Abstract_Character_Iterator) return Boolean is abstract;
-   --  Returns True when iterator points to the text element
-
-   type Abstract_Segment_Iterator is
-     abstract limited new VSS.Strings.Cursors.Abstract_Segment_Cursor
-       with private;
-
-private
-
-   type Abstract_Character_Iterator is
-     abstract limited new VSS.Strings.Cursors.Character_Cursor_Limited_Base
-       with null record;
-
-   type Abstract_Segment_Iterator is
-     abstract limited new VSS.Strings.Cursors.Segment_Cursor_Limited_Base
-       with null record;
-
-end VSS.Strings.Cursors.Iterators;
+end VSS.Strings.Cursors.Markers.Internals;

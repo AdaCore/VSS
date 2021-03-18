@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,12 +21,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with "../vss_config";
 with "../vss_text";
 
 project VSS_Stream_Tests is
 
    for Languages use ("Ada");
-   for Object_Dir use "../../.objs/tests";
+   for Object_Dir use VSS_Config.Tests_Object_Dir;
    for Source_Dirs use ("../../testsuite/stream");
    for Main use ("test_stream_element_buffer.adb",
                  "test_text_streams.adb");

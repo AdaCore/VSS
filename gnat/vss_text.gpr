@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -27,7 +27,7 @@ with "vss_config";
 project VSS_Text is
 
    for Languages use ("Ada");
-   for Object_Dir use "../.objs";
+   for Object_Dir use VSS_Config.Object_Dir;
    for Source_Dirs use
      ("../source/streams",
       "../source/streams/implementation",

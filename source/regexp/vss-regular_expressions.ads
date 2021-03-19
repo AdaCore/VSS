@@ -26,6 +26,9 @@ private with Ada.Finalization;
 with VSS.Strings.Cursors.Markers;
 with VSS.String_Vectors;
 
+limited private with VSS.Regular_Expressions.Engines;
+limited private with VSS.Regular_Expressions.Matches;
+
 package VSS.Regular_Expressions is
 
    pragma Preelaborate;
@@ -165,9 +168,23 @@ package VSS.Regular_Expressions is
 
 private
 
-   type Regular_Expression is new Ada.Finalization.Controlled with null record;
+   type Engine_Access is
+     access all VSS.Regular_Expressions.Engines.Engine'Class;
 
-   type Regular_Expression_Match is
-     new Ada.Finalization.Controlled with null record;
+   type Regular_Expression is new Ada.Finalization.Controlled with record
+      Data : Engine_Access;
+   end record;
+
+   overriding procedure Adjust (Self : in out Regular_Expression);
+   overriding procedure Finalize (Self : in out Regular_Expression);
+
+   type Match_Access is access all VSS.Regular_Expressions.Matches.Match;
+
+   type Regular_Expression_Match is new Ada.Finalization.Controlled with record
+      Data : Match_Access;
+   end record;
+
+   overriding procedure Adjust (Self : in out Regular_Expression_Match);
+   overriding procedure Finalize (Self : in out Regular_Expression_Match);
 
 end VSS.Regular_Expressions;

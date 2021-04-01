@@ -45,12 +45,27 @@ package VSS.Implementation.Strings is
    ------------
 
    type Cursor is record
-      Index        : Character_Count                   := 0;
-      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Index  :=
-        VSS.Unicode.UTF8_Code_Unit_Index'Last;
-      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Index :=
-        VSS.Unicode.UTF16_Code_Unit_Index'Last;
+      Index        : Character_Count                    := 0;
+      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Offset  :=
+        VSS.Unicode.UTF8_Code_Unit_Offset'Last;
+      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Offset :=
+        VSS.Unicode.UTF16_Code_Unit_Offset'Last;
    end record;
+   --  Position of the character in the string. There are few special values,
+   --  see table below.
+   --
+   --  UTF8_Offset and UTF16_Offset may be negative value, it means that
+   --  actual offset is not know and can be computed by subtraction of this
+   --  value from the total length of the data in corresponding encoding. It
+   --  is used to avoid scanning of the whole string when cursor for the last
+   --  character of the string is constructed.
+   --
+   --  Some special corner cases for values:
+   --
+   --                                   Index      UTF8_Offset   UTF16_Offset
+   --   - invalid position                0           'Last         'Last
+   --   - before first character          0             -1            -1
+   --   - after last character        Length + 1     0 | Size      0 | Size
 
    -----------------
    -- String_Data --

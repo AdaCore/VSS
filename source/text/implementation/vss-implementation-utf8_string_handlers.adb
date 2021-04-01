@@ -29,7 +29,8 @@ with VSS.Implementation.String_Configuration;
 package body VSS.Implementation.UTF8_String_Handlers is
 
    use type VSS.Implementation.Strings.Character_Count;
-   use type VSS.Unicode.UTF8_Code_Unit_Count;
+   use type VSS.Unicode.UTF8_Code_Unit_Offset;
+   use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
    Line_Feed              : constant VSS.Unicode.Code_Point := 16#00_000A#;
    Line_Tabulation        : constant VSS.Unicode.Code_Point := 16#00_000B#;
@@ -164,19 +165,12 @@ package body VSS.Implementation.UTF8_String_Handlers is
    is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
+
    begin
-      --  Go to the last character
       Position :=
-        (Index        => Source.Length,
+        (Index        => Source.Length + 1,
          UTF8_Offset  => Source.Size,
          UTF16_Offset => 0);
-
-      if Source.Length > 0 then  --  Move beyond the end
-         Unchecked_Forward (Source.Storage, Position);
-      end if;
-
-      --  FIXME :
-      Position.UTF16_Offset := VSS.Unicode.UTF16_Code_Unit_Index'Last;
    end After_Last_Character;
 
    --------------------------
@@ -190,19 +184,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
    is
       Source : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
+
    begin
-      --  Go to the last character
       Position :=
-        (Index        => Strings.Character_Count (Source.Length),
+        (Index        =>
+           VSS.Implementation.Strings.Character_Count (Source.Length) + 1,
          UTF8_Offset  => VSS.Unicode.UTF8_Code_Unit_Index (Source.Size),
          UTF16_Offset => 0);
-
-      if Position.Index > 0 then  --  Move beyond the end
-         Unchecked_Forward (Source.Storage, Position);
-      end if;
-
-      --  FIXME :
-      Position.UTF16_Offset := VSS.Unicode.UTF16_Code_Unit_Index'Last;
    end After_Last_Character;
 
    ----------------------
@@ -597,7 +585,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
-      Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
+      Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
    end Before_First_Character;
 
    ----------------------------
@@ -609,7 +597,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
-      Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
+      Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
    end Before_First_Character;
 
    ------------------
@@ -710,9 +698,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
       if Source = null or else Position.Index > Source.Length then
          return False;
 
-      elsif Position.Index = 0 then
-         Position.Index := 1;
-
       else
          Unchecked_Forward (Source.Storage, Position);
       end if;
@@ -737,9 +722,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
            > VSS.Implementation.Strings.Character_Count (Source.Length)
       then
          return False;
-
-      elsif Position.Index = 0 then
-         Position.Index := 1;
 
       else
          Unchecked_Forward (Source.Storage, Position);
@@ -1554,45 +1536,45 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end return;
    end To_UTF_8_String;
 
-   -----------------------
+   ------------------------
    -- Unchecked_Backward --
-   -----------------------
+   ------------------------
 
    procedure Unchecked_Backward
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Position : in out VSS.Implementation.Strings.Cursor)
-   is
-      use type VSS.Unicode.UTF16_Code_Unit_Count;
-
+      Position : in out VSS.Implementation.Strings.Cursor) is
    begin
+      Position.Index        := Position.Index - 1;
       Position.UTF8_Offset  := Position.UTF8_Offset - 1;
-      Position.Index := Position.Index - 1;
+      Position.UTF16_Offset := Position.UTF16_Offset - 1;
 
-      loop
-         declare
-            Code : constant VSS.Unicode.UTF8_Code_Unit :=
-              Storage (Position.UTF8_Offset);
-         begin
-            case Code is
-               when 16#80# .. 16#BF# =>
-                  Position.UTF8_Offset  := Position.UTF8_Offset - 1;
+      if Position.Index /= 0 then
+         loop
+            declare
+               Code : constant VSS.Unicode.UTF8_Code_Unit :=
+                 Storage (Position.UTF8_Offset);
 
-               when 16#00# .. 16#7F#
-                  | 16#C2# .. 16#DF#
-                  | 16#E0# .. 16#EF# =>
+            begin
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     Position.UTF8_Offset  := Position.UTF8_Offset - 1;
 
-                  Position.UTF16_Offset := Position.UTF16_Offset - 1;
-                  exit;
+                  when 16#00# .. 16#7F#
+                     | 16#C2# .. 16#DF#
+                     | 16#E0# .. 16#EF# =>
 
-               when 16#F0# .. 16#F4# =>
-                  Position.UTF16_Offset := Position.UTF16_Offset - 2;
-                  exit;
+                     exit;
 
-               when others =>
-                  raise Program_Error with "string data is corrupted";
-            end case;
-         end;
-      end loop;
+                  when 16#F0# .. 16#F4# =>
+                     Position.UTF16_Offset := Position.UTF16_Offset - 1;
+                     exit;
+
+                  when others =>
+                     raise Program_Error with "string data is corrupted";
+               end case;
+            end;
+         end loop;
+      end if;
    end Unchecked_Backward;
 
    ----------------------
@@ -1666,34 +1648,42 @@ package body VSS.Implementation.UTF8_String_Handlers is
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Position : in out VSS.Implementation.Strings.Cursor)
    is
-      use type VSS.Unicode.UTF16_Code_Unit_Count;
-
-      Code : constant VSS.Unicode.UTF8_Code_Unit :=
-        Storage (Position.UTF8_Offset);
-
    begin
       Position.Index := Position.Index + 1;
 
-      case Code is
-         when 16#00# .. 16#7F# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 1;
-            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+      if Position.Index = 1 then
+         Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+         Position.UTF16_Offset := Position.UTF16_Offset + 1;
 
-         when 16#C2# .. 16#DF# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 2;
-            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+         return;
+      end if;
 
-         when 16#E0# .. 16#EF# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 3;
-            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+      declare
+         Code : constant VSS.Unicode.UTF8_Code_Unit :=
+           Storage (Position.UTF8_Offset);
 
-         when 16#F0# .. 16#F4# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 4;
-            Position.UTF16_Offset := Position.UTF16_Offset + 2;
+      begin
+         case Code is
+            when 16#00# .. 16#7F# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
 
-         when others =>
-            raise Program_Error with "string data is corrupted";
-      end case;
+            when 16#C2# .. 16#DF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 2;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#E0# .. 16#EF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 3;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#F0# .. 16#F4# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 4;
+               Position.UTF16_Offset := Position.UTF16_Offset + 2;
+
+            when others =>
+               raise Program_Error with "string data is corrupted";
+         end case;
+      end;
 
       --  XXX case statement above may be rewritten as below to avoid
       --  use of branch instructions.

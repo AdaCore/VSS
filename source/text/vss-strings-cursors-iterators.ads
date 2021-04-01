@@ -31,6 +31,11 @@ package VSS.Strings.Cursors.Iterators is
 
    function Forward
      (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
+   --  Move cursor one character forward
+
+   function Backward
+     (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
+   --  Move cursor one character backward
 
    function Has_Element
      (Self : Abstract_Character_Iterator) return Boolean is abstract;

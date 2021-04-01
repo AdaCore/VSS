@@ -107,4 +107,29 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
       end return;
    end First_Character;
 
+   --------------------
+   -- Last_Character --
+   --------------------
+
+   function Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Dummy   : Boolean;
+
+   begin
+      return Result :
+        VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         Result.Connect (Self'Unrestricted_Access);
+
+         if Handler /= null then
+            Handler.After_Last_Character (Self.Data, Result.Position);
+            Dummy := Handler.Backward (Self.Data, Result.Position);
+         end if;
+      end return;
+   end Last_Character;
+
 end VSS.Strings.Cursors.Iterators.Characters.Internals;

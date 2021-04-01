@@ -40,6 +40,9 @@ private
 
    type Character_Iterator is new Abstract_Character_Iterator with null record;
 
+   overriding function Backward
+     (Self : in out Character_Iterator) return Boolean;
+
    overriding function Forward
      (Self : in out Character_Iterator) return Boolean;
 

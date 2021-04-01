@@ -520,6 +520,19 @@ package body VSS.Strings is
       return Self.Handler = null;
    end Is_Null;
 
+   --------------------
+   -- Last_Character --
+   --------------------
+
+   function Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+   begin
+      return
+        VSS.Strings.Cursors.Iterators.Characters.Internals.Last_Character
+          (Self);
+   end Last_Character;
+
    ----------
    -- Line --
    ----------

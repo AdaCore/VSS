@@ -290,4 +290,11 @@ private
    --  Common code to obtain offset of the first UTF16 code unit for given
    --  position.
 
+   function Last_UTF16_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Common code to obtain offset of the last UTF16 code unit for given
+   --  position.
+
 end VSS.Strings.Cursors;

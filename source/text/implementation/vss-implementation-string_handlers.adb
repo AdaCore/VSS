@@ -118,6 +118,39 @@ package body VSS.Implementation.String_Handlers is
       return Aux.UTF16_Offset;
    end First_UTF16_Offset;
 
+   -----------------------
+   -- First_UTF8_Offset --
+   -----------------------
+
+   not overriding function First_UTF8_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Aux     : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Position.UTF8_Offset >= 0 then
+         return Position.UTF8_Offset;
+
+      else
+         Handler.Before_First_Character (Data, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Handler.Forward (Data, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      return Aux.UTF8_Offset;
+   end First_UTF8_Offset;
+
    ----------
    -- Hash --
    ----------

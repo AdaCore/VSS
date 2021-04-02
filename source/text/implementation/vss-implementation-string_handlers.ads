@@ -192,6 +192,13 @@ package VSS.Implementation.String_Handlers is
    --  Return UTF-16 offset at the given position, when corresponding member
    --  of the cursor has negative value.
 
+   not overriding function Last_UTF16_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Return offset of the last UTF-16 code unit at the given position.
+
    not overriding procedure Append
      (Self : Abstract_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;

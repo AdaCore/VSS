@@ -334,12 +334,33 @@ package body VSS.Strings.Cursors is
    -- Last_UTF16_Offset --
    -----------------------
 
+   function Last_UTF16_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      use type VSS.Implementation.Strings.String_Handler_Access;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        String.Handler;
+
+   begin
+      if Handler /= null then
+         return Handler.Last_UTF16_Offset (String.Data, Position);
+
+      else
+         return 0;
+      end if;
+   end Last_UTF16_Offset;
+
+   -----------------------
+   -- Last_UTF16_Offset --
+   -----------------------
+
    overriding function Last_UTF16_Offset
      (Self : Character_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -350,9 +371,7 @@ package body VSS.Strings.Cursors is
      (Self : Character_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -362,9 +381,7 @@ package body VSS.Strings.Cursors is
    overriding function Last_UTF16_Offset
      (Self : Segment_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Last_Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Last_Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -375,9 +392,7 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Last_Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Last_Position);
    end Last_UTF16_Offset;
 
    ----------------------

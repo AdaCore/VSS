@@ -283,6 +283,13 @@ private
    -- Utilities --
    ---------------
 
+   function Last_UTF8_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+   --  Common code to obtain offset of the last UTF8 code unit for given
+   --  position.
+
    function First_UTF16_Offset
      (String   : not null VSS.Strings.Magic_String_Access;
       Position : VSS.Implementation.Strings.Cursor)

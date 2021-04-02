@@ -184,6 +184,13 @@ package VSS.Implementation.String_Handlers is
       return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
    --  Converts string data into standard UTF_8_String.
 
+   not overriding function Last_UTF8_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index;
+   --  Return offset of the last UTF-8 code unit at the given position.
+
    not overriding function First_UTF16_Offset
      (Self     : Abstract_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;

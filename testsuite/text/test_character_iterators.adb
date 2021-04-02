@@ -37,8 +37,10 @@ procedure Test_Character_Iterators is
 
    type Position_Data is record
       Character          : VSS.Characters.Virtual_Character;
-      First_UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Count;
-      First_UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Count;
+      First_UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Index;
+      Last_UTF8_Offset   : VSS.Unicode.UTF8_Code_Unit_Index;
+      First_UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Index;
+      Last_UTF16_Offset  : VSS.Unicode.UTF16_Code_Unit_Index;
    end record;
 
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
@@ -88,28 +90,28 @@ procedure Test_Character_Iterators is
 
    D : constant array (VSS.Strings.Character_Index range <>) of Position_Data
      :=
-    (('A', 0, 0),     --  'A' 1
-     ('S', 1, 1),     --  'S' 2
-     ('C', 2, 2),     --  'C' 3
-     ('I', 3, 3),     --  'I' 4
-     ('I', 4, 4),     --  'I' 5
-     (' ', 5, 5),     --  ' ' 6
-     ('К', 6, 6),     --  'К' 7
-     ('и', 8, 7),     --  'и' 8
-     ('р', 10, 8),    --  'р' 9
-     ('и', 12, 9),    --  'и' 10
-     ('л', 14, 10),   --  'л' 11
-     ('л', 16, 11),   --  'л' 12
-     ('и', 18, 12),   --  'и' 13
-     ('ц', 20, 13),   --  'ц' 14
-     ('а', 22, 14),   --  'а' 15
-     (' ', 24, 15),   --  ' ' 16
-     ('⊗', 25, 16),   --  '⊗' 17
-     ('∬', 28, 17),   --  '∬' 18
-     (' ', 31, 18),   --  ' ' 19
-     ('𝛻', 32, 19),   --  '𝛻' 17
-     ('𝜕', 36, 21),   --  '𝜕' 18
-     (' ', 40, 23));  --  ' ' 19
+    (('A', 0, 0, 0, 0),       --  'A' 1
+     ('S', 1, 1, 1, 1),       --  'S' 2
+     ('C', 2, 2, 2, 2),       --  'C' 3
+     ('I', 3, 3, 3, 3),       --  'I' 4
+     ('I', 4, 4, 4, 4),       --  'I' 5
+     (' ', 5, 5, 5, 5),       --  ' ' 6
+     ('К', 6, 7, 6, 6),       --  'К' 7
+     ('и', 8, 9, 7, 7),       --  'и' 8
+     ('р', 10, 11, 8, 8),     --  'р' 9
+     ('и', 12, 13, 9, 9),     --  'и' 10
+     ('л', 14, 15, 10, 10),   --  'л' 11
+     ('л', 16, 17, 11, 11),   --  'л' 12
+     ('и', 18, 19, 12, 12),   --  'и' 13
+     ('ц', 20, 21, 13, 13),   --  'ц' 14
+     ('а', 22, 23, 14, 14),   --  'а' 15
+     (' ', 24, 24, 15, 15),   --  ' ' 16
+     ('⊗', 25, 27, 16, 16),   --  '⊗' 17
+     ('∬', 28, 30, 17, 17),   --  '∬' 18
+     (' ', 31, 31, 18, 18),   --  ' ' 19
+     ('𝛻', 32, 35, 19, 20),   --  '𝛻' 17
+     ('𝜕', 36, 39, 21, 22),   --  '𝜕' 18
+     (' ', 40, 40, 23, 23));  --  ' ' 19
 
    procedure Test_Forward;
    procedure Test_Backward;
@@ -148,7 +150,15 @@ procedure Test_Character_Iterators is
             raise Program_Error;
          end if;
 
+         if J.Last_UTF8_Offset /= D (C).Last_UTF8_Offset then
+            raise Program_Error;
+         end if;
+
          if J.First_UTF16_Offset /= D (C).First_UTF16_Offset then
+            raise Program_Error;
+         end if;
+
+         if J.Last_UTF16_Offset /= D (C).Last_UTF16_Offset then
             raise Program_Error;
          end if;
 
@@ -177,8 +187,20 @@ procedure Test_Character_Iterators is
             raise Program_Error;
          end if;
 
+         if VSS.Strings.Cursors.Abstract_Cursor'Class (M).Last_UTF8_Offset
+           /= D (C).Last_UTF8_Offset
+         then
+            raise Program_Error;
+         end if;
+
          if VSS.Strings.Cursors.Abstract_Cursor'Class (M).First_UTF16_Offset
            /= D (C).First_UTF16_Offset
+         then
+            raise Program_Error;
+         end if;
+
+         if VSS.Strings.Cursors.Abstract_Cursor'Class (M).Last_UTF16_Offset
+           /= D (C).Last_UTF16_Offset
          then
             raise Program_Error;
          end if;
@@ -213,7 +235,15 @@ procedure Test_Character_Iterators is
                raise Program_Error;
             end if;
 
+            if J1.Last_UTF8_Offset /= D (C).Last_UTF8_Offset then
+               raise Program_Error;
+            end if;
+
             if J1.First_UTF16_Offset /= D (C).First_UTF16_Offset then
+               raise Program_Error;
+            end if;
+
+            if J1.Last_UTF16_Offset /= D (C).Last_UTF16_Offset then
                raise Program_Error;
             end if;
 
@@ -237,7 +267,15 @@ procedure Test_Character_Iterators is
                raise Program_Error;
             end if;
 
+            if J2.Last_UTF8_Offset /= D (C).Last_UTF8_Offset then
+               raise Program_Error;
+            end if;
+
             if J2.First_UTF16_Offset /= D (C).First_UTF16_Offset then
+               raise Program_Error;
+            end if;
+
+            if J2.Last_UTF16_Offset /= D (C).Last_UTF16_Offset then
                raise Program_Error;
             end if;
          end;
@@ -292,7 +330,15 @@ procedure Test_Character_Iterators is
             raise Program_Error;
          end if;
 
+         if J.Last_UTF8_Offset /= D (C).Last_UTF8_Offset then
+            raise Program_Error;
+         end if;
+
          if J.First_UTF16_Offset /= D (C).First_UTF16_Offset then
+            raise Program_Error;
+         end if;
+
+         if J.Last_UTF16_Offset /= D (C).Last_UTF16_Offset then
             raise Program_Error;
          end if;
 
@@ -321,8 +367,20 @@ procedure Test_Character_Iterators is
             raise Program_Error;
          end if;
 
+         if VSS.Strings.Cursors.Abstract_Cursor'Class (M).Last_UTF8_Offset
+           /= D (C).Last_UTF8_Offset
+         then
+            raise Program_Error;
+         end if;
+
          if VSS.Strings.Cursors.Abstract_Cursor'Class (M).First_UTF16_Offset
            /= D (C).First_UTF16_Offset
+         then
+            raise Program_Error;
+         end if;
+
+         if VSS.Strings.Cursors.Abstract_Cursor'Class (M).Last_UTF16_Offset
+           /= D (C).Last_UTF16_Offset
          then
             raise Program_Error;
          end if;
@@ -357,7 +415,15 @@ procedure Test_Character_Iterators is
                raise Program_Error;
             end if;
 
+            if J1.Last_UTF8_Offset /= D (C).Last_UTF8_Offset then
+               raise Program_Error;
+            end if;
+
             if J1.First_UTF16_Offset /= D (C).First_UTF16_Offset then
+               raise Program_Error;
+            end if;
+
+            if J1.Last_UTF16_Offset /= D (C).Last_UTF16_Offset then
                raise Program_Error;
             end if;
 
@@ -381,7 +447,15 @@ procedure Test_Character_Iterators is
                raise Program_Error;
             end if;
 
+            if J2.Last_UTF8_Offset /= D (C).Last_UTF8_Offset then
+               raise Program_Error;
+            end if;
+
             if J2.First_UTF16_Offset /= D (C).First_UTF16_Offset then
+               raise Program_Error;
+            end if;
+
+            if J2.Last_UTF16_Offset /= D (C).Last_UTF16_Offset then
                raise Program_Error;
             end if;
          end;

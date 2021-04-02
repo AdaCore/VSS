@@ -110,7 +110,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
      (Self : Line_Iterator'Class)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.Terminator_First.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.Terminator_First);
    end Terminator_First_UTF16_Offset;
 
    ---------------------

@@ -21,6 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Markers.Internals;
 
 package body VSS.Strings.Cursors is
@@ -134,10 +135,37 @@ package body VSS.Strings.Cursors is
    -- First_UTF16_Offset --
    ------------------------
 
+   function First_UTF16_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      use type VSS.Implementation.Strings.String_Handler_Access;
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        String.Handler;
+
+   begin
+      if Position.UTF16_Offset >= 0 then
+         return Position.UTF16_Offset;
+
+      elsif Handler /= null then
+         return Handler.UTF16_Offset (String.Data, Position);
+
+      else
+         return 0;
+      end if;
+   end First_UTF16_Offset;
+
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
    overriding function First_UTF16_Offset
      (Self : Character_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.Position);
    end First_UTF16_Offset;
 
    ------------------------
@@ -148,7 +176,7 @@ package body VSS.Strings.Cursors is
      (Self : Character_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.Position);
    end First_UTF16_Offset;
 
    ------------------------
@@ -159,7 +187,7 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.First_Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.First_Position);
    end First_UTF16_Offset;
 
    ------------------------
@@ -170,7 +198,7 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.First_Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.First_Position);
    end First_UTF16_Offset;
 
    -----------------------

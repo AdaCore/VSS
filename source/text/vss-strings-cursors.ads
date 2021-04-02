@@ -279,4 +279,15 @@ private
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index;
 
+   ---------------
+   -- Utilities --
+   ---------------
+
+   function First_UTF16_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index;
+   --  Common code to obtain offset of the first UTF16 code unit for given
+   --  position.
+
 end VSS.Strings.Cursors;

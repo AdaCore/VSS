@@ -151,7 +151,7 @@ package body VSS.Strings.Cursors is
          return Position.UTF16_Offset;
 
       elsif Handler /= null then
-         return Handler.UTF16_Offset (String.Data, Position);
+         return Handler.First_UTF16_Offset (String.Data, Position);
 
       else
          return 0;

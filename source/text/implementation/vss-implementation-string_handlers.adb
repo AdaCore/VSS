@@ -62,6 +62,39 @@ package body VSS.Implementation.String_Handlers is
       return True;
    end Ends_With;
 
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
+   not overriding function First_UTF16_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+
+      Handler : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Aux     : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Position.UTF16_Offset >= 0 then
+         return Position.UTF16_Offset;
+
+      else
+         Handler.Before_First_Character (Data, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Handler.Forward (Data, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      return Aux.UTF16_Offset;
+   end First_UTF16_Offset;
+
    ----------
    -- Hash --
    ----------
@@ -325,39 +358,6 @@ package body VSS.Implementation.String_Handlers is
 
       return True;
    end Starts_With;
-
-   ------------------
-   -- UTF16_Offset --
-   ------------------
-
-   not overriding function UTF16_Offset
-     (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.UTF16_Code_Unit_Index
-   is
-      use type VSS.Unicode.UTF16_Code_Unit_Offset;
-
-      Handler : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
-      Aux     : VSS.Implementation.Strings.Cursor;
-
-   begin
-      if Position.UTF16_Offset >= 0 then
-         return Position.UTF16_Offset;
-
-      else
-         Handler.Before_First_Character (Data, Aux);
-
-         while Aux.Index /= Position.Index
-           and then Handler.Forward (Data, Aux)
-         loop
-            null;
-         end loop;
-      end if;
-
-      return Aux.UTF16_Offset;
-   end UTF16_Offset;
 
    -----------------------
    -- Last_UTF16_Offset --

@@ -83,4 +83,14 @@ private
 
    overriding procedure Invalidate (Self : in out Line_Iterator);
 
+   overriding function Forward (Self : in out Line_Iterator) return Boolean;
+
+   procedure Initialize
+     (Self            : in out Line_Iterator'Class;
+      Position        : VSS.Implementation.Strings.Cursor;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False);
+   --  Initialize iterator and lookup for line boundaries at the given
+   --  position.
+
 end VSS.Strings.Cursors.Iterators.Lines;

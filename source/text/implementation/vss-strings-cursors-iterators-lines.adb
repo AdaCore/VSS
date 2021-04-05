@@ -26,6 +26,14 @@ with VSS.Strings.Cursors.Markers.Internals;
 
 package body VSS.Strings.Cursors.Iterators.Lines is
 
+   Line_Feed              : constant VSS.Unicode.Code_Point := 16#00_000A#;
+   Line_Tabulation        : constant VSS.Unicode.Code_Point := 16#00_000B#;
+   Form_Feed              : constant VSS.Unicode.Code_Point := 16#00_000C#;
+   Carriage_Return        : constant VSS.Unicode.Code_Point := 16#00_000D#;
+   Next_Line              : constant VSS.Unicode.Code_Point := 16#00_0085#;
+   Line_Separator         : constant VSS.Unicode.Code_Point := 16#00_2028#;
+   Paragraph_Separator    : constant VSS.Unicode.Code_Point := 16#00_2029#;
+
    function Terminator_First
      (Self : Line_Iterator'Class) return VSS.Implementation.Strings.Cursor;
    --  Return cursor of first character of the line terminator sequence.
@@ -33,6 +41,248 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    function Terminator_Last
      (Self : Line_Iterator'Class) return VSS.Implementation.Strings.Cursor;
    --  Return cursor of last character of the line terminator sequence.
+
+   procedure Lookup_Line_Boundaries
+     (Self          : in out Line_Iterator'Class;
+      Position      : VSS.Implementation.Strings.Cursor);
+      --  Terminator    : out VSS.Implementation.Strings.Cursor;
+      --  Last_Position : out VSS.Implementation.Strings.Cursor);
+
+   procedure Lookup_Next_Line
+     (Self     : in out Line_Iterator'Class;
+      Position : VSS.Implementation.Strings.Cursor);
+   --  Lookup for next line. Position points to the last character of the
+   --  line terminator sequence of the current line.
+
+   ----------------------
+   -- Lookup_Next_Line --
+   ----------------------
+
+   procedure Lookup_Next_Line
+     (Self     : in out Line_Iterator'Class;
+      Position : VSS.Implementation.Strings.Cursor)
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Owner.Handler;
+
+      Current_Position    : VSS.Implementation.Strings.Cursor := Position;
+      CR_Found            : Boolean := False;
+      Terminator_Position : VSS.Implementation.Strings.Cursor;
+      Dummy               : Boolean;
+
+   begin
+      Self.First_Position := Current_Position;
+
+      if not Handler.Forward (Self.Owner.Data, Self.First_Position) then
+         Self.Last_Position := Current_Position;
+         Self.Terminator    := (others => <>);
+
+         return;
+      end if;
+
+      while Handler.Forward (Self.Owner.Data, Current_Position) loop
+         declare
+            use type VSS.Unicode.Code_Point;
+
+            C : constant VSS.Unicode.Code_Point :=
+              Handler.Element (Self.Owner.Data, Current_Position);
+
+         begin
+            if CR_Found then
+               if C /= Line_Feed and Self.Terminators (VSS.Strings.CR) then
+                  --  It is special case to handle single CR when both CR and
+                  --  CRLF are allowed.
+
+                  CR_Found := False;
+                  Dummy :=
+                    Handler.Backward (Self.Owner.Data, Current_Position);
+
+                  exit;
+               end if;
+            end if;
+
+            case C is
+               when Line_Feed =>
+                  if Self.Terminators (VSS.Strings.CRLF) and CR_Found then
+                     CR_Found := False;
+
+                     exit;
+
+                  elsif Self.Terminators (VSS.Strings.LF) then
+                     Terminator_Position := Current_Position;
+
+                     exit;
+                  end if;
+
+               when Line_Tabulation =>
+                  if Self.Terminators (VSS.Strings.VT) then
+                     Terminator_Position := Current_Position;
+
+                     exit;
+                  end if;
+
+               when Form_Feed =>
+                  if Self.Terminators (VSS.Strings.FF) then
+                     Terminator_Position := Current_Position;
+
+                     exit;
+                  end if;
+
+               when Carriage_Return =>
+                  if Self.Terminators (VSS.Strings.CRLF) then
+                     Terminator_Position := Current_Position;
+                     CR_Found            := True;
+
+                  elsif Self.Terminators (VSS.Strings.CR) then
+                     Terminator_Position := Current_Position;
+
+                     exit;
+                  end if;
+
+               when Next_Line =>
+                  if Self.Terminators (VSS.Strings.NEL) then
+                     Terminator_Position := Current_Position;
+
+                     exit;
+                  end if;
+
+               when Line_Separator =>
+                  if Self.Terminators (VSS.Strings.LS) then
+                     Terminator_Position := Current_Position;
+
+                     exit;
+                  end if;
+
+               when Paragraph_Separator =>
+                  if Self.Terminators (VSS.Strings.PS) then
+                     Terminator_Position := Current_Position;
+
+                     exit;
+                  end if;
+
+               when others =>
+                  null;
+            end case;
+         end;
+      end loop;
+
+      if CR_Found then
+         if Self.Terminators (VSS.Strings.CR) then
+            --  It is special case to handle single CR at the end of string
+            --  when both CR and CRLF are allowed.
+
+            Dummy :=
+              Handler.Backward (Self.Owner.Data, Current_Position);
+
+         else
+            raise Program_Error;
+         end if;
+      end if;
+
+      --  Current_Position points to the last character of the line terminator
+      --  sequence.
+
+      if Self.Keep_Terminator then
+         if VSS.Implementation.Strings.Is_Invalid (Terminator_Position) then
+            --  Line terminator sequence is not found, and end of string
+            --  reached.
+
+            Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
+
+            Self.Last_Position := Current_Position;
+            Self.Terminator    := (others => <>);
+
+         else
+            Self.Last_Position := Current_Position;
+            Self.Terminator    := Terminator_Position;
+         end if;
+
+      else
+         if VSS.Implementation.Strings.Is_Invalid (Terminator_Position) then
+            --  Line terminator sequence is not found, and end of string
+            --  reached.
+
+            Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
+
+            Self.Last_Position := Current_Position;
+            Self.Terminator    := (others => <>);
+
+         else
+            Dummy := Handler.Backward (Self.Owner.Data, Terminator_Position);
+
+            Self.Last_Position := Terminator_Position;
+            Self.Terminator    := Current_Position;
+         end if;
+      end if;
+   end Lookup_Next_Line;
+
+   ----------------------------
+   -- Lookup_Line_Boundaries --
+   ----------------------------
+
+   procedure Lookup_Line_Boundaries
+     (Self          : in out Line_Iterator'Class;
+      Position      : VSS.Implementation.Strings.Cursor)
+   is
+      use type VSS.Implementation.Strings.Character_Count;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Owner.Handler;
+      Current_Position    : VSS.Implementation.Strings.Cursor := Position;
+      Dummy   : Boolean;
+
+   begin
+      if Current_Position.Index /= 1 then
+         --  XXX Going backward till previos line terminator has been found,
+         --  not implemented.
+
+         raise Program_Error;
+
+      else
+         --  Self.First_Position := Current_Position;
+
+         --  Rewind to previous character.
+
+         Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
+      end if;
+
+      Lookup_Next_Line (Self, Current_Position);
+   end Lookup_Line_Boundaries;
+
+   -------------
+   -- Forward --
+   -------------
+
+   overriding function Forward (Self : in out Line_Iterator) return Boolean is
+   begin
+      Lookup_Next_Line
+        (Self,
+         (if Self.Keep_Terminator
+            then Self.Last_Position
+            elsif VSS.Implementation.Strings.Is_Invalid (Self.Terminator)
+              then Self.Last_Position
+              else Self.Terminator));
+
+      return
+        Self.Owner.Character_Length
+          >= VSS.Strings.Character_Count (Self.First_Position.Index);
+   end Forward;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize
+     (Self            : in out Line_Iterator'Class;
+      Position        : VSS.Implementation.Strings.Cursor;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False) is
+   begin
+      Self.Terminators     := Terminators;
+      Self.Keep_Terminator := Keep_Terminator;
+
+      Lookup_Line_Boundaries (Self, Position);
+   end Initialize;
 
    ----------------
    -- Invalidate --
@@ -42,7 +292,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    begin
       Abstract_Segment_Iterator (Self).Invalidate;
 
-      Self.Terminator := (1, 0, 0);
+      Self.Terminator := (others => <>);
    end Invalidate;
 
    ----------------------
@@ -73,9 +323,26 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
    function Terminator_First_Character_Index
      (Self : Line_Iterator'Class)
-      return VSS.Strings.Character_Index is
+      return VSS.Strings.Character_Index
+   is
+      Position : VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
    begin
-      return VSS.Strings.Character_Count (Self.Terminator_First.Index);
+      if VSS.Implementation.Strings.Is_Invalid (Self.Terminator) then
+         return Self.Owner.Character_Length + 1;
+
+      else
+         if Self.Keep_Terminator then
+            return VSS.Strings.Character_Index (Self.Terminator.Index);
+
+         else
+            Position := Self.Last_Position;
+            Dummy    := Self.Owner.Handler.Forward (Self.Owner.Data, Position);
+
+            return VSS.Strings.Character_Count (Position.Index);
+         end if;
+      end if;
    end Terminator_First_Character_Index;
 
    -----------------------------
@@ -134,7 +401,17 @@ package body VSS.Strings.Cursors.Iterators.Lines is
      (Self : Line_Iterator'Class)
       return VSS.Strings.Character_Index is
    begin
-      return VSS.Strings.Character_Count (Self.Terminator_Last.Index);
+      if VSS.Implementation.Strings.Is_Invalid (Self.Terminator) then
+         return Self.Owner.Character_Length;
+
+      else
+         if Self.Keep_Terminator then
+            return VSS.Strings.Character_Index (Self.Last_Position.Index);
+
+         else
+            return VSS.Strings.Character_Index (Self.Terminator.Index);
+         end if;
+      end if;
    end Terminator_Last_Character_Index;
 
    ----------------------------

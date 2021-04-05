@@ -24,6 +24,7 @@
 
 with Ada.Unchecked_Deallocation;
 
+with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Configuration;
 
 package body VSS.Implementation.UTF8_String_Handlers is
@@ -31,14 +32,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
    use type VSS.Implementation.Strings.Character_Count;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
-
-   Line_Feed              : constant VSS.Unicode.Code_Point := 16#00_000A#;
-   Line_Tabulation        : constant VSS.Unicode.Code_Point := 16#00_000B#;
-   Form_Feed              : constant VSS.Unicode.Code_Point := 16#00_000C#;
-   Carriage_Return        : constant VSS.Unicode.Code_Point := 16#00_000D#;
-   Next_Line              : constant VSS.Unicode.Code_Point := 16#00_0085#;
-   Line_Separator         : constant VSS.Unicode.Code_Point := 16#00_2028#;
-   Paragraph_Separator    : constant VSS.Unicode.Code_Point := 16#00_2029#;
 
    type Verification_State is
      (Initial,    --  ASCII or start of multibyte sequence
@@ -1355,135 +1348,42 @@ package body VSS.Implementation.UTF8_String_Handlers is
            (Lines, Data);
       end Append;
 
+      Initial    : VSS.Implementation.Strings.Cursor;
       At_First   : VSS.Implementation.Strings.Cursor;
+      At_Last    : VSS.Implementation.Strings.Cursor;
       After_Last : VSS.Implementation.Strings.Cursor;
-      Current    : VSS.Implementation.Strings.Cursor;
-      CR_Found   : Boolean := False;
-      Line_Found : Boolean := False;
-      Set_First  : Boolean := True;
+      Terminator : VSS.Implementation.Strings.Cursor;
+      Dummy      : Boolean;
 
    begin
       VSS.Implementation.String_Vectors.Unreference (Lines);
 
-      Handler.Before_First_Character (Data, Current);
+      Handler.Before_First_Character (Data, Initial);
 
-      while Handler.Forward (Data, Current) loop
-         declare
-            use type VSS.Unicode.Code_Point;
+      while VSS.Implementation.Line_Iterators.Forward
+        (Data,
+         Terminators,
+         Initial,
+         At_First,
+         At_Last,
+         Terminator)
+      loop
+         Initial := At_Last;
 
-            C : constant VSS.Unicode.Code_Point :=
-              Handler.Element (Data, Current);
+         if VSS.Implementation.Strings.Is_Invalid (Terminator) then
+            After_Last := At_Last;
+            Dummy      := Handler.Forward (Data, After_Last);
 
-         begin
-            if CR_Found then
-               if C /= Line_Feed and Terminators (VSS.Strings.CR) then
-                  --  It is special case to handle single CR when both CR and
-                  --  CRLF are allowed.
+         elsif Keep_Terminator then
+            After_Last := At_Last;
+            Dummy      := Handler.Forward (Data, After_Last);
 
-                  CR_Found  := False;
-                  Set_First := True;
+         else
+            After_Last := Terminator;
+         end if;
 
-                  if Keep_Terminator then
-                     After_Last := Current;
-                  end if;
-
-                  Append (Storage, At_First, After_Last);
-               end if;
-            end if;
-
-            if Set_First then
-               Set_First := False;
-               At_First  := Current;
-            end if;
-
-            case C is
-               when Line_Feed =>
-                  if Terminators (VSS.Strings.CRLF) and CR_Found then
-                     if Keep_Terminator then
-                        --  Update After_Last position to point to current
-                        --  character to preserve it.
-
-                        After_Last := Current;
-                     end if;
-
-                     CR_Found   := False;
-                     Line_Found := True;
-
-                  elsif Terminators (VSS.Strings.LF) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Line_Tabulation =>
-                  if Terminators (VSS.Strings.VT) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Form_Feed =>
-                  if Terminators (VSS.Strings.FF) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Carriage_Return =>
-                  if Terminators (VSS.Strings.CRLF) then
-                     After_Last := Current;
-                     CR_Found   := True;
-
-                  elsif Terminators (VSS.Strings.CR) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Next_Line =>
-                  if Terminators (VSS.Strings.NEL) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Line_Separator =>
-                  if Terminators (VSS.Strings.LS) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Paragraph_Separator =>
-                  if Terminators (VSS.Strings.PS) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when others =>
-                  null;
-            end case;
-
-            if Line_Found then
-               Line_Found := False;
-               Set_First  := True;
-
-               if Keep_Terminator then
-                  declare
-                     Dummy : constant Boolean :=
-                       Handler.Forward (Data, After_Last);
-
-                  begin
-                     null;
-                  end;
-               end if;
-
-               Append (Storage, At_First, After_Last);
-            end if;
-         end;
+         Append (Storage, At_First, After_Last);
       end loop;
-
-      if CR_Found then
-         VSS.Implementation.String_Vectors.Append_And_Move_Ownership
-           (Lines, VSS.Implementation.Strings.Null_String_Data);
-
-      elsif not Set_First then
-         Append (Storage, At_First, Current);
-      end if;
    end Split_Lines_Common;
 
    ---------------------

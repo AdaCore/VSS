@@ -71,8 +71,8 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Last_Position,
          Terminator_Position)
       then
-         Self.Last_Position := Position;
-         Self.Terminator    := (others => <>);
+         Self.Last_Position       := Position;
+         Self.Terminator_Position := (others => <>);
 
          return;
       end if;
@@ -81,18 +81,18 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          --  Line terminator sequence is not found, and end of string
          --  reached.
 
-         Self.Last_Position := Last_Position;
-         Self.Terminator    := (others => <>);
+         Self.Last_Position       := Last_Position;
+         Self.Terminator_Position := (others => <>);
 
       elsif Self.Keep_Terminator then
-         Self.Last_Position := Last_Position;
-         Self.Terminator    := Terminator_Position;
+         Self.Last_Position       := Last_Position;
+         Self.Terminator_Position := Terminator_Position;
 
       else
          Dummy := Handler.Backward (Self.Owner.Data, Terminator_Position);
 
-         Self.Last_Position := Terminator_Position;
-         Self.Terminator    := Last_Position;
+         Self.Last_Position       := Terminator_Position;
+         Self.Terminator_Position := Last_Position;
       end if;
    end Lookup_Next_Line;
 
@@ -139,9 +139,10 @@ package body VSS.Strings.Cursors.Iterators.Lines is
         (Self,
          (if Self.Keep_Terminator
             then Self.Last_Position
-            elsif VSS.Implementation.Strings.Is_Invalid (Self.Terminator)
+            elsif VSS.Implementation.Strings.Is_Invalid
+                    (Self.Terminator_Position)
               then Self.Last_Position
-              else Self.Terminator));
+              else Self.Terminator_Position));
 
       return
         Self.Owner.Character_Length
@@ -172,7 +173,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    begin
       Abstract_Segment_Iterator (Self).Invalidate;
 
-      Self.Terminator := (others => <>);
+      Self.Terminator_Position := (others => <>);
    end Invalidate;
 
    ----------------------
@@ -187,7 +188,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
    begin
       if Self.Keep_Terminator then
-         Position := Self.Terminator;
+         Position := Self.Terminator_Position;
 
       else
          Position := Self.Last_Position;
@@ -209,12 +210,13 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Dummy    : Boolean;
 
    begin
-      if VSS.Implementation.Strings.Is_Invalid (Self.Terminator) then
+      if VSS.Implementation.Strings.Is_Invalid (Self.Terminator_Position) then
          return Self.Owner.Character_Length + 1;
 
       else
          if Self.Keep_Terminator then
-            return VSS.Strings.Character_Index (Self.Terminator.Index);
+            return
+              VSS.Strings.Character_Index (Self.Terminator_Position.Index);
 
          else
             Position := Self.Last_Position;
@@ -270,7 +272,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       return
         (if Self.Keep_Terminator
            then Self.Last_Position
-           else Self.Terminator);
+           else Self.Terminator_Position);
    end Terminator_Last;
 
    -------------------------------------
@@ -281,7 +283,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
      (Self : Line_Iterator'Class)
       return VSS.Strings.Character_Index is
    begin
-      if VSS.Implementation.Strings.Is_Invalid (Self.Terminator) then
+      if VSS.Implementation.Strings.Is_Invalid (Self.Terminator_Position) then
          return Self.Owner.Character_Length;
 
       else
@@ -289,7 +291,8 @@ package body VSS.Strings.Cursors.Iterators.Lines is
             return VSS.Strings.Character_Index (Self.Last_Position.Index);
 
          else
-            return VSS.Strings.Character_Index (Self.Terminator.Index);
+            return
+              VSS.Strings.Character_Index (Self.Terminator_Position.Index);
          end if;
       end if;
    end Terminator_Last_Character_Index;

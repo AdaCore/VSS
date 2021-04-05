@@ -72,10 +72,10 @@ package VSS.Strings.Cursors.Iterators.Lines is
 private
 
    type Line_Iterator is new Abstract_Segment_Iterator with record
-      Terminators     : Line_Terminator_Set;
-      Keep_Terminator : Boolean;
+      Terminators         : Line_Terminator_Set;
+      Keep_Terminator     : Boolean;
 
-      Terminator      : VSS.Implementation.Strings.Cursor;
+      Terminator_Position : VSS.Implementation.Strings.Cursor;
       --  Poistion of the line terminator sequence. It is position of the
       --  first character of the terminator when Keep_Terminator is True,
       --  overwise it is position of the last character of the terminator.

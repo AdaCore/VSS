@@ -67,6 +67,9 @@ package VSS.Implementation.Strings is
    --   - before first character          0             -1            -1
    --   - after last character        Length + 1     0 | Size      0 | Size
 
+   function Is_Invalid (Self : Cursor) return Boolean;
+   --  Return True when cursor has special invalid value.
+
    -----------------
    -- String_Data --
    -----------------

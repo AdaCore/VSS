@@ -77,37 +77,22 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          return;
       end if;
 
-      if Self.Keep_Terminator then
-         if VSS.Implementation.Strings.Is_Invalid (Terminator_Position) then
-            --  Line terminator sequence is not found, and end of string
-            --  reached.
+      if VSS.Implementation.Strings.Is_Invalid (Terminator_Position) then
+         --  Line terminator sequence is not found, and end of string
+         --  reached.
 
-            --  Dummy := Handler.Backward (Self.Owner.Data, Last_Position);
+         Self.Last_Position := Last_Position;
+         Self.Terminator    := (others => <>);
 
-            Self.Last_Position := Last_Position;
-            Self.Terminator    := (others => <>);
-
-         else
-            Self.Last_Position := Last_Position;
-            Self.Terminator    := Terminator_Position;
-         end if;
+      elsif Self.Keep_Terminator then
+         Self.Last_Position := Last_Position;
+         Self.Terminator    := Terminator_Position;
 
       else
-         if VSS.Implementation.Strings.Is_Invalid (Terminator_Position) then
-            --  Line terminator sequence is not found, and end of string
-            --  reached.
+         Dummy := Handler.Backward (Self.Owner.Data, Terminator_Position);
 
-            --  Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
-
-            Self.Last_Position := Last_Position;
-            Self.Terminator    := (others => <>);
-
-         else
-            Dummy := Handler.Backward (Self.Owner.Data, Terminator_Position);
-
-            Self.Last_Position := Terminator_Position;
-            Self.Terminator    := Last_Position;
-         end if;
+         Self.Last_Position := Terminator_Position;
+         Self.Terminator    := Last_Position;
       end if;
    end Lookup_Next_Line;
 

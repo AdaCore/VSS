@@ -47,7 +47,7 @@ package VSS.Strings.Cursors.Iterators is
 
    function Forward
      (Self : in out Abstract_Segment_Iterator) return Boolean is abstract;
-   --  Move cursor to the next line
+   --  Move cursor to the next segment
 
 private
 

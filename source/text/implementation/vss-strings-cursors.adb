@@ -21,9 +21,12 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Markers.Internals;
 
 package body VSS.Strings.Cursors is
+
+   use type VSS.Implementation.Strings.String_Handler_Access;
 
    ---------------------
    -- Character_Index --
@@ -134,10 +137,36 @@ package body VSS.Strings.Cursors is
    -- First_UTF16_Offset --
    ------------------------
 
+   function First_UTF16_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        String.Handler;
+
+   begin
+      if Position.UTF16_Offset >= 0 then
+         return Position.UTF16_Offset;
+
+      elsif Handler /= null then
+         return Handler.First_UTF16_Offset (String.Data, Position);
+
+      else
+         return 0;
+      end if;
+   end First_UTF16_Offset;
+
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
    overriding function First_UTF16_Offset
      (Self : Character_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.Position);
    end First_UTF16_Offset;
 
    ------------------------
@@ -148,7 +177,7 @@ package body VSS.Strings.Cursors is
      (Self : Character_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.Position);
    end First_UTF16_Offset;
 
    ------------------------
@@ -159,7 +188,7 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.First_Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.First_Position);
    end First_UTF16_Offset;
 
    ------------------------
@@ -170,8 +199,34 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      return Self.First_Position.UTF16_Offset;
+      return First_UTF16_Offset (Self.Owner, Self.First_Position);
    end First_UTF16_Offset;
+
+   -----------------------
+   -- First_UTF8_Offset --
+   -----------------------
+
+   function First_UTF8_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        String.Handler;
+
+   begin
+      if Position.UTF8_Offset >= 0 then
+         return Position.UTF8_Offset;
+
+      elsif Handler /= null then
+         return Handler.First_UTF8_Offset (String.Data, Position);
+
+      else
+         return 0;
+      end if;
+   end First_UTF8_Offset;
 
    -----------------------
    -- First_UTF8_Offset --
@@ -180,7 +235,7 @@ package body VSS.Strings.Cursors is
    overriding function First_UTF8_Offset
      (Self : Character_Cursor_Base) return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      return Self.Position.UTF8_Offset;
+      return First_UTF8_Offset (Self.Owner, Self.Position);
    end First_UTF8_Offset;
 
    -----------------------
@@ -191,7 +246,7 @@ package body VSS.Strings.Cursors is
      (Self : Character_Cursor_Limited_Base)
       return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      return Self.Position.UTF8_Offset;
+      return First_UTF8_Offset (Self.Owner, Self.Position);
    end First_UTF8_Offset;
 
    -----------------------
@@ -201,7 +256,7 @@ package body VSS.Strings.Cursors is
    overriding function First_UTF8_Offset
      (Self : Segment_Cursor_Base) return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      return Self.First_Position.UTF8_Offset;
+      return First_UTF8_Offset (Self.Owner, Self.First_Position);
    end First_UTF8_Offset;
 
    -----------------------
@@ -212,7 +267,7 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      return Self.First_Position.UTF8_Offset;
+      return First_UTF8_Offset (Self.Owner, Self.First_Position);
    end First_UTF8_Offset;
 
    ----------------
@@ -306,12 +361,31 @@ package body VSS.Strings.Cursors is
    -- Last_UTF16_Offset --
    -----------------------
 
+   function Last_UTF16_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        String.Handler;
+
+   begin
+      if Handler /= null then
+         return Handler.Last_UTF16_Offset (String.Data, Position);
+
+      else
+         return 0;
+      end if;
+   end Last_UTF16_Offset;
+
+   -----------------------
+   -- Last_UTF16_Offset --
+   -----------------------
+
    overriding function Last_UTF16_Offset
      (Self : Character_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -322,9 +396,7 @@ package body VSS.Strings.Cursors is
      (Self : Character_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -334,9 +406,7 @@ package body VSS.Strings.Cursors is
    overriding function Last_UTF16_Offset
      (Self : Segment_Cursor_Base) return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Last_Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Last_Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -347,10 +417,29 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Last_Position.UTF16_Offset;
+      return Last_UTF16_Offset (Self.Owner, Self.Last_Position);
    end Last_UTF16_Offset;
+
+   ----------------------
+   -- Last_UTF8_Offset --
+   ----------------------
+
+   function Last_UTF8_Offset
+     (String   : not null VSS.Strings.Magic_String_Access;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        String.Handler;
+
+   begin
+      if Handler /= null then
+         return Handler.Last_UTF8_Offset (String.Data, Position);
+
+      else
+         return 0;
+      end if;
+   end Last_UTF8_Offset;
 
    ----------------------
    -- Last_UTF8_Offset --
@@ -359,9 +448,7 @@ package body VSS.Strings.Cursors is
    overriding function Last_UTF8_Offset
      (Self : Character_Cursor_Base) return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Position.UTF8_Offset;
+      return Last_UTF8_Offset (Self.Owner, Self.Position);
    end Last_UTF8_Offset;
 
    ----------------------
@@ -372,9 +459,7 @@ package body VSS.Strings.Cursors is
      (Self : Character_Cursor_Limited_Base)
       return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Position.UTF8_Offset;
+      return Last_UTF8_Offset (Self.Owner, Self.Position);
    end Last_UTF8_Offset;
 
    ----------------------
@@ -384,9 +469,7 @@ package body VSS.Strings.Cursors is
    overriding function Last_UTF8_Offset
      (Self : Segment_Cursor_Base) return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Last_Position.UTF8_Offset;
+      return Last_UTF8_Offset (Self.Owner, Self.Last_Position);
    end Last_UTF8_Offset;
 
    ----------------------
@@ -397,9 +480,7 @@ package body VSS.Strings.Cursors is
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      raise Program_Error;
-      --  Not implemented
-      return Self.Last_Position.UTF8_Offset;
+      return Last_UTF8_Offset (Self.Owner, Self.Last_Position);
    end Last_UTF8_Offset;
 
    ------------

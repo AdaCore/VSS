@@ -27,6 +27,29 @@ package body VSS.Implementation.String_Handlers is
 
    use type VSS.Unicode.Code_Point;
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (Self           : Abstract_String_Handler;
+      Data           : in out VSS.Implementation.Strings.String_Data;
+      Suffix_Handler : Abstract_String_Handler'Class;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+   is
+      Handler  : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Position : VSS.Implementation.Strings.Cursor;
+      Code     : VSS.Unicode.Code_Point;
+   begin
+      Suffix_Handler.Before_First_Character (Suffix_Data, Position);
+
+      while Suffix_Handler.Forward (Suffix_Data, Position) loop
+         Code := Suffix_Handler.Element (Suffix_Data, Position);
+         Handler.Append (Data, Code);
+      end loop;
+   end Append;
+
    ---------------
    -- Ends_With --
    ---------------
@@ -61,6 +84,72 @@ package body VSS.Implementation.String_Handlers is
 
       return True;
    end Ends_With;
+
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
+   not overriding function First_UTF16_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+
+      Handler : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Aux     : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Position.UTF16_Offset >= 0 then
+         return Position.UTF16_Offset;
+
+      else
+         Handler.Before_First_Character (Data, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Handler.Forward (Data, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      return Aux.UTF16_Offset;
+   end First_UTF16_Offset;
+
+   -----------------------
+   -- First_UTF8_Offset --
+   -----------------------
+
+   not overriding function First_UTF8_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Aux     : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Position.UTF8_Offset >= 0 then
+         return Position.UTF8_Offset;
+
+      else
+         Handler.Before_First_Character (Data, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Handler.Forward (Data, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      return Aux.UTF8_Offset;
+   end First_UTF8_Offset;
 
    ----------
    -- Hash --
@@ -227,28 +316,77 @@ package body VSS.Implementation.String_Handlers is
           or not Left_Handler.Has_Character (Left_Data, Left_Position);
    end Is_Less_Or_Equal;
 
-   ------------
-   -- Append --
-   ------------
+   -----------------------
+   -- Last_UTF16_Offset --
+   -----------------------
 
-   procedure Append
-     (Self           : Abstract_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler : Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+   not overriding function Last_UTF16_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
    is
-      Handler  : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
-      Position : VSS.Implementation.Strings.Cursor;
-      Code     : VSS.Unicode.Code_Point;
-   begin
-      Suffix_Handler.Before_First_Character (Suffix_Data, Position);
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
-      while Suffix_Handler.Forward (Suffix_Data, Position) loop
-         Code := Suffix_Handler.Element (Suffix_Data, Position);
-         Handler.Append (Data, Code);
-      end loop;
-   end Append;
+      Handler : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Aux     : VSS.Implementation.Strings.Cursor;
+      Dummy   : Boolean;
+
+   begin
+      if Position.UTF16_Offset >= 0 then
+         Aux := Position;
+
+      else
+         Handler.Before_First_Character (Data, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Handler.Forward (Data, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      Dummy := Handler.Forward (Data, Aux);
+
+      return Aux.UTF16_Offset - 1;
+   end Last_UTF16_Offset;
+
+   ----------------------
+   -- Last_UTF8_Offset --
+   ----------------------
+
+   not overriding function Last_UTF8_Offset
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Aux     : VSS.Implementation.Strings.Cursor;
+      Dummy   : Boolean;
+
+   begin
+      if Position.UTF8_Offset >= 0 then
+         Aux := Position;
+
+      else
+         Handler.Before_First_Character (Data, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Handler.Forward (Data, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      Dummy := Handler.Forward (Data, Aux);
+
+      return Aux.UTF8_Offset - 1;
+   end Last_UTF8_Offset;
 
    -----------
    -- Slice --

@@ -83,15 +83,17 @@ package VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing to the first character of the stirng.
 
+   function Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing to the last character of the stirng.
+
    function Character
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing to the character at given position. Cursor
    --  must belong to the same string.
-
-   --  function Last_Character
-   --    (Self : Magic_String'Class) return Character_Iterator;
 
    --  function First_Grapheme
    --    (Self : Magic_String'Class) return Grapheme_Iterator;

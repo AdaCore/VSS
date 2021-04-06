@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,39 +20,28 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Utilities to handle strings as code units in UTF-family encodings.
---
---  This package is intended to be used by relatively low level code.
---
---  Opposite to general Ada convention to use '1'-based indexing of the
---  characters in the strings, here '0'-based indexing is used as more
---  appropriate for low level applications and interoparability.
 
-with Interfaces;
+with VSS.Implementation.Strings;
+with VSS.Strings;
 
-package VSS.Unicode is
+package VSS.Implementation.Line_Iterators is
 
-   pragma Pure;
+   pragma Preelaborate;
 
-   type Code_Point is
-     new Interfaces.Unsigned_32 range 16#00_0000# .. 16#10_FFFF#;
+   function Forward
+     (Data                : VSS.Implementation.Strings.String_Data;
+      Terminators         : VSS.Strings.Line_Terminator_Set;
+      Initial_Position    : VSS.Implementation.Strings.Cursor;
+      First_Position      : out VSS.Implementation.Strings.Cursor;
+      Last_Position       : out VSS.Implementation.Strings.Cursor;
+      Terminator_Position : out VSS.Implementation.Strings.Cursor)
+      return Boolean;
+   --  Lookup next line terminator sequence. Initial_Position is cursor at
+   --  the last character of previous line. First_Position and Last_Position
+   --  are set to location of the first and last characters of the found
+   --  line. Terminator_Position is location of the starting character of
+   --  the line terminator sequence, or invalid cursor when there is no line
+   --  terminator seqeunce found (it is case of last line and moving outside
+   --  of data).
 
-   type UTF8_Code_Unit is mod 2 ** 8;
-   type UTF8_Code_Unit_Offset is new Interfaces.Integer_32;
-   subtype UTF8_Code_Unit_Count is
-     UTF8_Code_Unit_Offset range 0 .. UTF8_Code_Unit_Offset'Last;
-   subtype UTF8_Code_Unit_Index is UTF8_Code_Unit_Count;
-
-   type UTF16_Code_Unit is mod 2 ** 16;
-   type UTF16_Code_Unit_Offset is new Interfaces.Integer_32;
-   subtype UTF16_Code_Unit_Count is
-     UTF16_Code_Unit_Offset range 0 .. UTF16_Code_Unit_Offset'Last;
-   subtype UTF16_Code_Unit_Index is UTF16_Code_Unit_Count;
-
-   type UTF32_Code_Unit is mod 2 ** 32; -- range 0 .. 16#10_FFFF#;
-   type UTF32_Code_Unit_Offset is new Interfaces.Integer_32;
-   subtype UTF32_Code_Unit_Count is
-     UTF32_Code_Unit_Offset range 0 .. UTF32_Code_Unit_Offset'Last;
-   subtype UTF32_Code_Unit_Index is UTF32_Code_Unit_Count;
-
-end VSS.Unicode;
+end VSS.Implementation.Line_Iterators;

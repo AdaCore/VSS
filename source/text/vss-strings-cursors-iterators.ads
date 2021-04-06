@@ -31,6 +31,11 @@ package VSS.Strings.Cursors.Iterators is
 
    function Forward
      (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
+   --  Move cursor one character forward
+
+   function Backward
+     (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
+   --  Move cursor one character backward
 
    function Has_Element
      (Self : Abstract_Character_Iterator) return Boolean is abstract;
@@ -39,6 +44,10 @@ package VSS.Strings.Cursors.Iterators is
    type Abstract_Segment_Iterator is
      abstract limited new VSS.Strings.Cursors.Abstract_Segment_Cursor
        with private;
+
+   function Forward
+     (Self : in out Abstract_Segment_Iterator) return Boolean is abstract;
+   --  Move cursor to the next segment
 
 private
 

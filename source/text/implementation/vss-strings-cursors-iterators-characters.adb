@@ -27,6 +27,25 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    use type VSS.Implementation.Strings.String_Handler_Access;
 
+   --------------
+   -- Backward --
+   --------------
+
+   overriding function Backward
+     (Self : in out Character_Iterator) return Boolean
+   is
+      Handler : constant  VSS.Implementation.Strings.String_Handler_Access
+        := (if Self.Owner = null then null
+            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
+
+   begin
+      if Handler /= null then
+         return Handler.Backward (Self.Owner.Data, Self.Position);
+      end if;
+
+      return False;
+   end Backward;
+
    -------------
    -- Element --
    -------------

@@ -24,20 +24,14 @@
 
 with Ada.Unchecked_Deallocation;
 
+with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Configuration;
 
 package body VSS.Implementation.UTF8_String_Handlers is
 
    use type VSS.Implementation.Strings.Character_Count;
-   use type VSS.Unicode.UTF8_Code_Unit_Count;
-
-   Line_Feed              : constant VSS.Unicode.Code_Point := 16#00_000A#;
-   Line_Tabulation        : constant VSS.Unicode.Code_Point := 16#00_000B#;
-   Form_Feed              : constant VSS.Unicode.Code_Point := 16#00_000C#;
-   Carriage_Return        : constant VSS.Unicode.Code_Point := 16#00_000D#;
-   Next_Line              : constant VSS.Unicode.Code_Point := 16#00_0085#;
-   Line_Separator         : constant VSS.Unicode.Code_Point := 16#00_2028#;
-   Paragraph_Separator    : constant VSS.Unicode.Code_Point := 16#00_2029#;
+   use type VSS.Unicode.UTF8_Code_Unit_Offset;
+   use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
    type Verification_State is
      (Initial,    --  ASCII or start of multibyte sequence
@@ -164,19 +158,12 @@ package body VSS.Implementation.UTF8_String_Handlers is
    is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
+
    begin
-      --  Go to the last character
       Position :=
-        (Index        => Source.Length,
+        (Index        => Source.Length + 1,
          UTF8_Offset  => Source.Size,
          UTF16_Offset => 0);
-
-      if Source.Length > 0 then  --  Move beyond the end
-         Unchecked_Forward (Source.Storage, Position);
-      end if;
-
-      --  FIXME :
-      Position.UTF16_Offset := VSS.Unicode.UTF16_Code_Unit_Index'Last;
    end After_Last_Character;
 
    --------------------------
@@ -190,19 +177,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
    is
       Source : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
+
    begin
-      --  Go to the last character
       Position :=
-        (Index        => Strings.Character_Count (Source.Length),
+        (Index        =>
+           VSS.Implementation.Strings.Character_Count (Source.Length) + 1,
          UTF8_Offset  => VSS.Unicode.UTF8_Code_Unit_Index (Source.Size),
          UTF16_Offset => 0);
-
-      if Position.Index > 0 then  --  Move beyond the end
-         Unchecked_Forward (Source.Storage, Position);
-      end if;
-
-      --  FIXME :
-      Position.UTF16_Offset := VSS.Unicode.UTF16_Code_Unit_Index'Last;
    end After_Last_Character;
 
    ----------------------
@@ -597,7 +578,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
-      Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
+      Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
    end Before_First_Character;
 
    ----------------------------
@@ -609,7 +590,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
-      Position := (Index => 0, UTF8_Offset => 0, UTF16_Offset => 0);
+      Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
    end Before_First_Character;
 
    ------------------
@@ -710,9 +691,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
       if Source = null or else Position.Index > Source.Length then
          return False;
 
-      elsif Position.Index = 0 then
-         Position.Index := 1;
-
       else
          Unchecked_Forward (Source.Storage, Position);
       end if;
@@ -737,9 +715,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
            > VSS.Implementation.Strings.Character_Count (Source.Length)
       then
          return False;
-
-      elsif Position.Index = 0 then
-         Position.Index := 1;
 
       else
          Unchecked_Forward (Source.Storage, Position);
@@ -1373,135 +1348,42 @@ package body VSS.Implementation.UTF8_String_Handlers is
            (Lines, Data);
       end Append;
 
+      Initial    : VSS.Implementation.Strings.Cursor;
       At_First   : VSS.Implementation.Strings.Cursor;
+      At_Last    : VSS.Implementation.Strings.Cursor;
       After_Last : VSS.Implementation.Strings.Cursor;
-      Current    : VSS.Implementation.Strings.Cursor;
-      CR_Found   : Boolean := False;
-      Line_Found : Boolean := False;
-      Set_First  : Boolean := True;
+      Terminator : VSS.Implementation.Strings.Cursor;
+      Dummy      : Boolean;
 
    begin
       VSS.Implementation.String_Vectors.Unreference (Lines);
 
-      Handler.Before_First_Character (Data, Current);
+      Handler.Before_First_Character (Data, Initial);
 
-      while Handler.Forward (Data, Current) loop
-         declare
-            use type VSS.Unicode.Code_Point;
+      while VSS.Implementation.Line_Iterators.Forward
+        (Data,
+         Terminators,
+         Initial,
+         At_First,
+         At_Last,
+         Terminator)
+      loop
+         Initial := At_Last;
 
-            C : constant VSS.Unicode.Code_Point :=
-              Handler.Element (Data, Current);
+         if VSS.Implementation.Strings.Is_Invalid (Terminator) then
+            After_Last := At_Last;
+            Dummy      := Handler.Forward (Data, After_Last);
 
-         begin
-            if CR_Found then
-               if C /= Line_Feed and Terminators (VSS.Strings.CR) then
-                  --  It is special case to handle single CR when both CR and
-                  --  CRLF are allowed.
+         elsif Keep_Terminator then
+            After_Last := At_Last;
+            Dummy      := Handler.Forward (Data, After_Last);
 
-                  CR_Found  := False;
-                  Set_First := True;
+         else
+            After_Last := Terminator;
+         end if;
 
-                  if Keep_Terminator then
-                     After_Last := Current;
-                  end if;
-
-                  Append (Storage, At_First, After_Last);
-               end if;
-            end if;
-
-            if Set_First then
-               Set_First := False;
-               At_First  := Current;
-            end if;
-
-            case C is
-               when Line_Feed =>
-                  if Terminators (VSS.Strings.CRLF) and CR_Found then
-                     if Keep_Terminator then
-                        --  Update After_Last position to point to current
-                        --  character to preserve it.
-
-                        After_Last := Current;
-                     end if;
-
-                     CR_Found   := False;
-                     Line_Found := True;
-
-                  elsif Terminators (VSS.Strings.LF) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Line_Tabulation =>
-                  if Terminators (VSS.Strings.VT) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Form_Feed =>
-                  if Terminators (VSS.Strings.FF) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Carriage_Return =>
-                  if Terminators (VSS.Strings.CRLF) then
-                     After_Last := Current;
-                     CR_Found   := True;
-
-                  elsif Terminators (VSS.Strings.CR) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Next_Line =>
-                  if Terminators (VSS.Strings.NEL) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Line_Separator =>
-                  if Terminators (VSS.Strings.LS) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when Paragraph_Separator =>
-                  if Terminators (VSS.Strings.PS) then
-                     After_Last := Current;
-                     Line_Found := True;
-                  end if;
-
-               when others =>
-                  null;
-            end case;
-
-            if Line_Found then
-               Line_Found := False;
-               Set_First  := True;
-
-               if Keep_Terminator then
-                  declare
-                     Dummy : constant Boolean :=
-                       Handler.Forward (Data, After_Last);
-
-                  begin
-                     null;
-                  end;
-               end if;
-
-               Append (Storage, At_First, After_Last);
-            end if;
-         end;
+         Append (Storage, At_First, After_Last);
       end loop;
-
-      if CR_Found then
-         VSS.Implementation.String_Vectors.Append_And_Move_Ownership
-           (Lines, VSS.Implementation.Strings.Null_String_Data);
-
-      elsif not Set_First then
-         Append (Storage, At_First, Current);
-      end if;
    end Split_Lines_Common;
 
    ---------------------
@@ -1554,45 +1436,45 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end return;
    end To_UTF_8_String;
 
-   -----------------------
+   ------------------------
    -- Unchecked_Backward --
-   -----------------------
+   ------------------------
 
    procedure Unchecked_Backward
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Position : in out VSS.Implementation.Strings.Cursor)
-   is
-      use type VSS.Unicode.UTF16_Code_Unit_Count;
-
+      Position : in out VSS.Implementation.Strings.Cursor) is
    begin
+      Position.Index        := Position.Index - 1;
       Position.UTF8_Offset  := Position.UTF8_Offset - 1;
-      Position.Index := Position.Index - 1;
+      Position.UTF16_Offset := Position.UTF16_Offset - 1;
 
-      loop
-         declare
-            Code : constant VSS.Unicode.UTF8_Code_Unit :=
-              Storage (Position.UTF8_Offset);
-         begin
-            case Code is
-               when 16#80# .. 16#BF# =>
-                  Position.UTF8_Offset  := Position.UTF8_Offset - 1;
+      if Position.Index /= 0 then
+         loop
+            declare
+               Code : constant VSS.Unicode.UTF8_Code_Unit :=
+                 Storage (Position.UTF8_Offset);
 
-               when 16#00# .. 16#7F#
-                  | 16#C2# .. 16#DF#
-                  | 16#E0# .. 16#EF# =>
+            begin
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     Position.UTF8_Offset  := Position.UTF8_Offset - 1;
 
-                  Position.UTF16_Offset := Position.UTF16_Offset - 1;
-                  exit;
+                  when 16#00# .. 16#7F#
+                     | 16#C2# .. 16#DF#
+                     | 16#E0# .. 16#EF# =>
 
-               when 16#F0# .. 16#F4# =>
-                  Position.UTF16_Offset := Position.UTF16_Offset - 2;
-                  exit;
+                     exit;
 
-               when others =>
-                  raise Program_Error with "string data is corrupted";
-            end case;
-         end;
-      end loop;
+                  when 16#F0# .. 16#F4# =>
+                     Position.UTF16_Offset := Position.UTF16_Offset - 1;
+                     exit;
+
+                  when others =>
+                     raise Program_Error with "string data is corrupted";
+               end case;
+            end;
+         end loop;
+      end if;
    end Unchecked_Backward;
 
    ----------------------
@@ -1666,34 +1548,42 @@ package body VSS.Implementation.UTF8_String_Handlers is
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Position : in out VSS.Implementation.Strings.Cursor)
    is
-      use type VSS.Unicode.UTF16_Code_Unit_Count;
-
-      Code : constant VSS.Unicode.UTF8_Code_Unit :=
-        Storage (Position.UTF8_Offset);
-
    begin
       Position.Index := Position.Index + 1;
 
-      case Code is
-         when 16#00# .. 16#7F# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 1;
-            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+      if Position.Index = 1 then
+         Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+         Position.UTF16_Offset := Position.UTF16_Offset + 1;
 
-         when 16#C2# .. 16#DF# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 2;
-            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+         return;
+      end if;
 
-         when 16#E0# .. 16#EF# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 3;
-            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+      declare
+         Code : constant VSS.Unicode.UTF8_Code_Unit :=
+           Storage (Position.UTF8_Offset);
 
-         when 16#F0# .. 16#F4# =>
-            Position.UTF8_Offset  := Position.UTF8_Offset + 4;
-            Position.UTF16_Offset := Position.UTF16_Offset + 2;
+      begin
+         case Code is
+            when 16#00# .. 16#7F# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
 
-         when others =>
-            raise Program_Error with "string data is corrupted";
-      end case;
+            when 16#C2# .. 16#DF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 2;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#E0# .. 16#EF# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 3;
+               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+
+            when 16#F0# .. 16#F4# =>
+               Position.UTF8_Offset  := Position.UTF8_Offset + 4;
+               Position.UTF16_Offset := Position.UTF16_Offset + 2;
+
+            when others =>
+               raise Program_Error with "string data is corrupted";
+         end case;
+      end;
 
       --  XXX case statement above may be rewritten as below to avoid
       --  use of branch instructions.

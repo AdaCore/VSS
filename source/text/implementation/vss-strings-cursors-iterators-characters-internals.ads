@@ -28,6 +28,12 @@ package VSS.Strings.Cursors.Iterators.Characters.Internals is
    function First_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return character iterator pointing to the first character of the string
+
+   function Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return character iterator pointing to the last character of the string
 
    function Character
      (Self     : Virtual_String'Class;

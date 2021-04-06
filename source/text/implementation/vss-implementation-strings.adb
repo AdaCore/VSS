@@ -69,6 +69,21 @@ package body VSS.Implementation.Strings is
       end if;
    end Handler;
 
+   ----------------
+   -- Is_Invalid --
+   ----------------
+
+   function Is_Invalid (Self : Cursor) return Boolean is
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+   begin
+      return
+        Self.Index = 0
+          and Self.UTF8_Offset = VSS.Unicode.UTF8_Code_Unit_Offset'Last
+          and Self.UTF16_Offset = VSS.Unicode.UTF16_Code_Unit_Offset'Last;
+   end Is_Invalid;
+
    --------------
    -- Is_Empty --
    --------------

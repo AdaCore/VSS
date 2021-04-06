@@ -25,7 +25,7 @@ with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
-with VSS.Strings.Cursors.Iterators.Lines;
+with VSS.Strings.Cursors.Iterators.Lines.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
@@ -461,16 +461,11 @@ package body VSS.Strings is
      (Self            : Virtual_String'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
-   is
-      pragma Unreferenced (Self);
-      pragma Unreferenced (Terminators);
-      pragma Unreferenced (Keep_Terminator);
-
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
    begin
-      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
-         raise Program_Error;
-      end return;
+      return
+        VSS.Strings.Cursors.Iterators.Lines.Internals.First_Line
+          (Self, Terminators, Keep_Terminator);
    end First_Line;
 
    -------------
@@ -519,6 +514,19 @@ package body VSS.Strings is
    begin
       return Self.Handler = null;
    end Is_Null;
+
+   --------------------
+   -- Last_Character --
+   --------------------
+
+   function Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+   begin
+      return
+        VSS.Strings.Cursors.Iterators.Characters.Internals.Last_Character
+          (Self);
+   end Last_Character;
 
    ----------
    -- Line --

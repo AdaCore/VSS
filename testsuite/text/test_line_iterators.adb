@@ -133,6 +133,11 @@ procedure Test_Line_Iterators is
       5 => (7, 6, 7, 7),
       6 => (8, 7, 8, 8));
 
+   Expected_2_3 : constant Expected_Array :=
+     (1 => (1, 1, 2, 3),
+      2 => (4, 5, 6, 7),
+      3 => (8, 8, 9, 8));
+
    procedure Test_Forward
      (Source_String   : VSS.Strings.Virtual_String;
       Expected_Result : Expected_Array;
@@ -226,5 +231,10 @@ begin
      (CRLFCR,
       Expected_2_2,
       (VSS.Strings.CR | VSS.Strings.LF => True, others => False),
+      False);
+   Test_Forward
+     (CRLFCR,
+      Expected_2_3,
+      (VSS.Strings.CRLF => True, others => False),
       False);
 end Test_Line_Iterators;

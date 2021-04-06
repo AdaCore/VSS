@@ -158,7 +158,9 @@ package body VSS.Implementation.Line_Iterators is
             Dummy := Handler.Backward (Data, Last_Position);
 
          else
-            raise Program_Error;
+            --  CR at the end of the string is not a line terminator sequence.
+
+            Terminator_Position := (others => <>);
          end if;
       end if;
 

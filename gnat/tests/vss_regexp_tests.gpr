@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2020, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,24 +20,24 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  VSS: RegExp processing subproject tests
 
 with "../vss_config";
-with "../vss_text";
+with "../vss_regexp";
 
-project VSS_Stream_Tests is
+project VSS_RegExp_Tests is
 
    for Languages use ("Ada");
    for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/stream");
-   for Main use ("test_stream_element_buffer.adb",
-                 "test_text_streams.adb");
+   for Source_Dirs use ("../../testsuite/regexp");
+   for Main use ("test_regexp_re_tests.adb");
 
    package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
+      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
    end Compiler;
 
    package Binder is
-      for Switches ("Ada") use ("-Wb");
+      for Switches ("Ada") use ("-W8");
    end Binder;
 
-end VSS_Stream_Tests;
+end VSS_RegExp_Tests;

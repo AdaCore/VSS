@@ -176,6 +176,10 @@ package body VSS.Strings is
 
    overriding procedure Adjust (Self : in out Virtual_String) is
    begin
+      Self.Head := null;
+      Self.Tail := null;
+      Self.Limited_Head := null;
+      Self.Limited_Tail := null;
       VSS.Implementation.Strings.Reference (Self.Data);
    end Adjust;
 

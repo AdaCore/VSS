@@ -9,8 +9,9 @@ build_tests:
 	gprbuild -p -P gnat/tests/vss_text_tests.gpr
 	gprbuild -p -P gnat/tests/vss_json_tests.gpr
 	gprbuild -p -P gnat/tests/vss_stream_tests.gpr
+	gprbuild -p -P gnat/tests/vss_regexp_tests.gpr
 
-check: build_tests check_text check_json
+check: build_tests check_text check_json check_regexp
 
 check_text:
 	.objs/tests/test_character_iterators
@@ -37,6 +38,12 @@ check_json:
 	test ! -e .objs/tests/.fails
 	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected
 
+check_regexp: re_tests
+	.objs/tests/test_regexp_re_tests < re_tests
+
+re_tests:
+	curl -o $@ https://raw.githubusercontent.com/Perl/perl5/blead/t/re/re_tests
+
 coverage:
 	gcov --verbose .objs/*
 
@@ -44,4 +51,4 @@ docs: all
 	make -C docs
 
 clean:
-	rm -rf .objs
+	rm -rf .objs re_tests

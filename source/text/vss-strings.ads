@@ -286,7 +286,8 @@ package VSS.Strings is
      (Self    : Virtual_String'Class;
       Segment : VSS.Strings.Cursors.Abstract_Cursor'Class)
       return Virtual_String;
-   --  Returns slice of the string.
+   --  Returns slice of the string. Return "null" string when one of cursors
+   --  doesn't belog to given string or invalid cursors.
 
    function Starts_With
      (Self   : Virtual_String'Class;

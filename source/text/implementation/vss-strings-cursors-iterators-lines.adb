@@ -47,6 +47,16 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    --  Lookup for next line. Position points to the last character of the
    --  line terminator sequence of the current line.
 
+   -------------------------
+   -- Has_Line_Terminator --
+   -------------------------
+
+   function Has_Line_Terminator (Self : Line_Iterator'Class) return Boolean is
+   begin
+      return
+        not VSS.Implementation.Strings.Is_Invalid (Self.Terminator_Position);
+   end Has_Line_Terminator;
+
    ----------------------
    -- Lookup_Next_Line --
    ----------------------

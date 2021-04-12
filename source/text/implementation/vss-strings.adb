@@ -586,11 +586,11 @@ package body VSS.Strings is
           VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (To);
 
    begin
-      --  Check_Owner (From, Self);
-      --  Check_Owner (To, Self);
-
       return Result : Virtual_String do
-         if Handler /= null then
+         if Handler /= null
+           and then VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+           and then VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
+         then
             Handler.Slice
               (Self.Data,
                First_Position.all,
@@ -620,10 +620,10 @@ package body VSS.Strings is
           VSS.Strings.Cursors.Internals.Last_Cursor_Access_Constant (Segment);
 
    begin
-      --  Check_Owner (Segment, Self);
-
       return Result : Virtual_String do
-         if Handler /= null then
+         if Handler /= null
+           and then VSS.Strings.Cursors.Internals.Is_Owner (Segment, Self)
+         then
             Handler.Slice
               (Self.Data,
                First_Position.all,

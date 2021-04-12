@@ -27,6 +27,11 @@ package VSS.Strings.Cursors.Iterators.Lines is
 
    type Line_Iterator is new Abstract_Segment_Iterator with private;
 
+   function Has_Line_Terminator (Self : Line_Iterator'Class) return Boolean;
+   --  Return True when line has lime terminator sequence. Only last line
+   --  of the text may not have line terminator. This function is independent
+   --  from the Keep_Terminator mode.
+
    function Terminator_First_Marker
      (Self : Line_Iterator'Class)
       return VSS.Strings.Cursors.Markers.Character_Marker;

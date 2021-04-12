@@ -40,4 +40,9 @@ package VSS.Strings.Cursors.Internals is
      (Self : VSS.Strings.Cursors.Abstract_Cursor'Class)
       return not null Cursor_Constant_Access;
 
+   function Is_Owner
+     (Self  : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Owner : VSS.Strings.Virtual_String'Class) return Boolean;
+   --  Return True when given string is owner of the cursor.
+
 end VSS.Strings.Cursors.Internals;

@@ -51,6 +51,34 @@ package body VSS.Strings.Cursors.Internals is
       end if;
    end First_Cursor_Access_Constant;
 
+   --------------
+   -- Is_Owner --
+   --------------
+
+   function Is_Owner
+     (Self  : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Owner : VSS.Strings.Virtual_String'Class) return Boolean is
+   begin
+      if Self in VSS.Strings.Cursors.Character_Cursor_Limited_Base'Class then
+         return
+           VSS.Strings.Cursors.Character_Cursor_Limited_Base (Self).Owner
+             = Owner'Unrestricted_Access;
+
+      elsif Self in VSS.Strings.Cursors.Character_Cursor_Base'Class then
+         return
+           VSS.Strings.Cursors.Character_Cursor_Base'Class (Self).Owner
+             = Owner'Unrestricted_Access;
+
+      elsif Self in VSS.Strings.Cursors.Segment_Cursor_Limited_Base'Class then
+         return
+           VSS.Strings.Cursors.Segment_Cursor_Limited_Base'Class (Self).Owner
+             = Owner'Unrestricted_Access;
+
+      else
+         raise Program_Error;
+      end if;
+   end Is_Owner;
+
    ---------------------------------
    -- Last_Cursor_Access_Constant --
    ---------------------------------

@@ -35,22 +35,22 @@ with Test_Support;
 procedure Test_String_Slice is
    use type VSS.Strings.Virtual_String;
 
-   S  : VSS.Strings.Virtual_String :=
+   S  : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("ASCII Кириллица ⊗∬ 𝛻𝜕 ");
-   S1 : VSS.Strings.Virtual_String :=
+   S1 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("A");
-   S2 : VSS.Strings.Virtual_String :=
+   S2 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("ASCII");
-   S3 : VSS.Strings.Virtual_String :=
+   S3 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("Кириллица");
-   S4 : VSS.Strings.Virtual_String :=
+   S4 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("⊗∬ 𝛻𝜕 ");
 
    J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
      S.First_Character;
    J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
      S.First_Character;
-   D  : Boolean;
+   D  : Boolean with Unreferenced;
 
 begin
    Test_Support.Assert (S.Slice (J1, J2) = S1);

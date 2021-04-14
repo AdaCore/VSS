@@ -49,6 +49,10 @@ package VSS.Strings.Cursors.Iterators is
      (Self : in out Abstract_Segment_Iterator) return Boolean is abstract;
    --  Move cursor to the next segment
 
+   function Has_Element
+     (Self : Abstract_Segment_Iterator) return Boolean is abstract;
+   --  Return True when iterator points to the text element
+
 private
 
    type Abstract_Character_Iterator is

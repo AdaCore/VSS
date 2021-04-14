@@ -47,6 +47,21 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    --  Lookup for next line. Position points to the last character of the
    --  line terminator sequence of the current line.
 
+   -----------------
+   -- Has_Element --
+   -----------------
+
+   overriding function Has_Element (Self : Line_Iterator) return Boolean is
+      use type VSS.Implementation.Strings.Character_Count;
+
+   begin
+      return
+        not VSS.Implementation.Strings.Is_Invalid (Self.First_Position)
+          and then Self.First_Position.Index
+                     <= VSS.Implementation.Strings.Character_Count
+                          (Self.Owner.Character_Length);
+   end Has_Element;
+
    -------------------------
    -- Has_Line_Terminator --
    -------------------------

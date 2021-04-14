@@ -90,6 +90,8 @@ private
 
    overriding function Forward (Self : in out Line_Iterator) return Boolean;
 
+   overriding function Has_Element (Self : Line_Iterator) return Boolean;
+
    procedure Initialize
      (Self            : in out Line_Iterator'Class;
       Position        : VSS.Implementation.Strings.Cursor;

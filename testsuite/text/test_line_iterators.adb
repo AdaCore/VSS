@@ -139,6 +139,13 @@ procedure Test_Line_Iterators is
       2 => (4, 5, 6, 7, True),
       3 => (8, 8, 9, 8, False));
 
+   Pack : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.To_Virtual_String ("package Pack is" & LF);
+   --  Text of single line with line terminator.
+
+   Expected_3 : constant Expected_Array :=
+     (1 => (1, 16, 16, 16, True));
+
    procedure Test_Forward
      (Source_String   : VSS.Strings.Virtual_String;
       Expected_Result : Expected_Array;
@@ -163,6 +170,10 @@ procedure Test_Line_Iterators is
 
    begin
       loop
+         if not J.Has_Element then
+            raise Program_Error;
+         end if;
+
          if J.First_Character_Index
            /= Expected_Result (C).Line_First_Character
          then
@@ -198,11 +209,19 @@ procedure Test_Line_Iterators is
          C := C + 1;
       end loop;
 
+      if J.Has_Element then
+         raise Program_Error;
+      end if;
+
       if C /= Expected_Result'Length then
          raise Program_Error;
       end if;
 
       if J.Forward then
+         raise Program_Error;
+      end if;
+
+      if J.Has_Element then
          raise Program_Error;
       end if;
 
@@ -248,4 +267,11 @@ begin
       Expected_2_3,
       (VSS.Strings.CRLF => True, others => False),
       False);
+
+   Test_Forward
+     (Pack,
+      Expected_3,
+      (VSS.Strings.CR | VSS.Strings.LF | VSS.Strings.CRLF => True,
+       others => False),
+      True);
 end Test_Line_Iterators;

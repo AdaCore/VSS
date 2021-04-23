@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -25,6 +25,8 @@ with VSS.Implementation.String_Configuration;
 
 package body VSS.Strings.Conversions is
 
+   use type VSS.Implementation.Strings.String_Handler_Access;
+
    ---------------------
    -- To_UTF_8_String --
    ---------------------
@@ -33,8 +35,6 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class)
       return Ada.Strings.UTF_Encoding.UTF_8_String
    is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
       Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
         Item.Handler;
 
@@ -80,5 +80,35 @@ package body VSS.Strings.Conversions is
          end if;
       end return;
    end To_Virtual_String;
+
+   -------------------------
+   -- To_Wide_Wide_String --
+   -------------------------
+
+   function To_Wide_Wide_String
+     (Item : Virtual_String'Class) return Wide_Wide_String
+   is
+      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Item.Handler;
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Handler = null then
+         return "";
+
+      else
+         return Result :
+           Wide_Wide_String (1 .. Integer (Handler.Length (Item.Data)))
+         do
+            Handler.Before_First_Character (Item.Data, Position);
+
+            while Handler.Forward (Item.Data, Position) loop
+               Result (Integer (Position.Index)) :=
+                 Wide_Wide_Character'Val
+                   (Handler.Element (Item.Data, Position));
+            end loop;
+         end return;
+      end if;
+   end To_Wide_Wide_String;
 
 end VSS.Strings.Conversions;

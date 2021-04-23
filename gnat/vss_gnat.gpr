@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,23 +20,20 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: Text processing subproject
+--  VSS: Extensions for GNAT RTL
 
 with "vss_config";
-with "vss_gnat";
 
-project VSS_Text is
+project VSS_GNAT is
 
    for Languages use ("Ada");
    for Object_Dir use VSS_Config.Object_Dir;
-   for Source_Dirs use
-     ("../source/streams",
-      "../source/streams/implementation",
-      "../source/text",
-      "../source/text/implementation");
+   for Source_Dirs use ("../source/text/gnat");
 
-   package Compiler renames VSS_Config.Compiler;
+   package Compiler is
+      for Switches ("a-szuvau.adb") use ("-g", "-gnatpg", "-O2");
+   end Compiler;
 
    package Linker renames VSS_Config.Linker;
 
-end VSS_Text;
+end VSS_GNAT;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,8 +22,20 @@
 ------------------------------------------------------------------------------
 
 with VSS.Implementation.String_Configuration;
+pragma Warnings (Off, ".* is an internal GNAT unit");
+with Ada.Strings.Wide_Wide_Unbounded.VSS_Aux;
+pragma Warnings (On, ".* is an internal GNAT unit");
 
 package body VSS.Strings.Conversions is
+
+   use type VSS.Implementation.Strings.String_Handler_Access;
+
+   procedure Set_Wide_Wide_String
+     (Item   : Virtual_String'Class;
+      String : out Wide_Wide_String);
+   --  Set given string to content of virtual string. Length of the string
+   --  must be equal to the length in characters of the virtual string;
+   --  otherwise Constraint_Error is raised.
 
    ---------------------
    -- To_UTF_8_String --
@@ -33,8 +45,6 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class)
       return Ada.Strings.UTF_Encoding.UTF_8_String
    is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
       Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
         Item.Handler;
 
@@ -46,6 +56,34 @@ package body VSS.Strings.Conversions is
          return Handler.To_UTF_8_String (Item.Data);
       end if;
    end To_UTF_8_String;
+
+   -----------------------------------
+   -- To_Unbounded_Wide_Wide_String --
+   -----------------------------------
+
+   function To_Unbounded_Wide_Wide_String
+     (Item : Virtual_String'Class)
+      return Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String
+   is
+      procedure Set (String : out Wide_Wide_String);
+
+      ---------
+      -- Set --
+      ---------
+
+      procedure Set (String : out Wide_Wide_String) is
+      begin
+         Set_Wide_Wide_String (Item, String);
+      end Set;
+
+   begin
+      return Result :
+        Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String
+      do
+         Ada.Strings.Wide_Wide_Unbounded.VSS_Aux.Set_String
+           (Result, Integer (Item.Character_Length), Set'Access);
+      end return;
+   end To_Unbounded_Wide_Wide_String;
 
    -----------------------
    -- To_Virtual_String --
@@ -80,5 +118,54 @@ package body VSS.Strings.Conversions is
          end if;
       end return;
    end To_Virtual_String;
+
+   -------------------------
+   -- Set_Wide_Wide_String --
+   -------------------------
+
+   procedure Set_Wide_Wide_String
+     (Item   : Virtual_String'Class;
+      String : out Wide_Wide_String)
+   is
+      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Item.Handler;
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Item.Character_Length /= String'Length then
+         raise Constraint_Error;
+      end if;
+
+      if Item.Is_Empty then
+         return;
+      end if;
+
+      Handler.Before_First_Character (Item.Data, Position);
+
+      while Handler.Forward (Item.Data, Position) loop
+         String (String'First + Integer (Position.Index) - 1) :=
+           Wide_Wide_Character'Val
+             (Handler.Element (Item.Data, Position));
+      end loop;
+   end Set_Wide_Wide_String;
+
+   -------------------------
+   -- To_Wide_Wide_String --
+   -------------------------
+
+   function To_Wide_Wide_String
+     (Item : Virtual_String'Class) return Wide_Wide_String is
+   begin
+      if Item.Is_Empty then
+         return "";
+
+      else
+         return Result :
+           Wide_Wide_String (1 .. Integer (Item.Character_Length))
+         do
+            Set_Wide_Wide_String (Item, Result);
+         end return;
+      end if;
+   end To_Wide_Wide_String;
 
 end VSS.Strings.Conversions;

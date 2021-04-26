@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.UTF_Encoding;
+with Ada.Strings.Wide_Wide_Unbounded;
 
 with VSS.Strings.Conversions;
 
@@ -44,6 +45,30 @@ begin
 
          if VSS.Strings.Conversions.To_UTF_8_String (String)
            /= Hello_World_Data.Hello (Language)
+         then
+            raise Program_Error;
+         end if;
+
+         --  Check conversion to Wide_Wide_String, it may be improved by
+         --  providing Wide_Wide_String version in Hello_World_Data.
+
+         if VSS.Strings.Conversions.To_Wide_Wide_String (String)
+           /= VSS.Strings.Conversions.To_Wide_Wide_String
+                (VSS.Strings.To_Virtual_String
+                   (VSS.Strings.Conversions.To_Wide_Wide_String (String)))
+         then
+            raise Program_Error;
+         end if;
+
+         --  Check conversion to Wide_Wide_String, it may be improved by
+         --  providing Wide_Wide_String version in Hello_World_Data.
+
+         if VSS.Strings.Conversions.To_Wide_Wide_String (String)
+           /= VSS.Strings.Conversions.To_Wide_Wide_String
+                (VSS.Strings.To_Virtual_String
+                   (Ada.Strings.Wide_Wide_Unbounded.To_Wide_Wide_String
+                      (VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String
+                         (String))))
          then
             raise Program_Error;
          end if;

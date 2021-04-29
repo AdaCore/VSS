@@ -147,12 +147,10 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Append single code point to the data.
 
    overriding procedure Append
-     (Self           : UTF8_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data;
-      Offset         : in out VSS.Implementation.Strings.Cursor_Offset);
+     (Self   : UTF8_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Suffix : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append another string to the data.
 
    overriding procedure Split_Lines
@@ -270,12 +268,10 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Append single code point to the data.
 
    overriding procedure Append
-     (Self           : UTF8_In_Place_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data;
-      Offset         : in out VSS.Implementation.Strings.Cursor_Offset);
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Suffix : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append another string to the data.
 
    overriding procedure Split_Lines

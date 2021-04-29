@@ -35,18 +35,20 @@ package body VSS.Implementation.String_Handlers is
      (Self           : Abstract_String_Handler;
       Data           : in out VSS.Implementation.Strings.String_Data;
       Suffix_Handler : Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+      Suffix_Data    : VSS.Implementation.Strings.String_Data;
+      Offset         : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       Handler  : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
       Position : VSS.Implementation.Strings.Cursor;
       Code     : VSS.Unicode.Code_Point;
+
    begin
       Suffix_Handler.Before_First_Character (Suffix_Data, Position);
 
       while Suffix_Handler.Forward (Suffix_Data, Position) loop
          Code := Suffix_Handler.Element (Suffix_Data, Position);
-         Handler.Append (Data, Code);
+         Handler.Append (Data, Code, Offset);
       end loop;
    end Append;
 
@@ -399,9 +401,10 @@ package body VSS.Implementation.String_Handlers is
       To     : VSS.Implementation.Strings.Cursor;
       Target : out VSS.Implementation.Strings.String_Data)
    is
-      Handler  : Abstract_String_Handler'Class
+      Handler : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Current  : VSS.Implementation.Strings.Cursor;
+      Current : VSS.Implementation.Strings.Cursor;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
       if From.Index <= To.Index then
@@ -415,13 +418,13 @@ package body VSS.Implementation.String_Handlers is
          Current := From;
 
          VSS.Implementation.Strings.Handler (Target).Append
-           (Target, Handler.Element (Source, Current));
+           (Target, Handler.Element (Source, Current), Offset);
 
          while Handler.Forward (Source, Current)
            and then Current.Index <= To.Index
          loop
             VSS.Implementation.Strings.Handler (Target).Append
-              (Target, Handler.Element (Source, Current));
+              (Target, Handler.Element (Source, Current), Offset);
          end loop;
 
       else

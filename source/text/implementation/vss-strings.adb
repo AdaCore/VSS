@@ -193,6 +193,7 @@ package body VSS.Strings is
    is
       Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
         Self.Handler;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
       if Handler = null then
@@ -202,7 +203,7 @@ package body VSS.Strings is
 
       else
          Handler.Append
-           (Self.Data, VSS.Characters.Virtual_Character'Pos (Item));
+           (Self.Data, VSS.Characters.Virtual_Character'Pos (Item), Offset);
       end if;
    end Append;
 
@@ -212,12 +213,16 @@ package body VSS.Strings is
 
    procedure Append
      (Self : in out Virtual_String'Class;
-      Item : Virtual_String'Class) is
+      Item : Virtual_String'Class)
+   is
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+
    begin
       if Self.Is_Empty then
          Self := Item;
+
       elsif not Item.Is_Empty then
-         Self.Handler.Append (Self.Data, Item.Handler.all, Item.Data);
+         Self.Handler.Append (Self.Data, Item.Handler.all, Item.Data, Offset);
       end if;
    end Append;
 

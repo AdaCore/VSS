@@ -222,7 +222,7 @@ package body VSS.Strings is
          Self := Item;
 
       elsif not Item.Is_Empty then
-         Self.Handler.Append (Self.Data, Item.Handler.all, Item.Data, Offset);
+         Self.Handler.Append (Self.Data, Item.Data, Offset);
       end if;
    end Append;
 

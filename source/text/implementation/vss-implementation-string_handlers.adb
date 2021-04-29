@@ -32,24 +32,30 @@ package body VSS.Implementation.String_Handlers is
    ------------
 
    procedure Append
-     (Self           : Abstract_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler : Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data;
-      Offset         : in out VSS.Implementation.Strings.Cursor_Offset)
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Suffix : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Handler  : Abstract_String_Handler'Class
+      use type VSS.Implementation.Strings.String_Handler_Access;
+
+      Handler        : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Position : VSS.Implementation.Strings.Cursor;
-      Code     : VSS.Unicode.Code_Point;
+      Suffix_Handler :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Suffix);
+      Position       : VSS.Implementation.Strings.Cursor;
+      Code           : VSS.Unicode.Code_Point;
 
    begin
-      Suffix_Handler.Before_First_Character (Suffix_Data, Position);
+      if Suffix_Handler /= null then
+         Suffix_Handler.Before_First_Character (Suffix, Position);
 
-      while Suffix_Handler.Forward (Suffix_Data, Position) loop
-         Code := Suffix_Handler.Element (Suffix_Data, Position);
-         Handler.Append (Data, Code, Offset);
-      end loop;
+         while Suffix_Handler.Forward (Suffix, Position) loop
+            Code := Suffix_Handler.Element (Suffix, Position);
+            Handler.Append (Data, Code, Offset);
+         end loop;
+      end if;
    end Append;
 
    ---------------

@@ -69,6 +69,18 @@ package body VSS.Implementation.Strings is
       end if;
    end Handler;
 
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (Self : String_Data) return Boolean is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        VSS.Implementation.Strings.Handler (Self);
+
+   begin
+      return Handler = null or else Handler.Is_Empty (Self);
+   end Is_Empty;
+
    ----------------
    -- Is_Invalid --
    ----------------
@@ -83,18 +95,6 @@ package body VSS.Implementation.Strings is
           and Self.UTF8_Offset = VSS.Unicode.UTF8_Code_Unit_Offset'Last
           and Self.UTF16_Offset = VSS.Unicode.UTF16_Code_Unit_Offset'Last;
    end Is_Invalid;
-
-   --------------
-   -- Is_Empty --
-   --------------
-
-   function Is_Empty (Self : String_Data) return Boolean is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        VSS.Implementation.Strings.Handler (Self);
-
-   begin
-      return Handler = null or else Handler.Is_Empty (Self);
-   end Is_Empty;
 
    ---------------
    -- Reference --

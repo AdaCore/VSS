@@ -225,9 +225,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self : UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
-      Code : VSS.Unicode.Code_Point)
+     (Self   : UTF8_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Code   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       Destination : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -239,6 +240,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    begin
       VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+      Offset.Index_Offset := Offset.Index_Offset + 1;
+      Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
+      Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
 
       Mutate
         (Destination,
@@ -273,7 +278,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Data           : in out VSS.Implementation.Strings.String_Data;
       Suffix_Handler :
        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+      Suffix_Data    : VSS.Implementation.Strings.String_Data;
+      Offset         : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       Parent : VSS.Implementation.String_Handlers.Abstract_String_Handler
         renames VSS.Implementation.String_Handlers.Abstract_String_Handler
@@ -295,13 +301,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
                Source.Size + VSS.Unicode.UTF8_Code_Unit_Count (Suffix.Size));
 
             --  Copy character by character
-            Parent.Append (Data, Suffix_Handler, Suffix_Data);
+            Parent.Append (Data, Suffix_Handler, Suffix_Data, Offset);
          end;
 
       elsif Suffix_Handler not in UTF8_String_Handler then
          --  No other optimization is possible here, copy character by
          --  character
-         Parent.Append (Data, Suffix_Handler, Suffix_Data);
+         Parent.Append (Data, Suffix_Handler, Suffix_Data, Offset);
 
       else  --  Both Data and suffix are not "in place"
 
@@ -334,9 +340,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self : UTF8_In_Place_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
-      Code : VSS.Unicode.Code_Point)
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Code   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       use type Interfaces.Unsigned_8;
 
@@ -350,6 +357,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    begin
       VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+      Offset.Index_Offset := Offset.Index_Offset + 1;
+      Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
+      Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
 
       if Destination.Size + Interfaces.Unsigned_8 (L)
            < Destination.Storage'Length
@@ -429,7 +440,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Data           : in out VSS.Implementation.Strings.String_Data;
       Suffix_Handler :
         VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+      Suffix_Data    : VSS.Implementation.Strings.String_Data;
+      Offset         : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       Parent : VSS.Implementation.String_Handlers.Abstract_String_Handler
         renames VSS.Implementation.String_Handlers.Abstract_String_Handler
@@ -454,12 +466,12 @@ package body VSS.Implementation.UTF8_String_Handlers is
                VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
                VSS.Unicode.UTF8_Code_Unit_Count (Source.Size) + Suffix.Size);
 
-            Suffix_Handler.Append (Data, Suffix_Handler, Suffix_Data);
+            Suffix_Handler.Append (Data, Suffix_Handler, Suffix_Data, Offset);
          end;
 
       elsif Suffix_Handler not in UTF8_In_Place_String_Handler then
          --  Can't optimize, use char-by-char append
-         Parent.Append (Data, Suffix_Handler, Suffix_Data);
+         Parent.Append (Data, Suffix_Handler, Suffix_Data, Offset);
 
       else  --  Both Data and suffix are "in place"
          declare
@@ -498,7 +510,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                --  Copy character by character
                VSS.Implementation.String_Handlers.Abstract_String_Handler
                  (Global_UTF8_String_Handler).Append
-                   (Data, Suffix_Handler, Suffix_Data);
+                   (Data, Suffix_Handler, Suffix_Data, Offset);
             end if;
          end;
       end if;

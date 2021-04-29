@@ -30,7 +30,9 @@ package VSS.Implementation.Strings is
 
    pragma Preelaborate;
 
-   type Character_Count is range 0 .. 2 ** 30 - 1;
+   type Character_Offset is range -2 ** 30 .. 2 ** 30 - 1;
+   subtype Character_Count is Character_Offset
+     range 0 .. Character_Offset'Last;
    subtype Character_Index is Character_Count range 1 .. Character_Count'Last;
 
    type Grapheme_Count is range 0 .. 2 ** 30 - 1;
@@ -69,6 +71,18 @@ package VSS.Implementation.Strings is
 
    function Is_Invalid (Self : Cursor) return Boolean;
    --  Return True when cursor has special invalid value.
+
+   -------------------
+   -- Cursor_Offset --
+   -------------------
+
+   type Cursor_Offset is record
+      Index_Offset : Character_Offset                   := 0;
+      UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Offset  := 0;
+      UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Offset := 0;
+   end record;
+   --  Offset between positions of two Cursors. Also used as size of the
+   --  segment.
 
    -----------------
    -- String_Data --

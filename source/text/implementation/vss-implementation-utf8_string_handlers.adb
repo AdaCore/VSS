@@ -221,25 +221,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
    end Allocate;
 
    ------------
-   -- Mutate --
-   ------------
-
-   procedure Mutate
-     (Data     : in out UTF8_String_Data_Access;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
-   begin
-      if Data = null then
-         Data := Allocate (Capacity, Size);
-
-      elsif not System.Atomic_Counters.Is_One (Data.Counter)
-        or else Size > Data.Bulk
-      then
-         Reallocate (Data, Capacity, Size);
-      end if;
-   end Mutate;
-
-   ------------
    -- Append --
    ------------
 
@@ -1141,6 +1122,25 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       return VSS.Implementation.Strings.Character_Count (Source.Length);
    end Length;
+
+   ------------
+   -- Mutate --
+   ------------
+
+   procedure Mutate
+     (Data     : in out UTF8_String_Data_Access;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
+   begin
+      if Data = null then
+         Data := Allocate (Capacity, Size);
+
+      elsif not System.Atomic_Counters.Is_One (Data.Counter)
+        or else Size > Data.Bulk
+      then
+         Reallocate (Data, Capacity, Size);
+      end if;
+   end Mutate;
 
    ----------------
    -- Reallocate --

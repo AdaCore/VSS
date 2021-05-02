@@ -21,34 +21,32 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Markers is
+package body VSS.Strings.Cursors.Markers is
 
-   pragma Preelaborate;
-
-   type Character_Marker is
-     new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
-
-   type Segment_Marker is
-     new VSS.Strings.Cursors.Abstract_Segment_Cursor with private;
-
-private
-
-   type Character_Marker is
-     new VSS.Strings.Cursors.Character_Cursor_Base with null record;
+   ---------------------
+   -- String_Modified --
+   ---------------------
 
    overriding procedure String_Modified
      (Self     : in out Character_Marker;
       Start    : VSS.Implementation.Strings.Cursor;
       Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      null;
+   end String_Modified;
 
-   type Segment_Marker is
-     new VSS.Strings.Cursors.Segment_Cursor_Base with null record;
+   ---------------------
+   -- String_Modified --
+   ---------------------
 
    overriding procedure String_Modified
      (Self     : in out Segment_Marker;
       Start    : VSS.Implementation.Strings.Cursor;
       Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      null;
+   end String_Modified;
 
 end VSS.Strings.Cursors.Markers;

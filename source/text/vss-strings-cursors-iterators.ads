@@ -59,8 +59,20 @@ private
      abstract limited new VSS.Strings.Cursors.Character_Cursor_Limited_Base
        with null record;
 
+   overriding procedure String_Modified
+     (Self     : in out Abstract_Character_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+
    type Abstract_Segment_Iterator is
      abstract limited new VSS.Strings.Cursors.Segment_Cursor_Limited_Base
        with null record;
+
+   overriding procedure String_Modified
+     (Self     : in out Abstract_Segment_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
 
 end VSS.Strings.Cursors.Iterators;

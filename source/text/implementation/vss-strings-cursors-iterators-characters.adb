@@ -105,4 +105,17 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       return False;
    end Has_Element;
 
+   ---------------------
+   -- String_Modified --
+   ---------------------
+
+   overriding procedure String_Modified
+     (Self     : in out Character_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      null;
+   end String_Modified;
+
 end VSS.Strings.Cursors.Iterators.Characters;

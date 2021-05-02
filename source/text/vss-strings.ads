@@ -335,6 +335,17 @@ private
 
    procedure Invalidate (Self : in out Referal_Base) is abstract;
 
+   procedure String_Modified
+     (Self     : in out Referal_Base;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+   --  Called when referenced string object has been modified. Start is the
+   --  position of the first character of the operation, it is state before
+   --  modification operation, thus negative UTF* offset is not valid.
+   --  Removed and Inserted parameters are sizes of the removed and inserted
+   --  segments. All their members are valid.
+
    overriding procedure Adjust (Self : in out Referal_Base);
    --  Connect new object to the string object.
 
@@ -365,6 +376,17 @@ private
    --  Disconnect referel from string object
 
    procedure Invalidate (Self : in out Referal_Limited_Base) is abstract;
+
+   procedure String_Modified
+     (Self     : in out Referal_Limited_Base;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+   --  Called when referenced string object has been modified. Start is the
+   --  position of the first character of the operation, it is state before
+   --  modification operation, thus negative UTF* offset is not valid.
+   --  Removed and Inserted parameters are sizes of the removed and inserted
+   --  segments. All their members are valid.
 
    overriding procedure Finalize (Self : in out Referal_Limited_Base);
    --  Invalidate referal state and disconnect from the string object.
@@ -410,6 +432,12 @@ private
    end record;
 
    overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
+
+   overriding procedure String_Modified
+     (Self     : in out Grapheme_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is null;
 
    function Handler
      (Self : Virtual_String'Class)

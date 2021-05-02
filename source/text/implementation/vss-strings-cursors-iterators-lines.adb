@@ -201,6 +201,19 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       end if;
    end Lookup_Next_Line;
 
+   ---------------------
+   -- String_Modified --
+   ---------------------
+
+   overriding procedure String_Modified
+     (Self     : in out Line_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      null;
+   end String_Modified;
+
    ----------------------
    -- Terminator_First --
    ----------------------

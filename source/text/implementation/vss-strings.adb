@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Exceptions;
+
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Strings.Cursors.Internals;
@@ -32,6 +34,17 @@ with VSS.Strings.Texts;
 package body VSS.Strings is
 
    use type VSS.Implementation.Strings.String_Handler_Access;
+
+   procedure Notify_String_Modified
+     (Self     : in out Virtual_String'Class;
+      From     : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+   --  Do notification about modification of the string. If some notification
+   --  handler raises exception it is stored, and notification continued.
+   --  First stored exception will be reraised before exit, thus call to this
+   --  subprogram should be done at the end of the body of the caller
+   --  subprogram or exception handling added to the caller subprogram.
 
    ---------
    -- "<" --
@@ -191,20 +204,24 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character)
    is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
         Self.Handler;
+      Start   : VSS.Implementation.Strings.Cursor;
       Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
       if Handler = null then
-         Self :=
-           To_Virtual_String
-             (Wide_Wide_String'(1 .. 1 => Wide_Wide_Character (Item)));
-
-      else
-         Handler.Append
-           (Self.Data, VSS.Characters.Virtual_Character'Pos (Item), Offset);
+         VSS.Implementation.String_Configuration.In_Place_Handler
+           .Initialize (Self.Data);
+         Handler := Self.Handler;
       end if;
+
+      Handler.After_Last_Character (Self.Data, Start);
+
+      Handler.Append
+        (Self.Data, VSS.Characters.Virtual_Character'Pos (Item), Offset);
+
+      Notify_String_Modified (Self, Start, (0, 0, 0), Offset);
    end Append;
 
    ------------
@@ -215,15 +232,27 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : Virtual_String'Class)
    is
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Start   : VSS.Implementation.Strings.Cursor;
       Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if Self.Is_Empty then
-         Self := Item;
-
-      elsif not Item.Is_Empty then
-         Self.Handler.Append (Self.Data, Item.Data, Offset);
+      if Item.Is_Empty then
+         return;
       end if;
+
+      if Handler = null then
+         VSS.Implementation.String_Configuration.In_Place_Handler
+           .Initialize (Self.Data);
+         Handler := Self.Handler;
+      end if;
+
+      Handler.After_Last_Character (Self.Data, Start);
+
+      Handler.Append (Self.Data, Item.Data, Offset);
+
+      Notify_String_Modified (Self, Start, (0, 0, 0), Offset);
    end Append;
 
    ---------------
@@ -558,6 +587,76 @@ package body VSS.Strings is
          raise Program_Error;
       end return;
    end Line;
+
+   ----------------------------
+   -- Notify_String_Modified --
+   ----------------------------
+
+   procedure Notify_String_Modified
+     (Self     : in out Virtual_String'Class;
+      From     : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type Ada.Exceptions.Exception_Id;
+
+      Occurrence : Ada.Exceptions.Exception_Occurrence;
+
+   begin
+      declare
+         Current : Referal_Limited_Access := Self.Limited_Head;
+         Next    : Referal_Limited_Access;
+
+      begin
+         while Current /= null loop
+            Next := Current.Next;
+
+            begin
+               Current.String_Modified (From, Removed, Inserted);
+
+            exception
+               when X : others =>
+                  if Ada.Exceptions.Exception_Identity (Occurrence)
+                    = Ada.Exceptions.Null_Id
+                  then
+                     --  Save first raised exception only.
+
+                     Ada.Exceptions.Save_Occurrence (Occurrence, X);
+                  end if;
+            end;
+
+            Current := Next;
+         end loop;
+      end;
+
+      declare
+         Current : Referal_Access := Self.Head;
+         Next    : Referal_Access;
+
+      begin
+         while Current /= null loop
+            Next := Current.Next;
+
+            begin
+               Current.String_Modified (From, Removed, Inserted);
+
+            exception
+               when X : others =>
+                  if Ada.Exceptions.Exception_Identity (Occurrence)
+                    = Ada.Exceptions.Null_Id
+                  then
+                     --  Save first raised exception only.
+
+                     Ada.Exceptions.Save_Occurrence (Occurrence, X);
+                  end if;
+            end;
+
+            Current := Next;
+         end loop;
+      end;
+
+      Ada.Exceptions.Reraise_Occurrence (Occurrence);
+   end Notify_String_Modified;
 
    ----------
    -- Read --

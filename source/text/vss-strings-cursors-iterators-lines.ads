@@ -88,6 +88,12 @@ private
 
    overriding procedure Invalidate (Self : in out Line_Iterator);
 
+   overriding procedure String_Modified
+     (Self     : in out Line_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+
    overriding function Forward (Self : in out Line_Iterator) return Boolean;
 
    overriding function Has_Element (Self : Line_Iterator) return Boolean;

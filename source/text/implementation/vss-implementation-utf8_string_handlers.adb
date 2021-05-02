@@ -320,13 +320,16 @@ package body VSS.Implementation.UTF8_String_Handlers is
       else  --  Both Data and suffix are not "in place"
 
          declare
+            use type VSS.Unicode.UTF8_Code_Unit;
+
             Suffix_Data : UTF8_String_Data_Access
               with Import,
                 Convention => Ada,
                 Address    => Suffix.Pointer'Address;
-
-            New_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+            New_Size    : constant VSS.Unicode.UTF8_Code_Unit_Count :=
               Source.Size + Suffix_Data.Size;
+            UTF16_Size  : VSS.Unicode.UTF16_Code_Unit_Offset :=
+              VSS.Unicode.UTF16_Code_Unit_Offset (Suffix_Data.Length);
 
          begin
             Mutate
@@ -334,11 +337,22 @@ package body VSS.Implementation.UTF8_String_Handlers is
                VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
                New_Size);
 
-            Source.Storage (Source.Size .. New_Size) :=
-              Suffix_Data.Storage (0 .. Suffix_Data.Size);
+            for J in 0 .. Suffix_Data.Size loop
+               Source.Storage (Source.Size + J) := Suffix_Data.Storage (J);
+
+               if (Suffix_Data.Storage (J) and 2#1111_1000#)
+                 = 2#1111_0000#
+               then
+                  UTF16_Size := UTF16_Size + 1;
+               end if;
+            end loop;
 
             Source.Size := New_Size;
             Source.Length := Source.Length + Suffix_Data.Length;
+
+            Offset.Index_Offset := Offset.Index_Offset + Suffix_Data.Length;
+            Offset.UTF8_Offset  := Offset.UTF8_Offset + Suffix_Data.Size;
+            Offset.UTF16_Offset := Offset.UTF16_Offset + UTF16_Size;
          end;
       end if;
    end Append;
@@ -488,15 +502,19 @@ package body VSS.Implementation.UTF8_String_Handlers is
       else  --  Both Data and suffix are "in place"
          declare
             use type Interfaces.Unsigned_8;
-
-            Old_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-              VSS.Unicode.UTF8_Code_Unit_Count (Source.Size);
+            use type VSS.Unicode.UTF8_Code_Unit;
 
             Suffix_Data : UTF8_In_Place_Data
               with Import, Convention => Ada, Address => Suffix'Address;
 
-            New_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-              Old_Size + VSS.Unicode.UTF8_Code_Unit_Count (Suffix_Data.Size);
+            Suffix_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              VSS.Unicode.UTF8_Code_Unit_Count (Suffix_Data.Size);
+            Old_Size    : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              VSS.Unicode.UTF8_Code_Unit_Count (Source.Size);
+            New_Size    : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              Old_Size + Suffix_Size;
+            UTF16_Size  : VSS.Unicode.UTF16_Code_Unit_Offset :=
+              VSS.Unicode.UTF16_Code_Unit_Offset (Suffix_Data.Length);
 
          begin
             if New_Size < Source.Storage'Length then
@@ -504,11 +522,24 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
                Source.Length := Source.Length + Suffix_Data.Length;
 
-               Source.Storage (Old_Size .. New_Size) :=
-                 Suffix_Data.Storage
-                   (0 .. VSS.Unicode.UTF8_Code_Unit_Count (Suffix_Data.Size));
+               for J in 0 .. Suffix_Size loop
+                  Source.Storage (Old_Size + J) := Suffix_Data.Storage (J);
+
+                  if (Suffix_Data.Storage (J) and 2#1111_1000#)
+                    = 2#1111_0000#
+                  then
+                     UTF16_Size := UTF16_Size + 1;
+                  end if;
+               end loop;
 
                Source.Size := Interfaces.Unsigned_8 (New_Size);
+
+               Offset.Index_Offset :=
+                 Offset.Index_Offset
+                   + VSS.Implementation.Strings.Character_Count
+                       (Suffix_Data.Length);
+               Offset.UTF8_Offset  := Offset.UTF8_Offset + Suffix_Size;
+               Offset.UTF16_Offset := Offset.UTF16_Offset + UTF16_Size;
 
             else
                --  Data can't be stored "in place" and need to be converted

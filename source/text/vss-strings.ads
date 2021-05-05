@@ -192,10 +192,10 @@ package VSS.Strings is
    --     Item : Virtual_String'Class);
    --  --  Prepend given string to the begin of the string.
 
-   --  procedure Insert
-   --    (Self     : in out Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     Item     : VSS.Characters.Virtual_Character);
+   procedure Insert
+     (Self     : in out Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Item     : VSS.Characters.Virtual_Character);
    --  procedure Insert
    --    (Self     : in out Virtual_String'Class;
    --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;

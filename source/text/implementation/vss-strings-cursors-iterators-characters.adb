@@ -113,9 +113,19 @@ package body VSS.Strings.Cursors.Iterators.Characters is
      (Self     : in out Character_Iterator;
       Start    : VSS.Implementation.Strings.Cursor;
       Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
+      Inserted : VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type VSS.Implementation.Strings.Character_Offset;
+
    begin
-      null;
+      if Self.Position.Index >= Start.Index then
+         if Removed.Index_Offset = 0 then
+            VSS.Implementation.Strings.Move (Self.Position, Inserted);
+
+         else
+            raise Program_Error;
+         end if;
+      end if;
    end String_Modified;
 
 end VSS.Strings.Cursors.Iterators.Characters;

@@ -23,6 +23,7 @@ check_text:
 	.objs/tests/test_string_compare
 	.objs/tests/test_string_conversions
 	.objs/tests/test_string_hash
+	.objs/tests/test_string_insert
 	.objs/tests/test_string_buffer
 	.objs/tests/test_string_slice
 	.objs/tests/test_string_split_lines

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,36 +20,34 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+with VSS.Characters;
+with VSS.Strings.Character_Iterators;
+with VSS.Strings.Conversions;
 
-project VSS_Text_Tests is
+with Test_Support;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/text");
-   for Main use ("test_character_iterators.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+procedure Test_String_Insert is
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   E : constant Wide_Wide_String := "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   --  S1 : VSS.Strings.Virtual_String := "C";
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   S : VSS.Strings.Virtual_String := "Z";
+   J : VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.First_Character;
 
-end VSS_Text_Tests;
+begin
+   --  Test result insert of the character operation, as well as correct
+   --  tracking of the iterator location on insert operation.
+
+   for K in VSS.Characters.Virtual_Character'('A') .. 'Y' loop
+      S.Insert (J, K);
+
+      Test_Support.Assert
+        (VSS.Strings.Conversions.To_Wide_Wide_String (S)
+         = E (E'First .. E'First
+                + (VSS.Characters.Virtual_Character'Pos (K)
+                     - VSS.Characters.Virtual_Character'Pos ('A'))) & 'Z');
+   end loop;
+
+end Test_String_Insert;

@@ -84,6 +84,11 @@ package VSS.Implementation.Strings is
    --  Offset between positions of two Cursors. Also used as size of the
    --  segment.
 
+   procedure Move
+     (Self   : in out Cursor;
+      Offset : Cursor_Offset);
+   --  Moves cursor by given offset.
+
    -----------------
    -- String_Data --
    -----------------

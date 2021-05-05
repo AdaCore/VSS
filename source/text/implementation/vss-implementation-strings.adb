@@ -96,6 +96,23 @@ package body VSS.Implementation.Strings is
           and Self.UTF16_Offset = VSS.Unicode.UTF16_Code_Unit_Offset'Last;
    end Is_Invalid;
 
+   ----------
+   -- Move --
+   ----------
+
+   procedure Move
+     (Self   : in out Cursor;
+      Offset : Cursor_Offset)
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+   begin
+      Self.Index        := Self.Index + Offset.Index_Offset;
+      Self.UTF8_Offset  := Self.UTF8_Offset + Offset.UTF8_Offset;
+      Self.UTF16_Offset := Self.UTF16_Offset + Offset.UTF16_Offset;
+   end Move;
+
    ---------------
    -- Reference --
    ---------------

@@ -39,7 +39,7 @@ private
    overriding procedure String_Modified
      (Self     : in out Character_Marker;
       Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
       Inserted : VSS.Implementation.Strings.Cursor_Offset);
 
    type Segment_Marker is

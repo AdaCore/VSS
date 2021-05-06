@@ -43,7 +43,7 @@ private
    overriding procedure String_Modified
      (Self     : in out Character_Iterator;
       Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
       Inserted : VSS.Implementation.Strings.Cursor_Offset);
 
    overriding function Backward

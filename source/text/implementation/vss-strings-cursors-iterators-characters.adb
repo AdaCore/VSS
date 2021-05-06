@@ -112,19 +112,18 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    overriding procedure String_Modified
      (Self     : in out Character_Iterator;
       Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset)
-   is
-      use type VSS.Implementation.Strings.Character_Offset;
-
+      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
    begin
-      if Self.Position.Index >= Start.Index then
-         if Removed.Index_Offset = 0 then
-            VSS.Implementation.Strings.Move (Self.Position, Inserted);
+      if VSS.Implementation.Strings.Fixup_Delete
+           (Self.Position, Start, Deleted)
+      then
+         VSS.Implementation.Strings.Fixup_Insert
+           (Self.Position, Start, Inserted);
 
-         else
-            raise Program_Error;
-         end if;
+      else
+         Self.Initialize;
+         Self.Disconnect;
       end if;
    end String_Modified;
 

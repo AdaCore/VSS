@@ -276,7 +276,7 @@ package body VSS.Strings.Cursors is
 
    overriding procedure Invalidate (Self : in out Character_Cursor_Base) is
    begin
-      Self.Position := (1, 0, 0);
+      Self.Position := (others => <>);
    end Invalidate;
 
    ----------------
@@ -286,7 +286,7 @@ package body VSS.Strings.Cursors is
    overriding procedure Invalidate
      (Self : in out Character_Cursor_Limited_Base) is
    begin
-      Self.Position := (1, 0, 0);
+      Self.Position := (others => <>);
    end Invalidate;
 
    ----------------
@@ -296,8 +296,8 @@ package body VSS.Strings.Cursors is
    overriding procedure Invalidate
      (Self : in out Segment_Cursor_Base) is
    begin
-      Self.First_Position := (1, 0, 0);
-      Self.Last_Position  := (1, 0, 0);
+      Self.First_Position := (others => <>);
+      Self.Last_Position  := (others => <>);
    end Invalidate;
 
    ----------------
@@ -307,8 +307,8 @@ package body VSS.Strings.Cursors is
    overriding procedure Invalidate
      (Self : in out Segment_Cursor_Limited_Base) is
    begin
-      Self.First_Position := (1, 0, 0);
-      Self.Last_Position  := (1, 0, 0);
+      Self.First_Position := (others => <>);
+      Self.Last_Position  := (others => <>);
    end Invalidate;
 
    --------------------------

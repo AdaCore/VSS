@@ -84,10 +84,20 @@ package VSS.Implementation.Strings is
    --  Offset between positions of two Cursors. Also used as size of the
    --  segment.
 
-   procedure Move
-     (Self   : in out Cursor;
-      Offset : Cursor_Offset);
-   --  Moves cursor by given offset.
+   procedure Fixup_Insert
+     (Self  : in out Cursor;
+      Start : Cursor;
+      Size  : Cursor_Offset);
+   --  Fixup position of the cursor on insert operation at the given position
+   --  and size.
+
+   function Fixup_Delete
+     (Self  : in out Cursor;
+      Start : Cursor;
+      Size  : Cursor_Offset) return Boolean;
+   --  Fixup position of the cursor on delete operaton at the given position
+   --  and size. Return False and set position to invalid value when position
+   --  of the cursor has been deleted.
 
    -----------------
    -- String_Data --

@@ -58,6 +58,71 @@ package body VSS.Implementation.String_Handlers is
       end if;
    end Append;
 
+   ------------------
+   -- Compute_Size --
+   ------------------
+
+   not overriding procedure Compute_Size
+     (Self   : Abstract_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Size   : out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler       : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      From_Position : VSS.Implementation.Strings.Cursor;
+      To_Position   : VSS.Implementation.Strings.Cursor;
+      Success       : Boolean with Unreferenced;
+
+   begin
+      if From.Index > To.Index then
+         Size := (0, 0, 0);
+
+      else
+         if From.UTF8_Offset < 0 or From.UTF16_Offset < 0 then
+            --  Some of UTF* offset of From must be resolved first.
+
+            Handler.Before_First_Character (Data, From_Position);
+
+            while From_Position.Index /= From.Index
+              and then Handler.Forward (Data, From_Position)
+            loop
+               null;
+            end loop;
+
+         else
+            From_Position := From;
+         end if;
+
+         if To.UTF8_Offset < 0 or To.UTF16_Offset < 0 then
+            --  Some of UTF* offset of To must be resolved first.
+
+            To_Position := From_Position;
+
+            while To_Position.Index /= To.Index
+              and then Handler.Forward (Data, To_Position)
+            loop
+               null;
+            end loop;
+
+         else
+            To_Position := To;
+         end if;
+
+         Success := Handler.Forward (Data, To_Position);
+
+         Size.Index_Offset := To_Position.Index - From_Position.Index;
+         Size.UTF8_Offset  :=
+           To_Position.UTF8_Offset - From_Position.UTF8_Offset;
+         Size.UTF16_Offset :=
+           To_Position.UTF16_Offset - From_Position.UTF16_Offset;
+      end if;
+   end Compute_Size;
+
    ---------------
    -- Ends_With --
    ---------------

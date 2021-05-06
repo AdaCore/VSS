@@ -214,15 +214,15 @@ package VSS.Strings is
    --  --  Inserts given item at the given position and returns result. Returns
    --  --  source string if the given position is invalid.
 
-   --  procedure Remove
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class);
+   procedure Delete
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class);
    --  procedure Remove
    --    (Self    : in out Virtual_String'Class;
    --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class);
-   --  --  Removes characters from of the string starting from given position
-   --  --  to given position.
+   --  Delete characters from of the string starting from given position
+   --  to given position.
 
    --  function Remove
    --    (Self : Virtual_String'Class;

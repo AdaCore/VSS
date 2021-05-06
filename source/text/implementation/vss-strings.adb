@@ -337,6 +337,44 @@ package body VSS.Strings is
       Self.Owner := Owner;
    end Connect;
 
+   ------------
+   -- Delete --
+   ------------
+
+   procedure Delete
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
+   is
+      use type VSS.Implementation.Strings.Character_Offset;
+
+      Handler     :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          Self.Handler;
+      From_Cursor : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (From).all;
+      To_Cursor   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (To).all;
+      Size        : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+        or else not VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
+      then
+         return;
+      end if;
+
+      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Size);
+
+      if Size.Index_Offset /= 0 then
+         Handler.Delete (Self.Data, From_Cursor, Size);
+
+         Self.Notify_String_Modified (From_Cursor, Size, (0, 0, 0));
+      end if;
+   end Delete;
+
    ----------------
    -- Disconnect --
    ----------------

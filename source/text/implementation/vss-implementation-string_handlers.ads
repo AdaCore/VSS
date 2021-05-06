@@ -214,6 +214,15 @@ package VSS.Implementation.String_Handlers is
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Return offset of the last UTF-16 code unit at the given position.
 
+   not overriding procedure Compute_Size
+     (Self   : Abstract_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Size   : out VSS.Implementation.Strings.Cursor_Offset);
+   --  Compute size of the given segment. All components of Size have valid
+   --  and positive values.
+
    not overriding procedure Append
      (Self   : Abstract_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
@@ -243,6 +252,13 @@ package VSS.Implementation.String_Handlers is
    --  Insert single code point into the string.
    --
    --  Implementation must increment value of the Offset.
+
+   not overriding procedure Delete
+     (Self : Abstract_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+   --  Delete segment of given size starting from given position.
 
    not overriding procedure Slice
      (Self   : Abstract_String_Handler;

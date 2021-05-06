@@ -660,6 +660,65 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Pointer  => Destination.all'Address);
    end Copy_To_Heap;
 
+   ------------
+   -- Delete --
+   ------------
+
+   overriding procedure Delete
+     (Self : UTF8_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset)
+   is
+      Source   : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+      New_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
+        Source.Size - Size.UTF8_Offset;
+
+   begin
+      if Size.Index_Offset = 0 then
+         return;
+      end if;
+
+      Source.Storage (From.UTF8_Offset .. New_Size) :=
+        Source.Storage (From.UTF8_Offset + Size.UTF8_Offset .. Source.Size);
+
+      Source.Length := Source.Length - Size.Index_Offset;
+      Source.Size   := New_Size;
+   end Delete;
+
+   ------------
+   -- Delete --
+   ------------
+
+   overriding procedure Delete
+     (Self : UTF8_In_Place_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type Interfaces.Unsigned_8;
+
+      Source   : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+      New_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
+        VSS.Unicode.UTF8_Code_Unit_Offset (Source.Size) - Size.UTF8_Offset;
+
+   begin
+      if Size.Index_Offset = 0 then
+         return;
+      end if;
+
+      Source.Storage (From.UTF8_Offset .. New_Size) :=
+        Source.Storage
+          (From.UTF8_Offset + Size.UTF8_Offset
+             .. VSS.Unicode.UTF8_Code_Unit_Offset (Source.Size));
+
+      Source.Length :=
+        Source.Length - Interfaces.Unsigned_8 (Size.Index_Offset);
+      Source.Size   := Interfaces.Unsigned_8 (New_Size);
+   end Delete;
+
    -------------
    -- Element --
    -------------

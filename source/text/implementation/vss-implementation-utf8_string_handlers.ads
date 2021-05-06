@@ -160,6 +160,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
+   overriding procedure Delete
+     (Self : UTF8_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset);
+
    overriding procedure Split_Lines
      (Self            : UTF8_String_Handler;
       Data            : VSS.Implementation.Strings.String_Data;
@@ -287,6 +293,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
+
+   overriding procedure Delete
+     (Self : UTF8_In_Place_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset);
 
    overriding procedure Split_Lines
      (Self            : UTF8_In_Place_String_Handler;

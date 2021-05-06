@@ -546,7 +546,7 @@ package body VSS.Strings is
    is
       Handler : VSS.Implementation.Strings.String_Handler_Access :=
         Self.Handler;
-      Start   : VSS.Implementation.Strings.Cursor :=
+      Start   : constant VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
           (Position).all;
       Offset  : VSS.Implementation.Strings.Cursor_Offset;

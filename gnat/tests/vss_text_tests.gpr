@@ -31,6 +31,7 @@ project VSS_Text_Tests is
    for Object_Dir use VSS_Config.Tests_Object_Dir;
    for Source_Dirs use ("../../testsuite/text");
    for Main use ("test_character_iterators.adb",
+                 "test_character_markers.adb",
                  "test_converters.adb",
                  "test_line_iterators.adb",
                  "test_string_append",

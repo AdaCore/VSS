@@ -177,9 +177,15 @@ package body VSS.Strings is
    ------------
 
    overriding procedure Adjust (Self : in out Referal_Base) is
+      Owner : constant Magic_String_Access := Self.Owner;
+
    begin
-      if Self.Owner /= null then
-         Self.Connect (Self.Owner);
+      Self.Owner    := null;
+      Self.Next     := null;
+      Self.Previous := null;
+
+      if Owner /= null then
+         Self.Connect (Owner);
       end if;
    end Adjust;
 

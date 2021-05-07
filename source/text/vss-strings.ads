@@ -236,25 +236,25 @@ package VSS.Strings is
    --  --  Removes characters from of the string starting from given position
    --  --  to given position and returns result.
 
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character);
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : VSS.Characters.Virtual_Character);
    --  procedure Replace
    --    (Self    : in out Virtual_String'Class;
    --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : VSS.Characters.Virtual_Character);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     By   : Virtual_String'Class);
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : Virtual_String'Class);
    --  procedure Replace
    --    (Self    : in out Virtual_String'Class;
    --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : Virtual_String'Class);
-   --  --  Replace slice from and to given positions by given item.
+   --  Replace slice from and to given positions by given item.
 
    --  function Replace
    --    (Self : Virtual_String'Class;

@@ -773,6 +773,94 @@ package body VSS.Strings is
       raise Program_Error with "Not implemented";
    end Read;
 
+   -------------
+   -- Replace --
+   -------------
+
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : VSS.Characters.Virtual_Character)
+   is
+      use type VSS.Implementation.Strings.Character_Offset;
+
+      Handler     :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          Self.Handler;
+      From_Cursor : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (From).all;
+      To_Cursor   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (To).all;
+      Deleted     : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted    : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+        or else not VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
+      then
+         return;
+      end if;
+
+      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Deleted);
+
+      if Deleted.Index_Offset /= 0 then
+         Handler.Delete (Self.Data, From_Cursor, Deleted);
+      end if;
+
+      Handler.Insert
+        (Self.Data,
+         From_Cursor,
+         VSS.Characters.Virtual_Character'Pos (By),
+         Inserted);
+
+      Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
+   end Replace;
+
+   -------------
+   -- Replace --
+   -------------
+
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : Virtual_String'Class)
+   is
+      use type VSS.Implementation.Strings.Character_Offset;
+
+      Handler     :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          Self.Handler;
+      From_Cursor : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (From).all;
+      To_Cursor   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (To).all;
+      Deleted     : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted    : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+        or else not VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
+      then
+         return;
+      end if;
+
+      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Deleted);
+
+      if Deleted.Index_Offset /= 0 then
+         Handler.Delete (Self.Data, From_Cursor, Deleted);
+      end if;
+
+      Handler.Insert (Self.Data, From_Cursor, By.Data, Inserted);
+
+      Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
+   end Replace;
+
    -----------
    -- Slice --
    -----------

@@ -262,6 +262,44 @@ package body VSS.Implementation.String_Handlers is
       end loop;
    end Hash;
 
+   ------------
+   -- Insert --
+   ------------
+
+   not overriding procedure Insert
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type VSS.Implementation.Strings.String_Handler_Access;
+
+      Item_Handler  :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item);
+      Item_Position : VSS.Implementation.Strings.Cursor;
+      Position      : VSS.Implementation.Strings.Cursor := From;
+      Code          : VSS.Unicode.Code_Point;
+      Success       : Boolean with Unreferenced;
+
+   begin
+      if Item_Handler = null or else Item_Handler.Is_Empty (Item) then
+         return;
+      end if;
+
+      Item_Handler.Before_First_Character (Item, Item_Position);
+
+      while Item_Handler.Forward (Item, Item_Position) loop
+         Code := Item_Handler.Element (Item, Item_Position);
+
+         VSS.Implementation.Strings.Handler (Data).Insert
+           (Data, Position, Code, Offset);
+         Success :=
+           VSS.Implementation.Strings.Handler (Data).Forward (Data, Position);
+      end loop;
+   end Insert;
+
    --------------
    -- Is_Equal --
    --------------

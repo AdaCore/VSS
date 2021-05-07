@@ -608,6 +608,37 @@ package body VSS.Strings is
       Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Insert;
 
+   ------------
+   -- Insert --
+   ------------
+
+   procedure Insert
+     (Self     : in out Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Item     : Virtual_String'Class)
+   is
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Start   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Position).all;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
+         return;
+      end if;
+
+      if Handler = null then
+         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
+         Handler.Initialize (Self.Data);
+      end if;
+
+      Handler.Insert (Self.Data, Start, Item.Data, Offset);
+
+      Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
+   end Insert;
+
    --------------
    -- Is_Empty --
    --------------

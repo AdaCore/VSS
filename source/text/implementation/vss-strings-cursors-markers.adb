@@ -40,7 +40,7 @@ package body VSS.Strings.Cursors.Markers is
            (Self.Position, Start, Inserted);
 
       else
-         Self.Initialize;
+         Self.Invalidate;
          Self.Disconnect;
       end if;
    end String_Modified;

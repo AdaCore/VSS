@@ -122,7 +122,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
            (Self.Position, Start, Inserted);
 
       else
-         Self.Initialize;
+         Self.Invalidate;
          Self.Disconnect;
       end if;
    end String_Modified;

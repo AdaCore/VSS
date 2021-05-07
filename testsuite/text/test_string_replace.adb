@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,38 +20,40 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+--  with VSS.Characters;
+with VSS.Strings.Character_Iterators;
 
-project VSS_Text_Tests is
+with Test_Support;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/text");
-   for Main use ("test_character_iterators.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+procedure Test_String_Replace is
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   use type VSS.Strings.Virtual_String;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   S  : VSS.Strings.Virtual_String := "Hello, bad world!";
+   J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.First_Character;
+   J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.Last_Character;
 
-end VSS_Text_Tests;
+begin
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+
+   S.Replace (J1, J2, "good");
+
+   Test_Support.Assert (S = "Hello, good world!");
+end Test_String_Replace;

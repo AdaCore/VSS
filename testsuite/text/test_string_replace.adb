@@ -21,34 +21,39 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Markers is
+--  with VSS.Characters;
+with VSS.Strings.Character_Iterators;
 
-   pragma Preelaborate;
+with Test_Support;
 
-   type Character_Marker is
-     new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
+procedure Test_String_Replace is
 
-   type Segment_Marker is
-     new VSS.Strings.Cursors.Abstract_Segment_Cursor with private;
+   use type VSS.Strings.Virtual_String;
 
-private
+   S  : VSS.Strings.Virtual_String := "Hello, bad world!";
+   J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.First_Character;
+   J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.Last_Character;
 
-   type Character_Marker is
-     new VSS.Strings.Cursors.Character_Cursor_Base with null record;
+begin
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
+   Test_Support.Assert (J1.Forward);
 
-   overriding procedure String_Modified
-     (Self     : in out Character_Marker;
-      Start    : VSS.Implementation.Strings.Cursor;
-      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
+   Test_Support.Assert (J2.Backward);
 
-   type Segment_Marker is
-     new VSS.Strings.Cursors.Segment_Cursor_Base with null record;
+   S.Replace (J1, J2, "good");
 
-   overriding procedure String_Modified
-     (Self     : in out Segment_Marker;
-      Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
-
-end VSS.Strings.Cursors.Markers;
+   Test_Support.Assert (S = "Hello, good world!");
+end Test_String_Replace;

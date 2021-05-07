@@ -32,23 +32,96 @@ package body VSS.Implementation.String_Handlers is
    ------------
 
    procedure Append
-     (Self           : Abstract_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler : Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Suffix : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Handler  : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
-      Position : VSS.Implementation.Strings.Cursor;
-      Code     : VSS.Unicode.Code_Point;
-   begin
-      Suffix_Handler.Before_First_Character (Suffix_Data, Position);
+      use type VSS.Implementation.Strings.String_Handler_Access;
 
-      while Suffix_Handler.Forward (Suffix_Data, Position) loop
-         Code := Suffix_Handler.Element (Suffix_Data, Position);
-         Handler.Append (Data, Code);
-      end loop;
+      Handler        : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Suffix_Handler :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Suffix);
+      Position       : VSS.Implementation.Strings.Cursor;
+      Code           : VSS.Unicode.Code_Point;
+
+   begin
+      if Suffix_Handler /= null then
+         Suffix_Handler.Before_First_Character (Suffix, Position);
+
+         while Suffix_Handler.Forward (Suffix, Position) loop
+            Code := Suffix_Handler.Element (Suffix, Position);
+            Handler.Append (Data, Code, Offset);
+         end loop;
+      end if;
    end Append;
+
+   ------------------
+   -- Compute_Size --
+   ------------------
+
+   not overriding procedure Compute_Size
+     (Self   : Abstract_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Size   : out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler       : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      From_Position : VSS.Implementation.Strings.Cursor;
+      To_Position   : VSS.Implementation.Strings.Cursor;
+      Success       : Boolean with Unreferenced;
+
+   begin
+      if From.Index > To.Index then
+         Size := (0, 0, 0);
+
+      else
+         if From.UTF8_Offset < 0 or From.UTF16_Offset < 0 then
+            --  Some of UTF* offset of From must be resolved first.
+
+            Handler.Before_First_Character (Data, From_Position);
+
+            while From_Position.Index /= From.Index
+              and then Handler.Forward (Data, From_Position)
+            loop
+               null;
+            end loop;
+
+         else
+            From_Position := From;
+         end if;
+
+         if To.UTF8_Offset < 0 or To.UTF16_Offset < 0 then
+            --  Some of UTF* offset of To must be resolved first.
+
+            To_Position := From_Position;
+
+            while To_Position.Index /= To.Index
+              and then Handler.Forward (Data, To_Position)
+            loop
+               null;
+            end loop;
+
+         else
+            To_Position := To;
+         end if;
+
+         Success := Handler.Forward (Data, To_Position);
+
+         Size.Index_Offset := To_Position.Index - From_Position.Index;
+         Size.UTF8_Offset  :=
+           To_Position.UTF8_Offset - From_Position.UTF8_Offset;
+         Size.UTF16_Offset :=
+           To_Position.UTF16_Offset - From_Position.UTF16_Offset;
+      end if;
+   end Compute_Size;
 
    ---------------
    -- Ends_With --
@@ -188,6 +261,44 @@ package body VSS.Implementation.String_Handlers is
             System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
       end loop;
    end Hash;
+
+   ------------
+   -- Insert --
+   ------------
+
+   not overriding procedure Insert
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type VSS.Implementation.Strings.String_Handler_Access;
+
+      Item_Handler  :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item);
+      Item_Position : VSS.Implementation.Strings.Cursor;
+      Position      : VSS.Implementation.Strings.Cursor := From;
+      Code          : VSS.Unicode.Code_Point;
+      Success       : Boolean with Unreferenced;
+
+   begin
+      if Item_Handler = null or else Item_Handler.Is_Empty (Item) then
+         return;
+      end if;
+
+      Item_Handler.Before_First_Character (Item, Item_Position);
+
+      while Item_Handler.Forward (Item, Item_Position) loop
+         Code := Item_Handler.Element (Item, Item_Position);
+
+         VSS.Implementation.Strings.Handler (Data).Insert
+           (Data, Position, Code, Offset);
+         Success :=
+           VSS.Implementation.Strings.Handler (Data).Forward (Data, Position);
+      end loop;
+   end Insert;
 
    --------------
    -- Is_Equal --
@@ -399,9 +510,10 @@ package body VSS.Implementation.String_Handlers is
       To     : VSS.Implementation.Strings.Cursor;
       Target : out VSS.Implementation.Strings.String_Data)
    is
-      Handler  : Abstract_String_Handler'Class
+      Handler : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Current  : VSS.Implementation.Strings.Cursor;
+      Current : VSS.Implementation.Strings.Cursor;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
       if From.Index <= To.Index then
@@ -415,13 +527,13 @@ package body VSS.Implementation.String_Handlers is
          Current := From;
 
          VSS.Implementation.Strings.Handler (Target).Append
-           (Target, Handler.Element (Source, Current));
+           (Target, Handler.Element (Source, Current), Offset);
 
          while Handler.Forward (Source, Current)
            and then Current.Index <= To.Index
          loop
             VSS.Implementation.Strings.Handler (Target).Append
-              (Target, Handler.Element (Source, Current));
+              (Target, Handler.Element (Source, Current), Offset);
          end loop;
 
       else

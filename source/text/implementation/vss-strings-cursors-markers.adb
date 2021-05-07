@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,58 +21,41 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Iterators is
+package body VSS.Strings.Cursors.Markers is
 
-   pragma Preelaborate;
-
-   type Abstract_Character_Iterator is
-     abstract limited new VSS.Strings.Cursors.Abstract_Character_Cursor
-       with private;
-
-   function Forward
-     (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
-   --  Move cursor one character forward
-
-   function Backward
-     (Self : in out Abstract_Character_Iterator) return Boolean is abstract;
-   --  Move cursor one character backward
-
-   function Has_Element
-     (Self : Abstract_Character_Iterator) return Boolean is abstract;
-   --  Returns True when iterator points to the text element
-
-   type Abstract_Segment_Iterator is
-     abstract limited new VSS.Strings.Cursors.Abstract_Segment_Cursor
-       with private;
-
-   function Forward
-     (Self : in out Abstract_Segment_Iterator) return Boolean is abstract;
-   --  Move cursor to the next segment
-
-   function Has_Element
-     (Self : Abstract_Segment_Iterator) return Boolean is abstract;
-   --  Return True when iterator points to the text element
-
-private
-
-   type Abstract_Character_Iterator is
-     abstract limited new VSS.Strings.Cursors.Character_Cursor_Limited_Base
-       with null record;
+   ---------------------
+   -- String_Modified --
+   ---------------------
 
    overriding procedure String_Modified
-     (Self     : in out Abstract_Character_Iterator;
+     (Self     : in out Character_Marker;
       Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      if VSS.Implementation.Strings.Fixup_Delete
+           (Self.Position, Start, Deleted)
+      then
+         VSS.Implementation.Strings.Fixup_Insert
+           (Self.Position, Start, Inserted);
 
-   type Abstract_Segment_Iterator is
-     abstract limited new VSS.Strings.Cursors.Segment_Cursor_Limited_Base
-       with null record;
+      else
+         Self.Initialize;
+         Self.Disconnect;
+      end if;
+   end String_Modified;
+
+   ---------------------
+   -- String_Modified --
+   ---------------------
 
    overriding procedure String_Modified
-     (Self     : in out Abstract_Segment_Iterator;
+     (Self     : in out Segment_Marker;
       Start    : VSS.Implementation.Strings.Cursor;
       Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      null;
+   end String_Modified;
 
-end VSS.Strings.Cursors.Iterators;
+end VSS.Strings.Cursors.Markers;

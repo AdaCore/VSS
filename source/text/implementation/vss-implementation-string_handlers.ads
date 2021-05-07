@@ -214,20 +214,61 @@ package VSS.Implementation.String_Handlers is
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Return offset of the last UTF-16 code unit at the given position.
 
-   not overriding procedure Append
-     (Self : Abstract_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
-      Code : VSS.Unicode.Code_Point) is abstract
-     with Pre'Class => Code not in 16#D800# .. 16#DFFF#;
-   --  Append single code point to the data.
+   not overriding procedure Compute_Size
+     (Self   : Abstract_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Size   : out VSS.Implementation.Strings.Cursor_Offset);
+   --  Compute size of the given segment. All components of Size have valid
+   --  and positive values.
 
    not overriding procedure Append
-     (Self           : Abstract_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler : Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data);
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Code   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is abstract
+     with Pre'Class => Code not in 16#D800# .. 16#DFFF#;
+   --  Append single code point to the data.
+   --
+   --  Implementation must increment value of the Offset.
+
+   not overriding procedure Append
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Suffix : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append suffix string to the data.
    --  The default implementatio append string in a character by character way.
+   --
+   --  Implementation must increment value of the Offset.
+
+   not overriding procedure Insert
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is abstract;
+   --  Insert single code point into the string.
+   --
+   --  Implementation must increment value of the Offset.
+
+   not overriding procedure Insert
+     (Self   : Abstract_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
+   --  Insert string into the string.
+   --
+   --  Implementation must increment value of the Offset.
+
+   not overriding procedure Delete
+     (Self : Abstract_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+   --  Delete segment of given size starting from given position.
 
    not overriding procedure Slice
      (Self   : Abstract_String_Handler;

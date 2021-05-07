@@ -46,6 +46,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       Lower  : Ada.Streams.Stream_Element        := Self.Lower;
       Upper  : Ada.Streams.Stream_Element        := Self.Upper;
       Byte   : Ada.Streams.Stream_Element;
+      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
       if (Self.Error and Self.Flags (Stop_On_Error))
@@ -69,7 +70,9 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                case Byte is
                   when 16#00# .. 16#7F# =>
                      VSS.Implementation.Strings.Handler (Target).Append
-                       (Target, VSS.Unicode.Code_Point (Byte and 16#7F#));
+                       (Target,
+                        VSS.Unicode.Code_Point (Byte and 16#7F#),
+                        Offset);
 
                   when 16#C2# .. 16#DF# =>
                      Code := VSS.Unicode.Code_Point (Byte and 16#1F#);
@@ -105,7 +108,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
 
                      else
                         VSS.Implementation.Strings.Handler (Target).Append
-                          (Target, Replacement_Character);
+                          (Target, Replacement_Character, Offset);
                      end if;
                end case;
 
@@ -127,7 +130,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                   end if;
 
                   VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Code);
+                    (Target, Code, Offset);
 
                   <<Skip>>
 
@@ -149,7 +152,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
 
                else
                   VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Replacement_Character);
+                    (Target, Replacement_Character, Offset);
                end if;
             end if;
 

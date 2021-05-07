@@ -192,16 +192,16 @@ package VSS.Strings is
    --     Item : Virtual_String'Class);
    --  --  Prepend given string to the begin of the string.
 
-   --  procedure Insert
-   --    (Self     : in out Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     Item     : VSS.Characters.Virtual_Character);
-   --  procedure Insert
-   --    (Self     : in out Virtual_String'Class;
-   --     Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     Item     : Virtual_String'Class);
-   --  --  Inserts given item at the given position. Do nothing if the given
-   --  --  position is invalid.
+   procedure Insert
+     (Self     : in out Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Item     : VSS.Characters.Virtual_Character);
+   procedure Insert
+     (Self     : in out Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Item     : Virtual_String'Class);
+   --  Inserts given item at the given position. Do nothing if the given
+   --  position is invalid.
 
    --  function Insert
    --    (Self     : Virtual_String'Class;
@@ -214,15 +214,15 @@ package VSS.Strings is
    --  --  Inserts given item at the given position and returns result. Returns
    --  --  source string if the given position is invalid.
 
-   --  procedure Remove
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class);
+   procedure Delete
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class);
    --  procedure Remove
    --    (Self    : in out Virtual_String'Class;
    --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class);
-   --  --  Removes characters from of the string starting from given position
-   --  --  to given position.
+   --  Delete characters from of the string starting from given position
+   --  to given position.
 
    --  function Remove
    --    (Self : Virtual_String'Class;
@@ -236,25 +236,25 @@ package VSS.Strings is
    --  --  Removes characters from of the string starting from given position
    --  --  to given position and returns result.
 
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     By   : VSS.Characters.Virtual_Character);
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : VSS.Characters.Virtual_Character);
    --  procedure Replace
    --    (Self    : in out Virtual_String'Class;
    --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : VSS.Characters.Virtual_Character);
-   --  procedure Replace
-   --    (Self : in out Virtual_String'Class;
-   --     From : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
-   --     By   : Virtual_String'Class);
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : Virtual_String'Class);
    --  procedure Replace
    --    (Self    : in out Virtual_String'Class;
    --     From_To : VSS.Strings.Cursors.Abstract_Cursor'Class;
    --     By      : Virtual_String'Class);
-   --  --  Replace slice from and to given positions by given item.
+   --  Replace slice from and to given positions by given item.
 
    --  function Replace
    --    (Self : Virtual_String'Class;
@@ -335,6 +335,17 @@ private
 
    procedure Invalidate (Self : in out Referal_Base) is abstract;
 
+   procedure String_Modified
+     (Self     : in out Referal_Base;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+   --  Called when referenced string object has been modified. Start is the
+   --  position of the first character of the operation, it is state before
+   --  modification operation, thus negative UTF* offset is not valid.
+   --  Removed and Inserted parameters are sizes of the removed and inserted
+   --  segments. All their members are valid.
+
    overriding procedure Adjust (Self : in out Referal_Base);
    --  Connect new object to the string object.
 
@@ -365,6 +376,17 @@ private
    --  Disconnect referel from string object
 
    procedure Invalidate (Self : in out Referal_Limited_Base) is abstract;
+
+   procedure String_Modified
+     (Self     : in out Referal_Limited_Base;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is abstract;
+   --  Called when referenced string object has been modified. Start is the
+   --  position of the first character of the operation, it is state before
+   --  modification operation, thus negative UTF* offset is not valid.
+   --  Removed and Inserted parameters are sizes of the removed and inserted
+   --  segments. All their members are valid.
 
    overriding procedure Finalize (Self : in out Referal_Limited_Base);
    --  Invalidate referal state and disconnect from the string object.
@@ -410,6 +432,12 @@ private
    end record;
 
    overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
+
+   overriding procedure String_Modified
+     (Self     : in out Grapheme_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is null;
 
    function Handler
      (Self : Virtual_String'Class)

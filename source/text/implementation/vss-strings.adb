@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Exceptions;
+
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Strings.Cursors.Internals;
@@ -32,6 +34,17 @@ with VSS.Strings.Texts;
 package body VSS.Strings is
 
    use type VSS.Implementation.Strings.String_Handler_Access;
+
+   procedure Notify_String_Modified
+     (Self     : in out Virtual_String'Class;
+      From     : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+   --  Do notification about modification of the string. If some notification
+   --  handler raises exception it is stored, and notification continued.
+   --  First stored exception will be reraised before exit, thus call to this
+   --  subprogram should be done at the end of the body of the caller
+   --  subprogram or exception handling added to the caller subprogram.
 
    ---------
    -- "<" --
@@ -164,9 +177,15 @@ package body VSS.Strings is
    ------------
 
    overriding procedure Adjust (Self : in out Referal_Base) is
+      Owner : constant Magic_String_Access := Self.Owner;
+
    begin
-      if Self.Owner /= null then
-         Self.Connect (Self.Owner);
+      Self.Owner    := null;
+      Self.Next     := null;
+      Self.Previous := null;
+
+      if Owner /= null then
+         Self.Connect (Owner);
       end if;
    end Adjust;
 
@@ -191,19 +210,24 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character)
    is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
         Self.Handler;
+      Start   : VSS.Implementation.Strings.Cursor;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
       if Handler = null then
-         Self :=
-           To_Virtual_String
-             (Wide_Wide_String'(1 .. 1 => Wide_Wide_Character (Item)));
-
-      else
-         Handler.Append
-           (Self.Data, VSS.Characters.Virtual_Character'Pos (Item));
+         VSS.Implementation.String_Configuration.In_Place_Handler
+           .Initialize (Self.Data);
+         Handler := Self.Handler;
       end if;
+
+      Handler.After_Last_Character (Self.Data, Start);
+
+      Handler.Append
+        (Self.Data, VSS.Characters.Virtual_Character'Pos (Item), Offset);
+
+      Notify_String_Modified (Self, Start, (0, 0, 0), Offset);
    end Append;
 
    ------------
@@ -212,13 +236,29 @@ package body VSS.Strings is
 
    procedure Append
      (Self : in out Virtual_String'Class;
-      Item : Virtual_String'Class) is
+      Item : Virtual_String'Class)
+   is
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Start   : VSS.Implementation.Strings.Cursor;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+
    begin
-      if Self.Is_Empty then
-         Self := Item;
-      elsif not Item.Is_Empty then
-         Self.Handler.Append (Self.Data, Item.Handler.all, Item.Data);
+      if Item.Is_Empty then
+         return;
       end if;
+
+      if Handler = null then
+         VSS.Implementation.String_Configuration.In_Place_Handler
+           .Initialize (Self.Data);
+         Handler := Self.Handler;
+      end if;
+
+      Handler.After_Last_Character (Self.Data, Start);
+
+      Handler.Append (Self.Data, Item.Data, Offset);
+
+      Notify_String_Modified (Self, Start, (0, 0, 0), Offset);
    end Append;
 
    ---------------
@@ -302,6 +342,44 @@ package body VSS.Strings is
 
       Self.Owner := Owner;
    end Connect;
+
+   ------------
+   -- Delete --
+   ------------
+
+   procedure Delete
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
+   is
+      use type VSS.Implementation.Strings.Character_Offset;
+
+      Handler     :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          Self.Handler;
+      From_Cursor : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (From).all;
+      To_Cursor   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (To).all;
+      Size        : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+        or else not VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
+      then
+         return;
+      end if;
+
+      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Size);
+
+      if Size.Index_Offset /= 0 then
+         Handler.Delete (Self.Data, From_Cursor, Size);
+
+         Self.Notify_String_Modified (From_Cursor, Size, (0, 0, 0));
+      end if;
+   end Delete;
 
    ----------------
    -- Disconnect --
@@ -501,6 +579,72 @@ package body VSS.Strings is
         VSS.Strings.Hash_Type (VSS.Implementation.FNV_Hash.Value (Generator));
    end Hash;
 
+   ------------
+   -- Insert --
+   ------------
+
+   procedure Insert
+     (Self     : in out Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Item     : VSS.Characters.Virtual_Character)
+   is
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Start   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Position).all;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
+         return;
+      end if;
+
+      if Handler = null then
+         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
+         Handler.Initialize (Self.Data);
+      end if;
+
+      Handler.Insert
+        (Self.Data,
+         Start,
+         VSS.Characters.Virtual_Character'Pos (Item),
+         Offset);
+
+      Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
+   end Insert;
+
+   ------------
+   -- Insert --
+   ------------
+
+   procedure Insert
+     (Self     : in out Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      Item     : Virtual_String'Class)
+   is
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Start   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Position).all;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
+         return;
+      end if;
+
+      if Handler = null then
+         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
+         Handler.Initialize (Self.Data);
+      end if;
+
+      Handler.Insert (Self.Data, Start, Item.Data, Offset);
+
+      Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
+   end Insert;
+
    --------------
    -- Is_Empty --
    --------------
@@ -554,6 +698,76 @@ package body VSS.Strings is
       end return;
    end Line;
 
+   ----------------------------
+   -- Notify_String_Modified --
+   ----------------------------
+
+   procedure Notify_String_Modified
+     (Self     : in out Virtual_String'Class;
+      From     : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type Ada.Exceptions.Exception_Id;
+
+      Occurrence : Ada.Exceptions.Exception_Occurrence;
+
+   begin
+      declare
+         Current : Referal_Limited_Access := Self.Limited_Head;
+         Next    : Referal_Limited_Access;
+
+      begin
+         while Current /= null loop
+            Next := Current.Next;
+
+            begin
+               Current.String_Modified (From, Removed, Inserted);
+
+            exception
+               when X : others =>
+                  if Ada.Exceptions.Exception_Identity (Occurrence)
+                    = Ada.Exceptions.Null_Id
+                  then
+                     --  Save first raised exception only.
+
+                     Ada.Exceptions.Save_Occurrence (Occurrence, X);
+                  end if;
+            end;
+
+            Current := Next;
+         end loop;
+      end;
+
+      declare
+         Current : Referal_Access := Self.Head;
+         Next    : Referal_Access;
+
+      begin
+         while Current /= null loop
+            Next := Current.Next;
+
+            begin
+               Current.String_Modified (From, Removed, Inserted);
+
+            exception
+               when X : others =>
+                  if Ada.Exceptions.Exception_Identity (Occurrence)
+                    = Ada.Exceptions.Null_Id
+                  then
+                     --  Save first raised exception only.
+
+                     Ada.Exceptions.Save_Occurrence (Occurrence, X);
+                  end if;
+            end;
+
+            Current := Next;
+         end loop;
+      end;
+
+      Ada.Exceptions.Reraise_Occurrence (Occurrence);
+   end Notify_String_Modified;
+
    ----------
    -- Read --
    ----------
@@ -564,6 +778,94 @@ package body VSS.Strings is
    begin
       raise Program_Error with "Not implemented";
    end Read;
+
+   -------------
+   -- Replace --
+   -------------
+
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : VSS.Characters.Virtual_Character)
+   is
+      use type VSS.Implementation.Strings.Character_Offset;
+
+      Handler     :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          Self.Handler;
+      From_Cursor : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (From).all;
+      To_Cursor   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (To).all;
+      Deleted     : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted    : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+        or else not VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
+      then
+         return;
+      end if;
+
+      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Deleted);
+
+      if Deleted.Index_Offset /= 0 then
+         Handler.Delete (Self.Data, From_Cursor, Deleted);
+      end if;
+
+      Handler.Insert
+        (Self.Data,
+         From_Cursor,
+         VSS.Characters.Virtual_Character'Pos (By),
+         Inserted);
+
+      Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
+   end Replace;
+
+   -------------
+   -- Replace --
+   -------------
+
+   procedure Replace
+     (Self : in out Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      To   : VSS.Strings.Cursors.Abstract_Cursor'Class;
+      By   : Virtual_String'Class)
+   is
+      use type VSS.Implementation.Strings.Character_Offset;
+
+      Handler     :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          Self.Handler;
+      From_Cursor : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (From).all;
+      To_Cursor   : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (To).all;
+      Deleted     : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted    : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if not VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+        or else not VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
+      then
+         return;
+      end if;
+
+      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Deleted);
+
+      if Deleted.Index_Offset /= 0 then
+         Handler.Delete (Self.Data, From_Cursor, Deleted);
+      end if;
+
+      Handler.Insert (Self.Data, From_Cursor, By.Data, Inserted);
+
+      Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
+   end Replace;
 
    -----------
    -- Slice --

@@ -67,6 +67,25 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       return VSS.Characters.Virtual_Character'Val (16#00_0000#);
    end Element;
 
+   -------------
+   -- Forward --
+   -------------
+
+   overriding function Forward
+     (Self : in out Character_Iterator) return Boolean
+   is
+      Handler : constant  VSS.Implementation.Strings.String_Handler_Access
+        := (if Self.Owner = null then null
+            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
+
+   begin
+      if Handler /= null then
+         return Handler.Forward (Self.Owner.Data, Self.Position);
+      end if;
+
+      return False;
+   end Forward;
+
    -----------------
    -- Has_Element --
    -----------------
@@ -86,23 +105,26 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       return False;
    end Has_Element;
 
-   -------------
-   -- Forward --
-   -------------
+   ---------------------
+   -- String_Modified --
+   ---------------------
 
-   overriding function Forward
-     (Self : in out Character_Iterator) return Boolean
-   is
-      Handler : constant  VSS.Implementation.Strings.String_Handler_Access
-        := (if Self.Owner = null then null
-            else VSS.Implementation.Strings.Handler (Self.Owner.Data));
-
+   overriding procedure String_Modified
+     (Self     : in out Character_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
    begin
-      if Handler /= null then
-         return Handler.Forward (Self.Owner.Data, Self.Position);
-      end if;
+      if VSS.Implementation.Strings.Fixup_Delete
+           (Self.Position, Start, Deleted)
+      then
+         VSS.Implementation.Strings.Fixup_Insert
+           (Self.Position, Start, Inserted);
 
-      return False;
-   end Forward;
+      else
+         Self.Initialize;
+         Self.Disconnect;
+      end if;
+   end String_Modified;
 
 end VSS.Strings.Cursors.Iterators.Characters;

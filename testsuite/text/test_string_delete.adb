@@ -21,34 +21,41 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Markers is
+with VSS.Strings.Character_Iterators;
+with Test_Support;
 
-   pragma Preelaborate;
+procedure Test_String_Delete is
 
-   type Character_Marker is
-     new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
+   use type VSS.Strings.Character_Count;
+   use type VSS.Strings.Virtual_String;
 
-   type Segment_Marker is
-     new VSS.Strings.Cursors.Abstract_Segment_Cursor with private;
+   S     : VSS.Strings.Virtual_String := "Hello, world!";
+   J0    : constant VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.First_Character;
+   J1    : VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.First_Character;
+   J2    : VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.Last_Character;
+   J3    : constant VSS.Strings.Character_Iterators.Character_Iterator :=
+     S.Last_Character;
+   Dummy : Boolean;
 
-private
+begin
+   --  Test result of the delete operation and position of the iterators at
+   --  first and last character of the string after operation.
+   --  XXX Check for invalidation of the other iterators should be added.
 
-   type Character_Marker is
-     new VSS.Strings.Cursors.Character_Cursor_Base with null record;
+   Dummy := J1.Forward;
+   Dummy := J1.Forward;
+   Dummy := J1.Forward;
+   Dummy := J1.Forward;
+   Dummy := J1.Forward;
 
-   overriding procedure String_Modified
-     (Self     : in out Character_Marker;
-      Start    : VSS.Implementation.Strings.Cursor;
-      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+   Dummy := J2.Backward;
 
-   type Segment_Marker is
-     new VSS.Strings.Cursors.Segment_Cursor_Base with null record;
+   S.Delete (J1, J2);
 
-   overriding procedure String_Modified
-     (Self     : in out Segment_Marker;
-      Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
-
-end VSS.Strings.Cursors.Markers;
+   Test_Support.Assert (S = "Hello!");
+   Test_Support.Assert (J0.Character_Index = 1);
+   Test_Support.Assert (J3.Character_Index = 6);
+end Test_String_Delete;

@@ -47,6 +47,26 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    --  Lookup for next line. Position points to the last character of the
    --  line terminator sequence of the current line.
 
+   -------------
+   -- Forward --
+   -------------
+
+   overriding function Forward (Self : in out Line_Iterator) return Boolean is
+   begin
+      Lookup_Next_Line
+        (Self,
+         (if Self.Keep_Terminator
+            then Self.Last_Position
+            elsif VSS.Implementation.Strings.Is_Invalid
+                    (Self.Terminator_Position)
+              then Self.Last_Position
+              else Self.Terminator_Position));
+
+      return
+        Self.Owner.Character_Length
+          >= VSS.Strings.Character_Count (Self.First_Position.Index);
+   end Forward;
+
    -----------------
    -- Has_Element --
    -----------------
@@ -71,6 +91,66 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       return
         not VSS.Implementation.Strings.Is_Invalid (Self.Terminator_Position);
    end Has_Line_Terminator;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize
+     (Self            : in out Line_Iterator'Class;
+      Position        : VSS.Implementation.Strings.Cursor;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False) is
+   begin
+      Self.Terminators     := Terminators;
+      Self.Keep_Terminator := Keep_Terminator;
+
+      Lookup_Line_Boundaries (Self, Position);
+   end Initialize;
+
+   ----------------
+   -- Invalidate --
+   ----------------
+
+   overriding procedure Invalidate (Self : in out Line_Iterator) is
+   begin
+      Abstract_Segment_Iterator (Self).Invalidate;
+
+      Self.Terminator_Position := (others => <>);
+   end Invalidate;
+
+   ----------------------------
+   -- Lookup_Line_Boundaries --
+   ----------------------------
+
+   procedure Lookup_Line_Boundaries
+     (Self          : in out Line_Iterator'Class;
+      Position      : VSS.Implementation.Strings.Cursor)
+   is
+      use type VSS.Implementation.Strings.Character_Count;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Owner.Handler;
+      Current_Position    : VSS.Implementation.Strings.Cursor := Position;
+      Dummy   : Boolean;
+
+   begin
+      if Current_Position.Index /= 1 then
+         --  XXX Going backward till previos line terminator has been found,
+         --  not implemented.
+
+         raise Program_Error;
+
+      else
+         --  Self.First_Position := Current_Position;
+
+         --  Rewind to previous character.
+
+         Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
+      end if;
+
+      Lookup_Next_Line (Self, Current_Position);
+   end Lookup_Line_Boundaries;
 
    ----------------------
    -- Lookup_Next_Line --
@@ -121,85 +201,18 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       end if;
    end Lookup_Next_Line;
 
-   ----------------------------
-   -- Lookup_Line_Boundaries --
-   ----------------------------
+   ---------------------
+   -- String_Modified --
+   ---------------------
 
-   procedure Lookup_Line_Boundaries
-     (Self          : in out Line_Iterator'Class;
-      Position      : VSS.Implementation.Strings.Cursor)
-   is
-      use type VSS.Implementation.Strings.Character_Count;
-
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Owner.Handler;
-      Current_Position    : VSS.Implementation.Strings.Cursor := Position;
-      Dummy   : Boolean;
-
+   overriding procedure String_Modified
+     (Self     : in out Line_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
    begin
-      if Current_Position.Index /= 1 then
-         --  XXX Going backward till previos line terminator has been found,
-         --  not implemented.
-
-         raise Program_Error;
-
-      else
-         --  Self.First_Position := Current_Position;
-
-         --  Rewind to previous character.
-
-         Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
-      end if;
-
-      Lookup_Next_Line (Self, Current_Position);
-   end Lookup_Line_Boundaries;
-
-   -------------
-   -- Forward --
-   -------------
-
-   overriding function Forward (Self : in out Line_Iterator) return Boolean is
-   begin
-      Lookup_Next_Line
-        (Self,
-         (if Self.Keep_Terminator
-            then Self.Last_Position
-            elsif VSS.Implementation.Strings.Is_Invalid
-                    (Self.Terminator_Position)
-              then Self.Last_Position
-              else Self.Terminator_Position));
-
-      return
-        Self.Owner.Character_Length
-          >= VSS.Strings.Character_Count (Self.First_Position.Index);
-   end Forward;
-
-   ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize
-     (Self            : in out Line_Iterator'Class;
-      Position        : VSS.Implementation.Strings.Cursor;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean             := False) is
-   begin
-      Self.Terminators     := Terminators;
-      Self.Keep_Terminator := Keep_Terminator;
-
-      Lookup_Line_Boundaries (Self, Position);
-   end Initialize;
-
-   ----------------
-   -- Invalidate --
-   ----------------
-
-   overriding procedure Invalidate (Self : in out Line_Iterator) is
-   begin
-      Abstract_Segment_Iterator (Self).Invalidate;
-
-      Self.Terminator_Position := (others => <>);
-   end Invalidate;
+      null;
+   end String_Modified;
 
    ----------------------
    -- Terminator_First --
@@ -265,17 +278,6 @@ package body VSS.Strings.Cursors.Iterators.Lines is
           (Self.Owner.all, Self.Terminator_First);
    end Terminator_First_Marker;
 
-   ----------------------------------
-   -- Terminator_First_UTF8_Offset --
-   ----------------------------------
-
-   function Terminator_First_UTF8_Offset
-     (Self : Line_Iterator'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index is
-   begin
-      return First_UTF8_Offset (Self.Owner, Self.Terminator_First);
-   end Terminator_First_UTF8_Offset;
-
    -----------------------------------
    -- Terminator_First_UTF16_Offset --
    -----------------------------------
@@ -286,6 +288,17 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    begin
       return First_UTF16_Offset (Self.Owner, Self.Terminator_First);
    end Terminator_First_UTF16_Offset;
+
+   ----------------------------------
+   -- Terminator_First_UTF8_Offset --
+   ----------------------------------
+
+   function Terminator_First_UTF8_Offset
+     (Self : Line_Iterator'Class)
+      return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      return First_UTF8_Offset (Self.Owner, Self.Terminator_First);
+   end Terminator_First_UTF8_Offset;
 
    ---------------------
    -- Terminator_Last --
@@ -335,19 +348,6 @@ package body VSS.Strings.Cursors.Iterators.Lines is
           (Self.Owner.all, Self.Terminator_Last);
    end Terminator_Last_Marker;
 
-   ---------------------------------
-   -- Terminator_Last_UTF8_Offset --
-   ---------------------------------
-
-   function Terminator_Last_UTF8_Offset
-     (Self : Line_Iterator'Class)
-      return VSS.Unicode.UTF8_Code_Unit_Index is
-   begin
-      raise Program_Error;
-      --  XXX Not implemented.
-      return 0;
-   end Terminator_Last_UTF8_Offset;
-
    ----------------------------------
    -- Terminator_Last_UTF16_Offset --
    ----------------------------------
@@ -360,5 +360,18 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       --  XXX Not implemented.
       return 0;
    end Terminator_Last_UTF16_Offset;
+
+   ---------------------------------
+   -- Terminator_Last_UTF8_Offset --
+   ---------------------------------
+
+   function Terminator_Last_UTF8_Offset
+     (Self : Line_Iterator'Class)
+      return VSS.Unicode.UTF8_Code_Unit_Index is
+   begin
+      raise Program_Error;
+      --  XXX Not implemented.
+      return 0;
+   end Terminator_Last_UTF8_Offset;
 
 end VSS.Strings.Cursors.Iterators.Lines;

@@ -221,32 +221,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
    end Allocate;
 
    ------------
-   -- Mutate --
-   ------------
-
-   procedure Mutate
-     (Data     : in out UTF8_String_Data_Access;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
-   begin
-      if Data = null then
-         Data := Allocate (Capacity, Size);
-
-      elsif not System.Atomic_Counters.Is_One (Data.Counter)
-        or else Size > Data.Bulk
-      then
-         Reallocate (Data, Capacity, Size);
-      end if;
-   end Mutate;
-
-   ------------
    -- Append --
    ------------
 
    overriding procedure Append
-     (Self : UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
-      Code : VSS.Unicode.Code_Point)
+     (Self   : UTF8_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Code   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       Destination : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -258,6 +240,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    begin
       VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+      Offset.Index_Offset := Offset.Index_Offset + 1;
+      Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
+      Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
 
       Mutate
         (Destination,
@@ -288,50 +274,62 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self           : UTF8_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler :
-       VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+     (Self   : UTF8_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Suffix : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
+      use type VSS.Implementation.Strings.String_Handler_Access;
+
       Parent : VSS.Implementation.String_Handlers.Abstract_String_Handler
         renames VSS.Implementation.String_Handlers.Abstract_String_Handler
                  (Self);
-
-      Source : UTF8_String_Data_Access
+      Source         : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
+      Suffix_Handler :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Suffix);
+
    begin
-      if Suffix_Handler in UTF8_In_Place_String_Handler then
+      if Suffix_Handler = null then
+         return;
+
+      elsif Suffix_Handler.all in UTF8_In_Place_String_Handler then
          --  When suffix is "in place", we can use its size to calculate
          --  result size in advance.
          declare
-            Suffix : UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Suffix_Data'Address;
+            Suffix_Data : UTF8_In_Place_Data
+              with Import, Convention => Ada, Address => Suffix'Address;
+
          begin
             Mutate
               (Source,
                VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
-               Source.Size + VSS.Unicode.UTF8_Code_Unit_Count (Suffix.Size));
+               Source.Size
+                 + VSS.Unicode.UTF8_Code_Unit_Count (Suffix_Data.Size));
 
             --  Copy character by character
-            Parent.Append (Data, Suffix_Handler, Suffix_Data);
+            Parent.Append (Data, Suffix, Offset);
          end;
 
-      elsif Suffix_Handler not in UTF8_String_Handler then
+      elsif Suffix_Handler.all not in UTF8_String_Handler then
          --  No other optimization is possible here, copy character by
          --  character
-         Parent.Append (Data, Suffix_Handler, Suffix_Data);
+         Parent.Append (Data, Suffix, Offset);
 
       else  --  Both Data and suffix are not "in place"
 
          declare
-            Suffix : UTF8_String_Data_Access
+            use type VSS.Unicode.UTF8_Code_Unit;
+
+            Suffix_Data : UTF8_String_Data_Access
               with Import,
                 Convention => Ada,
-                Address => Suffix_Data.Pointer'Address;
-
-            New_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-              Source.Size + Suffix.Size;
+                Address    => Suffix.Pointer'Address;
+            New_Size    : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              Source.Size + Suffix_Data.Size;
+            UTF16_Size  : VSS.Unicode.UTF16_Code_Unit_Offset :=
+              VSS.Unicode.UTF16_Code_Unit_Offset (Suffix_Data.Length);
 
          begin
             Mutate
@@ -339,11 +337,22 @@ package body VSS.Implementation.UTF8_String_Handlers is
                VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
                New_Size);
 
-            Source.Storage (Source.Size .. New_Size) :=
-              Suffix.Storage (0 .. Suffix.Size);
+            for J in 0 .. Suffix_Data.Size loop
+               Source.Storage (Source.Size + J) := Suffix_Data.Storage (J);
+
+               if (Suffix_Data.Storage (J) and 2#1111_1000#)
+                 = 2#1111_0000#
+               then
+                  UTF16_Size := UTF16_Size + 1;
+               end if;
+            end loop;
 
             Source.Size := New_Size;
-            Source.Length := Source.Length + Suffix.Length;
+            Source.Length := Source.Length + Suffix_Data.Length;
+
+            Offset.Index_Offset := Offset.Index_Offset + Suffix_Data.Length;
+            Offset.UTF8_Offset  := Offset.UTF8_Offset + Suffix_Data.Size;
+            Offset.UTF16_Offset := Offset.UTF16_Offset + UTF16_Size;
          end;
       end if;
    end Append;
@@ -353,9 +362,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self : UTF8_In_Place_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
-      Code : VSS.Unicode.Code_Point)
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Code   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       use type Interfaces.Unsigned_8;
 
@@ -369,6 +379,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    begin
       VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+      Offset.Index_Offset := Offset.Index_Offset + 1;
+      Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
+      Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
 
       if Destination.Size + Interfaces.Unsigned_8 (L)
            < Destination.Storage'Length
@@ -444,66 +458,88 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self           : UTF8_In_Place_String_Handler;
-      Data           : in out VSS.Implementation.Strings.String_Data;
-      Suffix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      Suffix : VSS.Implementation.Strings.String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
       Parent : VSS.Implementation.String_Handlers.Abstract_String_Handler
         renames VSS.Implementation.String_Handlers.Abstract_String_Handler
                  (Self);
 
-      Source : UTF8_In_Place_Data
+      Source         : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
+      Suffix_Handler :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Suffix);
+
    begin
-      if Suffix_Handler in UTF8_String_Handler then
+      if Suffix_Handler.all in UTF8_String_Handler then
          --  The Suffix isn't storred "in place", so the result can't be stored
          --  "in place" neither. Let's convert it into a shared data and then
          --  process as "in heap" string.
 
          declare
-            Suffix : UTF8_String_Data_Access
+            Suffix_Data : UTF8_String_Data_Access
               with Import,
                 Convention => Ada,
-                Address => Suffix_Data.Pointer'Address;
+                Address    => Suffix.Pointer'Address;
+
          begin
             Copy_To_Heap
               (Data,
                VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
-               VSS.Unicode.UTF8_Code_Unit_Count (Source.Size) + Suffix.Size);
+               VSS.Unicode.UTF8_Code_Unit_Count (Source.Size)
+                 + Suffix_Data.Size);
 
-            Suffix_Handler.Append (Data, Suffix_Handler, Suffix_Data);
+            Suffix_Handler.Append (Data, Suffix, Offset);
          end;
 
-      elsif Suffix_Handler not in UTF8_In_Place_String_Handler then
+      elsif Suffix_Handler.all not in UTF8_In_Place_String_Handler then
          --  Can't optimize, use char-by-char append
-         Parent.Append (Data, Suffix_Handler, Suffix_Data);
+         Parent.Append (Data, Suffix, Offset);
 
       else  --  Both Data and suffix are "in place"
          declare
             use type Interfaces.Unsigned_8;
+            use type VSS.Unicode.UTF8_Code_Unit;
 
-            Old_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+            Suffix_Data : UTF8_In_Place_Data
+              with Import, Convention => Ada, Address => Suffix'Address;
+
+            Suffix_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              VSS.Unicode.UTF8_Code_Unit_Count (Suffix_Data.Size);
+            Old_Size    : constant VSS.Unicode.UTF8_Code_Unit_Count :=
               VSS.Unicode.UTF8_Code_Unit_Count (Source.Size);
-
-            Suffix : UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Suffix_Data'Address;
-
-            New_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-              Old_Size + VSS.Unicode.UTF8_Code_Unit_Count (Suffix.Size);
+            New_Size    : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              Old_Size + Suffix_Size;
+            UTF16_Size  : VSS.Unicode.UTF16_Code_Unit_Offset :=
+              VSS.Unicode.UTF16_Code_Unit_Offset (Suffix_Data.Length);
 
          begin
             if New_Size < Source.Storage'Length then
                --  There is enough space to store data in place.
 
-               Source.Length := Source.Length + Suffix.Length;
+               Source.Length := Source.Length + Suffix_Data.Length;
 
-               Source.Storage (Old_Size .. New_Size) :=
-                 Suffix.Storage
-                   (0 .. VSS.Unicode.UTF8_Code_Unit_Count (Suffix.Size));
+               for J in 0 .. Suffix_Size loop
+                  Source.Storage (Old_Size + J) := Suffix_Data.Storage (J);
+
+                  if (Suffix_Data.Storage (J) and 2#1111_1000#)
+                    = 2#1111_0000#
+                  then
+                     UTF16_Size := UTF16_Size + 1;
+                  end if;
+               end loop;
 
                Source.Size := Interfaces.Unsigned_8 (New_Size);
+
+               Offset.Index_Offset :=
+                 Offset.Index_Offset
+                   + VSS.Implementation.Strings.Character_Count
+                       (Suffix_Data.Length);
+               Offset.UTF8_Offset  := Offset.UTF8_Offset + Suffix_Size;
+               Offset.UTF16_Offset := Offset.UTF16_Offset + UTF16_Size;
 
             else
                --  Data can't be stored "in place" and need to be converted
@@ -516,8 +552,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
                --  Copy character by character
                VSS.Implementation.String_Handlers.Abstract_String_Handler
-                 (Global_UTF8_String_Handler).Append
-                   (Data, Suffix_Handler, Suffix_Data);
+                 (Global_UTF8_String_Handler).Append (Data, Suffix, Offset);
             end if;
          end;
       end if;
@@ -624,6 +659,65 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Handler  => Global_UTF8_String_Handler'Access,
          Pointer  => Destination.all'Address);
    end Copy_To_Heap;
+
+   ------------
+   -- Delete --
+   ------------
+
+   overriding procedure Delete
+     (Self : UTF8_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset)
+   is
+      Source   : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+      New_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
+        Source.Size - Size.UTF8_Offset;
+
+   begin
+      if Size.Index_Offset = 0 then
+         return;
+      end if;
+
+      Source.Storage (From.UTF8_Offset .. New_Size) :=
+        Source.Storage (From.UTF8_Offset + Size.UTF8_Offset .. Source.Size);
+
+      Source.Length := Source.Length - Size.Index_Offset;
+      Source.Size   := New_Size;
+   end Delete;
+
+   ------------
+   -- Delete --
+   ------------
+
+   overriding procedure Delete
+     (Self : UTF8_In_Place_String_Handler;
+      Data : in out VSS.Implementation.Strings.String_Data;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type Interfaces.Unsigned_8;
+
+      Source   : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+      New_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
+        VSS.Unicode.UTF8_Code_Unit_Offset (Source.Size) - Size.UTF8_Offset;
+
+   begin
+      if Size.Index_Offset = 0 then
+         return;
+      end if;
+
+      Source.Storage (From.UTF8_Offset .. New_Size) :=
+        Source.Storage
+          (From.UTF8_Offset + Size.UTF8_Offset
+             .. VSS.Unicode.UTF8_Code_Unit_Offset (Source.Size));
+
+      Source.Length :=
+        Source.Length - Interfaces.Unsigned_8 (Size.Index_Offset);
+      Source.Size   := Interfaces.Unsigned_8 (New_Size);
+   end Delete;
 
    -------------
    -- Element --
@@ -1078,6 +1172,167 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end;
    end Initialize;
 
+   ------------
+   -- Insert --
+   ------------
+
+   overriding procedure Insert
+     (Self   : UTF8_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      Destination : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      U1          : VSS.Unicode.UTF8_Code_Unit;
+      U2          : VSS.Unicode.UTF8_Code_Unit;
+      U3          : VSS.Unicode.UTF8_Code_Unit;
+      U4          : VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      if VSS.Implementation.Strings.Is_Invalid (From) then
+         return;
+      end if;
+
+      VSS.Implementation.UTF8_Encoding.Encode (Item, L, U1, U2, U3, U4);
+
+      Offset.Index_Offset := Offset.Index_Offset + 1;
+      Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
+      Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
+
+      Mutate
+        (Destination,
+         VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
+         (if Destination = null then 0 else Destination.Size) + L);
+
+      Destination.Storage
+        (From.UTF8_Offset + L .. Destination.Size + L) :=
+           Destination.Storage (From.UTF8_Offset .. Destination.Size);
+
+      Destination.Storage (From.UTF8_Offset) := U1;
+
+      if L >= 2 then
+         Destination.Storage (From.UTF8_Offset + 1) := U2;
+
+         if L >= 3 then
+            Destination.Storage (From.UTF8_Offset + 2) := U3;
+
+            if L = 4 then
+               Destination.Storage (From.UTF8_Offset + 3) := U4;
+            end if;
+         end if;
+      end if;
+
+      Destination.Size := Destination.Size + L;
+      Destination.Length := Destination.Length + 1;
+      Destination.Storage (Destination.Size) := 16#00#;
+   end Insert;
+
+   ------------
+   -- Insert --
+   ------------
+
+   overriding procedure Insert
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : in out VSS.Implementation.Strings.String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type Interfaces.Unsigned_8;
+
+      Destination  : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+      Initial_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+        VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size);
+
+      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      U1          : VSS.Unicode.UTF8_Code_Unit;
+      U2          : VSS.Unicode.UTF8_Code_Unit;
+      U3          : VSS.Unicode.UTF8_Code_Unit;
+      U4          : VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      if VSS.Implementation.Strings.Is_Invalid (From) then
+         return;
+      end if;
+
+      VSS.Implementation.UTF8_Encoding.Encode (Item, L, U1, U2, U3, U4);
+
+      Offset.Index_Offset := Offset.Index_Offset + 1;
+      Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
+      Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
+
+      if Destination.Size + Interfaces.Unsigned_8 (L)
+           < Destination.Storage'Length
+      then
+         --  There is enough space to store data in place.
+
+         Destination.Storage
+           (From.UTF8_Offset + L .. Initial_Size + L) :=
+              Destination.Storage (From.UTF8_Offset .. Initial_Size);
+
+         Destination.Storage (From.UTF8_Offset) := U1;
+
+         if L >= 2 then
+            Destination.Storage (From.UTF8_Offset + 1) := U2;
+
+            if L >= 3 then
+               Destination.Storage (From.UTF8_Offset + 2) := U3;
+
+               if L = 4 then
+                  Destination.Storage (From.UTF8_Offset + 3) := U4;
+               end if;
+            end if;
+         end if;
+
+         Destination.Size := Destination.Size + Interfaces.Unsigned_8 (L);
+         Destination.Length := Destination.Length + 1;
+         Destination.Storage
+           (VSS.Unicode.UTF8_Code_Unit_Count (Destination.Size)) := 16#00#;
+
+      else
+         --  Data can't be stored "in place" and need to be converted into
+         --  shared data.
+
+         Copy_To_Heap
+           (Data,
+            VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
+            Initial_Size + L);
+
+         declare
+            Destination : UTF8_String_Data_Access
+              with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+         begin
+            Destination.Storage
+              (From.UTF8_Offset + L .. Destination.Size + L) :=
+               Destination.Storage (From.UTF8_Offset .. Destination.Size);
+
+            Destination.Storage (From.UTF8_Offset) := U1;
+
+            if L >= 2 then
+               Destination.Storage (From.UTF8_Offset + 1) := U2;
+
+               if L >= 3 then
+                  Destination.Storage (From.UTF8_Offset + 2) := U3;
+
+                  if L = 4 then
+                     Destination.Storage (From.UTF8_Offset + 3) := U4;
+                  end if;
+               end if;
+            end if;
+
+            Destination.Size := Destination.Size + L;
+            Destination.Length := Destination.Length + 1;
+            Destination.Storage (Destination.Size) := 16#00#;
+         end;
+      end if;
+   end Insert;
+
    --------------
    -- Is_Empty --
    --------------
@@ -1141,6 +1396,25 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       return VSS.Implementation.Strings.Character_Count (Source.Length);
    end Length;
+
+   ------------
+   -- Mutate --
+   ------------
+
+   procedure Mutate
+     (Data     : in out UTF8_String_Data_Access;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
+   begin
+      if Data = null then
+         Data := Allocate (Capacity, Size);
+
+      elsif not System.Atomic_Counters.Is_One (Data.Counter)
+        or else Size > Data.Bulk
+      then
+         Reallocate (Data, Capacity, Size);
+      end if;
+   end Mutate;
 
    ----------------
    -- Reallocate --

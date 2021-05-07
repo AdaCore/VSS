@@ -40,6 +40,12 @@ private
 
    type Character_Iterator is new Abstract_Character_Iterator with null record;
 
+   overriding procedure String_Modified
+     (Self     : in out Character_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Deleted  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+
    overriding function Backward
      (Self : in out Character_Iterator) return Boolean;
 

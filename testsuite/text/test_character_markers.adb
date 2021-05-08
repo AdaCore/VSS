@@ -26,6 +26,8 @@ with Ada.Containers.Vectors;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Markers;
 
+with Test_Support;
+
 procedure Test_Character_Markers is
    use type VSS.Strings.Character_Count;
 
@@ -47,23 +49,13 @@ procedure Test_Character_Markers is
    begin
       S1.Append ("world");
 
-      if M11.Character_Index /= 1 then
-         raise Program_Error;
-      end if;
-
-      if M12.Character_Index /= 7 then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (M11.Character_Index = 1);
+      Test_Support.Assert (M12.Character_Index = 7);
 
       S1.Append ('!');
 
-      if M11.Character_Index /= 1 then
-         raise Program_Error;
-      end if;
-
-      if M12.Character_Index /= 7 then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (M11.Character_Index = 1);
+      Test_Support.Assert (M12.Character_Index = 7);
    end Test_Append;
 
    -----------------
@@ -88,54 +80,23 @@ procedure Test_Character_Markers is
         S2.Last_Character.Marker;
 
    begin
-      if not J1.Forward then
-         raise Program_Error;
-      end if;
-
-      if M11.Character_Index /= 1 then
-         raise Program_Error;
-      end if;
-
-      if M12.Character_Index /= 2 then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (J1.Forward);
+      Test_Support.Assert (M11.Character_Index = 1);
+      Test_Support.Assert (M12.Character_Index = 2);
 
       S1.Insert (J1, 'B');
 
-      if M11.Character_Index /= 1 then
-         raise Program_Error;
-      end if;
-
-      if M12.Character_Index /= 3 then
-         raise Program_Error;
-      end if;
-
-      if not J2.Forward then
-         raise Program_Error;
-      end if;
-
-      if not J2.Forward then
-         raise Program_Error;
-      end if;
-
-      if M21.Character_Index /= 1 then
-         raise Program_Error;
-      end if;
-
-      if M22.Character_Index /= 26 then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (M11.Character_Index = 1);
+      Test_Support.Assert (M12.Character_Index = 3);
+      Test_Support.Assert (J2.Forward);
+      Test_Support.Assert (J2.Forward);
+      Test_Support.Assert (M21.Character_Index = 1);
+      Test_Support.Assert (M22.Character_Index = 26);
 
       S2.Insert (J2, '1');
 
-      if M21.Character_Index /= 1 then
-         raise Program_Error;
-      end if;
-
-      if M22.Character_Index /= 27 then
-         raise Program_Error;
-      end if;
-
+      Test_Support.Assert (M21.Character_Index = 1);
+      Test_Support.Assert (M22.Character_Index = 27);
    end Test_Insert;
 
    -------------------------------

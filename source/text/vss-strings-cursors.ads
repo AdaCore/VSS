@@ -34,6 +34,11 @@ package VSS.Strings.Cursors is
 
    type Abstract_Cursor is limited interface;
 
+   function Is_Valid (Self : Abstract_Cursor) return Boolean is abstract;
+   --  Return True when cursor is valid: it points to some logical element
+   --  in the string, including logical element before the string and after
+   --  the string when applicable.
+
    function First_Marker
      (Self : Abstract_Cursor)
       return VSS.Strings.Cursors.Markers.Character_Marker is abstract;
@@ -113,6 +118,8 @@ private
 
    overriding procedure Invalidate (Self : in out Character_Cursor_Base);
 
+   overriding function Is_Valid (Self : Character_Cursor_Base) return Boolean;
+
    overriding function First_Marker
      (Self : Character_Cursor_Base)
       return VSS.Strings.Cursors.Markers.Character_Marker;
@@ -154,6 +161,9 @@ private
 
    overriding procedure Invalidate
      (Self : in out Character_Cursor_Limited_Base);
+
+   overriding function Is_Valid
+     (Self : Character_Cursor_Limited_Base) return Boolean;
 
    overriding function First_Marker
      (Self : Character_Cursor_Limited_Base)
@@ -201,6 +211,8 @@ private
 
    overriding procedure Invalidate (Self : in out Segment_Cursor_Base);
 
+   overriding function Is_Valid (Self : Segment_Cursor_Base) return Boolean;
+
    overriding function First_Marker
      (Self : Segment_Cursor_Base)
       return VSS.Strings.Cursors.Markers.Character_Marker;
@@ -246,6 +258,9 @@ private
    end record;
 
    overriding procedure Invalidate (Self : in out Segment_Cursor_Limited_Base);
+
+   overriding function Is_Valid
+     (Self : Segment_Cursor_Limited_Base) return Boolean;
 
    overriding function First_Marker
      (Self : Segment_Cursor_Limited_Base)

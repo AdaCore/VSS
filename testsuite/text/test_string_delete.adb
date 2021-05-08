@@ -43,7 +43,6 @@ procedure Test_String_Delete is
 begin
    --  Test result of the delete operation and position of the iterators at
    --  first and last character of the string after operation.
-   --  XXX Check for invalidation of the other iterators should be added.
 
    Dummy := J1.Forward;
    Dummy := J1.Forward;
@@ -57,5 +56,7 @@ begin
 
    Test_Support.Assert (S = "Hello!");
    Test_Support.Assert (J0.Character_Index = 1);
+   Test_Support.Assert (not J1.Is_Valid);
+   Test_Support.Assert (not J2.Is_Valid);
    Test_Support.Assert (J3.Character_Index = 6);
 end Test_String_Delete;

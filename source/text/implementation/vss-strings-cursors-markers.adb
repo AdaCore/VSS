@@ -23,6 +23,15 @@
 
 package body VSS.Strings.Cursors.Markers is
 
+   --------------
+   -- Is_Valid --
+   --------------
+
+   overriding function Is_Valid (Self : Character_Marker) return Boolean is
+   begin
+      return Character_Cursor_Base (Self).Is_Valid;
+   end Is_Valid;
+
    ---------------------
    -- String_Modified --
    ---------------------

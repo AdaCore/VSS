@@ -103,6 +103,11 @@ package VSS.Strings.Cursors is
    type Abstract_Segment_Cursor is limited interface and Abstract_Cursor;
    --  Cursor that points to some segment of the string.
 
+   function Character_Length
+     (Self : Abstract_Segment_Cursor)
+      return VSS.Strings.Character_Count is abstract;
+   --  Length of the segment in characters.
+
 private
 
    ---------------------------
@@ -245,6 +250,9 @@ private
      (Self : Segment_Cursor_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index;
 
+   overriding function Character_Length
+     (Self : Segment_Cursor_Base) return VSS.Strings.Character_Count;
+
    ---------------------------------
    -- Segment_Cursor_Limited_Base --
    ---------------------------------
@@ -293,6 +301,9 @@ private
    overriding function Last_UTF16_Offset
      (Self : Segment_Cursor_Limited_Base)
       return VSS.Unicode.UTF16_Code_Unit_Index;
+
+   overriding function Character_Length
+     (Self : Segment_Cursor_Limited_Base) return VSS.Strings.Character_Count;
 
    ---------------
    -- Utilities --

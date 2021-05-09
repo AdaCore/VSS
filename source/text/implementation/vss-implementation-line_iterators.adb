@@ -34,6 +34,273 @@ package body VSS.Implementation.Line_Iterators is
    Line_Separator      : constant VSS.Unicode.Code_Point := 16#00_2028#;
    Paragraph_Separator : constant VSS.Unicode.Code_Point := 16#00_2029#;
 
+   --------------
+   -- Backward --
+   --------------
+
+   function Backward
+     (Data                : VSS.Implementation.Strings.String_Data;
+      Terminators         : VSS.Strings.Line_Terminator_Set;
+      Initial_Position    : VSS.Implementation.Strings.Cursor;
+      First_Position      : out VSS.Implementation.Strings.Cursor;
+      Last_Position       : out VSS.Implementation.Strings.Cursor;
+      Terminator_Position : out VSS.Implementation.Strings.Cursor)
+      return Boolean
+   is
+      use type VSS.Unicode.Code_Point;
+
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        VSS.Implementation.Strings.Handler (Data);
+
+      Current_Position : VSS.Implementation.Strings.Cursor := Initial_Position;
+      Aux_Position     : VSS.Implementation.Strings.Cursor;
+      LF_Found         : Boolean := False;
+      Dummy            : Boolean;
+
+   begin
+      if not Handler.Backward (Data, Current_Position) then
+         --  There is no any characters before initial position.
+
+         First_Position      := (others => <>);
+         Last_Position       := (others => <>);
+         Terminator_Position := (others => <>);
+
+         return False;
+      end if;
+
+      Last_Position       := Current_Position;
+      First_Position      := Current_Position;
+      Terminator_Position := (others => <>);
+
+      declare
+         C : constant VSS.Unicode.Code_Point :=
+           Handler.Element (Data, Current_Position);
+
+      begin
+         case C is
+            when Line_Feed =>
+               if Terminators (VSS.Strings.CRLF) then
+                  --  Set flag to check for CR prefix when CRLF line
+                  --  termination sequence is enabled. First position
+                  --  and terminator's position will be set later in this
+                  --  case.
+
+                  LF_Found := True;
+               end if;
+
+               if Terminators (VSS.Strings.LF) then
+                  --  Set first position and terminator position when LF only
+                  --  line termination sequence is enabled.
+
+                  First_Position      := Current_Position;
+                  Terminator_Position := Current_Position;
+
+               elsif not Terminators (VSS.Strings.CRLF) then
+                  Current_Position := Initial_Position;
+               end if;
+
+            when Line_Tabulation =>
+               if Terminators (VSS.Strings.VT) then
+                  First_Position      := Current_Position;
+                  Terminator_Position := Current_Position;
+
+               else
+                  Current_Position := Initial_Position;
+               end if;
+
+            when Form_Feed =>
+               if Terminators (VSS.Strings.FF) then
+                  First_Position      := Current_Position;
+                  Terminator_Position := Current_Position;
+
+               else
+                  Current_Position := Initial_Position;
+               end if;
+
+            when Carriage_Return =>
+               if Terminators (VSS.Strings.CR) then
+                  First_Position      := Current_Position;
+                  Terminator_Position := Current_Position;
+
+               else
+                  Current_Position := Initial_Position;
+               end if;
+
+            when Next_Line =>
+               if Terminators (VSS.Strings.NEL) then
+                  First_Position      := Current_Position;
+                  Terminator_Position := Current_Position;
+
+               else
+                  Current_Position := Initial_Position;
+               end if;
+
+            when Line_Separator =>
+               if Terminators (VSS.Strings.LS) then
+                  First_Position      := Current_Position;
+                  Terminator_Position := Current_Position;
+
+               else
+                  Current_Position := Initial_Position;
+               end if;
+
+            when Paragraph_Separator =>
+               if Terminators (VSS.Strings.PS) then
+                  First_Position      := Current_Position;
+                  Terminator_Position := Current_Position;
+
+               else
+                  Current_Position := Initial_Position;
+               end if;
+
+            when others =>
+               Current_Position := Initial_Position;
+         end case;
+      end;
+
+      if LF_Found then
+         Aux_Position := Current_Position;
+
+         if Handler.Backward (Data, Aux_Position) then
+            if Handler.Element (Data, Aux_Position) = Carriage_Return then
+               Current_Position    := Aux_Position;
+               First_Position      := Aux_Position;
+               Terminator_Position := Aux_Position;
+            end if;
+         end if;
+      end if;
+
+      LF_Found := False;
+
+      while Handler.Backward (Data, Current_Position) loop
+         declare
+            C : constant VSS.Unicode.Code_Point :=
+              Handler.Element (Data, Current_Position);
+            D : Boolean with Unreferenced;
+
+         begin
+            case C is
+               when Line_Feed =>
+                  if Terminators (VSS.Strings.LF) then
+                     --  LF_Found := True;
+                     --  First_Position := Current_Position;
+                     --  D := Handler.Forward (Data, First_Position);
+
+                     exit;
+
+                  elsif Terminators (VSS.Strings.CRLF) then
+                     raise Program_Error;
+
+                  else
+                     raise Program_Error;
+                  end if;
+
+                  --  if Terminators (VSS.Strings.CRLF) then
+                  --     LF_Found := True;
+                  --     First_Position := Current_Position;
+                  --     D := Handler.Forward (Data, First_Position);
+                  --
+                  --  elsif Terminators (VSS.Strings.LF) then
+                  --     raise Program_Error;
+                  --  else
+                  --     raise Program_Error;
+                  --  end if;
+
+               when Line_Tabulation =>
+                  if Terminators (VSS.Strings.VT) then
+                     --  First_Position := Current_Position;
+                     --  D := Handler.Forward (Data, First_Position);
+                     --
+                     --  return True;
+                     exit;
+
+                  else
+                     --  LF_Found := False;
+                     if LF_Found then
+                        raise Program_Error;
+                     end if;
+                  end if;
+
+               when Form_Feed =>
+                  if Terminators (VSS.Strings.FF) then
+                  --     First_Position := Current_Position;
+                  --     D := Handler.Forward (Data, First_Position);
+                  --
+                  --     --  return True;
+                     exit;
+                  else
+                     if LF_Found then
+                        raise Program_Error;
+                     end if;
+                  end if;
+
+               when Carriage_Return =>
+                  if Terminators (VSS.Strings.CR) then
+                     --  First_Position := Current_Position;
+                     --  D := Handler.Forward (Data, First_Position);
+                     --
+                     --  return True;
+                     exit;
+
+                  else
+                     raise Program_Error;
+                  end if;
+
+               when Next_Line =>
+                  if Terminators (VSS.Strings.NEL) then
+                     First_Position := Current_Position;
+                     D := Handler.Forward (Data, First_Position);
+
+                     exit;
+
+                  else
+                     raise Program_Error;
+                  end if;
+
+               when Line_Separator =>
+                  if Terminators (VSS.Strings.LS) then
+                     --  First_Position := Current_Position;
+                     --  D := Handler.Forward (Data, First_Position);
+                     --
+                     exit;
+
+                  else
+                     if LF_Found then
+                        raise Program_Error;
+                     end if;
+                  end if;
+
+               when Paragraph_Separator =>
+                  if Terminators (VSS.Strings.PS) then
+                     --  First_Position := Current_Position;
+                     --  D := Handler.Forward (Data, First_Position);
+                     --
+                     exit;
+
+                  else
+                     raise Program_Error;
+                  end if;
+
+               when others =>
+                  if LF_Found then
+                     raise Program_Error;
+                  end if;
+                  --  if LF_Found then
+                  --     return True;
+                  --  end if;
+            end case;
+
+            First_Position := Current_Position;
+         end;
+      end loop;
+
+      if LF_Found then
+         raise Program_Error;
+      end if;
+
+      return True;
+   end Backward;
+
    -------------
    -- Forward --
    -------------

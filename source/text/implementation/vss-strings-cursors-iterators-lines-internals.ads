@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.Strings;
+
 package VSS.Strings.Cursors.Iterators.Lines.Internals is
 
    pragma Preelaborate;
@@ -30,6 +32,15 @@ package VSS.Strings.Cursors.Iterators.Lines.Internals is
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean             := False)
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
-   --  Return character iterator pointing to the first line in the string
+   --  Return line iterator pointing to the first line in the string.
+
+   function Line
+     (Self            : Virtual_String'Class;
+      Position        : VSS.Implementation.Strings.Cursor;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+   --  Return line iterator pointing to the line containing given position
+   --  in the string.
 
 end VSS.Strings.Cursors.Iterators.Lines.Internals;

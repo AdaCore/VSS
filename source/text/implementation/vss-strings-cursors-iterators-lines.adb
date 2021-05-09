@@ -47,6 +47,12 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    --  Lookup for next line. Position points to the last character of the
    --  line terminator sequence of the current line.
 
+   procedure Lookup_Previous_Line
+     (Self     : in out Line_Iterator'Class;
+      Position : VSS.Implementation.Strings.Cursor);
+   --  Lookup for previous line. Position points to the first character of
+   --  the line of the current line.
+
    -------------
    -- Forward --
    -------------
@@ -98,10 +104,12 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
    procedure Initialize
      (Self            : in out Line_Iterator'Class;
+      String          : Virtual_String'Class;
       Position        : VSS.Implementation.Strings.Cursor;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean             := False) is
    begin
+      Self.Connect (String'Unrestricted_Access);
       Self.Terminators     := Terminators;
       Self.Keep_Terminator := Keep_Terminator;
 
@@ -136,14 +144,14 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
    begin
       if Current_Position.Index /= 1 then
-         --  XXX Going backward till previos line terminator has been found,
-         --  not implemented.
+         --  Going backward till previos line terminator has been found.
 
-         raise Program_Error;
+         Dummy := Handler.Forward (Self.Owner.Data, Current_Position);
+         Lookup_Previous_Line (Self, Current_Position);
+         Current_Position := Self.First_Position;
+         Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
 
       else
-         --  Self.First_Position := Current_Position;
-
          --  Rewind to previous character.
 
          Dummy := Handler.Backward (Self.Owner.Data, Current_Position);
@@ -200,6 +208,49 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Self.Terminator_Position := Last_Position;
       end if;
    end Lookup_Next_Line;
+
+   --------------------------
+   -- Lookup_Previous_Line --
+   --------------------------
+
+   procedure Lookup_Previous_Line
+     (Self     : in out Line_Iterator'Class;
+      Position : VSS.Implementation.Strings.Cursor)
+   is
+      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Owner.Handler;
+
+      Last_Position       : VSS.Implementation.Strings.Cursor;
+      Terminator_Position : VSS.Implementation.Strings.Cursor;
+      Dummy               : Boolean;
+
+   begin
+      if not VSS.Implementation.Line_Iterators.Backward
+        (Self.Owner.Data,
+         Self.Terminators,
+         Position,
+         Self.First_Position,
+         Last_Position,
+         Terminator_Position)
+      then
+         raise Program_Error;
+      end if;
+
+      if VSS.Implementation.Strings.Is_Invalid (Terminator_Position) then
+         Self.Last_Position       := Last_Position;
+         Self.Terminator_Position := (others => <>);
+
+      elsif Self.Keep_Terminator then
+         Self.Last_Position       := Last_Position;
+         Self.Terminator_Position := Terminator_Position;
+
+      else
+         Dummy := Handler.Backward (Self.Owner.Data, Terminator_Position);
+
+         Self.Last_Position       := Terminator_Position;
+         Self.Terminator_Position := Last_Position;
+      end if;
+   end Lookup_Previous_Line;
 
    ---------------------
    -- String_Modified --

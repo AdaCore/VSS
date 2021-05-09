@@ -687,15 +687,14 @@ package body VSS.Strings is
       Keep_Terminator : Boolean := False)
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
    is
-      pragma Unreferenced (Self);
-      pragma Unreferenced (Position);
-      pragma Unreferenced (Terminators);
-      pragma Unreferenced (Keep_Terminator);
+      Start : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Position).all;
 
    begin
-      return X : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
-         raise Program_Error;
-      end return;
+      return
+        VSS.Strings.Cursors.Iterators.Lines.Internals.Line
+          (Self, Start, Terminators, Keep_Terminator);
    end Line;
 
    ----------------------------

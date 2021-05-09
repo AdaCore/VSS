@@ -44,4 +44,15 @@ package VSS.Implementation.Line_Iterators is
    --  terminator seqeunce found (it is case of last line and moving outside
    --  of data).
 
+   function Backward
+     (Data                : VSS.Implementation.Strings.String_Data;
+      Terminators         : VSS.Strings.Line_Terminator_Set;
+      Initial_Position    : VSS.Implementation.Strings.Cursor;
+      First_Position      : out VSS.Implementation.Strings.Cursor;
+      Last_Position       : out VSS.Implementation.Strings.Cursor;
+      Terminator_Position : out VSS.Implementation.Strings.Cursor)
+      return Boolean;
+   --  Lookup previous line and line terminator sequence. Initial_Position
+   --  is a cursor at the first character of the next line.
+
 end VSS.Implementation.Line_Iterators;

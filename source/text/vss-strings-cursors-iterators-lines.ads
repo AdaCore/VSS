@@ -100,6 +100,7 @@ private
 
    procedure Initialize
      (Self            : in out Line_Iterator'Class;
+      String          : Virtual_String'Class;
       Position        : VSS.Implementation.Strings.Cursor;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean             := False);

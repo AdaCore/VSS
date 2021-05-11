@@ -27,6 +27,7 @@ with VSS.Strings.Cursors.Markers.Internals;
 package body VSS.Strings.Cursors is
 
    use type VSS.Implementation.Strings.String_Handler_Access;
+   use type VSS.Implementation.Strings.Character_Offset;
 
    ---------------------
    -- Character_Index --
@@ -38,6 +39,44 @@ package body VSS.Strings.Cursors is
    begin
       return Self.First_Character_Index;
    end Character_Index;
+
+   ----------------------
+   -- Character_Length --
+   ----------------------
+
+   overriding function Character_Length
+     (Self : Segment_Cursor_Base) return VSS.Strings.Character_Count is
+   begin
+      if VSS.Implementation.Strings.Is_Invalid (Self.First_Position)
+        or else Self.First_Position.Index > Self.Last_Position.Index
+      then
+         return 0;
+
+      else
+         return
+           VSS.Strings.Character_Index
+             (Self.Last_Position.Index - Self.First_Position.Index + 1);
+      end if;
+   end Character_Length;
+
+   ----------------------
+   -- Character_Length --
+   ----------------------
+
+   overriding function Character_Length
+     (Self : Segment_Cursor_Limited_Base) return VSS.Strings.Character_Count is
+   begin
+      if VSS.Implementation.Strings.Is_Invalid (Self.First_Position)
+        or else Self.First_Position.Index > Self.Last_Position.Index
+      then
+         return 0;
+
+      else
+         return
+           VSS.Strings.Character_Index
+             (Self.Last_Position.Index - Self.First_Position.Index + 1);
+      end if;
+   end Character_Length;
 
    ---------------------------
    -- First_Character_Index --
@@ -310,6 +349,55 @@ package body VSS.Strings.Cursors is
       Self.First_Position := (others => <>);
       Self.Last_Position  := (others => <>);
    end Invalidate;
+
+   --------------
+   -- Is_Valid --
+   --------------
+
+   overriding function Is_Valid
+     (Self : Character_Cursor_Base) return Boolean is
+   begin
+      return
+        Self.Owner /= null
+          and not VSS.Implementation.Strings.Is_Invalid (Self.Position);
+   end Is_Valid;
+
+   --------------
+   -- Is_Valid --
+   --------------
+
+   overriding function Is_Valid
+     (Self : Character_Cursor_Limited_Base) return Boolean is
+   begin
+      return
+        Self.Owner /= null
+          and not VSS.Implementation.Strings.Is_Invalid (Self.Position);
+   end Is_Valid;
+
+   --------------
+   -- Is_Valid --
+   --------------
+
+   overriding function Is_Valid (Self : Segment_Cursor_Base) return Boolean is
+   begin
+      return
+        Self.Owner /= null
+          and not VSS.Implementation.Strings.Is_Invalid (Self.First_Position)
+          and not VSS.Implementation.Strings.Is_Invalid (Self.Last_Position);
+   end Is_Valid;
+
+   --------------
+   -- Is_Valid --
+   --------------
+
+   overriding function Is_Valid
+     (Self : Segment_Cursor_Limited_Base) return Boolean is
+   begin
+      return
+        Self.Owner /= null
+          and not VSS.Implementation.Strings.Is_Invalid (Self.First_Position)
+          and not VSS.Implementation.Strings.Is_Invalid (Self.Last_Position);
+   end Is_Valid;
 
    --------------------------
    -- Last_Character_Index --

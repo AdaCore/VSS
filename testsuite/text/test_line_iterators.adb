@@ -21,9 +21,15 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Strings.Character_Iterators;
 with VSS.Strings.Line_Iterators;
+with VSS.Strings.Markers;
+
+with Test_Support;
 
 procedure Test_Line_Iterators is
+
+   use type VSS.Strings.Character_Count;
 
    LF  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_000A#);
    VT  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_000B#);
@@ -152,6 +158,13 @@ procedure Test_Line_Iterators is
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean);
 
+   procedure Test_Forward_Restart
+     (Source_String   : VSS.Strings.Virtual_String;
+      Expected_Result : Expected_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Restart_Line    : Positive);
+
    ------------------
    -- Test_Forward --
    ------------------
@@ -162,8 +175,6 @@ procedure Test_Line_Iterators is
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean)
    is
-      use type VSS.Strings.Character_Count;
-
       J : VSS.Strings.Line_Iterators.Line_Iterator :=
         Source_String.First_Line (Terminators, Keep_Terminator);
       C : Natural := 1;
@@ -250,6 +261,96 @@ procedure Test_Line_Iterators is
       end if;
    end Test_Forward;
 
+   --------------------------
+   -- Test_Forward_Restart --
+   --------------------------
+
+   procedure Test_Forward_Restart
+     (Source_String   : VSS.Strings.Virtual_String;
+      Expected_Result : Expected_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Restart_Line    : Positive)
+   is
+      --  J : VSS.Strings.Line_Iterators.Line_Iterator :=
+      --    Source_String.First_Line (Terminators, Keep_Terminator);
+
+      M : VSS.Strings.Markers.Character_Marker;
+
+   begin
+      declare
+         JL : VSS.Strings.Line_Iterators.Line_Iterator :=
+           Source_String.First_Line (Terminators, Keep_Terminator);
+
+      begin
+         for K in 2 .. Restart_Line loop
+            Test_Support.Assert (JL.Forward);
+         end loop;
+
+         declare
+            JC : VSS.Strings.Character_Iterators.Character_Iterator :=
+              Source_String.Character (JL.First_Marker);
+
+         begin
+            for K in 1 .. JL.Character_Length / 2 loop
+               Test_Support.Assert (JC.Forward);
+            end loop;
+
+            M := JC.Marker;
+         end;
+      end;
+
+      declare
+         J : VSS.Strings.Line_Iterators.Line_Iterator :=
+           Source_String.Line (M, Terminators, Keep_Terminator);
+         C : Positive := Restart_Line;
+
+      begin
+         loop
+            Test_Support.Assert (J.Has_Element);
+            Test_Support.Assert
+              (J.First_Character_Index
+                 = Expected_Result (C).Line_First_Character);
+            Test_Support.Assert
+              (J.Last_Character_Index
+                 = Expected_Result (C).Line_Last_Character);
+            Test_Support.Assert
+              (J.Terminator_First_Character_Index
+                 = Expected_Result (C).Terminator_First_Character);
+            Test_Support.Assert
+              (J.Terminator_Last_Character_Index
+                 = Expected_Result (C).Terminator_Last_Character);
+            Test_Support.Assert
+              (J.Has_Line_Terminator
+                 = Expected_Result (C).Has_Line_Terminator);
+
+            exit when not J.Forward;
+
+            C := C + 1;
+         end loop;
+
+         Test_Support.Assert (not J.Has_Element);
+         Test_Support.Assert (C = Expected_Result'Length);
+
+         Test_Support.Assert (not J.Forward);
+         Test_Support.Assert (not J.Has_Element);
+
+         Test_Support.Assert
+           (J.First_Character_Index = Source_String.Character_Length + 1);
+
+         Test_Support.Assert
+           (J.Last_Character_Index = Source_String.Character_Length);
+
+         Test_Support.Assert
+           (J.Terminator_First_Character_Index
+              = Source_String.Character_Length + 1);
+         Test_Support.Assert
+           (J.Terminator_Last_Character_Index
+              = Source_String.Character_Length);
+         Test_Support.Assert (not J.Has_Line_Terminator);
+      end;
+   end Test_Forward_Restart;
+
 begin
    Test_Forward (Source_1, Expected_1_1, VSS.Strings.New_Line_Function, False);
    Test_Forward (Source_1, Expected_1_2, VSS.Strings.New_Line_Function, True);
@@ -274,4 +375,14 @@ begin
       (VSS.Strings.CR | VSS.Strings.LF | VSS.Strings.CRLF => True,
        others => False),
       True);
+
+   for J in 2 .. Expected_1_2'Last loop
+      Test_Forward_Restart
+        (Source_1, Expected_1_2, VSS.Strings.New_Line_Function, True, J);
+   end loop;
+
+   for J in 2 .. Expected_1_4'Last loop
+      Test_Forward_Restart
+        (Source_1, Expected_1_4, (others => True), True, J);
+   end loop;
 end Test_Line_Iterators;

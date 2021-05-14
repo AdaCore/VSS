@@ -24,7 +24,6 @@
 with Ada.Unchecked_Deallocation;
 with System.Atomic_Counters;
 
-with VSS.Regular_Expressions.DFA_Engines;
 with VSS.Regular_Expressions.Engines;
 with VSS.Regular_Expressions.Matches;
 
@@ -361,17 +360,12 @@ package body VSS.Regular_Expressions is
       Options : Pattern_Options := No_Pattern_Options)
       return Regular_Expression
    is
-      Ok : Boolean;
    begin
-      return
-        Result : constant Regular_Expression :=
-          (Ada.Finalization.Controlled with
-           Data => new VSS.Regular_Expressions.DFA_Engines.Engine)
-      do
-         Result.Data.Parse (Pattern, Options, Ok);
+      pragma Compile_Time_Warning
+        (Standard.True, "To_Regular_Expression unimplemented");
 
-         pragma Assert (Ok);
-      end return;
+      return raise Program_Error
+        with "Unimplemented function To_Regular_Expression";
    end To_Regular_Expression;
 
 end VSS.Regular_Expressions;

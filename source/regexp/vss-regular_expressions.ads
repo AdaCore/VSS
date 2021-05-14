@@ -108,8 +108,8 @@ package VSS.Regular_Expressions is
       Right : Regular_Expression_Match) return Boolean;
 
    function Is_Valid (Self : Regular_Expression_Match'Class) return Boolean;
-   --  Return True when object was obtained as result of matching of valid regular
-   --  expression.
+   --  Return True when object was obtained as result of matching of valid
+   --  regular expression.
 
    function Has_Match (Self : Regular_Expression_Match'Class) return Boolean;
    --  Return True when regular expression matched against the subject string.
@@ -117,16 +117,17 @@ package VSS.Regular_Expressions is
    function Captured
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0) return VSS.Strings.Virtual_String;
-   --  Return substring caprured by the Index capturing group. If capture group did not
-   --  captured substring or there is no such captured group, returned string is null.
-   --  Capture group 0 means substring matched by the entire pattern.
+   --  Return substring caprured by the Index capturing group. If capture group
+   --  did not captured substring or there is no such captured group, returned
+   --  string is null. Capture group 0 means substring matched by the entire
+   --  pattern.
 
    function Captured
      (Self : Regular_Expression_Match'Class;
       Name : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String;
-   --  Return substring captured by the named capture group Name. If capture group did not
-   --  captured substring or there is no such named captured group, returned string is
-   --  null.
+   --  Return substring captured by the named capture group Name. If capture
+   --  group did not captured substring or there is no such named captured
+   --  group, returned string is null.
 
    function Marker
      (Self  : Regular_Expression_Match'Class;
@@ -144,27 +145,29 @@ package VSS.Regular_Expressions is
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0)
       return VSS.Strings.Cursors.Markers.Character_Marker;
-   --  Return marker at first position of the substring captured by capture group Index.
+   --  Return marker at first position of the substring captured by capture
+   --  group Index.
 
    function First_Marker
      (Self : Regular_Expression_Match'Class;
       Name : VSS.Strings.Virtual_String)
       return VSS.Strings.Cursors.Markers.Character_Marker;
-   --  Return marker at first position of the substring captured by named capture group
-   --  Name.
+   --  Return marker at first position of the substring captured by named
+   --  capture group Name.
 
    function Last_Marker
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0)
       return VSS.Strings.Cursors.Markers.Character_Marker;
-   --  Return marker at last position of the substring captured by capture group Index.
+   --  Return marker at last position of the substring captured by capture
+   --  group Index.
 
    function Last_Marker
      (Self : Regular_Expression_Match'Class;
       Name : VSS.Strings.Virtual_String)
       return VSS.Strings.Cursors.Markers.Character_Marker;
-   --  Return marker at last position of the substring captured by named capture group
-   --  Name.
+   --  Return marker at last position of the substring captured by named
+   --  capture group Name.
 
 private
 

@@ -22,14 +22,20 @@
 ------------------------------------------------------------------------------
 
 with System.Atomic_Counters;
+with VSS.Strings.Cursors.Markers;
 
 package VSS.Regular_Expressions.Matches is
 
    pragma Preelaborate;
 
+   type Segment_Marker_Array is array (Positive range <>) of
+     VSS.Strings.Cursors.Markers.Segment_Marker;
+
    type Match (Length : Natural := 0) is limited record
       Counter   : System.Atomic_Counters.Atomic_Counter;
       Has_Match : Boolean;
+      Subject   : VSS.Strings.Virtual_String;
+      Markers   : Segment_Marker_Array (1 .. Length);
    end record;
 
 end VSS.Regular_Expressions.Matches;

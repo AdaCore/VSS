@@ -11,6 +11,7 @@ with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
 
 procedure Test_RegExp_RE_Tests is
+   pragma Assertion_Policy (Check);
 
    type Check_Kind is (Skip, Match, Dont_Match);
 
@@ -238,6 +239,7 @@ begin
                   end if;
 
                   if Last_Sample /= Sample then
+                     Last_Sample := Sample;
                      Last_Match := Last_Pattern.Match (Sample);
                   end if;
 

@@ -26,6 +26,7 @@ with System.Atomic_Counters;
 
 with VSS.Regular_Expressions.Engines;
 with VSS.Regular_Expressions.Matches;
+with VSS.Regular_Expressions.Pike_Engines;
 
 package body VSS.Regular_Expressions is
    pragma Warnings (Off);
@@ -360,12 +361,17 @@ package body VSS.Regular_Expressions is
       Options : Pattern_Options := No_Pattern_Options)
       return Regular_Expression
    is
+      Ok : Boolean;
    begin
-      pragma Compile_Time_Warning
-        (Standard.True, "To_Regular_Expression unimplemented");
+      return
+        Result : constant Regular_Expression :=
+          (Ada.Finalization.Controlled with
+           Data => new VSS.Regular_Expressions.Pike_Engines.Engine)
+      do
+         Result.Data.Parse (Pattern, Options, Ok);
 
-      return raise Program_Error
-        with "Unimplemented function To_Regular_Expression";
+         pragma Assert (Ok);
+      end return;
    end To_Regular_Expression;
 
 end VSS.Regular_Expressions;

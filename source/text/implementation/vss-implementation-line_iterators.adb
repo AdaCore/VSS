@@ -182,6 +182,7 @@ package body VSS.Implementation.Line_Iterators is
             case C is
                when Line_Feed =>
                   if Terminators (VSS.Strings.LF) then
+                     --  ??? Commented-out code
                      --  LF_Found := True;
                      --  First_Position := Current_Position;
                      --  D := Handler.Forward (Data, First_Position);
@@ -194,6 +195,8 @@ package body VSS.Implementation.Line_Iterators is
                   else
                      raise Program_Error;
                   end if;
+
+                  --  ??? Commented-out code
 
                   --  if Terminators (VSS.Strings.CRLF) then
                   --     LF_Found := True;
@@ -208,6 +211,8 @@ package body VSS.Implementation.Line_Iterators is
 
                when Line_Tabulation =>
                   if Terminators (VSS.Strings.VT) then
+                     --  ??? Commented-out code
+
                      --  First_Position := Current_Position;
                      --  D := Handler.Forward (Data, First_Position);
                      --
@@ -215,7 +220,11 @@ package body VSS.Implementation.Line_Iterators is
                      exit;
 
                   else
+                     --  ??? Commented-out code
                      --  LF_Found := False;
+
+                     --  CodePeer reports here that LF_Found is always false
+                     --  (same for the 4 other occurrences of LF_Found below)
                      if LF_Found then
                         raise Program_Error;
                      end if;
@@ -223,6 +232,7 @@ package body VSS.Implementation.Line_Iterators is
 
                when Form_Feed =>
                   if Terminators (VSS.Strings.FF) then
+                     --  ??? Commented-out code
                   --     First_Position := Current_Position;
                   --     D := Handler.Forward (Data, First_Position);
                   --
@@ -236,6 +246,7 @@ package body VSS.Implementation.Line_Iterators is
 
                when Carriage_Return =>
                   if Terminators (VSS.Strings.CR) then
+                     --  ??? Commented-out code
                      --  First_Position := Current_Position;
                      --  D := Handler.Forward (Data, First_Position);
                      --
@@ -259,6 +270,7 @@ package body VSS.Implementation.Line_Iterators is
 
                when Line_Separator =>
                   if Terminators (VSS.Strings.LS) then
+                     --  ??? Commented-out code
                      --  First_Position := Current_Position;
                      --  D := Handler.Forward (Data, First_Position);
                      --
@@ -272,6 +284,7 @@ package body VSS.Implementation.Line_Iterators is
 
                when Paragraph_Separator =>
                   if Terminators (VSS.Strings.PS) then
+                     --  ??? Commented-out code
                      --  First_Position := Current_Position;
                      --  D := Handler.Forward (Data, First_Position);
                      --
@@ -285,6 +298,7 @@ package body VSS.Implementation.Line_Iterators is
                   if LF_Found then
                      raise Program_Error;
                   end if;
+                     --  ??? Commented-out code
                   --  if LF_Found then
                   --     return True;
                   --  end if;

@@ -230,6 +230,17 @@ package body VSS.Implementation.UTF8_Encoding is
       use type VSS.Unicode.UTF8_Code_Unit;
 
    begin
+      --  Protection against unitialized values
+      --  ??? This block is here to prevent CodePeer from flagging these
+      --  as uninitialized out parameters. We should profile this on a
+      --  real use case and assess whether this has a performance impact.
+      --  Another option might be to pack this into a 32-bit structure
+      --  and rely on the compiler to optimize this further.
+      Unit_1 := 0;
+      Unit_2 := 0;
+      Unit_3 := 0;
+      Unit_4 := 0;
+
       case Code is
          when 16#00_0000# .. 16#00_007F# =>
             Length := 1;

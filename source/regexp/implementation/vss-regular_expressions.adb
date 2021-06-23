@@ -24,11 +24,12 @@
 with Ada.Unchecked_Deallocation;
 with System.Atomic_Counters;
 
-with VSS.Regular_Expressions.DFA_Engines;
 with VSS.Regular_Expressions.Engines;
 with VSS.Regular_Expressions.Matches;
+with VSS.Regular_Expressions.Pike_Engines;
 
 package body VSS.Regular_Expressions is
+   pragma Warnings (Off);
 
    ---------
    -- "=" --
@@ -85,8 +86,6 @@ package body VSS.Regular_Expressions is
      (Self : Regular_Expression'Class) return Natural
    is
    begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Capture_Group_Count unimplemented");
       return
         raise Program_Error with "Unimplemented function Capture_Group_Count";
    end Capture_Group_Count;
@@ -111,12 +110,14 @@ package body VSS.Regular_Expressions is
    --------------
 
    function Captured
-     (Self : Regular_Expression_Match'Class; Index : Natural := 0)
+     (Self  : Regular_Expression_Match'Class;
+      Index : Natural := 0)
       return VSS.Strings.Virtual_String
    is
    begin
-      pragma Compile_Time_Warning (Standard.True, "Captured unimplemented");
-      return raise Program_Error with "Unimplemented function Captured";
+      return Self.Data.Subject.Slice
+        (From => Self.First_Marker (Index),
+         To   => Self.Last_Marker (Index));
    end Captured;
 
    --------------
@@ -124,101 +125,15 @@ package body VSS.Regular_Expressions is
    --------------
 
    function Captured
-     (Self : Regular_Expression_Match'Class; Name : VSS.Strings.Virtual_String)
+     (Self : Regular_Expression_Match'Class;
+      Name : VSS.Strings.Virtual_String)
       return VSS.Strings.Virtual_String
    is
    begin
-      pragma Compile_Time_Warning (Standard.True, "Captured unimplemented");
-      return raise Program_Error with "Unimplemented function Captured";
+      return Self.Data.Subject.Slice
+        (From => Self.First_Marker (Name),
+         To   => Self.Last_Marker (Name));
    end Captured;
-
-   -------------------------------
-   -- Captured_Character_Length --
-   -------------------------------
-
-   function Captured_Character_Length
-     (Self : Regular_Expression_Match'Class; Index : Natural := 0)
-      return VSS.Strings.Character_Count
-   is
-   begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Captured_Character_Length unimplemented");
-      return
-        raise Program_Error
-          with "Unimplemented function Captured_Character_Length";
-   end Captured_Character_Length;
-
-   -------------------------------
-   -- Captured_Character_Length --
-   -------------------------------
-
-   function Captured_Character_Length
-     (Self : Regular_Expression_Match'Class; Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Character_Count
-   is
-   begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Captured_Character_Length unimplemented");
-      return
-        raise Program_Error
-          with "Unimplemented function Captured_Character_Length";
-   end Captured_Character_Length;
-
-   ------------------
-   -- Captured_End --
-   ------------------
-
-   function Captured_End
-     (Self : Regular_Expression_Match'Class; Index : Natural := 0)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class
-   is
-   begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Captured_End unimplemented");
-      return raise Program_Error with "Unimplemented function Captured_End";
-   end Captured_End;
-
-   ------------------
-   -- Captured_End --
-   ------------------
-
-   function Captured_End
-     (Self : Regular_Expression_Match'Class; Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class
-   is
-   begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Captured_End unimplemented");
-      return raise Program_Error with "Unimplemented function Captured_End";
-   end Captured_End;
-
-   --------------------
-   -- Captured_Start --
-   --------------------
-
-   function Captured_Start
-     (Self : Regular_Expression_Match'Class; Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class
-   is
-   begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Captured_Start unimplemented");
-      return raise Program_Error with "Unimplemented function Captured_Start";
-   end Captured_Start;
-
-   --------------------
-   -- Captured_Start --
-   --------------------
-
-   function Captured_Start
-     (Self : Regular_Expression_Match'Class; Index : Natural := 0)
-      return VSS.Strings.Cursors.Abstract_Cursor'Class
-   is
-   begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Captured_Start unimplemented");
-      return raise Program_Error with "Unimplemented function Captured_Start";
-   end Captured_Start;
 
    ------------------
    -- Error_String --
@@ -274,13 +189,12 @@ package body VSS.Regular_Expressions is
    ------------------
 
    function First_Marker
-     (Self : Regular_Expression_Match'Class; Index : Natural := 0)
-      return VSS.Strings.Cursors.Markers.Character_Marker
-   is
+     (Self  : Regular_Expression_Match'Class;
+      Index : Natural := 0)
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
-      pragma Compile_Time_Warning
-        (Standard.True, "First_Marker unimplemented");
-      return raise Program_Error with "Unimplemented function First_Marker";
+      return VSS.Strings.Cursors.Abstract_Cursor'Class
+        (Self.Marker (Index)).First_Marker;
    end First_Marker;
 
    ------------------
@@ -288,13 +202,12 @@ package body VSS.Regular_Expressions is
    ------------------
 
    function First_Marker
-     (Self : Regular_Expression_Match'Class; Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Cursors.Markers.Character_Marker
-   is
+     (Self : Regular_Expression_Match'Class;
+      Name : VSS.Strings.Virtual_String)
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
-      pragma Compile_Time_Warning
-        (Standard.True, "First_Marker unimplemented");
-      return raise Program_Error with "Unimplemented function First_Marker";
+      return VSS.Strings.Cursors.Abstract_Cursor'Class
+        (Self.Marker (Name)).First_Marker;
    end First_Marker;
 
    ---------------
@@ -329,12 +242,12 @@ package body VSS.Regular_Expressions is
    -----------------
 
    function Last_Marker
-     (Self : Regular_Expression_Match'Class; Index : Natural := 0)
-      return VSS.Strings.Cursors.Markers.Character_Marker
-   is
+     (Self  : Regular_Expression_Match'Class;
+      Index : Natural := 0)
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
-      pragma Compile_Time_Warning (Standard.True, "Last_Marker unimplemented");
-      return raise Program_Error with "Unimplemented function Last_Marker";
+      return VSS.Strings.Cursors.Abstract_Cursor'Class
+        (Self.Marker (Index)).Last_Marker;
    end Last_Marker;
 
    -----------------
@@ -342,12 +255,12 @@ package body VSS.Regular_Expressions is
    -----------------
 
    function Last_Marker
-     (Self : Regular_Expression_Match'Class; Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Cursors.Markers.Character_Marker
-   is
+     (Self : Regular_Expression_Match'Class;
+      Name : VSS.Strings.Virtual_String)
+      return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
-      pragma Compile_Time_Warning (Standard.True, "Last_Marker unimplemented");
-      return raise Program_Error with "Unimplemented function Last_Marker";
+      return VSS.Strings.Cursors.Abstract_Cursor'Class
+        (Self.Marker (Name)).Last_Marker;
    end Last_Marker;
 
    ------------
@@ -355,12 +268,12 @@ package body VSS.Regular_Expressions is
    ------------
 
    function Marker
-     (Self : Regular_Expression_Match'Class; Index : Natural := 0)
+     (Self  : Regular_Expression_Match'Class;
+      Index : Natural := 0)
       return VSS.Strings.Cursors.Markers.Segment_Marker
    is
    begin
-      pragma Compile_Time_Warning (Standard.True, "Marker unimplemented");
-      return raise Program_Error with "Unimplemented function Marker";
+      return Self.Data.Markers (Index + 1);
    end Marker;
 
    ------------
@@ -453,7 +366,7 @@ package body VSS.Regular_Expressions is
       return
         Result : constant Regular_Expression :=
           (Ada.Finalization.Controlled with
-           Data => new VSS.Regular_Expressions.DFA_Engines.Engine)
+           Data => new VSS.Regular_Expressions.Pike_Engines.Engine)
       do
          Result.Data.Parse (Pattern, Options, Ok);
 

@@ -25,10 +25,143 @@ with VSS.Strings.Character_Iterators;
 with VSS.String_Vectors;
 with VSS.Strings;
 
+with Test_Support;
+
 procedure Test_String_Vector is
 
    use type VSS.Strings.Virtual_String;
    use type VSS.String_Vectors.Virtual_String_Vector;
+
+   LF  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_000A#);
+   VT  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_000B#);
+   FF  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_000C#);
+   CR  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_000D#);
+   NEL : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_0085#);
+   LS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2028#);
+   PS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2029#);
+
+   procedure Test_Join_Lines;
+
+   ---------------------
+   -- Test_Join_Lines --
+   ---------------------
+
+   procedure Test_Join_Lines is
+   begin
+      --  Join two lines with all available line termitators.
+
+      declare
+         Lines      : VSS.String_Vectors.Virtual_String_Vector;
+
+         Expected_CR   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & CR & "line 2" & CR);
+         Expected_LF   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & LF & "line 2" & LF);
+         Expected_CRLF : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & CR & LF & "line 2" & CR & LF);
+         Expected_NEL   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & NEL & "line 2" & NEL);
+         Expected_VT   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & VT & "line 2" & VT);
+         Expected_FF   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & FF & "line 2" & FF);
+         Expected_LS   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & LS & "line 2" & LS);
+         Expected_PS   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & PS & "line 2" & PS);
+
+      begin
+         Lines.Append ("line 1");
+         Lines.Append ("line 2");
+
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.CR) = Expected_CR);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.LF) = Expected_LF);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.CRLF) = Expected_CRLF);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.NEL) = Expected_NEL);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.VT) = Expected_VT);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.FF) = Expected_FF);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.LS) = Expected_LS);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.PS) = Expected_PS);
+      end;
+
+      --  Join lines without line terminator sequence for last line
+
+      declare
+         Lines      : VSS.String_Vectors.Virtual_String_Vector;
+
+         Expected_CR   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & CR & "line 2" & CR & "line 3");
+         Expected_LF   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & LF & "line 2" & LF & "line 3");
+         Expected_CRLF : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & CR & LF & "line 2" & CR & LF & "line 3");
+         Expected_NEL   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & NEL & "line 2" & NEL & "line 3");
+         Expected_VT   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & VT & "line 2" & VT & "line 3");
+         Expected_FF   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & FF & "line 2" & FF & "line 3");
+         Expected_LS   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & LS & "line 2" & LS & "line 3");
+         Expected_PS   : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             ("line 1" & PS & "line 2" & PS & "line 3");
+
+      begin
+         Lines.Append ("line 1");
+         Lines.Append ("line 2");
+         Lines.Append ("line 3");
+
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.CR, False) = Expected_CR);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.LF, False) = Expected_LF);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.CRLF, False) = Expected_CRLF);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.NEL, False) = Expected_NEL);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.VT, False) = Expected_VT);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.FF, False) = Expected_FF);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.LS, False) = Expected_LS);
+         Test_Support.Assert
+           (Lines.Join_Lines (VSS.Strings.PS, False) = Expected_PS);
+      end;
+
+      --  Empty vector case
+
+      declare
+         Lines : VSS.String_Vectors.Virtual_String_Vector;
+
+      begin
+         Test_Support.Assert (Lines.Join_Lines (VSS.Strings.CR).Is_Empty);
+      end;
+   end Test_Join_Lines;
 
    S1 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("a");
@@ -144,4 +277,5 @@ begin
       raise Program_Error;
    end if;
 
+   Test_Join_Lines;
 end Test_String_Vector;

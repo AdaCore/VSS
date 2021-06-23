@@ -21,36 +21,63 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 --
---  This regexp engine use DFA to check regular expressions.
+--  This regexp engine use Pike's VM to check regular expressions.
 
-with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Vectors;
 with VSS.Characters;
 with VSS.Regular_Expressions.Engines;
 
 private
-package VSS.Regular_Expressions.DFA_Engines is
+package VSS.Regular_Expressions.Pike_Engines is
 
    pragma Preelaborate;
 
    type Engine is new VSS.Regular_Expressions.Engines.Engine with private;
+   --  The regexp engine uses Pike's Virtual Machine to find a match
 
 private
 
-   type Jump is record
-      Char  : VSS.Characters.Virtual_Character;
-      State : Positive;
+   type Tag_Number is new Natural;
+   --  Tag represents subgroup boundaries
+   type Instruction_Offset is new Integer;
+   --  Offset between two VM instructions
+   subtype Instruction_Address is Instruction_Offset
+     range 1 .. Instruction_Offset'Last;
+   --  Address of some VM instruction
+
+   type Instruction_Kind is
+     (No_Operation,  --  To able accept an empty string
+      Split,         --  Create an alternative thread of execution
+      Character,     --  Accept one Virtual_Character
+      Match,         --  Mark accepted string prefix as a regexp match
+      Save);         --  Save subgroup bound
+   --  VM instruction kinds
+
+   type Instruction (Kind : Instruction_Kind := Split) is record
+      Next : Instruction_Offset;
+      --  Instruction address is relative to the current instruction
+
+      case Kind is
+         when Split =>
+            Fallback : Instruction_Address;
+         when Character =>
+            Character : VSS.Characters.Virtual_Character;
+         when Save =>
+            Tag : Tag_Number;
+         when No_Operation | Match =>
+            null;
+      end case;
    end record;
 
-   function Hash (Value : Jump) return Ada.Containers.Hash_Type;
-
-   package Jump_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Jump,
-      Element_Type    => Integer,
-      Hash            => Hash,
-      Equivalent_Keys => "=");
+   package Instruction_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Instruction_Address,
+      Element_Type => Instruction);
 
    type Engine is new VSS.Regular_Expressions.Engines.Engine with record
-      Jumps : Jump_Maps.Map;
+      Last_Tag    : Tag_Number;  --  Max tag used in the Program
+      Max_Threads : Positive;  --  Maximum number of threads
+      Program     : Instruction_Vectors.Vector;
+      --  The program executes starting from program address = 1
    end record;
 
    overriding procedure Parse
@@ -67,4 +94,4 @@ private
       Options : Match_Options := No_Match_Options;
       Result  : out Match_Access);
 
-end VSS.Regular_Expressions.DFA_Engines;
+end VSS.Regular_Expressions.Pike_Engines;

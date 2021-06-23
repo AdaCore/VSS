@@ -38,4 +38,21 @@ package body VSS.Strings.Cursors.Markers.Internals is
       end return;
    end New_Character_Marker;
 
+   ------------------------
+   -- New_Segment_Marker --
+   ------------------------
+
+   function New_Segment_Marker
+     (String : VSS.Strings.Virtual_String'Class;
+      First  : VSS.Implementation.Strings.Cursor;
+      Last   : VSS.Implementation.Strings.Cursor)
+      return VSS.Strings.Cursors.Markers.Segment_Marker is
+   begin
+      return Result : VSS.Strings.Cursors.Markers.Segment_Marker do
+         Result.First_Position := First;
+         Result.Last_Position := Last;
+         Result.Connect (String'Unrestricted_Access);
+      end return;
+   end New_Segment_Marker;
+
 end VSS.Strings.Cursors.Markers.Internals;

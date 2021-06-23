@@ -33,4 +33,11 @@ package VSS.Strings.Cursors.Markers.Internals is
       return VSS.Strings.Cursors.Markers.Character_Marker;
    --  Create new marker for the given string and position.
 
+   function New_Segment_Marker
+     (String : VSS.Strings.Virtual_String'Class;
+      First  : VSS.Implementation.Strings.Cursor;
+      Last   : VSS.Implementation.Strings.Cursor)
+      return VSS.Strings.Cursors.Markers.Segment_Marker;
+   --  Create a new marker for the given string and bounds.
+
 end VSS.Strings.Cursors.Markers.Internals;

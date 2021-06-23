@@ -129,6 +129,29 @@ package body VSS.String_Vectors is
       return (Last => Self.Length);
    end Iterate;
 
+   ----------------
+   -- Join_Lines --
+   ----------------
+
+   function Join_Lines
+     (Self           : Virtual_String_Vector'Class;
+      Terminator     : VSS.Strings.Line_Terminator;
+      Terminate_Last : Boolean := True)
+      return VSS.Strings.Virtual_String
+   is
+      Data : VSS.Implementation.Strings.String_Data;
+
+   begin
+      VSS.Implementation.String_Vectors.Join_Lines
+        (Self.Data, Data, Terminator, Terminate_Last);
+
+      return Result : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.Internals.To_Virtual_String (Data)
+      do
+         VSS.Implementation.Strings.Unreference (Data);
+      end return;
+   end Join_Lines;
+
    ----------
    -- Last --
    ----------

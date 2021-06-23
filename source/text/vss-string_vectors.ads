@@ -66,6 +66,15 @@ package VSS.String_Vectors is
         with Pre => Index <= Self.Length;
    --  Replace a string vector item with given Index by a new value.
 
+   function Join_Lines
+     (Self           : Virtual_String_Vector'Class;
+      Terminator     : VSS.Strings.Line_Terminator;
+      Terminate_Last : Boolean := True)
+      return VSS.Strings.Virtual_String;
+   --  Join all string vector's strings with each element separated by given
+   --  Terminator. When Terminate_Last is True line terminator is added after
+   --  last line.
+
    --  Syntax sugar for Ada 2012 user-defined iterator
 
    type Cursor is private;

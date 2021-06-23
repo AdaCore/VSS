@@ -80,8 +80,10 @@ package body VSS.Strings.Conversions is
       return Result :
         Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String
       do
-         Ada.Strings.Wide_Wide_Unbounded.VSS_Aux.Set_String
-           (Result, Integer (Item.Character_Length), Set'Access);
+         if not Item.Is_Empty then
+            Ada.Strings.Wide_Wide_Unbounded.VSS_Aux.Set_String
+              (Result, Integer (Item.Character_Length), Set'Access);
+         end if;
       end return;
    end To_Unbounded_Wide_Wide_String;
 

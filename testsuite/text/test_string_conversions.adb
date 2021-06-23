@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -158,5 +158,28 @@ begin
 
    begin
       null;
+   end;
+
+   --  Check conversion of the null and empty strings to
+   --  Unbounded_Wide_Wide_String.
+
+   declare
+      use type Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
+
+      N1 : VSS.Strings.Virtual_String;
+      N2 : constant VSS.Strings.Virtual_String := "";
+
+   begin
+      if VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (N1)
+        /= Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String
+      then
+         raise Program_Error;
+      end if;
+
+      if VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (N2)
+        /= Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String
+      then
+         raise Program_Error;
+      end if;
    end;
 end Test_String_Conversions;

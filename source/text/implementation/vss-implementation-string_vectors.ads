@@ -24,6 +24,7 @@
 with System.Atomic_Counters;
 
 with VSS.Implementation.Strings;
+with VSS.Strings;
 
 package VSS.Implementation.String_Vectors is
 
@@ -60,5 +61,12 @@ package VSS.Implementation.String_Vectors is
       Index : Positive;
       Item  : VSS.Implementation.Strings.String_Data);
    --  Replace a vector item with a given string.
+
+   procedure Join_Lines
+     (Self           : String_Vector_Data_Access;
+      Result         : in out VSS.Implementation.Strings.String_Data;
+      Terminator     : VSS.Strings.Line_Terminator;
+      Terminate_Last : Boolean);
+   --  Join string vertor's strings using given Terminator.
 
 end VSS.Implementation.String_Vectors;

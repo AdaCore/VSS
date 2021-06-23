@@ -25,12 +25,39 @@ with System.Storage_Elements;
 
 with Ada.Unchecked_Deallocation;
 
+with VSS.Implementation.String_Configuration;
+with VSS.Unicode;
+
 package body VSS.Implementation.String_Vectors is
 
    procedure Free is
      new Ada.Unchecked_Deallocation
        (VSS.Implementation.String_Vectors.String_Vector_Data,
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+
+   Line_Feed           : constant VSS.Unicode.Code_Point := 16#00_000A#;
+   Line_Tabulation     : constant VSS.Unicode.Code_Point := 16#00_000B#;
+   Form_Feed           : constant VSS.Unicode.Code_Point := 16#00_000C#;
+   Carriage_Return     : constant VSS.Unicode.Code_Point := 16#00_000D#;
+   Next_Line           : constant VSS.Unicode.Code_Point := 16#00_0085#;
+   Line_Separator      : constant VSS.Unicode.Code_Point := 16#00_2028#;
+   Paragraph_Separator : constant VSS.Unicode.Code_Point := 16#00_2029#;
+   --  XXX These constants should be moved into own package and reused between
+   --  all packages.
+
+   Line_Terminator_To_Code_Point : constant
+     array (VSS.Strings.Line_Terminator) of VSS.Unicode.Code_Point :=
+       (VSS.Strings.CR   => Carriage_Return,
+        VSS.Strings.LF   => Line_Feed,
+        VSS.Strings.CRLF => Carriage_Return,
+        VSS.Strings.NEL  => Next_Line,
+        VSS.Strings.VT   => Line_Tabulation,
+        VSS.Strings.FF   => Form_Feed,
+        VSS.Strings.LS   => Line_Separator,
+        VSS.Strings.PS   => Paragraph_Separator);
+   --  Mapping from Line_Terminator to code point of first character of the
+   --  line terminator sequence. Only CRLF case requires longer sequence and
+   --  it is processed separately.
 
    Growth_Factor : constant := 2;
    --  The growth factor controls how much extra space is allocated when
@@ -138,6 +165,46 @@ package body VSS.Implementation.String_Vectors is
       Self.Last := Self.Last + 1;
       Self.Data (Self.Last) := Item;
    end Append_And_Move_Ownership;
+
+   ----------------
+   -- Join_Lines --
+   ----------------
+
+   procedure Join_Lines
+     (Self           : String_Vector_Data_Access;
+      Result         : in out VSS.Implementation.Strings.String_Data;
+      Terminator     : VSS.Strings.Line_Terminator;
+      Terminate_Last : Boolean)
+   is
+      use type VSS.Strings.Line_Terminator;
+
+      Offset : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      VSS.Implementation.Strings.Unreference (Result);
+
+      if Self = null then
+         return;
+      end if;
+
+      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
+        (Result);
+
+      for J in 1 .. Self.Last loop
+         VSS.Implementation.Strings.Handler (Result).Append
+           (Result, Self.Data (J), Offset);
+
+         if J /= Self.Last or Terminate_Last then
+            VSS.Implementation.Strings.Handler (Result).Append
+              (Result, Line_Terminator_To_Code_Point (Terminator), Offset);
+
+            if Terminator = VSS.Strings.CRLF then
+               VSS.Implementation.Strings.Handler (Result).Append
+                 (Result, Line_Feed, Offset);
+            end if;
+         end if;
+      end loop;
+   end Join_Lines;
 
    ------------
    -- Mutate --

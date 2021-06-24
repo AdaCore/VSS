@@ -119,6 +119,15 @@ package body VSS.String_Vectors is
       VSS.Implementation.String_Vectors.Unreference (Self.Data);
    end Finalize;
 
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (Self : Virtual_String_Vector'Class) return Boolean is
+   begin
+      return Self.Data = null or else Self.Data.Last = 0;
+   end Is_Empty;
+
    -------------
    -- Iterate --
    -------------

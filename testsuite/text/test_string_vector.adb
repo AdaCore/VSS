@@ -41,6 +41,22 @@ procedure Test_String_Vector is
    PS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2029#);
 
    procedure Test_Join_Lines;
+   procedure Test_Is_Empty;
+
+   -------------------
+   -- Test_Is_Empty --
+   -------------------
+
+   procedure Test_Is_Empty is
+      V1 : VSS.String_Vectors.Virtual_String_Vector;
+      V2 : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      V2.Append ("line 1");
+
+      Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (not V2.Is_Empty);
+   end Test_Is_Empty;
 
    ---------------------
    -- Test_Join_Lines --
@@ -278,4 +294,5 @@ begin
    end if;
 
    Test_Join_Lines;
+   Test_Is_Empty;
 end Test_String_Vector;

@@ -62,6 +62,11 @@ package VSS.String_Vectors is
       Item : VSS.Strings.Virtual_String'Class);
    --  Append string to the end of the vector.
 
+   procedure Append
+     (Self : in out Virtual_String_Vector'Class;
+      Item : Virtual_String_Vector'Class);
+   --  Append strings of Item to the end of the vector.
+
    procedure Replace
      (Self  : in out Virtual_String_Vector'Class;
       Index : Positive;

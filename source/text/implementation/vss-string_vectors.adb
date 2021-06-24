@@ -73,6 +73,22 @@ package body VSS.String_Vectors is
         (Self.Data, VSS.Strings.Internals.Data_Access_Constant (Item).all);
    end Append;
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (Self : in out Virtual_String_Vector'Class;
+      Item : Virtual_String_Vector'Class) is
+   begin
+      if Item.Data /= null and then Item.Data.Last /= 0 then
+         for J in Item.Data.Data'First .. Item.Data.Last loop
+            VSS.Implementation.String_Vectors.Append
+              (Self.Data, Item.Data.Data (J));
+         end loop;
+      end if;
+   end Append;
+
    -------------
    -- Element --
    -------------
@@ -118,6 +134,15 @@ package body VSS.String_Vectors is
    begin
       VSS.Implementation.String_Vectors.Unreference (Self.Data);
    end Finalize;
+
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (Self : Virtual_String_Vector'Class) return Boolean is
+   begin
+      return Self.Data = null or else Self.Data.Last = 0;
+   end Is_Empty;
 
    -------------
    -- Iterate --

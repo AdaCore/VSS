@@ -46,6 +46,9 @@ package VSS.String_Vectors is
       Right : Virtual_String_Vector) return Boolean;
    --  Compare two string vectors.
 
+   function Is_Empty (Self : Virtual_String_Vector'Class) return Boolean;
+   --  Return True when string vector is empty.
+
    function Length (Self : Virtual_String_Vector'Class) return Natural;
    --  Number of elements in the vector.
 
@@ -58,6 +61,11 @@ package VSS.String_Vectors is
      (Self : in out Virtual_String_Vector'Class;
       Item : VSS.Strings.Virtual_String'Class);
    --  Append string to the end of the vector.
+
+   procedure Append
+     (Self : in out Virtual_String_Vector'Class;
+      Item : Virtual_String_Vector'Class);
+   --  Append strings of Item to the end of the vector.
 
    procedure Replace
      (Self  : in out Virtual_String_Vector'Class;

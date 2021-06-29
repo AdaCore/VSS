@@ -44,4 +44,21 @@ package VSS.Strings.Conversions is
       return Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
    --  Convert virtual string into Wide_Wide_String.
 
+   procedure Set_Wide_Wide_String
+     (Item : Virtual_String'Class;
+      Into : out Wide_Wide_String);
+   --  Set given string to content of virtual string. Length of the string
+   --  must be equal to the length in characters of the virtual string;
+   --  otherwise Constraint_Error is raised.
+
+   procedure Set_Wide_Wide_String
+     (Item : Virtual_String'Class;
+      From : Positive;
+      Last : out Natural;
+      Into : out Wide_Wide_String);
+   --  Fill given string by content of virtual string. Data is written
+   --  starting From character. Remaining length of the string must be at
+   --  least the length in characters of the virtual string; otherwise
+   --  Constraint_Error is raised.
+
 end VSS.Strings.Conversions;

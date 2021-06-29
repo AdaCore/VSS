@@ -30,12 +30,70 @@ package body VSS.Strings.Conversions is
 
    use type VSS.Implementation.Strings.String_Handler_Access;
 
+   --------------------------
+   -- Set_Wide_Wide_String --
+   --------------------------
+
    procedure Set_Wide_Wide_String
-     (Item   : Virtual_String'Class;
-      String : out Wide_Wide_String);
-   --  Set given string to content of virtual string. Length of the string
-   --  must be equal to the length in characters of the virtual string;
-   --  otherwise Constraint_Error is raised.
+     (Item : Virtual_String'Class;
+      Into : out Wide_Wide_String)
+   is
+      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Item.Handler;
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Item.Character_Length /= Into'Length then
+         raise Constraint_Error;
+      end if;
+
+      if Item.Is_Empty then
+         return;
+      end if;
+
+      Handler.Before_First_Character (Item.Data, Position);
+
+      while Handler.Forward (Item.Data, Position) loop
+         Into (Into'First + Integer (Position.Index) - 1) :=
+           Wide_Wide_Character'Val
+             (Handler.Element (Item.Data, Position));
+      end loop;
+   end Set_Wide_Wide_String;
+
+   --------------------------
+   -- Set_Wide_Wide_String --
+   --------------------------
+
+   procedure Set_Wide_Wide_String
+     (Item : Virtual_String'Class;
+      From : Positive;
+      Last : out Natural;
+      Into : out Wide_Wide_String)
+   is
+      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
+        Item.Handler;
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Last := From - 1;
+
+      if Item.Is_Empty then
+         return;
+      end if;
+
+      if Natural (Item.Character_Length) > Into'Last - From + 1 then
+         raise Constraint_Error;
+      end if;
+
+      Handler.Before_First_Character (Item.Data, Position);
+
+      while Handler.Forward (Item.Data, Position) loop
+         Last := Last + 1;
+         Into (Last) :=
+           Wide_Wide_Character'Val
+             (Handler.Element (Item.Data, Position));
+      end loop;
+   end Set_Wide_Wide_String;
 
    ---------------------
    -- To_UTF_8_String --
@@ -120,36 +178,6 @@ package body VSS.Strings.Conversions is
          end if;
       end return;
    end To_Virtual_String;
-
-   -------------------------
-   -- Set_Wide_Wide_String --
-   -------------------------
-
-   procedure Set_Wide_Wide_String
-     (Item   : Virtual_String'Class;
-      String : out Wide_Wide_String)
-   is
-      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Item.Handler;
-      Position : VSS.Implementation.Strings.Cursor;
-
-   begin
-      if Item.Character_Length /= String'Length then
-         raise Constraint_Error;
-      end if;
-
-      if Item.Is_Empty then
-         return;
-      end if;
-
-      Handler.Before_First_Character (Item.Data, Position);
-
-      while Handler.Forward (Item.Data, Position) loop
-         String (String'First + Integer (Position.Index) - 1) :=
-           Wide_Wide_Character'Val
-             (Handler.Element (Item.Data, Position));
-      end loop;
-   end Set_Wide_Wide_String;
 
    -------------------------
    -- To_Wide_Wide_String --

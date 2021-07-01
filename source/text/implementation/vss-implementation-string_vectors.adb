@@ -277,14 +277,20 @@ package body VSS.Implementation.String_Vectors is
 
    procedure Unreference (Self : in out String_Vector_Data_Access) is
    begin
-      if Self /= null
-        and then System.Atomic_Counters.Decrement (Self.Counter)
-      then
-         for J in 1 .. Self.Last loop
-            VSS.Implementation.Strings.Unreference (Self.Data (J));
-         end loop;
+      if Self /= null then
+         if System.Atomic_Counters.Decrement (Self.Counter) then
+            for J in 1 .. Self.Last loop
+               VSS.Implementation.Strings.Unreference (Self.Data (J));
+            end loop;
 
-         Free (Self);
+            Free (Self);
+
+         else
+            --  Data is shared, reset own pointer to null because counter
+            --  is decremented.
+
+            Self := null;
+         end if;
       end if;
    end Unreference;
 

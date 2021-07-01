@@ -43,6 +43,7 @@ procedure Test_String_Vector is
    procedure Test_Join_Lines;
    procedure Test_Is_Empty;
    procedure Test_Append_Vector;
+   procedure Test_Clear;
 
    ------------------------
    -- Test_Append_Vector --
@@ -70,6 +71,25 @@ procedure Test_String_Vector is
       Test_Support.Assert (V3.Element (4) = "line 2.2");
       Test_Support.Assert (V3.Element (5) = "line 2.3");
    end Test_Append_Vector;
+
+   ----------------
+   -- Test_Clear --
+   ----------------
+
+   procedure Test_Clear is
+      V1 : VSS.String_Vectors.Virtual_String_Vector;
+      V2 : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      V1.Append ("line 1");
+
+      V2 := V1;
+
+      V1.Clear;
+
+      Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (not V2.Is_Empty);
+   end Test_Clear;
 
    -------------------
    -- Test_Is_Empty --
@@ -324,4 +344,5 @@ begin
    Test_Join_Lines;
    Test_Is_Empty;
    Test_Append_Vector;
+   Test_Clear;
 end Test_String_Vector;

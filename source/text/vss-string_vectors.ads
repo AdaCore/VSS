@@ -57,6 +57,9 @@ package VSS.String_Vectors is
       Index : Positive) return VSS.Strings.Virtual_String;
    --  Return given element. Return "null" string when index is out of bound.
 
+   procedure Clear (Self : in out Virtual_String_Vector'Class);
+   --  Remove all strings from the vector
+
    procedure Append
      (Self : in out Virtual_String_Vector'Class;
       Item : VSS.Strings.Virtual_String'Class);

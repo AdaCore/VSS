@@ -41,6 +41,8 @@ package VSS.String_Vectors is
        Default_Iterator  => Iterate,
        Iterator_Element  => VSS.Strings.Virtual_String;
 
+   Empty_Virtual_String_Vector : constant Virtual_String_Vector;
+
    overriding function "="
      (Left  : Virtual_String_Vector;
       Right : Virtual_String_Vector) return Boolean;
@@ -138,6 +140,9 @@ private
 
    overriding procedure Adjust (Self : in out Virtual_String_Vector);
    overriding procedure Finalize (Self : in out Virtual_String_Vector);
+
+   Empty_Virtual_String_Vector : constant Virtual_String_Vector :=
+     (Ada.Finalization.Controlled with others => <>);
 
    type Reversible_Iterator is
      limited new Iterator_Interfaces.Reversible_Iterator with

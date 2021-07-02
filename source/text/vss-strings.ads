@@ -182,15 +182,15 @@ package VSS.Strings is
    --     Item : Virtual_String'Class) return Virtual_String;
    --  --  Append given string to the end of the string and returns result.
 
-   --  procedure Prepend
-   --    (Self : in out Virtual_String'Class;
-   --     Item : VSS.Characters.Virtual_Character);
-   --  --  Prepend given character to the begin of the string.
-   --
-   --  procedure Prepend
-   --    (Self : in out Virtual_String'Class;
-   --     Item : Virtual_String'Class);
-   --  --  Prepend given string to the begin of the string.
+   procedure Prepend
+     (Self : in out Virtual_String'Class;
+      Item : VSS.Characters.Virtual_Character);
+   --  Prepend given character to the begin of the string.
+
+   procedure Prepend
+     (Self : in out Virtual_String'Class;
+      Item : Virtual_String'Class);
+   --  Prepend given string to the begin of the string.
 
    procedure Insert
      (Self     : in out Virtual_String'Class;

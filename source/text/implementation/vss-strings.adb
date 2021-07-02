@@ -767,6 +767,56 @@ package body VSS.Strings is
       Ada.Exceptions.Reraise_Occurrence (Occurrence);
    end Notify_String_Modified;
 
+   -------------
+   -- Prepend --
+   -------------
+
+   procedure Prepend
+     (Self : in out Virtual_String'Class;
+      Item : VSS.Characters.Virtual_Character)
+   is
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if Handler = null then
+         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
+         Handler.Initialize (Self.Data);
+      end if;
+
+      Handler.Insert
+        (Self.Data,
+         (1, 0, 0),
+         VSS.Characters.Virtual_Character'Pos (Item),
+         Offset);
+
+      Notify_String_Modified (Self, (1, 0, 0), (0, 0, 0), Offset);
+   end Prepend;
+
+   -------------
+   -- Prepend --
+   -------------
+
+   procedure Prepend
+     (Self : in out Virtual_String'Class;
+      Item : Virtual_String'Class)
+   is
+      Handler : VSS.Implementation.Strings.String_Handler_Access :=
+        Self.Handler;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if Handler = null then
+         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
+         Handler.Initialize (Self.Data);
+      end if;
+
+      Handler.Insert (Self.Data, (1, 0, 0), Item.Data, Offset);
+
+      Self.Notify_String_Modified ((1, 0, 0), (0, 0, 0), Offset);
+   end Prepend;
+
    ----------
    -- Read --
    ----------

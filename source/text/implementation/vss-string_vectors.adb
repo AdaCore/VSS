@@ -89,6 +89,15 @@ package body VSS.String_Vectors is
       end if;
    end Append;
 
+   -----------
+   -- Clear --
+   -----------
+
+   procedure Clear (Self : in out Virtual_String_Vector'Class) is
+   begin
+      VSS.Implementation.String_Vectors.Unreference (Self.Data);
+   end Clear;
+
    -------------
    -- Element --
    -------------

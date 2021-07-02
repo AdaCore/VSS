@@ -41,6 +41,8 @@ package VSS.String_Vectors is
        Default_Iterator  => Iterate,
        Iterator_Element  => VSS.Strings.Virtual_String;
 
+   Empty_Virtual_String_Vector : constant Virtual_String_Vector;
+
    overriding function "="
      (Left  : Virtual_String_Vector;
       Right : Virtual_String_Vector) return Boolean;
@@ -56,6 +58,9 @@ package VSS.String_Vectors is
      (Self  : Virtual_String_Vector'Class;
       Index : Positive) return VSS.Strings.Virtual_String;
    --  Return given element. Return "null" string when index is out of bound.
+
+   procedure Clear (Self : in out Virtual_String_Vector'Class);
+   --  Remove all strings from the vector
 
    procedure Append
      (Self : in out Virtual_String_Vector'Class;
@@ -135,6 +140,9 @@ private
 
    overriding procedure Adjust (Self : in out Virtual_String_Vector);
    overriding procedure Finalize (Self : in out Virtual_String_Vector);
+
+   Empty_Virtual_String_Vector : constant Virtual_String_Vector :=
+     (Ada.Finalization.Controlled with others => <>);
 
    type Reversible_Iterator is
      limited new Iterator_Interfaces.Reversible_Iterator with

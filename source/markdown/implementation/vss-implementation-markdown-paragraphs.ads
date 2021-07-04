@@ -20,60 +20,41 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Internal representation of a markdown paragraph
 
-with System.Atomic_Counters;
+with VSS.String_Vectors;
 
-with VSS.Implementation.Markdown.Paragraphs;
-with VSS.Markdown.Blocks.Paragraphs;
+with VSS.Markdown.Annotations;
 
-package body VSS.Markdown.Blocks is
+package VSS.Implementation.Markdown.Paragraphs is
+   pragma Preelaborate;
 
-   ------------
-   -- Adjust --
-   ------------
+   type Paragraph is new Abstract_Block with private;
+   --  Paragraph block contains annotated inline content
 
-   overriding procedure Adjust (Self : in out Block) is
-   begin
-      if Self.Data.Assigned then
-         System.Atomic_Counters.Increment (Self.Data.Counter);
-      end if;
-   end Adjust;
+   function Text (Self : Paragraph)
+     return VSS.Markdown.Annotations.Annotated_Text;
+   --  Return nested annotated text
 
-   --------------
-   -- Finalize --
-   --------------
+   procedure Detector
+     (Line : Input_Position;
+      Tag  : in out Ada.Tags.Tag;
+      CIP  : out Can_Interrupt_Paragraph);
+   --  The detector procedure to find start of a paragraph
 
-   overriding procedure Finalize (Self : in out Block) is
-   begin
-      if Self.Data.Assigned then
-         if System.Atomic_Counters.Decrement (Self.Data.Counter) then
-            VSS.Implementation.Markdown.Free (Self.Data);
+private
 
-         else
-            Self.Data := null;
-         end if;
-      end if;
-   end Finalize;
+   type Paragraph is new Abstract_Block with record
+      Lines : VSS.String_Vectors.Virtual_String_Vector;
+   end record;
 
-   ------------------
-   -- Is_Paragraph --
-   ------------------
+   overriding function Create
+     (Input : not null access Input_Position) return Paragraph;
 
-   function Is_Paragraph (Self : Block) return Boolean is
-   begin
-      return Self.Data.Assigned
-        and then Self.Data.all in
-          VSS.Implementation.Markdown.Paragraphs.Paragraph;
-   end Is_Paragraph;
+   overriding procedure Append_Line
+     (Self  : in out Paragraph;
+      Input : Input_Position;
+      CIP   : Can_Interrupt_Paragraph;
+      Ok    : in out Boolean);
 
-   ------------------
-   -- To_Paragraph --
-   ------------------
-
-   function To_Paragraph (Self : Block)
-     return VSS.Markdown.Blocks.Paragraphs.Paragraph is
-   begin
-      return VSS.Markdown.Blocks.Paragraphs.From_Block (Self);
-   end To_Paragraph;
-
-end VSS.Markdown.Blocks;
+end VSS.Implementation.Markdown.Paragraphs;

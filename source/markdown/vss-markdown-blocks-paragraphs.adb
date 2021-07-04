@@ -23,16 +23,13 @@
 
 with System.Atomic_Counters;
 
-with VSS.Implementation.Markdown.Paragraphs;
-with VSS.Markdown.Blocks.Paragraphs;
-
-package body VSS.Markdown.Blocks is
+package body VSS.Markdown.Blocks.Paragraphs is
 
    ------------
    -- Adjust --
    ------------
 
-   overriding procedure Adjust (Self : in out Block) is
+   overriding procedure Adjust (Self : in out Paragraph) is
    begin
       if Self.Data.Assigned then
          System.Atomic_Counters.Increment (Self.Data.Counter);
@@ -43,11 +40,12 @@ package body VSS.Markdown.Blocks is
    -- Finalize --
    --------------
 
-   overriding procedure Finalize (Self : in out Block) is
+   overriding procedure Finalize (Self : in out Paragraph) is
    begin
       if Self.Data.Assigned then
          if System.Atomic_Counters.Decrement (Self.Data.Counter) then
-            VSS.Implementation.Markdown.Free (Self.Data);
+            VSS.Implementation.Markdown.Free
+              (VSS.Implementation.Markdown.Abstract_Block_Access (Self.Data));
 
          else
             Self.Data := null;
@@ -55,25 +53,36 @@ package body VSS.Markdown.Blocks is
       end if;
    end Finalize;
 
-   ------------------
-   -- Is_Paragraph --
-   ------------------
+   ----------------
+   -- From_Block --
+   ----------------
 
-   function Is_Paragraph (Self : Block) return Boolean is
+   function From_Block (Self : VSS.Markdown.Blocks.Block) return Paragraph is
    begin
-      return Self.Data.Assigned
-        and then Self.Data.all in
-          VSS.Implementation.Markdown.Paragraphs.Paragraph;
-   end Is_Paragraph;
+      System.Atomic_Counters.Increment (Self.Data.Counter);
 
-   ------------------
-   -- To_Paragraph --
-   ------------------
+      return (Ada.Finalization.Controlled with Data =>
+               Paragraph_Access (Self.Data));
+   end From_Block;
 
-   function To_Paragraph (Self : Block)
-     return VSS.Markdown.Blocks.Paragraphs.Paragraph is
+   ----------
+   -- Text --
+   ----------
+
+   function Text
+     (Self : Paragraph) return VSS.Markdown.Annotations.Annotated_Text is
    begin
-      return VSS.Markdown.Blocks.Paragraphs.From_Block (Self);
-   end To_Paragraph;
+      return Self.Data.Text;
+   end Text;
 
-end VSS.Markdown.Blocks;
+   --------------
+   -- To_Block --
+   --------------
+
+   function To_Block (Self : Paragraph) return VSS.Markdown.Blocks.Block is
+   begin
+      return (Ada.Finalization.Controlled with Data =>
+               VSS.Implementation.Markdown.Abstract_Block_Access (Self.Data));
+   end To_Block;
+
+end VSS.Markdown.Blocks.Paragraphs;

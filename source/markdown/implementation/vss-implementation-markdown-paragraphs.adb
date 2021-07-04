@@ -21,59 +21,79 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with System.Atomic_Counters;
+package body VSS.Implementation.Markdown.Paragraphs is
 
-with VSS.Implementation.Markdown.Paragraphs;
-with VSS.Markdown.Blocks.Paragraphs;
+   -----------------
+   -- Append_Line --
+   -----------------
 
-package body VSS.Markdown.Blocks is
+   overriding procedure Append_Line
+     (Self  : in out Paragraph;
+      Input : Input_Position;
+      CIP   : Can_Interrupt_Paragraph;
+      Ok    : in out Boolean)
+   is
+   begin
+      Ok := Input.First.Has_Element and not CIP;
+
+      if Ok then
+         Self.Lines.Append (Input.Line.Unexpanded_Tail (Input.First));
+      end if;
+   end Append_Line;
 
    ------------
-   -- Adjust --
+   -- Create --
    ------------
 
-   overriding procedure Adjust (Self : in out Block) is
+   overriding function Create
+     (Input : not null access Input_Position) return Paragraph
+   is
    begin
-      if Self.Data.Assigned then
-         System.Atomic_Counters.Increment (Self.Data.Counter);
-      end if;
-   end Adjust;
+      return Result : Paragraph do
+         Result.Lines.Append (Input.Line.Unexpanded_Tail (Input.First));
+         --  Shift Input.First to EOL
+         while Input.First.Forward loop
+            null;
+         end loop;
+      end return;
+   end Create;
 
    --------------
-   -- Finalize --
+   -- Detector --
    --------------
 
-   overriding procedure Finalize (Self : in out Block) is
+   procedure Detector
+     (Line : Input_Position;
+      Tag  : in out Ada.Tags.Tag;
+      CIP  : out Can_Interrupt_Paragraph)
+   is
    begin
-      if Self.Data.Assigned then
-         if System.Atomic_Counters.Decrement (Self.Data.Counter) then
-            VSS.Implementation.Markdown.Free (Self.Data);
-
-         else
-            Self.Data := null;
-         end if;
+      if Line.First.Has_Element then  --  FIXME: use Blank_Pattern here
+         Tag := Paragraph'Tag;
+         CIP := False;
       end if;
-   end Finalize;
+   end Detector;
 
-   ------------------
-   -- Is_Paragraph --
-   ------------------
+   ----------
+   -- Text --
+   ----------
 
-   function Is_Paragraph (Self : Block) return Boolean is
+   function Text (Self : Paragraph)
+     return VSS.Markdown.Annotations.Annotated_Text
+   is
+      First : Boolean := True;
    begin
-      return Self.Data.Assigned
-        and then Self.Data.all in
-          VSS.Implementation.Markdown.Paragraphs.Paragraph;
-   end Is_Paragraph;
+      return Result : VSS.Markdown.Annotations.Annotated_Text do
+         for Line of Self.Lines loop
+            if First then
+               First := False;
+            else
+               Result.Plain_Text.Append (' ');
+            end if;
 
-   ------------------
-   -- To_Paragraph --
-   ------------------
+            Result.Plain_Text.Append (Line);
+         end loop;
+      end return;
+   end Text;
 
-   function To_Paragraph (Self : Block)
-     return VSS.Markdown.Blocks.Paragraphs.Paragraph is
-   begin
-      return VSS.Markdown.Blocks.Paragraphs.From_Block (Self);
-   end To_Paragraph;
-
-end VSS.Markdown.Blocks;
+end VSS.Implementation.Markdown.Paragraphs;

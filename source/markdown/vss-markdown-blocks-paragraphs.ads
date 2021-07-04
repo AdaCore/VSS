@@ -20,60 +20,37 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  Markdown paragraph block elements
 
-with System.Atomic_Counters;
+with VSS.Markdown.Annotations;
+private with VSS.Implementation.Markdown.Paragraphs;
 
-with VSS.Implementation.Markdown.Paragraphs;
-with VSS.Markdown.Blocks.Paragraphs;
+package VSS.Markdown.Blocks.Paragraphs is
+   pragma Preelaborate;
 
-package body VSS.Markdown.Blocks is
+   type Paragraph is tagged private;
+   --  Paragraph block contains annotated inline content
 
-   ------------
-   -- Adjust --
-   ------------
+   function Text (Self : Paragraph)
+     return VSS.Markdown.Annotations.Annotated_Text;
+   --  Return nested annotated text
 
-   overriding procedure Adjust (Self : in out Block) is
-   begin
-      if Self.Data.Assigned then
-         System.Atomic_Counters.Increment (Self.Data.Counter);
-      end if;
-   end Adjust;
+   function To_Block (Self : Paragraph) return VSS.Markdown.Blocks.Block;
+   --  Convert to Block type
 
-   --------------
-   -- Finalize --
-   --------------
+   function From_Block (Self : VSS.Markdown.Blocks.Block) return Paragraph;
+   --  Convert the Block to Paragraph
 
-   overriding procedure Finalize (Self : in out Block) is
-   begin
-      if Self.Data.Assigned then
-         if System.Atomic_Counters.Decrement (Self.Data.Counter) then
-            VSS.Implementation.Markdown.Free (Self.Data);
+private
 
-         else
-            Self.Data := null;
-         end if;
-      end if;
-   end Finalize;
+   type Paragraph_Access is access all
+     VSS.Implementation.Markdown.Paragraphs.Paragraph;
 
-   ------------------
-   -- Is_Paragraph --
-   ------------------
+   type Paragraph is new Ada.Finalization.Controlled with record
+      Data : Paragraph_Access;
+   end record;
 
-   function Is_Paragraph (Self : Block) return Boolean is
-   begin
-      return Self.Data.Assigned
-        and then Self.Data.all in
-          VSS.Implementation.Markdown.Paragraphs.Paragraph;
-   end Is_Paragraph;
+   overriding procedure Adjust (Self : in out Paragraph);
+   overriding procedure Finalize (Self : in out Paragraph);
 
-   ------------------
-   -- To_Paragraph --
-   ------------------
-
-   function To_Paragraph (Self : Block)
-     return VSS.Markdown.Blocks.Paragraphs.Paragraph is
-   begin
-      return VSS.Markdown.Blocks.Paragraphs.From_Block (Self);
-   end To_Paragraph;
-
-end VSS.Markdown.Blocks;
+end VSS.Markdown.Blocks.Paragraphs;

@@ -24,6 +24,7 @@
 with Ada.Tags.Generic_Dispatching_Constructor;
 
 with VSS.Implementation.Markdown.Documents;
+with VSS.Implementation.Markdown.Paragraphs;
 with VSS.Markdown.Documents.Internals;
 
 package body VSS.Markdown.Parsers is
@@ -243,7 +244,8 @@ package body VSS.Markdown.Parsers is
    procedure Register_Common_Mark_Blocks
      (Self : in out Markdown_Parser'Class) is
    begin
-      null;
+      Self.Register_Block
+        (VSS.Implementation.Markdown.Paragraphs.Detector'Access);
    end Register_Common_Mark_Blocks;
 
    -------------------

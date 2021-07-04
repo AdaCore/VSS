@@ -26,7 +26,7 @@ private with Ada.Finalization;
 
 private with VSS.Implementation.Markdown;
 
---  limited with VSS.Markdown.Blocks.Paragraphs;
+limited with VSS.Markdown.Blocks.Paragraphs;
 
 package VSS.Markdown.Blocks is
    pragma Preelaborate;
@@ -37,9 +37,9 @@ package VSS.Markdown.Blocks is
    function Is_Paragraph (Self : Block) return Boolean;
    --  Check if given block is a paragraph
 
---   function To_Paragraph (Self : Block)
---     return VSS.Markdown.Blocks.Paragraphs.Paragraph
---        with Pre => Self.Is_Paragraph;
+   function To_Paragraph (Self : Block)
+     return VSS.Markdown.Blocks.Paragraphs.Paragraph
+        with Pre => Self.Is_Paragraph;
    --  Convert the block to a Paragraph
 
 private

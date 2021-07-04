@@ -13,8 +13,9 @@ build_tests:
 	gprbuild -p -P gnat/tests/vss_json_tests.gpr
 	gprbuild -p -P gnat/tests/vss_stream_tests.gpr
 	gprbuild -p -P gnat/tests/vss_regexp_tests.gpr
+	gprbuild -p -P gnat/tests/vss_markdown_tests.gpr
 
-check: build_tests check_text check_json check_regexp
+check: build_tests check_text check_json check_regexp check_markdown
 
 check_text:
 	.objs/tests/test_character_iterators
@@ -50,6 +51,17 @@ check_regexp: re_tests
 
 re_tests:
 	curl -o $@ https://raw.githubusercontent.com/Perl/perl5/blead/t/re/re_tests
+
+check_markdown: commonmark-spec
+	cd commonmark-spec; python3 test/spec_tests.py --program ../.objs/tests/test_markdown_tests |\
+	  grep -E "^Example|^[0-9]+.passed" |\
+	  tee markdown_tests_result
+	diff -u testsuite/markdown/xfails.txt commonmark-spec/markdown_tests_result
+
+commonmark-spec:
+	@echo Checkout commonmark repo with:
+	@echo git clone --depth=1 https://github.com/commonmark/commonmark-spec
+	@false
 
 coverage:
 	gcov --verbose .objs/*

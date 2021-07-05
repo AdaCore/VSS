@@ -2,3 +2,4 @@
 
 testsuite/json/JSON.expected/*.txt -crlf
 source/text/gnat/*.ad[sb] text eol=lf
+testsuite/markdown/*.txt -crlf

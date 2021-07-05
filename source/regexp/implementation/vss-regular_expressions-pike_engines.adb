@@ -453,10 +453,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
       package Parser is new VSS.Regular_Expressions.ECMA_Parser (Node);
 
       --  The final program is
-      -- <save tag=1>
-      -- <AST.program>
-      -- <save tag=2>
-      -- <match>
+      --  <save tag=1>
+      --  <AST.program>
+      --  <save tag=2>
+      --  <match>
 
       Save_1 : constant Instruction :=
         (Kind => Save,

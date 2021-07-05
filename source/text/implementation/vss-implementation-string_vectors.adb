@@ -21,11 +21,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Unchecked_Deallocation;
 with System.Storage_Elements;
 
-with Ada.Unchecked_Deallocation;
-
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 with VSS.Unicode;
 
 package body VSS.Implementation.String_Vectors is
@@ -187,8 +186,7 @@ package body VSS.Implementation.String_Vectors is
          return;
       end if;
 
-      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-        (Result);
+      Result := VSS.Implementation.Strings.Null_String_Data;
 
       for J in 1 .. Self.Last loop
          VSS.Implementation.Strings.Handler (Result).Append

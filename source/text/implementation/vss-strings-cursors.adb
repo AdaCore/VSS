@@ -26,7 +26,6 @@ with VSS.Strings.Cursors.Markers.Internals;
 
 package body VSS.Strings.Cursors is
 
-   use type VSS.Implementation.Strings.String_Handler_Access;
    use type VSS.Implementation.Strings.Character_Offset;
 
    ---------------------
@@ -183,18 +182,14 @@ package body VSS.Strings.Cursors is
    is
       use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        String.Handler;
-
    begin
       if Position.UTF16_Offset >= 0 then
          return Position.UTF16_Offset;
 
-      elsif Handler /= null then
-         return Handler.First_UTF16_Offset (String.Data, Position);
-
       else
-         return 0;
+         return
+           VSS.Implementation.Strings.Handler
+             (String.Data).First_UTF16_Offset (String.Data, Position);
       end if;
    end First_UTF16_Offset;
 
@@ -252,18 +247,14 @@ package body VSS.Strings.Cursors is
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        String.Handler;
-
    begin
       if Position.UTF8_Offset >= 0 then
          return Position.UTF8_Offset;
 
-      elsif Handler /= null then
-         return Handler.First_UTF8_Offset (String.Data, Position);
-
       else
-         return 0;
+         return
+           VSS.Implementation.Strings.Handler
+             (String.Data).First_UTF8_Offset (String.Data, Position);
       end if;
    end First_UTF8_Offset;
 
@@ -452,18 +443,11 @@ package body VSS.Strings.Cursors is
    function Last_UTF16_Offset
      (String   : not null VSS.Strings.Magic_String_Access;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.UTF16_Code_Unit_Index
-   is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        String.Handler;
-
+      return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
-      if Handler /= null then
-         return Handler.Last_UTF16_Offset (String.Data, Position);
-
-      else
-         return 0;
-      end if;
+      return
+        VSS.Implementation.Strings.Handler
+          (String.Data).Last_UTF16_Offset (String.Data, Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -515,18 +499,11 @@ package body VSS.Strings.Cursors is
    function Last_UTF8_Offset
      (String   : not null VSS.Strings.Magic_String_Access;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.UTF8_Code_Unit_Index
-   is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        String.Handler;
-
+      return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
-      if Handler /= null then
-         return Handler.Last_UTF8_Offset (String.Data, Position);
-
-      else
-         return 0;
-      end if;
+      return
+        VSS.Implementation.Strings.Handler
+          (String.Data).Last_UTF8_Offset (String.Data, Position);
    end Last_UTF8_Offset;
 
    ----------------------

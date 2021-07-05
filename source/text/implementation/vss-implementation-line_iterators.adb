@@ -49,8 +49,9 @@ package body VSS.Implementation.Line_Iterators is
    is
       use type VSS.Unicode.Code_Point;
 
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        VSS.Implementation.Strings.Handler (Data);
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Data);
 
       Current_Position : VSS.Implementation.Strings.Cursor := Initial_Position;
       Aux_Position     : VSS.Implementation.Strings.Cursor;
@@ -328,8 +329,9 @@ package body VSS.Implementation.Line_Iterators is
       Terminator_Position : out VSS.Implementation.Strings.Cursor)
       return Boolean
    is
-      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
-        VSS.Implementation.Strings.Handler (Data);
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Data);
 
       CR_Found : Boolean := False;
       Dummy    : Boolean;

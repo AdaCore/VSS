@@ -33,8 +33,6 @@ with VSS.Strings.Texts;
 
 package body VSS.Strings is
 
-   use type VSS.Implementation.Strings.String_Handler_Access;
-
    procedure Notify_String_Modified
      (Self     : in out Virtual_String'Class;
       From     : VSS.Implementation.Strings.Cursor;
@@ -52,26 +50,13 @@ package body VSS.Strings is
 
    function "<"
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean
-   is
-      Left_Handler  : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Left.Handler;
-      Right_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Right.Handler;
-
+      Right : Virtual_String) return Boolean is
    begin
-      if Right_Handler = null then
-         return False;
-
-      elsif Left_Handler = null then
-         return not Right_Handler.Is_Empty (Right.Data);
-
-      else
-         return
-           Left_Handler.Is_Less (Left.Data, Right_Handler.all, Right.Data);
-      end if;
+      return
+        VSS.Implementation.Strings.Handler (Left.Data).Is_Less
+          (Left.Data,
+           VSS.Implementation.Strings.Handler (Right.Data).all,
+           Right.Data);
    end "<";
 
    ----------
@@ -80,27 +65,13 @@ package body VSS.Strings is
 
    function "<="
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean
-   is
-      Left_Handler  : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Left.Handler;
-      Right_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Right.Handler;
-
+      Right : Virtual_String) return Boolean is
    begin
-      if Left_Handler = null then
-         return True;
-
-      elsif Right_Handler = null then
-         return Left_Handler.Is_Empty (Left.Data);
-
-      else
-         return
-           Left_Handler.Is_Less_Or_Equal
-             (Left.Data, Right_Handler.all, Right.Data);
-      end if;
+      return
+        VSS.Implementation.Strings.Handler (Left.Data).Is_Less_Or_Equal
+          (Left.Data,
+           VSS.Implementation.Strings.Handler (Right.Data).all,
+           Right.Data);
    end "<=";
 
    ---------
@@ -120,27 +91,13 @@ package body VSS.Strings is
 
    function ">"
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean
-   is
-      Left_Handler  : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Left.Handler;
-      Right_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Right.Handler;
-
+      Right : Virtual_String) return Boolean is
    begin
-      if Left_Handler = null then
-         return False;
-
-      elsif Right_Handler = null then
-         return not Left_Handler.Is_Empty (Left.Data);
-
-      else
-         return
-           not Left_Handler.Is_Less_Or_Equal
-                 (Left.Data, Right_Handler.all, Right.Data);
-      end if;
+      return
+        not VSS.Implementation.Strings.Handler (Left.Data).Is_Less_Or_Equal
+          (Left.Data,
+           VSS.Implementation.Strings.Handler (Right.Data).all,
+           Right.Data);
    end ">";
 
    ----------
@@ -149,27 +106,13 @@ package body VSS.Strings is
 
    function ">="
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean
-   is
-      Left_Handler  : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Left.Handler;
-      Right_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Right.Handler;
-
+      Right : Virtual_String) return Boolean is
    begin
-      if Right_Handler = null then
-         return True;
-
-      elsif Left_Handler = null then
-         return Right_Handler.Is_Empty (Right.Data);
-
-      else
-         return
-           not Left_Handler.Is_Less
-                 (Left.Data, Right_Handler.all, Right.Data);
-      end if;
+      return
+        not VSS.Implementation.Strings.Handler (Left.Data).Is_Less
+          (Left.Data,
+           VSS.Implementation.Strings.Handler (Right.Data).all,
+           Right.Data);
    end ">=";
 
    ------------
@@ -210,18 +153,13 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character)
    is
-      Handler : VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
       Start   : VSS.Implementation.Strings.Cursor;
       Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if Handler = null then
-         VSS.Implementation.String_Configuration.In_Place_Handler
-           .Initialize (Self.Data);
-         Handler := Self.Handler;
-      end if;
-
       Handler.After_Last_Character (Self.Data, Start);
 
       Handler.Append
@@ -238,20 +176,15 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : Virtual_String'Class)
    is
-      Handler : VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
       Start   : VSS.Implementation.Strings.Cursor;
       Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
       if Item.Is_Empty then
          return;
-      end if;
-
-      if Handler = null then
-         VSS.Implementation.String_Configuration.In_Place_Handler
-           .Initialize (Self.Data);
-         Handler := Self.Handler;
       end if;
 
       Handler.After_Last_Character (Self.Data, Start);
@@ -280,16 +213,11 @@ package body VSS.Strings is
    ----------------------
 
    function Character_Length
-     (Self : Virtual_String'Class) return Character_Count
-   is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-
+     (Self : Virtual_String'Class) return Character_Count is
    begin
       return
-        (if Handler = null
-         then 0
-         else Character_Count (Handler.Length (Self.Data)));
+        Character_Count
+          (VSS.Implementation.Strings.Handler (Self.Data).Length (Self.Data));
    end Character_Length;
 
    -----------
@@ -355,8 +283,8 @@ package body VSS.Strings is
       use type VSS.Implementation.Strings.Character_Offset;
 
       Handler     :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
-          Self.Handler;
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
       From_Cursor : constant VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
           (From).all;
@@ -449,22 +377,16 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Count;
 
-      Self_Handler   : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Self.Handler;
-      Suffix_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Suffix.Handler;
+      Self_Handler   :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
+      Suffix_Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Suffix.Data);
 
    begin
-      if Suffix_Handler = null then
-         return True;
-
-      elsif Self_Handler = null then
-         return Suffix_Handler.Is_Empty (Suffix.Data);
-
-      elsif Self_Handler.Length (Self.Data)
-              < Suffix_Handler.Length (Suffix.Data)
+      if Self_Handler.Length (Self.Data)
+           < Suffix_Handler.Length (Suffix.Data)
       then
          return False;
 
@@ -550,30 +472,16 @@ package body VSS.Strings is
           (Self, Terminators, Keep_Terminator);
    end First_Line;
 
-   -------------
-   -- Handler --
-   -------------
-
-   function Handler
-     (Self : Virtual_String'Class)
-      return VSS.Implementation.Strings.String_Handler_Access is
-   begin
-      return VSS.Implementation.Strings.Handler (Self.Data);
-   end Handler;
-
    ----------
    -- Hash --
    ----------
 
    function Hash (Self : Virtual_String'Class) return Hash_Type is
-      Handler   : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
       Generator : VSS.Implementation.FNV_Hash.FNV_1a_Generator;
 
    begin
-      if Handler /= null then
-         Handler.Hash (Self.Data, Generator);
-      end if;
+      VSS.Implementation.Strings.Handler
+        (Self.Data).Hash (Self.Data, Generator);
 
       return
         VSS.Strings.Hash_Type (VSS.Implementation.FNV_Hash.Value (Generator));
@@ -588,24 +496,17 @@ package body VSS.Strings is
       Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
       Item     : VSS.Characters.Virtual_Character)
    is
-      Handler : VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-      Start   : constant VSS.Implementation.Strings.Cursor :=
+      Start  : constant VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
           (Position).all;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+      Offset : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
       if not VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
          return;
       end if;
 
-      if Handler = null then
-         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
-         Handler.Initialize (Self.Data);
-      end if;
-
-      Handler.Insert
+      VSS.Implementation.Strings.Handler (Self.Data).Insert
         (Self.Data,
          Start,
          VSS.Characters.Virtual_Character'Pos (Item),
@@ -623,24 +524,18 @@ package body VSS.Strings is
       Position : VSS.Strings.Cursors.Abstract_Cursor'Class;
       Item     : Virtual_String'Class)
    is
-      Handler : VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-      Start   : constant VSS.Implementation.Strings.Cursor :=
+      Start  : constant VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
           (Position).all;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+      Offset : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
       if not VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
          return;
       end if;
 
-      if Handler = null then
-         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
-         Handler.Initialize (Self.Data);
-      end if;
-
-      Handler.Insert (Self.Data, Start, Item.Data, Offset);
+      VSS.Implementation.Strings.Handler (Self.Data).Insert
+        (Self.Data, Start, Item.Data, Offset);
 
       Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Insert;
@@ -651,7 +546,8 @@ package body VSS.Strings is
 
    function Is_Empty (Self : Virtual_String'Class) return Boolean is
    begin
-      return VSS.Implementation.Strings.Is_Empty (Self.Data);
+      return
+        VSS.Implementation.Strings.Handler (Self.Data).Is_Empty (Self.Data);
    end Is_Empty;
 
    -------------
@@ -660,7 +556,8 @@ package body VSS.Strings is
 
    function Is_Null (Self : Virtual_String'Class) return Boolean is
    begin
-      return Self.Handler = null;
+      return
+        VSS.Implementation.Strings.Handler (Self.Data).Is_Null (Self.Data);
    end Is_Null;
 
    --------------------
@@ -775,17 +672,10 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character)
    is
-      Handler : VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+      Offset : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
-      if Handler = null then
-         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
-         Handler.Initialize (Self.Data);
-      end if;
-
-      Handler.Insert
+      VSS.Implementation.Strings.Handler (Self.Data).Insert
         (Self.Data,
          (1, 0, 0),
          VSS.Characters.Virtual_Character'Pos (Item),
@@ -802,17 +692,11 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : Virtual_String'Class)
    is
-      Handler : VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+      Offset : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
-      if Handler = null then
-         Handler := VSS.Implementation.String_Configuration.In_Place_Handler;
-         Handler.Initialize (Self.Data);
-      end if;
-
-      Handler.Insert (Self.Data, (1, 0, 0), Item.Data, Offset);
+      VSS.Implementation.Strings.Handler (Self.Data).Insert
+        (Self.Data, (1, 0, 0), Item.Data, Offset);
 
       Self.Notify_String_Modified ((1, 0, 0), (0, 0, 0), Offset);
    end Prepend;
@@ -840,9 +724,6 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Offset;
 
-      Handler     :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
-          Self.Handler;
       From_Cursor : constant VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
           (From).all;
@@ -859,13 +740,15 @@ package body VSS.Strings is
          return;
       end if;
 
-      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Deleted);
+      VSS.Implementation.Strings.Handler (Self.Data).Compute_Size
+        (Self.Data, From_Cursor, To_Cursor, Deleted);
 
       if Deleted.Index_Offset /= 0 then
-         Handler.Delete (Self.Data, From_Cursor, Deleted);
+         VSS.Implementation.Strings.Handler (Self.Data).Delete
+           (Self.Data, From_Cursor, Deleted);
       end if;
 
-      Handler.Insert
+      VSS.Implementation.Strings.Handler (Self.Data).Insert
         (Self.Data,
          From_Cursor,
          VSS.Characters.Virtual_Character'Pos (By),
@@ -886,9 +769,6 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Offset;
 
-      Handler     :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
-          Self.Handler;
       From_Cursor : constant VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
           (From).all;
@@ -905,13 +785,16 @@ package body VSS.Strings is
          return;
       end if;
 
-      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Deleted);
+      VSS.Implementation.Strings.Handler (Self.Data).Compute_Size
+        (Self.Data, From_Cursor, To_Cursor, Deleted);
 
       if Deleted.Index_Offset /= 0 then
-         Handler.Delete (Self.Data, From_Cursor, Deleted);
+         VSS.Implementation.Strings.Handler (Self.Data).Delete
+           (Self.Data, From_Cursor, Deleted);
       end if;
 
-      Handler.Insert (Self.Data, From_Cursor, By.Data, Inserted);
+      VSS.Implementation.Strings.Handler (Self.Data).Insert
+        (Self.Data, From_Cursor, By.Data, Inserted);
 
       Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
    end Replace;
@@ -926,9 +809,6 @@ package body VSS.Strings is
       To   : VSS.Strings.Cursors.Abstract_Cursor'Class)
       return Virtual_String
    is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-
       First_Position :
         constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
           VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (From);
@@ -938,11 +818,10 @@ package body VSS.Strings is
 
    begin
       return Result : Virtual_String do
-         if Handler /= null
-           and then VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
+         if VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
            and then VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
          then
-            Handler.Slice
+            VSS.Implementation.Strings.Handler (Self.Data).Slice
               (Self.Data,
                First_Position.all,
                Last_Position.all,
@@ -960,9 +839,6 @@ package body VSS.Strings is
       Segment : VSS.Strings.Cursors.Abstract_Cursor'Class)
       return Virtual_String
    is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-
       First_Position :
         constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
           VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (Segment);
@@ -972,10 +848,8 @@ package body VSS.Strings is
 
    begin
       return Result : Virtual_String do
-         if Handler /= null
-           and then VSS.Strings.Cursors.Internals.Is_Owner (Segment, Self)
-         then
-            Handler.Slice
+         if VSS.Strings.Cursors.Internals.Is_Owner (Segment, Self) then
+            VSS.Implementation.Strings.Handler (Self.Data).Slice
               (Self.Data,
                First_Position.all,
                Last_Position.all,
@@ -992,20 +866,14 @@ package body VSS.Strings is
      (Self            : Virtual_String'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean := False)
-      return VSS.String_Vectors.Virtual_String_Vector
-   is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-
+      return VSS.String_Vectors.Virtual_String_Vector is
    begin
       return Result : VSS.String_Vectors.Virtual_String_Vector do
-         if Handler /= null then
-            Handler.Split_Lines
-              (Self.Data,
-               Terminators,
-               Keep_Terminator,
-               VSS.String_Vectors.Internals.Data_Access (Result).all);
-         end if;
+         VSS.Implementation.Strings.Handler (Self.Data).Split_Lines
+           (Self.Data,
+            Terminators,
+            Keep_Terminator,
+            VSS.String_Vectors.Internals.Data_Access (Result).all);
       end return;
    end Split_Lines;
 
@@ -1019,22 +887,16 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Count;
 
-      Self_Handler   : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Self.Handler;
-      Prefix_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Prefix.Handler;
+      Self_Handler   :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
+      Prefix_Handler :
+        constant not null  VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Prefix.Data);
 
    begin
-      if Prefix_Handler = null then
-         return True;
-
-      elsif Self_Handler = null then
-         return Prefix_Handler.Is_Empty (Prefix.Data);
-
-      elsif Self_Handler.Length (Self.Data)
-              < Prefix_Handler.Length (Prefix.Data)
+      if Self_Handler.Length (Self.Data)
+           < Prefix_Handler.Length (Prefix.Data)
       then
          return False;
 

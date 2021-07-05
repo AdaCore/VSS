@@ -37,25 +37,21 @@ package body VSS.Implementation.String_Handlers is
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
       Handler        : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
       Suffix_Handler :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Suffix);
       Position       : VSS.Implementation.Strings.Cursor;
       Code           : VSS.Unicode.Code_Point;
 
    begin
-      if Suffix_Handler /= null then
-         Suffix_Handler.Before_First_Character (Suffix, Position);
+      Suffix_Handler.Before_First_Character (Suffix, Position);
 
-         while Suffix_Handler.Forward (Suffix, Position) loop
-            Code := Suffix_Handler.Element (Suffix, Position);
-            Handler.Append (Data, Code, Offset);
-         end loop;
-      end if;
+      while Suffix_Handler.Forward (Suffix, Position) loop
+         Code := Suffix_Handler.Element (Suffix, Position);
+         Handler.Append (Data, Code, Offset);
+      end loop;
    end Append;
 
    ------------------
@@ -273,10 +269,8 @@ package body VSS.Implementation.String_Handlers is
       Item   : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
       Item_Handler  :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Item);
       Item_Position : VSS.Implementation.Strings.Cursor;
       Position      : VSS.Implementation.Strings.Cursor := From;
@@ -284,7 +278,7 @@ package body VSS.Implementation.String_Handlers is
       Success       : Boolean with Unreferenced;
 
    begin
-      if Item_Handler = null or else Item_Handler.Is_Empty (Item) then
+      if Item_Handler.Is_Empty (Item) then
          return;
       end if;
 
@@ -426,6 +420,14 @@ package body VSS.Implementation.String_Handlers is
         Right_Handler.Has_Character (Right_Data, Right_Position)
           or not Left_Handler.Has_Character (Left_Data, Left_Position);
    end Is_Less_Or_Equal;
+
+   -------------
+   -- Is_Null --
+   -------------
+
+   not overriding function Is_Null
+     (Self : Abstract_String_Handler;
+      Data : VSS.Implementation.Strings.String_Data) return Boolean is (False);
 
    -----------------------
    -- Last_UTF16_Offset --

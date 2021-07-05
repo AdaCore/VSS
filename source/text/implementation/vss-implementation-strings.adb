@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with VSS.Implementation.String_Configuration;
+with VSS.Implementation.Null_String_Handlers;
 
 package body VSS.Implementation.Strings is
 
@@ -34,26 +35,11 @@ package body VSS.Implementation.Strings is
 
    overriding function "="
      (Left  : String_Data;
-      Right : String_Data) return Boolean
-   is
-      Left_Handler  : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Handler (Left);
-      Right_Handler : constant
-        VSS.Implementation.Strings.String_Handler_Access :=
-          Handler (Right);
-
+      Right : String_Data) return Boolean is
    begin
-      if Left_Handler = null and Right_Handler = null then
-         return True;
-
-      elsif Left_Handler = null xor Right_Handler = null then
-         return Is_Empty (Left) and Is_Empty (Right);
-
-      else
-         return
-           Left_Handler.Is_Equal (Left, Right_Handler.all, Right);
-      end if;
+      return
+        VSS.Implementation.Strings.Handler (Left).Is_Equal
+          (Left, VSS.Implementation.Strings.Handler (Right).all, Right);
    end "=";
 
    ------------------
@@ -155,27 +141,20 @@ package body VSS.Implementation.Strings is
 
    function Handler
      (Data : String_Data)
-      return VSS.Implementation.Strings.String_Handler_Access is
+      return not null VSS.Implementation.Strings.String_Handler_Access is
    begin
       if Data.In_Place then
          return VSS.Implementation.String_Configuration.In_Place_Handler;
 
-      else
+      elsif Data.Handler /= null then
          return Data.Handler;
+
+      else
+         return
+           VSS.Implementation.Null_String_Handlers
+             .Global_Null_String_Handler'Access;
       end if;
    end Handler;
-
-   --------------
-   -- Is_Empty --
-   --------------
-
-   function Is_Empty (Self : String_Data) return Boolean is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        VSS.Implementation.Strings.Handler (Self);
-
-   begin
-      return Handler = null or else Handler.Is_Empty (Self);
-   end Is_Empty;
 
    ----------------
    -- Is_Invalid --
@@ -194,13 +173,8 @@ package body VSS.Implementation.Strings is
    ---------------
 
    procedure Reference (Data : in out String_Data) is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        VSS.Implementation.Strings.Handler (Data);
-
    begin
-      if Handler /= null then
-         Handler.Reference (Data);
-      end if;
+      VSS.Implementation.Strings.Handler (Data).Reference (Data);
    end Reference;
 
    -----------------
@@ -208,14 +182,8 @@ package body VSS.Implementation.Strings is
    -----------------
 
    procedure Unreference (Data : in out String_Data) is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        VSS.Implementation.Strings.Handler (Data);
-
    begin
-      if Handler /= null then
-         Handler.Unreference (Data);
-      end if;
-
+      VSS.Implementation.Strings.Handler (Data).Unreference (Data);
       Data := Null_String_Data;
    end Unreference;
 

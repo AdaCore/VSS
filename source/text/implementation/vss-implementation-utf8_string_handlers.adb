@@ -279,22 +279,17 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
       Parent : VSS.Implementation.String_Handlers.Abstract_String_Handler
         renames VSS.Implementation.String_Handlers.Abstract_String_Handler
                  (Self);
       Source         : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
       Suffix_Handler :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Suffix);
 
    begin
-      if Suffix_Handler = null then
-         return;
-
-      elsif Suffix_Handler.all in UTF8_In_Place_String_Handler then
+      if Suffix_Handler.all in UTF8_In_Place_String_Handler then
          --  When suffix is "in place", we can use its size to calculate
          --  result size in advance.
          declare
@@ -470,7 +465,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Source         : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
       Suffix_Handler :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Suffix);
 
    begin

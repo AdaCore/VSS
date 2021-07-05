@@ -28,8 +28,6 @@ pragma Warnings (On, ".* is an internal GNAT unit");
 
 package body VSS.Strings.Conversions is
 
-   use type VSS.Implementation.Strings.String_Handler_Access;
-
    procedure Set_Wide_Wide_String
      (Item   : Virtual_String'Class;
       String : out Wide_Wide_String);
@@ -45,8 +43,9 @@ package body VSS.Strings.Conversions is
      (Item   : Virtual_String'Class;
       String : out Wide_Wide_String)
    is
-      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Item.Handler;
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin
@@ -103,18 +102,11 @@ package body VSS.Strings.Conversions is
 
    function To_UTF_8_String
      (Item : Virtual_String'Class)
-      return Ada.Strings.UTF_Encoding.UTF_8_String
-   is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Item.Handler;
-
+      return Ada.Strings.UTF_Encoding.UTF_8_String is
    begin
-      if Handler = null then
-         return "";
-
-      else
-         return Handler.To_UTF_8_String (Item.Data);
-      end if;
+      return
+        VSS.Implementation.Strings.Handler
+          (Item.Data).To_UTF_8_String (Item.Data);
    end To_UTF_8_String;
 
    -----------------------

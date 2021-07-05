@@ -439,10 +439,4 @@ private
       Removed  : VSS.Implementation.Strings.Cursor_Offset;
       Inserted : VSS.Implementation.Strings.Cursor_Offset) is null;
 
-   function Handler
-     (Self : Virtual_String'Class)
-      return VSS.Implementation.Strings.String_Handler_Access;
-   --  Returns string data handler should be used to process data of given
-   --  object.
-
 end VSS.Strings;

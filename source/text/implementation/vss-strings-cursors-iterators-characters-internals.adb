@@ -25,8 +25,6 @@ with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Cursors.Iterators.Characters.Internals is
 
-   use type VSS.Implementation.Strings.String_Handler_Access;
-
    ---------------
    -- Character --
    ---------------
@@ -90,8 +88,9 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
    is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
       Dummy   : Boolean;
 
    begin
@@ -100,10 +99,8 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
       do
          Result.Connect (Self'Unrestricted_Access);
 
-         if Handler /= null then
-            Handler.Before_First_Character (Self.Data, Result.Position);
-            Dummy := Handler.Forward (Self.Data, Result.Position);
-         end if;
+         Handler.Before_First_Character (Self.Data, Result.Position);
+         Dummy := Handler.Forward (Self.Data, Result.Position);
       end return;
    end First_Character;
 
@@ -115,8 +112,9 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
    is
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
       Dummy   : Boolean;
 
    begin
@@ -125,10 +123,8 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
       do
          Result.Connect (Self'Unrestricted_Access);
 
-         if Handler /= null then
-            Handler.After_Last_Character (Self.Data, Result.Position);
-            Dummy := Handler.Backward (Self.Data, Result.Position);
-         end if;
+         Handler.After_Last_Character (Self.Data, Result.Position);
+         Dummy := Handler.Backward (Self.Data, Result.Position);
       end return;
    end Last_Character;
 

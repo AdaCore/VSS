@@ -152,15 +152,10 @@ package VSS.Implementation.Strings is
    --  default. Also, System.Null_Address is not static expression and can't be
    --  used here for initialization.
 
-   function Is_Empty (Self : String_Data) return Boolean
-     with Inline;
-   --  Return True when string is empty string: it is ether null or has zero
-   --  length.
-
    function Handler
      (Data : String_Data)
-      return VSS.Implementation.Strings.String_Handler_Access
-        with Inline;
+      return not null VSS.Implementation.Strings.String_Handler_Access
+      with Inline;
    --  Return string handler for given string data. Null handler is returned
    --  for null string.
 

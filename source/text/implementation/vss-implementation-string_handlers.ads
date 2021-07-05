@@ -23,6 +23,9 @@
 --  Abstract_String_Hanlder is abstract set of operations on string data.
 --  It provides default generic implementation of some operations which
 --  derived handlers may override to provide better implementation.
+--
+--  Note, when adding new operation it must be overridden by the
+--  Null_String_Handler with proper preconditions and implementation.
 
 with Ada.Strings.UTF_Encoding;
 
@@ -66,6 +69,11 @@ package VSS.Implementation.String_Handlers is
       Data : VSS.Implementation.Strings.String_Data)
       return Boolean is abstract;
    --  Return True when string is empty.
+
+   not overriding function Is_Null
+     (Self : Abstract_String_Handler;
+      Data : VSS.Implementation.Strings.String_Data) return Boolean;
+   --  Return True when string is null.
 
    not overriding procedure Hash
      (Self      : Abstract_String_Handler;

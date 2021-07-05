@@ -35,10 +35,9 @@ package body VSS.Strings.Cursors.Iterators.Lines.Internals is
       Keep_Terminator : Boolean             := False)
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
    is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
-      Handler  : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
@@ -46,12 +45,9 @@ package body VSS.Strings.Cursors.Iterators.Lines.Internals is
       return Result :
         VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
       do
-         if Handler /= null then
-            Handler.Before_First_Character (Self.Data, Position);
-            Dummy := Handler.Forward (Self.Data, Position);
-
-            Result.Initialize (Self, Position, Terminators, Keep_Terminator);
-         end if;
+         Handler.Before_First_Character (Self.Data, Position);
+         Dummy := Handler.Forward (Self.Data, Position);
+         Result.Initialize (Self, Position, Terminators, Keep_Terminator);
       end return;
    end First_Line;
 
@@ -64,20 +60,12 @@ package body VSS.Strings.Cursors.Iterators.Lines.Internals is
       Position        : VSS.Implementation.Strings.Cursor;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean             := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
-   is
-      use type VSS.Implementation.Strings.String_Handler_Access;
-
-      Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-        Self.Handler;
-
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
    begin
       return Result :
         VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
       do
-         if Handler /= null
-           and not VSS.Implementation.Strings.Is_Invalid (Position)
-         then
+         if not VSS.Implementation.Strings.Is_Invalid (Position) then
             Result.Initialize (Self, Position, Terminators, Keep_Terminator);
          end if;
       end return;

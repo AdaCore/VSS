@@ -5,6 +5,10 @@ all:
 	gprbuild -p -P gnat/vss_text.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 	gprbuild -p -P gnat/vss_json.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 
+generate:
+	gprbuild -p -P gnat/tools/gen_ucd.gpr
+	.objs/tools/gen_ucd data/ucd
+
 build_tests:
 	gprbuild -p -P gnat/tests/vss_text_tests.gpr
 	gprbuild -p -P gnat/tests/vss_json_tests.gpr

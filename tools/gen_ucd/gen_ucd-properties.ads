@@ -21,8 +21,26 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Property_Aliases_Loader is
+with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Vectors;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
+with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 
-   procedure Load (UCD_Root : Wide_Wide_String);
+package Gen_UCD.Properties is
 
-end Gen_UCD.Property_Aliases_Loader;
+   package String_Vectors is
+      new Ada.Containers.Vectors (Positive, Unbounded_Wide_Wide_String);
+
+   type Property is record
+      Names : String_Vectors.Vector;
+   end record;
+
+   type Property_Access is access all Property;
+
+   package Name_Property_Maps is
+     new Ada.Containers.Hashed_Maps
+       (Unbounded_Wide_Wide_String, Property_Access, Wide_Wide_Hash, "=");
+
+   Properties : Name_Property_Maps.Map;
+
+end Gen_UCD.Properties;

@@ -21,9 +21,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
 with Gen_UCD.Data_File_Loaders;
+with Gen_UCD.Properties;
 
 package body Gen_UCD.Property_Aliases_Loader is
 
@@ -38,26 +39,14 @@ package body Gen_UCD.Property_Aliases_Loader is
       Loader.Open (UCD_Root, "PropertyAliases.txt");
 
       while not Loader.End_Of_File loop
-         Put
-           ("Property '" & Loader.Get_Field (0)
-            & "': '" & Loader.Get_Field (1) &  ''');
-
-         for J in 2 .. Data_File_Loaders.Field_Index'Last loop
-            if Loader.Has_Field (J) then
-               Put (", '" & Loader.Get_Field (J) & ''');
-            end if;
-         end loop;
-
-         New_Line;
-
          declare
-            P : constant Property_Access := new Property;
+            P : constant Properties.Property_Access := new Properties.Property;
             N : Unbounded_Wide_Wide_String;
 
          begin
             N := To_Unbounded_Wide_Wide_String (Loader.Get_Field (0));
             P.Names.Append (N);
-            Properties.Insert (N, P);
+            Properties.Properties.Insert (N, P);
 
             --  Second field is a long name of the property and may be the same
             --  as short name of the property, thus ignore it in such cases.
@@ -66,14 +55,14 @@ package body Gen_UCD.Property_Aliases_Loader is
 
             if N /= P.Names.First_Element then
                P.Names.Append (N);
-               Properties.Insert (N, P);
+               Properties.Properties.Insert (N, P);
             end if;
 
             for J in 2 .. Data_File_Loaders.Field_Index'Last loop
                if Loader.Has_Field (J) then
                   N := To_Unbounded_Wide_Wide_String (Loader.Get_Field (J));
                   P.Names.Append (N);
-                  Properties.Insert (N, P);
+                  Properties.Properties.Insert (N, P);
                end if;
             end loop;
 

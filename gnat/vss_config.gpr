@@ -36,6 +36,7 @@ abstract project VSS_Config is
 
    Object_Dir       := "../.objs/" & Superproject;
    Tests_Object_Dir := "../../.objs/" & Superproject & "/tests";
+   Tools_Object_Dir := "../../.objs/" & Superproject & "/tools";
 
    case Build_Mode is
       when "prod" =>

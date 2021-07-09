@@ -24,9 +24,9 @@
 with Ada.Command_Line;      use Ada.Command_Line;
 with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
 with Gen_UCD.Property_Aliases_Loader;
+with Gen_UCD.Property_Value_Aliases_Loader;
 
 procedure Gen_UCD.Driver is
 begin
@@ -39,6 +39,7 @@ begin
 
    begin
       Gen_UCD.Property_Aliases_Loader.Load (UCD_Root);
+      Gen_UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
 
       null;
    end;

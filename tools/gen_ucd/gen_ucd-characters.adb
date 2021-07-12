@@ -63,6 +63,11 @@ package body Gen_UCD.Characters is
    Enumeration_Properties        : Properties.Property_Vectors.Vector;
    Enumeration_Property_To_Index : Property_Integer_Maps.Map;
 
+   function Internal_Enumeration_Value
+     (Property  : not null Properties.Property_Access;
+      Value     : not null Properties.Property_Value_Access)
+      return Interfaces.Unsigned_16;
+
    ----------
    -- Hash --
    ----------
@@ -155,7 +160,50 @@ package body Gen_UCD.Characters is
             Database (Code_Point (C)).Boolean (ExtPict_Index) := True;
          end loop;
       end;
+
+      --  Default value for General_Category is 'Cn' ("Unassigned")
+
+      declare
+         GC_Property    : constant not null Properties.Property_Access :=
+           Properties.Resolve ("gc");
+         GC_Value       : constant not null Properties.Property_Value_Access :=
+           Properties.Resolve (GC_Property, "Cn");
+         GC_Index       : constant Positive :=
+           Enumeration_Property_To_Index (GC_Property);
+         GC_Value_Index : constant Interfaces.Unsigned_16 :=
+           Internal_Enumeration_Value (GC_Property, GC_Value);
+
+      begin
+         for C in Code_Point loop
+            Database (C).Enumeration (GC_Index) := GC_Value_Index;
+         end loop;
+
+         GC_Value.Is_Used := True;
+      end;
    end Initialize_Character_Database;
+
+   --------------------------------
+   -- Internal_Enumeration_Value --
+   --------------------------------
+
+   function Internal_Enumeration_Value
+     (Property  : not null Properties.Property_Access;
+      Value     : not null Properties.Property_Value_Access)
+      return Interfaces.Unsigned_16
+   is
+      use type Gen_UCD.Properties.Property_Value_Access;
+
+   begin
+      for J in Property.All_Values.First_Index
+                 .. Property.All_Values.Last_Index
+      loop
+         if Property.All_Values.Element (J) = Value then
+            return Interfaces.Unsigned_16 (J);
+         end if;
+      end loop;
+
+      raise Program_Error;
+   end Internal_Enumeration_Value;
 
    ---------
    -- Set --
@@ -164,30 +212,11 @@ package body Gen_UCD.Characters is
    procedure Set
      (Character : Code_Point;
       Property  : not null Properties.Property_Access;
-      Value     : not null Properties.Property_Value_Access)
-   is
-      use type Gen_UCD.Properties.Property_Value_Access;
-      use type Interfaces.Unsigned_16;
-
-      Index : Interfaces.Unsigned_16 := 0;
-
+      Value     : not null Properties.Property_Value_Access) is
    begin
-      for J in Property.All_Values.First_Index
-                 .. Property.All_Values.Last_Index
-      loop
-         if Property.All_Values.Element (J) = Value then
-            Index := Interfaces.Unsigned_16 (J);
-
-            exit;
-         end if;
-      end loop;
-
-      if Index = 0 then
-         raise Program_Error;
-      end if;
-
       Database (Character).Enumeration
-        (Enumeration_Property_To_Index.Element (Property)) := Index;
+        (Enumeration_Property_To_Index.Element (Property)) :=
+          Internal_Enumeration_Value (Property, Value);
 
       --  Set flag of use of value.
 

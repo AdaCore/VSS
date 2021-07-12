@@ -29,6 +29,8 @@ package body Gen_UCD.Data_File_Loaders is
 
    procedure Scan_Next_Line (Self : in out File_Loader'Class);
 
+   function To_Code_Point (Item : Wide_Wide_String) return Gen_UCD.Code_Point;
+
    -----------------
    -- End_Of_File --
    -----------------
@@ -38,12 +40,77 @@ package body Gen_UCD.Data_File_Loaders is
       return not Is_Open (Self.File) or Self.Buffer'First > Self.Line_Last;
    end End_Of_File;
 
+   --------------------------
+   -- Get_Code_Point_Range --
+   --------------------------
+
+   procedure Get_Code_Point_Range
+     (Self       : in out File_Loader;
+      First_Code : out Gen_UCD.Code_Point;
+      Last_Code  : out Gen_UCD.Code_Point)
+   is
+      function Is_Start_Of_Unicode_Data_Range return Boolean;
+      --  Returns True when current line opens range in UnicodeData.txt format,
+      --  thus first field ends with ", First>" string.
+
+      ------------------------------------
+      -- Is_Start_Of_Unicode_Data_Range --
+      ------------------------------------
+
+      function Is_Start_Of_Unicode_Data_Range return Boolean is
+         Buffer : constant Wide_Wide_String := Self.Get_Field (1);
+         Suffix : constant Wide_Wide_String := ", First>";
+
+      begin
+         return
+           Buffer'Length > Suffix'Length
+             and then Buffer (Buffer'First) = '<'
+             and then Buffer (Buffer'Last - Suffix'Length + 1 .. Buffer'Last)
+                        = Suffix;
+      end Is_Start_Of_Unicode_Data_Range;
+
+   begin
+      if Is_Start_Of_Unicode_Data_Range then
+         First_Code := To_Code_Point (Self.Get_Field (0));
+         Self.Skip_Line;
+         Last_Code := To_Code_Point (Self.Get_Field (0));
+
+      else
+         declare
+            Buffer  : constant Wide_Wide_String := Self.Get_Field (0);
+            Current : Positive := Buffer'First;
+            First   : constant Positive := Buffer'First;
+            Last    : Natural;
+
+         begin
+            Last := Buffer'Last;
+
+            while Current <= Buffer'Last loop
+               if Buffer (Current) not in '0' .. '9' | 'A' .. 'F' then
+                  Last := Current - 1;
+
+                  exit;
+               end if;
+
+               Current := Current + 1;
+            end loop;
+
+            First_Code := To_Code_Point (Buffer (First .. Last));
+            Last_Code  := First_Code;
+
+            if Last /= Buffer'Last then
+               raise Program_Error;
+            end if;
+         end;
+      end if;
+   end Get_Code_Point_Range;
+
    ---------------
    -- Get_Field --
    ---------------
 
    function Get_Field
-     (Self  : in out File_Loader;
+     (Self  : File_Loader;
       Index : Field_Index) return Wide_Wide_String is
    begin
       return
@@ -186,5 +253,37 @@ package body Gen_UCD.Data_File_Loaders is
    begin
       Self.Scan_Next_Line;
    end Skip_Line;
+
+   -------------------
+   -- To_Code_Point --
+   -------------------
+
+   function To_Code_Point
+     (Item : Wide_Wide_String) return Gen_UCD.Code_Point is
+   begin
+      return Result : Gen_UCD.Code_Point := 0 do
+         for J in Item'Range loop
+            Result := Result * 16;
+
+            case Item (J) is
+               when '0' .. '9' =>
+                  Result :=
+                    Result
+                      + Wide_Wide_Character'Pos (Item (J))
+                      - Wide_Wide_Character'Pos ('0');
+
+               when 'A' .. 'F' =>
+                  Result :=
+                    Result
+                      + Wide_Wide_Character'Pos (Item (J))
+                      - Wide_Wide_Character'Pos ('A')
+                      + 10;
+
+               when others =>
+                  raise Constraint_Error;
+            end case;
+         end loop;
+      end return;
+   end To_Code_Point;
 
 end Gen_UCD.Data_File_Loaders;

@@ -34,7 +34,9 @@ package Gen_UCD.Properties is
       new Ada.Containers.Vectors (Positive, Unbounded_Wide_Wide_String);
 
    type Property_Value is record
-      Names : String_Vectors.Vector;
+      Names                           : String_Vectors.Vector;
+      Is_Used                         : Boolean := False;
+      Canonical_Combining_Class_Value : Canonical_Combinig_Class;
    end record;
 
    type Property_Value_Access is access all Property_Value;
@@ -54,8 +56,9 @@ package Gen_UCD.Properties is
       All_Values    : Property_Value_Vectors.Vector;
       Name_To_Value : Name_Property_Value_Maps.Map;
 
-      Is_Canonical_Combining_Class   : Boolean := False;
-      Canonical_Combinig_Class_Value : Canonical_Combinig_Class;
+      Is_Canonical_Combining_Class : Boolean := False;
+      Is_Binary                    : Boolean := False;
+      Is_Enumeration               : Boolean := False;
    end record;
 
    type Property_Access is access all Property;
@@ -69,5 +72,12 @@ package Gen_UCD.Properties is
 
    All_Properties   : Property_Vectors.Vector;
    Name_To_Property : Name_Property_Maps.Map;
+
+   function Resolve
+     (Property_Name : Wide_Wide_String) return not null Property_Access;
+
+   function Resolve
+     (Property   : not null Property_Access;
+      Value_Name : Wide_Wide_String) return Property_Value_Access;
 
 end Gen_UCD.Properties;

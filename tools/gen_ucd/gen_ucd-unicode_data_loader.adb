@@ -21,74 +21,62 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
-
+with Gen_UCD.Characters;
 with Gen_UCD.Data_File_Loaders;
 with Gen_UCD.Properties;
 
-package body Gen_UCD.Property_Value_Aliases_Loader is
+package body Gen_UCD.Unicode_Data_Loader is
 
    ----------
    -- Load --
    ----------
 
    procedure Load (UCD_Root : Wide_Wide_String) is
+      --  General_Category
+
+      GC_Property : constant not null Properties.Property_Access :=
+        Properties.Resolve ("gc");
+      GC_Field    : constant Data_File_Loaders.Field_Index := 2;
+
+      --  Canonical_Combinig_Class
+
+      CCC_Property : constant not null Properties.Property_Access :=
+        Properties.Resolve ("ccc");
+      CCC_Field    : constant Data_File_Loaders.Field_Index := 3;
+
       Loader : Gen_UCD.Data_File_Loaders.File_Loader;
 
    begin
-      Loader.Open (UCD_Root, "PropertyValueAliases.txt");
+      Loader.Open (UCD_Root, "UnicodeData.txt");
 
       while not Loader.End_Of_File loop
-         --  XXX @missing annotation is not processed!
-
          declare
-            P : constant Properties.Property_Access :=
-              Properties.Name_To_Property
-                (To_Unbounded_Wide_Wide_String (Loader.Get_Field (0)));
-            V : constant Properties.Property_Value_Access :=
-              new Properties.Property_Value;
-            F : Data_File_Loaders.Field_Index := 1;
+            First_Code : Gen_UCD.Code_Point;
+            Last_Code  : Gen_UCD.Code_Point;
 
          begin
-            if P.Is_Canonical_Combining_Class then
-               --  Second field for 'ccc' property is numeric value.
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
-               V.Canonical_Combining_Class_Value :=
-                 Properties.Canonical_Combinig_Class'Wide_Wide_Value
-                   (Loader.Get_Field (1));
-               F := 2;
-            end if;
+            declare
+               GC_Value  :
+                 constant not null Properties.Property_Value_Access :=
+                   Properties.Resolve
+                     (GC_Property, Loader.Get_Field (GC_Field));
+               CCC_Value :
+                 constant not null Properties.Property_Value_Access :=
+                   Properties.Resolve
+                     (CCC_Property, Loader.Get_Field (CCC_Field));
 
-            for J in F .. Data_File_Loaders.Field_Index'Last loop
-               if Loader.Has_Field (J) then
-                  declare
-                     Name : constant Unbounded_Wide_Wide_String :=
-                       To_Unbounded_Wide_Wide_String (Loader.Get_Field (J));
-
-                  begin
-                     --  Short name and long name may be the same, ignore
-                     --  duplicates.
-
-                     if V.Names.Is_Empty
-                          or else Name /= V.Names.First_Element
-                     then
-                        V.Names.Append (Name);
-                     end if;
-                  end;
-               end if;
-            end loop;
-
-            --  Register value and its names
-
-            P.All_Values.Append (V);
-
-            for Name of V.Names loop
-               P.Name_To_Value.Insert (Name, V);
-            end loop;
+            begin
+               for Code in First_Code .. Last_Code loop
+                  Characters.Set (Code, GC_Property, GC_Value);
+                  Characters.Set (Code, CCC_Property, CCC_Value);
+               end loop;
+            end;
 
             Loader.Skip_Line;
          end;
       end loop;
    end Load;
 
-end Gen_UCD.Property_Value_Aliases_Loader;
+end Gen_UCD.Unicode_Data_Loader;

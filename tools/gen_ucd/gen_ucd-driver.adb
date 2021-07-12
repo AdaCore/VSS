@@ -28,6 +28,7 @@ use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 with Gen_UCD.Characters;
 with Gen_UCD.Property_Aliases_Loader;
 with Gen_UCD.Property_Value_Aliases_Loader;
+with Gen_UCD.Unicode_Data_Loader;
 
 procedure Gen_UCD.Driver is
 begin
@@ -43,5 +44,7 @@ begin
       Gen_UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
 
       Gen_UCD.Characters.Initialize_Character_Database;
+
+      Gen_UCD.Unicode_Data_Loader.Load (UCD_Root);
    end;
 end Gen_UCD.Driver;

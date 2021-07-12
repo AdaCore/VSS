@@ -27,8 +27,6 @@ with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 
 with Interfaces;
 
-with Gen_UCD.Properties;
-
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
 package body Gen_UCD.Characters is
@@ -140,20 +138,60 @@ package body Gen_UCD.Characters is
       --  Initialize special cases.
 
       --  Unicode 13.0: exception: Extended_Pictographic property is Y by
-      --  default.
+      --  default for few ranges of the code points.
 
       declare
          ExtPict_Property : constant not null Properties.Property_Access :=
-           Properties.Name_To_Property.Element
-             (To_Unbounded_Wide_Wide_String ("ExtPict"));
+           Properties.Resolve ("ExtPict");
          ExtPict_Index    : constant Positive :=
            Boolean_Property_To_Index (ExtPict_Property);
 
       begin
-         for R of Database.all loop
-            R.Boolean (ExtPict_Index) := True;
+         for C in 16#01_F000# .. 16#01_FAFF# loop
+            Database (Code_Point (C)).Boolean (ExtPict_Index) := True;
+         end loop;
+
+         for C in 16#01_FC00# .. 16#01_FFFD# loop
+            Database (Code_Point (C)).Boolean (ExtPict_Index) := True;
          end loop;
       end;
    end Initialize_Character_Database;
+
+   ---------
+   -- Set --
+   ---------
+
+   procedure Set
+     (Character : Code_Point;
+      Property  : not null Properties.Property_Access;
+      Value     : not null Properties.Property_Value_Access)
+   is
+      use type Gen_UCD.Properties.Property_Value_Access;
+      use type Interfaces.Unsigned_16;
+
+      Index : Interfaces.Unsigned_16 := 0;
+
+   begin
+      for J in Property.All_Values.First_Index
+                 .. Property.All_Values.Last_Index
+      loop
+         if Property.All_Values.Element (J) = Value then
+            Index := Interfaces.Unsigned_16 (J);
+
+            exit;
+         end if;
+      end loop;
+
+      if Index = 0 then
+         raise Program_Error;
+      end if;
+
+      Database (Character).Enumeration
+        (Enumeration_Property_To_Index.Element (Property)) := Index;
+
+      --  Set flag of use of value.
+
+      Value.Is_Used := True;
+   end Set;
 
 end Gen_UCD.Characters;

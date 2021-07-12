@@ -21,11 +21,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Gen_UCD.Properties;
+
 package Gen_UCD.Characters is
 
    type Character_Information is private;
 
    procedure Initialize_Character_Database;
+
+   procedure Set
+     (Character : Code_Point;
+      Property  : not null Properties.Property_Access;
+      Value     : not null Properties.Property_Value_Access);
 
 private
 

@@ -21,57 +21,47 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-private with Ada.Finalization;
-private with Ada.Wide_Wide_Text_IO;
+package body Gen_UCD.Properties is
 
-package Gen_UCD.Data_File_Loaders is
+   -------------
+   -- Resolve --
+   -------------
 
-   type Field_Index is range 0 .. 16;
+   function Resolve
+     (Property_Name : Wide_Wide_String) return not null Property_Access is
+   begin
+      return
+        Name_To_Property.Element
+          (To_Unbounded_Wide_Wide_String (Property_Name));
+   end Resolve;
 
-   type File_Loader is tagged limited private;
+   -------------
+   -- Resolve --
+   -------------
 
-   procedure Open
-     (Self      : in out File_Loader;
-      UCD_Root  : Wide_Wide_String;
-      File_Name : Wide_Wide_String);
+   function Resolve
+     (Property   : not null Property_Access;
+      Value_Name : Wide_Wide_String) return Property_Value_Access is
+   begin
+      if Property.Is_Canonical_Combining_Class then
+         declare
+            Value : constant Canonical_Combinig_Class :=
+              Canonical_Combinig_Class'Wide_Wide_Value (Value_Name);
 
-   procedure Close (Self : in out File_Loader);
+         begin
+            for V of Property.All_Values loop
+               if V.Canonical_Combining_Class_Value = Value then
+                  return V;
+               end if;
+            end loop;
 
-   function End_Of_File (Self : File_Loader) return Boolean;
+            raise Program_Error;
+         end;
 
-   procedure Skip_Line (Self : in out File_Loader);
+      else
+         return
+           Property.Name_To_Value (To_Unbounded_Wide_Wide_String (Value_Name));
+      end if;
+   end Resolve;
 
-   function Get_Field
-     (Self : File_Loader; Index : Field_Index) return Wide_Wide_String;
-
-   function Has_Field (Self : File_Loader; Index : Field_Index) return Boolean;
-
-   procedure Get_Code_Point_Range
-     (Self       : in out File_Loader;
-      First_Code : out Gen_UCD.Code_Point;
-      Last_Code  : out Gen_UCD.Code_Point);
-   --  Get range of code points current line applied. It parse zero field of
-   --  the line and supports both ordinary XXXX..YYYY format and special
-   --  UnicodeData.txt when two lines used to define range.
-
-private
-
-   use Ada.Wide_Wide_Text_IO;
-
-   type Field is record
-      First : Positive;
-      Last  : Natural;
-   end record;
-
-   type Field_Array is array (Field_Index) of Field;
-
-   type File_Loader is new Ada.Finalization.Limited_Controlled with record
-      File   : File_Type;
-      Buffer : Wide_Wide_String (1 .. 2048);
-      Line_Last   : Natural;
-      Fields : Field_Array;
-   end record;
-
-   overriding procedure Finalize (Self : in out File_Loader);
-
-end Gen_UCD.Data_File_Loaders;
+end Gen_UCD.Properties;

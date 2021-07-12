@@ -21,27 +21,16 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;      use Ada.Command_Line;
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+package Gen_UCD.Characters is
 
-with Gen_UCD.Characters;
-with Gen_UCD.Property_Aliases_Loader;
-with Gen_UCD.Property_Value_Aliases_Loader;
+   type Character_Information is private;
 
-procedure Gen_UCD.Driver is
-begin
-   if Ada.Command_Line.Argument_Count /= 1 then
-      return;
-   end if;
+   procedure Initialize_Character_Database;
 
-   declare
-      UCD_Root : constant Wide_Wide_String := Decode (Argument (1));
+private
 
-   begin
-      Gen_UCD.Property_Aliases_Loader.Load (UCD_Root);
-      Gen_UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+   type Character_Record;
 
-      Gen_UCD.Characters.Initialize_Character_Database;
-   end;
-end Gen_UCD.Driver;
+   type Character_Information is access all Character_Record;
+
+end Gen_UCD.Characters;

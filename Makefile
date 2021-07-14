@@ -7,7 +7,9 @@ all:
 
 generate:
 	gprbuild -p -P gnat/tools/gen_ucd.gpr
-	.objs/tools/gen_ucd data/ucd
+	.objs/tools/gen_ucd data/ucd .objs/ucd.ada
+	rm -f source/text/ucd/*
+	gnatchop .objs/ucd.ada source/text/ucd
 
 build_tests:
 	gprbuild -p -P gnat/tests/vss_text_tests.gpr

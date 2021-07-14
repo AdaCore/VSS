@@ -23,6 +23,16 @@
 
 package body Gen_UCD.Properties is
 
+   ----------
+   -- Hash --
+   ----------
+
+   function Hash
+     (Item : Property_Value_Access) return Ada.Containers.Hash_Type is
+   begin
+      return Wide_Wide_Hash (Item.Names.First_Element);
+   end Hash;
+
    -------------
    -- Resolve --
    -------------

@@ -24,16 +24,18 @@
 with Ada.Command_Line;      use Ada.Command_Line;
 with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
 with Gen_UCD.Characters;
+with Gen_UCD.Core_Properties;
 with Gen_UCD.Property_Aliases_Loader;
 with Gen_UCD.Property_Value_Aliases_Loader;
 with Gen_UCD.Unicode_Data_Loader;
 
 procedure Gen_UCD.Driver is
 begin
-   if Ada.Command_Line.Argument_Count /= 1 then
-      return;
+   if Ada.Command_Line.Argument_Count /= 2 then
+      raise Program_Error;
    end if;
 
    declare
@@ -46,5 +48,21 @@ begin
       Gen_UCD.Characters.Initialize_Character_Database;
 
       Gen_UCD.Unicode_Data_Loader.Load (UCD_Root);
+   end;
+
+   Put_Line ("Processing...");
+   Gen_UCD.Core_Properties.Build;
+
+   declare
+      Ada_File : File_Type;
+
+   begin
+      Put_Line ("Generating...");
+
+      Create (Ada_File, Out_File, Argument (2));
+
+      Gen_UCD.Core_Properties.Generate (Ada_File);
+
+      Close (Ada_File);
    end;
 end Gen_UCD.Driver;

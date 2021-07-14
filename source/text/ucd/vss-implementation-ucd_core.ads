@@ -89,7 +89,10 @@ package VSS.Implementation.UCD_Core is
       GC   at 0 range 0 .. 4;
    end record;
 
-   Core_Index_Table : constant array (Core_Index) of Core_Offset :=
+   type Index_Table_Array is array (Core_Index) of Core_Offset;
+   pragma Pack (Index_Table_Array);
+
+   Core_Index_Table : constant Index_Table_Array :=
      (0, 256, 512, 768, 1024, 1280, 1536, 1792,
       2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840,
       4096, 4352, 4608, 4864, 5120, 4352, 5376, 5632,

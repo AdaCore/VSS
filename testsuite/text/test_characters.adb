@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,40 +20,41 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+with VSS.Characters;
 
-project VSS_Text_Tests is
+with Test_Support;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/text");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+procedure Test_Characters is
+   use type VSS.Characters.General_Category;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+begin
+   --  This test can be replaces by the test with full coverage of possible
+   --  Unicode characters listed in 'extracted/DerivedGeneralCategory.txt'
+   --  file of UCD.
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
-
-end VSS_Text_Tests;
+   Test_Support.Assert
+     (VSS.Characters.Get_General_Category
+        (VSS.Characters.Virtual_Character'Val (16#00#))
+      = VSS.Characters.Control);
+   Test_Support.Assert
+     (VSS.Characters.Get_General_Category
+        (VSS.Characters.Virtual_Character'Val (16#20#))
+      = VSS.Characters.Space_Separator);
+   Test_Support.Assert
+     (VSS.Characters.Get_General_Category
+        (VSS.Characters.Virtual_Character'Val (16#31#))
+      = VSS.Characters.Decimal_Number);
+   Test_Support.Assert
+     (VSS.Characters.Get_General_Category
+        (VSS.Characters.Virtual_Character'Val (16#41#))
+      = VSS.Characters.Uppercase_Letter);
+   Test_Support.Assert
+     (VSS.Characters.Get_General_Category
+        (VSS.Characters.Virtual_Character'Val (16#430#))
+      = VSS.Characters.Lowercase_Letter);
+   Test_Support.Assert
+     (VSS.Characters.Get_General_Category
+        (VSS.Characters.Virtual_Character'Val (16#D800#))
+      = VSS.Characters.Surrogate);
+end Test_Characters;

@@ -548,6 +548,12 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "      GC   at 0 range 0 .. 4;");
          Put_Line (File, "   end record;");
          New_Line (File);
+
+         Put_Line
+           (File,
+            "   type Index_Table_Array is array (Core_Index) of Core_Offset;");
+         Put_Line (File, "   pragma Pack (Index_Table_Array);");
+         New_Line (File);
       end;
 
       --  Generate index table.
@@ -559,8 +565,7 @@ package body Gen_UCD.Core_Properties is
       begin
          Put_Line
            (File,
-            "   Core_Index_Table :"
-            & " constant array (Core_Index) of Core_Offset :=");
+            "   Core_Index_Table : constant Index_Table_Array :=");
 
          for J in 0 .. Database.Index_Last loop
             if First then

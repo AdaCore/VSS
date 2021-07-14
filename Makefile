@@ -8,7 +8,7 @@ all:
 generate:
 	gprbuild -p -P gnat/tools/gen_ucd.gpr
 	.objs/tools/gen_ucd data/ucd .objs/ucd.ada
-	rm -f source/text/ucd/*
+	rm -f source/text/ucd/*.ad[sb]
 	gnatchop .objs/ucd.ada source/text/ucd
 
 build_tests:
@@ -20,6 +20,7 @@ build_tests:
 check: build_tests check_text check_json check_regexp
 
 check_text:
+	.objs/tests/test_characters
 	.objs/tests/test_character_iterators
 	.objs/tests/test_character_markers
 	.objs/tests/test_converters

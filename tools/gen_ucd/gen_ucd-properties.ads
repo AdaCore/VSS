@@ -44,7 +44,7 @@ package Gen_UCD.Properties is
    package Property_Value_Vectors is
       new Ada.Containers.Vectors (Positive, Property_Value_Access);
 
-   package Name_Property_Value_Maps is
+   package String_Property_Value_Maps is
      new Ada.Containers.Hashed_Maps
        (Unbounded_Wide_Wide_String,
         Property_Value_Access,
@@ -54,7 +54,7 @@ package Gen_UCD.Properties is
    type Property is record
       Names         : String_Vectors.Vector;
       All_Values    : Property_Value_Vectors.Vector;
-      Name_To_Value : Name_Property_Value_Maps.Map;
+      Name_To_Value : String_Property_Value_Maps.Map;
 
       Is_Canonical_Combining_Class : Boolean := False;
       Is_Binary                    : Boolean := False;
@@ -79,5 +79,8 @@ package Gen_UCD.Properties is
    function Resolve
      (Property   : not null Property_Access;
       Value_Name : Wide_Wide_String) return Property_Value_Access;
+
+   function Hash
+     (Item : Property_Value_Access) return Ada.Containers.Hash_Type;
 
 end Gen_UCD.Properties;

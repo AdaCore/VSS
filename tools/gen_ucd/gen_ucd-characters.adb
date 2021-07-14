@@ -68,6 +68,22 @@ package body Gen_UCD.Characters is
       Value     : not null Properties.Property_Value_Access)
       return Interfaces.Unsigned_16;
 
+   ---------
+   -- Get --
+   ---------
+
+   function Get
+     (Character : Code_Point;
+      Property  : not null Properties.Property_Access)
+      return not null Properties.Property_Value_Access is
+   begin
+      return
+        Property.All_Values
+          (Positive
+             (Database (Character).Enumeration
+              (Enumeration_Property_To_Index.Element (Property))));
+   end Get;
+
    ----------
    -- Hash --
    ----------

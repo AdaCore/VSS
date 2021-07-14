@@ -21,28 +21,12 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Gen_UCD.Properties;
+with Ada.Wide_Wide_Text_IO;
 
-package Gen_UCD.Characters is
+package Gen_UCD.Core_Properties is
 
-   type Character_Information is private;
+   procedure Build;
 
-   procedure Initialize_Character_Database;
+   procedure Generate (File : Ada.Wide_Wide_Text_IO.File_Type);
 
-   procedure Set
-     (Character : Code_Point;
-      Property  : not null Properties.Property_Access;
-      Value     : not null Properties.Property_Value_Access);
-
-   function Get
-     (Character : Code_Point;
-      Property  : not null Properties.Property_Access)
-        return not null Properties.Property_Value_Access;
-
-private
-
-   type Character_Record;
-
-   type Character_Information is access all Character_Record;
-
-end Gen_UCD.Characters;
+end Gen_UCD.Core_Properties;

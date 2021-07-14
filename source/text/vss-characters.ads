@@ -93,4 +93,8 @@ package VSS.Characters is
    subtype Other is
      General_Category range Control .. Unassigned;
 
+   function Get_General_Category
+     (Self : Virtual_Character) return General_Category;
+   --  Return General_Category property for given character.
+
 end VSS.Characters;

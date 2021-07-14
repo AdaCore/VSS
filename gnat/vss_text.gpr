@@ -33,7 +33,8 @@ project VSS_Text is
      ("../source/streams",
       "../source/streams/implementation",
       "../source/text",
-      "../source/text/implementation");
+      "../source/text/implementation",
+      "../source/text/ucd");
 
    package Compiler renames VSS_Config.Compiler;
 

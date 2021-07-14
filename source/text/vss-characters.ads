@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -30,5 +30,71 @@ package VSS.Characters is
    type Virtual_Character is new Wide_Wide_Character
      range Wide_Wide_Character'Val (16#00_0000#)
        .. Wide_Wide_Character'Val (16#10_FFFF#);
+
+   type General_Category is
+     (Uppercase_Letter,
+      Lowercase_Letter,
+      Titlecase_Letter,
+      Modifier_Letter,
+      Other_Letter,
+
+      Nonspacing_Mark,
+      Spacing_Mark,
+      Enclosing_Mark,
+
+      Decimal_Number,
+      Letter_Number,
+      Other_Number,
+
+      Connector_Punctuation,
+      Dash_Punctuation,
+      Open_Punctuation,
+      Close_Punctuation,
+      Initial_Punctuation,
+      Final_Punctuation,
+      Other_Punctuation,
+
+      Math_Symbol,
+      Currency_Symbol,
+      Modifier_Symbol,
+      Other_Symbol,
+
+      Space_Separator,
+      Line_Separator,
+      Paragraph_Separator,
+
+      Control,
+      Format,
+      Surrogate,
+      Private_Use,
+      Unassigned);
+
+   subtype Cased_Letter is
+     General_Category range Uppercase_Letter .. Titlecase_Letter;
+
+   subtype Letter is
+     General_Category range Uppercase_Letter .. Other_Letter;
+
+   subtype Mark is
+     General_Category range Nonspacing_Mark .. Enclosing_Mark;
+
+   subtype Number is
+     General_Category range Decimal_Number .. Other_Number;
+
+   subtype Punctuation is
+     General_Category range Connector_Punctuation .. Other_Punctuation;
+
+   subtype Symbol is
+     General_Category range Math_Symbol .. Other_Symbol;
+
+   subtype Separator is
+     General_Category range Space_Separator .. Paragraph_Separator;
+
+   subtype Other is
+     General_Category range Control .. Unassigned;
+
+   function Get_General_Category
+     (Self : Virtual_Character) return General_Category;
+   --  Return General_Category property for given character.
 
 end VSS.Characters;

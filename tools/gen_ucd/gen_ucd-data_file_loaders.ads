@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,40 +20,58 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+private with Ada.Finalization;
+private with Ada.Wide_Wide_Text_IO;
 
-project VSS_Text_Tests is
+package Gen_UCD.Data_File_Loaders is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/text");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+   type Field_Index is range 0 .. 16;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   type File_Loader is tagged limited private;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   procedure Open
+     (Self      : in out File_Loader;
+      UCD_Root  : Wide_Wide_String;
+      File_Name : Wide_Wide_String);
 
-end VSS_Text_Tests;
+   procedure Close (Self : in out File_Loader);
+
+   function End_Of_File (Self : File_Loader) return Boolean;
+
+   procedure Skip_Line (Self : in out File_Loader);
+
+   function Get_Field
+     (Self : File_Loader; Index : Field_Index) return Wide_Wide_String;
+
+   function Has_Field (Self : File_Loader; Index : Field_Index) return Boolean;
+
+   procedure Get_Code_Point_Range
+     (Self       : in out File_Loader;
+      First_Code : out Gen_UCD.Code_Point;
+      Last_Code  : out Gen_UCD.Code_Point);
+   --  Get range of code points current line applied. It parse zero field of
+   --  the line and supports both ordinary XXXX..YYYY format and special
+   --  UnicodeData.txt when two lines used to define range.
+
+private
+
+   use Ada.Wide_Wide_Text_IO;
+
+   type Field is record
+      First : Positive;
+      Last  : Natural;
+   end record;
+
+   type Field_Array is array (Field_Index) of Field;
+
+   type File_Loader is new Ada.Finalization.Limited_Controlled with record
+      File   : File_Type;
+      Buffer : Wide_Wide_String (1 .. 2048);
+      Line_Last   : Natural;
+      Fields : Field_Array;
+   end record;
+
+   overriding procedure Finalize (Self : in out File_Loader);
+
+end Gen_UCD.Data_File_Loaders;

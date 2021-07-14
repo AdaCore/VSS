@@ -247,7 +247,6 @@ procedure Test_Converters is
       end;
    end Do_Test;
 
-
 begin
    --  Check invalid state of the decoder after object declaration without
    --  initialization.

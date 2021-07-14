@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,40 +20,49 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+with Ada.Command_Line;      use Ada.Command_Line;
+with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
-project VSS_Text_Tests is
+with Gen_UCD.Characters;
+with Gen_UCD.Core_Properties;
+with Gen_UCD.Property_Aliases_Loader;
+with Gen_UCD.Property_Value_Aliases_Loader;
+with Gen_UCD.Unicode_Data_Loader;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/text");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+procedure Gen_UCD.Driver is
+begin
+   if Ada.Command_Line.Argument_Count /= 2 then
+      raise Program_Error;
+   end if;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   declare
+      UCD_Root : constant Wide_Wide_String := Decode (Argument (1));
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   begin
+      Gen_UCD.Property_Aliases_Loader.Load (UCD_Root);
+      Gen_UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
 
-end VSS_Text_Tests;
+      Gen_UCD.Characters.Initialize_Character_Database;
+
+      Gen_UCD.Unicode_Data_Loader.Load (UCD_Root);
+   end;
+
+   Put_Line ("Processing...");
+   Gen_UCD.Core_Properties.Build;
+
+   declare
+      Ada_File : File_Type;
+
+   begin
+      Put_Line ("Generating...");
+
+      Create (Ada_File, Out_File, Argument (2));
+
+      Gen_UCD.Core_Properties.Generate (Ada_File);
+
+      Close (Ada_File);
+   end;
+end Gen_UCD.Driver;

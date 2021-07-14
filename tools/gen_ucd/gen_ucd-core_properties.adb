@@ -281,7 +281,7 @@ package body Gen_UCD.Core_Properties is
          for Block in 1 .. Raw'Length / Block_Size - 1 loop
             Reused := False;
 
-            for Compressed in 0 .. Compressed_Data_Last loop
+            for Compressed in 0 .. Compressed_Data_Last - Block_Size + 1 loop
                if Is_Equal (Block, Compressed) then
                   Index_Data (Block) := Compressed;
                   Reused := True;
@@ -291,8 +291,8 @@ package body Gen_UCD.Core_Properties is
             end loop;
 
             if not Reused then
+               Index_Data (Block) := Compressed_Data_Last + 1;
                Compressed_Data_Last := Compressed_Data_Last + Block_Size;
-               Index_Data (Block) := Compressed_Data_Last;
                Compressed_Data
                  (Compressed_Data_Last - Block_Size + 1
                   .. Compressed_Data_Last) :=

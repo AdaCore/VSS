@@ -27,6 +27,7 @@ private with Ada.Streams;
 
 with VSS.Characters;
 private with VSS.Implementation.Strings;
+limited with VSS.Locales;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
@@ -44,6 +45,17 @@ package VSS.Strings is
    subtype Grapheme_Index is Grapheme_Count range 1 .. Grapheme_Count'Last;
 
    type Hash_Type is mod 2**64;
+
+   type Case_Sensitivity is
+     (Case_Sensitive,          --  Simple binary search.
+      Default_Caseless,        --  Full case folding without normalization.
+      Canonical_Caseless,      --  Full case folding & canonical decomposition.
+      Compatibility_Caseless,
+      --  Full case folding & compatibility decomposition.
+      Identifier_Caseless);
+      --  Full case folding, compatibility composition & ignore any characters
+      --  with Default_Ignorable_Code_Point property set to True. Suitable to
+      --  compare identifiers.
 
    type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
 
@@ -290,13 +302,44 @@ package VSS.Strings is
    --  doesn't belog to given string or invalid cursors.
 
    function Starts_With
-     (Self   : Virtual_String'Class;
-      Prefix : Virtual_String'Class) return Boolean;
-   --  Return True when Self starts with Prefix.
+     (Self             : Virtual_String'Class;
+      Prefix           : Virtual_String'Class;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean;
+   --  Return True when Self starts with Prefix. Case_Sensitivity defines
+   --  whether search is case sensitive or not, and select algorithm for the
+   --  last. This function always use current thread locale for caseless
+   --  mappings.
+
+   function Starts_With
+     (Self             : Virtual_String'Class;
+      Prefix           : Virtual_String'Class;
+      Locale           : VSS.Locales.Locale;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean;
+   --  Return True when Self starts with Prefix. Case_Sensitivity defines
+   --  whether search is case sensitive or not, and select algorithm for the
+   --  last. Locale specifies locale to be used for caseless mappings.
+
    function Ends_With
-     (Self   : Virtual_String'Class;
-      Suffix : Virtual_String'Class) return Boolean;
-   --  Return True when Self has given Suffix.
+     (Self             : Virtual_String'Class;
+      Suffix           : Virtual_String'Class;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean;
+   --  Return True when Self has given Suffix. Case_Sensitivity defines
+   --  whether search is case sensitive or not, and select algorithm for the
+   --  last. This function always use current thread locale for caseless
+   --  mappings.
+
+   function Ends_With
+     (Self             : Virtual_String'Class;
+      Suffix           : Virtual_String'Class;
+      Locale           : VSS.Locales.Locale;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean;
+   --  Return True when Self has given Suffix. Case_Sensitivity defines
+   --  whether search is case sensitive or not, and select algorithm for the
+   --  last. Locale specifies locale to be used for caseless mappings.
 
    function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
    --  Convert given string into virtual string.

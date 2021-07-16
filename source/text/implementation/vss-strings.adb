@@ -25,6 +25,7 @@ with Ada.Exceptions;
 
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
+with VSS.Locales;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
 with VSS.Strings.Cursors.Iterators.Lines.Internals;
@@ -372,9 +373,29 @@ package body VSS.Strings is
    ---------------
 
    function Ends_With
-     (Self   : Virtual_String'Class;
-      Suffix : Virtual_String'Class) return Boolean
+     (Self             : Virtual_String'Class;
+      Suffix           : Virtual_String'Class;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean is
+   begin
+      return
+        Self.Ends_With (Suffix, VSS.Locales.Current_Locale, Case_Sensitivity);
+   end Ends_With;
+
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   function Ends_With
+     (Self             : Virtual_String'Class;
+      Suffix           : Virtual_String'Class;
+      Locale           : VSS.Locales.Locale;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean
    is
+      pragma Unreferenced (Locale);
+      pragma Unreferenced (Case_Sensitivity);
+
       use type VSS.Implementation.Strings.Character_Count;
 
       Self_Handler   :
@@ -882,9 +903,30 @@ package body VSS.Strings is
    -----------------
 
    function Starts_With
-     (Self   : Virtual_String'Class;
-      Prefix : Virtual_String'Class) return Boolean
+     (Self             : Virtual_String'Class;
+      Prefix           : Virtual_String'Class;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean is
+   begin
+      return
+        Self.Starts_With
+          (Prefix, VSS.Locales.Current_Locale, Case_Sensitivity);
+   end Starts_With;
+
+   -----------------
+   -- Starts_With --
+   -----------------
+
+   function Starts_With
+     (Self             : Virtual_String'Class;
+      Prefix           : Virtual_String'Class;
+      Locale           : VSS.Locales.Locale;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean
    is
+      pragma Unreferenced (Locale);
+      pragma Unreferenced (Case_Sensitivity);
+
       use type VSS.Implementation.Strings.Character_Count;
 
       Self_Handler   :

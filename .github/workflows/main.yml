@@ -17,6 +17,12 @@ jobs:
           path: ./cached_gnat
           key: ${{ runner.os }}-gnat-2020.1
           restore-keys: ${{ runner.os }}-gnat-2020.1
+      - name: Get UCD.zip
+        run: |
+          curl -C - -o ./cached_gnat/UCD-13.0.0.zip https://www.unicode.org/Public/13.0.0/ucd/UCD.zip
+          mkdir data
+          mkdir data/ucd
+          unzip cached_gnat/UCD-13.0.0.zip -d ./data/ucd
       - name: Get GNAT Community 2020 toolchain
         uses: ada-actions/toolchain@ce2020
         with:

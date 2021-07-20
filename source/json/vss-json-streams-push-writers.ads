@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -25,7 +25,7 @@ with VSS.JSON.Streams.Content_Handlers;
 private with VSS.Strings;
 with VSS.Text_Streams;
 
-package VSS.JSON.Streams.Writers is
+package VSS.JSON.Streams.Push.Writers is
 
    type JSON_Simple_Writer is
      limited new VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler
@@ -88,4 +88,4 @@ private
    overriding procedure Null_Value
      (Self : in out JSON_Simple_Writer; Success : in out Boolean);
 
-end VSS.JSON.Streams.Writers;
+end VSS.JSON.Streams.Push.Writers;

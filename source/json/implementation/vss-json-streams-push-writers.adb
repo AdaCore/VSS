@@ -208,6 +208,16 @@ package body VSS.JSON.Streams.Push.Writers is
       Self.Open_Parenthesis := False;
    end End_Object;
 
+   -------------------
+   -- Error_Message --
+   -------------------
+
+   overriding function Error_Message
+     (Self : JSON_Simple_Writer) return VSS.Strings.Virtual_String is
+   begin
+      return VSS.Strings.Empty_Virtual_String;
+   end Error_Message;
+
    --------------------------
    -- Escaped_String_Value --
    --------------------------

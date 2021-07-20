@@ -88,4 +88,7 @@ private
    overriding procedure Null_Value
      (Self : in out JSON_Simple_Writer; Success : in out Boolean);
 
+   overriding function Error_Message
+     (Self : JSON_Simple_Writer) return VSS.Strings.Virtual_String;
+
 end VSS.JSON.Streams.Push.Writers;

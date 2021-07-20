@@ -38,7 +38,7 @@ procedure Test_JSON_Reader is
    use all type VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error;
 
    Input       : aliased Tests_Text_Streams.Memory_UTF8_Input_Stream;
-   Reader      : VSS.JSON.Streams.Pull.Readers.Simple.JSON_Simple_Reader;
+   Reader      : VSS.JSON.Streams.Pull.Readers.Simple.JSON_Simple_Pull_Reader;
    Count       : Natural := 0;
    Perfomance  : Boolean := False;
    Incremental : Boolean := False;

@@ -27,10 +27,10 @@ package VSS.JSON.Streams.Push.Readers is
 
    pragma Preelaborate;
 
-   type JSON_Stream_Push_Reader is limited interface;
+   type JSON_Push_Reader is limited interface;
 
    not overriding procedure Set_Content_Handler
-     (Self : in out JSON_Stream_Push_Reader;
+     (Self : in out JSON_Push_Reader;
       To   : VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access)
       is abstract;
    --  Set content handler to process stream.

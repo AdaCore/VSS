@@ -28,7 +28,7 @@ with VSS.Text_Streams;
 package VSS.JSON.Streams.Push.Readers.Simple is
 
    type JSON_Simple_Push_Reader is
-     limited new VSS.JSON.Streams.Push.Readers.JSON_Stream_Push_Reader
+     limited new VSS.JSON.Streams.Push.Readers.JSON_Push_Reader
        with private;
 
    procedure Set_Stream
@@ -51,9 +51,9 @@ package VSS.JSON.Streams.Push.Readers.Simple is
 private
 
    type JSON_Simple_Push_Reader is
-     limited new VSS.JSON.Streams.Push.Readers.JSON_Stream_Push_Reader
+     limited new VSS.JSON.Streams.Push.Readers.JSON_Push_Reader
    with record
-      Reader  : VSS.JSON.Streams.Pull.Readers.Simple.JSON_Simple_Reader;
+      Reader  : VSS.JSON.Streams.Pull.Readers.Simple.JSON_Simple_Pull_Reader;
       Content : VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access;
       Error   : VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error
         := VSS.JSON.Streams.Pull.Readers.No_Error;

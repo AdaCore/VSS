@@ -75,14 +75,16 @@ procedure Test_JSON_Writer is
    Escaped : constant VSS.Strings.Virtual_String := "\""";
 
    procedure Test_Output_Failure
-     (Writer : in out VSS.JSON.Streams.Push.Writers.JSON_Simple_Writer'Class);
+     (Writer : in out
+        VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer'Class);
 
    -------------------------
    -- Test_Output_Failure --
    -------------------------
 
    procedure Test_Output_Failure
-     (Writer : in out VSS.JSON.Streams.Push.Writers.JSON_Simple_Writer'Class)
+     (Writer : in out
+        VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer'Class)
    is
       type Test_Event is record
          Length : VSS.Strings.Character_Count;
@@ -272,7 +274,7 @@ procedure Test_JSON_Writer is
 
    Stream  :
      aliased VSS.Text_Streams.Memory_UTF8_Output.Memory_UTF8_Output_Stream;
-   Writer  : aliased VSS.JSON.Streams.Push.Writers.JSON_Simple_Writer;
+   Writer  : aliased VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer;
    Success : Boolean := True;
 
 begin
@@ -400,7 +402,7 @@ begin
    end;
 
    declare
-      Writer : aliased VSS.JSON.Streams.Push.Writers.JSON_Simple_Writer;
+      Writer : aliased VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer;
 
    begin
       Test_Output_Failure (Writer);

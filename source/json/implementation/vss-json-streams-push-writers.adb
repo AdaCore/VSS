@@ -34,10 +34,10 @@ package body VSS.JSON.Streams.Push.Writers is
    use type VSS.Text_Streams.Output_Text_Stream_Access;
 
    procedure Check_Effective_Stream
-     (Self : in out JSON_Simple_Writer'Class; Success : in out Boolean);
+     (Self : in out JSON_Simple_Push_Writer'Class; Success : in out Boolean);
 
    procedure Escaped_String_Value
-     (Self    : in out JSON_Simple_Writer'Class;
+     (Self    : in out JSON_Simple_Push_Writer'Class;
       Item    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean);
    --  Outputs escaped string value
@@ -47,7 +47,7 @@ package body VSS.JSON.Streams.Push.Writers is
    -------------------
 
    overriding procedure Boolean_Value
-     (Self    : in out JSON_Simple_Writer;
+     (Self    : in out JSON_Simple_Push_Writer;
       Value   : Boolean;
       Success : in out Boolean) is
    begin
@@ -131,7 +131,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ----------------------------
 
    procedure Check_Effective_Stream
-     (Self : in out JSON_Simple_Writer'Class; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer'Class; Success : in out Boolean) is
    begin
       if Self.Effective_Stream = null then
          Success := False;
@@ -143,7 +143,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ---------------
 
    overriding procedure End_Array
-     (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer; Success : in out Boolean) is
    begin
       Self.Check_Effective_Stream (Success);
 
@@ -165,7 +165,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ------------------
 
    overriding procedure End_Document
-     (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer; Success : in out Boolean) is
    begin
       --  End_Document is special exception: it must shutdown processing even
       --  in case of intermediate failures.
@@ -191,7 +191,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ----------------
 
    overriding procedure End_Object
-     (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer; Success : in out Boolean) is
    begin
       Self.Check_Effective_Stream (Success);
 
@@ -213,7 +213,7 @@ package body VSS.JSON.Streams.Push.Writers is
    -------------------
 
    overriding function Error_Message
-     (Self : JSON_Simple_Writer) return VSS.Strings.Virtual_String is
+     (Self : JSON_Simple_Push_Writer) return VSS.Strings.Virtual_String is
    begin
       return VSS.Strings.Empty_Virtual_String;
    end Error_Message;
@@ -223,7 +223,7 @@ package body VSS.JSON.Streams.Push.Writers is
    --------------------------
 
    procedure Escaped_String_Value
-     (Self    : in out JSON_Simple_Writer'Class;
+     (Self    : in out JSON_Simple_Push_Writer'Class;
       Item    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean)
    is
@@ -476,7 +476,7 @@ package body VSS.JSON.Streams.Push.Writers is
    --------------
 
    overriding procedure Key_Name
-     (Self    : in out JSON_Simple_Writer;
+     (Self    : in out JSON_Simple_Push_Writer;
       Name    : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean) is
    begin
@@ -520,7 +520,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ----------------
 
    overriding procedure Null_Value
-     (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer; Success : in out Boolean) is
    begin
       Self.Check_Effective_Stream (Success);
 
@@ -569,7 +569,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ------------------
 
    overriding procedure Number_Value
-     (Self    : in out JSON_Simple_Writer;
+     (Self    : in out JSON_Simple_Push_Writer;
       Value   : VSS.JSON.JSON_Number;
       Success : in out Boolean) is
    begin
@@ -643,7 +643,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ----------------
 
    procedure Set_Stream
-     (Self   : in out JSON_Simple_Writer'Class;
+     (Self   : in out JSON_Simple_Push_Writer'Class;
       Stream : not null VSS.Text_Streams.Output_Text_Stream_Access) is
    begin
       Self.Configured_Stream := Stream;
@@ -654,7 +654,7 @@ package body VSS.JSON.Streams.Push.Writers is
    -----------------
 
    overriding procedure Start_Array
-     (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer; Success : in out Boolean) is
    begin
       Self.Check_Effective_Stream (Success);
 
@@ -684,7 +684,7 @@ package body VSS.JSON.Streams.Push.Writers is
    --------------------
 
    overriding procedure Start_Document
-     (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer; Success : in out Boolean) is
    begin
       if Self.Effective_Stream /= null then
          Success := False;
@@ -703,7 +703,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ------------------
 
    overriding procedure Start_Object
-     (Self : in out JSON_Simple_Writer; Success : in out Boolean) is
+     (Self : in out JSON_Simple_Push_Writer; Success : in out Boolean) is
    begin
       Self.Check_Effective_Stream (Success);
 
@@ -733,7 +733,7 @@ package body VSS.JSON.Streams.Push.Writers is
    ------------------
 
    overriding procedure String_Value
-     (Self    : in out JSON_Simple_Writer;
+     (Self    : in out JSON_Simple_Push_Writer;
       Value   : VSS.Strings.Virtual_String'Class;
       Success : in out Boolean) is
    begin

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,7 +23,7 @@
 
 with VSS.Strings;
 
-package VSS.JSON.Events is
+package VSS.JSON.Streams.Events is
 
    pragma Preelaborate;
 
@@ -64,4 +64,4 @@ package VSS.JSON.Events is
       end case;
    end record;
 
-end VSS.JSON.Events;
+end VSS.JSON.Streams.Events;

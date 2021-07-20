@@ -31,6 +31,8 @@ package VSS.JSON.Streams.Content_Handlers is
 
    type JSON_Content_Handler is limited interface;
 
+   type JSON_Content_Handler_Access is access all JSON_Content_Handler'Class;
+
    procedure Start_Document
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
    --  Called when processing of JSON document has been started
@@ -76,6 +78,13 @@ package VSS.JSON.Streams.Content_Handlers is
 
    procedure Null_Value
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
+
+   function Error_Message
+     (Self : JSON_Content_Handler) return VSS.Strings.Virtual_String
+      is abstract;
+   --  Return diagnosis message for error detected by handler. Usually called
+   --  by the reader to get diagnosis and provide it for higher level
+   --  component.
 
    --  Convinience subprograms to report integer and float value using Ada
    --  types

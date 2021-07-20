@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -77,6 +77,9 @@ procedure Test_JSON_Content_Handler is
    overriding procedure Null_Value
      (Self : in out Test_Content_Handler; Success : in out Boolean);
 
+   overriding function Error_Message
+     (Self : Test_Content_Handler) return VSS.Strings.Virtual_String;
+
    -------------------
    -- Boolean_Value --
    -------------------
@@ -118,6 +121,16 @@ procedure Test_JSON_Content_Handler is
    begin
       Success := Self.Status;
    end End_Object;
+
+   -------------------
+   -- Error_Message --
+   -------------------
+
+   overriding function Error_Message
+     (Self : Test_Content_Handler) return VSS.Strings.Virtual_String is
+   begin
+      return VSS.Strings.Empty_Virtual_String;
+   end Error_Message;
 
    --------------
    -- Key_Name --

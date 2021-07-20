@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -24,7 +24,7 @@
 private with VSS.JSON.Implementation.Parsers;
 with VSS.Text_Streams;
 
-package VSS.JSON.Streams.Readers.Simple is
+package VSS.JSON.Streams.Pull.Readers.Simple is
 
    type JSON_Simple_Reader is limited new JSON_Stream_Reader with private;
 
@@ -47,14 +47,14 @@ private
 
    overriding function Error
      (Self : JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Reader_Error;
+      return VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error;
 
    overriding function Error_Message
      (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String;
 
    overriding function Event_Kind
      (Self : JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Event_Kind;
+      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind;
 
    overriding function Key_Name
      (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String;
@@ -68,7 +68,7 @@ private
 
    overriding function Read_Next
      (Self : in out JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Event_Kind;
+      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind;
 
    overriding procedure Skip_Current_Array (Self : in out JSON_Simple_Reader);
 
@@ -79,4 +79,4 @@ private
    overriding function String_Value
      (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String;
 
-end VSS.JSON.Streams.Readers.Simple;
+end VSS.JSON.Streams.Pull.Readers.Simple;

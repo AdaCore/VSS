@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -24,7 +24,7 @@
 
 with VSS.Strings;
 
-package VSS.JSON.Streams.Readers is
+package VSS.JSON.Streams.Pull.Readers is
 
    pragma Preelaborate;
 
@@ -117,4 +117,4 @@ package VSS.JSON.Streams.Readers is
 
    procedure Skip_Current_Value (Self : in out JSON_Stream_Reader) is abstract;
 
-end VSS.JSON.Streams.Readers;
+end VSS.JSON.Streams.Pull.Readers;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.JSON.Streams.Readers.Simple is
+package body VSS.JSON.Streams.Pull.Readers.Simple is
 
    ------------
    -- At_End --
@@ -57,7 +57,7 @@ package body VSS.JSON.Streams.Readers.Simple is
 
    overriding function Error
      (Self : JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Reader_Error is
+      return VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error is
    begin
       return Self.Parser.Error;
    end Error;
@@ -78,7 +78,7 @@ package body VSS.JSON.Streams.Readers.Simple is
 
    overriding function Event_Kind
      (Self : JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Event_Kind is
+      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind is
    begin
       return Self.Parser.Event_Kind;
    end Event_Kind;
@@ -120,7 +120,7 @@ package body VSS.JSON.Streams.Readers.Simple is
 
    overriding function Read_Next
      (Self : in out JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Event_Kind is
+      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind is
    begin
       Self.Parser.Parse;
 
@@ -224,4 +224,4 @@ package body VSS.JSON.Streams.Readers.Simple is
       return Self.Parser.String_Value;
    end String_Value;
 
-end VSS.JSON.Streams.Readers.Simple;
+end VSS.JSON.Streams.Pull.Readers.Simple;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.JSON.Streams.Readers is
+package body VSS.JSON.Streams.Pull.Readers is
 
    ---------------
    -- Has_Error --
@@ -144,4 +144,4 @@ package body VSS.JSON.Streams.Readers is
       null;
    end Read_Next;
 
-end VSS.JSON.Streams.Readers;
+end VSS.JSON.Streams.Pull.Readers;

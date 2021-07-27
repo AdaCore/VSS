@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,28 +20,51 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: JSON processing subproject tests
 
-with "../vss_config";
-with "../vss_json";
-with "vss_test_common";
+with VSS.JSON.Documents.Objects;
+with VSS.JSON.Documents.Values;
+with VSS.Strings;
 
-project VSS_JSON_Tests is
+with Test_Support;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/json");
-   for Main use ("test_json_content_handler.adb",
-                 "test_json_document.adb",
-                 "test_json_reader.adb",
-                 "test_json_writer.adb");
+procedure Test_JSON_Document is
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-   end Compiler;
+   use type VSS.Strings.Virtual_String;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   O1 : VSS.JSON.Documents.Objects.JSON_Object;
+   O2 : VSS.JSON.Documents.Objects.JSON_Object;
 
-end VSS_JSON_Tests;
+begin
+   O1.Include
+     ("key1",
+      VSS.JSON.Documents.Values.JSON_Value'
+        (Kind         => VSS.JSON.Documents.Values.JSON_String_Value,
+         String_Value => "value1"));
+
+   Test_Support.Assert (O1.Element ("key1").String_Value = "value1");
+
+   O1.Include
+     ("key1",
+      VSS.JSON.Documents.Values.JSON_Value'
+        (Kind         => VSS.JSON.Documents.Values.JSON_String_Value,
+         String_Value => "value12"));
+
+   Test_Support.Assert (O1.Element ("key1").String_Value = "value12");
+
+   O2 := O1;
+
+   O2.Include
+     ("key2",
+      VSS.JSON.Documents.Values.JSON_Value'
+        (Kind         => VSS.JSON.Documents.Values.JSON_String_Value,
+         String_Value => "value21"));
+
+   Test_Support.Assert (O2.Element ("key1").String_Value = "value12");
+   Test_Support.Assert (O2.Element ("key2").String_Value = "value21");
+
+   O1.Include
+     ("key3",
+      VSS.JSON.Documents.Values.JSON_Value'
+        (Kind         => VSS.JSON.Documents.Values.JSON_Object_Value,
+         Object_Value => O2));
+end Test_JSON_Document;

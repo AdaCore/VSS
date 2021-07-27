@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,28 +20,24 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: JSON processing subproject
 
-with "vss_config";
-with "vss_text";
+private with Ada.Finalization;
 
-project VSS_JSON is
+private with VSS.Implementation.JSON_Values;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Object_Dir;
-   for Source_Dirs use
-     ("../source/json",
-      "../source/json/implementation");
+package VSS.JSON.Documents is
 
-   package Compiler is
-      for Switches ("Ada") use
-        VSS_Config.Ada_Switches & VSS_Config.Ada_Coverage_Switches;
-      for Switches ("vss-implementation-node_references.adb") use
-        VSS_Config.Ada_Switches & VSS_Config.Ada_Coverage_Switches
-          & ("-mcx16");
-   end Compiler;
+   pragma Preelaborate;
 
+private
 
-   package Linker renames VSS_Config.Linker;
+   type Abstract_JSON_Node_Wrapper is
+     new Ada.Finalization.Controlled with record
+      Node : VSS.Implementation.JSON_Values.Node_Access;
+   end record;
 
-end VSS_JSON;
+   overriding procedure Adjust (Self : in out Abstract_JSON_Node_Wrapper);
+
+   overriding procedure Finalize (Self : in out Abstract_JSON_Node_Wrapper);
+
+end VSS.JSON.Documents;

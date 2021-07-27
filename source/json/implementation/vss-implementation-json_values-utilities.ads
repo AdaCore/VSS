@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,28 +20,15 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: JSON processing subproject
 
-with "vss_config";
-with "vss_text";
+with VSS.JSON.Documents.Values;
 
-project VSS_JSON is
+package VSS.Implementation.JSON_Values.Utilities is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Object_Dir;
-   for Source_Dirs use
-     ("../source/json",
-      "../source/json/implementation");
+   pragma Preelaborate;
 
-   package Compiler is
-      for Switches ("Ada") use
-        VSS_Config.Ada_Switches & VSS_Config.Ada_Coverage_Switches;
-      for Switches ("vss-implementation-node_references.adb") use
-        VSS_Config.Ada_Switches & VSS_Config.Ada_Coverage_Switches
-          & ("-mcx16");
-   end Compiler;
+   function To_JSON_Value
+     (Node : VSS.Implementation.JSON_Values.Node_Access)
+      return VSS.JSON.Documents.Values.JSON_Value;
 
-
-   package Linker renames VSS_Config.Linker;
-
-end VSS_JSON;
+end VSS.Implementation.JSON_Values.Utilities;

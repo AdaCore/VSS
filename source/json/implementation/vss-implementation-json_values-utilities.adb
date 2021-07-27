@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,28 +20,40 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: JSON processing subproject
 
-with "vss_config";
-with "vss_text";
+package body VSS.Implementation.JSON_Values.Utilities is
 
-project VSS_JSON is
+   -------------------
+   -- To_JSON_Value --
+   -------------------
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Object_Dir;
-   for Source_Dirs use
-     ("../source/json",
-      "../source/json/implementation");
+   function To_JSON_Value
+     (Node : VSS.Implementation.JSON_Values.Node_Access)
+      return VSS.JSON.Documents.Values.JSON_Value is
+   begin
+      if Node = null then
+         return (Kind => VSS.JSON.Documents.Values.No_JSON_Value);
+      end if;
 
-   package Compiler is
-      for Switches ("Ada") use
-        VSS_Config.Ada_Switches & VSS_Config.Ada_Coverage_Switches;
-      for Switches ("vss-implementation-node_references.adb") use
-        VSS_Config.Ada_Switches & VSS_Config.Ada_Coverage_Switches
-          & ("-mcx16");
-   end Compiler;
+      case Node.Kind is
+         when Array_Node =>
+            raise Program_Error;
 
+         when Object_Node =>
+            raise Program_Error;
 
-   package Linker renames VSS_Config.Linker;
+         when String_Node =>
+            return
+              (VSS.JSON.Documents.Values.JSON_String_Value,
+               Node.String_Data);
 
-end VSS_JSON;
+         when Number_Node =>
+            raise Program_Error;
+         when Boolean_Node =>
+            raise Program_Error;
+         when Null_Node =>
+            raise Program_Error;
+      end case;
+   end To_JSON_Value;
+
+end VSS.Implementation.JSON_Values.Utilities;

@@ -15,19 +15,26 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ./cached_gnat
-          key: ${{ runner.os }}-gnat-2020.1
-          restore-keys: ${{ runner.os }}-gnat-2020.1
+          key: ${{ runner.os }}-gnat-ce-2021
+          restore-keys: ${{ runner.os }}-gnat-ce-2021
+      - name: Get GNAT Community 2021 toolchain
+        if: ${{ runner.os != 'macOS' }}
+        uses: ada-actions/toolchain@ce2021
+        with:
+          distrib: community
+          install_dir: ./cached_gnat
+      - name: Get GNAT Community 2020 toolchain
+        if: ${{ runner.os == 'macOS' }}
+        uses: ada-actions/toolchain@ce2020
+        with:
+          distrib: community
+          install_dir: ./cached_gnat
       - name: Get UCD.zip
         run: |
           curl -C - -o ./cached_gnat/UCD-13.0.0.zip https://www.unicode.org/Public/13.0.0/ucd/UCD.zip
           mkdir data
           mkdir data/ucd
           unzip cached_gnat/UCD-13.0.0.zip -d ./data/ucd
-      - name: Get GNAT Community 2020 toolchain
-        uses: ada-actions/toolchain@ce2020
-        with:
-          distrib: community
-          install_dir: ./cached_gnat
       - name: Build and test
         run: make all check coverage BUILD_MODE=${{ matrix.build_mode }}
       - name: Upload coverage to Codecov

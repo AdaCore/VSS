@@ -35,36 +35,20 @@ procedure Test_JSON_Document is
    O2 : VSS.JSON.Documents.Objects.JSON_Object;
 
 begin
-   O1.Include
-     ("key1",
-      VSS.JSON.Documents.Values.JSON_Value'
-        (Kind         => VSS.JSON.Documents.Values.JSON_String_Value,
-         String_Value => "value1"));
+   O1.Include ("key1", "value1");
 
    Test_Support.Assert (O1.Element ("key1").String_Value = "value1");
 
-   O1.Include
-     ("key1",
-      VSS.JSON.Documents.Values.JSON_Value'
-        (Kind         => VSS.JSON.Documents.Values.JSON_String_Value,
-         String_Value => "value12"));
+   O1.Include ("key1", "value12");
 
    Test_Support.Assert (O1.Element ("key1").String_Value = "value12");
 
    O2 := O1;
 
-   O2.Include
-     ("key2",
-      VSS.JSON.Documents.Values.JSON_Value'
-        (Kind         => VSS.JSON.Documents.Values.JSON_String_Value,
-         String_Value => "value21"));
+   O2.Include ("key2", "value21");
 
    Test_Support.Assert (O2.Element ("key1").String_Value = "value12");
    Test_Support.Assert (O2.Element ("key2").String_Value = "value21");
 
-   O1.Include
-     ("key3",
-      VSS.JSON.Documents.Values.JSON_Value'
-        (Kind         => VSS.JSON.Documents.Values.JSON_Object_Value,
-         Object_Value => O2));
+   O1.Include ("key3", O2);
 end Test_JSON_Document;

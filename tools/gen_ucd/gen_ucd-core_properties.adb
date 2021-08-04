@@ -31,24 +31,24 @@ with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Interfaces;
 
-with Gen_UCD.Characters;
-with Gen_UCD.Properties;
+with UCD.Characters;
+with UCD.Properties;
 
 package body Gen_UCD.Core_Properties is
 
    function Minimum_Bits (Value : Integer) return Integer;
 
    function Value_Identifier
-     (Property : not null Gen_UCD.Properties.Property_Access;
-      Value    : not null Gen_UCD.Properties.Property_Value_Access)
+     (Property : not null UCD.Properties.Property_Access;
+      Value    : not null UCD.Properties.Property_Value_Access)
       return Wide_Wide_String;
 
    package Property_Value_Integer_Maps is
      new Ada.Containers.Hashed_Maps
-       (Gen_UCD.Properties.Property_Value_Access,
+       (UCD.Properties.Property_Value_Access,
         Integer,
-        Gen_UCD.Properties.Hash,
-        Gen_UCD.Properties."=");
+        UCD.Properties.Hash,
+        UCD.Properties."=");
 
    GC_Mapping : Property_Value_Integer_Maps.Map;
 
@@ -63,11 +63,11 @@ package body Gen_UCD.Core_Properties is
 
       procedure Compress;
 
-      procedure Set_5 (Code : Code_Point; To : Unsigned_5);
+      procedure Set_5 (Code : UCD.Code_Point; To : Unsigned_5);
 
-      procedure Set_1_6 (Code : Code_Point; To : Boolean);
+      procedure Set_1_6 (Code : UCD.Code_Point; To : Boolean);
 
-      procedure Set_1_7 (Code : Code_Point; To : Boolean);
+      procedure Set_1_7 (Code : UCD.Code_Point; To : Boolean);
 
       --  procedure Set_1_8 (Code : Code_Point; To : Boolean);
 
@@ -97,8 +97,8 @@ package body Gen_UCD.Core_Properties is
       Put ("   ... core properties");
 
       declare
-         Property : constant not null Gen_UCD.Properties.Property_Access :=
-           Gen_UCD.Properties.Resolve ("gc");
+         Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("gc");
          Count    : Natural := 0;
 
       begin
@@ -113,31 +113,28 @@ package body Gen_UCD.Core_Properties is
       Database.Initialize (8);
 
       declare
-         GC_Property     : constant not null
-           Gen_UCD.Properties.Property_Access :=
-             Gen_UCD.Properties.Resolve ("gc");
-         OLower_Property : constant not null
-           Gen_UCD.Properties.Property_Access :=
-             Gen_UCD.Properties.Resolve ("OLower");
-         OUpper_Property : constant not null
-           Gen_UCD.Properties.Property_Access :=
-             Gen_UCD.Properties.Resolve ("OUpper");
+         GC_Property     : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("gc");
+         OLower_Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("OLower");
+         OUpper_Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("OUpper");
 
       begin
-         for Code in Code_Point loop
+         for Code in UCD.Code_Point loop
             Database.Set_5
               (Code,
                Database.Unsigned_5
                  (GC_Mapping.Element
-                      (Gen_UCD.Characters.Get (Code, GC_Property))));
+                      (UCD.Characters.Get (Code, GC_Property))));
 
             Database.Set_1_6
               (Code,
-               Gen_UCD.Characters.Get
+               UCD.Characters.Get
                  (Code, OLower_Property).Names.First_Element = "Y");
             Database.Set_1_7
               (Code,
-               Gen_UCD.Characters.Get
+               UCD.Characters.Get
                  (Code, OUpper_Property).Names.First_Element = "Y");
          end loop;
       end;
@@ -421,7 +418,7 @@ package body Gen_UCD.Core_Properties is
          Database.Record_Size := 1;
          Raw :=
            new Union_8_Array'
-             (0 .. Unsigned_32 (Code_Point'Last) * Database.Record_Size =>
+             (0 .. Unsigned_32 (UCD.Code_Point'Last) * Database.Record_Size =>
                 (F8, 0));
       end Initialize;
 
@@ -445,7 +442,7 @@ package body Gen_UCD.Core_Properties is
       -- Set_1_6 --
       -------------
 
-      procedure Set_1_6 (Code : Code_Point; To : Boolean) is
+      procedure Set_1_6 (Code : UCD.Code_Point; To : Boolean) is
       begin
          Raw (Unsigned_32 (Code) * Record_Size).F1_6 := Boolean'Pos (To);
       end Set_1_6;
@@ -454,7 +451,7 @@ package body Gen_UCD.Core_Properties is
       -- Set_1_7 --
       -------------
 
-      procedure Set_1_7 (Code : Code_Point; To : Boolean) is
+      procedure Set_1_7 (Code : UCD.Code_Point; To : Boolean) is
       begin
          Raw (Unsigned_32 (Code) * Record_Size).F1_7 := Boolean'Pos (To);
       end Set_1_7;
@@ -463,7 +460,7 @@ package body Gen_UCD.Core_Properties is
       -- Set_1_8 --
       -------------
 
-      --  procedure Set_1_8 (Code : Code_Point; To : Boolean) is
+      --  procedure Set_1_8 (Code : UCD.Code_Point; To : Boolean) is
       --  begin
       --     Raw (Unsigned_32 (Code) * Record_Size).F1_8 := Boolean'Pos (To);
       --  end Set_1_8;
@@ -472,7 +469,7 @@ package body Gen_UCD.Core_Properties is
       -- Set_5 --
       -----------
 
-      procedure Set_5 (Code : Code_Point; To : Unsigned_5) is
+      procedure Set_5 (Code : UCD.Code_Point; To : Unsigned_5) is
       begin
          Raw (Unsigned_32 (Code) * Record_Size).F5_1 := To;
       end Set_5;
@@ -506,8 +503,8 @@ package body Gen_UCD.Core_Properties is
       --  Generate GC_Values type
 
       declare
-         Property : constant not null Gen_UCD.Properties.Property_Access :=
-           Gen_UCD.Properties.Resolve ("gc");
+         Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("gc");
          First    : Boolean := True;
          Count    : Natural := 0;
 
@@ -715,8 +712,8 @@ package body Gen_UCD.Core_Properties is
    ----------------------
 
    function Value_Identifier
-     (Property : not null Gen_UCD.Properties.Property_Access;
-      Value    : not null Gen_UCD.Properties.Property_Value_Access)
+     (Property : not null UCD.Properties.Property_Access;
+      Value    : not null UCD.Properties.Property_Value_Access)
       return Wide_Wide_String
    is
       Property_Name : constant Wide_Wide_String :=

@@ -23,66 +23,48 @@
 
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with Gen_UCD.Data_File_Loaders;
-with Gen_UCD.Properties;
+with UCD.Characters;
+with UCD.Data_File_Loaders;
+with UCD.Properties;
 
-package body Gen_UCD.Property_Aliases_Loader is
+package body UCD.Prop_List_Loader is
 
    ----------
    -- Load --
    ----------
 
    procedure Load (UCD_Root : Wide_Wide_String) is
-      Loader : Gen_UCD.Data_File_Loaders.File_Loader;
+      Name_Field : constant Data_File_Loaders.Field_Index := 1;
+      --  Index of the data field with name of the property.
+
+      Loader : UCD.Data_File_Loaders.File_Loader;
 
    begin
-      Loader.Open (UCD_Root, "PropertyAliases.txt");
+      Loader.Open (UCD_Root, "PropList.txt");
 
       while not Loader.End_Of_File loop
          declare
-            P : constant Properties.Property_Access := new Properties.Property;
+            First_Code : UCD.Code_Point;
+            Last_Code  : UCD.Code_Point;
 
          begin
-            P.Names.Append
-              (To_Unbounded_Wide_Wide_String (Loader.Get_Field (0)));
-
-            --  Second field is a long name of the property and may be the same
-            --  as short name of the property, thus ignore it in such cases.
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
             declare
-               Name : constant Unbounded_Wide_Wide_String :=
-                 To_Unbounded_Wide_Wide_String (Loader.Get_Field (1));
+               Property : constant not null Properties.Property_Access :=
+                 Properties.Resolve (Loader.Get_Field (Name_Field));
 
             begin
-               if Name /= P.Names.First_Element then
-                  P.Names.Append (Name);
-               end if;
+               for Code in First_Code .. Last_Code loop
+                  Characters.Set
+                    (Code, Property, Property.Name_To_Value.Element
+                       (To_Unbounded_Wide_Wide_String ("Y")));
+               end loop;
             end;
-
-            for J in 2 .. Data_File_Loaders.Field_Index'Last loop
-               if Loader.Has_Field (J) then
-                  P.Names.Append
-                    (To_Unbounded_Wide_Wide_String (Loader.Get_Field (J)));
-               end if;
-            end loop;
-
-            --  Compute some properties of the property.
-
-            if P.Names.First_Element = "ccc" then
-               P.Is_Canonical_Combining_Class := True;
-            end if;
-
-            --  Register property and its names.
-
-            Properties.All_Properties.Append (P);
-
-            for Name of P.Names loop
-               Properties.Name_To_Property.Insert (Name, P);
-            end loop;
 
             Loader.Skip_Line;
          end;
       end loop;
    end Load;
 
-end Gen_UCD.Property_Aliases_Loader;
+end UCD.Prop_List_Loader;

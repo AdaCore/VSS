@@ -29,7 +29,7 @@ with Interfaces;
 
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
-package body Gen_UCD.Characters is
+package body UCD.Characters is
 
    type Boolean_Array is array (1 .. 96) of Boolean with Pack;
 
@@ -41,8 +41,7 @@ package body Gen_UCD.Characters is
       Enumeration : Unsigned_16_Array;
    end record;
 
-   type Character_Array is
-     array (Gen_UCD.Code_Point) of aliased Character_Record;
+   type Character_Array is array (UCD.Code_Point) of aliased Character_Record;
 
    type Character_Array_Access is access all Character_Array;
 
@@ -74,8 +73,8 @@ package body Gen_UCD.Characters is
 
    function Get
      (Character : Code_Point;
-      Property  : not null Properties.Property_Access)
-      return not null Properties.Property_Value_Access is
+      Property  : not null UCD.Properties.Property_Access)
+      return not null UCD.Properties.Property_Value_Access is
    begin
       if Property.Is_Binary then
          return
@@ -220,7 +219,7 @@ package body Gen_UCD.Characters is
       Value     : not null Properties.Property_Value_Access)
       return Interfaces.Unsigned_16
    is
-      use type Gen_UCD.Properties.Property_Value_Access;
+      use type UCD.Properties.Property_Value_Access;
 
    begin
       for J in Property.All_Values.First_Index
@@ -240,8 +239,8 @@ package body Gen_UCD.Characters is
 
    procedure Set
      (Character : Code_Point;
-      Property  : not null Properties.Property_Access;
-      Value     : not null Properties.Property_Value_Access) is
+      Property  : not null UCD.Properties.Property_Access;
+      Value     : not null UCD.Properties.Property_Value_Access) is
    begin
       if Property.Is_Binary then
          Database (Character).Boolean
@@ -262,4 +261,4 @@ package body Gen_UCD.Characters is
       end if;
    end Set;
 
-end Gen_UCD.Characters;
+end UCD.Characters;

@@ -23,13 +23,13 @@
 
 with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
-package body Gen_UCD.Data_File_Loaders is
+package body UCD.Data_File_Loaders is
 
    use Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
    procedure Scan_Next_Line (Self : in out File_Loader'Class);
 
-   function To_Code_Point (Item : Wide_Wide_String) return Gen_UCD.Code_Point;
+   function To_Code_Point (Item : Wide_Wide_String) return UCD.Code_Point;
 
    -----------------
    -- End_Of_File --
@@ -46,8 +46,8 @@ package body Gen_UCD.Data_File_Loaders is
 
    procedure Get_Code_Point_Range
      (Self       : in out File_Loader;
-      First_Code : out Gen_UCD.Code_Point;
-      Last_Code  : out Gen_UCD.Code_Point)
+      First_Code : out UCD.Code_Point;
+      Last_Code  : out UCD.Code_Point)
    is
       function Is_Start_Of_Unicode_Data_Range return Boolean;
       --  Returns True when current line opens range in UnicodeData.txt format,
@@ -287,10 +287,9 @@ package body Gen_UCD.Data_File_Loaders is
    -- To_Code_Point --
    -------------------
 
-   function To_Code_Point
-     (Item : Wide_Wide_String) return Gen_UCD.Code_Point is
+   function To_Code_Point (Item : Wide_Wide_String) return UCD.Code_Point is
    begin
-      return Result : Gen_UCD.Code_Point := 0 do
+      return Result : UCD.Code_Point := 0 do
          for J in Item'Range loop
             Result := Result * 16;
 
@@ -315,4 +314,4 @@ package body Gen_UCD.Data_File_Loaders is
       end return;
    end To_Code_Point;
 
-end Gen_UCD.Data_File_Loaders;
+end UCD.Data_File_Loaders;

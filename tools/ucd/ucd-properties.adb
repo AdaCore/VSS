@@ -21,50 +21,57 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
-
-with Gen_UCD.Characters;
-with Gen_UCD.Data_File_Loaders;
-with Gen_UCD.Properties;
-
-package body Gen_UCD.Prop_List_Loader is
+package body UCD.Properties is
 
    ----------
-   -- Load --
+   -- Hash --
    ----------
 
-   procedure Load (UCD_Root : Wide_Wide_String) is
-      Name_Field : constant Data_File_Loaders.Field_Index := 1;
-      --  Index of the data field with name of the property.
-
-      Loader : Gen_UCD.Data_File_Loaders.File_Loader;
-
+   function Hash
+     (Item : Property_Value_Access) return Ada.Containers.Hash_Type is
    begin
-      Loader.Open (UCD_Root, "PropList.txt");
+      return Wide_Wide_Hash (Item.Names.First_Element);
+   end Hash;
 
-      while not Loader.End_Of_File loop
+   -------------
+   -- Resolve --
+   -------------
+
+   function Resolve
+     (Property_Name : Wide_Wide_String) return not null Property_Access is
+   begin
+      return
+        Name_To_Property.Element
+          (To_Unbounded_Wide_Wide_String (Property_Name));
+   end Resolve;
+
+   -------------
+   -- Resolve --
+   -------------
+
+   function Resolve
+     (Property   : not null Property_Access;
+      Value_Name : Wide_Wide_String) return Property_Value_Access is
+   begin
+      if Property.Is_Canonical_Combining_Class then
          declare
-            First_Code : Gen_UCD.Code_Point;
-            Last_Code  : Gen_UCD.Code_Point;
+            Value : constant Canonical_Combinig_Class :=
+              Canonical_Combinig_Class'Wide_Wide_Value (Value_Name);
 
          begin
-            Loader.Get_Code_Point_Range (First_Code, Last_Code);
+            for V of Property.All_Values loop
+               if V.Canonical_Combining_Class_Value = Value then
+                  return V;
+               end if;
+            end loop;
 
-            declare
-               Property : constant not null Properties.Property_Access :=
-                 Properties.Resolve (Loader.Get_Field (Name_Field));
-
-            begin
-               for Code in First_Code .. Last_Code loop
-                  Characters.Set
-                    (Code, Property, Property.Name_To_Value.Element
-                       (To_Unbounded_Wide_Wide_String ("Y")));
-               end loop;
-            end;
-
-            Loader.Skip_Line;
+            raise Program_Error;
          end;
-      end loop;
-   end Load;
 
-end Gen_UCD.Prop_List_Loader;
+      else
+         return
+           Property.Name_To_Value (To_Unbounded_Wide_Wide_String (Value_Name));
+      end if;
+   end Resolve;
+
+end UCD.Properties;

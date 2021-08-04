@@ -26,12 +26,13 @@ with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
-with Gen_UCD.Characters;
+with UCD.Characters;
+with UCD.Prop_List_Loader;
+with UCD.Property_Aliases_Loader;
+with UCD.Property_Value_Aliases_Loader;
+with UCD.Unicode_Data_Loader;
+
 with Gen_UCD.Core_Properties;
-with Gen_UCD.Prop_List_Loader;
-with Gen_UCD.Property_Aliases_Loader;
-with Gen_UCD.Property_Value_Aliases_Loader;
-with Gen_UCD.Unicode_Data_Loader;
 
 procedure Gen_UCD.Driver is
 begin
@@ -43,13 +44,13 @@ begin
       UCD_Root : constant Wide_Wide_String := Decode (Argument (1));
 
    begin
-      Gen_UCD.Property_Aliases_Loader.Load (UCD_Root);
-      Gen_UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+      UCD.Property_Aliases_Loader.Load (UCD_Root);
+      UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
 
-      Gen_UCD.Characters.Initialize_Character_Database;
+      UCD.Characters.Initialize_Character_Database;
 
-      Gen_UCD.Unicode_Data_Loader.Load (UCD_Root);
-      Gen_UCD.Prop_List_Loader.Load (UCD_Root);
+      UCD.Unicode_Data_Loader.Load (UCD_Root);
+      UCD.Prop_List_Loader.Load (UCD_Root);
    end;
 
    Put_Line ("Processing...");

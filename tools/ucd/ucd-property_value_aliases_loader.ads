@@ -21,8 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Unicode_Data_Loader is
+package UCD.Property_Value_Aliases_Loader is
 
    procedure Load (UCD_Root : Wide_Wide_String);
 
-end Gen_UCD.Unicode_Data_Loader;
+end UCD.Property_Value_Aliases_Loader;

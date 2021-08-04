@@ -21,23 +21,62 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "../vss_config";
+with UCD.Characters;
+with UCD.Data_File_Loaders;
+with UCD.Properties;
 
-project Gen_UCD is
+package body UCD.Unicode_Data_Loader is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tools_Object_Dir;
-   for Source_Dirs use
-     ("../../tools/gen_ucd",
-      "../../tools/ucd");
-   for Main use ("gen_ucd-driver.adb");
+   ----------
+   -- Load --
+   ----------
 
-   package Compiler renames VSS_Config.Compiler;
+   procedure Load (UCD_Root : Wide_Wide_String) is
+      --  General_Category
 
-   package Linker renames VSS_Config.Linker;
+      GC_Property : constant not null Properties.Property_Access :=
+        Properties.Resolve ("gc");
+      GC_Field    : constant Data_File_Loaders.Field_Index := 2;
 
-   package Builder is
-      for Executable ("gen_ucd-driver.adb") use "gen_ucd";
-   end Builder;
+      --  Canonical_Combinig_Class
 
-end Gen_UCD;
+      CCC_Property : constant not null Properties.Property_Access :=
+        Properties.Resolve ("ccc");
+      CCC_Field    : constant Data_File_Loaders.Field_Index := 3;
+
+      Loader : UCD.Data_File_Loaders.File_Loader;
+
+   begin
+      Loader.Open (UCD_Root, "UnicodeData.txt");
+
+      while not Loader.End_Of_File loop
+         declare
+            First_Code : UCD.Code_Point;
+            Last_Code  : UCD.Code_Point;
+
+         begin
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
+
+            declare
+               GC_Value  :
+                 constant not null Properties.Property_Value_Access :=
+                   Properties.Resolve
+                     (GC_Property, Loader.Get_Field (GC_Field));
+               CCC_Value :
+                 constant not null Properties.Property_Value_Access :=
+                   Properties.Resolve
+                     (CCC_Property, Loader.Get_Field (CCC_Field));
+
+            begin
+               for Code in First_Code .. Last_Code loop
+                  Characters.Set (Code, GC_Property, GC_Value);
+                  Characters.Set (Code, CCC_Property, CCC_Value);
+               end loop;
+            end;
+
+            Loader.Skip_Line;
+         end;
+      end loop;
+   end Load;
+
+end UCD.Unicode_Data_Loader;

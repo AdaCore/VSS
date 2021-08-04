@@ -78,12 +78,14 @@ package body Gen_UCD.Data_File_Loaders is
       else
          declare
             Buffer  : constant Wide_Wide_String := Self.Get_Field (0);
-            Current : Positive := Buffer'First;
-            First   : constant Positive := Buffer'First;
+            Current : Positive;
+            First   : Positive;
             Last    : Natural;
 
          begin
-            Last := Buffer'Last;
+            First   := Buffer'First;
+            Last    := Buffer'Last;
+            Current := First;
 
             while Current <= Buffer'Last loop
                if Buffer (Current) not in '0' .. '9' | 'A' .. 'F' then
@@ -97,6 +99,33 @@ package body Gen_UCD.Data_File_Loaders is
 
             First_Code := To_Code_Point (Buffer (First .. Last));
             Last_Code  := First_Code;
+
+            if Last = Buffer'Last then
+               return;
+            end if;
+
+            if Last + 3 < Buffer'Last
+              and then Buffer (Last + 1) /= '.'
+              and then Buffer (Last + 2) /= '.'
+            then
+               raise Program_Error;
+            end if;
+
+            First   := Last + 3;
+            Last    := Buffer'Last;
+            Current := First;
+
+            while Current <= Buffer'Last loop
+               if Buffer (Current) not in '0' .. '9' | 'A' .. 'F' then
+                  Last := Current - 1;
+
+                  exit;
+               end if;
+
+               Current := Current + 1;
+            end loop;
+
+            Last_Code := To_Code_Point (Buffer (First .. Last));
 
             if Last /= Buffer'Last then
                raise Program_Error;

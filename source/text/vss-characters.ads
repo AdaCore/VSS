@@ -97,4 +97,13 @@ package VSS.Characters is
      (Self : Virtual_Character) return General_Category;
    --  Return General_Category property for given character.
 
+   function Get_Lowercase (Self : Virtual_Character) return Boolean;
+   --  Return value of the Lowercase property of the character.
+
+   function Get_Uppercase (Self : Virtual_Character) return Boolean;
+   --  Return value of the Uppercase property of the character.
+
+   function Get_Cased (Self : Virtual_Character) return Boolean;
+   --  Return value of the Cased property of the character.
+
 end VSS.Characters;

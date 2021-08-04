@@ -21,50 +21,50 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;      use Ada.Command_Line;
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
 with Gen_UCD.Characters;
-with Gen_UCD.Core_Properties;
-with Gen_UCD.Prop_List_Loader;
-with Gen_UCD.Property_Aliases_Loader;
-with Gen_UCD.Property_Value_Aliases_Loader;
-with Gen_UCD.Unicode_Data_Loader;
+with Gen_UCD.Data_File_Loaders;
+with Gen_UCD.Properties;
 
-procedure Gen_UCD.Driver is
-begin
-   if Ada.Command_Line.Argument_Count /= 2 then
-      raise Program_Error;
-   end if;
+package body Gen_UCD.Prop_List_Loader is
 
-   declare
-      UCD_Root : constant Wide_Wide_String := Decode (Argument (1));
+   ----------
+   -- Load --
+   ----------
 
-   begin
-      Gen_UCD.Property_Aliases_Loader.Load (UCD_Root);
-      Gen_UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+   procedure Load (UCD_Root : Wide_Wide_String) is
+      Name_Field : constant Data_File_Loaders.Field_Index := 1;
+      --  Index of the data field with name of the property.
 
-      Gen_UCD.Characters.Initialize_Character_Database;
-
-      Gen_UCD.Unicode_Data_Loader.Load (UCD_Root);
-      Gen_UCD.Prop_List_Loader.Load (UCD_Root);
-   end;
-
-   Put_Line ("Processing...");
-   Gen_UCD.Core_Properties.Build;
-
-   declare
-      Ada_File : File_Type;
+      Loader : Gen_UCD.Data_File_Loaders.File_Loader;
 
    begin
-      Put_Line ("Generating...");
+      Loader.Open (UCD_Root, "PropList.txt");
 
-      Create (Ada_File, Out_File, Argument (2));
+      while not Loader.End_Of_File loop
+         declare
+            First_Code : Gen_UCD.Code_Point;
+            Last_Code  : Gen_UCD.Code_Point;
 
-      Gen_UCD.Core_Properties.Generate (Ada_File);
+         begin
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
-      Close (Ada_File);
-   end;
-end Gen_UCD.Driver;
+            declare
+               Property : constant not null Properties.Property_Access :=
+                 Properties.Resolve (Loader.Get_Field (Name_Field));
+
+            begin
+               for Code in First_Code .. Last_Code loop
+                  Characters.Set
+                    (Code, Property, Property.Name_To_Value.Element
+                       (To_Unbounded_Wide_Wide_String ("Y")));
+               end loop;
+            end;
+
+            Loader.Skip_Line;
+         end;
+      end loop;
+   end Load;
+
+end Gen_UCD.Prop_List_Loader;

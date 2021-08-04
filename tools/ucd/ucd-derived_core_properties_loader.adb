@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,42 +20,51 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-project VSS_Text_Tests is
+with UCD.Characters;
+with UCD.Data_File_Loaders;
+with UCD.Properties;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use
-     ("../../testsuite/text",
-      "../../tools/ucd");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+package body UCD.Derived_Core_Properties_Loader is
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   ----------
+   -- Load --
+   ----------
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   procedure Load (UCD_Root : Wide_Wide_String) is
+      Name_Field : constant Data_File_Loaders.Field_Index := 1;
+      --  Index of the data field with name of the property.
 
-end VSS_Text_Tests;
+      Loader : UCD.Data_File_Loaders.File_Loader;
+
+   begin
+      Loader.Open (UCD_Root, "DerivedCoreProperties.txt");
+
+      while not Loader.End_Of_File loop
+         declare
+            First_Code : UCD.Code_Point;
+            Last_Code  : UCD.Code_Point;
+
+         begin
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
+
+            declare
+               Property : constant not null Properties.Property_Access :=
+                 Properties.Resolve (Loader.Get_Field (Name_Field));
+
+            begin
+               for Code in First_Code .. Last_Code loop
+                  Characters.Set
+                    (Code, Property, Property.Name_To_Value.Element
+                       (To_Unbounded_Wide_Wide_String ("Y")));
+               end loop;
+            end;
+
+            Loader.Skip_Line;
+         end;
+      end loop;
+   end Load;
+
+end UCD.Derived_Core_Properties_Loader;

@@ -21,12 +21,114 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
+with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+
+with UCD.Characters;
+with UCD.Derived_Core_Properties_Loader;
+with UCD.Properties;
+with UCD.Property_Aliases_Loader;
+with UCD.Property_Value_Aliases_Loader;
+
 with VSS.Characters;
 
 with Test_Support;
 
 procedure Test_Characters is
    use type VSS.Characters.General_Category;
+
+   procedure Test_Properties;
+   --  Test properties of all characters.
+
+   ---------------------
+   -- Test_Properties --
+   ---------------------
+
+   procedure Test_Properties is
+   begin
+      if Ada.Command_Line.Argument_Count /= 1 then
+         raise Program_Error;
+      end if;
+
+      declare
+         UCD_Root : constant Wide_Wide_String :=
+           Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Decode
+             (Ada.Command_Line.Argument (1));
+
+      begin
+         UCD.Property_Aliases_Loader.Load (UCD_Root);
+         UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+
+         UCD.Characters.Initialize_Character_Database;
+
+         UCD.Derived_Core_Properties_Loader.Load (UCD_Root);
+      end;
+
+      declare
+         use type UCD.Properties.Property_Value_Access;
+
+         Lowercase_Property : constant UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("Lowercase");
+         Lowercase_Y        : constant UCD.Properties.Property_Value_Access :=
+           UCD.Properties.Resolve (Lowercase_Property, "Y");
+         Lowercase_N        : constant UCD.Properties.Property_Value_Access :=
+           UCD.Properties.Resolve (Lowercase_Property, "N");
+         Uppercase_Property : constant UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("Uppercase");
+         Uppercase_Y        : constant UCD.Properties.Property_Value_Access :=
+           UCD.Properties.Resolve (Uppercase_Property, "Y");
+         Uppercase_N        : constant UCD.Properties.Property_Value_Access :=
+           UCD.Properties.Resolve (Uppercase_Property, "N");
+         Cased_Property     : constant UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("Cased");
+         Cased_Y            : constant UCD.Properties.Property_Value_Access :=
+           UCD.Properties.Resolve (Cased_Property, "Y");
+         Cased_N            : constant UCD.Properties.Property_Value_Access :=
+           UCD.Properties.Resolve (Cased_Property, "N");
+
+      begin
+         for Character in VSS.Characters.Virtual_Character'Range loop
+            if VSS.Characters.Get_Lowercase (Character) then
+               Test_Support.Assert
+                 (UCD.Characters.Get
+                    (VSS.Characters.Virtual_Character'Pos (Character),
+                     Lowercase_Property) = Lowercase_Y);
+
+            else
+               Test_Support.Assert
+                 (UCD.Characters.Get
+                    (VSS.Characters.Virtual_Character'Pos (Character),
+                     Lowercase_Property) = Lowercase_N);
+            end if;
+
+            if VSS.Characters.Get_Uppercase (Character) then
+               Test_Support.Assert
+                 (UCD.Characters.Get
+                    (VSS.Characters.Virtual_Character'Pos (Character),
+                     Uppercase_Property) = Uppercase_Y);
+
+            else
+               Test_Support.Assert
+                 (UCD.Characters.Get
+                    (VSS.Characters.Virtual_Character'Pos (Character),
+                     Uppercase_Property) = Uppercase_N);
+            end if;
+
+            if VSS.Characters.Get_Cased (Character) then
+               Test_Support.Assert
+                 (UCD.Characters.Get
+                    (VSS.Characters.Virtual_Character'Pos (Character),
+                     Cased_Property) = Cased_Y);
+
+            else
+               Test_Support.Assert
+                 (UCD.Characters.Get
+                    (VSS.Characters.Virtual_Character'Pos (Character),
+                     Cased_Property) = Cased_N);
+            end if;
+         end loop;
+      end;
+   end Test_Properties;
 
 begin
    --  This test can be replaces by the test with full coverage of possible
@@ -57,4 +159,6 @@ begin
      (VSS.Characters.Get_General_Category
         (VSS.Characters.Virtual_Character'Val (16#D800#))
       = VSS.Characters.Surrogate);
+
+   Test_Properties;
 end Test_Characters;

@@ -65,6 +65,12 @@ package body Gen_UCD.Core_Properties is
 
       procedure Set_5 (Code : Code_Point; To : Unsigned_5);
 
+      procedure Set_1_6 (Code : Code_Point; To : Boolean);
+
+      procedure Set_1_7 (Code : Code_Point; To : Boolean);
+
+      --  procedure Set_1_8 (Code : Code_Point; To : Boolean);
+
       function Uncompressed_Size return Positive;
 
       function Block_Size return Positive;
@@ -107,8 +113,15 @@ package body Gen_UCD.Core_Properties is
       Database.Initialize (8);
 
       declare
-         Property : constant not null Gen_UCD.Properties.Property_Access :=
-           Gen_UCD.Properties.Resolve ("gc");
+         GC_Property     : constant not null
+           Gen_UCD.Properties.Property_Access :=
+             Gen_UCD.Properties.Resolve ("gc");
+         OLower_Property : constant not null
+           Gen_UCD.Properties.Property_Access :=
+             Gen_UCD.Properties.Resolve ("OLower");
+         OUpper_Property : constant not null
+           Gen_UCD.Properties.Property_Access :=
+             Gen_UCD.Properties.Resolve ("OUpper");
 
       begin
          for Code in Code_Point loop
@@ -116,7 +129,16 @@ package body Gen_UCD.Core_Properties is
               (Code,
                Database.Unsigned_5
                  (GC_Mapping.Element
-                      (Gen_UCD.Characters.Get (Code, Property))));
+                      (Gen_UCD.Characters.Get (Code, GC_Property))));
+
+            Database.Set_1_6
+              (Code,
+               Gen_UCD.Characters.Get
+                 (Code, OLower_Property).Names.First_Element = "Y");
+            Database.Set_1_7
+              (Code,
+               Gen_UCD.Characters.Get
+                 (Code, OUpper_Property).Names.First_Element = "Y");
          end loop;
       end;
 
@@ -138,6 +160,9 @@ package body Gen_UCD.Core_Properties is
 
    package body Database is
 
+      type Unsigned_1 is mod 2 ** 1;
+      for Unsigned_1'Size use 1;
+
       type Unsigned_8 is mod 2 ** 8;
       for Unsigned_8'Size use 8;
 
@@ -147,10 +172,20 @@ package body Gen_UCD.Core_Properties is
       type Unsigned_32 is mod 2 ** 32;
       for Unsigned_32'Size use 32;
 
-      type Field_Size is (F5, F8);
+      type Field_Size is (F1, F5, F8);
 
       type Union_8 (Size : Field_Size := F5) is record
          case Size is
+            when F1 =>
+               F1_1 : Unsigned_1;
+               F1_2 : Unsigned_1;
+               F1_3 : Unsigned_1;
+               F1_4 : Unsigned_1;
+               F1_5 : Unsigned_1;
+               F1_6 : Unsigned_1;
+               F1_7 : Unsigned_1;
+               F1_8 : Unsigned_1;
+
             when F5 =>
                F5_1 : Unsigned_5;
 
@@ -158,6 +193,7 @@ package body Gen_UCD.Core_Properties is
                F8_1 : Unsigned_8;
          end case;
       end record;
+      pragma Pack (Union_8);
       pragma Unchecked_Union (Union_8);
       for Union_8'Size use 8;
 
@@ -405,6 +441,33 @@ package body Gen_UCD.Core_Properties is
                 else Index_Data'Length * 4));
       end Memory_Consumption;
 
+      -------------
+      -- Set_1_6 --
+      -------------
+
+      procedure Set_1_6 (Code : Code_Point; To : Boolean) is
+      begin
+         Raw (Unsigned_32 (Code) * Record_Size).F1_6 := Boolean'Pos (To);
+      end Set_1_6;
+
+      -------------
+      -- Set_1_7 --
+      -------------
+
+      procedure Set_1_7 (Code : Code_Point; To : Boolean) is
+      begin
+         Raw (Unsigned_32 (Code) * Record_Size).F1_7 := Boolean'Pos (To);
+      end Set_1_7;
+
+      -------------
+      -- Set_1_8 --
+      -------------
+
+      --  procedure Set_1_8 (Code : Code_Point; To : Boolean) is
+      --  begin
+      --     Raw (Unsigned_32 (Code) * Record_Size).F1_8 := Boolean'Pos (To);
+      --  end Set_1_8;
+
       -----------
       -- Set_5 --
       -----------
@@ -539,13 +602,17 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "            Data : Interfaces.Unsigned_8;");
          New_Line (File);
          Put_Line (File, "         when False =>");
-         Put_Line (File, "            GC : GC_Values;");
+         Put_Line (File, "            GC     : GC_Values;");
+         Put_Line (File, "            OLower : Boolean;");
+         Put_Line (File, "            OUpper : Boolean;");
          Put_Line (File, "      end case;");
          Put_Line (File, "   end record;");
          Put_Line (File, "   pragma Unchecked_Union (Core_Data_Record);");
          Put_Line (File, "   for Core_Data_Record use record");
-         Put_Line (File, "      Data at 0 range 0 .. 7;");
-         Put_Line (File, "      GC   at 0 range 0 .. 4;");
+         Put_Line (File, "      Data   at 0 range 0 .. 7;");
+         Put_Line (File, "      GC     at 0 range 0 .. 4;");
+         Put_Line (File, "      OLower at 0 range 5 .. 5;");
+         Put_Line (File, "      OUpper at 0 range 6 .. 6;");
          Put_Line (File, "   end record;");
          New_Line (File);
 

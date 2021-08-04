@@ -21,10 +21,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with GNAT.Source_Info;
+
 package Test_Support is
 
    Test_Failed : exception;
 
-   procedure Assert (Condition : Boolean);
+   procedure Assert
+     (Condition : Boolean;
+      Location  : String := GNAT.Source_Info.Source_Location);
 
 end Test_Support;

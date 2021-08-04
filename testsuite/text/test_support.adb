@@ -27,10 +27,12 @@ package body Test_Support is
    -- Assert --
    ------------
 
-   procedure Assert (Condition : Boolean) is
+   procedure Assert
+     (Condition : Boolean;
+      Location  : String := GNAT.Source_Info.Source_Location) is
    begin
       if not Condition then
-         raise Test_Failed;
+         raise Test_Failed with "at " & Location;
       end if;
    end Assert;
 

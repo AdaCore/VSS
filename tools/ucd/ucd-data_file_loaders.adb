@@ -23,13 +23,13 @@
 
 with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
-package body Gen_UCD.Data_File_Loaders is
+package body UCD.Data_File_Loaders is
 
    use Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
    procedure Scan_Next_Line (Self : in out File_Loader'Class);
 
-   function To_Code_Point (Item : Wide_Wide_String) return Gen_UCD.Code_Point;
+   function To_Code_Point (Item : Wide_Wide_String) return UCD.Code_Point;
 
    -----------------
    -- End_Of_File --
@@ -46,8 +46,8 @@ package body Gen_UCD.Data_File_Loaders is
 
    procedure Get_Code_Point_Range
      (Self       : in out File_Loader;
-      First_Code : out Gen_UCD.Code_Point;
-      Last_Code  : out Gen_UCD.Code_Point)
+      First_Code : out UCD.Code_Point;
+      Last_Code  : out UCD.Code_Point)
    is
       function Is_Start_Of_Unicode_Data_Range return Boolean;
       --  Returns True when current line opens range in UnicodeData.txt format,
@@ -78,12 +78,14 @@ package body Gen_UCD.Data_File_Loaders is
       else
          declare
             Buffer  : constant Wide_Wide_String := Self.Get_Field (0);
-            Current : Positive := Buffer'First;
-            First   : constant Positive := Buffer'First;
+            Current : Positive;
+            First   : Positive;
             Last    : Natural;
 
          begin
-            Last := Buffer'Last;
+            First   := Buffer'First;
+            Last    := Buffer'Last;
+            Current := First;
 
             while Current <= Buffer'Last loop
                if Buffer (Current) not in '0' .. '9' | 'A' .. 'F' then
@@ -97,6 +99,33 @@ package body Gen_UCD.Data_File_Loaders is
 
             First_Code := To_Code_Point (Buffer (First .. Last));
             Last_Code  := First_Code;
+
+            if Last = Buffer'Last then
+               return;
+            end if;
+
+            if Last + 3 < Buffer'Last
+              and then Buffer (Last + 1) /= '.'
+              and then Buffer (Last + 2) /= '.'
+            then
+               raise Program_Error;
+            end if;
+
+            First   := Last + 3;
+            Last    := Buffer'Last;
+            Current := First;
+
+            while Current <= Buffer'Last loop
+               if Buffer (Current) not in '0' .. '9' | 'A' .. 'F' then
+                  Last := Current - 1;
+
+                  exit;
+               end if;
+
+               Current := Current + 1;
+            end loop;
+
+            Last_Code := To_Code_Point (Buffer (First .. Last));
 
             if Last /= Buffer'Last then
                raise Program_Error;
@@ -258,10 +287,9 @@ package body Gen_UCD.Data_File_Loaders is
    -- To_Code_Point --
    -------------------
 
-   function To_Code_Point
-     (Item : Wide_Wide_String) return Gen_UCD.Code_Point is
+   function To_Code_Point (Item : Wide_Wide_String) return UCD.Code_Point is
    begin
-      return Result : Gen_UCD.Code_Point := 0 do
+      return Result : UCD.Code_Point := 0 do
          for J in Item'Range loop
             Result := Result * 16;
 
@@ -286,4 +314,4 @@ package body Gen_UCD.Data_File_Loaders is
       end return;
    end To_Code_Point;
 
-end Gen_UCD.Data_File_Loaders;
+end UCD.Data_File_Loaders;

@@ -21,28 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Gen_UCD.Properties;
+package UCD.Unicode_Data_Loader is
 
-package Gen_UCD.Characters is
+   procedure Load (UCD_Root : Wide_Wide_String);
 
-   type Character_Information is private;
-
-   procedure Initialize_Character_Database;
-
-   procedure Set
-     (Character : Code_Point;
-      Property  : not null Properties.Property_Access;
-      Value     : not null Properties.Property_Value_Access);
-
-   function Get
-     (Character : Code_Point;
-      Property  : not null Properties.Property_Access)
-        return not null Properties.Property_Value_Access;
-
-private
-
-   type Character_Record;
-
-   type Character_Information is access all Character_Record;
-
-end Gen_UCD.Characters;
+end UCD.Unicode_Data_Loader;

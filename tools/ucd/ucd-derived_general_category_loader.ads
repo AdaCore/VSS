@@ -21,57 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-private with Ada.Finalization;
-private with Ada.Wide_Wide_Text_IO;
+package UCD.Derived_General_Category_Loader is
 
-package Gen_UCD.Data_File_Loaders is
+   procedure Load (UCD_Root : Wide_Wide_String);
 
-   type Field_Index is range 0 .. 16;
-
-   type File_Loader is tagged limited private;
-
-   procedure Open
-     (Self      : in out File_Loader;
-      UCD_Root  : Wide_Wide_String;
-      File_Name : Wide_Wide_String);
-
-   procedure Close (Self : in out File_Loader);
-
-   function End_Of_File (Self : File_Loader) return Boolean;
-
-   procedure Skip_Line (Self : in out File_Loader);
-
-   function Get_Field
-     (Self : File_Loader; Index : Field_Index) return Wide_Wide_String;
-
-   function Has_Field (Self : File_Loader; Index : Field_Index) return Boolean;
-
-   procedure Get_Code_Point_Range
-     (Self       : in out File_Loader;
-      First_Code : out Gen_UCD.Code_Point;
-      Last_Code  : out Gen_UCD.Code_Point);
-   --  Get range of code points current line applied. It parse zero field of
-   --  the line and supports both ordinary XXXX..YYYY format and special
-   --  UnicodeData.txt when two lines used to define range.
-
-private
-
-   use Ada.Wide_Wide_Text_IO;
-
-   type Field is record
-      First : Positive;
-      Last  : Natural;
-   end record;
-
-   type Field_Array is array (Field_Index) of Field;
-
-   type File_Loader is new Ada.Finalization.Limited_Controlled with record
-      File   : File_Type;
-      Buffer : Wide_Wide_String (1 .. 2048);
-      Line_Last   : Natural;
-      Fields : Field_Array;
-   end record;
-
-   overriding procedure Finalize (Self : in out File_Loader);
-
-end Gen_UCD.Data_File_Loaders;
+end UCD.Derived_General_Category_Loader;

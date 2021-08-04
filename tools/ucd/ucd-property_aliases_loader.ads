@@ -21,8 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Property_Aliases_Loader is
+package UCD.Property_Aliases_Loader is
 
    procedure Load (UCD_Root : Wide_Wide_String);
 
-end Gen_UCD.Property_Aliases_Loader;
+end UCD.Property_Aliases_Loader;

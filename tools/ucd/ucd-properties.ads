@@ -26,7 +26,7 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 
-package Gen_UCD.Properties is
+package UCD.Properties is
 
    type Canonical_Combinig_Class is range 0 .. 255;
 
@@ -83,4 +83,4 @@ package Gen_UCD.Properties is
    function Hash
      (Item : Property_Value_Access) return Ada.Containers.Hash_Type;
 
-end Gen_UCD.Properties;
+end UCD.Properties;

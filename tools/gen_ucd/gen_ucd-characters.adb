@@ -77,11 +77,24 @@ package body Gen_UCD.Characters is
       Property  : not null Properties.Property_Access)
       return not null Properties.Property_Value_Access is
    begin
-      return
-        Property.All_Values
-          (Positive
-             (Database (Character).Enumeration
-              (Enumeration_Property_To_Index.Element (Property))));
+      if Property.Is_Binary then
+         return
+           Property.Name_To_Value.Element
+             ((if Database (Character).Boolean
+                    (Boolean_Property_To_Index.Element (Property))
+               then To_Unbounded_Wide_Wide_String ("Y")
+               else To_Unbounded_Wide_Wide_String ("N")));
+
+      elsif Property.Is_Enumeration then
+         return
+           Property.All_Values
+             (Positive
+                (Database (Character).Enumeration
+                 (Enumeration_Property_To_Index.Element (Property))));
+
+      else
+         raise Program_Error;
+      end if;
    end Get;
 
    ----------
@@ -230,13 +243,23 @@ package body Gen_UCD.Characters is
       Property  : not null Properties.Property_Access;
       Value     : not null Properties.Property_Value_Access) is
    begin
-      Database (Character).Enumeration
-        (Enumeration_Property_To_Index.Element (Property)) :=
-          Internal_Enumeration_Value (Property, Value);
+      if Property.Is_Binary then
+         Database (Character).Boolean
+           (Boolean_Property_To_Index.Element (Property)) :=
+             Value.Names.First_Element = "Y";
 
-      --  Set flag of use of value.
+      elsif Property.Is_Enumeration then
+         Database (Character).Enumeration
+           (Enumeration_Property_To_Index.Element (Property)) :=
+             Internal_Enumeration_Value (Property, Value);
 
-      Value.Is_Used := True;
+         --  Set flag of use of value.
+
+         Value.Is_Used := True;
+
+      else
+         raise Program_Error;
+      end if;
    end Set;
 
 end Gen_UCD.Characters;

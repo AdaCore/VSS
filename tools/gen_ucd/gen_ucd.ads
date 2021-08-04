@@ -25,6 +25,4 @@ package Gen_UCD is
 
    pragma Pure;
 
-   type Code_Point is range 16#00_0000# .. 16#10_FFFF#;
-
 end Gen_UCD;

@@ -21,8 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Prop_List_Loader is
+package UCD.Unicode_Data_Loader is
 
    procedure Load (UCD_Root : Wide_Wide_String);
 
-end Gen_UCD.Prop_List_Loader;
+end UCD.Unicode_Data_Loader;

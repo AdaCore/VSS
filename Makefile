@@ -20,7 +20,7 @@ build_tests:
 check: build_tests check_text check_json check_regexp
 
 check_text:
-	.objs/tests/test_characters
+	.objs/tests/test_characters data/ucd
 	.objs/tests/test_character_iterators
 	.objs/tests/test_character_markers
 	.objs/tests/test_converters

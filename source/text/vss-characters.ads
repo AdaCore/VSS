@@ -99,9 +99,17 @@ package VSS.Characters is
 
    function Get_Lowercase (Self : Virtual_Character) return Boolean;
    --  Return value of the Lowercase property of the character.
+   --
+   --  Note, value of Lowercase property of the given character may be
+   --  different from value of Is_Lowercase function of string composed from
+   --  the same character.
 
    function Get_Uppercase (Self : Virtual_Character) return Boolean;
    --  Return value of the Uppercase property of the character.
+   --
+   --  Note, value of Uppercase property of the given character may be
+   --  different from value of Is_Lowercase function of string composed from
+   --  the same character.
 
    function Get_Cased (Self : Virtual_Character) return Boolean;
    --  Return value of the Cased property of the character.

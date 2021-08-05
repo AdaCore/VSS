@@ -179,11 +179,15 @@ package body UCD.Data_File_Loaders is
 
             Result.Append (To_Code_Point (Buffer (First .. Last)));
 
-            if Last /= Buffer'Last then
-               raise Program_Error;
-            end if;
-
             First := Last + 1;
+
+            --  Skip spaces
+
+            for J in First .. Buffer'Last loop
+               First := J;
+
+               exit when Buffer (J) /= ' ';
+            end loop;
          end loop;
       end return;
    end Get_Field;

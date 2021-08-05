@@ -37,7 +37,7 @@ package UCD.Characters is
    function Get
      (Character : Code_Point;
       Property  : not null UCD.Properties.Property_Access)
-        return not null UCD.Properties.Property_Value_Access;
+      return UCD.Properties.Property_Value_Access;
 
 private
 

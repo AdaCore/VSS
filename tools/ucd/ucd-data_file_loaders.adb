@@ -267,8 +267,6 @@ package body UCD.Data_File_Loaders is
          end loop;
 
          if Self.Buffer'First <= Self.Line_Last then
-            --  Put_Line (Self.Buffer (Self.Buffer'First .. Self.Line_Last));
-
             Current := Self.Buffer'First;
 
             loop
@@ -296,17 +294,21 @@ package body UCD.Data_File_Loaders is
 
                --  Remove trailing spaces
 
-               for J in reverse Field_First .. Field_Last loop
-                  Field_Last := J;
+               if Field_First = Field_Last
+                 and then Self.Buffer (Field_Last) = ' '
+               then
+                  Field_First := Field_First + 1;
 
-                  exit when Self.Buffer (J) /= ' ';
-               end loop;
+               else
+                  for J in reverse Field_First .. Field_Last loop
+                     Field_Last := J;
+
+                     exit when Self.Buffer (J) /= ' ';
+                  end loop;
+               end if;
 
                Self.Fields (Current_Field) := (Field_First, Field_Last);
                Current_Field := Current_Field + 1;
-
-               --  Put_Line
-               --    (''' & Self.Buffer (Field_First .. Field_Last) & ''');
 
                exit when not Has_Separator;
             end loop;

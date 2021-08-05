@@ -147,6 +147,48 @@ package body UCD.Data_File_Loaders is
    end Get_Field;
 
    ---------------
+   -- Get_Field --
+   ---------------
+
+   function Get_Field
+     (Self  : File_Loader;
+      Index : Field_Index) return UCD.Code_Point_Vectors.Vector
+   is
+      Buffer  : constant Wide_Wide_String := Self.Get_Field (Index);
+      First   : Positive;
+      Last    : Positive;
+      Current : Positive;
+
+   begin
+      return Result : UCD.Code_Point_Vectors.Vector do
+         First := Buffer'First;
+
+         while First <= Buffer'Last loop
+            Last    := Buffer'Last;
+            Current := First;
+
+            while Current <= Buffer'Last loop
+               if Buffer (Current) not in '0' .. '9' | 'A' .. 'F' then
+                  Last := Current - 1;
+
+                  exit;
+               end if;
+
+               Current := Current + 1;
+            end loop;
+
+            Result.Append (To_Code_Point (Buffer (First .. Last)));
+
+            if Last /= Buffer'Last then
+               raise Program_Error;
+            end if;
+
+            First := Last + 1;
+         end loop;
+      end return;
+   end Get_Field;
+
+   ---------------
    -- Has_Field --
    ---------------
 

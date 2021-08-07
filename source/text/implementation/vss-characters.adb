@@ -22,6 +22,8 @@
 ------------------------------------------------------------------------------
 
 with VSS.Implementation.UCD_Core;
+with VSS.Locales;
+with VSS.Strings;
 with VSS.Unicode;
 
 package body VSS.Characters is
@@ -145,5 +147,104 @@ package body VSS.Characters is
           or Data.OLower
           or Data.OUpper;
    end Get_Cased;
+
+   ---------------------------
+   -- Get_Lowercase_Mapping --
+   ---------------------------
+
+   function Get_Lowercase_Mapping
+     (Self : Virtual_Character) return VSS.Strings.Virtual_String is
+   begin
+      return Get_Lowercase_Mapping (Self, VSS.Locales.Current_Locale);
+   end Get_Lowercase_Mapping;
+
+   ---------------------------
+   -- Get_Lowercase_Mapping --
+   ---------------------------
+
+   function Get_Lowercase_Mapping
+     (Self   : Virtual_Character;
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String is
+   begin
+      raise Program_Error;
+      return VSS.Strings.Empty_Virtual_String;
+   end Get_Lowercase_Mapping;
+
+   ----------------------------------
+   -- Get_Simple_Lowercase_Mapping --
+   ----------------------------------
+
+   function Get_Simple_Lowercase_Mapping
+     (Self : Virtual_Character) return Virtual_Character is
+   begin
+      raise Program_Error;
+      return Virtual_Character'Val (0);
+   end Get_Simple_Lowercase_Mapping;
+
+   ----------------------------------
+   -- Get_Simple_Titlecase_Mapping --
+   ----------------------------------
+
+   function Get_Simple_Titlecase_Mapping
+     (Self : Virtual_Character) return Virtual_Character is
+   begin
+      raise Program_Error;
+      return Virtual_Character'Val (0);
+   end Get_Simple_Titlecase_Mapping;
+
+   ----------------------------------
+   -- Get_Simple_Uppercase_Mapping --
+   ----------------------------------
+
+   function Get_Simple_Uppercase_Mapping
+     (Self : Virtual_Character) return Virtual_Character is
+   begin
+      raise Program_Error;
+      return Virtual_Character'Val (0);
+   end Get_Simple_Uppercase_Mapping;
+
+   ---------------------------
+   -- Get_Titlecase_Mapping --
+   ---------------------------
+
+   function Get_Titlecase_Mapping
+     (Self : Virtual_Character) return VSS.Strings.Virtual_String is
+   begin
+      return Get_Titlecase_Mapping (Self, VSS.Locales.Current_Locale);
+   end Get_Titlecase_Mapping;
+
+   ---------------------------
+   -- Get_Titlecase_Mapping --
+   ---------------------------
+
+   function Get_Titlecase_Mapping
+     (Self   : Virtual_Character;
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String is
+   begin
+      raise Program_Error;
+      return VSS.Strings.Empty_Virtual_String;
+   end Get_Titlecase_Mapping;
+
+   ---------------------------
+   -- Get_Uppercase_Mapping --
+   ---------------------------
+
+   function Get_Uppercase_Mapping
+     (Self : Virtual_Character) return VSS.Strings.Virtual_String is
+   begin
+      return Get_Uppercase_Mapping (Self, VSS.Locales.Current_Locale);
+   end Get_Uppercase_Mapping;
+
+   ---------------------------
+   -- Get_Uppercase_Mapping --
+   ---------------------------
+
+   function Get_Uppercase_Mapping
+     (Self   : Virtual_Character;
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String is
+   begin
+      raise Program_Error;
+      return VSS.Strings.Empty_Virtual_String;
+   end Get_Uppercase_Mapping;
 
 end VSS.Characters;

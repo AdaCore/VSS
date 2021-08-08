@@ -176,6 +176,13 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
+   overriding procedure Get_Case_Mapping
+     (Self    : UTF8_String_Handler;
+      Code    : VSS.Unicode.Code_Point;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Data    : out VSS.Implementation.Strings.String_Data);
+   --  Fill given case mapping for the given character into Target.
+
    In_Place_Storage_Capacity : constant := 17;
    --  Number of code units can be stored in place
 
@@ -322,6 +329,12 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Splits string into lines using given set of allowed new line
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
+
+   overriding procedure Get_Case_Mapping
+     (Self    : UTF8_In_Place_String_Handler;
+      Code    : VSS.Unicode.Code_Point;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Data    : out VSS.Implementation.Strings.String_Data);
 
    Global_UTF8_String_Handler   : aliased
      VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;

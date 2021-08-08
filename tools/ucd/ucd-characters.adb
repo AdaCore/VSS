@@ -37,7 +37,7 @@ package body UCD.Characters is
      array (1 .. 24) of Interfaces.Unsigned_16 with Pack;
 
    type String_Array is
-     array (1 .. 8) of Properties.Property_Value_Access;
+     array (1 .. 16) of Properties.Property_Value_Access;
 
    type Character_Record is record
       Boolean     : Boolean_Array;

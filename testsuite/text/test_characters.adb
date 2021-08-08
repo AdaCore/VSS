@@ -32,6 +32,7 @@ with UCD.Property_Aliases_Loader;
 with UCD.Property_Value_Aliases_Loader;
 
 with VSS.Characters;
+with VSS.Strings;
 
 with Test_Support;
 
@@ -43,6 +44,11 @@ procedure Test_Characters is
 
    procedure Test_Properties;
    --  Test properties of all characters.
+
+   procedure Test_Well_Know;
+   --  Test properties of few well known character to be sure that properties
+   --  for them have expected values. Full coverage of all characters is done
+   --  in other tests for some groups of properties.
 
    --------------------
    -- Initialize_UCD --
@@ -224,37 +230,68 @@ procedure Test_Characters is
       end loop;
    end Test_Properties;
 
+   --------------------
+   -- Test_Well_Know --
+   --------------------
+
+   procedure Test_Well_Know is
+      use type VSS.Characters.Virtual_Character;
+      use type VSS.Strings.Virtual_String;
+
+   begin
+      --  General_Category
+
+      Test_Support.Assert
+        (VSS.Characters.Get_General_Category
+           (VSS.Characters.Virtual_Character'Val (16#00#))
+         = VSS.Characters.Control);
+      Test_Support.Assert
+        (VSS.Characters.Get_General_Category
+           (VSS.Characters.Virtual_Character'Val (16#20#))
+         = VSS.Characters.Space_Separator);
+      Test_Support.Assert
+        (VSS.Characters.Get_General_Category
+           (VSS.Characters.Virtual_Character'Val (16#31#))
+         = VSS.Characters.Decimal_Number);
+      Test_Support.Assert
+        (VSS.Characters.Get_General_Category
+           (VSS.Characters.Virtual_Character'Val (16#41#))
+         = VSS.Characters.Uppercase_Letter);
+      Test_Support.Assert
+        (VSS.Characters.Get_General_Category
+           (VSS.Characters.Virtual_Character'Val (16#430#))
+         = VSS.Characters.Lowercase_Letter);
+      Test_Support.Assert
+        (VSS.Characters.Get_General_Category
+           (VSS.Characters.Virtual_Character'Val (16#D800#))
+         = VSS.Characters.Surrogate);
+
+      --  Case mappings
+
+      Test_Support.Assert
+        (VSS.Characters.Get_Simple_Lowercase_Mapping
+           (VSS.Characters.Virtual_Character'Val (16#41#))
+         = VSS.Characters.Virtual_Character'Val (16#61#));
+      Test_Support.Assert
+        (VSS.Characters.Get_Simple_Titlecase_Mapping
+           (VSS.Characters.Virtual_Character'Val (16#61#))
+         = VSS.Characters.Virtual_Character'Val (16#41#));
+      Test_Support.Assert
+        (VSS.Characters.Get_Simple_Uppercase_Mapping
+           (VSS.Characters.Virtual_Character'Val (16#61#))
+         = VSS.Characters.Virtual_Character'Val (16#41#));
+
+      Test_Support.Assert
+        (VSS.Characters.Get_Lowercase_Mapping ('А') = "а");
+      Test_Support.Assert
+        (VSS.Characters.Get_Titlecase_Mapping ('а') = "А");
+      Test_Support.Assert
+        (VSS.Characters.Get_Uppercase_Mapping ('а') = "А");
+   end Test_Well_Know;
+
 begin
+   Test_Well_Know;
+
    Initialize_UCD;
-
-   --  This test can be replaces by the test with full coverage of possible
-   --  Unicode characters listed in 'extracted/DerivedGeneralCategory.txt'
-   --  file of UCD.
-
-   Test_Support.Assert
-     (VSS.Characters.Get_General_Category
-        (VSS.Characters.Virtual_Character'Val (16#00#))
-      = VSS.Characters.Control);
-   Test_Support.Assert
-     (VSS.Characters.Get_General_Category
-        (VSS.Characters.Virtual_Character'Val (16#20#))
-      = VSS.Characters.Space_Separator);
-   Test_Support.Assert
-     (VSS.Characters.Get_General_Category
-        (VSS.Characters.Virtual_Character'Val (16#31#))
-      = VSS.Characters.Decimal_Number);
-   Test_Support.Assert
-     (VSS.Characters.Get_General_Category
-        (VSS.Characters.Virtual_Character'Val (16#41#))
-      = VSS.Characters.Uppercase_Letter);
-   Test_Support.Assert
-     (VSS.Characters.Get_General_Category
-        (VSS.Characters.Virtual_Character'Val (16#430#))
-      = VSS.Characters.Lowercase_Letter);
-   Test_Support.Assert
-     (VSS.Characters.Get_General_Category
-        (VSS.Characters.Virtual_Character'Val (16#D800#))
-      = VSS.Characters.Surrogate);
-
    Test_Properties;
 end Test_Characters;

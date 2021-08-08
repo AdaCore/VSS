@@ -26,6 +26,7 @@ with Ada.Unchecked_Deallocation;
 
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Configuration;
+with VSS.Implementation.UCD_Casing_UTF8;
 
 package body VSS.Implementation.UTF8_String_Handlers is
 
@@ -1045,6 +1046,112 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end if;
       end;
    end From_Wide_Wide_String;
+
+   ----------------------
+   -- Get_Case_Mapping --
+   ----------------------
+
+   overriding procedure Get_Case_Mapping
+     (Self    : UTF8_String_Handler;
+      Code    : VSS.Unicode.Code_Point;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Data    : out VSS.Implementation.Strings.String_Data)
+   is
+      Target : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      raise Program_Error;
+   end Get_Case_Mapping;
+
+   ----------------------
+   -- Get_Case_Mapping --
+   ----------------------
+
+   overriding procedure Get_Case_Mapping
+     (Self    : UTF8_In_Place_String_Handler;
+      Code    : VSS.Unicode.Code_Point;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Data    : out VSS.Implementation.Strings.String_Data)
+   is
+      use type VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset;
+      use type VSS.Unicode.Code_Point;
+
+      Group  : constant VSS.Implementation.UCD_Casing_UTF8.Mapping_Group :=
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Group
+          (Code / VSS.Implementation.UCD_Casing_UTF8.Group_Size);
+      Base   : constant
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset :=
+          (case Mapping is
+           when VSS.Implementation.String_Handlers.Simple_Lowercase =>
+             VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index (Group),
+           when VSS.Implementation.String_Handlers.Simple_Titlecase =>
+             VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index (Group),
+           when VSS.Implementation.String_Handlers.Simple_Uppercase =>
+             VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index (Group),
+           when VSS.Implementation.String_Handlers.Lowercase =>
+             VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index (Group),
+           when VSS.Implementation.String_Handlers.Titlecase =>
+             VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index (Group),
+           when VSS.Implementation.String_Handlers.Uppercase =>
+             VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index (Group));
+      Offset : constant
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset :=
+          VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset
+            (Code mod VSS.Implementation.UCD_Casing_UTF8.Group_Size);
+      Info   : constant
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Information :=
+          VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Table
+            (Base + Offset);
+
+      Target : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      --  Amount of the data that might be stored in in-place object is know
+      --  to be large that largest case mapping, thus all checks for this case
+      --  are omitted to don't have useless code.
+
+      if Info.Has_Mapping then
+         Target.Storage (0 .. Info.Count - 1) :=
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table
+                (Info.Offset .. Info.Offset + Info.Count - 1));
+         Target.Length := Info.Length;
+         Target.Size   := Info.Count;
+         Target.Storage (Target.Size) := 16#00#;
+
+      else
+         declare
+            L  : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+            U1 : VSS.Unicode.UTF8_Code_Unit;
+            U2 : VSS.Unicode.UTF8_Code_Unit;
+            U3 : VSS.Unicode.UTF8_Code_Unit;
+            U4 : VSS.Unicode.UTF8_Code_Unit;
+
+         begin
+            VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
+
+            Target.Storage (0) := U1;
+
+            if L >= 2 then
+               Target.Storage (1) := U2;
+
+               if L >= 3 then
+                  Target.Storage (2) := U3;
+
+                  if L = 4 then
+                     Target.Storage (3) := U4;
+                  end if;
+               end if;
+            end if;
+
+            Target.Size   := L;
+            Target.Length := 1;
+            Target.Storage (Target.Size) := 16#00#;
+         end;
+      end if;
+   end Get_Case_Mapping;
 
    -------------------
    -- Has_Character --

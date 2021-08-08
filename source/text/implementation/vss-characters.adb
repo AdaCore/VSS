@@ -21,9 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Core;
 with VSS.Locales;
-with VSS.Strings;
+with VSS.Strings.Internals;
 with VSS.Unicode;
 
 package body VSS.Characters is
@@ -164,10 +166,24 @@ package body VSS.Characters is
 
    function Get_Lowercase_Mapping
      (Self   : Virtual_Character;
-      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String is
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String
+   is
+      pragma Unreferenced (Locale);
+
+      Data : VSS.Implementation.Strings.String_Data;
+
    begin
-      raise Program_Error;
-      return VSS.Strings.Empty_Virtual_String;
+      VSS.Implementation.Strings.Handler
+        (Data).Get_Case_Mapping
+        (Virtual_Character'Pos (Self),
+         VSS.Implementation.String_Handlers.Lowercase,
+         Data);
+
+      return Result : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.Internals.To_Virtual_String (Data)
+      do
+         VSS.Implementation.Strings.Unreference (Data);
+      end return;
    end Get_Lowercase_Mapping;
 
    ----------------------------------
@@ -175,10 +191,28 @@ package body VSS.Characters is
    ----------------------------------
 
    function Get_Simple_Lowercase_Mapping
-     (Self : Virtual_Character) return Virtual_Character is
+     (Self : Virtual_Character) return Virtual_Character
+   is
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor;
+      Success  : Boolean with Unreferenced;
+
    begin
-      raise Program_Error;
-      return Virtual_Character'Val (0);
+      VSS.Implementation.Strings.Handler
+        (Data).Get_Case_Mapping
+        (Virtual_Character'Pos (Self),
+         VSS.Implementation.String_Handlers.Simple_Lowercase,
+         Data);
+
+      VSS.Implementation.Strings.Handler
+        (Data).Before_First_Character (Data, Position);
+      Success := VSS.Implementation.Strings.Handler
+        (Data).Forward (Data, Position);
+
+      return
+        Virtual_Character'Val
+          (VSS.Implementation.Strings.Handler
+             (Data).Element (Data, Position));
    end Get_Simple_Lowercase_Mapping;
 
    ----------------------------------
@@ -186,10 +220,28 @@ package body VSS.Characters is
    ----------------------------------
 
    function Get_Simple_Titlecase_Mapping
-     (Self : Virtual_Character) return Virtual_Character is
+     (Self : Virtual_Character) return Virtual_Character
+   is
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor;
+      Success  : Boolean with Unreferenced;
+
    begin
-      raise Program_Error;
-      return Virtual_Character'Val (0);
+      VSS.Implementation.Strings.Handler
+        (Data).Get_Case_Mapping
+        (Virtual_Character'Pos (Self),
+         VSS.Implementation.String_Handlers.Simple_Titlecase,
+         Data);
+
+      VSS.Implementation.Strings.Handler
+        (Data).Before_First_Character (Data, Position);
+      Success := VSS.Implementation.Strings.Handler
+        (Data).Forward (Data, Position);
+
+      return
+        Virtual_Character'Val
+          (VSS.Implementation.Strings.Handler
+             (Data).Element (Data, Position));
    end Get_Simple_Titlecase_Mapping;
 
    ----------------------------------
@@ -197,10 +249,28 @@ package body VSS.Characters is
    ----------------------------------
 
    function Get_Simple_Uppercase_Mapping
-     (Self : Virtual_Character) return Virtual_Character is
+     (Self : Virtual_Character) return Virtual_Character
+   is
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : VSS.Implementation.Strings.Cursor;
+      Success  : Boolean with Unreferenced;
+
    begin
-      raise Program_Error;
-      return Virtual_Character'Val (0);
+      VSS.Implementation.Strings.Handler
+        (Data).Get_Case_Mapping
+        (Virtual_Character'Pos (Self),
+         VSS.Implementation.String_Handlers.Simple_Uppercase,
+         Data);
+
+      VSS.Implementation.Strings.Handler
+        (Data).Before_First_Character (Data, Position);
+      Success := VSS.Implementation.Strings.Handler
+        (Data).Forward (Data, Position);
+
+      return
+        Virtual_Character'Val
+          (VSS.Implementation.Strings.Handler
+             (Data).Element (Data, Position));
    end Get_Simple_Uppercase_Mapping;
 
    ---------------------------
@@ -219,10 +289,24 @@ package body VSS.Characters is
 
    function Get_Titlecase_Mapping
      (Self   : Virtual_Character;
-      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String is
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String
+   is
+      pragma Unreferenced (Locale);
+
+      Data : VSS.Implementation.Strings.String_Data;
+
    begin
-      raise Program_Error;
-      return VSS.Strings.Empty_Virtual_String;
+      VSS.Implementation.Strings.Handler
+        (Data).Get_Case_Mapping
+        (Virtual_Character'Pos (Self),
+         VSS.Implementation.String_Handlers.Titlecase,
+         Data);
+
+      return Result : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.Internals.To_Virtual_String (Data)
+      do
+         VSS.Implementation.Strings.Unreference (Data);
+      end return;
    end Get_Titlecase_Mapping;
 
    ---------------------------
@@ -241,10 +325,24 @@ package body VSS.Characters is
 
    function Get_Uppercase_Mapping
      (Self   : Virtual_Character;
-      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String is
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String
+   is
+      pragma Unreferenced (Locale);
+
+      Data : VSS.Implementation.Strings.String_Data;
+
    begin
-      raise Program_Error;
-      return VSS.Strings.Empty_Virtual_String;
+      VSS.Implementation.Strings.Handler
+        (Data).Get_Case_Mapping
+        (Virtual_Character'Pos (Self),
+         VSS.Implementation.String_Handlers.Uppercase,
+         Data);
+
+      return Result : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.Internals.To_Virtual_String (Data)
+      do
+         VSS.Implementation.Strings.Unreference (Data);
+      end return;
    end Get_Uppercase_Mapping;
 
 end VSS.Characters;

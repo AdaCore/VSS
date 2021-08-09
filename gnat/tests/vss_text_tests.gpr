@@ -38,6 +38,7 @@ project VSS_Text_Tests is
                  "test_converters.adb",
                  "test_line_iterators.adb",
                  "test_string_append",
+                 "test_string_casing.adb",
                  "test_string_compare",
                  "test_string_conversions.adb",
                  "test_string_delete",

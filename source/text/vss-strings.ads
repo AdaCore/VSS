@@ -350,6 +350,36 @@ package VSS.Strings is
       Keep_Terminator : Boolean := False)
       return VSS.String_Vectors.Virtual_String_Vector;
 
+   function To_Lowercase (Self : Virtual_String'Class) return Virtual_String;
+   --  Convert string to lowercase form using full case conversion and
+   --  tailoring provided by the locale of the current task.
+
+   function To_Lowercase
+     (Self   : Virtual_String'Class;
+      Locale : VSS.Locales.Locale) return Virtual_String;
+   --  Convert string to lowercase form using full case conversion and
+   --  tailoring provided by given locale.
+
+   function To_Titlecase (Self : Virtual_String'Class) return Virtual_String;
+   --  Convert string to titlecase form using full case conversion and
+   --  tailoring provided by the locale of the current task.
+
+   function To_Titlecase
+     (Self   : Virtual_String'Class;
+      Locale : VSS.Locales.Locale) return Virtual_String;
+   --  Convert string to titlecase form using full case conversion and
+   --  tailoring provided by given locale.
+
+   function To_Uppercase (Self : Virtual_String'Class) return Virtual_String;
+   --  Convert string to uppercase form using full case conversion and
+   --  tailoring provided by the locale of the current task.
+
+   function To_Uppercase
+     (Self   : Virtual_String'Class;
+      Locale : VSS.Locales.Locale) return Virtual_String;
+   --  Convert string to uppercase form using full case conversion and
+   --  tailoring provided by given locale.
+
 private
 
    type Magic_String_Access is access all Virtual_String'Class;

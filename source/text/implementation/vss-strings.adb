@@ -949,6 +949,27 @@ package body VSS.Strings is
       end if;
    end Starts_With;
 
+   ------------------
+   -- To_Lowercase --
+   ------------------
+
+   function To_Lowercase (Self : Virtual_String'Class) return Virtual_String is
+   begin
+      return Self.To_Lowercase (VSS.Locales.Current_Locale);
+   end To_Lowercase;
+
+   ------------------
+   -- To_Lowercase --
+   ------------------
+
+   function To_Lowercase
+     (Self   : Virtual_String'Class;
+      Locale : VSS.Locales.Locale) return Virtual_String is
+   begin
+      raise Program_Error;
+      return Empty_Virtual_String;
+   end To_Lowercase;
+
    -------------------
    -- To_Magic_Text --
    -------------------
@@ -966,6 +987,48 @@ package body VSS.Strings is
                 Limited_Head => null,
                 Limited_Tail => null);
    end To_Magic_Text;
+
+   ------------------
+   -- To_Titlecase --
+   ------------------
+
+   function To_Titlecase (Self : Virtual_String'Class) return Virtual_String is
+   begin
+      return Self.To_Titlecase (VSS.Locales.Current_Locale);
+   end To_Titlecase;
+
+   ------------------
+   -- To_Titlecase --
+   ------------------
+
+   function To_Titlecase
+     (Self   : Virtual_String'Class;
+      Locale : VSS.Locales.Locale) return Virtual_String is
+   begin
+      raise Program_Error;
+      return Empty_Virtual_String;
+   end To_Titlecase;
+
+   ------------------
+   -- To_Uppercase --
+   ------------------
+
+   function To_Uppercase (Self : Virtual_String'Class) return Virtual_String is
+   begin
+      return Self.To_Uppercase (VSS.Locales.Current_Locale);
+   end To_Uppercase;
+
+   ------------------
+   -- To_Uppercase --
+   ------------------
+
+   function To_Uppercase
+     (Self   : Virtual_String'Class;
+      Locale : VSS.Locales.Locale) return Virtual_String is
+   begin
+      raise Program_Error;
+      return Empty_Virtual_String;
+   end To_Uppercase;
 
    -----------------------
    -- To_Virtual_String --

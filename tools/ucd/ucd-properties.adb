@@ -54,18 +54,26 @@ package body UCD.Properties is
       Value_Name : Wide_Wide_String) return Property_Value_Access is
    begin
       if Property.Is_Canonical_Combining_Class then
-         declare
-            Value : constant Canonical_Combinig_Class :=
-              Canonical_Combinig_Class'Wide_Wide_Value (Value_Name);
-
          begin
-            for V of Property.All_Values loop
-               if V.Canonical_Combining_Class_Value = Value then
-                  return V;
-               end if;
-            end loop;
+            declare
+               Value : constant Canonical_Combinig_Class :=
+                 Canonical_Combinig_Class'Wide_Wide_Value (Value_Name);
 
-            raise Program_Error;
+            begin
+               for V of Property.All_Values loop
+                  if V.Canonical_Combining_Class_Value = Value then
+                     return V;
+                  end if;
+               end loop;
+
+               raise Program_Error;
+            end;
+
+         exception
+            when Constraint_Error =>
+               return
+                 Property.Name_To_Value
+                   (To_Unbounded_Wide_Wide_String (Value_Name));
          end;
 
       else

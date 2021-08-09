@@ -158,6 +158,26 @@ package body VSS.Stream_Element_Vectors is
    end Iterate;
 
    ----------
+   -- Last --
+   ----------
+
+   overriding function Last (Self : Reversible_Iterator) return Cursor is
+   begin
+      return (Index => Self.Last);
+   end Last;
+
+   ------------
+   -- Length --
+   ------------
+
+   function Length
+     (Self : Stream_Element_Vector'Class)
+      return Ada.Streams.Stream_Element_Count is
+   begin
+      return (if Self.Data = null then 0 else Self.Data.Length);
+   end Length;
+
+   ----------
    -- Next --
    ----------
 
@@ -171,15 +191,6 @@ package body VSS.Stream_Element_Vectors is
       return (Index => Index);
    end Next;
 
-   ----------
-   -- Last --
-   ----------
-
-   overriding function Last (Self : Reversible_Iterator) return Cursor is
-   begin
-      return (Index => Self.Last);
-   end Last;
-
    --------------
    -- Previous --
    --------------
@@ -192,17 +203,6 @@ package body VSS.Stream_Element_Vectors is
    begin
       return (Index => (if Position.Index > 0 then Position.Index - 1 else 0));
    end Previous;
-
-   ------------
-   -- Length --
-   ------------
-
-   function Length
-     (Self : Stream_Element_Vector'Class)
-      return Ada.Streams.Stream_Element_Count is
-   begin
-      return (if Self.Data = null then 0 else Self.Data.Length);
-   end Length;
 
    ----------
    -- Read --

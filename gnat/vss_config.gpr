@@ -55,9 +55,12 @@ abstract project VSS_Config is
             --  investigation in debuggers.
             "-O0", "-g",
 
-            --  Enable all warnings and GNAT stylechecks (plus O: check for
-            --  overriding indicators).
-            "-gnatwa", "-gnatygO",
+            --  Enable warnings and stylechecks.
+            "-gnatwa",   --  turn on all info/warnings
+            "-gnatygoO",
+              --  g    check standard GNAT style rules
+              --  o    check subprogram bodies in alphabetical order
+              --  O    check overriding indicators
 
             --  Enable assertions and all validity checking options
             "-gnata", "-gnatVa",

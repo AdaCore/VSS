@@ -142,37 +142,6 @@ package body VSS.Implementation.Null_String_Handlers is
       return Suffix_Handler.Is_Empty (Suffix_Data);
    end Ends_With;
 
-   ----------------------
-   -- Get_Case_Mapping --
-   ----------------------
-
-   overriding procedure Get_Case_Mapping
-     (Self    : Null_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data) is
-   begin
-      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-        (Data);
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping (Code, Mapping, Data);
-   end Get_Case_Mapping;
-
-   -----------------
-   -- Starts_With --
-   -----------------
-
-   overriding function Starts_With
-     (Self           : Null_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Prefix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
-      Prefix_Data    : VSS.Implementation.Strings.String_Data)
-      return Boolean is
-   begin
-      return Prefix_Handler.Is_Empty (Prefix_Data);
-   end Starts_With;
-
    -------------
    -- Forward --
    -------------
@@ -226,6 +195,22 @@ package body VSS.Implementation.Null_String_Handlers is
 
       Success := False;
    end From_Wide_Wide_String;
+
+   ----------------------
+   -- Get_Case_Mapping --
+   ----------------------
+
+   overriding procedure Get_Case_Mapping
+     (Self    : Null_String_Handler;
+      Code    : VSS.Unicode.Code_Point;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Data    : out VSS.Implementation.Strings.String_Data) is
+   begin
+      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
+        (Data);
+      VSS.Implementation.Strings.Handler
+        (Data).Get_Case_Mapping (Code, Mapping, Data);
+   end Get_Case_Mapping;
 
    -------------------
    -- Has_Character --
@@ -317,6 +302,21 @@ package body VSS.Implementation.Null_String_Handlers is
    begin
       Lines := null;
    end Split_Lines;
+
+   -----------------
+   -- Starts_With --
+   -----------------
+
+   overriding function Starts_With
+     (Self           : Null_String_Handler;
+      Data           : VSS.Implementation.Strings.String_Data;
+      Prefix_Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+      Prefix_Data    : VSS.Implementation.Strings.String_Data)
+      return Boolean is
+   begin
+      return Prefix_Handler.Is_Empty (Prefix_Data);
+   end Starts_With;
 
    ---------------------
    -- To_UTF_8_String --

@@ -1109,7 +1109,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    begin
       --  Amount of the data that might be stored in in-place object is know
-      --  to be large that largest case mapping, thus all checks for this case
+      --  to be larger that largest case mapping, thus all checks for this case
       --  are omitted to don't have useless code.
 
       if Info.Has_Mapping then

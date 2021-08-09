@@ -26,6 +26,7 @@ with Ada.Unchecked_Deallocation;
 
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Configuration;
+with VSS.Implementation.UCD_Casing;
 with VSS.Implementation.UCD_Casing_UTF8;
 
 package body VSS.Implementation.UTF8_String_Handlers is
@@ -808,9 +809,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end if;
       end Append;
 
-      Code   : VSS.Unicode.Code_Point;
-      Start  : VSS.Unicode.UTF8_Code_Unit_Offset;
-      Offset : VSS.Unicode.UTF8_Code_Unit_Offset := 0;
+      Code    : VSS.Unicode.Code_Point;
+      Start   : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Offset  : VSS.Unicode.UTF8_Code_Unit_Offset := 0;
+      Context : VSS.Implementation.UCD_Casing.Casing_Context;
 
    begin
       while Offset < Source_Size loop
@@ -818,20 +820,60 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Unchecked_Decode_Forward (Source_Storage, Offset, Code);
 
          declare
+            use type VSS.Unicode.Code_Point;
+
             Info : constant
               VSS.Implementation.UCD_Casing_UTF8.Mapping_Information :=
                 Get_Case_Mapping_Information (Mapping, Code);
+            Skip : Boolean := False;
 
          begin
-            if Info.Has_Mapping then
-               Append
-                 (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
-                  Info.Offset,
-                  Info.Count,
-                  Info.Length);
+            if Context.Final_Sigma and Code = 16#03A3# then
+               declare
+                  Suffix_Offset : VSS.Unicode.UTF8_Code_Unit_Offset := Offset;
+                  Match         : Boolean := False;
+                  Suffix_Info   :
+                    VSS.Implementation.UCD_Casing_UTF8.Mapping_Information;
 
-            else
-               Append (Source_Storage, Start, Offset - Start, 1);
+               begin
+                  while Suffix_Offset < Source_Size loop
+                     Unchecked_Decode_Forward
+                       (Source_Storage, Suffix_Offset, Code);
+                     Suffix_Info :=
+                       Get_Case_Mapping_Information (Mapping, Code);
+
+                     if Suffix_Info.Case_Ignorable then
+                        null;
+
+                     else
+                        Match := Suffix_Info.Cased;
+
+                        exit;
+                     end if;
+                  end loop;
+
+                  if not Match then
+                     --  Replace by 03C2
+
+                     Append ((16#CF#, 16#82#), 0, 2, 1);
+                     Skip := True;
+                  end if;
+               end;
+            end if;
+
+            VSS.Implementation.UCD_Casing.Apply (Context, Info.Context_Change);
+
+            if not Skip then
+               if Info.Has_Mapping then
+                  Append
+                    (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
+                     Info.Offset,
+                     Info.Count,
+                     Info.Length);
+
+               else
+                  Append (Source_Storage, Start, Offset - Start, 1);
+               end if;
             end if;
          end;
       end loop;

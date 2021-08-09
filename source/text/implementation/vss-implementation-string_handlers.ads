@@ -315,4 +315,11 @@ package VSS.Implementation.String_Handlers is
       Data    : out VSS.Implementation.Strings.String_Data) is abstract;
    --  Fill given case mapping for the given character into Target.
 
+   not overriding procedure Convert_Case
+     (Self    : Abstract_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data) is abstract;
+   --  Do case conversion of the string.
+
 end VSS.Implementation.String_Handlers;

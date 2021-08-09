@@ -62,6 +62,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
       return VSS.Unicode.Code_Point;
    --  Decode UTF8 encoded character started at given offset
 
+   procedure Unchecked_Decode_Forward
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point);
+   --  Decode UTF8 encoded character started at given offset and change offset
+   --  to point to the beginning of the next character.
+
    procedure Unchecked_Forward
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Position : in out VSS.Implementation.Strings.Cursor);
@@ -147,6 +154,28 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
    --  Common code of Split_Lines subprogram for on heap and inline handlers.
+
+   function Get_Case_Mapping_Information
+     (Mapping : VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      Code    : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Casing_UTF8.Mapping_Information;
+   --  Returns case mapping information for given mapping and character.
+
+   procedure Convert_Case_Simple
+     (Source_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Mapping        :
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      Result_Data    : in out VSS.Implementation.Strings.String_Data);
+   --  Common code for simple case conversions.
+
+   procedure Convert_Case_Full
+     (Source_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Mapping        :
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      Result_Data    : in out VSS.Implementation.Strings.String_Data);
+   --  Common code for full case conversions.
 
    --------------------------
    -- After_Last_Character --
@@ -607,6 +636,284 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
    end Before_First_Character;
+
+   ------------------
+   -- Convert_Case --
+   ------------------
+
+   overriding procedure Convert_Case
+     (Self    : UTF8_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data)
+   is
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      Self.Initialize (Result);
+
+      case Mapping is
+         when VSS.Implementation.String_Handlers.Simple_Lowercase =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Titlecase =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Uppercase =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Lowercase =>
+            Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Titlecase =>
+            Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Uppercase =>
+            Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
+               Result);
+      end case;
+   end Convert_Case;
+
+   ------------------
+   -- Convert_Case --
+   ------------------
+
+   overriding procedure Convert_Case
+     (Self    : UTF8_In_Place_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data)
+   is
+      Source : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      Self.Initialize (Result);
+
+      case Mapping is
+         when VSS.Implementation.String_Handlers.Simple_Lowercase =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Titlecase =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Uppercase =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Lowercase =>
+            Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Titlecase =>
+            Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Uppercase =>
+            Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
+               Result);
+      end case;
+   end Convert_Case;
+
+   -----------------------
+   -- Convert_Case_Full --
+   -----------------------
+
+   procedure Convert_Case_Full
+     (Source_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Mapping        :
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      Result_Data    : in out VSS.Implementation.Strings.String_Data)
+   is
+      procedure Append
+        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         From    : VSS.Unicode.UTF8_Code_Unit_Index;
+         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+         Length  : VSS.Implementation.Strings.Character_Count);
+      --  Append data from given position and size to result. Convert result
+      --  to heap based implementation when necessary.
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append
+        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         From    : VSS.Unicode.UTF8_Code_Unit_Index;
+         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+         Length  : VSS.Implementation.Strings.Character_Count)
+      is
+         Target : UTF8_In_Place_Data
+           with Import, Convention => Ada, Address => Result_Data'Address;
+
+      begin
+         if Result_Data.In_Place then
+            if Target.Size + Size <= In_Place_Storage_Capacity then
+               Target.Storage (Target.Size .. Target.Size + Size - 1) :=
+                 Storage (From .. From + Size - 1);
+               Target.Size := Target.Size + Size;
+               Target.Length := Target.Length + Length;
+
+            else
+               raise Program_Error;
+            end if;
+
+         else
+            raise Program_Error;
+         end if;
+      end Append;
+
+      Code   : VSS.Unicode.Code_Point;
+      Start  : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Offset : VSS.Unicode.UTF8_Code_Unit_Offset := 0;
+
+   begin
+      while Offset < Source_Size loop
+         Start := Offset;
+         Unchecked_Decode_Forward (Source_Storage, Offset, Code);
+
+         declare
+            Info : constant
+              VSS.Implementation.UCD_Casing_UTF8.Mapping_Information :=
+                Get_Case_Mapping_Information (Mapping, Code);
+
+         begin
+            if Info.Has_Mapping then
+               Append
+                 (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
+                  Info.Offset,
+                  Info.Count,
+                  Info.Length);
+
+            else
+               Append (Source_Storage, Start, Offset - Start, 1);
+            end if;
+         end;
+      end loop;
+   end Convert_Case_Full;
+
+   -------------------------
+   -- Convert_Case_Simple --
+   -------------------------
+
+   procedure Convert_Case_Simple
+     (Source_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Mapping        :
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      Result_Data    : in out VSS.Implementation.Strings.String_Data)
+   is
+      procedure Append
+        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         From    : VSS.Unicode.UTF8_Code_Unit_Index;
+         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+         Length  : VSS.Implementation.Strings.Character_Count);
+      --  Append data from given position and size to result. Convert result
+      --  to heap based implementation when necessary.
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append
+        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         From    : VSS.Unicode.UTF8_Code_Unit_Index;
+         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+         Length  : VSS.Implementation.Strings.Character_Count)
+      is
+         Target : UTF8_In_Place_Data
+           with Import, Convention => Ada, Address => Result_Data'Address;
+
+      begin
+         if Result_Data.In_Place then
+            if Target.Size + Size <= In_Place_Storage_Capacity then
+               Target.Storage (Target.Size .. Target.Size + Size - 1) :=
+                 Storage (From .. From + Size - 1);
+               Target.Size := Target.Size + Size;
+               Target.Length := Target.Length + Length;
+
+            else
+               raise Program_Error;
+            end if;
+
+         else
+            raise Program_Error;
+         end if;
+      end Append;
+
+      Code   : VSS.Unicode.Code_Point;
+      Start  : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Offset : VSS.Unicode.UTF8_Code_Unit_Offset := 0;
+
+   begin
+      while Offset < Source_Size loop
+         Start := Offset;
+         Unchecked_Decode_Forward (Source_Storage, Offset, Code);
+
+         declare
+            Info : constant
+              VSS.Implementation.UCD_Casing_UTF8.Mapping_Information :=
+                Get_Case_Mapping_Information (Mapping, Code);
+
+         begin
+            if Info.Has_Mapping then
+               Append
+                 (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
+                  Info.Offset,
+                  Info.Count,
+                  Info.Length);
+
+            else
+               Append (Source_Storage, Start, Offset - Start, 1);
+            end if;
+         end;
+      end loop;
+   end Convert_Case_Simple;
 
    ------------------
    -- Copy_To_Heap --
@@ -1074,35 +1381,23 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
       Data    : out VSS.Implementation.Strings.String_Data)
    is
-      use type VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset;
-      use type VSS.Unicode.Code_Point;
-
-      Group  : constant VSS.Implementation.UCD_Casing_UTF8.Mapping_Group :=
-        VSS.Implementation.UCD_Casing_UTF8.Mapping_Group
-          (Code / VSS.Implementation.UCD_Casing_UTF8.Group_Size);
-      Base   : constant
-        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset :=
-          (case Mapping is
-           when VSS.Implementation.String_Handlers.Simple_Lowercase =>
-             VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index (Group),
-           when VSS.Implementation.String_Handlers.Simple_Titlecase =>
-             VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index (Group),
-           when VSS.Implementation.String_Handlers.Simple_Uppercase =>
-             VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index (Group),
-           when VSS.Implementation.String_Handlers.Lowercase =>
-             VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index (Group),
-           when VSS.Implementation.String_Handlers.Titlecase =>
-             VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index (Group),
-           when VSS.Implementation.String_Handlers.Uppercase =>
-             VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index (Group));
-      Offset : constant
-        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset :=
-          VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset
-            (Code mod VSS.Implementation.UCD_Casing_UTF8.Group_Size);
       Info   : constant
         VSS.Implementation.UCD_Casing_UTF8.Mapping_Information :=
-          VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Table
-            (Base + Offset);
+          Get_Case_Mapping_Information
+            ((case Mapping is
+                when VSS.Implementation.String_Handlers.Simple_Lowercase =>
+                  VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
+                when VSS.Implementation.String_Handlers.Simple_Titlecase =>
+                  VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
+                when VSS.Implementation.String_Handlers.Simple_Uppercase =>
+                  VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
+                when VSS.Implementation.String_Handlers.Lowercase =>
+                  VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
+                when VSS.Implementation.String_Handlers.Titlecase =>
+                  VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+                when VSS.Implementation.String_Handlers.Uppercase =>
+                  VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index),
+             Code);
 
       Target : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
@@ -1152,6 +1447,32 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end;
       end if;
    end Get_Case_Mapping;
+
+   ----------------------------------
+   -- Get_Case_Mapping_Information --
+   ----------------------------------
+
+   function Get_Case_Mapping_Information
+     (Mapping : VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      Code    : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Casing_UTF8.Mapping_Information
+   is
+      use type VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset;
+      use type VSS.Unicode.Code_Point;
+
+      Group  : constant VSS.Implementation.UCD_Casing_UTF8.Mapping_Group :=
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Group
+          (Code / VSS.Implementation.UCD_Casing_UTF8.Mapping_Group_Size);
+      Offset : constant
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset :=
+          VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset
+            (Code mod VSS.Implementation.UCD_Casing_UTF8.Mapping_Group_Size);
+
+   begin
+      return
+        VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Table
+          (Mapping (Group) + Offset);
+   end Get_Case_Mapping_Information;
 
    -------------------
    -- Has_Character --
@@ -1862,6 +2183,73 @@ package body VSS.Implementation.UTF8_String_Handlers is
             raise Program_Error;
       end case;
    end Unchecked_Decode;
+
+   ------------------------------
+   -- Unchecked_Decode_Forward --
+   ------------------------------
+
+   procedure Unchecked_Decode_Forward
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point)
+   is
+      use type VSS.Unicode.Code_Point;
+      use type VSS.Unicode.UTF8_Code_Unit;
+
+      U1 : VSS.Unicode.Code_Point := VSS.Unicode.Code_Point (Storage (Offset));
+      U2 : VSS.Unicode.Code_Point;
+      U3 : VSS.Unicode.Code_Point;
+      U4 : VSS.Unicode.Code_Point;
+
+   begin
+      case U1 is
+         when 16#00# .. 16#7F# =>
+            --  1x code units sequence
+
+            Code   := U1;
+            Offset := Offset + 1;
+
+         when 16#C2# .. 16#DF# =>
+            --  2x code units sequence
+
+            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
+            U2 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 1) and 2#0011_1111#);
+
+            Code   := U1 or U2;
+            Offset := Offset + 2;
+
+         when 16#E0# .. 16#EF# =>
+            --  3x code units sequence
+
+            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#0100_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 2) and 2#0011_1111#);
+
+            Code   := U1 or U2 or U3;
+            Offset := Offset + 3;
+
+         when 16#F0# .. 16#F4# =>
+            --  4x code units sequence
+
+            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#010_000_0000_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point
+                (Storage (Offset + 2) and 2#0011_1111#) * 2#0100_0000#;
+            U4 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 3) and 2#0011_1111#);
+
+            Code   := U1 or U2 or U3 or U4;
+            Offset := Offset + 4;
+
+         when others =>
+            raise Program_Error;
+      end case;
+   end Unchecked_Decode_Forward;
 
    -----------------------
    -- Unchecked_Forward --

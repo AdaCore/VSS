@@ -25,6 +25,7 @@ with Ada.Exceptions;
 
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 with VSS.Locales;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
@@ -966,8 +967,12 @@ package body VSS.Strings is
      (Self   : Virtual_String'Class;
       Locale : VSS.Locales.Locale) return Virtual_String is
    begin
-      raise Program_Error;
-      return Empty_Virtual_String;
+      return Result : Virtual_String do
+         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
+           (Self.Data,
+            VSS.Implementation.String_Handlers.Lowercase,
+            Result.Data);
+      end return;
    end To_Lowercase;
 
    -------------------
@@ -1005,8 +1010,12 @@ package body VSS.Strings is
      (Self   : Virtual_String'Class;
       Locale : VSS.Locales.Locale) return Virtual_String is
    begin
-      raise Program_Error;
-      return Empty_Virtual_String;
+      return Result : Virtual_String do
+         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
+           (Self.Data,
+            VSS.Implementation.String_Handlers.Titlecase,
+            Result.Data);
+      end return;
    end To_Titlecase;
 
    ------------------
@@ -1026,8 +1035,12 @@ package body VSS.Strings is
      (Self   : Virtual_String'Class;
       Locale : VSS.Locales.Locale) return Virtual_String is
    begin
-      raise Program_Error;
-      return Empty_Virtual_String;
+      return Result : Virtual_String do
+         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
+           (Self.Data,
+            VSS.Implementation.String_Handlers.Uppercase,
+            Result.Data);
+      end return;
    end To_Uppercase;
 
    -----------------------

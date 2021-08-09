@@ -27,6 +27,7 @@ with Ada.Containers.Vectors;
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Ada.Strings;                       use Ada.Strings;
 with Ada.Strings.Wide_Wide_Fixed;       use Ada.Strings.Wide_Wide_Fixed;
+with Ada.Strings.Wide_Wide_Unbounded;   use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Unchecked_Conversion;
 with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
 with Interfaces;
@@ -222,6 +223,10 @@ package body Gen_UCD.Casing is
          Mapping   : Case_Mapping;
          Data      : UCD.Code_Point_Vectors.Vector);
 
+      procedure Set_NFD_QC
+        (Character : UCD.Code_Point;
+         To        : Boolean);
+
       procedure Compress;
 
       function UTF_8_Data_Index_Last return Natural;
@@ -267,6 +272,12 @@ package body Gen_UCD.Casing is
       CF_Property  : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("cf");
 
+      NFD_QC_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("NFD_QC");
+      NFD_QC_Y        : constant not null
+        UCD.Properties.Property_Value_Access :=
+          UCD.Properties.Resolve (NFD_QC_Property, "Y");
+
    begin
       Put_Line ("   ... casing");
 
@@ -296,6 +307,9 @@ package body Gen_UCD.Casing is
               UCD.Characters.Get (Code, UC_Property);
             CF_Value  : constant UCD.Properties.Property_Value_Access :=
               UCD.Characters.Get (Code, CF_Property);
+
+            NFD_QC_Value : constant Boolean :=
+              UCD.Characters.Get (Code, NFD_QC_Property) = NFD_QC_Y;
 
          begin
             if SUC_Value /= null then
@@ -350,6 +364,8 @@ package body Gen_UCD.Casing is
                Database.Set
                  (Code, Database.Full_Case_Folding, SCF_Value.String);
             end if;
+
+            Database.Set_NFD_QC (Code, NFD_QC_Value);
          end;
       end loop;
 
@@ -378,9 +394,10 @@ package body Gen_UCD.Casing is
          Length      : Unsigned_2  := 0;
          Size        : Unsigned_3  := 0;
          Has_Mapping : Boolean     := False;
+         NFD_QC      : Boolean     := False;
          Reserved_1  : Unsigned_2  := 0;
          Reserved_2  : Unsigned_6  := 0;
-         Reserved_3  : Unsigned_4  := 0;
+         Reserved_3  : Unsigned_3  := 0;
       end record;
       for Mapping_Record'Size use 32;
       for Mapping_Record use record
@@ -389,11 +406,18 @@ package body Gen_UCD.Casing is
          Length      at 0 range 16 .. 17;
          Reserved_2  at 0 range 18 .. 23;
          Size        at 0 range 24 .. 26;
-         Reserved_3  at 0 range 27 .. 30;
+         Reserved_3  at 0 range 27 .. 29;
+         NFD_QC      at 0 range 30 .. 30;
          Has_Mapping at 0 range 31 .. 31;
       end record;
       --  This declaration must be synchronized with type declaration in the
       --  generated code.
+      --
+      --  This record contains additional information that may be derived or
+      --  by copy of core properties when is in interest of casing algoriphms.
+      --  This not increase total amount of the data for UCD, but allows to
+      --  have all necessary data in one place, primary to mininize CPU cache
+      --  usage.
 
       type Mapping_Array is array (UCD.Code_Point) of Mapping_Record;
 
@@ -647,6 +671,19 @@ package body Gen_UCD.Casing is
          Raw_Mapping (Mapping) (Character) := Append_Data (Data);
       end Set;
 
+      ----------------
+      -- Set_NFD_QC --
+      ----------------
+
+      procedure Set_NFD_QC
+        (Character : UCD.Code_Point;
+         To        : Boolean) is
+      begin
+         for Mapping in Case_Mapping loop
+            Raw_Mapping (Mapping) (Character).NFD_QC := To;
+         end loop;
+      end Set_NFD_QC;
+
       ------------------------
       -- UTF_8_Data_Element --
       ------------------------
@@ -770,6 +807,9 @@ package body Gen_UCD.Casing is
          "      Count       : Casing_UTF8_Code_Unit_Count;");
       Put_Line
         (File,
+         "      NFD_QC      : Boolean;");
+      Put_Line
+        (File,
          "      Has_Mapping : Boolean;");
       Put_Line (File, "   end record;");
       Put_Line
@@ -787,6 +827,9 @@ package body Gen_UCD.Casing is
       Put_Line
         (File,
          "      Count       at 0 range 24 .. 26;");
+      Put_Line
+        (File,
+         "      NFD_QC      at 0 range 30 .. 30;");
       Put_Line
         (File,
          "      Has_Mapping at 0 range 31 .. 31;");

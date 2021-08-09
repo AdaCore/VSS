@@ -726,9 +726,7 @@ package body Gen_UCD.Casing is
 
       begin
          Put_Line (File, "   " & Name & " :");
-         Put_Line
-           (File,
-            "     constant array (Mapping_Group) of Mapping_Data_Offset :=");
+         Put_Line (File, "     constant Mapping_Data_Offset_Array :=");
 
          for J in 0 .. Database.Mapping_Index_Last (Mapping) loop
             Put (Image, Database.Mapping_Index_Element (Mapping, J));
@@ -839,8 +837,9 @@ package body Gen_UCD.Casing is
 
       Put_Line
         (File,
-         "   type Mapping_Data_Offset is range 0 .."
-         & Integer'Wide_Wide_Image (Database.Mapping_Data_Last)
+         "   Mapping_Group_Size : constant :="
+         & Integer'Wide_Wide_Image
+           (Database.Mapping_Index_Group_Size (Database.Simple_Lowercase))
          & ";");
       New_Line (File);
 
@@ -854,10 +853,13 @@ package body Gen_UCD.Casing is
 
       Put_Line
         (File,
-         "   Group_Size : constant :="
-         & Integer'Wide_Wide_Image
-           (Database.Mapping_Index_Group_Size (Database.Simple_Lowercase))
+         "   type Mapping_Data_Offset is range 0 .."
+         & Integer'Wide_Wide_Image (Database.Mapping_Data_Last)
          & ";");
+      New_Line (File);
+
+      Put_Line (File, "   type Mapping_Data_Offset_Array is");
+      Put_Line (File, "     array (Mapping_Group) of Mapping_Data_Offset;");
       New_Line (File);
 
       --  Generate case mappings indices.

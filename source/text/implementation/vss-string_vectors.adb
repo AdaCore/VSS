@@ -126,15 +126,6 @@ package body VSS.String_Vectors is
       return Self.Element (Position.Index);
    end Element;
 
-   -----------
-   -- First --
-   -----------
-
-   overriding function First (Self : Reversible_Iterator) return Cursor is
-   begin
-      return (Index => (if Self.Last > 0 then 1 else 0));
-   end First;
-
    --------------
    -- Finalize --
    --------------
@@ -143,6 +134,15 @@ package body VSS.String_Vectors is
    begin
       VSS.Implementation.String_Vectors.Unreference (Self.Data);
    end Finalize;
+
+   -----------
+   -- First --
+   -----------
+
+   overriding function First (Self : Reversible_Iterator) return Cursor is
+   begin
+      return (Index => (if Self.Last > 0 then 1 else 0));
+   end First;
 
    --------------
    -- Is_Empty --

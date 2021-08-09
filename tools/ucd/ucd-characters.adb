@@ -228,6 +228,27 @@ package body UCD.Characters is
 
          GC_Value.Is_Used := True;
       end;
+
+      --  Default value for Canonical_Combining_Class is 'NR' ("Not_Reordered")
+
+      declare
+         CCC_Property    : constant not null Properties.Property_Access :=
+           Properties.Resolve ("ccc");
+         CCC_Value       : constant not null
+           Properties.Property_Value_Access :=
+             Properties.Resolve (CCC_Property, "NR");
+         CCC_Index       : constant Positive :=
+           Enumeration_Property_To_Index (CCC_Property);
+         CCC_Value_Index : constant Interfaces.Unsigned_16 :=
+           Internal_Enumeration_Value (CCC_Property, CCC_Value);
+
+      begin
+         for C in Code_Point loop
+            Database (C).Enumeration (CCC_Index) := CCC_Value_Index;
+         end loop;
+
+         CCC_Value.Is_Used := True;
+      end;
    end Initialize_Character_Database;
 
    --------------------------------

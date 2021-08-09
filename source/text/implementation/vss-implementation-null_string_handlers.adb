@@ -107,6 +107,21 @@ package body VSS.Implementation.Null_String_Handlers is
       Position := Before_First_Character_Cursor;
    end Before_First_Character;
 
+   ------------------
+   -- Convert_Case --
+   ------------------
+
+   overriding procedure Convert_Case
+     (Self    : Null_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data) is
+   begin
+      --  String is empty, nothing to do.
+
+      Self.Initialize (Result);
+   end Convert_Case;
+
    ------------
    -- Delete --
    ------------

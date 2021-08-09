@@ -758,6 +758,7 @@ package body Gen_UCD.Casing is
       New_Line (File);
 
       Put_Line (File, "with VSS.Implementation.Strings;");
+      Put_Line (File, "with VSS.Implementation.UTF8_Encoding;");
       Put_Line (File, "with VSS.Unicode;");
       Put_Line (File, "with Interfaces;");
       New_Line (File);
@@ -944,10 +945,11 @@ package body Gen_UCD.Casing is
             "   UTF8_Data_Table :");
          Put_Line
            (File,
-            "     constant array (Casing_UTF8_Data_Offset)");
+            "     constant"
+              & " VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array");
          Put_Line
            (File,
-            "       of VSS.Unicode.UTF8_Code_Unit :=");
+            "       (Casing_UTF8_Data_Offset) :=");
 
          for J in 0 .. Database.UTF_8_Data_Index_Last loop
             Put (Image, Integer (Database.UTF_8_Data_Element (J)), 16);

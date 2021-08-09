@@ -25,6 +25,7 @@ package Gen_UCD.Unsigned_Types is
 
    pragma Pure;
 
+   type Unsigned_1  is mod 2 ** 1  with Size => 1;
    type Unsigned_2  is mod 2 ** 2  with Size => 2;
    type Unsigned_3  is mod 2 ** 3  with Size => 3;
    type Unsigned_4  is mod 2 ** 4  with Size => 4;

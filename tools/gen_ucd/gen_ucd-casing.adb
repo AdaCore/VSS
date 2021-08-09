@@ -223,6 +223,14 @@ package body Gen_UCD.Casing is
          Mapping   : Case_Mapping;
          Data      : UCD.Code_Point_Vectors.Vector);
 
+      procedure Set_Cased
+        (Character : UCD.Code_Point;
+         To        : Boolean);
+
+      procedure Set_Case_Ignorable
+        (Character : UCD.Code_Point;
+         To        : Boolean);
+
       procedure Set_NFD_QC
         (Character : UCD.Code_Point;
          To        : Boolean);
@@ -425,10 +433,13 @@ package body Gen_UCD.Casing is
             end if;
 
             Database.Set_NFD_QC (Code, NFD_QC_Value);
+            Database.Set_Cased (Code, Cased_Value);
+            Database.Set_Case_Ignorable (Code, CI_Value);
 
             --  Compute changes for casing context.
 
-            Database.Set_Final_Sigma_Enter (Code, Cased_Value);
+            Database.Set_Final_Sigma_Enter
+              (Code, Cased_Value and not CI_Value);
             Database.Set_Final_Sigma_Continue (Code, CI_Value);
             Database.Set_After_Soft_Dotted_Enter (Code, SD_Value);
             Database.Set_After_Soft_Dotted_Continue
@@ -477,10 +488,12 @@ package body Gen_UCD.Casing is
          Length         : Unsigned_2  := 0;
          Size           : Unsigned_3  := 0;
          Context_Change : Casing_Context_Change;
+         Cased          : Boolean     := False;
+         Case_Ignorable : Boolean     := False;
          Has_Mapping    : Boolean     := False;
          NFD_QC         : Boolean     := False;
          Reserved_1     : Unsigned_2  := 0;
-         Reserved_2     : Unsigned_3  := 0;
+         Reserved_2     : Unsigned_1  := 0;
       end record;
       for Mapping_Record'Size use 32;
       for Mapping_Record use record
@@ -489,7 +502,9 @@ package body Gen_UCD.Casing is
          Length         at 0 range 16 .. 17;
          Context_Change at 0 range 18 .. 23;
          Size           at 0 range 24 .. 26;
-         Reserved_2     at 0 range 27 .. 29;
+         Reserved_2     at 0 range 27 .. 27;
+         Cased          at 0 range 28 .. 28;
+         Case_Ignorable at 0 range 29 .. 29;
          NFD_QC         at 0 range 30 .. 30;
          Has_Mapping    at 0 range 31 .. 31;
       end record;
@@ -812,6 +827,32 @@ package body Gen_UCD.Casing is
          end loop;
       end Set_After_Soft_Dotted_Enter;
 
+      ------------------------
+      -- Set_Case_Ignorable --
+      ------------------------
+
+      procedure Set_Case_Ignorable
+        (Character : UCD.Code_Point;
+         To        : Boolean) is
+      begin
+         for Mapping in Case_Mapping loop
+            Raw_Mapping (Mapping) (Character).Case_Ignorable := To;
+         end loop;
+      end Set_Case_Ignorable;
+
+      ---------------
+      -- Set_Cased --
+      ---------------
+
+      procedure Set_Cased
+        (Character : UCD.Code_Point;
+         To        : Boolean) is
+      begin
+         for Mapping in Case_Mapping loop
+            Raw_Mapping (Mapping) (Character).Cased := To;
+         end loop;
+      end Set_Cased;
+
       ------------------------------
       -- Set_Final_Sigma_Continue --
       ------------------------------
@@ -972,6 +1013,8 @@ package body Gen_UCD.Casing is
         (File,
          "      Context_Change :"
          & " VSS.Implementation.UCD_Casing.Casing_Context_Change;");
+      Put_Line (File, "      Cased          : Boolean;");
+      Put_Line (File, "      Case_Ignorable : Boolean;");
       Put_Line (File, "      NFD_QC         : Boolean;");
       Put_Line (File, "      Has_Mapping    : Boolean;");
       Put_Line (File, "   end record;");
@@ -983,6 +1026,8 @@ package body Gen_UCD.Casing is
       Put_Line (File, "      Length         at 0 range 16 .. 17;");
       Put_Line (File, "      Context_Change at 0 range 18 .. 23;");
       Put_Line (File, "      Count          at 0 range 24 .. 26;");
+      Put_Line (File, "      Cased          at 0 range 28 .. 28;");
+      Put_Line (File, "      Case_Ignorable at 0 range 29 .. 29;");
       Put_Line (File, "      NFD_QC         at 0 range 30 .. 30;");
       Put_Line (File, "      Has_Mapping    at 0 range 31 .. 31;");
       Put_Line (File, "   end record;");

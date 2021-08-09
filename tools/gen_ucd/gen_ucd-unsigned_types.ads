@@ -21,15 +21,20 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Vectors;
+package Gen_UCD.Unsigned_Types is
 
-package UCD is
+   pragma Pure;
 
-   pragma Preelaborate;
+   type Unsigned_2  is mod 2 ** 2  with Size => 2;
+   type Unsigned_3  is mod 2 ** 3  with Size => 3;
+   type Unsigned_4  is mod 2 ** 4  with Size => 4;
 
-   type Code_Point is range 16#00_0000# .. 16#10_FFFF#;
+   type Unsigned_6  is mod 2 ** 6  with Size => 7;
 
-   package Code_Point_Vectors is
-     new Ada.Containers.Vectors (Positive, UCD.Code_Point);
+   type Unsigned_8  is mod 2 ** 8  with Size => 8;
 
-end UCD;
+   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+
+   type Unsigned_32 is mod 2 ** 32 with Size => 32;
+
+end Gen_UCD.Unsigned_Types;

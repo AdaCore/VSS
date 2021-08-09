@@ -36,9 +36,13 @@ package body UCD.Characters is
    type Unsigned_16_Array is
      array (1 .. 24) of Interfaces.Unsigned_16 with Pack;
 
+   type String_Array is
+     array (1 .. 16) of Properties.Property_Value_Access;
+
    type Character_Record is record
       Boolean     : Boolean_Array;
       Enumeration : Unsigned_16_Array;
+      String      : String_Array;
    end record;
 
    type Character_Array is array (UCD.Code_Point) of aliased Character_Record;
@@ -61,11 +65,17 @@ package body UCD.Characters is
    Boolean_Property_To_Index     : Property_Integer_Maps.Map;
    Enumeration_Properties        : Properties.Property_Vectors.Vector;
    Enumeration_Property_To_Index : Property_Integer_Maps.Map;
+   String_Properties             : Properties.Property_Vectors.Vector;
+   String_Property_To_Index      : Property_Integer_Maps.Map;
 
    function Internal_Enumeration_Value
      (Property  : not null Properties.Property_Access;
       Value     : not null Properties.Property_Value_Access)
       return Interfaces.Unsigned_16;
+
+   procedure Register_String_Property
+     (Property : not null Properties.Property_Access);
+   --  Register property of "string" type.
 
    ---------
    -- Get --
@@ -74,7 +84,7 @@ package body UCD.Characters is
    function Get
      (Character : Code_Point;
       Property  : not null UCD.Properties.Property_Access)
-      return not null UCD.Properties.Property_Value_Access is
+      return UCD.Properties.Property_Value_Access is
    begin
       if Property.Is_Binary then
          return
@@ -89,7 +99,12 @@ package body UCD.Characters is
            Property.All_Values
              (Positive
                 (Database (Character).Enumeration
-                 (Enumeration_Property_To_Index.Element (Property))));
+                   (Enumeration_Property_To_Index.Element (Property))));
+
+      elsif Property.Is_String then
+         return
+           Database (Character).String
+             (String_Property_To_Index.Element (Property));
 
       else
          raise Program_Error;
@@ -158,6 +173,10 @@ package body UCD.Characters is
          & " (of"
          & Integer'Wide_Wide_Image (Unsigned_16_Array'Length)
          & ')');
+      Put_Line
+        ("  - string properties      : dynamic (of"
+         & Integer'Wide_Wide_Image (String_Array'Length)
+         & ')');
 
       --  Allocate database and reset all information.
 
@@ -166,7 +185,8 @@ package body UCD.Characters is
         new Character_Array'
           (others =>
              (Boolean     => (others => False),
-              Enumeration => (others => 0)));
+              Enumeration => (others => 0),
+              String      => (others => null)));
 
       --  Initialize special cases.
 
@@ -233,6 +253,20 @@ package body UCD.Characters is
       raise Program_Error;
    end Internal_Enumeration_Value;
 
+   ------------------------------
+   -- Register_String_Property --
+   ------------------------------
+
+   procedure Register_String_Property
+     (Property : not null Properties.Property_Access) is
+   begin
+      if not String_Property_To_Index.Contains (Property) then
+         String_Properties.Append (Property);
+         String_Property_To_Index.Insert
+           (Property, String_Properties.Last_Index);
+      end if;
+   end Register_String_Property;
+
    ---------
    -- Set --
    ---------
@@ -255,6 +289,12 @@ package body UCD.Characters is
          --  Set flag of use of value.
 
          Value.Is_Used := True;
+
+      elsif Property.Is_String then
+         Register_String_Property (Property);
+
+         Database (Character).String
+           (String_Property_To_Index.Element (Property)) := Value;
 
       else
          raise Program_Error;

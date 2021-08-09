@@ -22,6 +22,9 @@
 ------------------------------------------------------------------------------
 --  Data type to represent individual abstract character
 
+limited with VSS.Locales;
+limited with VSS.Strings;
+
 package VSS.Characters is
 
    pragma Preelaborate;
@@ -99,11 +102,64 @@ package VSS.Characters is
 
    function Get_Lowercase (Self : Virtual_Character) return Boolean;
    --  Return value of the Lowercase property of the character.
+   --
+   --  Note, value of Lowercase property of the given character may be
+   --  different from value of Is_Lowercase function of string composed from
+   --  the same character.
 
    function Get_Uppercase (Self : Virtual_Character) return Boolean;
    --  Return value of the Uppercase property of the character.
+   --
+   --  Note, value of Uppercase property of the given character may be
+   --  different from value of Is_Lowercase function of string composed from
+   --  the same character.
 
    function Get_Cased (Self : Virtual_Character) return Boolean;
    --  Return value of the Cased property of the character.
+
+   function Get_Lowercase_Mapping
+     (Self   : Virtual_Character) return VSS.Strings.Virtual_String;
+   --  Return value of the Lowercase_Mapping property of the character with
+   --  tailoring by the locale of the current task.
+
+   function Get_Lowercase_Mapping
+     (Self   : Virtual_Character;
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String;
+   --  Return value of the Lowercase_Mapping property of the character with
+   --  tailoring by the given locale.
+
+   function Get_Titlecase_Mapping
+     (Self : Virtual_Character) return VSS.Strings.Virtual_String;
+   --  Return value of the Titlecase_Mapping property of the character with
+   --  tailoring by the locale of the current task.
+
+   function Get_Titlecase_Mapping
+     (Self   : Virtual_Character;
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String;
+   --  Return value of the Titlecase_Mapping property of the character with
+   --  tailoring by the given locale.
+
+   function Get_Uppercase_Mapping
+     (Self : Virtual_Character) return VSS.Strings.Virtual_String;
+   --  Return value of the Uppercase_Mapping property of the character with
+   --  tailoring by the locale of the current task.
+
+   function Get_Uppercase_Mapping
+     (Self   : Virtual_Character;
+      Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String;
+   --  Return value of the Uppercase_Mapping property of the character with
+   --  tailoring by the given locale.
+
+   function Get_Simple_Lowercase_Mapping
+     (Self : Virtual_Character) return Virtual_Character;
+   --  Return value of the Simple_Lowercase_Mapping property of the character.
+
+   function Get_Simple_Titlecase_Mapping
+     (Self : Virtual_Character) return Virtual_Character;
+   --  Return value of the Simple_Titlecase_Mapping property of the character.
+
+   function Get_Simple_Uppercase_Mapping
+     (Self : Virtual_Character) return Virtual_Character;
+   --  Return value of the Simple_Uppercase_Mapping property of the character.
 
 end VSS.Characters;

@@ -21,15 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Vectors;
+package UCD.Special_Casing_Loader is
 
-package UCD is
+   procedure Load (UCD_Root : Wide_Wide_String);
 
-   pragma Preelaborate;
-
-   type Code_Point is range 16#00_0000# .. 16#10_FFFF#;
-
-   package Code_Point_Vectors is
-     new Ada.Containers.Vectors (Positive, UCD.Code_Point);
-
-end UCD;
+end UCD.Special_Casing_Loader;

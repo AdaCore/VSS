@@ -25,39 +25,30 @@ with UCD.Characters;
 with UCD.Data_File_Loaders;
 with UCD.Properties;
 
-package body UCD.Unicode_Data_Loader is
+package body UCD.Special_Casing_Loader is
 
    ----------
    -- Load --
    ----------
 
    procedure Load (UCD_Root : Wide_Wide_String) is
-      --  General_Category
+      --  Lowercase_Mapping, Titlecase_Mapping, and Uppercase_Mapping.
 
-      GC_Field    : constant Data_File_Loaders.Field_Index := 2;
-      GC_Property : constant not null Properties.Property_Access :=
-        Properties.Resolve ("gc");
+      LC_Field      : constant Data_File_Loaders.Field_Index := 1;
+      LC_Property   : constant not null Properties.Property_Access :=
+        Properties.Resolve ("lc");
 
-      --  Canonical_Combinig_Class
+      TC_Field      : constant Data_File_Loaders.Field_Index := 2;
+      TC_Property   : constant not null Properties.Property_Access :=
+        Properties.Resolve ("tc");
 
-      CCC_Field    : constant Data_File_Loaders.Field_Index := 3;
-      CCC_Property : constant not null Properties.Property_Access :=
-        Properties.Resolve ("ccc");
+      UC_Field      : constant Data_File_Loaders.Field_Index := 3;
+      UC_Property   : constant not null Properties.Property_Access :=
+        Properties.Resolve ("uc");
 
-      --  Simple_Uppercase_Mapping, Simple_Lowercase_Mapping, and
-      --  Simple_Titlecase_Mapping.
+      --  Context field
 
-      SUC_Field    : constant Data_File_Loaders.Field_Index := 12;
-      SUC_Property : constant not null Properties.Property_Access :=
-        Properties.Resolve ("suc");
-
-      SLC_Field    : constant Data_File_Loaders.Field_Index := 13;
-      SLC_Property : constant not null Properties.Property_Access :=
-        Properties.Resolve ("slc");
-
-      STC_Field    : constant Data_File_Loaders.Field_Index := 14;
-      STC_Property : constant not null Properties.Property_Access :=
-        Properties.Resolve ("stc");
+      Context_Field : constant Data_File_Loaders.Field_Index := 4;
 
       Loader : UCD.Data_File_Loaders.File_Loader;
 
@@ -65,72 +56,93 @@ package body UCD.Unicode_Data_Loader is
       --  Mark properties as string properties, this can't be determined
       --  during initial database construction.
 
-      SUC_Property.Is_String := True;
-      SLC_Property.Is_String := True;
-      STC_Property.Is_String := True;
+      LC_Property.Is_String := True;
+      TC_Property.Is_String := True;
+      UC_Property.Is_String := True;
 
-      Loader.Open (UCD_Root, "UnicodeData.txt");
+      Loader.Open (UCD_Root, "SpecialCasing.txt");
 
       while not Loader.End_Of_File loop
          declare
             First_Code : UCD.Code_Point;
             Last_Code  : UCD.Code_Point;
+            Code       : UCD.Code_Point;
 
          begin
             Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
+            if First_Code /= Last_Code then
+               raise Program_Error;
+            end if;
+
+            Code := First_Code;
+
             declare
-               GC_Value  :
+               use type Ada.Containers.Count_Type;
+
+               LC_Data       : constant UCD.Code_Point_Vectors.Vector :=
+                 Loader.Get_Field (LC_Field);
+               LC_Value      :
                  constant not null Properties.Property_Value_Access :=
-                   Properties.Resolve
-                     (GC_Property, Loader.Get_Field (GC_Field));
-               CCC_Value :
-                 constant not null Properties.Property_Value_Access :=
-                   Properties.Resolve
-                     (CCC_Property, Loader.Get_Field (CCC_Field));
-               SUC_Data  : constant UCD.Code_Point_Vectors.Vector :=
-                 Loader.Get_Field (SUC_Field);
-               SUC_Value :
-                 constant not null Properties.Property_Value_Access :=
-                 (if SUC_Data.Is_Empty
+                 (if LC_Data.Length = 1 and then LC_Data.First_Element = Code
                   then null
                   else new Properties.Property_Value'
                     (Names                           => <>,
                      Is_Used                         => <>,
                      Canonical_Combining_Class_Value => <>,
-                     String                          => SUC_Data));
-               SLC_Data  : constant UCD.Code_Point_Vectors.Vector :=
-                 Loader.Get_Field (SLC_Field);
-               SLC_Value :
+                     String                          => LC_Data));
+               TC_Data       : constant UCD.Code_Point_Vectors.Vector :=
+                 Loader.Get_Field (TC_Field);
+               TC_Value      :
                  constant not null Properties.Property_Value_Access :=
-                 (if SLC_Data.Is_Empty
+                 (if TC_Data.Length = 1 and then TC_Data.First_Element = Code
                   then null
                   else new Properties.Property_Value'
                     (Names                           => <>,
                      Is_Used                         => <>,
                      Canonical_Combining_Class_Value => <>,
-                     String                          => SLC_Data));
-               STC_Data : constant UCD.Code_Point_Vectors.Vector :=
-                 Loader.Get_Field (STC_Field);
-               STC_Value :
+                     String                          => TC_Data));
+               UC_Data       : constant UCD.Code_Point_Vectors.Vector :=
+                 Loader.Get_Field (UC_Field);
+               UC_Value      :
                  constant not null Properties.Property_Value_Access :=
-                 (if STC_Data.Is_Empty
+                 (if UC_Data.Length = 1 and then UC_Data.First_Element = Code
                   then null
                   else new Properties.Property_Value'
                     (Names                           => <>,
                      Is_Used                         => <>,
                      Canonical_Combining_Class_Value => <>,
-                     String                          => STC_Data));
+                     String                          => UC_Data));
+               Context_Value : constant Wide_Wide_String :=
+                 Loader.Get_Field (Context_Field);
 
             begin
-               for Code in First_Code .. Last_Code loop
-                  Characters.Set (Code, GC_Property, GC_Value);
-                  Characters.Set (Code, CCC_Property, CCC_Value);
+               if Context_Value = "" then
+                  Characters.Set (Code, LC_Property, LC_Value);
+                  Characters.Set (Code, TC_Property, TC_Value);
+                  Characters.Set (Code, UC_Property, UC_Value);
 
-                  Characters.Set (Code, SUC_Property, SUC_Value);
-                  Characters.Set (Code, SLC_Property, SLC_Value);
-                  Characters.Set (Code, STC_Property, STC_Value);
-               end loop;
+               elsif Context_Value = "Final_Sigma" and Code = 16#03A3# then
+                  --  This is single case of conditional mapping for default
+                  --  locale. It may be hardcoded for now to simplify data
+                  --  structures.
+
+                  null;
+
+               elsif Context_Value'Length >= 2
+                 and then Context_Value
+                   (Context_Value'First .. Context_Value'First + 1)
+                      in "lt" | "tr" | "az"
+               then
+                  --  Ignore all locale specific mappings.
+
+                  null;
+
+               else
+                  --  All other context specifications are not expected.
+
+                  raise Program_Error;
+               end if;
             end;
 
             Loader.Skip_Line;
@@ -138,4 +150,4 @@ package body UCD.Unicode_Data_Loader is
       end loop;
    end Load;
 
-end UCD.Unicode_Data_Loader;
+end UCD.Special_Casing_Loader;

@@ -21,15 +21,12 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Vectors;
+with Ada.Wide_Wide_Text_IO;
 
-package UCD is
+package Gen_UCD.Casing is
 
-   pragma Preelaborate;
+   procedure Build;
 
-   type Code_Point is range 16#00_0000# .. 16#10_FFFF#;
+   procedure Generate (File : Ada.Wide_Wide_Text_IO.File_Type);
 
-   package Code_Point_Vectors is
-     new Ada.Containers.Vectors (Positive, UCD.Code_Point);
-
-end UCD;
+end Gen_UCD.Casing;

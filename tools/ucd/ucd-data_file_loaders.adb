@@ -147,6 +147,52 @@ package body UCD.Data_File_Loaders is
    end Get_Field;
 
    ---------------
+   -- Get_Field --
+   ---------------
+
+   function Get_Field
+     (Self  : File_Loader;
+      Index : Field_Index) return UCD.Code_Point_Vectors.Vector
+   is
+      Buffer  : constant Wide_Wide_String := Self.Get_Field (Index);
+      First   : Positive;
+      Last    : Positive;
+      Current : Positive;
+
+   begin
+      return Result : UCD.Code_Point_Vectors.Vector do
+         First := Buffer'First;
+
+         while First <= Buffer'Last loop
+            Last    := Buffer'Last;
+            Current := First;
+
+            while Current <= Buffer'Last loop
+               if Buffer (Current) not in '0' .. '9' | 'A' .. 'F' then
+                  Last := Current - 1;
+
+                  exit;
+               end if;
+
+               Current := Current + 1;
+            end loop;
+
+            Result.Append (To_Code_Point (Buffer (First .. Last)));
+
+            First := Last + 1;
+
+            --  Skip spaces
+
+            for J in First .. Buffer'Last loop
+               First := J;
+
+               exit when Buffer (J) /= ' ';
+            end loop;
+         end loop;
+      end return;
+   end Get_Field;
+
+   ---------------
    -- Has_Field --
    ---------------
 
@@ -225,8 +271,6 @@ package body UCD.Data_File_Loaders is
          end loop;
 
          if Self.Buffer'First <= Self.Line_Last then
-            --  Put_Line (Self.Buffer (Self.Buffer'First .. Self.Line_Last));
-
             Current := Self.Buffer'First;
 
             loop
@@ -254,17 +298,21 @@ package body UCD.Data_File_Loaders is
 
                --  Remove trailing spaces
 
-               for J in reverse Field_First .. Field_Last loop
-                  Field_Last := J;
+               if Field_First = Field_Last
+                 and then Self.Buffer (Field_Last) = ' '
+               then
+                  Field_First := Field_First + 1;
 
-                  exit when Self.Buffer (J) /= ' ';
-               end loop;
+               else
+                  for J in reverse Field_First .. Field_Last loop
+                     Field_Last := J;
+
+                     exit when Self.Buffer (J) /= ' ';
+                  end loop;
+               end if;
 
                Self.Fields (Current_Field) := (Field_First, Field_Last);
                Current_Field := Current_Field + 1;
-
-               --  Put_Line
-               --    (''' & Self.Buffer (Field_First .. Field_Last) & ''');
 
                exit when not Has_Separator;
             end loop;

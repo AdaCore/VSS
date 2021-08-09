@@ -44,6 +44,10 @@ package UCD.Data_File_Loaders is
    function Get_Field
      (Self : File_Loader; Index : Field_Index) return Wide_Wide_String;
 
+   function Get_Field
+     (Self  : File_Loader;
+      Index : Field_Index) return UCD.Code_Point_Vectors.Vector;
+
    function Has_Field (Self : File_Loader; Index : Field_Index) return Boolean;
 
    procedure Get_Code_Point_Range

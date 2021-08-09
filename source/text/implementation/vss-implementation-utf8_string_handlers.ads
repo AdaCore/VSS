@@ -23,7 +23,6 @@
 --  Generic implementation of the string which use UTF-8 encoding for data.
 
 with Ada.Strings.UTF_Encoding;
-with Interfaces;
 with System.Atomic_Counters;
 
 with VSS.Implementation.String_Handlers;
@@ -177,15 +176,35 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
-   In_Place_Storage_Capacity : constant VSS.Unicode.UTF8_Code_Unit_Count := 17;
+   overriding procedure Get_Case_Mapping
+     (Self    : UTF8_String_Handler;
+      Code    : VSS.Unicode.Code_Point;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Data    : out VSS.Implementation.Strings.String_Data);
+   --  Fill given case mapping for the given character into Target.
+
+   In_Place_Storage_Capacity : constant := 17;
    --  Number of code units can be stored in place
+
+   subtype In_Place_UTF8_Code_Unit_Count is
+     VSS.Unicode.UTF8_Code_Unit_Count range 0 .. In_Place_Storage_Capacity;
+
+   subtype In_Place_Character_Count is
+     VSS.Implementation.Strings.Character_Count
+   range 0
+     .. VSS.Implementation.Strings.Character_Count (In_Place_Storage_Capacity);
 
    type UTF8_In_Place_Data is record
       Storage :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
           (0 .. In_Place_Storage_Capacity);
-      Size    : Interfaces.Unsigned_8;
-      Length  : Interfaces.Unsigned_8;
+      Size    : In_Place_UTF8_Code_Unit_Count;
+      Length  : In_Place_Character_Count;
+   end record;
+   for UTF8_In_Place_Data use record
+      Storage at 0 range 0 .. 8 * (In_Place_Storage_Capacity + 1) - 1;
+      Size    at In_Place_Storage_Capacity + 1 range 0 .. 7;
+      Length  at In_Place_Storage_Capacity + 1 range 8 .. 16;
    end record;
 
    type UTF8_In_Place_String_Handler is
@@ -310,6 +329,12 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Splits string into lines using given set of allowed new line
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
+
+   overriding procedure Get_Case_Mapping
+     (Self    : UTF8_In_Place_String_Handler;
+      Code    : VSS.Unicode.Code_Point;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Data    : out VSS.Implementation.Strings.String_Data);
 
    Global_UTF8_String_Handler   : aliased
      VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;

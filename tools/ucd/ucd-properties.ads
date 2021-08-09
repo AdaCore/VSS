@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Vectors;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 
@@ -31,12 +30,13 @@ package UCD.Properties is
    type Canonical_Combinig_Class is range 0 .. 255;
 
    package String_Vectors is
-      new Ada.Containers.Vectors (Positive, Unbounded_Wide_Wide_String);
+     new Ada.Containers.Vectors (Positive, Unbounded_Wide_Wide_String);
 
    type Property_Value is record
       Names                           : String_Vectors.Vector;
       Is_Used                         : Boolean := False;
       Canonical_Combining_Class_Value : Canonical_Combinig_Class;
+      String                          : Code_Point_Vectors.Vector;
    end record;
 
    type Property_Value_Access is access all Property_Value;
@@ -59,6 +59,7 @@ package UCD.Properties is
       Is_Canonical_Combining_Class : Boolean := False;
       Is_Binary                    : Boolean := False;
       Is_Enumeration               : Boolean := False;
+      Is_String                    : Boolean := False;
    end record;
 
    type Property_Access is access all Property;

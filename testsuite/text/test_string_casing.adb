@@ -86,4 +86,11 @@ begin
    --  Test for null string for code coverage of Null_String_Handler.
 
    Test_Support.Assert (SN.To_Lowercase = SN);
+
+   --  Test of simple case conversion.
+
+   Test_Support.Assert (S1.To_Lowercase = E1);
+   Test_Support.Assert (E1.To_Uppercase = S1);
+   Test_Support.Assert (U1.To_Lowercase = L1);
+   Test_Support.Assert (L1.To_Uppercase = U1);
 end Test_String_Casing;

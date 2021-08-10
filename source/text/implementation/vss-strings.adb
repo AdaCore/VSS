@@ -997,26 +997,27 @@ package body VSS.Strings is
    -- To_Titlecase --
    ------------------
 
-   function To_Titlecase (Self : Virtual_String'Class) return Virtual_String is
-   begin
-      return Self.To_Titlecase (VSS.Locales.Current_Locale);
-   end To_Titlecase;
+--   function To_Titlecase
+--     (Self : Virtual_String'Class) return Virtual_String is
+--   begin
+--      return Self.To_Titlecase (VSS.Locales.Current_Locale);
+--   end To_Titlecase;
 
    ------------------
    -- To_Titlecase --
    ------------------
 
-   function To_Titlecase
-     (Self   : Virtual_String'Class;
-      Locale : VSS.Locales.Locale) return Virtual_String is
-   begin
-      return Result : Virtual_String do
-         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
-           (Self.Data,
-            VSS.Implementation.String_Handlers.Titlecase,
-            Result.Data);
-      end return;
-   end To_Titlecase;
+--   function To_Titlecase
+--     (Self   : Virtual_String'Class;
+--      Locale : VSS.Locales.Locale) return Virtual_String is
+--   begin
+--      return Result : Virtual_String do
+--         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
+--           (Self.Data,
+--            VSS.Implementation.String_Handlers.Titlecase,
+--            Result.Data);
+--      end return;
+--   end To_Titlecase;
 
    ------------------
    -- To_Uppercase --

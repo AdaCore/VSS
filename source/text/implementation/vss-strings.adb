@@ -948,6 +948,51 @@ package body VSS.Strings is
                 Limited_Tail => null);
    end To_Magic_Text;
 
+   -------------------------
+   -- To_Simple_Lowercase --
+   -------------------------
+
+   function To_Simple_Lowercase
+     (Self : Virtual_String'Class) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
+           (Self.Data,
+            VSS.Implementation.String_Handlers.Simple_Lowercase,
+            Result.Data);
+      end return;
+   end To_Simple_Lowercase;
+
+   -------------------------
+   -- To_Simple_Titlecase --
+   -------------------------
+
+--   function To_Simple_Titlecase
+--     (Self : Virtual_String'Class) return Virtual_String is
+--   begin
+--      return Result : Virtual_String do
+--         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
+--           (Self.Data,
+--            VSS.Implementation.String_Handlers.Simple_Titlecase,
+--            Result.Data);
+--      end return;
+--   end To_Simple_Titlecase;
+
+   -------------------------
+   -- To_Simple_Uppercase --
+   -------------------------
+
+   function To_Simple_Uppercase
+     (Self : Virtual_String'Class) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
+           (Self.Data,
+            VSS.Implementation.String_Handlers.Simple_Uppercase,
+            Result.Data);
+      end return;
+   end To_Simple_Uppercase;
+
    ------------------
    -- To_Titlecase --
    ------------------

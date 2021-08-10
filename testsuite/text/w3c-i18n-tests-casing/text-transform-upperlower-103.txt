@@ -1,0 +1,4 @@
+CSS3 Text, text transform: Cyrillic Extended-B, uppercase
+uppercase
+ꙁ ꙃ ꙅ ꙇ ꙉ ꙋ ꙍ ꙏ ꙑ ꙓ ꙕ ꙗ ꙙ ꙛ ꙝ ꙟ ꙡ ꙣ ꙥ ꙧ ꙩ ꙫ ꙭ ꚁ ꚃ ꚅ ꚇ ꚉ ꚋ ꚍ ꚏ ꚑ ꚓ ꚕ ꚗ ꚙ ꚛ
+Ꙁ Ꙃ Ꙅ Ꙇ Ꙉ Ꙋ Ꙍ Ꙏ Ꙑ Ꙓ Ꙕ Ꙗ Ꙙ Ꙛ Ꙝ Ꙟ Ꙡ Ꙣ Ꙥ Ꙧ Ꙩ Ꙫ Ꙭ Ꚁ Ꚃ Ꚅ Ꚇ Ꚉ Ꚋ Ꚍ Ꚏ Ꚑ Ꚓ Ꚕ Ꚗ Ꚙ Ꚛ

@@ -1,0 +1,4 @@
+CSS3 Text, text transform: Cyrillic Extended, lowercase
+lowercase
+Ԁ Ԃ Ԅ Ԇ Ԉ Ԋ Ԍ Ԏ Ԑ Ԓ Ԕ Ԗ Ԙ Ԛ Ԝ Ԟ Ԡ Ԣ Ԥ Ԧ Ԩ Ԫ Ԭ Ԯ
+ԁ ԃ ԅ ԇ ԉ ԋ ԍ ԏ ԑ ԓ ԕ ԗ ԙ ԛ ԝ ԟ ԡ ԣ ԥ ԧ ԩ ԫ ԭ ԯ

@@ -345,6 +345,18 @@ package VSS.Strings is
    --  See VSS.Locales.To_Uppercase for case conversions with tailoring by
    --  the locale.
 
+   function To_Simple_Lowercase
+     (Self : Virtual_String'Class) return Virtual_String;
+   --  Convert string to lowercase form using default simple case conversion.
+
+--   function To_Simple_Titlecase
+--     (Self : Virtual_String'Class) return Virtual_String;
+--   --  Convert string to titlecase form using default simple case conversion.
+
+   function To_Simple_Uppercase
+     (Self : Virtual_String'Class) return Virtual_String;
+   --  Convert string to uppercase form using default simple case conversion.
+
 private
 
    type Magic_String_Access is access all Virtual_String'Class;

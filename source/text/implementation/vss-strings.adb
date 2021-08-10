@@ -26,7 +26,6 @@ with Ada.Exceptions;
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
-with VSS.Locales;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
 with VSS.Strings.Cursors.Iterators.Lines.Internals;
@@ -377,24 +376,8 @@ package body VSS.Strings is
      (Self             : Virtual_String'Class;
       Suffix           : Virtual_String'Class;
       Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean is
-   begin
-      return
-        Self.Ends_With (Suffix, VSS.Locales.Current_Locale, Case_Sensitivity);
-   end Ends_With;
-
-   ---------------
-   -- Ends_With --
-   ---------------
-
-   function Ends_With
-     (Self             : Virtual_String'Class;
-      Suffix           : Virtual_String'Class;
-      Locale           : VSS.Locales.Locale;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
       return Boolean
    is
-      pragma Unreferenced (Locale);
       pragma Unreferenced (Case_Sensitivity);
 
       use type VSS.Implementation.Strings.Character_Count;
@@ -907,25 +890,8 @@ package body VSS.Strings is
      (Self             : Virtual_String'Class;
       Prefix           : Virtual_String'Class;
       Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean is
-   begin
-      return
-        Self.Starts_With
-          (Prefix, VSS.Locales.Current_Locale, Case_Sensitivity);
-   end Starts_With;
-
-   -----------------
-   -- Starts_With --
-   -----------------
-
-   function Starts_With
-     (Self             : Virtual_String'Class;
-      Prefix           : Virtual_String'Class;
-      Locale           : VSS.Locales.Locale;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
       return Boolean
    is
-      pragma Unreferenced (Locale);
       pragma Unreferenced (Case_Sensitivity);
 
       use type VSS.Implementation.Strings.Character_Count;
@@ -955,17 +921,6 @@ package body VSS.Strings is
    ------------------
 
    function To_Lowercase (Self : Virtual_String'Class) return Virtual_String is
-   begin
-      return Self.To_Lowercase (VSS.Locales.Current_Locale);
-   end To_Lowercase;
-
-   ------------------
-   -- To_Lowercase --
-   ------------------
-
-   function To_Lowercase
-     (Self   : Virtual_String'Class;
-      Locale : VSS.Locales.Locale) return Virtual_String is
    begin
       return Result : Virtual_String do
          VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
@@ -1000,17 +955,6 @@ package body VSS.Strings is
 --   function To_Titlecase
 --     (Self : Virtual_String'Class) return Virtual_String is
 --   begin
---      return Self.To_Titlecase (VSS.Locales.Current_Locale);
---   end To_Titlecase;
-
-   ------------------
-   -- To_Titlecase --
-   ------------------
-
---   function To_Titlecase
---     (Self   : Virtual_String'Class;
---      Locale : VSS.Locales.Locale) return Virtual_String is
---   begin
 --      return Result : Virtual_String do
 --         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
 --           (Self.Data,
@@ -1024,17 +968,6 @@ package body VSS.Strings is
    ------------------
 
    function To_Uppercase (Self : Virtual_String'Class) return Virtual_String is
-   begin
-      return Self.To_Uppercase (VSS.Locales.Current_Locale);
-   end To_Uppercase;
-
-   ------------------
-   -- To_Uppercase --
-   ------------------
-
-   function To_Uppercase
-     (Self   : Virtual_String'Class;
-      Locale : VSS.Locales.Locale) return Virtual_String is
    begin
       return Result : Virtual_String do
          VSS.Implementation.Strings.Handler (Self.Data).Convert_Case

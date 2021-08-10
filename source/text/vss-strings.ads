@@ -27,7 +27,6 @@ private with Ada.Streams;
 
 with VSS.Characters;
 private with VSS.Implementation.Strings;
-limited with VSS.Locales;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
@@ -308,18 +307,7 @@ package VSS.Strings is
       return Boolean;
    --  Return True when Self starts with Prefix. Case_Sensitivity defines
    --  whether search is case sensitive or not, and select algorithm for the
-   --  last. This function always use current thread locale for caseless
-   --  mappings.
-
-   function Starts_With
-     (Self             : Virtual_String'Class;
-      Prefix           : Virtual_String'Class;
-      Locale           : VSS.Locales.Locale;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean;
-   --  Return True when Self starts with Prefix. Case_Sensitivity defines
-   --  whether search is case sensitive or not, and select algorithm for the
-   --  last. Locale specifies locale to be used for caseless mappings.
+   --  last.
 
    function Ends_With
      (Self             : Virtual_String'Class;
@@ -328,18 +316,7 @@ package VSS.Strings is
       return Boolean;
    --  Return True when Self has given Suffix. Case_Sensitivity defines
    --  whether search is case sensitive or not, and select algorithm for the
-   --  last. This function always use current thread locale for caseless
-   --  mappings.
-
-   function Ends_With
-     (Self             : Virtual_String'Class;
-      Suffix           : Virtual_String'Class;
-      Locale           : VSS.Locales.Locale;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean;
-   --  Return True when Self has given Suffix. Case_Sensitivity defines
-   --  whether search is case sensitive or not, and select algorithm for the
-   --  last. Locale specifies locale to be used for caseless mappings.
+   --  last.
 
    function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
    --  Convert given string into virtual string.
@@ -351,34 +328,22 @@ package VSS.Strings is
       return VSS.String_Vectors.Virtual_String_Vector;
 
    function To_Lowercase (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to lowercase form using full case conversion and
-   --  tailoring provided by the locale of the current task.
-
-   function To_Lowercase
-     (Self   : Virtual_String'Class;
-      Locale : VSS.Locales.Locale) return Virtual_String;
-   --  Convert string to lowercase form using full case conversion and
-   --  tailoring provided by given locale.
+   --  Convert string to lowercase form using default full case conversion.
+   --
+   --  See VSS.Locales.To_Lowercase for case conversions with tailoring by
+   --  the locale.
 
 --   function To_Titlecase (Self : Virtual_String'Class) return Virtual_String;
---   --  Convert string to titlecase form using full case conversion and
---   --  tailoring provided by the locale of the current task.
---
---   function To_Titlecase
---     (Self   : Virtual_String'Class;
---      Locale : VSS.Locales.Locale) return Virtual_String;
---   --  Convert string to titlecase form using full case conversion and
---   --  tailoring provided by given locale.
+--   --  Convert string to titlecase form using default full case conversion.
+--   --
+--   --  See VSS.Locales.To_Titlecase for case conversions with tailoring by
+--   --  the locale.
 
    function To_Uppercase (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to uppercase form using full case conversion and
-   --  tailoring provided by the locale of the current task.
-
-   function To_Uppercase
-     (Self   : Virtual_String'Class;
-      Locale : VSS.Locales.Locale) return Virtual_String;
-   --  Convert string to uppercase form using full case conversion and
-   --  tailoring provided by given locale.
+   --  Convert string to uppercase form using default full case conversion.
+   --
+   --  See VSS.Locales.To_Uppercase for case conversions with tailoring by
+   --  the locale.
 
 private
 

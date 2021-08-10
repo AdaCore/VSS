@@ -23,6 +23,8 @@
 --  This is placeholder for locale information, not implemented but necessary
 --  to stabilize strings API.
 
+--  with VSS.Strings;
+
 package VSS.Locales is
 
    pragma Preelaborate;
@@ -38,6 +40,24 @@ package VSS.Locales is
    function Current_Locale return Locale;
    --  Return locale associated with the current thread, or system's locale
    --  when thread locale is not set.
+
+--   function To_Lowercase
+--     (Self : Locale'Class;
+--      Item : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String;
+--   --  Convert string to lowercase form using full case conversion and
+--   --  tailoring provided by given locale.
+--
+--   function To_Titlecase
+--     (Self : Locale'Class;
+--      Item : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String;
+--   --  Convert string to titlecase form using full case conversion and
+--   --  tailoring provided by given locale.
+--
+--   function To_Uppercase
+--     (Self : VSS.Locales.Locale'Class;
+--      Item : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String;
+--   --  Convert string to uppercase form using full case conversion and
+--   --  tailoring provided by given locale.
 
 private
 

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,43 +20,34 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+with Ada.Unchecked_Conversion;
 
-project VSS_Text_Tests is
+package body VSS.Implementation.UCD_Casing is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use
-     ("../../testsuite/text",
-      "../../tools/ucd");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_casing.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+   type Unsigned_6 is mod 2**6 with Size => 6;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   function To_Unsigned_6 is
+     new Ada.Unchecked_Conversion (Casing_Context, Unsigned_6);
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   function To_Unsigned_6 is
+     new Ada.Unchecked_Conversion (Casing_Context_Change, Unsigned_6);
 
-end VSS_Text_Tests;
+   function To_Casing_Context is
+     new Ada.Unchecked_Conversion (Unsigned_6, Casing_Context);
+
+   -----------
+   -- Apply --
+   -----------
+
+   procedure Apply
+     (Context : in out Casing_Context;
+      Change  : Casing_Context_Change) is
+   begin
+      Context :=
+        To_Casing_Context
+          (To_Unsigned_6 (Change)
+           or (To_Unsigned_6 (Context) and (To_Unsigned_6 (Change) / 2)));
+   end Apply;
+
+end VSS.Implementation.UCD_Casing;

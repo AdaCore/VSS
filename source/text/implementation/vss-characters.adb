@@ -95,6 +95,23 @@ package body VSS.Characters is
           (VSS.Implementation.UCD_Core.Core_Index_Table (Block) + Offset);
    end Extract_Core_Data;
 
+   ---------------
+   -- Get_Cased --
+   ---------------
+
+   function Get_Cased (Self : Virtual_Character) return Boolean is
+      Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
+        Extract_Core_Data (Self);
+
+   begin
+      return
+        Data.GC in VSS.Implementation.UCD_Core.GC_Ll
+                     | VSS.Implementation.UCD_Core.GC_Lu
+                     | VSS.Implementation.UCD_Core.GC_Lt
+          or Data.OLower
+          or Data.OUpper;
+   end Get_Cased;
+
    --------------------------
    -- Get_General_Category --
    --------------------------
@@ -120,35 +137,6 @@ package body VSS.Characters is
    begin
       return Data.GC = VSS.Implementation.UCD_Core.GC_Ll or Data.OLower;
    end Get_Lowercase;
-
-   -------------------
-   -- Get_Uppercase --
-   -------------------
-
-   function Get_Uppercase (Self : Virtual_Character) return Boolean is
-      Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
-        Extract_Core_Data (Self);
-
-   begin
-      return Data.GC = VSS.Implementation.UCD_Core.GC_Lu or Data.OUpper;
-   end Get_Uppercase;
-
-   ---------------
-   -- Get_Cased --
-   ---------------
-
-   function Get_Cased (Self : Virtual_Character) return Boolean is
-      Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
-        Extract_Core_Data (Self);
-
-   begin
-      return
-        Data.GC in VSS.Implementation.UCD_Core.GC_Ll
-                     | VSS.Implementation.UCD_Core.GC_Lu
-                     | VSS.Implementation.UCD_Core.GC_Lt
-          or Data.OLower
-          or Data.OUpper;
-   end Get_Cased;
 
    ---------------------------
    -- Get_Lowercase_Mapping --
@@ -308,6 +296,18 @@ package body VSS.Characters is
          VSS.Implementation.Strings.Unreference (Data);
       end return;
    end Get_Titlecase_Mapping;
+
+   -------------------
+   -- Get_Uppercase --
+   -------------------
+
+   function Get_Uppercase (Self : Virtual_Character) return Boolean is
+      Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
+        Extract_Core_Data (Self);
+
+   begin
+      return Data.GC = VSS.Implementation.UCD_Core.GC_Lu or Data.OUpper;
+   end Get_Uppercase;
 
    ---------------------------
    -- Get_Uppercase_Mapping --

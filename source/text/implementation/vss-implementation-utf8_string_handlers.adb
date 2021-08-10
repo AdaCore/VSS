@@ -655,6 +655,23 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Self.Initialize (Result);
 
+      if Self.Is_Empty (Data) then
+         --  Nothing to do for an empty string.
+
+         return;
+      end if;
+
+      declare
+         Target : UTF8_String_Data_Access
+           with Import, Convention => Ada, Address => Result.Pointer'Address;
+
+      begin
+         Target :=
+           Allocate
+             (VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
+              Source.Size);
+      end;
+
       case Mapping is
          when VSS.Implementation.String_Handlers.Simple_Lowercase =>
             Convert_Case_Simple
@@ -797,23 +814,41 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Size    : VSS.Unicode.UTF8_Code_Unit_Count;
          Length  : VSS.Implementation.Strings.Character_Count)
       is
-         Target : UTF8_In_Place_Data
-           with Import, Convention => Ada, Address => Result_Data'Address;
-
       begin
          if Result_Data.In_Place then
-            if Target.Size + Size <= In_Place_Storage_Capacity then
+            declare
+               Target : UTF8_In_Place_Data
+                 with Import, Convention => Ada,
+                      Address => Result_Data'Address;
+
+            begin
+               if Target.Size + Size <= In_Place_Storage_Capacity then
+                  Target.Storage (Target.Size .. Target.Size + Size - 1) :=
+                    Storage (From .. From + Size - 1);
+                  Target.Size := Target.Size + Size;
+                  Target.Length := Target.Length + Length;
+
+               else
+                  raise Program_Error;
+               end if;
+            end;
+
+         else
+            declare
+               Target : UTF8_String_Data_Access
+                 with Import, Convention => Ada,
+                      Address => Result_Data.Pointer'Address;
+
+            begin
+               if Target.Size + Size > Target.Bulk then
+                  Reallocate (Target, 0, Target.Size + Size);
+               end if;
+
                Target.Storage (Target.Size .. Target.Size + Size - 1) :=
                  Storage (From .. From + Size - 1);
                Target.Size := Target.Size + Size;
                Target.Length := Target.Length + Length;
-
-            else
-               raise Program_Error;
-            end if;
-
-         else
-            raise Program_Error;
+            end;
          end if;
       end Append;
 

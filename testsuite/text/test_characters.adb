@@ -287,6 +287,13 @@ procedure Test_Characters is
         (VSS.Characters.Get_Titlecase_Mapping ('а') = "А");
       Test_Support.Assert
         (VSS.Characters.Get_Uppercase_Mapping ('а') = "А");
+
+      Test_Support.Assert
+        (VSS.Characters.Get_Lowercase_Mapping ('1') = "1");
+      Test_Support.Assert
+        (VSS.Characters.Get_Titlecase_Mapping ('1') = "1");
+      Test_Support.Assert
+        (VSS.Characters.Get_Uppercase_Mapping ('1') = "1");
    end Test_Well_Know;
 
 begin

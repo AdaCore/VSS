@@ -31,6 +31,11 @@ procedure Test_String_Casing is
    S1 : constant VSS.Strings.Virtual_String := "123ABCАБВ";
    E1 : constant VSS.Strings.Virtual_String := "123abcабв";
 
+   L1 : constant VSS.Strings.Virtual_String :=
+     "abcdefghigklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+   U1 : constant VSS.Strings.Virtual_String :=
+     "ABCDEFGHIGKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+
    --  This is a testcase for Final_Sigma context. \u03A3 translated to \u03C3
    --  when there is no Final_Sigma context and to \u03C2 in Final_Sigma
    --  context.
@@ -71,4 +76,7 @@ begin
    Test_Support.Assert (S4S.To_Lowercase = S4E);
    Test_Support.Assert (S5S.To_Lowercase = S5E);
    Test_Support.Assert (S6S.To_Lowercase = S6E);
+
+   Test_Support.Assert (U1.To_Lowercase = L1);
+   Test_Support.Assert (L1.To_Uppercase = U1);
 end Test_String_Casing;

@@ -690,11 +690,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
                Result);
 
          when VSS.Implementation.String_Handlers.Simple_Titlecase =>
-            Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
-               VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
-               Result);
+            raise Program_Error;
+
+            --  Convert_Case_Simple
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
+            --     Result);
 
          when VSS.Implementation.String_Handlers.Simple_Uppercase =>
             Convert_Case_Simple
@@ -712,12 +714,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
                Result);
 
          when VSS.Implementation.String_Handlers.Titlecase =>
-            Convert_Case_Full
-              (Source.Storage,
-               Source.Size,
-               VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
-               False,
-               Result);
+            raise Program_Error;
+
+            --  Convert_Case_Full
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+            --     False,
+            --     Result);
 
          when VSS.Implementation.String_Handlers.Uppercase =>
             Convert_Case_Full
@@ -754,11 +758,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
                Result);
 
          when VSS.Implementation.String_Handlers.Simple_Titlecase =>
-            Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
-               VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
-               Result);
+            raise Program_Error;
+
+            --  Convert_Case_Simple
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
+            --     Result);
 
          when VSS.Implementation.String_Handlers.Simple_Uppercase =>
             Convert_Case_Simple
@@ -776,12 +782,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
                Result);
 
          when VSS.Implementation.String_Handlers.Titlecase =>
-            Convert_Case_Full
-              (Source.Storage,
-               Source.Size,
-               VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
-               False,
-               Result);
+            raise Program_Error;
+
+            --  Convert_Case_Full
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+            --     False,
+            --     Result);
 
          when VSS.Implementation.String_Handlers.Uppercase =>
             Convert_Case_Full

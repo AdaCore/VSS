@@ -175,6 +175,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
       Mapping        :
         VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      To_Lower       : Boolean;
       Result_Data    : in out VSS.Implementation.Strings.String_Data);
    --  Common code for full case conversions.
 
@@ -681,6 +682,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Source.Storage,
                Source.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
+               True,
                Result);
 
          when VSS.Implementation.String_Handlers.Titlecase =>
@@ -688,6 +690,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Source.Storage,
                Source.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+               False,
                Result);
 
          when VSS.Implementation.String_Handlers.Uppercase =>
@@ -695,6 +698,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Source.Storage,
                Source.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
+               False,
                Result);
       end case;
    end Convert_Case;
@@ -742,6 +746,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Source.Storage,
                Source.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
+               True,
                Result);
 
          when VSS.Implementation.String_Handlers.Titlecase =>
@@ -749,6 +754,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Source.Storage,
                Source.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+               False,
                Result);
 
          when VSS.Implementation.String_Handlers.Uppercase =>
@@ -756,6 +762,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Source.Storage,
                Source.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
+               False,
                Result);
       end case;
    end Convert_Case;
@@ -769,6 +776,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
       Mapping        :
         VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
+      To_Lower       : Boolean;
       Result_Data    : in out VSS.Implementation.Strings.String_Data)
    is
       procedure Append
@@ -828,7 +836,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
             Skip : Boolean := False;
 
          begin
-            if Context.Final_Sigma and Code = 16#03A3# then
+            if To_Lower and Context.Final_Sigma and Code = 16#03A3# then
                declare
                   Suffix_Offset : VSS.Unicode.UTF8_Code_Unit_Offset := Offset;
                   Match         : Boolean := False;

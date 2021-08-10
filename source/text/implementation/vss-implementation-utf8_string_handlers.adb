@@ -88,6 +88,15 @@ package body VSS.Implementation.UTF8_String_Handlers is
    --  Destination. Length is set to the length of the text in characters.
    --  Success is set False when validation is failed and to True otherwise.
 
+   procedure Unchecked_Append
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count);
+   --  Append given slice of the data to the target. Convert target
+   --  from in-place to heap based implementation when necessary.
+
    Growth_Factor            : constant := 32;
    --  The growth factor controls how much extra space is allocated when
    --  we have to increase the size of an allocated unbounded string. By
@@ -796,62 +805,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
       To_Lower       : Boolean;
       Result_Data    : in out VSS.Implementation.Strings.String_Data)
    is
-      procedure Append
-        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         From    : VSS.Unicode.UTF8_Code_Unit_Index;
-         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
-         Length  : VSS.Implementation.Strings.Character_Count);
-      --  Append data from given position and size to result. Convert result
-      --  to heap based implementation when necessary.
-
-      ------------
-      -- Append --
-      ------------
-
-      procedure Append
-        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         From    : VSS.Unicode.UTF8_Code_Unit_Index;
-         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
-         Length  : VSS.Implementation.Strings.Character_Count)
-      is
-      begin
-         if Result_Data.In_Place then
-            declare
-               Target : UTF8_In_Place_Data
-                 with Import, Convention => Ada,
-                      Address => Result_Data'Address;
-
-            begin
-               if Target.Size + Size <= In_Place_Storage_Capacity then
-                  Target.Storage (Target.Size .. Target.Size + Size - 1) :=
-                    Storage (From .. From + Size - 1);
-                  Target.Size := Target.Size + Size;
-                  Target.Length := Target.Length + Length;
-
-               else
-                  raise Program_Error;
-               end if;
-            end;
-
-         else
-            declare
-               Target : UTF8_String_Data_Access
-                 with Import, Convention => Ada,
-                      Address => Result_Data.Pointer'Address;
-
-            begin
-               if Target.Size + Size > Target.Bulk then
-                  Reallocate (Target, 0, Target.Size + Size);
-               end if;
-
-               Target.Storage (Target.Size .. Target.Size + Size - 1) :=
-                 Storage (From .. From + Size - 1);
-               Target.Size := Target.Size + Size;
-               Target.Length := Target.Length + Length;
-            end;
-         end if;
-      end Append;
-
       Code    : VSS.Unicode.Code_Point;
       Start   : VSS.Unicode.UTF8_Code_Unit_Offset;
       Offset  : VSS.Unicode.UTF8_Code_Unit_Offset := 0;
@@ -898,7 +851,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   if not Match then
                      --  Replace by 03C2
 
-                     Append ((16#CF#, 16#82#), 0, 2, 1);
+                     Unchecked_Append (Result_Data, (16#CF#, 16#82#), 0, 2, 1);
                      Skip := True;
                   end if;
                end;
@@ -908,14 +861,16 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
             if not Skip then
                if Info.Has_Mapping then
-                  Append
-                    (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
+                  Unchecked_Append
+                    (Result_Data,
+                     VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
                      Info.Offset,
                      Info.Count,
                      Info.Length);
 
                else
-                  Append (Source_Storage, Start, Offset - Start, 1);
+                  Unchecked_Append
+                    (Result_Data, Source_Storage, Start, Offset - Start, 1);
                end if;
             end if;
          end;
@@ -933,44 +888,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
         VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
       Result_Data    : in out VSS.Implementation.Strings.String_Data)
    is
-      procedure Append
-        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         From    : VSS.Unicode.UTF8_Code_Unit_Index;
-         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
-         Length  : VSS.Implementation.Strings.Character_Count);
-      --  Append data from given position and size to result. Convert result
-      --  to heap based implementation when necessary.
-
-      ------------
-      -- Append --
-      ------------
-
-      procedure Append
-        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         From    : VSS.Unicode.UTF8_Code_Unit_Index;
-         Size    : VSS.Unicode.UTF8_Code_Unit_Count;
-         Length  : VSS.Implementation.Strings.Character_Count)
-      is
-         Target : UTF8_In_Place_Data
-           with Import, Convention => Ada, Address => Result_Data'Address;
-
-      begin
-         if Result_Data.In_Place then
-            if Target.Size + Size <= In_Place_Storage_Capacity then
-               Target.Storage (Target.Size .. Target.Size + Size - 1) :=
-                 Storage (From .. From + Size - 1);
-               Target.Size := Target.Size + Size;
-               Target.Length := Target.Length + Length;
-
-            else
-               raise Program_Error;
-            end if;
-
-         else
-            raise Program_Error;
-         end if;
-      end Append;
-
       Code   : VSS.Unicode.Code_Point;
       Start  : VSS.Unicode.UTF8_Code_Unit_Offset;
       Offset : VSS.Unicode.UTF8_Code_Unit_Offset := 0;
@@ -987,14 +904,16 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          begin
             if Info.Has_Mapping then
-               Append
-                 (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
+               Unchecked_Append
+                 (Result_Data,
+                  VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
                   Info.Offset,
                   Info.Count,
                   Info.Length);
 
             else
-               Append (Source_Storage, Start, Offset - Start, 1);
+               Unchecked_Append
+                 (Result_Data, Source_Storage, Start, Offset - Start, 1);
             end if;
          end;
       end loop;
@@ -2164,6 +2083,53 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end loop;
       end return;
    end To_UTF_8_String;
+
+   ----------------------
+   -- Unchecked_Append --
+   ----------------------
+
+   procedure Unchecked_Append
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count) is
+   begin
+      if Target_Data.In_Place then
+         declare
+            Target : UTF8_In_Place_Data
+              with Import, Convention => Ada, Address => Target_Data'Address;
+
+         begin
+            if Target.Size + Size <= In_Place_Storage_Capacity then
+               Target.Storage (Target.Size .. Target.Size + Size - 1) :=
+                 Storage (From .. From + Size - 1);
+               Target.Size := Target.Size + Size;
+               Target.Length := Target.Length + Length;
+
+            else
+               raise Program_Error;
+            end if;
+         end;
+
+      else
+         declare
+            Target : UTF8_String_Data_Access
+              with Import, Convention => Ada,
+                   Address => Target_Data.Pointer'Address;
+
+         begin
+            if Target.Size + Size > Target.Bulk then
+               Reallocate (Target, 0, Target.Size + Size);
+            end if;
+
+            Target.Storage (Target.Size .. Target.Size + Size - 1) :=
+              Storage (From .. From + Size - 1);
+            Target.Size := Target.Size + Size;
+            Target.Length := Target.Length + Length;
+         end;
+      end if;
+   end Unchecked_Append;
 
    ------------------------
    -- Unchecked_Backward --

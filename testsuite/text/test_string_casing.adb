@@ -68,6 +68,9 @@ procedure Test_String_Casing is
    S6S : constant VSS.Strings.Virtual_String := "ᾼΣͅΑ";
    S6E : constant VSS.Strings.Virtual_String := "ᾳσͅα";
 
+   SN  : constant VSS.Strings.Virtual_String :=
+     VSS.Strings.Empty_Virtual_String;
+
 begin
    Test_Support.Assert (S1.To_Lowercase = E1);
    Test_Support.Assert (S1S.To_Lowercase = S1E);
@@ -79,4 +82,8 @@ begin
 
    Test_Support.Assert (U1.To_Lowercase = L1);
    Test_Support.Assert (L1.To_Uppercase = U1);
+
+   --  Test for null string for code coverage of Null_String_Handler.
+
+   Test_Support.Assert (SN.To_Lowercase = SN);
 end Test_String_Casing;

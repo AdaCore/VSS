@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,44 +20,67 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
+with Ada.Command_Line;
+with Ada.Wide_Wide_Text_IO;
 
-project VSS_Text_Tests is
+with VSS.Strings;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use
-     ("../../testsuite/text",
-      "../../tools/ucd");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_casing.adb",
-                 "test_string_casing_w3c_i18n.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split_lines",
-                 "test_string_vector");
+with Test_Support;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+procedure Test_String_Casing_W3C_I18N is
+   use type VSS.Strings.Virtual_String;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   File      : Ada.Wide_Wide_Text_IO.File_Type;
+   Line      : Wide_Wide_String (1 .. 1024);
+   Last      : Natural;
+   Lowercase : Boolean;
+   Source    : VSS.Strings.Virtual_String;
+   Expected  : VSS.Strings.Virtual_String;
 
-end VSS_Text_Tests;
+begin
+   Ada.Wide_Wide_Text_IO.Open
+     (File,
+      Ada.Wide_Wide_Text_IO.In_File,
+      Ada.Command_Line.Argument (1),
+      "wcem=8");
+
+   --  Skip name of the test
+
+   Ada.Wide_Wide_Text_IO.Skip_Line (File);
+
+   --  Read case conversion
+
+   Ada.Wide_Wide_Text_IO.Get_Line (File, Line, Last);
+
+   if Line (Line'First .. Last) = "lowercase" then
+      Lowercase := True;
+
+   elsif Line (Line'First .. Last) = "uppercase" then
+      Lowercase := False;
+
+   else
+      raise Program_Error;
+   end if;
+
+   --  Read source string
+
+   Ada.Wide_Wide_Text_IO.Get_Line (File, Line, Last);
+   Source := VSS.Strings.To_Virtual_String (Line (Line'First .. Last));
+   Test_Support.Assert (not Source.Is_Empty);
+
+   --  Read expected string
+
+   Ada.Wide_Wide_Text_IO.Get_Line (File, Line, Last);
+   Expected := VSS.Strings.To_Virtual_String (Line (Line'First .. Last));
+   Test_Support.Assert (not Expected.Is_Empty);
+
+   Ada.Wide_Wide_Text_IO.Close (File);
+
+   if Lowercase then
+      Test_Support.Assert (Source.To_Lowercase = Expected);
+
+   else
+      Test_Support.Assert (Source.To_Uppercase = Expected);
+   end if;
+end Test_String_Casing_W3C_I18N;

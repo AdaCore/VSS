@@ -4,8 +4,8 @@ https://github.com/w3c/i18n-tests
 
 To rebuild data files clone repository into <VSS>/data/i18n-tests directory
 
-   cd <VSS>/data
-   git clone https://github.com/w3c/i18n-tests.git
+    cd <VSS>/data
+    git clone https://github.com/w3c/i18n-tests.git
 
 When run extract-casing.sh script from this directory
 

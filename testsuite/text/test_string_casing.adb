@@ -89,8 +89,8 @@ begin
 
    --  Test of simple case conversion.
 
-   Test_Support.Assert (S1.To_Lowercase = E1);
-   Test_Support.Assert (E1.To_Uppercase = S1);
-   Test_Support.Assert (U1.To_Lowercase = L1);
-   Test_Support.Assert (L1.To_Uppercase = U1);
+   Test_Support.Assert (S1.To_Simple_Lowercase = E1);
+   Test_Support.Assert (E1.To_Simple_Uppercase = S1);
+   Test_Support.Assert (U1.To_Simple_Lowercase = L1);
+   Test_Support.Assert (L1.To_Simple_Uppercase = U1);
 end Test_String_Casing;

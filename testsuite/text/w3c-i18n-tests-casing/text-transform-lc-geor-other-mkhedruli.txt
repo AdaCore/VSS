@@ -1,0 +1,4 @@
+CSS3 Text, text transform: lowercase, other mtavruli to mkhedruli
+lowercase
+Ჱ Ჲ Ჳ Ჴ Ჷ Ჸ Ჶ
+ჱ ჲ ჳ ჴ ჷ ჸ ჶ

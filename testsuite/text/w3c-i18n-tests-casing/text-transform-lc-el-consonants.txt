@@ -1,0 +1,4 @@
+CSS3 Text, text transform: lowercase, modern Greek consonants
+lowercase
+Β Γ Δ Ζ Η Θ Κ Λ Μ Ν Ξ Π Ρ Σ Τ Φ Χ Ψ
+β γ δ ζ η θ κ λ μ ν ξ π ρ σ τ φ χ ψ

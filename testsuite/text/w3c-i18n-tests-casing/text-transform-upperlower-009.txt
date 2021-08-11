@@ -1,0 +1,4 @@
+CSS3 Text, text transform: Latin Extended-C, uppercase
+uppercase
+ⱡ ⱥ ⱦ ⱨ ⱪ ⱬ ⱳ ⱶ
+Ⱡ Ⱥ Ⱦ Ⱨ Ⱪ Ⱬ Ⱳ Ⱶ

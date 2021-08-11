@@ -97,6 +97,16 @@ package body VSS.Implementation.UTF8_String_Handlers is
    --  Append given slice of the data to the target. Convert target
    --  from in-place to heap based implementation when necessary.
 
+   procedure Unchecked_Store
+     (Storage : in out VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Length  : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Unit_1  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_2  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_3  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_4  : VSS.Unicode.UTF8_Code_Unit) with Inline_Always;
+   --  Store encoded character.
+
    Growth_Factor            : constant := 32;
    --  The growth factor controls how much extra space is allocated when
    --  we have to increase the size of an allocated unbounded string. By
@@ -291,19 +301,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
          VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
          (if Destination = null then 0 else Destination.Size) + L);
 
-      Destination.Storage (Destination.Size) := U1;
-
-      if L >= 2 then
-         Destination.Storage (Destination.Size + 1) := U2;
-
-         if L >= 3 then
-            Destination.Storage (Destination.Size + 2) := U3;
-
-            if L = 4 then
-               Destination.Storage (Destination.Size + 3) := U4;
-            end if;
-         end if;
-      end if;
+      Unchecked_Store
+        (Destination.Storage, Destination.Size, L, U1, U2, U3, U4);
 
       Destination.Size := Destination.Size + L;
       Destination.Length := Destination.Length + 1;
@@ -420,19 +419,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       if Destination.Size + L < Destination.Storage'Length then
          --  There is enough space to store data in place.
 
-         Destination.Storage (Destination.Size) := U1;
-
-         if L >= 2 then
-            Destination.Storage (Destination.Size + 1) := U2;
-
-            if L >= 3 then
-               Destination.Storage (Destination.Size + 2) := U3;
-
-               if L = 4 then
-                  Destination.Storage (Destination.Size + 3) := U4;
-               end if;
-            end if;
-         end if;
+         Unchecked_Store
+           (Destination.Storage, Destination.Size, L, U1, U2, U3, U4);
 
          Destination.Size := Destination.Size + L;
          Destination.Length := Destination.Length + 1;
@@ -456,19 +444,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
               with Import, Convention => Ada, Address => Data.Pointer'Address;
 
          begin
-            Destination.Storage (Destination.Size) := U1;
-
-            if L >= 2 then
-               Destination.Storage (Destination.Size + 1) := U2;
-
-               if L >= 3 then
-                  Destination.Storage (Destination.Size + 2) := U3;
-
-                  if L = 4 then
-                     Destination.Storage (Destination.Size + 3) := U4;
-                  end if;
-               end if;
-            end if;
+            Unchecked_Store
+              (Destination.Storage, Destination.Size, L, U1, U2, U3, U4);
 
             Destination.Size := Destination.Size + L;
             Destination.Length := Destination.Length + 1;
@@ -1263,19 +1240,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   Destination.Size + L);
             end if;
 
-            Destination.Storage (Destination.Size) := U1;
-
-            if L >= 2 then
-               Destination.Storage (Destination.Size + 1) := U2;
-
-               if L >= 3 then
-                  Destination.Storage (Destination.Size + 2) := U3;
-
-                  if L = 4 then
-                     Destination.Storage (Destination.Size + 3) := U4;
-                  end if;
-               end if;
-            end if;
+            Unchecked_Store
+              (Destination.Storage, Destination.Size, L, U1, U2, U3, U4);
 
             Destination.Size := Destination.Size + L;
          end loop;
@@ -1342,19 +1308,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
                exit;
             end if;
 
-            Destination.Storage (Destination.Size) := U1;
-
-            if L >= 2 then
-               Destination.Storage (Destination.Size + 1) := U2;
-
-               if L >= 3 then
-                  Destination.Storage (Destination.Size + 2) := U3;
-
-                  if L = 4 then
-                     Destination.Storage (Destination.Size + 3) := U4;
-                  end if;
-               end if;
-            end if;
+            Unchecked_Store
+              (Destination.Storage, Destination.Size, L, U1, U2, U3, U4);
 
             Destination.Size := Destination.Size + L;
          end loop;
@@ -1439,19 +1394,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          begin
             VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
-            Target.Storage (0) := U1;
-
-            if L >= 2 then
-               Target.Storage (1) := U2;
-
-               if L >= 3 then
-                  Target.Storage (2) := U3;
-
-                  if L = 4 then
-                     Target.Storage (3) := U4;
-                  end if;
-               end if;
-            end if;
+            Unchecked_Store (Target.Storage, 0, L, U1, U2, U3, U4);
 
             Target.Size   := L;
             Target.Length := 1;
@@ -1604,19 +1547,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
         (From.UTF8_Offset + L .. Destination.Size + L) :=
            Destination.Storage (From.UTF8_Offset .. Destination.Size);
 
-      Destination.Storage (From.UTF8_Offset) := U1;
-
-      if L >= 2 then
-         Destination.Storage (From.UTF8_Offset + 1) := U2;
-
-         if L >= 3 then
-            Destination.Storage (From.UTF8_Offset + 2) := U3;
-
-            if L = 4 then
-               Destination.Storage (From.UTF8_Offset + 3) := U4;
-            end if;
-         end if;
-      end if;
+      Unchecked_Store
+        (Destination.Storage, From.UTF8_Offset, L, U1, U2, U3, U4);
 
       Destination.Size := Destination.Size + L;
       Destination.Length := Destination.Length + 1;
@@ -1661,19 +1593,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
            (From.UTF8_Offset + L .. Destination.Size + L) :=
               Destination.Storage (From.UTF8_Offset .. Destination.Size);
 
-         Destination.Storage (From.UTF8_Offset) := U1;
-
-         if L >= 2 then
-            Destination.Storage (From.UTF8_Offset + 1) := U2;
-
-            if L >= 3 then
-               Destination.Storage (From.UTF8_Offset + 2) := U3;
-
-               if L = 4 then
-                  Destination.Storage (From.UTF8_Offset + 3) := U4;
-               end if;
-            end if;
-         end if;
+         Unchecked_Store
+           (Destination.Storage, From.UTF8_Offset, L, U1, U2, U3, U4);
 
          Destination.Size   := Destination.Size + L;
          Destination.Length := Destination.Length + 1;
@@ -1697,19 +1618,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (From.UTF8_Offset + L .. Destination.Size + L) :=
                Destination.Storage (From.UTF8_Offset .. Destination.Size);
 
-            Destination.Storage (From.UTF8_Offset) := U1;
-
-            if L >= 2 then
-               Destination.Storage (From.UTF8_Offset + 1) := U2;
-
-               if L >= 3 then
-                  Destination.Storage (From.UTF8_Offset + 2) := U3;
-
-                  if L = 4 then
-                     Destination.Storage (From.UTF8_Offset + 3) := U4;
-                  end if;
-               end if;
-            end if;
+            Unchecked_Store
+              (Destination.Storage, From.UTF8_Offset, L, U1, U2, U3, U4);
 
             Destination.Size := Destination.Size + L;
             Destination.Length := Destination.Length + 1;
@@ -2367,6 +2277,34 @@ package body VSS.Implementation.UTF8_String_Handlers is
       --    Position.UTF16_Offset + 1
       --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
    end Unchecked_Forward;
+
+   ---------------------
+   -- Unchecked_Store --
+   ---------------------
+
+   procedure Unchecked_Store
+     (Storage : in out VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Length  : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Unit_1  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_2  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_3  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_4  : VSS.Unicode.UTF8_Code_Unit) is
+   begin
+      Storage (From) := Unit_1;
+
+      if Length >= 2 then
+         Storage (From + 1) := Unit_2;
+
+         if Length >= 3 then
+            Storage (From + 2) := Unit_3;
+
+            if Length = 4 then
+               Storage (From + 3) := Unit_4;
+            end if;
+         end if;
+      end if;
+   end Unchecked_Store;
 
    -----------------
    -- Unreference --

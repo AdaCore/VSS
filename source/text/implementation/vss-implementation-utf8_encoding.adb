@@ -296,4 +296,35 @@ package body VSS.Implementation.UTF8_Encoding is
       end case;
    end Encode;
 
+   ---------------------
+   -- Unchecked_Store --
+   ---------------------
+
+   procedure Unchecked_Store
+     (Storage : in out VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Length  : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Unit_1  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_2  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_3  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_4  : VSS.Unicode.UTF8_Code_Unit)
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+   begin
+      Storage (From) := Unit_1;
+
+      if Length >= 2 then
+         Storage (From + 1) := Unit_2;
+
+         if Length >= 3 then
+            Storage (From + 2) := Unit_3;
+
+            if Length = 4 then
+               Storage (From + 3) := Unit_4;
+            end if;
+         end if;
+      end if;
+   end Unchecked_Store;
+
 end VSS.Implementation.UTF8_Encoding;

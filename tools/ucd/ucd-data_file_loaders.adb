@@ -31,6 +31,17 @@ package body UCD.Data_File_Loaders is
 
    function To_Code_Point (Item : Wide_Wide_String) return UCD.Code_Point;
 
+   -----------
+   -- Close --
+   -----------
+
+   procedure Close (Self : in out File_Loader) is
+   begin
+      if Is_Open (Self.File) then
+         Close (Self.File);
+      end if;
+   end Close;
+
    -----------------
    -- End_Of_File --
    -----------------
@@ -39,6 +50,15 @@ package body UCD.Data_File_Loaders is
    begin
       return not Is_Open (Self.File) or Self.Buffer'First > Self.Line_Last;
    end End_Of_File;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding procedure Finalize (Self : in out File_Loader) is
+   begin
+      Self.Close;
+   end Finalize;
 
    --------------------------
    -- Get_Code_Point_Range --
@@ -218,26 +238,6 @@ package body UCD.Data_File_Loaders is
       Open (Self.File, In_File, Encode (UCD_Root & '/' & File_Name), "wcem=8");
       Self.Scan_Next_Line;
    end Open;
-
-   -----------
-   -- Close --
-   -----------
-
-   procedure Close (Self : in out File_Loader) is
-   begin
-      if Is_Open (Self.File) then
-         Close (Self.File);
-      end if;
-   end Close;
-
-   --------------
-   -- Finalize --
-   --------------
-
-   overriding procedure Finalize (Self : in out File_Loader) is
-   begin
-      Self.Close;
-   end Finalize;
 
    --------------------
    -- Scan_Next_Line --

@@ -28,6 +28,7 @@ with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
+with VSS.Strings.Cursors.Iterators.Graphemes;
 with VSS.Strings.Cursors.Iterators.Lines.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
@@ -462,6 +463,18 @@ package body VSS.Strings is
           (Self);
    end First_Character;
 
+   --------------------
+   -- First_Grapheme --
+   --------------------
+
+   function First_Grapheme
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+   begin
+      raise Program_Error;
+      return Self.First_Grapheme;
+   end First_Grapheme;
+
    ----------------
    -- First_Line --
    ----------------
@@ -476,6 +489,19 @@ package body VSS.Strings is
         VSS.Strings.Cursors.Iterators.Lines.Internals.First_Line
           (Self, Terminators, Keep_Terminator);
    end First_Line;
+
+   --------------
+   -- Grapheme --
+   --------------
+
+   function Grapheme
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+   begin
+      raise Program_Error;
+      return Self.Grapheme (Position);
+   end Grapheme;
 
    ----------
    -- Hash --
@@ -577,6 +603,18 @@ package body VSS.Strings is
         VSS.Strings.Cursors.Iterators.Characters.Internals.Last_Character
           (Self);
    end Last_Character;
+
+   -------------------
+   -- Last_Grapheme --
+   -------------------
+
+   function Last_Grapheme
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+   begin
+      raise Program_Error;
+      return Self.Last_Grapheme;
+   end Last_Grapheme;
 
    ----------
    -- Line --

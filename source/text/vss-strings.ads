@@ -29,6 +29,7 @@ with VSS.Characters;
 private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
+limited with VSS.Strings.Cursors.Iterators.Graphemes;
 limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Texts;
 
@@ -87,8 +88,6 @@ package VSS.Strings is
    function To_Magic_Text
      (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text;
 
-   type Grapheme_Iterator is tagged limited private;
-
    function First_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
@@ -106,11 +105,22 @@ package VSS.Strings is
    --  Return iterator pointing to the character at given position. Cursor
    --  must belong to the same string.
 
-   --  function First_Grapheme
-   --    (Self : Magic_String'Class) return Grapheme_Iterator;
-   --
-   --  function Last_Grapheme
-   --    (Self : Magic_String'Class) return Grapheme_Iterator;
+   function First_Grapheme
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator;
+   --  Return iterator pointing to the first grapheme of the string.
+
+   function Last_Grapheme
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator;
+   --  Return iterator pointing to the last grapheme of the string.
+
+   function Grapheme
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator;
+   --  Return iterator pointing to the grapheme of the string at the given
+   --  position.
 
    function First_Line
      (Self            : Virtual_String'Class;
@@ -472,21 +482,5 @@ private
         Tail         => null,
         Limited_Head => null,
         Limited_Tail => null);
-
-   -----------------------
-   -- Grapheme_Iterator --
-   -----------------------
-
-   type Grapheme_Iterator is limited new Referal_Limited_Base with record
-      null;
-   end record;
-
-   overriding procedure Invalidate (Self : in out Grapheme_Iterator) is null;
-
-   overriding procedure String_Modified
-     (Self     : in out Grapheme_Iterator;
-      Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset) is null;
 
 end VSS.Strings;

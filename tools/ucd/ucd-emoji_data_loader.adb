@@ -21,64 +21,50 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;      use Ada.Command_Line;
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with UCD.Case_Folding_Loader;
 with UCD.Characters;
-with UCD.Derived_Core_Properties_Loader;
-with UCD.Derived_Normalization_Props_Loader;
-with UCD.Emoji_Data_Loader;
-with UCD.Prop_List_Loader;
-with UCD.Property_Aliases_Loader;
-with UCD.Property_Value_Aliases_Loader;
-with UCD.Special_Casing_Loader;
-with UCD.Unicode_Data_Loader;
+with UCD.Data_File_Loaders;
+with UCD.Properties;
 
-with Gen_UCD.Casing;
-with Gen_UCD.Core_Properties;
+package body UCD.Emoji_Data_Loader is
 
-procedure Gen_UCD.Driver is
-begin
-   if Ada.Command_Line.Argument_Count /= 2 then
-      raise Program_Error;
-   end if;
+   ----------
+   -- Load --
+   ----------
 
-   declare
-      UCD_Root : constant Wide_Wide_String := Decode (Argument (1));
+   procedure Load (UCD_Root : Wide_Wide_String) is
+      Name_Field : constant Data_File_Loaders.Field_Index := 1;
+      --  Index of the data field with name of the property.
+
+      Loader : UCD.Data_File_Loaders.File_Loader;
 
    begin
-      UCD.Property_Aliases_Loader.Load (UCD_Root);
-      UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+      Loader.Open (UCD_Root, "emoji/emoji-data.txt");
 
-      UCD.Characters.Initialize_Character_Database;
+      while not Loader.End_Of_File loop
+         declare
+            First_Code : UCD.Code_Point;
+            Last_Code  : UCD.Code_Point;
 
-      UCD.Unicode_Data_Loader.Load (UCD_Root);
-      UCD.Prop_List_Loader.Load (UCD_Root);
-      UCD.Derived_Core_Properties_Loader.Load (UCD_Root);
-      UCD.Derived_Normalization_Props_Loader.Load (UCD_Root);
-      UCD.Special_Casing_Loader.Load (UCD_Root);
-      UCD.Case_Folding_Loader.Load (UCD_Root);
-      UCD.Emoji_Data_Loader.Load (UCD_Root);
-   end;
+         begin
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
-   Put_Line ("Processing...");
-   Gen_UCD.Core_Properties.Build;
-   Gen_UCD.Casing.Build;
+            declare
+               Property : constant not null Properties.Property_Access :=
+                 Properties.Resolve (Loader.Get_Field (Name_Field));
 
-   declare
-      Ada_File : File_Type;
+            begin
+               for Code in First_Code .. Last_Code loop
+                  Characters.Set
+                    (Code, Property, Property.Name_To_Value.Element
+                       (To_Unbounded_Wide_Wide_String ("Y")));
+               end loop;
+            end;
 
-   begin
-      Put_Line ("Generating...");
+            Loader.Skip_Line;
+         end;
+      end loop;
+   end Load;
 
-      Create (Ada_File, Out_File, Argument (2));
-
-      Gen_UCD.Core_Properties.Generate (Ada_File);
-      Gen_UCD.Casing.Generate (Ada_File);
-
-      Close (Ada_File);
-   end;
-end Gen_UCD.Driver;
+end UCD.Emoji_Data_Loader;

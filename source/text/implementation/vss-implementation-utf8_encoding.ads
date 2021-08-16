@@ -71,4 +71,14 @@ package VSS.Implementation.UTF8_Encoding is
       Success : in out Boolean;
       Error   : out UTF8_Decode_Error);
 
+   procedure Unchecked_Store
+     (Storage : in out VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Length  : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Unit_1  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_2  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_3  : VSS.Unicode.UTF8_Code_Unit;
+      Unit_4  : VSS.Unicode.UTF8_Code_Unit) with Inline_Always;
+   --  Store encoded character.
+
 end VSS.Implementation.UTF8_Encoding;

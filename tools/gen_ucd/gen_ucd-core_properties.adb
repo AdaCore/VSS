@@ -486,6 +486,9 @@ package body Gen_UCD.Core_Properties is
    begin
       Put_Line ("   ... core properties");
 
+      Put_Line (File, "pragma Restrictions (No_Elaboration_Code);");
+      New_Line (File);
+
       Put_Line (File, "with Interfaces;");
       New_Line (File);
       Put_Line (File, "package VSS.Implementation.UCD_Core is");
@@ -586,20 +589,13 @@ package body Gen_UCD.Core_Properties is
 
          Put_Line
            (File,
-            "   type Core_Data_Record (Raw : Boolean := False) is record");
-         Put_Line (File, "      case Raw is");
-         Put_Line (File, "         when True =>");
-         Put_Line (File, "            Data : Interfaces.Unsigned_8;");
-         New_Line (File);
-         Put_Line (File, "         when False =>");
-         Put_Line (File, "            GC     : GC_Values;");
-         Put_Line (File, "            OLower : Boolean;");
-         Put_Line (File, "            OUpper : Boolean;");
-         Put_Line (File, "      end case;");
+            "   type Core_Data_Record is record");
+         Put_Line (File, "      GC     : GC_Values;");
+         Put_Line (File, "      OLower : Boolean;");
+         Put_Line (File, "      OUpper : Boolean;");
          Put_Line (File, "   end record;");
-         Put_Line (File, "   pragma Unchecked_Union (Core_Data_Record);");
+         Put_Line (File, "   for Core_Data_Record'Size use 8;");
          Put_Line (File, "   for Core_Data_Record use record");
-         Put_Line (File, "      Data   at 0 range 0 .. 7;");
          Put_Line (File, "      GC     at 0 range 0 .. 4;");
          Put_Line (File, "      OLower at 0 range 5 .. 5;");
          Put_Line (File, "      OUpper at 0 range 6 .. 6;");
@@ -610,6 +606,20 @@ package body Gen_UCD.Core_Properties is
            (File,
             "   type Index_Table_Array is array (Core_Index) of Core_Offset;");
          Put_Line (File, "   pragma Pack (Index_Table_Array);");
+         New_Line (File);
+
+         Put_Line
+           (File,
+            "   type Core_Data_Array is"
+            & " array (Core_Offset) of Core_Data_Record;");
+         Put_Line (File, "   pragma Pack (Core_Data_Array);");
+         New_Line (File);
+
+         Put_Line
+           (File,
+            "   type Core_Data_Raw_Array is"
+            & " array (Core_Offset) of Interfaces.Unsigned_8;");
+         Put_Line (File, "   pragma Pack (Core_Data_Raw_Array);");
          New_Line (File);
       end;
 
@@ -653,8 +663,7 @@ package body Gen_UCD.Core_Properties is
       begin
          Put_Line
            (File,
-            "   Core_Data_Table : "
-            & "constant array (Core_Offset) of Core_Data_Record :=");
+            "   Core_Data_Raw_Table : constant Core_Data_Raw_Array :=");
 
          for J in 0 .. Database.Data_Index_Last loop
             Put (Image, Integer (Database.Data_Table_Element (J)), 16);
@@ -662,7 +671,7 @@ package body Gen_UCD.Core_Properties is
             if J = 0 then
                Put (File, "     (");
 
-            elsif J mod 4 = 0 then
+            elsif J mod 8 = 0 then
                Put_Line (File, ",");
                Put (File, "      ");
 
@@ -670,10 +679,19 @@ package body Gen_UCD.Core_Properties is
                Put (File, ", ");
             end if;
 
-            Put (File, "(True, " & Trim (Image, Both) & ")");
+            Put (File, Trim (Image, Both));
          end loop;
 
          Put_Line (File, ");");
+         New_Line (File);
+
+         Put_Line
+           (File,
+            "   Core_Data_Table : constant Core_Data_Array");
+         Put_Line
+           (File,
+            "     with Import, Convention => Ada,"
+            & " Address => Core_Data_Raw_Table'Address;");
          New_Line (File);
       end;
 

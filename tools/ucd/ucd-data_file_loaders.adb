@@ -31,6 +31,9 @@ package body UCD.Data_File_Loaders is
 
    function To_Code_Point (Item : Wide_Wide_String) return UCD.Code_Point;
 
+   function Parse_Sequence_Of_Code_Unit
+     (Buffer : Wide_Wide_String) return UCD.Code_Point_Vectors.Vector;
+
    -----------
    -- Close --
    -----------
@@ -172,9 +175,94 @@ package body UCD.Data_File_Loaders is
 
    function Get_Field
      (Self  : File_Loader;
-      Index : Field_Index) return UCD.Code_Point_Vectors.Vector
+      Index : Field_Index) return UCD.Code_Point_Vectors.Vector is
+   begin
+      return Parse_Sequence_Of_Code_Unit (Self.Get_Field (Index));
+   end Get_Field;
+
+   ---------------
+   -- Get_Field --
+   ---------------
+
+   procedure Get_Field
+     (Self  : File_Loader;
+      Index : Field_Index;
+      Tag   : out Unbounded_Wide_Wide_String;
+      Data  : out UCD.Code_Point_Vectors.Vector)
    is
       Buffer  : constant Wide_Wide_String := Self.Get_Field (Index);
+      First   : Positive;
+      Current : Positive;
+
+   begin
+      if Buffer'First > Buffer'Last then
+         Tag := Null_Unbounded_Wide_Wide_String;
+         Data := UCD.Code_Point_Vectors.Empty_Vector;
+
+         return;
+      end if;
+
+      First := Buffer'First;
+
+      if Buffer (First) = '<' then
+         Current := First + 1;
+
+         while Buffer (Current) /= '>' loop
+            Current := Current + 1;
+         end loop;
+
+         Tag := To_Unbounded_Wide_Wide_String (Buffer (First .. Current));
+         First := Current + 1;
+
+         --  Skip spaces
+
+         for J in First .. Buffer'Last loop
+            First := J;
+
+            exit when Buffer (J) /= ' ';
+         end loop;
+
+      else
+         Tag := Null_Unbounded_Wide_Wide_String;
+      end if;
+
+      Data := Parse_Sequence_Of_Code_Unit (Buffer (First .. Buffer'Last));
+   end Get_Field;
+
+   ---------------
+   -- Has_Field --
+   ---------------
+
+   function Has_Field
+     (Self : File_Loader; Index : Field_Index) return Boolean is
+   begin
+      return
+        Self.Fields (Index).First /= Self.Buffer'First
+          or else Self.Fields (Index).First <= Self.Fields (Index).Last;
+   end Has_Field;
+
+   ----------
+   -- Open --
+   ----------
+
+   procedure Open
+     (Self      : in out File_Loader;
+      UCD_Root  : Wide_Wide_String;
+      File_Name : Wide_Wide_String)
+   is
+   begin
+      Put_Line ("Loading " & File_Name & "...");
+      Open (Self.File, In_File, Encode (UCD_Root & '/' & File_Name), "wcem=8");
+      Self.Scan_Next_Line;
+   end Open;
+
+   ---------------------------------
+   -- Parse_Sequence_Of_Code_Unit --
+   ---------------------------------
+
+   function Parse_Sequence_Of_Code_Unit
+     (Buffer : Wide_Wide_String) return UCD.Code_Point_Vectors.Vector
+   is
       First   : Positive;
       Last    : Positive;
       Current : Positive;
@@ -210,34 +298,7 @@ package body UCD.Data_File_Loaders is
             end loop;
          end loop;
       end return;
-   end Get_Field;
-
-   ---------------
-   -- Has_Field --
-   ---------------
-
-   function Has_Field
-     (Self : File_Loader; Index : Field_Index) return Boolean is
-   begin
-      return
-        Self.Fields (Index).First /= Self.Buffer'First
-          or else Self.Fields (Index).First <= Self.Fields (Index).Last;
-   end Has_Field;
-
-   ----------
-   -- Open --
-   ----------
-
-   procedure Open
-     (Self      : in out File_Loader;
-      UCD_Root  : Wide_Wide_String;
-      File_Name : Wide_Wide_String)
-   is
-   begin
-      Put_Line ("Loading " & File_Name & "...");
-      Open (Self.File, In_File, Encode (UCD_Root & '/' & File_Name), "wcem=8");
-      Self.Scan_Next_Line;
-   end Open;
+   end Parse_Sequence_Of_Code_Unit;
 
    --------------------
    -- Scan_Next_Line --

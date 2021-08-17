@@ -25,14 +25,14 @@ with VSS.Strings.Cursors.Markers;
 pragma Unreferenced (VSS.Strings.Cursors.Markers);
 --  XXX GNAT 20210710: crash without clause above.
 
-package body VSS.Strings.Cursors.Iterators.Graphemes is
+package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    -------------
    -- Forward --
    -------------
 
    overriding function Forward
-     (Self : in out Grapheme_Iterator) return Boolean is
+     (Self : in out Grapheme_Cluster_Iterator) return Boolean is
    begin
       raise Program_Error;
       return False;
@@ -42,7 +42,8 @@ package body VSS.Strings.Cursors.Iterators.Graphemes is
    -- Has_Element --
    -----------------
 
-   overriding function Has_Element (Self : Grapheme_Iterator) return Boolean is
+   overriding function Has_Element
+     (Self : Grapheme_Cluster_Iterator) return Boolean is
    begin
       raise Program_Error;
       return False;
@@ -53,7 +54,7 @@ package body VSS.Strings.Cursors.Iterators.Graphemes is
    ----------------
 
    procedure Initialize
-     (Self            : in out Grapheme_Iterator'Class;
+     (Self            : in out Grapheme_Cluster_Iterator'Class;
       String          : Virtual_String'Class;
       Position        : VSS.Implementation.Strings.Cursor)
    is
@@ -67,7 +68,7 @@ package body VSS.Strings.Cursors.Iterators.Graphemes is
    -- Invalidate --
    ----------------
 
-   overriding procedure Invalidate (Self : in out Grapheme_Iterator) is
+   overriding procedure Invalidate (Self : in out Grapheme_Cluster_Iterator) is
    begin
       Abstract_Segment_Iterator (Self).Invalidate;
    end Invalidate;
@@ -77,7 +78,7 @@ package body VSS.Strings.Cursors.Iterators.Graphemes is
    ---------------------
 
    overriding procedure String_Modified
-     (Self     : in out Grapheme_Iterator;
+     (Self     : in out Grapheme_Cluster_Iterator;
       Start    : VSS.Implementation.Strings.Cursor;
       Removed  : VSS.Implementation.Strings.Cursor_Offset;
       Inserted : VSS.Implementation.Strings.Cursor_Offset) is
@@ -85,4 +86,4 @@ package body VSS.Strings.Cursors.Iterators.Graphemes is
       null;
    end String_Modified;
 
-end VSS.Strings.Cursors.Iterators.Graphemes;
+end VSS.Strings.Cursors.Iterators.Grapheme_Clusters;

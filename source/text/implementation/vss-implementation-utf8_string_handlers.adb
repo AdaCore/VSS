@@ -1754,6 +1754,97 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end if;
    end Reference;
 
+   -----------
+   -- Slice --
+   -----------
+
+   overriding procedure Slice
+     (Self        : UTF8_String_Handler;
+      Source_Data : VSS.Implementation.Strings.String_Data;
+      From        : VSS.Implementation.Strings.Cursor;
+      To          : VSS.Implementation.Strings.Cursor;
+      Target_Data : out VSS.Implementation.Strings.String_Data)
+   is
+      Source : constant UTF8_String_Data_Access
+        with Import,
+             Convention => Ada,
+             Address    => Source_Data.Pointer'Address;
+
+      Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length : VSS.Implementation.Strings.Character_Count;
+      After  : VSS.Implementation.Strings.Cursor := To;
+
+   begin
+      if From.Index > To.Index then
+         Target_Data := VSS.Implementation.Strings.Null_String_Data;
+
+         return;
+      end if;
+
+      Unchecked_Forward (Source.Storage, After);
+
+      Size   := After.UTF8_Offset - From.UTF8_Offset;
+      Length := After.Index - From.Index;
+
+      if Size <= In_Place_Storage_Capacity
+        and then
+          VSS.Implementation.String_Configuration.In_Place_Handler.all
+            in UTF8_In_Place_String_Handler
+      then
+         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
+           (Target_Data);
+
+         Unchecked_Append
+           (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length);
+
+      elsif Size > In_Place_Storage_Capacity then
+         Self.Initialize (Target_Data);
+
+         Unchecked_Append
+           (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length);
+
+      else
+         VSS.Implementation.String_Handlers.Abstract_String_Handler
+           (Self).Slice (Source_Data, From, To, Target_Data);
+      end if;
+   end Slice;
+
+   -----------
+   -- Slice --
+   -----------
+
+   overriding procedure Slice
+     (Self        : UTF8_In_Place_String_Handler;
+      Source_Data : VSS.Implementation.Strings.String_Data;
+      From        : VSS.Implementation.Strings.Cursor;
+      To          : VSS.Implementation.Strings.Cursor;
+      Target_Data : out VSS.Implementation.Strings.String_Data)
+   is
+      Source : constant UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Source_Data'Address;
+
+      Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length : VSS.Implementation.Strings.Character_Count;
+      After  : VSS.Implementation.Strings.Cursor := To;
+
+   begin
+      if From.Index > To.Index then
+         Target_Data := VSS.Implementation.Strings.Null_String_Data;
+
+         return;
+      end if;
+
+      Unchecked_Forward (Source.Storage, After);
+
+      Size   := After.UTF8_Offset - From.UTF8_Offset;
+      Length := After.Index - From.Index;
+
+      Self.Initialize (Target_Data);
+
+      Unchecked_Append
+        (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length);
+   end Slice;
+
    -----------------
    -- Split_Lines --
    -----------------
@@ -2028,7 +2119,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
                    Address => Target_Data.Pointer'Address;
 
          begin
-            if Target.Size + Size > Target.Bulk then
+            if Target = null then
+               Target := Allocate (0, Size);
+
+            elsif Target.Size + Size > Target.Bulk then
                Reallocate (Target, 0, Target.Size + Size);
             end if;
 

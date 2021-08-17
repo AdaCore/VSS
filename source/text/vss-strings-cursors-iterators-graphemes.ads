@@ -21,64 +21,36 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;      use Ada.Command_Line;
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+package VSS.Strings.Cursors.Iterators.Graphemes is
 
-with UCD.Case_Folding_Loader;
-with UCD.Characters;
-with UCD.Derived_Core_Properties_Loader;
-with UCD.Derived_Normalization_Props_Loader;
-with UCD.Emoji_Data_Loader;
-with UCD.Prop_List_Loader;
-with UCD.Property_Aliases_Loader;
-with UCD.Property_Value_Aliases_Loader;
-with UCD.Special_Casing_Loader;
-with UCD.Unicode_Data_Loader;
+   pragma Preelaborate;
 
-with Gen_UCD.Casing;
-with Gen_UCD.Core_Properties;
+   type Grapheme_Iterator is new Abstract_Segment_Iterator with private;
 
-procedure Gen_UCD.Driver is
-begin
-   if Ada.Command_Line.Argument_Count /= 2 then
-      raise Program_Error;
-   end if;
+private
 
-   declare
-      UCD_Root : constant Wide_Wide_String := Decode (Argument (1));
+   type Grapheme_Iterator is new Abstract_Segment_Iterator with record
+      null;
+   end record;
 
-   begin
-      UCD.Property_Aliases_Loader.Load (UCD_Root);
-      UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+   overriding procedure Invalidate (Self : in out Grapheme_Iterator);
 
-      UCD.Characters.Initialize_Character_Database;
+   overriding procedure String_Modified
+     (Self     : in out Grapheme_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset);
 
-      UCD.Unicode_Data_Loader.Load (UCD_Root);
-      UCD.Prop_List_Loader.Load (UCD_Root);
-      UCD.Derived_Core_Properties_Loader.Load (UCD_Root);
-      UCD.Derived_Normalization_Props_Loader.Load (UCD_Root);
-      UCD.Special_Casing_Loader.Load (UCD_Root);
-      UCD.Case_Folding_Loader.Load (UCD_Root);
-      UCD.Emoji_Data_Loader.Load (UCD_Root);
-   end;
+   overriding function Forward
+     (Self : in out Grapheme_Iterator) return Boolean;
 
-   Put_Line ("Processing...");
-   Gen_UCD.Core_Properties.Build;
-   Gen_UCD.Casing.Build;
+   overriding function Has_Element (Self : Grapheme_Iterator) return Boolean;
 
-   declare
-      Ada_File : File_Type;
+   procedure Initialize
+     (Self            : in out Grapheme_Iterator'Class;
+      String          : Virtual_String'Class;
+      Position        : VSS.Implementation.Strings.Cursor);
+   --  Initialize iterator and lookup for grapheme boundaries around the given
+   --  position.
 
-   begin
-      Put_Line ("Generating...");
-
-      Create (Ada_File, Out_File, Argument (2));
-
-      Gen_UCD.Core_Properties.Generate (Ada_File);
-      Gen_UCD.Casing.Generate (Ada_File);
-
-      Close (Ada_File);
-   end;
-end Gen_UCD.Driver;
+end VSS.Strings.Cursors.Iterators.Graphemes;

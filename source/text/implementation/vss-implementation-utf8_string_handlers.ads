@@ -138,6 +138,13 @@ package VSS.Implementation.UTF8_String_Handlers is
       return Ada.Strings.UTF_Encoding.UTF_8_String;
    --  Converts string data into standard UTF_8_String.
 
+   overriding procedure Slice
+     (Self        : UTF8_String_Handler;
+      Source_Data : VSS.Implementation.Strings.String_Data;
+      From        : VSS.Implementation.Strings.Cursor;
+      To          : VSS.Implementation.Strings.Cursor;
+      Target_Data : out VSS.Implementation.Strings.String_Data);
+
    overriding procedure Append
      (Self   : UTF8_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
@@ -297,6 +304,13 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data : VSS.Implementation.Strings.String_Data)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
    --  Converts string data into standard UTF_8_String.
+
+   overriding procedure Slice
+     (Self        : UTF8_In_Place_String_Handler;
+      Source_Data : VSS.Implementation.Strings.String_Data;
+      From        : VSS.Implementation.Strings.Cursor;
+      To          : VSS.Implementation.Strings.Cursor;
+      Target_Data : out VSS.Implementation.Strings.String_Data);
 
    overriding procedure Append
      (Self   : UTF8_In_Place_String_Handler;

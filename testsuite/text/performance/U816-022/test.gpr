@@ -1,0 +1,9 @@
+
+with "../../../../gnat/vss_text.gpr";
+
+project Test is
+
+   for Object_Dir use ".objs";
+   for Main use ("main.adb");
+
+end Test;

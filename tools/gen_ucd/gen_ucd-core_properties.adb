@@ -22,15 +22,17 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Hashed_Maps;
+with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Ada.Strings;                       use Ada.Strings;
 with Ada.Strings.Wide_Wide_Fixed;       use Ada.Strings.Wide_Wide_Fixed;
 with Ada.Strings.Wide_Wide_Unbounded;   use Ada.Strings.Wide_Wide_Unbounded;
+with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
 with Ada.Wide_Wide_Characters.Handling; use Ada.Wide_Wide_Characters.Handling;
 with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
-with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Interfaces;
 
+with Gen_UCD.Unsigned_Types;
 with UCD.Characters;
 with UCD.Properties;
 
@@ -54,20 +56,16 @@ package body Gen_UCD.Core_Properties is
 
    package Database is
 
-      --  type Field_5 is (Field_5_1);
-
-      type Unsigned_5 is mod 2 ** 5;
-      for Unsigned_5'Size use 5;
-
       procedure Initialize (Record_Size : Positive);
 
       procedure Compress;
 
-      procedure Set_5 (Code : UCD.Code_Point; To : Unsigned_5);
+      procedure Set_GC
+        (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_Types.Unsigned_5);
 
-      procedure Set_1_6 (Code : UCD.Code_Point; To : Boolean);
+      procedure Set_OLower (Code : UCD.Code_Point; To : Boolean);
 
-      procedure Set_1_7 (Code : UCD.Code_Point; To : Boolean);
+      procedure Set_OUpper (Code : UCD.Code_Point; To : Boolean);
 
       --  procedure Set_1_8 (Code : Code_Point; To : Boolean);
 
@@ -84,7 +82,7 @@ package body Gen_UCD.Core_Properties is
       function Index_Table_Element (Index : Natural) return Natural;
 
       function Data_Table_Element
-        (Index : Natural) return Interfaces.Unsigned_8;
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_8;
 
    end Database;
 
@@ -122,17 +120,17 @@ package body Gen_UCD.Core_Properties is
 
       begin
          for Code in UCD.Code_Point loop
-            Database.Set_5
+            Database.Set_GC
               (Code,
-               Database.Unsigned_5
+               Gen_UCD.Unsigned_Types.Unsigned_5
                  (GC_Mapping.Element
                       (UCD.Characters.Get (Code, GC_Property))));
 
-            Database.Set_1_6
+            Database.Set_OLower
               (Code,
                UCD.Characters.Get
                  (Code, OLower_Property).Names.First_Element = "Y");
-            Database.Set_1_7
+            Database.Set_OUpper
               (Code,
                UCD.Characters.Get
                  (Code, OUpper_Property).Names.First_Element = "Y");
@@ -157,70 +155,55 @@ package body Gen_UCD.Core_Properties is
 
    package body Database is
 
-      type Unsigned_1 is mod 2 ** 1;
-      for Unsigned_1'Size use 1;
+      use type Gen_UCD.Unsigned_Types.Unsigned_32;
 
-      type Unsigned_8 is mod 2 ** 8;
-      for Unsigned_8'Size use 8;
-
-      type Unsigned_16 is mod 2 ** 16;
-      for Unsigned_16'Size use 16;
-
-      type Unsigned_32 is mod 2 ** 32;
-      for Unsigned_32'Size use 32;
-
-      type Field_Size is (F1, F5, F8);
-
-      type Union_8 (Size : Field_Size := F5) is record
-         case Size is
-            when F1 =>
-               F1_1 : Unsigned_1;
-               F1_2 : Unsigned_1;
-               F1_3 : Unsigned_1;
-               F1_4 : Unsigned_1;
-               F1_5 : Unsigned_1;
-               F1_6 : Unsigned_1;
-               F1_7 : Unsigned_1;
-               F1_8 : Unsigned_1;
-
-            when F5 =>
-               F5_1 : Unsigned_5;
-
-            when F8 =>
-               F8_1 : Unsigned_8;
-         end case;
+      type Core_Data_Record is record
+         GC         : Gen_UCD.Unsigned_Types.Unsigned_5 := 0;
+         OLower     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
+         OUpper     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
+         Reserved_1 : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
       end record;
-      pragma Pack (Union_8);
-      pragma Unchecked_Union (Union_8);
-      for Union_8'Size use 8;
+      for Core_Data_Record'Size use 8;
+      for Core_Data_Record use record
+         GC         at 0 range 0 .. 4;
+         OLower     at 0 range 5 .. 5;
+         OUpper     at 0 range 6 .. 6;
+         Reserved_1 at 0 range 7 .. 7;
+      end record;
 
-      type Union_8_Array is array (Unsigned_32 range <>) of Union_8;
+      type Core_Data_Array is
+        array (Gen_UCD.Unsigned_Types.Unsigned_32 range <>)
+          of Core_Data_Record;
 
-      type Union_8_Array_Access is access all Union_8_Array;
+      type Core_Data_Array_Access is access all Core_Data_Array;
 
-      type Unsigned_32_Array is array (Unsigned_32 range <>) of Unsigned_32;
+      type Unsigned_32_Array is
+        array (Gen_UCD.Unsigned_Types.Unsigned_32 range <>)
+          of Gen_UCD.Unsigned_Types.Unsigned_32;
 
       type Unsigned_32_Array_Access is access all Unsigned_32_Array;
 
-      Raw         : Union_8_Array_Access;
-      Record_Size : Unsigned_32;
+      Raw         : Core_Data_Array_Access;
 
-      Compressed_Block_Size : Unsigned_32;
-      Compressed_Data       : Union_8_Array_Access;
-      Compressed_Data_Last  : Unsigned_32;
+      Compressed_Block_Size : Gen_UCD.Unsigned_Types.Unsigned_32;
+      Compressed_Data       : Core_Data_Array_Access;
+      Compressed_Data_Last  : Gen_UCD.Unsigned_Types.Unsigned_32;
       Index_Data            : Unsigned_32_Array_Access;
 
       procedure Free is
-        new Ada.Unchecked_Deallocation (Union_8_Array, Union_8_Array_Access);
+        new Ada.Unchecked_Deallocation
+              (Core_Data_Array, Core_Data_Array_Access);
 
       procedure Free is
         new Ada.Unchecked_Deallocation
           (Unsigned_32_Array, Unsigned_32_Array_Access);
 
-      procedure Compress (Block_Size : Unsigned_32; Done : in out Boolean);
+      procedure Compress
+        (Block_Size : Gen_UCD.Unsigned_Types.Unsigned_32;
+         Done       : in out Boolean);
 
       function Memory_Consumption
-        (Compressed_Data_Last : Unsigned_32;
+        (Compressed_Data_Last : Gen_UCD.Unsigned_Types.Unsigned_32;
          Index_Data           : Unsigned_32_Array) return Integer;
 
       ----------------
@@ -257,37 +240,36 @@ package body Gen_UCD.Core_Properties is
       -- Compress --
       --------------
 
-      procedure Compress (Block_Size : Unsigned_32; Done : in out Boolean) is
+      procedure Compress
+        (Block_Size : Gen_UCD.Unsigned_Types.Unsigned_32;
+         Done       : in out Boolean)
+      is
 
          function Is_Equal
-           (Raw_Block  : Unsigned_32;
-            Compressed : Unsigned_32) return Boolean;
+           (Raw_Block  : Gen_UCD.Unsigned_Types.Unsigned_32;
+            Compressed : Gen_UCD.Unsigned_Types.Unsigned_32) return Boolean;
 
          --------------
          -- Is_Equal --
          --------------
 
          function Is_Equal
-           (Raw_Block  : Unsigned_32;
-            Compressed : Unsigned_32) return Boolean is
+           (Raw_Block  : Gen_UCD.Unsigned_Types.Unsigned_32;
+            Compressed : Gen_UCD.Unsigned_Types.Unsigned_32) return Boolean is
          begin
-            for Offset in 0 .. Block_Size - 1 loop
-               if Raw (Raw_Block * Block_Size + Offset).F8_1
-                 /= Compressed_Data (Compressed + Offset).F8_1
-               then
-                  return False;
-               end if;
-            end loop;
-
-            return True;
+            return
+              Raw (Raw_Block * Block_Size .. (Raw_Block + 1) * Block_Size - 1)
+                = Compressed_Data (Compressed .. Compressed + Block_Size - 1);
          end Is_Equal;
 
-         Previous_Compressed_Block_Size : constant Unsigned_32 :=
-           Compressed_Block_Size;
-         Previous_Compressed_Data       : Union_8_Array_Access :=
+         Previous_Compressed_Block_Size : constant
+           Gen_UCD.Unsigned_Types.Unsigned_32 :=
+             Compressed_Block_Size;
+         Previous_Compressed_Data       : Core_Data_Array_Access :=
            Compressed_Data;
-         Previous_Compressed_Data_Last  : constant  Unsigned_32 :=
-           Compressed_Data_Last;
+         Previous_Compressed_Data_Last  : constant
+           Gen_UCD.Unsigned_Types.Unsigned_32 :=
+             Compressed_Data_Last;
          Previous_Index_Data            : Unsigned_32_Array_Access :=
            Index_Data;
 
@@ -299,7 +281,7 @@ package body Gen_UCD.Core_Properties is
          end if;
 
          Compressed_Block_Size := Block_Size;
-         Compressed_Data := new Union_8_Array (Raw'Range);
+         Compressed_Data := new Core_Data_Array (Raw'Range);
          Index_Data :=
            new Unsigned_32_Array (0 .. Raw'Length / Block_Size - 1);
 
@@ -381,10 +363,17 @@ package body Gen_UCD.Core_Properties is
       ------------------------
 
       function Data_Table_Element
-        (Index : Natural) return Interfaces.Unsigned_8 is
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_8
+      is
+         function To_Unsigned_8 is
+           new Ada.Unchecked_Conversion
+                 (Core_Data_Record, Gen_UCD.Unsigned_Types.Unsigned_8);
+
       begin
          return
-           Interfaces.Unsigned_8 (Compressed_Data (Unsigned_32 (Index)).F8_1);
+           To_Unsigned_8
+             (Compressed_Data
+                (Gen_UCD.Unsigned_Types.Unsigned_32 (Index)));
       end Data_Table_Element;
 
       ----------------
@@ -402,7 +391,8 @@ package body Gen_UCD.Core_Properties is
 
       function Index_Table_Element (Index : Natural) return Natural is
       begin
-         return Natural (Index_Data (Unsigned_32 (Index)));
+         return
+           Natural (Index_Data (Gen_UCD.Unsigned_Types.Unsigned_32 (Index)));
       end Index_Table_Element;
 
       ----------------
@@ -415,11 +405,9 @@ package body Gen_UCD.Core_Properties is
             raise Program_Error;
          end if;
 
-         Database.Record_Size := 1;
          Raw :=
-           new Union_8_Array'
-             (0 .. Unsigned_32 (UCD.Code_Point'Last) * Database.Record_Size =>
-                (F8, 0));
+           new Core_Data_Array
+             (0 .. Gen_UCD.Unsigned_Types.Unsigned_32 (UCD.Code_Point'Last));
       end Initialize;
 
       ------------------------
@@ -427,34 +415,48 @@ package body Gen_UCD.Core_Properties is
       ------------------------
 
       function Memory_Consumption
-        (Compressed_Data_Last : Unsigned_32;
+        (Compressed_Data_Last : Gen_UCD.Unsigned_Types.Unsigned_32;
          Index_Data           : Unsigned_32_Array) return Integer is
       begin
          return
            Integer
              (Compressed_Data_Last + 1
-              + (if Compressed_Data_Last <= Unsigned_32 (Unsigned_16'Last)
+              + (if Compressed_Data_Last
+                   <= Gen_UCD.Unsigned_Types.Unsigned_32
+                        (Gen_UCD.Unsigned_Types.Unsigned_16'Last)
                 then Index_Data'Length * 2
                 else Index_Data'Length * 4));
       end Memory_Consumption;
 
-      -------------
-      -- Set_1_6 --
-      -------------
+      ------------
+      -- Set_GC --
+      ------------
 
-      procedure Set_1_6 (Code : UCD.Code_Point; To : Boolean) is
+      procedure Set_GC
+        (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_Types.Unsigned_5) is
       begin
-         Raw (Unsigned_32 (Code) * Record_Size).F1_6 := Boolean'Pos (To);
-      end Set_1_6;
+         Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).GC := To;
+      end Set_GC;
 
-      -------------
-      -- Set_1_7 --
-      -------------
+      ----------------
+      -- Set_OLower --
+      ----------------
 
-      procedure Set_1_7 (Code : UCD.Code_Point; To : Boolean) is
+      procedure Set_OLower (Code : UCD.Code_Point; To : Boolean) is
       begin
-         Raw (Unsigned_32 (Code) * Record_Size).F1_7 := Boolean'Pos (To);
-      end Set_1_7;
+         Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).OLower :=
+           Boolean'Pos (To);
+      end Set_OLower;
+
+      ----------------
+      -- Set_OUpper --
+      ----------------
+
+      procedure Set_OUpper (Code : UCD.Code_Point; To : Boolean) is
+      begin
+         Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).OUpper :=
+           Boolean'Pos (To);
+      end Set_OUpper;
 
       -------------
       -- Set_1_8 --
@@ -464,15 +466,6 @@ package body Gen_UCD.Core_Properties is
       --  begin
       --     Raw (Unsigned_32 (Code) * Record_Size).F1_8 := Boolean'Pos (To);
       --  end Set_1_8;
-
-      -----------
-      -- Set_5 --
-      -----------
-
-      procedure Set_5 (Code : UCD.Code_Point; To : Unsigned_5) is
-      begin
-         Raw (Unsigned_32 (Code) * Record_Size).F5_1 := To;
-      end Set_5;
 
       -----------------------
       -- Uncompressed_Size --
@@ -492,6 +485,9 @@ package body Gen_UCD.Core_Properties is
    procedure Generate (File : Ada.Wide_Wide_Text_IO.File_Type) is
    begin
       Put_Line ("   ... core properties");
+
+      Put_Line (File, "pragma Restrictions (No_Elaboration_Code);");
+      New_Line (File);
 
       Put_Line (File, "with Interfaces;");
       New_Line (File);
@@ -593,20 +589,13 @@ package body Gen_UCD.Core_Properties is
 
          Put_Line
            (File,
-            "   type Core_Data_Record (Raw : Boolean := False) is record");
-         Put_Line (File, "      case Raw is");
-         Put_Line (File, "         when True =>");
-         Put_Line (File, "            Data : Interfaces.Unsigned_8;");
-         New_Line (File);
-         Put_Line (File, "         when False =>");
-         Put_Line (File, "            GC     : GC_Values;");
-         Put_Line (File, "            OLower : Boolean;");
-         Put_Line (File, "            OUpper : Boolean;");
-         Put_Line (File, "      end case;");
+            "   type Core_Data_Record is record");
+         Put_Line (File, "      GC     : GC_Values;");
+         Put_Line (File, "      OLower : Boolean;");
+         Put_Line (File, "      OUpper : Boolean;");
          Put_Line (File, "   end record;");
-         Put_Line (File, "   pragma Unchecked_Union (Core_Data_Record);");
+         Put_Line (File, "   for Core_Data_Record'Size use 8;");
          Put_Line (File, "   for Core_Data_Record use record");
-         Put_Line (File, "      Data   at 0 range 0 .. 7;");
          Put_Line (File, "      GC     at 0 range 0 .. 4;");
          Put_Line (File, "      OLower at 0 range 5 .. 5;");
          Put_Line (File, "      OUpper at 0 range 6 .. 6;");
@@ -617,6 +606,20 @@ package body Gen_UCD.Core_Properties is
            (File,
             "   type Index_Table_Array is array (Core_Index) of Core_Offset;");
          Put_Line (File, "   pragma Pack (Index_Table_Array);");
+         New_Line (File);
+
+         Put_Line
+           (File,
+            "   type Core_Data_Array is"
+            & " array (Core_Offset) of Core_Data_Record;");
+         Put_Line (File, "   pragma Pack (Core_Data_Array);");
+         New_Line (File);
+
+         Put_Line
+           (File,
+            "   type Core_Data_Raw_Array is"
+            & " array (Core_Offset) of Interfaces.Unsigned_8;");
+         Put_Line (File, "   pragma Pack (Core_Data_Raw_Array);");
          New_Line (File);
       end;
 
@@ -660,8 +663,7 @@ package body Gen_UCD.Core_Properties is
       begin
          Put_Line
            (File,
-            "   Core_Data_Table : "
-            & "constant array (Core_Offset) of Core_Data_Record :=");
+            "   Core_Data_Raw_Table : constant Core_Data_Raw_Array :=");
 
          for J in 0 .. Database.Data_Index_Last loop
             Put (Image, Integer (Database.Data_Table_Element (J)), 16);
@@ -669,7 +671,7 @@ package body Gen_UCD.Core_Properties is
             if J = 0 then
                Put (File, "     (");
 
-            elsif J mod 4 = 0 then
+            elsif J mod 8 = 0 then
                Put_Line (File, ",");
                Put (File, "      ");
 
@@ -677,10 +679,19 @@ package body Gen_UCD.Core_Properties is
                Put (File, ", ");
             end if;
 
-            Put (File, "(True, " & Trim (Image, Both) & ")");
+            Put (File, Trim (Image, Both));
          end loop;
 
          Put_Line (File, ");");
+         New_Line (File);
+
+         Put_Line
+           (File,
+            "   Core_Data_Table : constant Core_Data_Array");
+         Put_Line
+           (File,
+            "     with Import, Convention => Ada,"
+            & " Address => Core_Data_Raw_Table'Address;");
          New_Line (File);
       end;
 

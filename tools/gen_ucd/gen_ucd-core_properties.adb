@@ -82,7 +82,7 @@ package body Gen_UCD.Core_Properties is
       function Index_Table_Element (Index : Natural) return Natural;
 
       function Data_Table_Element
-        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_8;
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_16;
 
    end Database;
 
@@ -162,13 +162,15 @@ package body Gen_UCD.Core_Properties is
          OLower     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
          OUpper     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
          Reserved_1 : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
+         Reserved_2 : Gen_UCD.Unsigned_Types.Unsigned_8 := 0;
       end record;
-      for Core_Data_Record'Size use 8;
+      for Core_Data_Record'Size use 16;
       for Core_Data_Record use record
          GC         at 0 range 0 .. 4;
          OLower     at 0 range 5 .. 5;
          OUpper     at 0 range 6 .. 6;
          Reserved_1 at 0 range 7 .. 7;
+         Reserved_2 at 0 range 8 .. 15;
       end record;
 
       type Core_Data_Array is
@@ -363,11 +365,11 @@ package body Gen_UCD.Core_Properties is
       ------------------------
 
       function Data_Table_Element
-        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_8
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_16
       is
          function To_Unsigned_8 is
            new Ada.Unchecked_Conversion
-                 (Core_Data_Record, Gen_UCD.Unsigned_Types.Unsigned_8);
+                 (Core_Data_Record, Gen_UCD.Unsigned_Types.Unsigned_16);
 
       begin
          return
@@ -420,7 +422,7 @@ package body Gen_UCD.Core_Properties is
       begin
          return
            Integer
-             (Compressed_Data_Last + 1
+             ((Compressed_Data_Last + 1) * 2
               + (if Compressed_Data_Last
                    <= Gen_UCD.Unsigned_Types.Unsigned_32
                         (Gen_UCD.Unsigned_Types.Unsigned_16'Last)
@@ -594,7 +596,7 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "      OLower : Boolean;");
          Put_Line (File, "      OUpper : Boolean;");
          Put_Line (File, "   end record;");
-         Put_Line (File, "   for Core_Data_Record'Size use 8;");
+         Put_Line (File, "   for Core_Data_Record'Size use 16;");
          Put_Line (File, "   for Core_Data_Record use record");
          Put_Line (File, "      GC     at 0 range 0 .. 4;");
          Put_Line (File, "      OLower at 0 range 5 .. 5;");
@@ -618,7 +620,7 @@ package body Gen_UCD.Core_Properties is
          Put_Line
            (File,
             "   type Core_Data_Raw_Array is"
-            & " array (Core_Offset) of Interfaces.Unsigned_8;");
+            & " array (Core_Offset) of Interfaces.Unsigned_16;");
          Put_Line (File, "   pragma Pack (Core_Data_Raw_Array);");
          New_Line (File);
       end;
@@ -671,7 +673,7 @@ package body Gen_UCD.Core_Properties is
             if J = 0 then
                Put (File, "     (");
 
-            elsif J mod 8 = 0 then
+            elsif J mod 6 = 0 then
                Put_Line (File, ",");
                Put (File, "      ");
 

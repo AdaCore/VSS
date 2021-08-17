@@ -111,14 +111,25 @@ package body Gen_UCD.Core_Properties is
       Database.Initialize (8);
 
       declare
+         use type UCD.Properties.Property_Value_Access;
+
          GC_Property      : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("gc");
          OLower_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OLower");
+         OLower_Y         :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (OLower_Property, "Y");
          OUpper_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OUpper");
+         OUpper_Y         :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (OUpper_Property, "Y");
          ExtPict_Property : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("ExtPict");
+         ExtPict_Y        :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (ExtPict_Property, "Y");
 
       begin
          for Code in UCD.Code_Point loop
@@ -130,16 +141,13 @@ package body Gen_UCD.Core_Properties is
 
             Database.Set_OLower
               (Code,
-               UCD.Characters.Get
-                 (Code, OLower_Property).Names.First_Element = "Y");
+               UCD.Characters.Get (Code, OLower_Property) = OLower_Y);
             Database.Set_OUpper
               (Code,
-               UCD.Characters.Get
-                 (Code, OUpper_Property).Names.First_Element = "Y");
+               UCD.Characters.Get (Code, OUpper_Property) = OUpper_Y);
             Database.Set_ExtPict
               (Code,
-               UCD.Characters.Get
-                 (Code, ExtPict_Property).Names.First_Element = "Y");
+               UCD.Characters.Get (Code, ExtPict_Property) = ExtPict_Y);
          end loop;
       end;
 

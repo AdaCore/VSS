@@ -29,7 +29,7 @@ with VSS.Characters;
 private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
-limited with VSS.Strings.Cursors.Iterators.Graphemes;
+limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Texts;
 
@@ -107,18 +107,21 @@ package VSS.Strings is
 
    function First_Grapheme
      (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator;
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the first grapheme of the string.
 
    function Last_Grapheme
      (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator;
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the last grapheme of the string.
 
    function Grapheme
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator;
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the grapheme of the string at the given
    --  position.
 

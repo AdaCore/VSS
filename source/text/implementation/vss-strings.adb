@@ -28,7 +28,7 @@ with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
-with VSS.Strings.Cursors.Iterators.Graphemes;
+with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 with VSS.Strings.Cursors.Iterators.Lines.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
@@ -469,7 +469,8 @@ package body VSS.Strings is
 
    function First_Grapheme
      (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator is
    begin
       raise Program_Error;
       return Self.First_Grapheme;
@@ -497,7 +498,8 @@ package body VSS.Strings is
    function Grapheme
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator is
    begin
       raise Program_Error;
       return Self.Grapheme (Position);
@@ -610,7 +612,8 @@ package body VSS.Strings is
 
    function Last_Grapheme
      (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator is
    begin
       raise Program_Error;
       return Self.Last_Grapheme;

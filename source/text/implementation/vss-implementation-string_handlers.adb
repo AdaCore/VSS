@@ -23,6 +23,8 @@
 
 with System.Storage_Elements;
 
+with VSS.Implementation.String_Configuration;
+
 package body VSS.Implementation.String_Handlers is
 
    use type VSS.Unicode.Code_Point;
@@ -519,13 +521,8 @@ package body VSS.Implementation.String_Handlers is
 
    begin
       if From.Index <= To.Index then
-         Target :=
-           (In_Place => True,
-            Capacity => 0,
-            Storage  => (others => 0),
-            Padding  => <>);
-         --  XXX Should Initialize subprogram be added to string handler to
-         --  be used in cases like this?
+         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
+           (Target);
          Current := From;
 
          VSS.Implementation.Strings.Handler (Target).Append

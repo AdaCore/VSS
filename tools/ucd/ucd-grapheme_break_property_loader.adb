@@ -21,66 +21,59 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;      use Ada.Command_Line;
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-use  Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with UCD.Case_Folding_Loader;
 with UCD.Characters;
-with UCD.Derived_Core_Properties_Loader;
-with UCD.Derived_Normalization_Props_Loader;
-with UCD.Emoji_Data_Loader;
-with UCD.Grapheme_Break_Property_Loader;
-with UCD.Prop_List_Loader;
-with UCD.Property_Aliases_Loader;
-with UCD.Property_Value_Aliases_Loader;
-with UCD.Special_Casing_Loader;
-with UCD.Unicode_Data_Loader;
+with UCD.Data_File_Loaders;
+with UCD.Properties;
 
-with Gen_UCD.Casing;
-with Gen_UCD.Core_Properties;
+package body UCD.Grapheme_Break_Property_Loader is
 
-procedure Gen_UCD.Driver is
-begin
-   if Ada.Command_Line.Argument_Count /= 2 then
-      raise Program_Error;
-   end if;
+   ----------
+   -- Load --
+   ----------
 
-   declare
-      UCD_Root : constant Wide_Wide_String := Decode (Argument (1));
+   procedure Load (UCD_Root : Wide_Wide_String) is
+      GCB_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("GCB");
+      GCB_Other    : constant not null UCD.Properties.Property_Value_Access :=
+        UCD.Properties.Resolve (GCB_Property, "Other");
+      Value_Field : constant Data_File_Loaders.Field_Index := 1;
+      --  Index of the data field with the value of the property.
+
+      Loader : UCD.Data_File_Loaders.File_Loader;
 
    begin
-      UCD.Property_Aliases_Loader.Load (UCD_Root);
-      UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+      --  Setup default value for all characters.
 
-      UCD.Characters.Initialize_Character_Database;
+      for Code in UCD.Code_Point loop
+         UCD.Characters.Set (Code, GCB_Property, GCB_Other);
+      end loop;
 
-      UCD.Unicode_Data_Loader.Load (UCD_Root);
-      UCD.Prop_List_Loader.Load (UCD_Root);
-      UCD.Derived_Core_Properties_Loader.Load (UCD_Root);
-      UCD.Grapheme_Break_Property_Loader.Load (UCD_Root);
-      UCD.Derived_Normalization_Props_Loader.Load (UCD_Root);
-      UCD.Special_Casing_Loader.Load (UCD_Root);
-      UCD.Case_Folding_Loader.Load (UCD_Root);
-      UCD.Emoji_Data_Loader.Load (UCD_Root);
-   end;
+      Loader.Open (UCD_Root, "auxiliary/GraphemeBreakProperty.txt");
 
-   Put_Line ("Processing...");
-   Gen_UCD.Core_Properties.Build;
-   Gen_UCD.Casing.Build;
+      while not Loader.End_Of_File loop
+         declare
+            First_Code : UCD.Code_Point;
+            Last_Code  : UCD.Code_Point;
 
-   declare
-      Ada_File : File_Type;
+         begin
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
-   begin
-      Put_Line ("Generating...");
+            declare
+               Value : constant not null Properties.Property_Value_Access :=
+                 UCD.Properties.Resolve
+                   (GCB_Property, Loader.Get_Field (Value_Field));
 
-      Create (Ada_File, Out_File, Argument (2));
+            begin
+               for Code in First_Code .. Last_Code loop
+                  UCD.Characters.Set (Code, GCB_Property, Value);
+               end loop;
+            end;
 
-      Gen_UCD.Core_Properties.Generate (Ada_File);
-      Gen_UCD.Casing.Generate (Ada_File);
+            Loader.Skip_Line;
+         end;
+      end loop;
+   end Load;
 
-      Close (Ada_File);
-   end;
-end Gen_UCD.Driver;
+end UCD.Grapheme_Break_Property_Loader;

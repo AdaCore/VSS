@@ -67,7 +67,7 @@ package body Gen_UCD.Core_Properties is
 
       procedure Set_OUpper (Code : UCD.Code_Point; To : Boolean);
 
-      --  procedure Set_1_8 (Code : Code_Point; To : Boolean);
+      procedure Set_ExtPict (Code : UCD.Code_Point; To : Boolean);
 
       function Uncompressed_Size return Positive;
 
@@ -111,12 +111,14 @@ package body Gen_UCD.Core_Properties is
       Database.Initialize (8);
 
       declare
-         GC_Property     : constant not null UCD.Properties.Property_Access :=
+         GC_Property      : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("gc");
-         OLower_Property : constant not null UCD.Properties.Property_Access :=
+         OLower_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OLower");
-         OUpper_Property : constant not null UCD.Properties.Property_Access :=
+         OUpper_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OUpper");
+         ExtPict_Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("ExtPict");
 
       begin
          for Code in UCD.Code_Point loop
@@ -134,6 +136,10 @@ package body Gen_UCD.Core_Properties is
               (Code,
                UCD.Characters.Get
                  (Code, OUpper_Property).Names.First_Element = "Y");
+            Database.Set_ExtPict
+              (Code,
+               UCD.Characters.Get
+                 (Code, ExtPict_Property).Names.First_Element = "Y");
          end loop;
       end;
 
@@ -161,16 +167,16 @@ package body Gen_UCD.Core_Properties is
          GC         : Gen_UCD.Unsigned_Types.Unsigned_5 := 0;
          OLower     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
          OUpper     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
-         Reserved_1 : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
-         Reserved_2 : Gen_UCD.Unsigned_Types.Unsigned_8 := 0;
+         ExtPict    : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
+         Reserved_1 : Gen_UCD.Unsigned_Types.Unsigned_8 := 0;
       end record;
       for Core_Data_Record'Size use 16;
       for Core_Data_Record use record
          GC         at 0 range 0 .. 4;
          OLower     at 0 range 5 .. 5;
          OUpper     at 0 range 6 .. 6;
-         Reserved_1 at 0 range 7 .. 7;
-         Reserved_2 at 0 range 8 .. 15;
+         ExtPict    at 0 range 7 .. 7;
+         Reserved_1 at 0 range 8 .. 15;
       end record;
 
       type Core_Data_Array is
@@ -430,6 +436,16 @@ package body Gen_UCD.Core_Properties is
                 else Index_Data'Length * 4));
       end Memory_Consumption;
 
+      -----------------
+      -- Set_ExtPict --
+      -----------------
+
+      procedure Set_ExtPict (Code : UCD.Code_Point; To : Boolean) is
+      begin
+         Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).ExtPict :=
+           Boolean'Pos (To);
+      end Set_ExtPict;
+
       ------------
       -- Set_GC --
       ------------
@@ -459,15 +475,6 @@ package body Gen_UCD.Core_Properties is
          Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).OUpper :=
            Boolean'Pos (To);
       end Set_OUpper;
-
-      -------------
-      -- Set_1_8 --
-      -------------
-
-      --  procedure Set_1_8 (Code : UCD.Code_Point; To : Boolean) is
-      --  begin
-      --     Raw (Unsigned_32 (Code) * Record_Size).F1_8 := Boolean'Pos (To);
-      --  end Set_1_8;
 
       -----------------------
       -- Uncompressed_Size --
@@ -592,15 +599,17 @@ package body Gen_UCD.Core_Properties is
          Put_Line
            (File,
             "   type Core_Data_Record is record");
-         Put_Line (File, "      GC     : GC_Values;");
-         Put_Line (File, "      OLower : Boolean;");
-         Put_Line (File, "      OUpper : Boolean;");
+         Put_Line (File, "      GC      : GC_Values;");
+         Put_Line (File, "      OLower  : Boolean;");
+         Put_Line (File, "      OUpper  : Boolean;");
+         Put_Line (File, "      ExtPict : Boolean;");
          Put_Line (File, "   end record;");
          Put_Line (File, "   for Core_Data_Record'Size use 16;");
          Put_Line (File, "   for Core_Data_Record use record");
-         Put_Line (File, "      GC     at 0 range 0 .. 4;");
-         Put_Line (File, "      OLower at 0 range 5 .. 5;");
-         Put_Line (File, "      OUpper at 0 range 6 .. 6;");
+         Put_Line (File, "      GC      at 0 range 0 .. 4;");
+         Put_Line (File, "      OLower  at 0 range 5 .. 5;");
+         Put_Line (File, "      OUpper  at 0 range 6 .. 6;");
+         Put_Line (File, "      ExtPict at 0 range 7 .. 7;");
          Put_Line (File, "   end record;");
          New_Line (File);
 

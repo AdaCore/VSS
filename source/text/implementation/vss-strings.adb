@@ -467,14 +467,14 @@ package body VSS.Strings is
    -- First_Grapheme --
    --------------------
 
-   function First_Grapheme
+   function First_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
       raise Program_Error;
-      return Self.First_Grapheme;
-   end First_Grapheme;
+      return Self.First_Grapheme_Cluster;
+   end First_Grapheme_Cluster;
 
    ----------------
    -- First_Line --
@@ -495,15 +495,15 @@ package body VSS.Strings is
    -- Grapheme --
    --------------
 
-   function Grapheme
+   function Grapheme_Cluster
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
       raise Program_Error;
-      return Self.Grapheme (Position);
-   end Grapheme;
+      return Self.Grapheme_Cluster (Position);
+   end Grapheme_Cluster;
 
    ----------
    -- Hash --
@@ -610,14 +610,14 @@ package body VSS.Strings is
    -- Last_Grapheme --
    -------------------
 
-   function Last_Grapheme
+   function Last_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
       raise Program_Error;
-      return Self.Last_Grapheme;
-   end Last_Grapheme;
+      return Self.Last_Grapheme_Cluster;
+   end Last_Grapheme_Cluster;
 
    ----------
    -- Line --

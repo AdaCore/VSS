@@ -41,8 +41,9 @@ package VSS.Strings is
    type Character_Count is range 0 .. 2 ** 30 - 1;
    subtype Character_Index is Character_Count range 1 .. Character_Count'Last;
 
-   type Grapheme_Count is range 0 .. 2 ** 30 - 1;
-   subtype Grapheme_Index is Grapheme_Count range 1 .. Grapheme_Count'Last;
+   type Grapheme_Cluster_Count is range 0 .. 2 ** 30 - 1;
+   subtype Grapheme_Cluster_Index is Grapheme_Cluster_Count
+     range 1 .. Grapheme_Cluster_Count'Last;
 
    type Hash_Type is mod 2**64;
 
@@ -105,19 +106,19 @@ package VSS.Strings is
    --  Return iterator pointing to the character at given position. Cursor
    --  must belong to the same string.
 
-   function First_Grapheme
+   function First_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the first grapheme of the string.
 
-   function Last_Grapheme
+   function Last_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the last grapheme of the string.
 
-   function Grapheme
+   function Grapheme_Cluster
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters

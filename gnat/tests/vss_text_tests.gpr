@@ -36,6 +36,7 @@ project VSS_Text_Tests is
                  "test_character_iterators.adb",
                  "test_character_markers.adb",
                  "test_converters.adb",
+                 "test_grapheme_cluster_iterators.adb",
                  "test_line_iterators.adb",
                  "test_string_append",
                  "test_string_casing.adb",

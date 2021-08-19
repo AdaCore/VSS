@@ -21,21 +21,242 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.String_Handlers;
+with VSS.Implementation.UCD_Core;
+
 with VSS.Strings.Cursors.Markers;
 pragma Unreferenced (VSS.Strings.Cursors.Markers);
 --  XXX GNAT 20210710: crash without clause above.
 
 package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
+   use type VSS.Implementation.Strings.Character_Offset;
+
+   procedure Lookup_Grapheme_Cluster_Boundaries
+     (Self     : in out Grapheme_Cluster_Iterator'Class;
+      Position : VSS.Implementation.Strings.Cursor);
+   --  Lookup for grapheme cluster boundaries around given position and setup
+   --  iterator to point to found segment.
+
+   function Extract_Core_Data
+     (Code : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Core.Core_Data_Record;
+   --  Return core data record for the given character.
+
+   -----------------------
+   -- Extract_Core_Data --
+   -----------------------
+
+   function Extract_Core_Data
+     (Code : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Core.Core_Data_Record
+   is
+      use type VSS.Implementation.UCD_Core.Core_Offset;
+      use type VSS.Unicode.Code_Point;
+
+      Block : constant VSS.Implementation.UCD_Core.Core_Index :=
+        VSS.Implementation.UCD_Core.Core_Index
+          (Code / VSS.Implementation.UCD_Core.Block_Size);
+      Offset : constant VSS.Implementation.UCD_Core.Core_Offset :=
+        VSS.Implementation.UCD_Core.Core_Offset
+          (Code mod VSS.Implementation.UCD_Core.Block_Size);
+
+   begin
+      return
+        VSS.Implementation.UCD_Core.Core_Data_Table
+          (VSS.Implementation.UCD_Core.Core_Index_Table (Block) + Offset);
+   end Extract_Core_Data;
+
    -------------
    -- Forward --
    -------------
 
    overriding function Forward
-     (Self : in out Grapheme_Cluster_Iterator) return Boolean is
+     (Self : in out Grapheme_Cluster_Iterator) return Boolean
+   is
+      use all type VSS.Implementation.UCD_Core.GCB_Values;
+
+      type ExtPict_State is
+        (None,
+         Started,
+         Matched,
+         Apply);
+
+      type RI_State is
+        (None,
+         Apply);
+
+      Handler         : constant not null
+        VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+      Last            : VSS.Implementation.Strings.Cursor;
+      Last_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+      Next            : VSS.Implementation.Strings.Cursor;
+      Next_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+      Success         : Boolean;
+      Done            : Boolean := False;
+      RI              : RI_State := None;
+      ExtPict         : ExtPict_State := None;
+
    begin
-      raise Program_Error;
-      return False;
+      Self.First_Position := Self.Last_Position;
+      Success := Handler.Forward (Self.Owner.Data, Self.First_Position);
+
+      if not Success then
+         --  End of the string has been reached.
+         --  XXX Should Last_Position be set to After_Last_Character?
+
+         return False;
+
+      else
+         Next    := Self.First_Position;
+         Next_Properties :=
+           Extract_Core_Data (Handler.Element (Self.Owner.Data, Next));
+
+         loop
+            Last            := Next;
+            Last_Properties := Next_Properties;
+
+            Success := Handler.Forward (Self.Owner.Data, Next);
+
+            if not Success then
+               --  End of line has been reached
+               --  Rule GB2
+
+               Self.Last_Position := Last;
+
+               return True;
+
+            else
+               Next_Properties :=
+                 Extract_Core_Data (Handler.Element (Self.Owner.Data, Next));
+
+               --  Process context for Rule GB11
+
+               if Last_Properties.ExtPict
+                 and then Next_Properties.GCB in GCB_EX
+               then
+                  --  Before context for Rule GB11 has been started.
+
+                  ExtPict := Started;
+
+               elsif Last_Properties.ExtPict
+                 and then Next_Properties.GCB in GCB_ZWJ
+               then
+                  --  Before context for Rule GB11 has been found.
+
+                  ExtPict := Matched;
+
+               elsif ExtPict = Started then
+                  if Next_Properties.GCB = GCB_EX then
+                     --  Consume GCB_EX character, it doesn't change state.
+
+                     null;
+
+                  elsif Next_Properties.GCB = GCB_ZWJ then
+                     --  GCB_ZWJ complete match of the context
+
+                     ExtPict := Matched;
+
+                  else
+                     --  Any other character reset context
+
+                     ExtPict := None;
+                  end if;
+
+               elsif ExtPict = Matched then
+                  ExtPict := Apply;
+               end if;
+
+               --  Process context for Rules GB12, GB13.
+
+               if Last_Properties.GCB = GCB_RI
+                 and Next_Properties.GCB = GCB_RI
+                 and RI = None
+               then
+                  RI := Apply;
+
+               elsif RI /= None then
+                  RI := None;
+               end if;
+
+               if Last_Properties.GCB = GCB_CR
+                 and Next_Properties.GCB = GCB_LF
+               then
+                  --  Rule GB3
+
+                  null;
+
+               elsif Last_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+                  --  Rule GB4
+
+                  Done := True;
+
+               elsif Next_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+                  --  Rule GB5
+
+                  Done := True;
+
+               elsif Last_Properties.GCB = GCB_L
+                 and then Next_Properties.GCB
+               in GCB_L | GCB_V | GCB_LV | GCB_LVT
+               then
+                  --  Rule GB6
+
+                  null;
+
+               elsif Last_Properties.GCB in GCB_LV | GCB_V
+                 and then Next_Properties.GCB in GCB_V | GCB_T
+               then
+                  --  Rule GB7
+
+                  null;
+
+               elsif Last_Properties.GCB in GCB_LVT | GCB_T
+                 and then Next_Properties.GCB = GCB_T
+               then
+                  --  Rule GB8
+
+                  null;
+
+               elsif Next_Properties.GCB in GCB_EX | GCB_ZWJ then
+                  --  Rule GB9
+
+                  null;
+
+               elsif Next_Properties.GCB = GCB_SM then
+                  --  Rule GB9a
+
+                  null;
+
+               elsif Last_Properties.GCB = GCB_PP then
+                  --  Rule GB9b
+
+                  null;
+
+               elsif ExtPict = Apply and Next_Properties.ExtPict then
+                  --  Rule GB11.
+
+                  null;
+
+               elsif RI = Apply then
+                  --  Rule GB12.
+                  --  Rule GB13.
+
+                  null;
+
+               else
+                  Done := True;
+               end if;
+
+               if Done then
+                  Self.Last_Position := Last;
+
+                  return True;
+               end if;
+            end if;
+         end loop;
+      end if;
    end Forward;
 
    -----------------
@@ -56,12 +277,10 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    procedure Initialize
      (Self            : in out Grapheme_Cluster_Iterator'Class;
       String          : Virtual_String'Class;
-      Position        : VSS.Implementation.Strings.Cursor)
-   is
-      pragma Unreferenced (Position);
-
+      Position        : VSS.Implementation.Strings.Cursor) is
    begin
       Self.Connect (String'Unrestricted_Access);
+      Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Initialize;
 
    ----------------
@@ -72,6 +291,44 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    begin
       Abstract_Segment_Iterator (Self).Invalidate;
    end Invalidate;
+
+   ----------------------------------------
+   -- Lookup_Grapheme_Cluster_Boundaries --
+   ----------------------------------------
+
+   procedure Lookup_Grapheme_Cluster_Boundaries
+     (Self     : in out Grapheme_Cluster_Iterator'Class;
+      Position : VSS.Implementation.Strings.Cursor)
+   is
+      Handler : constant not null
+        VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+      Success : Boolean with Unreferenced;
+
+   begin
+      if Position.Index = 0 then
+         --  Before first character of the string.
+
+         Self.First_Position := Position;
+         Self.Last_Position  := Position;
+
+      elsif Position.Index > Handler.Length (Self.Owner.Data) then
+         --  After last character of the string.
+
+         Self.First_Position := Position;
+         Self.Last_Position  := Position;
+
+      elsif Position.Index = 1 then
+         --  First character of the string, it starts first grapheme cluster.
+
+         Handler.Before_First_Character (Self.Owner.Data, Self.First_Position);
+         Handler.Before_First_Character (Self.Owner.Data, Self.Last_Position);
+         Success := Self.Forward;
+
+      else
+         raise Program_Error;
+      end if;
+   end Lookup_Grapheme_Cluster_Boundaries;
 
    ---------------------
    -- String_Modified --

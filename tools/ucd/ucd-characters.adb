@@ -191,23 +191,11 @@ package body UCD.Characters is
       --  Initialize special cases.
 
       --  Unicode 13.0: exception: Extended_Pictographic property is Y by
-      --  default for few ranges of the code points.
-
-      declare
-         ExtPict_Property : constant not null Properties.Property_Access :=
-           Properties.Resolve ("ExtPict");
-         ExtPict_Index    : constant Positive :=
-           Boolean_Property_To_Index (ExtPict_Property);
-
-      begin
-         for C in 16#01_F000# .. 16#01_FAFF# loop
-            Database (Code_Point (C)).Boolean (ExtPict_Index) := True;
-         end loop;
-
-         for C in 16#01_FC00# .. 16#01_FFFD# loop
-            Database (Code_Point (C)).Boolean (ExtPict_Index) := True;
-         end loop;
-      end;
+      --  default for unassigned code points in few ranges of the code points.
+      --
+      --  To construct this property UnicodeData.txt must be loaded first,
+      --  thus it is initialized when corresponding data is loaded from the
+      --  emoji/emoji-data.txt file.
 
       --  Default value for General_Category is 'Cn' ("Unassigned")
 

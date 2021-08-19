@@ -40,6 +40,43 @@ package body UCD.Emoji_Data_Loader is
       Loader : UCD.Data_File_Loaders.File_Loader;
 
    begin
+      --  Unicode 13.0: exception: Extended_Pictographic property is Y by
+      --  default for unassigned code points in few ranges.
+
+      declare
+         use type UCD.Properties.Property_Value_Access;
+
+         GC_Property      : constant not null Properties.Property_Access :=
+           Properties.Resolve ("gc");
+         GC_Unassigned    : constant not null
+           Properties.Property_Value_Access :=
+             Properties.Resolve (GC_Property, "Cn");
+         ExtPict_Property : constant not null Properties.Property_Access :=
+           Properties.Resolve ("ExtPict");
+         ExtPict_Y        : constant not null
+           Properties.Property_Value_Access :=
+             Properties.Resolve (ExtPict_Property, "Y");
+         ExtPict_N        : constant not null
+           Properties.Property_Value_Access :=
+             Properties.Resolve (ExtPict_Property, "N");
+
+      begin
+         for C in UCD.Code_Point loop
+            if C in 16#01_F000# .. 16#01_FAFF# | 16#01_FC00# .. 16#01_FFFD#
+            then
+               if UCD.Characters.Get (C, GC_Property) = GC_Unassigned then
+                  UCD.Characters.Set (C, ExtPict_Property, ExtPict_Y);
+
+               else
+                  UCD.Characters.Set (C, ExtPict_Property, ExtPict_N);
+               end if;
+
+            else
+               UCD.Characters.Set (C, ExtPict_Property, ExtPict_N);
+            end if;
+         end loop;
+      end;
+
       Loader.Open (UCD_Root, "emoji/emoji-data.txt");
 
       while not Loader.End_Of_File loop

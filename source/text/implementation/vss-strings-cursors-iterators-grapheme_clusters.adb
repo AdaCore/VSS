@@ -44,6 +44,80 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       return VSS.Implementation.UCD_Core.Core_Data_Record;
    --  Return core data record for the given character.
 
+   function Apply_RI
+     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Left    : VSS.Implementation.Strings.Cursor) return Boolean;
+   --  Scan string backward to check whether Rules GB12, GB13 should be
+   --  applied.
+
+   function Apply_ExtPict
+     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Left    : VSS.Implementation.Strings.Cursor) return Boolean;
+   --  Can string backward to check whether Rule GB11 should be applied.
+
+   -------------------
+   -- Apply_ExtPict --
+   -------------------
+
+   function Apply_ExtPict
+     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Left    : VSS.Implementation.Strings.Cursor) return Boolean
+   is
+      Position   : VSS.Implementation.Strings.Cursor := Left;
+      Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+
+   begin
+      loop
+         if not Handler.Backward (Data, Position) then
+            return False;
+         end if;
+
+         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+
+         if Properties.GCB = GCB_EX then
+            null;
+
+         elsif Properties.ExtPict then
+            return True;
+
+         else
+            return False;
+         end if;
+      end loop;
+   end Apply_ExtPict;
+
+   --------------
+   -- Apply_RI --
+   --------------
+
+   function Apply_RI
+     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Left    : VSS.Implementation.Strings.Cursor) return Boolean
+   is
+      Position : VSS.Implementation.Strings.Cursor := Left;
+      Count    : Natural := 0;
+
+   begin
+      loop
+         if not Handler.Backward (Data, Position) then
+            return Count mod 2 = 0;
+         end if;
+
+         if Extract_Core_Data (Handler.Element (Data, Position)).GCB
+              = GCB_RI
+         then
+            Count := Count + 1;
+
+         else
+            return Count mod 2 = 0;
+         end if;
+      end loop;
+   end Apply_RI;
+
    --------------
    -- Backward --
    --------------
@@ -60,67 +134,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success          : Boolean;
       Done             : Boolean := False;
-
-      function Apply_RI return Boolean;
-      --  Check whether Rules GB12, GB13 should be applied.
-
-      function Apply_ExtPict return Boolean;
-      --  Check whether Rule GB11 should be applied.
-
-      -------------------
-      -- Apply_ExtPict --
-      -------------------
-
-      function Apply_ExtPict return Boolean is
-         Position   : VSS.Implementation.Strings.Cursor := Left;
-         Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-
-      begin
-         loop
-            if not Handler.Backward (Self.Owner.Data, Position) then
-               return False;
-            end if;
-
-            Properties :=
-              Extract_Core_Data
-                (Handler.Element (Self.Owner.Data, Position));
-
-            if Properties.GCB = GCB_EX then
-               null;
-
-            elsif Properties.ExtPict then
-               return True;
-
-            else
-               return False;
-            end if;
-         end loop;
-      end Apply_ExtPict;
-
-      --------------
-      -- Apply_RI --
-      --------------
-
-      function Apply_RI return Boolean is
-         Position : VSS.Implementation.Strings.Cursor := Left;
-         Count    : Natural := 0;
-
-      begin
-         loop
-            if not Handler.Backward (Self.Owner.Data, Position) then
-               return Count mod 2 = 0;
-            end if;
-
-            if Extract_Core_Data
-                 (Handler.Element (Self.Owner.Data, Position)).GCB = GCB_RI
-            then
-               Count := Count + 1;
-
-            else
-               return Count mod 2 = 0;
-            end if;
-         end loop;
-      end Apply_RI;
 
    begin
       Self.Last_Position := Self.First_Position;
@@ -211,7 +224,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_ZWJ
                  and then Right_Properties.ExtPict
-                 and then Apply_ExtPict
+                 and then Apply_ExtPict (Handler, Self.Owner.Data, Left)
                then
                   --  Rule 11.
 
@@ -219,7 +232,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_RI
                  and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI
+                 and then Apply_RI (Handler, Self.Owner.Data, Left)
                then
                   --  Rules GB12, GB13.
 

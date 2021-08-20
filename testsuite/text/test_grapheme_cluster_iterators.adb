@@ -131,10 +131,14 @@ procedure Test_Grapheme_Cluster_Iterators is
       S : Positive := 1;
 
    begin
-      --  Test_Support.Assert (not J.Has_Element);
+      if Data.String.Is_Empty then
+         Test_Support.Assert (not J.Has_Element);
+
+         return;
+      end if;
 
       loop
-         --  Test_Support.Assert (J.Has_Element);
+         Test_Support.Assert (J.Has_Element);
          --  Test_Support.Assert (J.Element = Data.Segments (S));
          Test_Support.Assert (Data.String.Slice (J) = Data.Segments (S));
          S := S + 1;
@@ -143,7 +147,7 @@ procedure Test_Grapheme_Cluster_Iterators is
       end loop;
 
       Test_Support.Assert (S - 1 = Data.Segments.Length);
-      --  Test_Support.Assert (not J.Has_Element);
+      Test_Support.Assert (not J.Has_Element);
    end Run_Test_Case;
 
    File        : Ada.Wide_Wide_Text_IO.File_Type;
@@ -180,4 +184,8 @@ begin
    end loop;
 
    Ada.Wide_Wide_Text_IO.Close (File);
+
+   --  Additional test for an empty string.
+
+   Run_Test_Case ((String => <>, Segments => <>));
 end Test_Grapheme_Cluster_Iterators;

@@ -126,28 +126,43 @@ procedure Test_Grapheme_Cluster_Iterators is
 
       use type VSS.Strings.Virtual_String;
 
-      J : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
+      JF : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
         Data.String.First_Grapheme_Cluster;
-      S : Positive := 1;
+      JB : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
+        Data.String.Last_Grapheme_Cluster;
+      S  : Positive := 1;
 
    begin
       if Data.String.Is_Empty then
-         Test_Support.Assert (not J.Has_Element);
+         Test_Support.Assert (not JF.Has_Element);
+         Test_Support.Assert (not JB.Has_Element);
 
          return;
       end if;
 
       loop
-         Test_Support.Assert (J.Has_Element);
+         Test_Support.Assert (JF.Has_Element);
          --  Test_Support.Assert (J.Element = Data.Segments (S));
-         Test_Support.Assert (Data.String.Slice (J) = Data.Segments (S));
+         Test_Support.Assert (Data.String.Slice (JF) = Data.Segments (S));
          S := S + 1;
 
-         exit when not J.Forward;
+         exit when not JF.Forward;
       end loop;
 
       Test_Support.Assert (S - 1 = Data.Segments.Length);
-      Test_Support.Assert (not J.Has_Element);
+      Test_Support.Assert (not JF.Has_Element);
+
+      loop
+         Test_Support.Assert (JB.Has_Element);
+
+         S := S - 1;
+         Test_Support.Assert (Data.String.Slice (JB) = Data.Segments (S));
+
+         exit when not JB.Backward;
+      end loop;
+
+      Test_Support.Assert (S = 1);
+      Test_Support.Assert (not JB.Has_Element);
    end Run_Test_Case;
 
    File        : Ada.Wide_Wide_Text_IO.File_Type;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,33 +20,42 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Conversion between standard string types and Magic_String.
 
-with Ada.Strings.Unbounded;
-with Ada.Strings.UTF_Encoding;
-with Ada.Strings.Wide_Wide_Unbounded;
+package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
-package VSS.Strings.Conversions is
+   pragma Preelaborate;
 
-   function To_Virtual_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String;
+   type Grapheme_Cluster_Iterator is
+     new Abstract_Segment_Iterator with private;
 
-   function To_Virtual_String
-     (Item : Ada.Strings.Unbounded.Unbounded_String) return Virtual_String;
-   --  Convert UTF-8 encoded unbounded string into Virtual_String.
+   function Backward (Self : in out Grapheme_Cluster_Iterator) return Boolean;
+   --  Move iterator to previous grapheme cluster.
 
-   function To_UTF_8_String
-     (Item : Virtual_String'Class)
-      return Ada.Strings.UTF_Encoding.UTF_8_String;
-   --  Convert virtual string into UTF-8 encoded string.
+private
 
-   function To_Wide_Wide_String
-     (Item : Virtual_String'Class) return Wide_Wide_String;
-   --  Convert virtual string into Wide_Wide_String.
+   type Grapheme_Cluster_Iterator is new Abstract_Segment_Iterator with record
+      null;
+   end record;
 
-   function To_Unbounded_Wide_Wide_String
-     (Item : Virtual_String'Class)
-      return Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
-   --  Convert virtual string into Wide_Wide_String.
+   overriding procedure Invalidate (Self : in out Grapheme_Cluster_Iterator);
 
-end VSS.Strings.Conversions;
+   overriding procedure String_Modified
+     (Self     : in out Grapheme_Cluster_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset);
+
+   overriding function Forward
+     (Self : in out Grapheme_Cluster_Iterator) return Boolean;
+
+   overriding function Has_Element
+     (Self : Grapheme_Cluster_Iterator) return Boolean;
+
+   procedure Initialize
+     (Self            : in out Grapheme_Cluster_Iterator'Class;
+      String          : Virtual_String'Class;
+      Position        : VSS.Implementation.Strings.Cursor);
+   --  Initialize iterator and lookup for grapheme boundaries around the given
+   --  position.
+
+end VSS.Strings.Cursors.Iterators.Grapheme_Clusters;

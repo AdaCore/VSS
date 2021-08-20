@@ -52,7 +52,8 @@ package body Gen_UCD.Core_Properties is
         UCD.Properties.Hash,
         UCD.Properties."=");
 
-   GC_Mapping : Property_Value_Integer_Maps.Map;
+   GC_Mapping  : Property_Value_Integer_Maps.Map;
+   GCB_Mapping : Property_Value_Integer_Maps.Map;
 
    package Database is
 
@@ -67,7 +68,10 @@ package body Gen_UCD.Core_Properties is
 
       procedure Set_OUpper (Code : UCD.Code_Point; To : Boolean);
 
-      --  procedure Set_1_8 (Code : Code_Point; To : Boolean);
+      procedure Set_ExtPict (Code : UCD.Code_Point; To : Boolean);
+
+      procedure Set_GCB
+        (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_Types.Unsigned_4);
 
       function Uncompressed_Size return Positive;
 
@@ -82,7 +86,7 @@ package body Gen_UCD.Core_Properties is
       function Index_Table_Element (Index : Natural) return Natural;
 
       function Data_Table_Element
-        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_8;
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_16;
 
    end Database;
 
@@ -108,15 +112,44 @@ package body Gen_UCD.Core_Properties is
          end loop;
       end;
 
+      declare
+         Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("GCB");
+         Count    : Natural := 0;
+
+      begin
+         for Value of Property.All_Values loop
+            if Value.Is_Used then
+               GCB_Mapping.Insert (Value, Count);
+               Count := Count + 1;
+            end if;
+         end loop;
+      end;
+
       Database.Initialize (8);
 
       declare
-         GC_Property     : constant not null UCD.Properties.Property_Access :=
+         use type UCD.Properties.Property_Value_Access;
+
+         GC_Property      : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("gc");
-         OLower_Property : constant not null UCD.Properties.Property_Access :=
+         OLower_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OLower");
-         OUpper_Property : constant not null UCD.Properties.Property_Access :=
+         OLower_Y         :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (OLower_Property, "Y");
+         OUpper_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OUpper");
+         OUpper_Y         :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (OUpper_Property, "Y");
+         ExtPict_Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("ExtPict");
+         ExtPict_Y        :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (ExtPict_Property, "Y");
+         GCB_Property     : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("GCB");
 
       begin
          for Code in UCD.Code_Point loop
@@ -128,12 +161,19 @@ package body Gen_UCD.Core_Properties is
 
             Database.Set_OLower
               (Code,
-               UCD.Characters.Get
-                 (Code, OLower_Property).Names.First_Element = "Y");
+               UCD.Characters.Get (Code, OLower_Property) = OLower_Y);
             Database.Set_OUpper
               (Code,
-               UCD.Characters.Get
-                 (Code, OUpper_Property).Names.First_Element = "Y");
+               UCD.Characters.Get (Code, OUpper_Property) = OUpper_Y);
+            Database.Set_ExtPict
+              (Code,
+               UCD.Characters.Get (Code, ExtPict_Property) = ExtPict_Y);
+
+            Database.Set_GCB
+              (Code,
+               Gen_UCD.Unsigned_Types.Unsigned_4
+                 (GCB_Mapping.Element
+                      (UCD.Characters.Get (Code, GCB_Property))));
          end loop;
       end;
 
@@ -157,18 +197,30 @@ package body Gen_UCD.Core_Properties is
 
       use type Gen_UCD.Unsigned_Types.Unsigned_32;
 
+      --  GC, OLower, OUpper are used for character classification in public
+      --  API, and put into the first byte. One bit in this byte is reserved.
+      --
+      --  GCB & ExtPict are used by grapheme cluster iterator and put into
+      --  second byte of the record. Three bits in this byte are reserved.
+
       type Core_Data_Record is record
          GC         : Gen_UCD.Unsigned_Types.Unsigned_5 := 0;
          OLower     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
          OUpper     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
          Reserved_1 : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
+         GCB        : Gen_UCD.Unsigned_Types.Unsigned_4 := 0;
+         ExtPict    : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
+         Reserved_2 : Gen_UCD.Unsigned_Types.Unsigned_3 := 0;
       end record;
-      for Core_Data_Record'Size use 8;
+      for Core_Data_Record'Size use 16;
       for Core_Data_Record use record
          GC         at 0 range 0 .. 4;
          OLower     at 0 range 5 .. 5;
          OUpper     at 0 range 6 .. 6;
          Reserved_1 at 0 range 7 .. 7;
+         GCB        at 0 range 8 .. 11;
+         ExtPict    at 0 range 12 .. 12;
+         Reserved_2 at 0 range 13 .. 15;
       end record;
 
       type Core_Data_Array is
@@ -363,11 +415,11 @@ package body Gen_UCD.Core_Properties is
       ------------------------
 
       function Data_Table_Element
-        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_8
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_16
       is
          function To_Unsigned_8 is
            new Ada.Unchecked_Conversion
-                 (Core_Data_Record, Gen_UCD.Unsigned_Types.Unsigned_8);
+                 (Core_Data_Record, Gen_UCD.Unsigned_Types.Unsigned_16);
 
       begin
          return
@@ -420,13 +472,23 @@ package body Gen_UCD.Core_Properties is
       begin
          return
            Integer
-             (Compressed_Data_Last + 1
+             ((Compressed_Data_Last + 1) * 2
               + (if Compressed_Data_Last
                    <= Gen_UCD.Unsigned_Types.Unsigned_32
                         (Gen_UCD.Unsigned_Types.Unsigned_16'Last)
                 then Index_Data'Length * 2
                 else Index_Data'Length * 4));
       end Memory_Consumption;
+
+      -----------------
+      -- Set_ExtPict --
+      -----------------
+
+      procedure Set_ExtPict (Code : UCD.Code_Point; To : Boolean) is
+      begin
+         Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).ExtPict :=
+           Boolean'Pos (To);
+      end Set_ExtPict;
 
       ------------
       -- Set_GC --
@@ -437,6 +499,16 @@ package body Gen_UCD.Core_Properties is
       begin
          Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).GC := To;
       end Set_GC;
+
+      -------------
+      -- Set_GCB --
+      -------------
+
+      procedure Set_GCB
+        (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_Types.Unsigned_4) is
+      begin
+         Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).GCB := To;
+      end Set_GCB;
 
       ----------------
       -- Set_OLower --
@@ -457,15 +529,6 @@ package body Gen_UCD.Core_Properties is
          Raw (Gen_UCD.Unsigned_Types.Unsigned_32 (Code)).OUpper :=
            Boolean'Pos (To);
       end Set_OUpper;
-
-      -------------
-      -- Set_1_8 --
-      -------------
-
-      --  procedure Set_1_8 (Code : UCD.Code_Point; To : Boolean) is
-      --  begin
-      --     Raw (Unsigned_32 (Code) * Record_Size).F1_8 := Boolean'Pos (To);
-      --  end Set_1_8;
 
       -----------------------
       -- Uncompressed_Size --
@@ -558,6 +621,68 @@ package body Gen_UCD.Core_Properties is
          New_Line (File);
       end;
 
+      --  Generate GCB_Values type
+
+      declare
+         Property : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("GCB");
+         First    : Boolean := True;
+         Count    : Natural := 0;
+
+      begin
+         Put_Line (File, "   type GCB_Values is");
+
+         for Value of Property.All_Values loop
+            if Value.Is_Used then
+               Count := Count + 1;
+
+               if First then
+                  Put (File, "     (");
+                  First := False;
+
+               else
+                  Put_Line (File, ",");
+                  Put (File, "      ");
+               end if;
+
+               Put (File, Value_Identifier (Property, Value));
+            end if;
+         end loop;
+
+         Put_Line (File, ");");
+
+         Put_Line
+           (File,
+            "   for GCB_Values'Size use"
+            & Natural'Wide_Wide_Image (Minimum_Bits (Count))
+            & ";");
+         Put_Line (File, "   for GCB_Values use");
+         First := True;
+
+         for Value of Property.All_Values loop
+            if Value.Is_Used then
+               Count := Count + 1;
+
+               if First then
+                  Put (File, "     (");
+                  First := False;
+
+               else
+                  Put_Line (File, ",");
+                  Put (File, "      ");
+               end if;
+
+               Put (File, Value_Identifier (Property, Value));
+               Put (File, " =>");
+               Put
+                 (File, Integer'Wide_Wide_Image (GCB_Mapping.Element (Value)));
+            end if;
+         end loop;
+
+         Put_Line (File, ");");
+         New_Line (File);
+      end;
+
       --  Generate types for index and data tables.
 
       declare
@@ -590,15 +715,19 @@ package body Gen_UCD.Core_Properties is
          Put_Line
            (File,
             "   type Core_Data_Record is record");
-         Put_Line (File, "      GC     : GC_Values;");
-         Put_Line (File, "      OLower : Boolean;");
-         Put_Line (File, "      OUpper : Boolean;");
+         Put_Line (File, "      GC      : GC_Values;");
+         Put_Line (File, "      OLower  : Boolean;");
+         Put_Line (File, "      OUpper  : Boolean;");
+         Put_Line (File, "      GCB     : GCB_Values;");
+         Put_Line (File, "      ExtPict : Boolean;");
          Put_Line (File, "   end record;");
-         Put_Line (File, "   for Core_Data_Record'Size use 8;");
+         Put_Line (File, "   for Core_Data_Record'Size use 16;");
          Put_Line (File, "   for Core_Data_Record use record");
-         Put_Line (File, "      GC     at 0 range 0 .. 4;");
-         Put_Line (File, "      OLower at 0 range 5 .. 5;");
-         Put_Line (File, "      OUpper at 0 range 6 .. 6;");
+         Put_Line (File, "      GC      at 0 range 0 .. 4;");
+         Put_Line (File, "      OLower  at 0 range 5 .. 5;");
+         Put_Line (File, "      OUpper  at 0 range 6 .. 6;");
+         Put_Line (File, "      GCB     at 0 range 8 .. 11;");
+         Put_Line (File, "      ExtPict at 0 range 12 .. 12;");
          Put_Line (File, "   end record;");
          New_Line (File);
 
@@ -618,7 +747,7 @@ package body Gen_UCD.Core_Properties is
          Put_Line
            (File,
             "   type Core_Data_Raw_Array is"
-            & " array (Core_Offset) of Interfaces.Unsigned_8;");
+            & " array (Core_Offset) of Interfaces.Unsigned_16;");
          Put_Line (File, "   pragma Pack (Core_Data_Raw_Array);");
          New_Line (File);
       end;
@@ -671,7 +800,7 @@ package body Gen_UCD.Core_Properties is
             if J = 0 then
                Put (File, "     (");
 
-            elsif J mod 8 = 0 then
+            elsif J mod 6 = 0 then
                Put_Line (File, ",");
                Put (File, "      ");
 

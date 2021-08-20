@@ -21,12 +21,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Unbounded;
 with Ada.Strings.UTF_Encoding;
 with Ada.Strings.Wide_Wide_Unbounded;
 
 with VSS.Strings.Conversions;
 
 with Hello_World_Data;
+with Test_Support;
 
 procedure Test_String_Conversions is
 begin
@@ -154,7 +156,8 @@ begin
            & "development this string literal requires to have at least "
            & "256 (two hundreds fithty six) characters to overflow unsigned "
            & "8 (eight) bit wide Length member of the UTF-8 ib place string "
-           & "handler.");
+           & "handler.")
+        with Unreferenced;
 
    begin
       null;
@@ -181,5 +184,43 @@ begin
       then
          raise Program_Error;
       end if;
+   end;
+
+   --  Check conversion of Unbounded_String.
+
+   declare
+      use type VSS.Strings.Virtual_String;
+
+      SS : constant Ada.Strings.Unbounded.Unbounded_String :=
+        Ada.Strings.Unbounded.To_Unbounded_String ("ABC");
+      ES : constant VSS.Strings.Virtual_String := "ABC";
+
+      SL : constant Ada.Strings.Unbounded.Unbounded_String :=
+        Ada.Strings.Unbounded.To_Unbounded_String
+          ("This is large string literal to test conversion from "
+           & " Wide_Wide_String to Virtual_String. At the time of initial "
+           & "development this string literal requires to have at least "
+           & "256 (two hundreds fithty six) characters to overflow unsigned "
+           & "8 (eight) bit wide Length member of the UTF-8 ib place string "
+           & "handler.");
+      EL : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.To_Virtual_String
+          ("This is large string literal to test conversion from "
+           & " Wide_Wide_String to Virtual_String. At the time of initial "
+           & "development this string literal requires to have at least "
+           & "256 (two hundreds fithty six) characters to overflow unsigned "
+           & "8 (eight) bit wide Length member of the UTF-8 ib place string "
+           & "handler.");
+
+   begin
+      Test_Support.Assert
+        (VSS.Strings.Conversions.To_Virtual_String (SS) = ES);
+
+      Test_Support.Assert
+        (VSS.Strings.Conversions.To_Virtual_String (SL) = EL);
+
+      Test_Support.Assert
+        (VSS.Strings.Conversions.To_Virtual_String
+           (Ada.Strings.Unbounded.Null_Unbounded_String).Is_Empty);
    end;
 end Test_String_Conversions;

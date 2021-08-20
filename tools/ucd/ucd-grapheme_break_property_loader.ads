@@ -21,36 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Iterators.Graphemes is
+package UCD.Grapheme_Break_Property_Loader is
 
-   pragma Preelaborate;
+   procedure Load (UCD_Root : Wide_Wide_String);
 
-   type Grapheme_Iterator is new Abstract_Segment_Iterator with private;
-
-private
-
-   type Grapheme_Iterator is new Abstract_Segment_Iterator with record
-      null;
-   end record;
-
-   overriding procedure Invalidate (Self : in out Grapheme_Iterator);
-
-   overriding procedure String_Modified
-     (Self     : in out Grapheme_Iterator;
-      Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
-
-   overriding function Forward
-     (Self : in out Grapheme_Iterator) return Boolean;
-
-   overriding function Has_Element (Self : Grapheme_Iterator) return Boolean;
-
-   procedure Initialize
-     (Self            : in out Grapheme_Iterator'Class;
-      String          : Virtual_String'Class;
-      Position        : VSS.Implementation.Strings.Cursor);
-   --  Initialize iterator and lookup for grapheme boundaries around the given
-   --  position.
-
-end VSS.Strings.Cursors.Iterators.Graphemes;
+end UCD.Grapheme_Break_Property_Loader;

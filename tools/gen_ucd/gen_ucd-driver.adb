@@ -31,6 +31,7 @@ with UCD.Characters;
 with UCD.Derived_Core_Properties_Loader;
 with UCD.Derived_Normalization_Props_Loader;
 with UCD.Emoji_Data_Loader;
+with UCD.Grapheme_Break_Property_Loader;
 with UCD.Prop_List_Loader;
 with UCD.Property_Aliases_Loader;
 with UCD.Property_Value_Aliases_Loader;
@@ -58,6 +59,7 @@ begin
       UCD.Unicode_Data_Loader.Load (UCD_Root);
       UCD.Prop_List_Loader.Load (UCD_Root);
       UCD.Derived_Core_Properties_Loader.Load (UCD_Root);
+      UCD.Grapheme_Break_Property_Loader.Load (UCD_Root);
       UCD.Derived_Normalization_Props_Loader.Load (UCD_Root);
       UCD.Special_Casing_Loader.Load (UCD_Root);
       UCD.Case_Folding_Loader.Load (UCD_Root);

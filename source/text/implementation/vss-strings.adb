@@ -28,7 +28,7 @@ with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters.Internals;
-with VSS.Strings.Cursors.Iterators.Graphemes;
+with VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals;
 with VSS.Strings.Cursors.Iterators.Lines.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
@@ -467,13 +467,15 @@ package body VSS.Strings is
    -- First_Grapheme --
    --------------------
 
-   function First_Grapheme
+   function First_Grapheme_Cluster
      (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator is
    begin
-      raise Program_Error;
-      return Self.First_Grapheme;
-   end First_Grapheme;
+      return
+        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals
+          .First_Grapheme_Cluster (Self);
+   end First_Grapheme_Cluster;
 
    ----------------
    -- First_Line --
@@ -494,14 +496,21 @@ package body VSS.Strings is
    -- Grapheme --
    --------------
 
-   function Grapheme
+   function Grapheme_Cluster
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator
+   is
+      Start : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Position).all;
+
    begin
-      raise Program_Error;
-      return Self.Grapheme (Position);
-   end Grapheme;
+      return
+        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals
+          .Grapheme_Cluster (Self, Start);
+   end Grapheme_Cluster;
 
    ----------
    -- Hash --
@@ -608,13 +617,15 @@ package body VSS.Strings is
    -- Last_Grapheme --
    -------------------
 
-   function Last_Grapheme
+   function Last_Grapheme_Cluster
      (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Graphemes.Grapheme_Iterator is
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator is
    begin
-      raise Program_Error;
-      return Self.Last_Grapheme;
-   end Last_Grapheme;
+      return
+        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals
+          .Last_Grapheme_Cluster (Self);
+   end Last_Grapheme_Cluster;
 
    ----------
    -- Line --

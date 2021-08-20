@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -29,7 +29,7 @@ package VSS.Strings.Texts is
    type Line_Count is new Natural;
    subtype Line_Index is Line_Count range 1 .. Line_Count'Last;
 
-   type Column_Count is new Grapheme_Count;
+   type Column_Count is new Grapheme_Cluster_Count;
    subtype Column_Index is Column_Count range 1 .. Column_Count'Last;
 
    type Magic_Text is new Virtual_String with null record;

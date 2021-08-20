@@ -21,68 +21,32 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings.Cursors.Markers;
-pragma Unreferenced (VSS.Strings.Cursors.Markers);
---  XXX GNAT 20210710: crash without clause above.
+with VSS.Implementation.Strings;
 
-package body VSS.Strings.Cursors.Iterators.Graphemes is
+package VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals is
 
-   -------------
-   -- Forward --
-   -------------
+   pragma Preelaborate;
 
-   overriding function Forward
-     (Self : in out Grapheme_Iterator) return Boolean is
-   begin
-      raise Program_Error;
-      return False;
-   end Forward;
+   function First_Grapheme_Cluster
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
+   --  Return grapheme cluster iterator pointing to the first grapheme cluster
+   --  of the string.
 
-   -----------------
-   -- Has_Element --
-   -----------------
+   function Last_Grapheme_Cluster
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
+   --  Return grapheme cluster iterator pointing to the last grapheme cluster
+   --  of the string.
 
-   overriding function Has_Element (Self : Grapheme_Iterator) return Boolean is
-   begin
-      raise Program_Error;
-      return False;
-   end Has_Element;
+   function Grapheme_Cluster
+     (Self     : Virtual_String'Class;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
+   --  Return grapheme cluster iterator pointing to the grapheme cluster at
+   --  the given position.
 
-   ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize
-     (Self            : in out Grapheme_Iterator'Class;
-      String          : Virtual_String'Class;
-      Position        : VSS.Implementation.Strings.Cursor)
-   is
-      pragma Unreferenced (Position);
-
-   begin
-      Self.Connect (String'Unrestricted_Access);
-   end Initialize;
-
-   ----------------
-   -- Invalidate --
-   ----------------
-
-   overriding procedure Invalidate (Self : in out Grapheme_Iterator) is
-   begin
-      Abstract_Segment_Iterator (Self).Invalidate;
-   end Invalidate;
-
-   ---------------------
-   -- String_Modified --
-   ---------------------
-
-   overriding procedure String_Modified
-     (Self     : in out Grapheme_Iterator;
-      Start    : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset) is
-   begin
-      null;
-   end String_Modified;
-
-end VSS.Strings.Cursors.Iterators.Graphemes;
+end VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals;

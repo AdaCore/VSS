@@ -51,15 +51,15 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Backward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
-      Handler             : constant not null
+      Handler          : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Self.Owner.Data);
-      First               : VSS.Implementation.Strings.Cursor;
-      First_Properties    : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Previous            : VSS.Implementation.Strings.Cursor;
-      Previous_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Success             : Boolean;
-      Done                : Boolean := False;
+      Right            : VSS.Implementation.Strings.Cursor;
+      Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+      Left             : VSS.Implementation.Strings.Cursor;
+      Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
+      Success          : Boolean;
+      Done             : Boolean := False;
 
       function Apply_RI return Boolean;
       --  Check whether Rules GB12, GB13 should be applied.
@@ -72,7 +72,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       -------------------
 
       function Apply_ExtPict return Boolean is
-         Position   : VSS.Implementation.Strings.Cursor := Previous;
+         Position   : VSS.Implementation.Strings.Cursor := Left;
          Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
 
       begin
@@ -102,7 +102,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       --------------
 
       function Apply_RI return Boolean is
-         Position : VSS.Implementation.Strings.Cursor := Previous;
+         Position : VSS.Implementation.Strings.Cursor := Left;
          Count    : Natural := 0;
 
       begin
@@ -134,91 +134,91 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
 
       else
-         Previous := Self.Last_Position;
-         Previous_Properties :=
-           Extract_Core_Data (Handler.Element (Self.Owner.Data, Previous));
+         Left := Self.Last_Position;
+         Left_Properties :=
+           Extract_Core_Data (Handler.Element (Self.Owner.Data, Left));
 
          loop
-            First            := Previous;
-            First_Properties := Previous_Properties;
+            Right            := Left;
+            Right_Properties := Left_Properties;
 
-            Success := Handler.Backward (Self.Owner.Data, Previous);
+            Success := Handler.Backward (Self.Owner.Data, Left);
 
             if not Success then
                --  Start of the string has been reached.
 
-               Self.First_Position := First;
+               Self.First_Position := Right;
 
                return True;
 
             else
-               Previous_Properties :=
+               Left_Properties :=
                  Extract_Core_Data
-                   (Handler.Element (Self.Owner.Data, Previous));
+                   (Handler.Element (Self.Owner.Data, Left));
 
-               if Previous_Properties.GCB = GCB_CR
-                 and First_Properties.GCB = GCB_LF
+               if Left_Properties.GCB = GCB_CR
+                 and Right_Properties.GCB = GCB_LF
                then
                   --  Rule GB3.
 
                   null;
 
-               elsif Previous_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+               elsif Left_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
                   --  Rule GB4.
 
                   Done := True;
 
-               elsif First_Properties.GCB in  GCB_CN | GCB_CR | GCB_LF then
+               elsif Right_Properties.GCB in  GCB_CN | GCB_CR | GCB_LF then
                   --  Rule GB5.
 
                   Done := True;
 
-               elsif Previous_Properties.GCB = GCB_L
-                 and First_Properties.GCB in GCB_L | GCB_V | GCB_LV | GCB_LVT
+               elsif Left_Properties.GCB = GCB_L
+                 and Right_Properties.GCB in GCB_L | GCB_V | GCB_LV | GCB_LVT
                then
                   --  Rule GB6.
 
                   null;
 
-               elsif Previous_Properties.GCB in GCB_LV | GCB_V
-                 and First_Properties.GCB in GCB_V | GCB_T
+               elsif Left_Properties.GCB in GCB_LV | GCB_V
+                 and Right_Properties.GCB in GCB_V | GCB_T
                then
                   --  Rule GB7.
 
                   null;
 
-               elsif Previous_Properties.GCB in GCB_LVT | GCB_T
-                 and First_Properties.GCB in GCB_T
+               elsif Left_Properties.GCB in GCB_LVT | GCB_T
+                 and Right_Properties.GCB in GCB_T
                then
                   --  Rule GB8.
 
                   null;
 
-               elsif First_Properties.GCB in GCB_EX | GCB_ZWJ then
+               elsif Right_Properties.GCB in GCB_EX | GCB_ZWJ then
                   --  Rule GB9.
 
                   null;
 
-               elsif First_Properties.GCB = GCB_SM then
+               elsif Right_Properties.GCB = GCB_SM then
                   --  Rule 9a.
 
                   null;
 
-               elsif Previous_Properties.GCB = GCB_PP then
+               elsif Left_Properties.GCB = GCB_PP then
                   --  Rule 9b.
 
                   null;
 
-               elsif Previous_Properties.GCB = GCB_ZWJ
-                 and then First_Properties.ExtPict
+               elsif Left_Properties.GCB = GCB_ZWJ
+                 and then Right_Properties.ExtPict
                  and then Apply_ExtPict
                then
                   --  Rule 11.
 
                   null;
 
-               elsif Previous_Properties.GCB = GCB_RI
-                 and then First_Properties.GCB = GCB_RI
+               elsif Left_Properties.GCB = GCB_RI
+                 and then Right_Properties.GCB = GCB_RI
                  and then Apply_RI
                then
                   --  Rules GB12, GB13.
@@ -232,7 +232,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                end if;
 
                if Done then
-                  Self.First_Position := First;
+                  Self.First_Position := Right;
 
                   return True;
                end if;
@@ -282,17 +282,17 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
         (None,
          Apply);
 
-      Handler         : constant not null
+      Handler          : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Self.Owner.Data);
-      Last            : VSS.Implementation.Strings.Cursor;
-      Last_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Next            : VSS.Implementation.Strings.Cursor;
-      Next_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Success         : Boolean;
-      Done            : Boolean := False;
-      RI              : RI_State := None;
-      ExtPict         : ExtPict_State := None;
+      Left             : VSS.Implementation.Strings.Cursor;
+      Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
+      Right            : VSS.Implementation.Strings.Cursor;
+      Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+      Success          : Boolean;
+      Done             : Boolean := False;
+      RI               : RI_State := None;
+      ExtPict          : ExtPict_State := None;
 
    begin
       Self.First_Position := Self.Last_Position;
@@ -305,51 +305,51 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
 
       else
-         Next    := Self.First_Position;
-         Next_Properties :=
-           Extract_Core_Data (Handler.Element (Self.Owner.Data, Next));
+         Right    := Self.First_Position;
+         Right_Properties :=
+           Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
 
          loop
-            Last            := Next;
-            Last_Properties := Next_Properties;
+            Left            := Right;
+            Left_Properties := Right_Properties;
 
-            Success := Handler.Forward (Self.Owner.Data, Next);
+            Success := Handler.Forward (Self.Owner.Data, Right);
 
             if not Success then
                --  End of line has been reached
                --  Rule GB2
 
-               Self.Last_Position := Last;
+               Self.Last_Position := Left;
 
                return True;
 
             else
-               Next_Properties :=
-                 Extract_Core_Data (Handler.Element (Self.Owner.Data, Next));
+               Right_Properties :=
+                 Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
 
                --  Process context for Rule GB11
 
-               if Last_Properties.ExtPict
-                 and then Next_Properties.GCB in GCB_EX
+               if Left_Properties.ExtPict
+                 and then Right_Properties.GCB in GCB_EX
                then
                   --  Before context for Rule GB11 has been started.
 
                   ExtPict := Started;
 
-               elsif Last_Properties.ExtPict
-                 and then Next_Properties.GCB in GCB_ZWJ
+               elsif Left_Properties.ExtPict
+                 and then Right_Properties.GCB in GCB_ZWJ
                then
                   --  Before context for Rule GB11 has been found.
 
                   ExtPict := Matched;
 
                elsif ExtPict = Started then
-                  if Next_Properties.GCB = GCB_EX then
+                  if Right_Properties.GCB = GCB_EX then
                      --  Consume GCB_EX character, it doesn't change state.
 
                      null;
 
-                  elsif Next_Properties.GCB = GCB_ZWJ then
+                  elsif Right_Properties.GCB = GCB_ZWJ then
                      --  GCB_ZWJ complete match of the context
 
                      ExtPict := Matched;
@@ -366,8 +366,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                --  Process context for Rules GB12, GB13.
 
-               if Last_Properties.GCB = GCB_RI
-                 and Next_Properties.GCB = GCB_RI
+               if Left_Properties.GCB = GCB_RI
+                 and Right_Properties.GCB = GCB_RI
                  and RI = None
                then
                   RI := Apply;
@@ -376,61 +376,61 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                   RI := None;
                end if;
 
-               if Last_Properties.GCB = GCB_CR
-                 and Next_Properties.GCB = GCB_LF
+               if Left_Properties.GCB = GCB_CR
+                 and Right_Properties.GCB = GCB_LF
                then
                   --  Rule GB3
 
                   null;
 
-               elsif Last_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+               elsif Left_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
                   --  Rule GB4
 
                   Done := True;
 
-               elsif Next_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+               elsif Right_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
                   --  Rule GB5
 
                   Done := True;
 
-               elsif Last_Properties.GCB = GCB_L
-                 and then Next_Properties.GCB
+               elsif Left_Properties.GCB = GCB_L
+                 and then Right_Properties.GCB
                in GCB_L | GCB_V | GCB_LV | GCB_LVT
                then
                   --  Rule GB6
 
                   null;
 
-               elsif Last_Properties.GCB in GCB_LV | GCB_V
-                 and then Next_Properties.GCB in GCB_V | GCB_T
+               elsif Left_Properties.GCB in GCB_LV | GCB_V
+                 and then Right_Properties.GCB in GCB_V | GCB_T
                then
                   --  Rule GB7
 
                   null;
 
-               elsif Last_Properties.GCB in GCB_LVT | GCB_T
-                 and then Next_Properties.GCB = GCB_T
+               elsif Left_Properties.GCB in GCB_LVT | GCB_T
+                 and then Right_Properties.GCB = GCB_T
                then
                   --  Rule GB8
 
                   null;
 
-               elsif Next_Properties.GCB in GCB_EX | GCB_ZWJ then
+               elsif Right_Properties.GCB in GCB_EX | GCB_ZWJ then
                   --  Rule GB9
 
                   null;
 
-               elsif Next_Properties.GCB = GCB_SM then
+               elsif Right_Properties.GCB = GCB_SM then
                   --  Rule GB9a
 
                   null;
 
-               elsif Last_Properties.GCB = GCB_PP then
+               elsif Left_Properties.GCB = GCB_PP then
                   --  Rule GB9b
 
                   null;
 
-               elsif ExtPict = Apply and Next_Properties.ExtPict then
+               elsif ExtPict = Apply and Right_Properties.ExtPict then
                   --  Rule GB11.
 
                   null;
@@ -446,7 +446,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                end if;
 
                if Done then
-                  Self.Last_Position := Last;
+                  Self.Last_Position := Left;
 
                   return True;
                end if;

@@ -28,6 +28,9 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    type Grapheme_Cluster_Iterator is
      new Abstract_Segment_Iterator with private;
 
+   function Backward (Self : in out Grapheme_Cluster_Iterator) return Boolean;
+   --  Move iterator to previous grapheme cluster.
+
 private
 
    type Grapheme_Cluster_Iterator is new Abstract_Segment_Iterator with record

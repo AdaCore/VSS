@@ -264,10 +264,15 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    -----------------
 
    overriding function Has_Element
-     (Self : Grapheme_Cluster_Iterator) return Boolean is
+     (Self : Grapheme_Cluster_Iterator) return Boolean
+   is
+      Handler : constant not null
+        VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+
    begin
-      raise Program_Error;
-      return False;
+      return
+        Self.First_Position.Index in 1 .. Handler.Length (Self.Owner.Data);
    end Has_Element;
 
    ----------------

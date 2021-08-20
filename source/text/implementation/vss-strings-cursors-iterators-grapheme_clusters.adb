@@ -234,7 +234,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                  and then Right_Properties.GCB = GCB_RI
                  and then Apply_RI (Handler, Self.Owner.Data, Left)
                then
-                  --  Rules GB12, GB13.
+                  --  Rule GB12.
+                  --  Rule GB13.
 
                   null;
 
@@ -285,16 +286,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    overriding function Forward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
-      type ExtPict_State is
-        (None,
-         Started,
-         Matched,
-         Apply);
-
-      type RI_State is
-        (None,
-         Apply);
-
       Handler          : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Self.Owner.Data);
@@ -304,8 +295,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success          : Boolean;
       Done             : Boolean := False;
-      RI               : RI_State := None;
-      ExtPict          : ExtPict_State := None;
 
    begin
       Self.First_Position := Self.Last_Position;
@@ -339,55 +328,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             else
                Right_Properties :=
                  Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
-
-               --  Process context for Rule GB11
-
-               if Left_Properties.ExtPict
-                 and then Right_Properties.GCB in GCB_EX
-               then
-                  --  Before context for Rule GB11 has been started.
-
-                  ExtPict := Started;
-
-               elsif Left_Properties.ExtPict
-                 and then Right_Properties.GCB in GCB_ZWJ
-               then
-                  --  Before context for Rule GB11 has been found.
-
-                  ExtPict := Matched;
-
-               elsif ExtPict = Started then
-                  if Right_Properties.GCB = GCB_EX then
-                     --  Consume GCB_EX character, it doesn't change state.
-
-                     null;
-
-                  elsif Right_Properties.GCB = GCB_ZWJ then
-                     --  GCB_ZWJ complete match of the context
-
-                     ExtPict := Matched;
-
-                  else
-                     --  Any other character reset context
-
-                     ExtPict := None;
-                  end if;
-
-               elsif ExtPict = Matched then
-                  ExtPict := Apply;
-               end if;
-
-               --  Process context for Rules GB12, GB13.
-
-               if Left_Properties.GCB = GCB_RI
-                 and Right_Properties.GCB = GCB_RI
-                 and RI = None
-               then
-                  RI := Apply;
-
-               elsif RI /= None then
-                  RI := None;
-               end if;
 
                if Left_Properties.GCB = GCB_CR
                  and Right_Properties.GCB = GCB_LF
@@ -443,12 +383,18 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                   null;
 
-               elsif ExtPict = Apply and Right_Properties.ExtPict then
+               elsif Left_Properties.GCB = GCB_ZWJ
+                 and then Right_Properties.ExtPict
+                 and then Apply_ExtPict (Handler, Self.Owner.Data, Left)
+               then
                   --  Rule GB11.
 
                   null;
 
-               elsif RI = Apply then
+               elsif Left_Properties.GCB = GCB_RI
+                 and then Right_Properties.GCB = GCB_RI
+                 and then Apply_RI (Handler, Self.Owner.Data, Left)
+               then
                   --  Rule GB12.
                   --  Rule GB13.
 

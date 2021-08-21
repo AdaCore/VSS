@@ -31,6 +31,7 @@ limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
+limited with VSS.Strings.Cursors.Iterators.Words;
 limited with VSS.Strings.Texts;
 
 package VSS.Strings is
@@ -124,6 +125,23 @@ package VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the grapheme of the string at the given
+   --  position.
+
+   function First_Word
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
+   --  Return iterator pointing to the first word of the string.
+
+   function Last_Word
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
+   --  Return iterator pointing to the last word of the string.
+
+   function Word
+     (Self     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
+   --  Return iterator pointing to the word of the string at the given
    --  position.
 
    function First_Line

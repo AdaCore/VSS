@@ -464,9 +464,9 @@ package body VSS.Strings is
           (Self);
    end First_Character;
 
-   --------------------
-   -- First_Grapheme --
-   --------------------
+   ----------------------------
+   -- First_Grapheme_Cluster --
+   ----------------------------
 
    function First_Grapheme_Cluster
      (Self : Virtual_String'Class)
@@ -504,9 +504,9 @@ package body VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Words.Internals.First_Word (Self);
    end First_Word;
 
-   --------------
-   -- Grapheme --
-   --------------
+   ----------------------
+   -- Grapheme_Cluster --
+   ----------------------
 
    function Grapheme_Cluster
      (Self     : Virtual_String'Class;
@@ -625,9 +625,9 @@ package body VSS.Strings is
           (Self);
    end Last_Character;
 
-   -------------------
-   -- Last_Grapheme --
-   -------------------
+   ---------------------------
+   -- Last_Grapheme_Cluster --
+   ---------------------------
 
    function Last_Grapheme_Cluster
      (Self : Virtual_String'Class)

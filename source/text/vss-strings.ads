@@ -111,21 +111,21 @@ package VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the first grapheme of the string.
+   --  Return iterator pointing to the first grapheme cluster of the string.
 
    function Last_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the last grapheme of the string.
+   --  Return iterator pointing to the last grapheme cluster of the string.
 
    function Grapheme_Cluster
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the grapheme of the string at the given
-   --  position.
+   --  Return iterator pointing to the grapheme cluster of the string at the
+   --  given position.
 
    function First_Word
      (Self : Virtual_String'Class)

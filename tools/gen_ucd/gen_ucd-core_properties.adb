@@ -86,7 +86,7 @@ package body Gen_UCD.Core_Properties is
       function Index_Table_Element (Index : Natural) return Natural;
 
       function Data_Table_Element
-        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_16;
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_32;
 
    end Database;
 
@@ -201,15 +201,16 @@ package body Gen_UCD.Core_Properties is
       --  second byte of the record. Three bits in this byte are reserved.
 
       type Core_Data_Record is record
-         GC         : Gen_UCD.Unsigned_Types.Unsigned_5 := 0;
-         OLower     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
-         OUpper     : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
-         Reserved_1 : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
-         GCB        : Gen_UCD.Unsigned_Types.Unsigned_4 := 0;
-         ExtPict    : Gen_UCD.Unsigned_Types.Unsigned_1 := 0;
-         Reserved_2 : Gen_UCD.Unsigned_Types.Unsigned_3 := 0;
+         GC         : Gen_UCD.Unsigned_Types.Unsigned_5  := 0;
+         OLower     : Gen_UCD.Unsigned_Types.Unsigned_1  := 0;
+         OUpper     : Gen_UCD.Unsigned_Types.Unsigned_1  := 0;
+         Reserved_1 : Gen_UCD.Unsigned_Types.Unsigned_1  := 0;
+         GCB        : Gen_UCD.Unsigned_Types.Unsigned_4  := 0;
+         ExtPict    : Gen_UCD.Unsigned_Types.Unsigned_1  := 0;
+         Reserved_2 : Gen_UCD.Unsigned_Types.Unsigned_3  := 0;
+         Reserved_3 : Gen_UCD.Unsigned_Types.Unsigned_16 := 0;
       end record;
-      for Core_Data_Record'Size use 16;
+      for Core_Data_Record'Size use 32;
       for Core_Data_Record use record
          GC         at 0 range 0 .. 4;
          OLower     at 0 range 5 .. 5;
@@ -218,6 +219,7 @@ package body Gen_UCD.Core_Properties is
          GCB        at 0 range 8 .. 11;
          ExtPict    at 0 range 12 .. 12;
          Reserved_2 at 0 range 13 .. 15;
+         Reserved_3 at 0 range 16 .. 31;
       end record;
 
       type Core_Data_Array is
@@ -412,15 +414,15 @@ package body Gen_UCD.Core_Properties is
       ------------------------
 
       function Data_Table_Element
-        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_16
+        (Index : Natural) return Gen_UCD.Unsigned_Types.Unsigned_32
       is
-         function To_Unsigned_8 is
+         function To_Unsigned_32 is
            new Ada.Unchecked_Conversion
-                 (Core_Data_Record, Gen_UCD.Unsigned_Types.Unsigned_16);
+                 (Core_Data_Record, Gen_UCD.Unsigned_Types.Unsigned_32);
 
       begin
          return
-           To_Unsigned_8
+           To_Unsigned_32
              (Compressed_Data
                 (Gen_UCD.Unsigned_Types.Unsigned_32 (Index)));
       end Data_Table_Element;
@@ -469,7 +471,7 @@ package body Gen_UCD.Core_Properties is
       begin
          return
            Integer
-             ((Compressed_Data_Last + 1) * 2
+             ((Compressed_Data_Last + 1) * 4
               + (if Compressed_Data_Last
                    <= Gen_UCD.Unsigned_Types.Unsigned_32
                         (Gen_UCD.Unsigned_Types.Unsigned_16'Last)
@@ -718,7 +720,7 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "      GCB     : GCB_Values;");
          Put_Line (File, "      ExtPict : Boolean;");
          Put_Line (File, "   end record;");
-         Put_Line (File, "   for Core_Data_Record'Size use 16;");
+         Put_Line (File, "   for Core_Data_Record'Size use 32;");
          Put_Line (File, "   for Core_Data_Record use record");
          Put_Line (File, "      GC      at 0 range 0 .. 4;");
          Put_Line (File, "      OLower  at 0 range 5 .. 5;");
@@ -744,7 +746,7 @@ package body Gen_UCD.Core_Properties is
          Put_Line
            (File,
             "   type Core_Data_Raw_Array is"
-            & " array (Core_Offset) of Interfaces.Unsigned_16;");
+            & " array (Core_Offset) of Interfaces.Unsigned_32;");
          Put_Line (File, "   pragma Pack (Core_Data_Raw_Array);");
          New_Line (File);
       end;
@@ -784,7 +786,7 @@ package body Gen_UCD.Core_Properties is
       --  Generate data table.
 
       declare
-         Image : Wide_Wide_String (1 .. 10);
+         Image : Wide_Wide_String (1 .. 13);
 
       begin
          Put_Line

@@ -95,16 +95,19 @@ package body Gen_UCD.Core_Properties is
    -----------
 
    procedure Build is
+      GC_Property  : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("gc");
+      GCB_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("GCB");
+
    begin
       Put ("   ... core properties");
 
       declare
-         Property : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("gc");
-         Count    : Natural := 0;
+         Count : Natural := 0;
 
       begin
-         for Value of Property.All_Values loop
+         for Value of GC_Property.All_Values loop
             if Value.Is_Used then
                GC_Mapping.Insert (Value, Count);
                Count := Count + 1;
@@ -113,12 +116,10 @@ package body Gen_UCD.Core_Properties is
       end;
 
       declare
-         Property : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("GCB");
-         Count    : Natural := 0;
+         Count : Natural := 0;
 
       begin
-         for Value of Property.All_Values loop
+         for Value of GCB_Property.All_Values loop
             if Value.Is_Used then
                GCB_Mapping.Insert (Value, Count);
                Count := Count + 1;
@@ -131,8 +132,6 @@ package body Gen_UCD.Core_Properties is
       declare
          use type UCD.Properties.Property_Value_Access;
 
-         GC_Property      : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("gc");
          OLower_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OLower");
          OLower_Y         :
@@ -148,8 +147,6 @@ package body Gen_UCD.Core_Properties is
          ExtPict_Y        :
            constant not null UCD.Properties.Property_Value_Access :=
              UCD.Properties.Resolve (ExtPict_Property, "Y");
-         GCB_Property     : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("GCB");
 
       begin
          for Code in UCD.Code_Point loop

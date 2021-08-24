@@ -43,6 +43,7 @@ check_text:
 	for f in testsuite/text/w3c-i18n-tests-casing/*.txt; do \
 		echo "   $$f"; .objs/tests/test_string_casing_w3c_i18n $$f || return 1; \
 	done
+	.objs/tests/test_word_iterators data/ucd
 
 check_json:
 	.objs/tests/test_json_content_handler

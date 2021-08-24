@@ -157,6 +157,10 @@ package VSS.Implementation.String_Handlers is
    --  provide better implementation for particular case, but always should
    --  fallback to this implementation.
 
+   pragma Warnings (Off, "redundant conversion, ""SELF"" is of type");
+   --  Disable warning for conversion to class-wide type in preconditions,
+   --  call to Length must be dispatched to actual implementation.
+
    not overriding function Starts_With
      (Self           : Abstract_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
@@ -179,6 +183,8 @@ package VSS.Implementation.String_Handlers is
    --  Return True when string ends with given suffix. This subprogram
    --  provides generic implementation and can work with any string handlers
    --  in cost of performance.
+
+   pragma Warnings (On, "redundant conversion, ""SELF"" is of type");
 
    not overriding procedure From_Wide_Wide_String
      (Self    : in out Abstract_String_Handler;

@@ -21,25 +21,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Unsigned_Types is
+with VSS.Strings.Cursors.Iterators.Words;
 
-   pragma Pure;
-
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
-
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
-
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
-
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
-
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
-
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
-
-end Gen_UCD.Unsigned_Types;
+package VSS.Strings.Word_Iterators renames VSS.Strings.Cursors.Iterators.Words;

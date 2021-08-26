@@ -21,25 +21,38 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Unsigned_Types is
+package VSS.Strings.Cursors.Iterators.Words is
 
-   pragma Pure;
+   pragma Preelaborate;
 
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
+   type Word_Iterator is new Abstract_Segment_Iterator with private;
 
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
+   function Backward (Self : in out Word_Iterator) return Boolean;
+   --  Move iterator to previous word.
 
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
+private
 
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+   type Word_Iterator is new Abstract_Segment_Iterator with record
+      null;
+   end record;
 
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
+   overriding procedure Invalidate (Self : in out Word_Iterator);
 
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
+   overriding procedure String_Modified
+     (Self     : in out Word_Iterator;
+      Start    : VSS.Implementation.Strings.Cursor;
+      Removed  : VSS.Implementation.Strings.Cursor_Offset;
+      Inserted : VSS.Implementation.Strings.Cursor_Offset);
 
-end Gen_UCD.Unsigned_Types;
+   overriding function Forward (Self : in out Word_Iterator) return Boolean;
+
+   overriding function Has_Element (Self : Word_Iterator) return Boolean;
+
+   procedure Initialize
+     (Self            : in out Word_Iterator'Class;
+      String          : Virtual_String'Class;
+      Position        : VSS.Implementation.Strings.Cursor);
+   --  Initialize iterator and lookup for word boundaries around the given
+   --  position.
+
+end VSS.Strings.Cursors.Iterators.Words;

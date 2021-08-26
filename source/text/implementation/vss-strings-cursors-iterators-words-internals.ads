@@ -21,25 +21,26 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Unsigned_Types is
+with VSS.Implementation.Strings;
 
-   pragma Pure;
+package VSS.Strings.Cursors.Iterators.Words.Internals is
 
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
+   pragma Preelaborate;
 
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
+   function First_Word
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
+   --  Return word iterator pointing to the first word of the string.
 
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
+   function Last_Word
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
+   --  Return word iterator pointing to the last word of the string.
 
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+   function Word
+     (Self     : Virtual_String'Class;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
+   --  Return word iterator pointing to the word at the given position.
 
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
-
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
-
-end Gen_UCD.Unsigned_Types;
+end VSS.Strings.Cursors.Iterators.Words.Internals;

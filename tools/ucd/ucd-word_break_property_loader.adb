@@ -21,25 +21,59 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Unsigned_Types is
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-   pragma Pure;
+with UCD.Characters;
+with UCD.Data_File_Loaders;
+with UCD.Properties;
 
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
+package body UCD.Word_Break_Property_Loader is
 
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
+   ----------
+   -- Load --
+   ----------
 
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
+   procedure Load (UCD_Root : Wide_Wide_String) is
+      WB_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("WB");
+      GCB_Other   : constant not null UCD.Properties.Property_Value_Access :=
+        UCD.Properties.Resolve (WB_Property, "Other");
+      Value_Field : constant Data_File_Loaders.Field_Index := 1;
+      --  Index of the data field with the value of the property.
 
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+      Loader : UCD.Data_File_Loaders.File_Loader;
 
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
+   begin
+      --  Setup default value for all characters.
 
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
+      for Code in UCD.Code_Point loop
+         UCD.Characters.Set (Code, WB_Property, GCB_Other);
+      end loop;
 
-end Gen_UCD.Unsigned_Types;
+      Loader.Open (UCD_Root, "auxiliary/WordBreakProperty.txt");
+
+      while not Loader.End_Of_File loop
+         declare
+            First_Code : UCD.Code_Point;
+            Last_Code  : UCD.Code_Point;
+
+         begin
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
+
+            declare
+               Value : constant not null Properties.Property_Value_Access :=
+                 UCD.Properties.Resolve
+                   (WB_Property, Loader.Get_Field (Value_Field));
+
+            begin
+               for Code in First_Code .. Last_Code loop
+                  UCD.Characters.Set (Code, WB_Property, Value);
+               end loop;
+            end;
+
+            Loader.Skip_Line;
+         end;
+      end loop;
+   end Load;
+
+end UCD.Word_Break_Property_Loader;

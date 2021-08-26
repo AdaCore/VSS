@@ -50,7 +50,8 @@ project VSS_Text_Tests is
                  "test_string_replace",
                  "test_string_slice",
                  "test_string_split_lines",
-                 "test_string_vector");
+                 "test_string_vector",
+                 "test_word_iterators");
 
    package Compiler is
       for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");

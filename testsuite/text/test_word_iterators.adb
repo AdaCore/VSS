@@ -24,12 +24,12 @@
 with Ada.Command_Line;
 
 with VSS.String_Vectors;
-with VSS.Strings.Grapheme_Cluster_Iterators;
+with VSS.Strings.Word_Iterators;
 
 with Test_Support;
 with Generic_UCD_Break_Test_Runner;
 
-procedure Test_Grapheme_Cluster_Iterators is
+procedure Test_Word_Iterators is
 
    procedure Run_Test_Case
      (String   : VSS.Strings.Virtual_String;
@@ -48,16 +48,14 @@ procedure Test_Grapheme_Cluster_Iterators is
    is
       use type VSS.Strings.Virtual_String;
 
-      JF : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        String.First_Grapheme_Cluster;
-      JB : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        String.Last_Grapheme_Cluster;
+      JF : VSS.Strings.Word_Iterators.Word_Iterator := String.First_Word;
+      --  JB : VSS.Strings.Word_Iterators.Word_Iterator := String.Last_Word;
       S  : Positive := 1;
 
    begin
       if String.Is_Empty then
          Test_Support.Assert (not JF.Has_Element);
-         Test_Support.Assert (not JB.Has_Element);
+         --  Test_Support.Assert (not JB.Has_Element);
 
          return;
       end if;
@@ -74,28 +72,28 @@ procedure Test_Grapheme_Cluster_Iterators is
       Test_Support.Assert (S - 1 = Segments.Length);
       Test_Support.Assert (not JF.Has_Element);
 
-      loop
-         Test_Support.Assert (JB.Has_Element);
-
-         S := S - 1;
-         Test_Support.Assert (String.Slice (JB) = Segments (S));
-
-         exit when not JB.Backward;
-      end loop;
-
-      Test_Support.Assert (S = 1);
-      Test_Support.Assert (not JB.Has_Element);
+      --  loop
+      --     Test_Support.Assert (JB.Has_Element);
+      --
+      --     S := S - 1;
+      --     Test_Support.Assert (String.Slice (JB) = Segments (S));
+      --
+      --     exit when not JB.Backward;
+      --  end loop;
+      --
+      --  Test_Support.Assert (S = 1);
+      --  Test_Support.Assert (not JB.Has_Element);
    end Run_Test_Case;
 
 begin
    --  Process test cases provided with UCD.
 
    Run_UCD_Tests
-     (Ada.Command_Line.Argument (1) & "/auxiliary/GraphemeBreakTest.txt");
+     (Ada.Command_Line.Argument (1) & "/auxiliary/WordBreakTest.txt");
 
    --  Additional test for an empty string.
 
    Run_Test_Case
      (VSS.Strings.Empty_Virtual_String,
       VSS.String_Vectors.Empty_Virtual_String_Vector);
-end Test_Grapheme_Cluster_Iterators;
+end Test_Word_Iterators;

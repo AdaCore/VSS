@@ -36,7 +36,7 @@ that supports them.
 ### Build from sources
 Prefered way to install is to download sources and run
 
-    make all
+    make all install PREFIX=/path/to/install
 
 ### Using `alire`
 Or you can use [alire](https://alire.ada.dev/) library manager:
@@ -47,6 +47,9 @@ Then you can use it as dependency in the project file:
 
     with "vss_text.gpr";
 
+For use JSON streaming API:
+
+    with "vss_json.gpr";
 
 ## Documentation
 

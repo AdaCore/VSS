@@ -24,6 +24,7 @@
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Markers.Internals;
+with VSS.Strings.Internals;
 
 package body VSS.Strings.Cursors.Iterators.Lines is
 
@@ -52,6 +53,38 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Position : VSS.Implementation.Strings.Cursor);
    --  Lookup for previous line. Position points to the first character of
    --  the line of the current line.
+
+   ------------------------
+   -- Element_Terminator --
+   ------------------------
+
+   function Element_Terminator
+     (Self : Line_Iterator'Class) return VSS.Strings.Virtual_String
+   is
+      First      : constant VSS.Implementation.Strings.Cursor :=
+        Self.Terminator_First;
+      Last       : constant VSS.Implementation.Strings.Cursor :=
+        Self.Terminator_Last;
+      Terminator : VSS.Implementation.Strings.String_Data;
+
+   begin
+      if Self.Owner = null
+        or VSS.Implementation.Strings.Is_Invalid (First)
+        or VSS.Implementation.Strings.Is_Invalid (Last)
+      then
+         return VSS.Strings.Empty_Virtual_String;
+
+      else
+         VSS.Implementation.Strings.Handler (Self.Owner.Data).Slice
+           (Self.Owner.Data, First, Last, Terminator);
+
+         return Result : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.Internals.To_Virtual_String (Terminator)
+         do
+            VSS.Implementation.Strings.Unreference (Terminator);
+         end return;
+      end if;
+   end Element_Terminator;
 
    -------------
    -- Forward --

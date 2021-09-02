@@ -32,6 +32,12 @@ package VSS.Strings.Cursors.Iterators.Lines is
    --  of the text may not have line terminator. This function is independent
    --  from the Keep_Terminator mode.
 
+   function Element_Terminator
+     (Self : Line_Iterator'Class) return VSS.Strings.Virtual_String;
+   --  Return line terminator sequence of the current line. Return empty
+   --  string when line is not terminated by line termination sequence
+   --  (it is last line in the source string).
+
    function Terminator_First_Marker
      (Self : Line_Iterator'Class)
       return VSS.Strings.Cursors.Markers.Character_Marker;

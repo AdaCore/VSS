@@ -33,8 +33,10 @@ package body VSS.Strings.Cursors.Markers.Internals is
       return VSS.Strings.Cursors.Markers.Character_Marker is
    begin
       return Result : VSS.Strings.Cursors.Markers.Character_Marker do
-         Result.Position := Position;
-         Result.Connect (String'Unrestricted_Access);
+         if not VSS.Implementation.Strings.Is_Invalid (Position) then
+            Result.Position := Position;
+            Result.Connect (String'Unrestricted_Access);
+         end if;
       end return;
    end New_Character_Marker;
 

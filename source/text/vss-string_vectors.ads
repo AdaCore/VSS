@@ -62,6 +62,11 @@ package VSS.String_Vectors is
    procedure Clear (Self : in out Virtual_String_Vector'Class);
    --  Remove all strings from the vector
 
+   function Contains
+     (Self : Virtual_String_Vector'Class;
+      Item : VSS.Strings.Virtual_String'Class) return Boolean;
+   --  Return True if the given item is present in the vector, False otherwise.
+
    procedure Append
      (Self : in out Virtual_String_Vector'Class;
       Item : VSS.Strings.Virtual_String'Class);

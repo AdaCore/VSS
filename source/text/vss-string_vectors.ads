@@ -79,6 +79,11 @@ package VSS.String_Vectors is
         with Pre => Index <= Self.Length;
    --  Replace a string vector item with given Index by a new value.
 
+   function Contains
+     (Self : Virtual_String_Vector'Class;
+      Item : VSS.Strings.Virtual_String) return Boolean;
+   --  Return True when vector contains given string.
+
    function Join_Lines
      (Self           : Virtual_String_Vector'Class;
       Terminator     : VSS.Strings.Line_Terminator;

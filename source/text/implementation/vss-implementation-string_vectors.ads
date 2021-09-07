@@ -69,4 +69,9 @@ package VSS.Implementation.String_Vectors is
       Terminate_Last : Boolean);
    --  Join string vertor's strings using given Terminator.
 
+   function Contains
+     (Self : String_Vector_Data_Access;
+      Item : VSS.Implementation.Strings.String_Data) return Boolean;
+   --  Return True when given string is present in vector.
+
 end VSS.Implementation.String_Vectors;

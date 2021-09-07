@@ -44,6 +44,7 @@ procedure Test_String_Vector is
    procedure Test_Is_Empty;
    procedure Test_Append_Vector;
    procedure Test_Clear;
+   procedure Test_Contains;
 
    ------------------------
    -- Test_Append_Vector --
@@ -91,6 +92,26 @@ procedure Test_String_Vector is
       Test_Support.Assert (not V2.Is_Empty);
    end Test_Clear;
 
+   -------------------
+   -- Test_Contains --
+   -------------------
+
+   procedure Test_Contains is
+      V1 : VSS.String_Vectors.Virtual_String_Vector;
+      V2 : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      V1.Append ("abc");
+      V1.Append (VSS.Strings.Empty_Virtual_String);
+      V1.Append ("def");
+
+      Test_Support.Assert (V1.Contains ("abc"));
+      Test_Support.Assert (V1.Contains (""));
+      Test_Support.Assert (V1.Contains ("def"));
+      Test_Support.Assert (not V1.Contains ("xyz"));
+
+      Test_Support.Assert (not V2.Contains ("abc"));
+   end Test_Contains;
    -------------------
    -- Test_Is_Empty --
    -------------------
@@ -345,4 +366,5 @@ begin
    Test_Is_Empty;
    Test_Append_Vector;
    Test_Clear;
+   Test_Contains;
 end Test_String_Vector;

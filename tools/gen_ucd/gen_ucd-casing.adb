@@ -35,174 +35,12 @@ with Interfaces;
 with UCD.Characters;
 with UCD.Properties;
 
+with Gen_UCD.Generic_Compressed_Stage_Table;
 with Gen_UCD.Unsigned_Types;            use Gen_UCD.Unsigned_Types;
 
 package body Gen_UCD.Casing is
 
    use type UCD.Code_Point;
-
-   generic
-      type Data_Type is private;
-      type Data_Type_Array is array (UCD.Code_Point) of Data_Type;
-
-   package Generic_Compressed_Stage_Table is
-
-      Group_Size : constant := 256;
-
-      type Group_Count is new Natural;
-      subtype Group_Offset is Group_Count;
-
-      type Data_Count is new Natural;
-      subtype Data_Offset is Data_Count;
-
-      type Compressed_Stage_Table is tagged limited private;
-
-      procedure Build
-        (Self : in out Compressed_Stage_Table'Class; Data : Data_Type_Array);
-
-      function Index_Table_Last
-        (Self : Compressed_Stage_Table'Class) return Group_Count;
-
-      function Index_Table_Element
-        (Self   : Compressed_Stage_Table'Class;
-         Offset : Group_Offset) return Data_Offset;
-
-      function Data_Table_Last return Data_Count;
-
-      function Data_Table_Element (Offset : Data_Offset) return Data_Type;
-
-   private
-
-      type Group_Array is array (Unsigned_32 range <>) of Unsigned_32;
-
-      type Group_Array_Access is access all Group_Array;
-
-      type Compressed_Stage_Table is tagged limited record
-         Group_Data : Group_Array_Access;
-      end record;
-
-   end Generic_Compressed_Stage_Table;
-
-   ------------------------------------
-   -- Generic_Compressed_Stage_Table --
-   ------------------------------------
-
-   package body Generic_Compressed_Stage_Table is
-
-      type Compressed_Array is array (Unsigned_32 range <>) of Data_Type;
-
-      type Compressed_Array_Access is access all Compressed_Array;
-
-      Result_Data       : Compressed_Array_Access;
-      Result_Data_Last  : Unsigned_32;
-
-      -----------
-      -- Build --
-      -----------
-
-      procedure Build
-        (Self : in out Compressed_Stage_Table'Class; Data : Data_Type_Array)
-      is
-         Initial : Unsigned_32;
-         Reused  : Boolean;
-
-      begin
-         Self.Group_Data :=
-           new Group_Array
-             (0 .. (Unsigned_32 (UCD.Code_Point'Last) + 1) / Group_Size - 1);
-
-         if Result_Data = null then
-            --  Allocate memory.
-
-            Result_Data :=
-              new Compressed_Array (0 .. Unsigned_32 (UCD.Code_Point'Last));
-
-            --  Copy first block
-
-            Result_Data (0 .. Group_Size - 1) :=
-              Compressed_Array (Data (0 .. Group_Size - 1));
-            Result_Data_Last := Group_Size - 1;
-            Self.Group_Data (0) := 0;
-            Initial := 1;
-
-         else
-            Initial := 0;
-         end if;
-
-         --  Process all other blocks
-
-         for Group in Initial .. Self.Group_Data'Last loop
-            declare
-               Source : Compressed_Array renames
-                 Compressed_Array
-                     (Data (UCD.Code_Point (Group * Group_Size)
-                      .. UCD.Code_Point ((Group + 1) * Group_Size - 1)));
-
-            begin
-               Reused := False;
-
-               for Offset in 0 .. Result_Data_Last - Group_Size + 1 loop
-                  if Result_Data (Offset .. Offset + Group_Size - 1)
-                    = Source
-                  then
-                     Self.Group_Data (Group) := Offset;
-                     Reused := True;
-
-                     exit;
-                  end if;
-               end loop;
-
-               if not Reused then
-                  Self.Group_Data (Group) := Result_Data_Last + 1;
-                  Result_Data_Last := Result_Data_Last + Group_Size;
-                  Result_Data
-                    (Result_Data_Last - Group_Size + 1 .. Result_Data_Last) :=
-                       Source;
-               end if;
-            end;
-         end loop;
-      end Build;
-
-      ------------------------
-      -- Data_Table_Element --
-      ------------------------
-
-      function Data_Table_Element (Offset : Data_Offset) return Data_Type is
-      begin
-         return Result_Data (Unsigned_32 (Offset));
-      end Data_Table_Element;
-
-      ---------------------
-      -- Data_Table_Last --
-      ---------------------
-
-      function Data_Table_Last return Data_Count is
-      begin
-         return Data_Count (Result_Data_Last);
-      end Data_Table_Last;
-
-      -------------------------
-      -- Index_Table_Element --
-      -------------------------
-
-      function Index_Table_Element
-        (Self   : Compressed_Stage_Table'Class;
-         Offset : Group_Offset) return Data_Offset is
-      begin
-         return Data_Offset (Self.Group_Data (Unsigned_32 (Offset)));
-      end Index_Table_Element;
-
-      ----------------------
-      -- Index_Table_Last --
-      ----------------------
-
-      function Index_Table_Last
-        (Self : Compressed_Stage_Table'Class) return Group_Count is
-      begin
-         return Group_Count (Self.Group_Data'Last);
-      end Index_Table_Last;
-
-   end Generic_Compressed_Stage_Table;
 
    package Database is
 
@@ -534,7 +372,8 @@ package body Gen_UCD.Casing is
          return UTF_8_Code_Unit_Vectors.Vector;
 
       package Compressed_Stage_Table is
-        new Generic_Compressed_Stage_Table (Mapping_Record, Mapping_Array);
+        new Gen_UCD.Generic_Compressed_Stage_Table
+              (Mapping_Record, Mapping_Array);
 
       Compressed :
         array (Case_Mapping) of Compressed_Stage_Table.Compressed_Stage_Table;

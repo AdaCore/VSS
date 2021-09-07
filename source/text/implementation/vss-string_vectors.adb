@@ -98,6 +98,20 @@ package body VSS.String_Vectors is
       VSS.Implementation.String_Vectors.Unreference (Self.Data);
    end Clear;
 
+   --------------
+   -- Contains --
+   --------------
+
+   function Contains
+     (Self : Virtual_String_Vector'Class;
+      Item : VSS.Strings.Virtual_String) return Boolean is
+   begin
+      return
+        VSS.Implementation.String_Vectors.Contains
+          (Self.Data,
+           VSS.Strings.Internals.Data_Access_Constant (Item).all);
+   end Contains;
+
    -------------
    -- Element --
    -------------

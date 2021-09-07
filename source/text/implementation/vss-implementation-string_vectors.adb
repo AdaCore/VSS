@@ -165,6 +165,39 @@ package body VSS.Implementation.String_Vectors is
       Self.Data (Self.Last) := Item;
    end Append_And_Move_Ownership;
 
+   --------------
+   -- Contains --
+   --------------
+
+   function Contains
+     (Self : String_Vector_Data_Access;
+      Item : VSS.Implementation.Strings.String_Data) return Boolean
+   is
+      Item_Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+          renames VSS.Implementation.Strings.Handler (Item).all;
+
+   begin
+      if Self = null then
+         return False;
+      end if;
+
+      for J in Self.Data'First .. Self.Last loop
+         declare
+            Handler :
+              VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+                renames VSS.Implementation.Strings.Handler (Self.Data (J)).all;
+
+         begin
+            if Item_Handler.Is_Equal (Item, Handler, Self.Data (J)) then
+               return True;
+            end if;
+         end;
+      end loop;
+
+      return False;
+   end Contains;
+
    ----------------
    -- Join_Lines --
    ----------------

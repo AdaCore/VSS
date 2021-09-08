@@ -25,13 +25,12 @@ pragma Ada_2022;
 
 package body Gen_UCD.Generic_Compressed_Stage_Table is
 
-   type Compressed_Array is
-     array (Gen_UCD.Unsigned_Types.Unsigned_32 range <>) of Data_Type;
+   type Compressed_Array is array (Gen_UCD.Unsigned_32 range <>) of Data_Type;
 
    type Compressed_Array_Access is access all Compressed_Array;
 
    Result_Data       : Compressed_Array_Access;
-   Result_Data_Last  : Gen_UCD.Unsigned_Types.Unsigned_32;
+   Result_Data_Last  : Gen_UCD.Unsigned_32;
 
    -----------
    -- Build --
@@ -40,7 +39,6 @@ package body Gen_UCD.Generic_Compressed_Stage_Table is
    procedure Build
      (Self : in out Compressed_Stage_Table'Class; Data : Data_Type_Array)
    is
-      use Gen_UCD.Unsigned_Types;
       use type UCD.Code_Point;
 
       Initial : Unsigned_32;
@@ -107,7 +105,7 @@ package body Gen_UCD.Generic_Compressed_Stage_Table is
 
    function Data_Table_Element (Offset : Data_Offset) return Data_Type is
    begin
-      return Result_Data (Gen_UCD.Unsigned_Types.Unsigned_32 (Offset));
+      return Result_Data (Gen_UCD.Unsigned_32 (Offset));
    end Data_Table_Element;
 
    ---------------------
@@ -127,9 +125,7 @@ package body Gen_UCD.Generic_Compressed_Stage_Table is
      (Self   : Compressed_Stage_Table'Class;
       Offset : Group_Offset) return Data_Offset is
    begin
-      return
-        Data_Offset
-          (Self.Group_Data (Gen_UCD.Unsigned_Types.Unsigned_32 (Offset)));
+      return Data_Offset (Self.Group_Data (Gen_UCD.Unsigned_32 (Offset)));
    end Index_Table_Element;
 
    ----------------------

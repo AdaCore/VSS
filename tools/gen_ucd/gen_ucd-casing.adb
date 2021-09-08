@@ -36,7 +36,6 @@ with UCD.Characters;
 with UCD.Properties;
 
 with Gen_UCD.Generic_Compressed_Stage_Table;
-with Gen_UCD.Unsigned_Types;            use Gen_UCD.Unsigned_Types;
 
 package body Gen_UCD.Casing is
 

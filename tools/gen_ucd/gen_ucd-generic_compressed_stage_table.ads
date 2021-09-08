@@ -21,7 +21,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Gen_UCD.Unsigned_Types;
 with UCD;
 
 generic
@@ -57,8 +56,7 @@ package Gen_UCD.Generic_Compressed_Stage_Table is
 private
 
    type Group_Array is
-     array (Gen_UCD.Unsigned_Types.Unsigned_32 range <>)
-       of Gen_UCD.Unsigned_Types.Unsigned_32;
+     array (Gen_UCD.Unsigned_32 range <>) of Gen_UCD.Unsigned_32;
 
    type Group_Array_Access is access all Group_Array;
 

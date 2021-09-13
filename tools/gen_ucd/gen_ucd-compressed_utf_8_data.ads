@@ -21,38 +21,35 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD is
+private with Ada.Containers.Vectors;
 
-   pragma Pure;
+with UCD;
 
-   --------------------
-   -- Unsigned types --
-   --------------------
+package Gen_UCD.Compressed_UTF_8_Data is
 
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
+   type Compressed_UTF_8_Data is tagged limited private;
 
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
+   procedure Append_Data
+     (Self   : in out Compressed_UTF_8_Data;
+      Data   : UCD.Code_Point_Vectors.Vector;
+      Offset : out Gen_UCD.UTF_8_Offset;
+      Size   : out Gen_UCD.UTF_8_Count;
+      Length : out Natural);
 
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
+   function Element
+     (Self   : Compressed_UTF_8_Data;
+      Offset : Gen_UCD.UTF_8_Offset) return Gen_UCD.UTF_8_Code_Unit;
 
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+   function Last_Index
+     (Self : Compressed_UTF_8_Data) return Gen_UCD.UTF_8_Offset;
 
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
+private
 
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
+   package UTF_8_Code_Unit_Vectors is
+     new Ada.Containers.Vectors (Gen_UCD.UTF_8_Count, Gen_UCD.UTF_8_Code_Unit);
 
-   --------------------------
-   -- UTF-8 encoding types --
-   --------------------------
+   type Compressed_UTF_8_Data is tagged limited record
+      Data : UTF_8_Code_Unit_Vectors.Vector;
+   end record;
 
-   type UTF_8_Code_Unit is new Unsigned_8;
-
-   type UTF_8_Offset is range -2 ** 15 .. 2 ** 15 - 1;
-   subtype UTF_8_Count is UTF_8_Offset range 0 .. UTF_8_Offset'Last;
-
-end Gen_UCD;
+end Gen_UCD.Compressed_UTF_8_Data;

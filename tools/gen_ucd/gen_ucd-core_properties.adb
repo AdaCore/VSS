@@ -21,39 +21,27 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Hashed_Maps;
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Ada.Strings;                       use Ada.Strings;
 with Ada.Strings.Wide_Wide_Fixed;       use Ada.Strings.Wide_Wide_Fixed;
 with Ada.Strings.Wide_Wide_Unbounded;   use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
-with Ada.Wide_Wide_Characters.Handling; use Ada.Wide_Wide_Characters.Handling;
 with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
-with Interfaces;
 
 with UCD.Characters;
 with UCD.Properties;
 
+with Gen_UCD.Compressed_Enumeration_Properties;
+
 package body Gen_UCD.Core_Properties is
 
-   function Minimum_Bits (Value : Integer) return Integer;
-
-   function Value_Identifier
-     (Property : not null UCD.Properties.Property_Access;
-      Value    : not null UCD.Properties.Property_Value_Access)
-      return Wide_Wide_String;
-
-   package Property_Value_Integer_Maps is
-     new Ada.Containers.Hashed_Maps
-       (UCD.Properties.Property_Value_Access,
-        Integer,
-        UCD.Properties.Hash,
-        UCD.Properties."=");
-
-   GC_Mapping  : Property_Value_Integer_Maps.Map;
-   GCB_Mapping : Property_Value_Integer_Maps.Map;
-   WB_Mapping  : Property_Value_Integer_Maps.Map;
+   GC_Mapping  :
+     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
+   GCB_Mapping :
+     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
+   WB_Mapping  :
+     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
 
    package Database is
 
@@ -104,41 +92,9 @@ package body Gen_UCD.Core_Properties is
    begin
       Put ("   ... core properties");
 
-      declare
-         Count : Natural := 0;
-
-      begin
-         for Value of GC_Property.All_Values loop
-            if Value.Is_Used then
-               GC_Mapping.Insert (Value, Count);
-               Count := Count + 1;
-            end if;
-         end loop;
-      end;
-
-      declare
-         Count : Natural := 0;
-
-      begin
-         for Value of GCB_Property.All_Values loop
-            if Value.Is_Used then
-               GCB_Mapping.Insert (Value, Count);
-               Count := Count + 1;
-            end if;
-         end loop;
-      end;
-
-      declare
-         Count : Natural := 0;
-
-      begin
-         for Value of WB_Property.All_Values loop
-            if Value.Is_Used then
-               WB_Mapping.Insert (Value, Count);
-               Count := Count + 1;
-            end if;
-         end loop;
-      end;
+      GC_Mapping.Initialize (GC_Property);
+      GCB_Mapping.Initialize (GCB_Property);
+      WB_Mapping.Initialize (WB_Property);
 
       Database.Initialize (8);
 
@@ -164,10 +120,7 @@ package body Gen_UCD.Core_Properties is
       begin
          for Code in UCD.Code_Point loop
             Database.Set_GC
-              (Code,
-               Gen_UCD.Unsigned_5
-                 (GC_Mapping.Element
-                      (UCD.Characters.Get (Code, GC_Property))));
+              (Code, Gen_UCD.Unsigned_5 (GC_Mapping.Representation (Code)));
 
             Database.Set_OLower
               (Code,
@@ -180,16 +133,10 @@ package body Gen_UCD.Core_Properties is
                UCD.Characters.Get (Code, ExtPict_Property) = ExtPict_Y);
 
             Database.Set_GCB
-              (Code,
-               Gen_UCD.Unsigned_4
-                 (GCB_Mapping.Element
-                      (UCD.Characters.Get (Code, GCB_Property))));
+              (Code, Gen_UCD.Unsigned_4 (GCB_Mapping.Representation (Code)));
 
             Database.Set_WB
-              (Code,
-               Gen_UCD.Unsigned_5
-                 (WB_Mapping.Element
-                      (UCD.Characters.Get (Code, WB_Property))));
+              (Code, Gen_UCD.Unsigned_5 (WB_Mapping.Representation (Code)));
          end loop;
       end;
 
@@ -580,189 +527,15 @@ package body Gen_UCD.Core_Properties is
 
       --  Generate GC_Values type
 
-      declare
-         Property : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("gc");
-         First    : Boolean := True;
-         Count    : Natural := 0;
-
-      begin
-         Put_Line (File, "   type GC_Values is");
-
-         for Value of Property.All_Values loop
-            if Value.Is_Used then
-               Count := Count + 1;
-
-               if First then
-                  Put (File, "     (");
-                  First := False;
-
-               else
-                  Put_Line (File, ",");
-                  Put (File, "      ");
-               end if;
-
-               Put (File, Value_Identifier (Property, Value));
-            end if;
-         end loop;
-
-         Put_Line (File, ");");
-
-         Put_Line
-           (File,
-            "   for GC_Values'Size use"
-            & Natural'Wide_Wide_Image (Minimum_Bits (Count))
-            & ";");
-         Put_Line (File, "   for GC_Values use");
-         First := True;
-
-         for Value of Property.All_Values loop
-            if Value.Is_Used then
-               Count := Count + 1;
-
-               if First then
-                  Put (File, "     (");
-                  First := False;
-
-               else
-                  Put_Line (File, ",");
-                  Put (File, "      ");
-               end if;
-
-               Put (File, Value_Identifier (Property, Value));
-               Put (File, " =>");
-               Put
-                 (File, Integer'Wide_Wide_Image (GC_Mapping.Element (Value)));
-            end if;
-         end loop;
-
-         Put_Line (File, ");");
-         New_Line (File);
-      end;
+      GC_Mapping.Generate_Type_Declaration (File);
 
       --  Generate GCB_Values type
 
-      declare
-         Property : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("GCB");
-         First    : Boolean := True;
-         Count    : Natural := 0;
-
-      begin
-         Put_Line (File, "   type GCB_Values is");
-
-         for Value of Property.All_Values loop
-            if Value.Is_Used then
-               Count := Count + 1;
-
-               if First then
-                  Put (File, "     (");
-                  First := False;
-
-               else
-                  Put_Line (File, ",");
-                  Put (File, "      ");
-               end if;
-
-               Put (File, Value_Identifier (Property, Value));
-            end if;
-         end loop;
-
-         Put_Line (File, ");");
-
-         Put_Line
-           (File,
-            "   for GCB_Values'Size use"
-            & Natural'Wide_Wide_Image (Minimum_Bits (Count))
-            & ";");
-         Put_Line (File, "   for GCB_Values use");
-         First := True;
-
-         for Value of Property.All_Values loop
-            if Value.Is_Used then
-               Count := Count + 1;
-
-               if First then
-                  Put (File, "     (");
-                  First := False;
-
-               else
-                  Put_Line (File, ",");
-                  Put (File, "      ");
-               end if;
-
-               Put (File, Value_Identifier (Property, Value));
-               Put (File, " =>");
-               Put
-                 (File, Integer'Wide_Wide_Image (GCB_Mapping.Element (Value)));
-            end if;
-         end loop;
-
-         Put_Line (File, ");");
-         New_Line (File);
-      end;
+      GCB_Mapping.Generate_Type_Declaration (File);
 
       --  Generate WB_Values type
 
-      declare
-         Property : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("WB");
-         First    : Boolean := True;
-         Count    : Natural := 0;
-
-      begin
-         Put_Line (File, "   type WB_Values is");
-
-         for Value of Property.All_Values loop
-            if Value.Is_Used and WB_Mapping.Contains (Value) then
-               Count := Count + 1;
-
-               if First then
-                  Put (File, "     (");
-                  First := False;
-
-               else
-                  Put_Line (File, ",");
-                  Put (File, "      ");
-               end if;
-
-               Put (File, Value_Identifier (Property, Value));
-            end if;
-         end loop;
-
-         Put_Line (File, ");");
-
-         Put_Line
-           (File,
-            "   for WB_Values'Size use"
-            & Natural'Wide_Wide_Image (Minimum_Bits (Count))
-            & ";");
-         Put_Line (File, "   for WB_Values use");
-         First := True;
-
-         for Value of Property.All_Values loop
-            if Value.Is_Used and WB_Mapping.Contains (Value) then
-               Count := Count + 1;
-
-               if First then
-                  Put (File, "     (");
-                  First := False;
-
-               else
-                  Put_Line (File, ",");
-                  Put (File, "      ");
-               end if;
-
-               Put (File, Value_Identifier (Property, Value));
-               Put (File, " =>");
-               Put
-                 (File, Integer'Wide_Wide_Image (WB_Mapping.Element (Value)));
-            end if;
-         end loop;
-
-         Put_Line (File, ");");
-         New_Line (File);
-      end;
+      WB_Mapping.Generate_Type_Declaration (File);
 
       --  Generate types for index and data tables.
 
@@ -909,43 +682,5 @@ package body Gen_UCD.Core_Properties is
 
       Put_Line (File, "end VSS.Implementation.UCD_Core;");
    end Generate;
-
-   ------------------
-   -- Minimum_Bits --
-   ------------------
-
-   function Minimum_Bits (Value : Integer) return Integer is
-      use type Interfaces.Unsigned_32;
-
-      Aux : Interfaces.Unsigned_32 := Interfaces.Unsigned_32 (Value);
-
-   begin
-      return Result : Integer := 32 do
-         loop
-            exit when Aux / 16#8000_0000# = 1;
-
-            Result := Result - 1;
-            Aux    := Aux * 2;
-         end loop;
-      end return;
-   end Minimum_Bits;
-
-   ----------------------
-   -- Value_Identifier --
-   ----------------------
-
-   function Value_Identifier
-     (Property : not null UCD.Properties.Property_Access;
-      Value    : not null UCD.Properties.Property_Value_Access)
-      return Wide_Wide_String
-   is
-      Property_Name : constant Wide_Wide_String :=
-        To_Upper (To_Wide_Wide_String (Property.Names.First_Element));
-      Value_Name    : constant Wide_Wide_String :=
-        To_Wide_Wide_String (Value.Names.First_Element);
-
-   begin
-      return Property_Name & '_' & Value_Name;
-   end Value_Identifier;
 
 end Gen_UCD.Core_Properties;

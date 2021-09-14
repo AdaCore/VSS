@@ -237,6 +237,26 @@ package body UCD.Characters is
 
          CCC_Value.Is_Used := True;
       end;
+
+      --  Default value for Decomposition_Type is 'None'
+
+      declare
+         DT_Property    : constant not null Properties.Property_Access :=
+           Properties.Resolve ("dt");
+         DT_Value       : constant not null Properties.Property_Value_Access :=
+           Properties.Resolve (DT_Property, "None");
+         DT_Index       : constant Positive :=
+           Enumeration_Property_To_Index (DT_Property);
+         DT_Value_Index : constant Interfaces.Unsigned_16 :=
+           Internal_Enumeration_Value (DT_Property, DT_Value);
+
+      begin
+         for C in Code_Point loop
+            Database (C).Enumeration (DT_Index) := DT_Value_Index;
+         end loop;
+
+         DT_Value.Is_Used := True;
+      end;
    end Initialize_Character_Database;
 
    --------------------------------

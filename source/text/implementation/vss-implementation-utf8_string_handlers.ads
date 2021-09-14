@@ -196,6 +196,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
 
+   overriding procedure Normalize
+     (Self   : UTF8_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data);
+
    In_Place_Storage_Capacity : constant := 17;
    --  Number of code units can be stored in place
 
@@ -361,6 +367,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data    : VSS.Implementation.Strings.String_Data;
       Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
+
+   overriding procedure Normalize
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data);
 
    Global_UTF8_String_Handler   : aliased
      VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;

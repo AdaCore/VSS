@@ -296,6 +296,21 @@ package body VSS.Implementation.Null_String_Handlers is
       return VSS.Implementation.Strings.Character_Count is (0);
 
    ---------------
+   -- Normalize --
+   ---------------
+
+   overriding procedure Normalize
+     (Self   : Null_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data) is
+   begin
+      --  String is empty, nothing to do.
+
+      Self.Initialize (Result);
+   end Normalize;
+
+   ---------------
    -- Reference --
    ---------------
 

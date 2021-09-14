@@ -1700,6 +1700,56 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end if;
    end Mutate;
 
+   ---------------
+   -- Normalize --
+   ---------------
+
+   overriding procedure Normalize
+     (Self   : UTF8_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data) is
+   begin
+      case Form is
+         when VSS.Strings.Normalization_Form_D =>
+            raise Program_Error;
+
+         when VSS.Strings.Normalization_Form_C =>
+            raise Program_Error;
+
+         when VSS.Strings.Normalization_Form_KD =>
+            raise Program_Error;
+
+         when VSS.Strings.Normalization_Form_KC =>
+            raise Program_Error;
+      end case;
+   end Normalize;
+
+   ---------------
+   -- Normalize --
+   ---------------
+
+   overriding procedure Normalize
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data) is
+   begin
+      case Form is
+         when VSS.Strings.Normalization_Form_D =>
+            raise Program_Error;
+
+         when VSS.Strings.Normalization_Form_C =>
+            raise Program_Error;
+
+         when VSS.Strings.Normalization_Form_KD =>
+            raise Program_Error;
+
+         when VSS.Strings.Normalization_Form_KC =>
+            raise Program_Error;
+      end case;
+   end Normalize;
+
    ----------------
    -- Reallocate --
    ----------------

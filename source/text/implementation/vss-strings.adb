@@ -1028,21 +1028,10 @@ package body VSS.Strings is
      (Self : Virtual_String'Class;
       Form : Normalization_Form) return Virtual_String is
    begin
-      case Form is
-         when Normalization_Form_D =>
-            raise Program_Error;
-
-         when Normalization_Form_C =>
-            raise Program_Error;
-
-         when Normalization_Form_KD =>
-            raise Program_Error;
-
-         when Normalization_Form_KC =>
-            raise Program_Error;
-      end case;
-
-      return Empty_Virtual_String;
+      return Result : Virtual_String do
+         VSS.Implementation.Strings.Handler (Self.Data).Normalize
+           (Self.Data, Form, Result.Data);
+      end return;
    end To_Normalized;
 
    -------------------------

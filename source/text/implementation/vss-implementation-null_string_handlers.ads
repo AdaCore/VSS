@@ -275,6 +275,12 @@ package VSS.Implementation.Null_String_Handlers is
       Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
 
+   overriding procedure Normalize
+     (Self   : Null_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data);
+
    Global_Null_String_Handler : aliased Null_String_Handler;
 
 end VSS.Implementation.Null_String_Handlers;

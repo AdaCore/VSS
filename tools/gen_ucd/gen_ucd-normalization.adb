@@ -87,7 +87,7 @@ package body Gen_UCD.Normalization is
 
       function Mapping_Data_Last return Natural;
 
-      function Mapping_Data_Element (Offset : Natural) return Unsigned_32;
+      function Mapping_Data_Element (Offset : Natural) return Unsigned_64;
 
       function Mapping_Index_Last
         (Decomposition : Decomposition_Kind) return Natural;
@@ -195,19 +195,31 @@ package body Gen_UCD.Normalization is
    package body Database is
 
       type Mapping_Record is record
-         CCC              : Unsigned_6  := 0;
          Decomposition_QC : Boolean     := True;
+         CCC              : Unsigned_6  := 0;
          Offset           : Unsigned_14 := 0;
          Size             : Unsigned_6  := 0;
          Length           : Unsigned_5  := 0;
+         Last_CCC         : Unsigned_6  := 0;
+         Reserved_1       : Unsigned_2  := 0;
+         Reserved_2       : Unsigned_2  := 0;
+         Reserved_3       : Unsigned_3  := 0;
+         Reserved_4       : Unsigned_2  := 0;
+         Reserved_5       : Unsigned_17 := 0;
       end record;
-      for Mapping_Record'Size use 32;
+      for Mapping_Record'Size use 64;
       for Mapping_Record use record
-         CCC              at 0 range 0 .. 5;
-         Offset           at 0 range 6 .. 19;
-         Size             at 0 range 20 .. 25;
-         Length           at 0 range 26 .. 30;
-         Decomposition_QC at 0 range 31 .. 31;
+         Offset           at 0 range 0 .. 13;
+         Reserved_1       at 0 range 14 .. 15;
+         Size             at 0 range 16 .. 21;
+         Reserved_2       at 0 range 22 .. 23;
+         Length           at 0 range 24 .. 28;
+         Reserved_3       at 0 range 29 .. 31;
+         CCC              at 0 range 32 .. 37;
+         Reserved_4       at 0 range 38 .. 39;
+         Last_CCC         at 0 range 40 .. 45;
+         Reserved_5       at 0 range 46 .. 62;
+         Decomposition_QC at 0 range 63 .. 63;
       end record;
       --  This declaration must be synchronized with type declaration in the
       --  generated code.
@@ -264,13 +276,13 @@ package body Gen_UCD.Normalization is
       -- Mapping_Data_Element --
       --------------------------
 
-      function Mapping_Data_Element (Offset : Natural) return Unsigned_32 is
-         function To_Unsigned_32 is
-            new Ada.Unchecked_Conversion (Mapping_Record, Unsigned_32);
+      function Mapping_Data_Element (Offset : Natural) return Unsigned_64 is
+         function To_Unsigned_64 is
+            new Ada.Unchecked_Conversion (Mapping_Record, Unsigned_64);
 
       begin
          return
-           To_Unsigned_32
+           To_Unsigned_64
              (Compressed_Stage_Table.Data_Table_Element
                 (Compressed_Stage_Table.Data_Count (Offset)));
       end Mapping_Data_Element;
@@ -349,16 +361,20 @@ package body Gen_UCD.Normalization is
         (Character : UCD.Code_Point;
          Data      : UCD.Code_Point_Vectors.Vector)
       is
-         Offset : UTF_8_Offset;
-         Size   : UTF_8_Count;
-         Length : Natural;
+         Last_CCC : constant Unsigned_6 :=
+           Unsigned_6 (CCC_Mapping.Representation (Data.Last_Element));
+
+         Offset   : UTF_8_Offset;
+         Size     : UTF_8_Count;
+         Length   : Natural;
 
       begin
          UTF_8_Data.Append_Data (Data, Offset, Size, Length);
 
-         Raw_Mapping (Canonical) (Character).Offset := Unsigned_14 (Offset);
-         Raw_Mapping (Canonical) (Character).Size   := Unsigned_6 (Size);
-         Raw_Mapping (Canonical) (Character).Length := Unsigned_5 (Length);
+         Raw_Mapping (Canonical) (Character).Offset   := Unsigned_14 (Offset);
+         Raw_Mapping (Canonical) (Character).Size     := Unsigned_6 (Size);
+         Raw_Mapping (Canonical) (Character).Length   := Unsigned_5 (Length);
+         Raw_Mapping (Canonical) (Character).Last_CCC := Last_CCC;
 
          Raw_Mapping (Compatibility) (Character).Offset :=
            Unsigned_14 (Offset);
@@ -366,6 +382,7 @@ package body Gen_UCD.Normalization is
            Unsigned_6 (Size);
          Raw_Mapping (Compatibility) (Character).Length :=
            Unsigned_5 (Length);
+         Raw_Mapping (Compatibility) (Character).Last_CCC := Last_CCC;
 
          Max_Length  := Natural'Max (Max_Length, Length);
          Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));
@@ -601,25 +618,26 @@ package body Gen_UCD.Normalization is
       Put_Line
         (File,
          "   type Mapping_Information is record");
-      Put_Line
-        (File, "      CCC              : CCC_Values;");
+      Put_Line (File, "      Decomposition_QC : Boolean;");
+      Put_Line (File, "      CCC              : CCC_Values;");
       Put_Line
         (File, "      Offset           : Normalization_UTF8_Data_Offset;");
       Put_Line
         (File, "      Size             : Normalization_UTF8_Code_Unit_Count;");
       Put_Line
         (File, "      Length           : Normalization_Character_Count;");
-      Put_Line (File, "      Decomposition_QC : Boolean;");
+      Put_Line (File, "      Last_CCC         : CCC_Values;");
       Put_Line (File, "   end record;");
       Put_Line
         (File,
-         "   for Mapping_Information'Size use 32;");
+         "   for Mapping_Information'Size use 64;");
       Put_Line (File, "   for Mapping_Information use record");
-      Put_Line (File, "      CCC              at 0 range 0 .. 5;");
-      Put_Line (File, "      Offset           at 0 range 6 .. 19;");
-      Put_Line (File, "      Size             at 0 range 20 .. 25;");
-      Put_Line (File, "      Length           at 0 range 26 .. 30;");
-      Put_Line (File, "      Decomposition_QC at 0 range 31 .. 31;");
+      Put_Line (File, "      Offset           at 0 range 0 .. 13;");
+      Put_Line (File, "      Size             at 0 range 16 .. 21;");
+      Put_Line (File, "      Length           at 0 range 24 .. 28;");
+      Put_Line (File, "      CCC              at 0 range 32 .. 37;");
+      Put_Line (File, "      Last_CCC         at 0 range 40 .. 45;");
+      Put_Line (File, "      Decomposition_QC at 0 range 63 .. 63;");
       Put_Line (File, "   end record;");
       New_Line (File);
 
@@ -659,10 +677,10 @@ package body Gen_UCD.Normalization is
       declare
 
          package Mapping_Data_IO is
-           new Ada.Wide_Wide_Text_IO.Modular_IO (Unsigned_32);
+           new Ada.Wide_Wide_Text_IO.Modular_IO (Unsigned_64);
          use Mapping_Data_IO;
 
-         Image : Wide_Wide_String (1 .. 12);
+         Image : Wide_Wide_String (1 .. 20);
 
       begin
          Put_Line
@@ -673,7 +691,7 @@ package body Gen_UCD.Normalization is
             "     constant array (Mapping_Data_Offset)");
          Put_Line
            (File,
-            "       of Interfaces.Unsigned_32 :=");
+            "       of Interfaces.Unsigned_64 :=");
 
          for J in 0 .. Database.Mapping_Data_Last loop
             Put (Image, Database.Mapping_Data_Element (J), 16);
@@ -681,7 +699,7 @@ package body Gen_UCD.Normalization is
             if J = 0 then
                Put (File, "         (");
 
-            elsif J mod 4 = 0 then
+            elsif J mod 3 = 0 then
                Put_Line (File, ",");
                Put (File, "          ");
 

@@ -47,6 +47,7 @@ project VSS_Text_Tests is
                  "test_string_hash",
                  "test_string_insert",
                  "test_string_buffer",
+                 "test_string_normalization",
                  "test_string_replace",
                  "test_string_slice",
                  "test_string_split_lines",

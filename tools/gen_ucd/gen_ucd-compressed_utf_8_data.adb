@@ -46,7 +46,9 @@ package body Gen_UCD.Compressed_UTF_8_Data is
       Size   := Gen_UCD.UTF_8_Offset (Encoded.Length);
       Length := Natural (Data.Length);
 
-      for Position in Self.Data.First_Index .. Self.Data.Last_Index loop
+      for Position in Self.Data.First_Index
+        .. Self.Data.Last_Index - UTF_8_Offset (Encoded.Length) + 1
+      loop
          if Self.Data.Element (Position) = Encoded.First_Element then
             Found  := True;
             Offset := Position;

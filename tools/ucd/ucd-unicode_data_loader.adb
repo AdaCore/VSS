@@ -149,7 +149,7 @@ package body UCD.Unicode_Data_Loader is
                   UCD.Characters.Set (Code, GC_Property, GC_Value);
                   UCD.Characters.Set (Code, CCC_Property, CCC_Value);
 
-                  if DT_Image = "" and not DM_Data.Is_Empty then
+                  if not DM_Data.Is_Empty then
                      UCD.Characters.Set (Code, DT_Property, DT_Value);
                      UCD.Characters.Set
                        (Code,

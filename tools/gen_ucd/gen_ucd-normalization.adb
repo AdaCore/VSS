@@ -32,6 +32,7 @@ with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
 with UCD.Characters;
 with UCD.Properties;
 
+with Gen_UCD.Compressed_Enumeration_Properties;
 with Gen_UCD.Compressed_UTF_8_Data;
 with Gen_UCD.Generic_Compressed_Stage_Table;
 
@@ -50,6 +51,9 @@ package body Gen_UCD.Normalization is
       DM_Property   : not null UCD.Properties.Property_Access)
       return UCD.Code_Point_Vectors.Vector;
 
+   CCC_Mapping :
+     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
+
    package Database is
 
       procedure Initialize;
@@ -61,6 +65,10 @@ package body Gen_UCD.Normalization is
       procedure Set_Compatibility_Decomposition
         (Character : UCD.Code_Point;
          Data      : UCD.Code_Point_Vectors.Vector);
+
+      procedure Set_CCC
+        (Character : UCD.Code_Point;
+         To        : Natural);
 
       procedure Set_NFD_QC
         (Character : UCD.Code_Point;
@@ -100,6 +108,9 @@ package body Gen_UCD.Normalization is
    -----------
 
    procedure Build is
+      CCC_Property     : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("ccc");
+
       DT_Property      : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("dt");
       DT_None          : constant not null
@@ -128,6 +139,8 @@ package body Gen_UCD.Normalization is
       Put_Line ("   ... normalization");
 
       Database.Initialize;
+
+      CCC_Mapping.Initialize (CCC_Property);
 
       --  Process properties of each character. Do it in reverse order, it
       --  produce little bit smaller table.
@@ -164,6 +177,7 @@ package body Gen_UCD.Normalization is
                      DM_Property));
             end if;
 
+            Database.Set_CCC (Code, CCC_Mapping.Representation (Code));
             Database.Set_NFD_QC (Code, NFD_QC_Value);
             Database.Set_NFKD_QC (Code, NFKD_QC_Value);
          end;
@@ -181,23 +195,19 @@ package body Gen_UCD.Normalization is
    package body Database is
 
       type Mapping_Record is record
+         CCC              : Unsigned_6  := 0;
+         Decomposition_QC : Boolean     := True;
          Offset           : Unsigned_14 := 0;
          Size             : Unsigned_6  := 0;
          Length           : Unsigned_5  := 0;
-         Decomposition_QC : Boolean     := True;
-         Reserved_1       : Unsigned_1  := 0;
-         Reserved_2       : Unsigned_2  := 0;
-         Reserved_3       : Unsigned_3  := 0;
       end record;
       for Mapping_Record'Size use 32;
       for Mapping_Record use record
-         Offset           at 0 range 0 .. 13;
-         Reserved_1       at 0 range 14 .. 14;
-         Decomposition_QC at 0 range 15 .. 15;
-         Size             at 0 range 16 .. 21;
-         Reserved_2       at 0 range 22 .. 23;
-         Length           at 0 range 24 .. 28;
-         Reserved_3       at 0 range 29 .. 31;
+         CCC              at 0 range 0 .. 5;
+         Offset           at 0 range 6 .. 19;
+         Size             at 0 range 20 .. 25;
+         Length           at 0 range 26 .. 30;
+         Decomposition_QC at 0 range 31 .. 31;
       end record;
       --  This declaration must be synchronized with type declaration in the
       --  generated code.
@@ -361,6 +371,18 @@ package body Gen_UCD.Normalization is
          Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));
          Total_UTF_8 := Total_UTF_8 + Natural (Size);
       end Set_Canonical_Decomposition;
+
+      -------------
+      -- Set_CCC --
+      -------------
+
+      procedure Set_CCC
+        (Character : UCD.Code_Point;
+         To        : Natural) is
+      begin
+         Raw_Mapping (Canonical) (Character).CCC := Unsigned_6 (To);
+         Raw_Mapping (Compatibility) (Character).CCC := Unsigned_6 (To);
+      end Set_CCC;
 
       -------------------------------------
       -- Set_Compatibility_Decomposition --
@@ -544,6 +566,10 @@ package body Gen_UCD.Normalization is
       Put_Line (File, "   pragma Preelaborate;");
       New_Line (File);
 
+      --  Generate CCC enumeration type declaration.
+
+      CCC_Mapping.Generate_Type_Declaration (File);
+
       --  Generate data types
 
       Put_Line
@@ -576,6 +602,8 @@ package body Gen_UCD.Normalization is
         (File,
          "   type Mapping_Information is record");
       Put_Line
+        (File, "      CCC              : CCC_Values;");
+      Put_Line
         (File, "      Offset           : Normalization_UTF8_Data_Offset;");
       Put_Line
         (File, "      Size             : Normalization_UTF8_Code_Unit_Count;");
@@ -587,10 +615,11 @@ package body Gen_UCD.Normalization is
         (File,
          "   for Mapping_Information'Size use 32;");
       Put_Line (File, "   for Mapping_Information use record");
-      Put_Line (File, "      Offset           at 0 range 0 .. 13;");
-      Put_Line (File, "      Decomposition_QC at 0 range 15 .. 15;");
-      Put_Line (File, "      Size             at 0 range 16 .. 21;");
-      Put_Line (File, "      Length           at 0 range 24 .. 28;");
+      Put_Line (File, "      CCC              at 0 range 0 .. 5;");
+      Put_Line (File, "      Offset           at 0 range 6 .. 19;");
+      Put_Line (File, "      Size             at 0 range 20 .. 25;");
+      Put_Line (File, "      Length           at 0 range 26 .. 30;");
+      Put_Line (File, "      Decomposition_QC at 0 range 31 .. 31;");
       Put_Line (File, "   end record;");
       New_Line (File);
 

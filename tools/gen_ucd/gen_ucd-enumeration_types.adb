@@ -27,7 +27,7 @@ with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
 
 with UCD.Characters;
 
-package body Gen_UCD.Compressed_Enumeration_Properties is
+package body Gen_UCD.Enumeration_Types is
 
    function Type_Identifier
      (Property : not null UCD.Properties.Property_Access)
@@ -39,7 +39,7 @@ package body Gen_UCD.Compressed_Enumeration_Properties is
       return Wide_Wide_String;
 
    function Representation
-     (Self  : Compressed_Enumeration_Property'Class;
+     (Self  : Enumeration_Type'Class;
       Value : not null UCD.Properties.Property_Value_Access) return Natural;
 
    function Minimum_Bits (Value : Ada.Containers.Count_Type) return Integer;
@@ -49,7 +49,7 @@ package body Gen_UCD.Compressed_Enumeration_Properties is
    -------------------------------
 
    procedure Generate_Type_Declaration
-     (Self : Compressed_Enumeration_Property'Class;
+     (Self : Enumeration_Type'Class;
       File : Ada.Wide_Wide_Text_IO.File_Type)
    is
       First : Boolean := True;
@@ -108,7 +108,7 @@ package body Gen_UCD.Compressed_Enumeration_Properties is
    ----------------
 
    procedure Initialize
-     (Self     : in out Compressed_Enumeration_Property'Class;
+     (Self     : in out Enumeration_Type'Class;
       Property : not null UCD.Properties.Property_Access) is
    begin
       Self.Property := Property;
@@ -143,7 +143,7 @@ package body Gen_UCD.Compressed_Enumeration_Properties is
    --------------------
 
    function Representation
-     (Self : Compressed_Enumeration_Property'Class;
+     (Self : Enumeration_Type'Class;
       Code : UCD.Code_Point) return Natural
    is
       Value : constant not null UCD.Properties.Property_Value_Access :=
@@ -158,7 +158,7 @@ package body Gen_UCD.Compressed_Enumeration_Properties is
    --------------------
 
    function Representation
-     (Self  : Compressed_Enumeration_Property'Class;
+     (Self  : Enumeration_Type'Class;
       Value : not null UCD.Properties.Property_Value_Access) return Natural is
    begin
       return Self.Map (Value);
@@ -197,4 +197,4 @@ package body Gen_UCD.Compressed_Enumeration_Properties is
       return Property_Name & '_' & Value_Name;
    end Value_Identifier;
 
-end Gen_UCD.Compressed_Enumeration_Properties;
+end Gen_UCD.Enumeration_Types;

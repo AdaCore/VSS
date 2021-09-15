@@ -32,7 +32,7 @@ with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
 with UCD.Characters;
 with UCD.Properties;
 
-with Gen_UCD.Compressed_Enumeration_Properties;
+with Gen_UCD.Enumeration_Types;
 with Gen_UCD.Compressed_UTF_8_Data;
 with Gen_UCD.Generic_Compressed_Stage_Table;
 
@@ -51,8 +51,7 @@ package body Gen_UCD.Normalization is
       DM_Property   : not null UCD.Properties.Property_Access)
       return UCD.Code_Point_Vectors.Vector;
 
-   CCC_Mapping :
-     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
+   CCC_Enumeration : Gen_UCD.Enumeration_Types.Enumeration_Type;
 
    package Database is
 
@@ -140,7 +139,7 @@ package body Gen_UCD.Normalization is
 
       Database.Initialize;
 
-      CCC_Mapping.Initialize (CCC_Property);
+      CCC_Enumeration.Initialize (CCC_Property);
 
       --  Process properties of each character. Do it in reverse order, it
       --  produce little bit smaller table.
@@ -177,7 +176,7 @@ package body Gen_UCD.Normalization is
                      DM_Property));
             end if;
 
-            Database.Set_CCC (Code, CCC_Mapping.Representation (Code));
+            Database.Set_CCC (Code, CCC_Enumeration.Representation (Code));
             Database.Set_NFD_QC (Code, NFD_QC_Value);
             Database.Set_NFKD_QC (Code, NFKD_QC_Value);
          end;
@@ -362,7 +361,7 @@ package body Gen_UCD.Normalization is
          Data      : UCD.Code_Point_Vectors.Vector)
       is
          Last_CCC : constant Unsigned_6 :=
-           Unsigned_6 (CCC_Mapping.Representation (Data.Last_Element));
+           Unsigned_6 (CCC_Enumeration.Representation (Data.Last_Element));
 
          Offset   : UTF_8_Offset;
          Size     : UTF_8_Count;
@@ -585,7 +584,7 @@ package body Gen_UCD.Normalization is
 
       --  Generate CCC enumeration type declaration.
 
-      CCC_Mapping.Generate_Type_Declaration (File);
+      CCC_Enumeration.Generate_Type_Declaration (File);
 
       --  Generate data types
 

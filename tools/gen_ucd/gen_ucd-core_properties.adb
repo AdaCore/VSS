@@ -32,16 +32,13 @@ with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
 with UCD.Characters;
 with UCD.Properties;
 
-with Gen_UCD.Compressed_Enumeration_Properties;
+with Gen_UCD.Enumeration_Types;
 
 package body Gen_UCD.Core_Properties is
 
-   GC_Mapping  :
-     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
-   GCB_Mapping :
-     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
-   WB_Mapping  :
-     Gen_UCD.Compressed_Enumeration_Properties.Compressed_Enumeration_Property;
+   GC_Enumeration  : Gen_UCD.Enumeration_Types.Enumeration_Type;
+   GCB_Enumeration : Gen_UCD.Enumeration_Types.Enumeration_Type;
+   WB_Enumeration  : Gen_UCD.Enumeration_Types.Enumeration_Type;
 
    package Database is
 
@@ -92,9 +89,9 @@ package body Gen_UCD.Core_Properties is
    begin
       Put ("   ... core properties");
 
-      GC_Mapping.Initialize (GC_Property);
-      GCB_Mapping.Initialize (GCB_Property);
-      WB_Mapping.Initialize (WB_Property);
+      GC_Enumeration.Initialize (GC_Property);
+      GCB_Enumeration.Initialize (GCB_Property);
+      WB_Enumeration.Initialize (WB_Property);
 
       Database.Initialize (8);
 
@@ -120,7 +117,7 @@ package body Gen_UCD.Core_Properties is
       begin
          for Code in UCD.Code_Point loop
             Database.Set_GC
-              (Code, Gen_UCD.Unsigned_5 (GC_Mapping.Representation (Code)));
+              (Code, Unsigned_5 (GC_Enumeration.Representation (Code)));
 
             Database.Set_OLower
               (Code,
@@ -133,10 +130,10 @@ package body Gen_UCD.Core_Properties is
                UCD.Characters.Get (Code, ExtPict_Property) = ExtPict_Y);
 
             Database.Set_GCB
-              (Code, Gen_UCD.Unsigned_4 (GCB_Mapping.Representation (Code)));
+              (Code, Unsigned_4 (GCB_Enumeration.Representation (Code)));
 
             Database.Set_WB
-              (Code, Gen_UCD.Unsigned_5 (WB_Mapping.Representation (Code)));
+              (Code, Unsigned_5 (WB_Enumeration.Representation (Code)));
          end loop;
       end;
 
@@ -527,15 +524,15 @@ package body Gen_UCD.Core_Properties is
 
       --  Generate GC_Values type
 
-      GC_Mapping.Generate_Type_Declaration (File);
+      GC_Enumeration.Generate_Type_Declaration (File);
 
       --  Generate GCB_Values type
 
-      GCB_Mapping.Generate_Type_Declaration (File);
+      GCB_Enumeration.Generate_Type_Declaration (File);
 
       --  Generate WB_Values type
 
-      WB_Mapping.Generate_Type_Declaration (File);
+      WB_Enumeration.Generate_Type_Declaration (File);
 
       --  Generate types for index and data tables.
 

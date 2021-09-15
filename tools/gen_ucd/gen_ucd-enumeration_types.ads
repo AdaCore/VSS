@@ -26,23 +26,23 @@ with Ada.Wide_Wide_Text_IO;
 
 with UCD.Properties;
 
-package Gen_UCD.Compressed_Enumeration_Properties is
+package Gen_UCD.Enumeration_Types is
 
-   type Compressed_Enumeration_Property is tagged limited private;
+   type Enumeration_Type is tagged limited private;
 
    procedure Initialize
-     (Self     : in out Compressed_Enumeration_Property'Class;
+     (Self     : in out Enumeration_Type'Class;
       Property : not null UCD.Properties.Property_Access);
    --  Initialize mapping of used enumeration property values to continuous
    --  range of natural numbers used for internal representation.
 
    function Representation
-     (Self : Compressed_Enumeration_Property'Class;
+     (Self : Enumeration_Type'Class;
       Code : UCD.Code_Point) return Natural;
    --  Return internal representation of the given value of the property.
 
    procedure Generate_Type_Declaration
-     (Self : Compressed_Enumeration_Property'Class;
+     (Self : Enumeration_Type'Class;
       File : Ada.Wide_Wide_Text_IO.File_Type);
    --  Generate enumeration type declaration and necessary representation
    --  clauses.
@@ -56,9 +56,9 @@ private
         UCD.Properties.Hash,
         UCD.Properties."=");
 
-   type Compressed_Enumeration_Property is tagged limited record
+   type Enumeration_Type is tagged limited record
       Property : UCD.Properties.Property_Access;
       Map      : Property_Value_Integer_Maps.Map;
    end record;
 
-end Gen_UCD.Compressed_Enumeration_Properties;
+end Gen_UCD.Enumeration_Types;

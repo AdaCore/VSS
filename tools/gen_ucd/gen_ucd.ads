@@ -37,6 +37,7 @@ package Gen_UCD is
    type Unsigned_6  is mod 2 ** 6  with Size => 7;
 
    type Unsigned_8  is mod 2 ** 8  with Size => 8;
+   type Unsigned_9  is mod 2 ** 9  with Size => 9;
 
    type Unsigned_11 is mod 2 ** 11 with Size => 11;
 

@@ -199,12 +199,14 @@ package body Gen_UCD.Normalization is
          Offset           : Unsigned_14 := 0;
          Size             : Unsigned_6  := 0;
          Length           : Unsigned_5  := 0;
+         First_CCC        : Unsigned_6  := 0;
          Last_CCC         : Unsigned_6  := 0;
          Reserved_1       : Unsigned_2  := 0;
          Reserved_2       : Unsigned_2  := 0;
          Reserved_3       : Unsigned_3  := 0;
          Reserved_4       : Unsigned_2  := 0;
-         Reserved_5       : Unsigned_17 := 0;
+         Reserved_5       : Unsigned_2  := 0;
+         Reserved_6       : Unsigned_9  := 0;
       end record;
       for Mapping_Record'Size use 64;
       for Mapping_Record use record
@@ -216,8 +218,10 @@ package body Gen_UCD.Normalization is
          Reserved_3       at 0 range 29 .. 31;
          CCC              at 0 range 32 .. 37;
          Reserved_4       at 0 range 38 .. 39;
-         Last_CCC         at 0 range 40 .. 45;
-         Reserved_5       at 0 range 46 .. 62;
+         First_CCC        at 0 range 40 .. 45;
+         Reserved_5       at 0 range 46 .. 47;
+         Last_CCC         at 0 range 48 .. 53;
+         Reserved_6       at 0 range 54 .. 62;
          Decomposition_QC at 0 range 63 .. 63;
       end record;
       --  This declaration must be synchronized with type declaration in the
@@ -360,28 +364,32 @@ package body Gen_UCD.Normalization is
         (Character : UCD.Code_Point;
          Data      : UCD.Code_Point_Vectors.Vector)
       is
-         Last_CCC : constant Unsigned_6 :=
+         First_CCC : constant Unsigned_6 :=
+           Unsigned_6 (CCC_Enumeration.Representation (Data.First_Element));
+         Last_CCC  : constant Unsigned_6 :=
            Unsigned_6 (CCC_Enumeration.Representation (Data.Last_Element));
 
-         Offset   : UTF_8_Offset;
-         Size     : UTF_8_Count;
-         Length   : Natural;
+         Offset    : UTF_8_Offset;
+         Size      : UTF_8_Count;
+         Length    : Natural;
 
       begin
          UTF_8_Data.Append_Data (Data, Offset, Size, Length);
 
-         Raw_Mapping (Canonical) (Character).Offset   := Unsigned_14 (Offset);
-         Raw_Mapping (Canonical) (Character).Size     := Unsigned_6 (Size);
-         Raw_Mapping (Canonical) (Character).Length   := Unsigned_5 (Length);
-         Raw_Mapping (Canonical) (Character).Last_CCC := Last_CCC;
+         Raw_Mapping (Canonical) (Character).Offset    := Unsigned_14 (Offset);
+         Raw_Mapping (Canonical) (Character).Size      := Unsigned_6 (Size);
+         Raw_Mapping (Canonical) (Character).Length    := Unsigned_5 (Length);
+         Raw_Mapping (Canonical) (Character).First_CCC := First_CCC;
+         Raw_Mapping (Canonical) (Character).Last_CCC  := Last_CCC;
 
-         Raw_Mapping (Compatibility) (Character).Offset :=
+         Raw_Mapping (Compatibility) (Character).Offset    :=
            Unsigned_14 (Offset);
-         Raw_Mapping (Compatibility) (Character).Size   :=
+         Raw_Mapping (Compatibility) (Character).Size      :=
            Unsigned_6 (Size);
-         Raw_Mapping (Compatibility) (Character).Length :=
+         Raw_Mapping (Compatibility) (Character).Length    :=
            Unsigned_5 (Length);
-         Raw_Mapping (Compatibility) (Character).Last_CCC := Last_CCC;
+         Raw_Mapping (Compatibility) (Character).First_CCC := First_CCC;
+         Raw_Mapping (Compatibility) (Character).Last_CCC  := Last_CCC;
 
          Max_Length  := Natural'Max (Max_Length, Length);
          Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));
@@ -408,19 +416,26 @@ package body Gen_UCD.Normalization is
         (Character : UCD.Code_Point;
          Data      : UCD.Code_Point_Vectors.Vector)
       is
-         Offset : UTF_8_Offset;
-         Size   : UTF_8_Count;
-         Length : Natural;
+         First_CCC : constant Unsigned_6 :=
+           Unsigned_6 (CCC_Enumeration.Representation (Data.First_Element));
+         Last_CCC  : constant Unsigned_6 :=
+           Unsigned_6 (CCC_Enumeration.Representation (Data.Last_Element));
+
+         Offset    : UTF_8_Offset;
+         Size      : UTF_8_Count;
+         Length    : Natural;
 
       begin
          UTF_8_Data.Append_Data (Data, Offset, Size, Length);
 
-         Raw_Mapping (Compatibility) (Character).Offset :=
+         Raw_Mapping (Compatibility) (Character).Offset    :=
            Unsigned_14 (Offset);
-         Raw_Mapping (Compatibility) (Character).Size   :=
+         Raw_Mapping (Compatibility) (Character).Size      :=
            Unsigned_6 (Size);
-         Raw_Mapping (Compatibility) (Character).Length :=
+         Raw_Mapping (Compatibility) (Character).Length    :=
            Unsigned_5 (Length);
+         Raw_Mapping (Compatibility) (Character).First_CCC := First_CCC;
+         Raw_Mapping (Compatibility) (Character).Last_CCC  := Last_CCC;
 
          Max_Length  := Natural'Max (Max_Length, Length);
          Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));
@@ -625,6 +640,7 @@ package body Gen_UCD.Normalization is
         (File, "      Size             : Normalization_UTF8_Code_Unit_Count;");
       Put_Line
         (File, "      Length           : Normalization_Character_Count;");
+      Put_Line (File, "      First_CCC        : CCC_Values;");
       Put_Line (File, "      Last_CCC         : CCC_Values;");
       Put_Line (File, "   end record;");
       Put_Line
@@ -635,7 +651,8 @@ package body Gen_UCD.Normalization is
       Put_Line (File, "      Size             at 0 range 16 .. 21;");
       Put_Line (File, "      Length           at 0 range 24 .. 28;");
       Put_Line (File, "      CCC              at 0 range 32 .. 37;");
-      Put_Line (File, "      Last_CCC         at 0 range 40 .. 45;");
+      Put_Line (File, "      First_CCC        at 0 range 40 .. 45;");
+      Put_Line (File, "      Last_CCC         at 0 range 48 .. 53;");
       Put_Line (File, "      Decomposition_QC at 0 range 63 .. 63;");
       Put_Line (File, "   end record;");
       New_Line (File);

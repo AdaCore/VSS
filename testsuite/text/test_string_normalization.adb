@@ -118,7 +118,27 @@ begin
 
                --  NFKC: not implemented
 
-               --  NFKD: not implemented
+               --  NFKD
+
+               declare
+                  C1N : constant VSS.Strings.Virtual_String :=
+                    C1.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                  C2N : constant VSS.Strings.Virtual_String :=
+                    C2.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                  C3N : constant VSS.Strings.Virtual_String :=
+                    C3.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                  C4N : constant VSS.Strings.Virtual_String :=
+                    C4.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                  C5N : constant VSS.Strings.Virtual_String :=
+                    C5.To_Normalized (VSS.Strings.Normalization_Form_KD);
+
+               begin
+                  Test_Support.Assert (C5 = C1N);
+                  Test_Support.Assert (C5 = C2N);
+                  Test_Support.Assert (C5 = C3N);
+                  Test_Support.Assert (C5 = C4N);
+                  Test_Support.Assert (C5 = C5N);
+               end;
 
             end;
          end if;

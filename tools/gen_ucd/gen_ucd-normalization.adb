@@ -165,6 +165,13 @@ package body Gen_UCD.Normalization is
                      Canonical,
                      DT_Property, DT_None, DT_Canonical,
                      DM_Property));
+               Database.Set_Compatibility_Decomposition
+                 (Code,
+                  Full_Decomposition
+                    (Code,
+                     Compatibility,
+                     DT_Property, DT_None, DT_Canonical,
+                     DM_Property));
 
             else
                Database.Set_Compatibility_Decomposition
@@ -381,15 +388,6 @@ package body Gen_UCD.Normalization is
          Raw_Mapping (Canonical) (Character).Length    := Unsigned_5 (Length);
          Raw_Mapping (Canonical) (Character).First_CCC := First_CCC;
          Raw_Mapping (Canonical) (Character).Last_CCC  := Last_CCC;
-
-         Raw_Mapping (Compatibility) (Character).Offset    :=
-           Unsigned_14 (Offset);
-         Raw_Mapping (Compatibility) (Character).Size      :=
-           Unsigned_6 (Size);
-         Raw_Mapping (Compatibility) (Character).Length    :=
-           Unsigned_5 (Length);
-         Raw_Mapping (Compatibility) (Character).First_CCC := First_CCC;
-         Raw_Mapping (Compatibility) (Character).Last_CCC  := Last_CCC;
 
          Max_Length  := Natural'Max (Max_Length, Length);
          Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));

@@ -2108,7 +2108,12 @@ package body VSS.Implementation.UTF8_String_Handlers is
                raise Program_Error;
 
             when VSS.Strings.Normalization_Form_KD =>
-               raise Program_Error;
+               Decomposite
+                 (Source.Storage,
+                  Source.Size,
+                  VSS.Implementation.UCD_Normalization_UTF8
+                    .Compatibility_Index,
+                  Result);
 
             when VSS.Strings.Normalization_Form_KC =>
                raise Program_Error;
@@ -2149,7 +2154,12 @@ package body VSS.Implementation.UTF8_String_Handlers is
                raise Program_Error;
 
             when VSS.Strings.Normalization_Form_KD =>
-               raise Program_Error;
+               Decomposite
+                 (Source.Storage,
+                  Source.Size,
+                  VSS.Implementation.UCD_Normalization_UTF8
+                    .Compatibility_Index,
+                  Result);
 
             when VSS.Strings.Normalization_Form_KC =>
                raise Program_Error;

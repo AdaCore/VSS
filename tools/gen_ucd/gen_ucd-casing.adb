@@ -23,186 +23,22 @@
 
 pragma Ada_2022;
 
-with Ada.Containers.Vectors;
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Ada.Strings;                       use Ada.Strings;
 with Ada.Strings.Wide_Wide_Fixed;       use Ada.Strings.Wide_Wide_Fixed;
 with Ada.Strings.Wide_Wide_Unbounded;   use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Unchecked_Conversion;
 with Ada.Wide_Wide_Text_IO;             use Ada.Wide_Wide_Text_IO;
-with Interfaces;
 
 with UCD.Characters;
 with UCD.Properties;
 
-with Gen_UCD.Unsigned_Types;            use Gen_UCD.Unsigned_Types;
+with Gen_UCD.Compressed_UTF_8_Data;
+with Gen_UCD.Generic_Compressed_Stage_Table;
 
 package body Gen_UCD.Casing is
 
    use type UCD.Code_Point;
-
-   generic
-      type Data_Type is private;
-      type Data_Type_Array is array (UCD.Code_Point) of Data_Type;
-
-   package Generic_Compressed_Stage_Table is
-
-      Group_Size : constant := 256;
-
-      type Group_Count is new Natural;
-      subtype Group_Offset is Group_Count;
-
-      type Data_Count is new Natural;
-      subtype Data_Offset is Data_Count;
-
-      type Compressed_Stage_Table is tagged limited private;
-
-      procedure Build
-        (Self : in out Compressed_Stage_Table'Class; Data : Data_Type_Array);
-
-      function Index_Table_Last
-        (Self : Compressed_Stage_Table'Class) return Group_Count;
-
-      function Index_Table_Element
-        (Self   : Compressed_Stage_Table'Class;
-         Offset : Group_Offset) return Data_Offset;
-
-      function Data_Table_Last return Data_Count;
-
-      function Data_Table_Element (Offset : Data_Offset) return Data_Type;
-
-   private
-
-      type Group_Array is array (Unsigned_32 range <>) of Unsigned_32;
-
-      type Group_Array_Access is access all Group_Array;
-
-      type Compressed_Stage_Table is tagged limited record
-         Group_Data : Group_Array_Access;
-      end record;
-
-   end Generic_Compressed_Stage_Table;
-
-   ------------------------------------
-   -- Generic_Compressed_Stage_Table --
-   ------------------------------------
-
-   package body Generic_Compressed_Stage_Table is
-
-      type Compressed_Array is array (Unsigned_32 range <>) of Data_Type;
-
-      type Compressed_Array_Access is access all Compressed_Array;
-
-      Result_Data       : Compressed_Array_Access;
-      Result_Data_Last  : Unsigned_32;
-
-      -----------
-      -- Build --
-      -----------
-
-      procedure Build
-        (Self : in out Compressed_Stage_Table'Class; Data : Data_Type_Array)
-      is
-         Initial : Unsigned_32;
-         Reused  : Boolean;
-
-      begin
-         Self.Group_Data :=
-           new Group_Array
-             (0 .. (Unsigned_32 (UCD.Code_Point'Last) + 1) / Group_Size - 1);
-
-         if Result_Data = null then
-            --  Allocate memory.
-
-            Result_Data :=
-              new Compressed_Array (0 .. Unsigned_32 (UCD.Code_Point'Last));
-
-            --  Copy first block
-
-            Result_Data (0 .. Group_Size - 1) :=
-              Compressed_Array (Data (0 .. Group_Size - 1));
-            Result_Data_Last := Group_Size - 1;
-            Self.Group_Data (0) := 0;
-            Initial := 1;
-
-         else
-            Initial := 0;
-         end if;
-
-         --  Process all other blocks
-
-         for Group in Initial .. Self.Group_Data'Last loop
-            declare
-               Source : Compressed_Array renames
-                 Compressed_Array
-                     (Data (UCD.Code_Point (Group * Group_Size)
-                      .. UCD.Code_Point ((Group + 1) * Group_Size - 1)));
-
-            begin
-               Reused := False;
-
-               for Offset in 0 .. Result_Data_Last - Group_Size + 1 loop
-                  if Result_Data (Offset .. Offset + Group_Size - 1)
-                    = Source
-                  then
-                     Self.Group_Data (Group) := Offset;
-                     Reused := True;
-
-                     exit;
-                  end if;
-               end loop;
-
-               if not Reused then
-                  Self.Group_Data (Group) := Result_Data_Last + 1;
-                  Result_Data_Last := Result_Data_Last + Group_Size;
-                  Result_Data
-                    (Result_Data_Last - Group_Size + 1 .. Result_Data_Last) :=
-                       Source;
-               end if;
-            end;
-         end loop;
-      end Build;
-
-      ------------------------
-      -- Data_Table_Element --
-      ------------------------
-
-      function Data_Table_Element (Offset : Data_Offset) return Data_Type is
-      begin
-         return Result_Data (Unsigned_32 (Offset));
-      end Data_Table_Element;
-
-      ---------------------
-      -- Data_Table_Last --
-      ---------------------
-
-      function Data_Table_Last return Data_Count is
-      begin
-         return Data_Count (Result_Data_Last);
-      end Data_Table_Last;
-
-      -------------------------
-      -- Index_Table_Element --
-      -------------------------
-
-      function Index_Table_Element
-        (Self   : Compressed_Stage_Table'Class;
-         Offset : Group_Offset) return Data_Offset is
-      begin
-         return Data_Offset (Self.Group_Data (Unsigned_32 (Offset)));
-      end Index_Table_Element;
-
-      ----------------------
-      -- Index_Table_Last --
-      ----------------------
-
-      function Index_Table_Last
-        (Self : Compressed_Stage_Table'Class) return Group_Count is
-      begin
-         return Group_Count (Self.Group_Data'Last);
-      end Index_Table_Last;
-
-   end Generic_Compressed_Stage_Table;
 
    package Database is
 
@@ -261,9 +97,10 @@ package body Gen_UCD.Casing is
 
       procedure Compress;
 
-      function UTF_8_Data_Index_Last return Natural;
+      function UTF_8_Data_Index_Last return Gen_UCD.UTF_8_Offset;
 
-      function UTF_8_Data_Element (Index : Natural) return Unsigned_8;
+      function UTF_8_Data_Element
+        (Index : Gen_UCD.UTF_8_Offset) return Gen_UCD.UTF_8_Code_Unit;
 
       function Mapping_Data_Last return Natural;
 
@@ -462,15 +299,6 @@ package body Gen_UCD.Casing is
 
    package body Database is
 
-      type UTF_8_Code_Unit is mod 2 ** 8;
-      for UTF_8_Code_Unit'Size use 8;
-
-      package UTF_8_Code_Unit_Vectors is
-        new Ada.Containers.Vectors (Positive, UTF_8_Code_Unit);
-
-      UTF_8_Data      : UTF_8_Code_Unit_Vectors.Vector;
-      UTF_8_Data_Size : Natural := 0;
-
       type Casing_Context_Change is record
          Enter_Final_Sigma          : Boolean := False;
          Continue_Final_Sigma       : Boolean := False;
@@ -523,68 +351,18 @@ package body Gen_UCD.Casing is
 
       Raw_Mapping : array (Case_Mapping) of Mapping_Array_Access;
 
-      Max_Length : Natural := 0;
-      Max_UTF_8  : Natural := 0;
-
-      function Append_Data
-        (Data : UCD.Code_Point_Vectors.Vector) return Mapping_Record;
-
-      function Encode
-        (Data : UCD.Code_Point_Vectors.Vector)
-         return UTF_8_Code_Unit_Vectors.Vector;
+      Max_Length  : Natural := 0;
+      Max_UTF_8   : Natural := 0;
+      Total_UTF_8 : Natural := 0;
 
       package Compressed_Stage_Table is
-        new Generic_Compressed_Stage_Table (Mapping_Record, Mapping_Array);
+        new Gen_UCD.Generic_Compressed_Stage_Table
+              (Mapping_Record, Mapping_Array);
 
       Compressed :
         array (Case_Mapping) of Compressed_Stage_Table.Compressed_Stage_Table;
 
-      -----------------
-      -- Append_Data --
-      -----------------
-
-      function Append_Data
-        (Data : UCD.Code_Point_Vectors.Vector) return Mapping_Record
-      is
-         Encoded : constant UTF_8_Code_Unit_Vectors.Vector := Encode (Data);
-         Found   : Boolean := False;
-         Offset  : Unsigned_14;
-
-      begin
-         Max_Length := Natural'Max (Max_Length, Natural (Data.Length));
-         Max_UTF_8  := Natural'Max (Max_UTF_8, Natural (Encoded.Length));
-
-         UTF_8_Data_Size := UTF_8_Data_Size + Natural (Encoded.Length);
-
-         for Position in UTF_8_Data.First_Index .. UTF_8_Data.Last_Index loop
-            if UTF_8_Data.Element (Position) = Encoded.First_Element then
-               Found := True;
-               Offset := Unsigned_14 (Position - 1);
-
-               for Offset in 1 .. Natural (Encoded.Length) - 1 loop
-                  if UTF_8_Data.Element (Position + Offset)
-                    /= Encoded.Element (Encoded.First_Index + Offset)
-                  then
-                     Found := False;
-
-                     exit;
-                  end if;
-               end loop;
-            end if;
-         end loop;
-
-         if not Found then
-            Offset := Unsigned_14 (UTF_8_Data.Length);
-            UTF_8_Data.Append_Vector (Encoded);
-         end if;
-
-         return
-           (Offset      => Offset,
-            Length      => Unsigned_2 (Data.Length),
-            Size        => Unsigned_3 (Encoded.Length),
-            Has_Mapping => True,
-            others      => <>);
-      end Append_Data;
+      UTF_8_Data : Gen_UCD.Compressed_UTF_8_Data.Compressed_UTF_8_Data;
 
       --------------
       -- Compress --
@@ -596,75 +374,6 @@ package body Gen_UCD.Casing is
             Compressed (J).Build (Raw_Mapping (J).all);
          end loop;
       end Compress;
-
-      ------------
-      -- Encode --
-      ------------
-
-      function Encode
-        (Data : UCD.Code_Point_Vectors.Vector)
-         return UTF_8_Code_Unit_Vectors.Vector
-      is
-         use type Interfaces.Unsigned_32;
-
-         C  : Interfaces.Unsigned_32;
-
-      begin
-         return Result : UTF_8_Code_Unit_Vectors.Vector do
-            for Position in Data.First_Index .. Data.Last_Index loop
-               C := Interfaces.Unsigned_32 (Data.Element (Position));
-
-               if C <= 16#00_007F# then
-                  Result.Append (UTF_8_Code_Unit (C));
-
-               elsif C <= 16#00_07FF# then
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1100_0000#
-                        or ((C and 2#111_1100_0000#) / 2#100_0000#)));
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1000_0000#
-                        or (C and 2#000_0011_1111#)));
-
-               elsif C <= 16#00_FFFF# then
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1110_0000#
-                        or ((C and 2#1111_0000_0000_0000#)
-                          / 2#1_0000_0000_0000#)));
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1000_0000#
-                        or ((C and 2#0000_1111_1100_0000#) / 2#100_0000#)));
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1000_0000# or (C and 2#0000_0000_0011_1111#)));
-
-               else
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1111_0000#
-                        or ((C and 2#1_1100_0000_0000_0000_0000#)
-                          / 2#100_0000_0000_0000_0000#)));
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1000_0000#
-                        or ((C and 2#0_0011_1111_0000_0000_0000#)
-                          / 2#1_0000_0000_0000#)));
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1000_0000#
-                        or ((C and 2#0_0000_0000_1111_1100_0000#)
-                          / 2#100_0000#)));
-                  Result.Append
-                    (UTF_8_Code_Unit
-                       (2#1000_0000#
-                        or (C and 2#0_0000_0000_0000_0011_1111#)));
-               end if;
-            end loop;
-         end return;
-      end Encode;
 
       ----------------
       -- Initialize --
@@ -751,9 +460,9 @@ package body Gen_UCD.Casing is
 
          Put_Line
            ("         UTF-8 data size is"
-            & Natural'Wide_Wide_Image (UTF_8_Data_Size)
+            & Natural'Wide_Wide_Image (Total_UTF_8)
             & " bytes (compressed size is"
-            & Natural'Wide_Wide_Image (Natural (UTF_8_Data.Length))
+            & Natural'Wide_Wide_Image (Natural (UTF_8_Data.Last_Index) + 1)
             & " bytes)");
       end Print_Statistics;
 
@@ -764,9 +473,23 @@ package body Gen_UCD.Casing is
       procedure Set
         (Character : UCD.Code_Point;
          Mapping   : Case_Mapping;
-         Data      : UCD.Code_Point_Vectors.Vector) is
+         Data      : UCD.Code_Point_Vectors.Vector)
+      is
+         Offset : Gen_UCD.UTF_8_Offset;
+         Size   : Gen_UCD.UTF_8_Count;
+         Length : Natural;
+
       begin
-         Raw_Mapping (Mapping) (Character) := Append_Data (Data);
+         UTF_8_Data.Append_Data (Data, Offset, Size, Length);
+
+         Raw_Mapping (Mapping) (Character).Has_Mapping := True;
+         Raw_Mapping (Mapping) (Character).Offset      := Unsigned_14 (Offset);
+         Raw_Mapping (Mapping) (Character).Size        := Unsigned_3 (Size);
+         Raw_Mapping (Mapping) (Character).Length      := Unsigned_2 (Length);
+
+         Max_Length  := Natural'Max (Max_Length, Length);
+         Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));
+         Total_UTF_8 := Total_UTF_8 + Natural (Size);
       end Set;
 
       --------------------------
@@ -898,18 +621,19 @@ package body Gen_UCD.Casing is
       -- UTF_8_Data_Element --
       ------------------------
 
-      function UTF_8_Data_Element (Index : Natural) return Unsigned_8 is
+      function UTF_8_Data_Element
+        (Index : Gen_UCD.UTF_8_Offset) return Gen_UCD.UTF_8_Code_Unit is
       begin
-         return Unsigned_8 (UTF_8_Data.Element (Index + 1));
+         return UTF_8_Data.Element (Index);
       end UTF_8_Data_Element;
 
       ---------------------------
       -- UTF_8_Data_Index_Last --
       ---------------------------
 
-      function UTF_8_Data_Index_Last return Natural is
+      function UTF_8_Data_Index_Last return Gen_UCD.UTF_8_Offset is
       begin
-         return Natural (UTF_8_Data.Last_Index) - 1;
+         return UTF_8_Data.Last_Index;
       end UTF_8_Data_Index_Last;
 
    end Database;
@@ -984,7 +708,8 @@ package body Gen_UCD.Casing is
       Put_Line
         (File,
          "     VSS.Unicode.UTF8_Code_Unit_Offset range 0 .."
-         & Positive'Wide_Wide_Image (Database.UTF_8_Data_Index_Last) & ";");
+         & Positive'Wide_Wide_Image (Positive (Database.UTF_8_Data_Index_Last))
+         & ";");
       New_Line (File);
 
       Put_Line

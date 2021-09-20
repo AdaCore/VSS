@@ -1020,6 +1020,20 @@ package body VSS.Strings is
                 Limited_Tail => null);
    end To_Magic_Text;
 
+   -------------------
+   -- To_Normalized --
+   -------------------
+
+   function To_Normalized
+     (Self : Virtual_String'Class;
+      Form : Normalization_Form) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         VSS.Implementation.Strings.Handler (Self.Data).Normalize
+           (Self.Data, Form, Result.Data);
+      end return;
+   end To_Normalized;
+
    -------------------------
    -- To_Simple_Lowercase --
    -------------------------

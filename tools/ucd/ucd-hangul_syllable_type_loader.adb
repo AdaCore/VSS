@@ -21,42 +21,61 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD is
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-   pragma Pure;
+with UCD.Characters;
+with UCD.Data_File_Loaders;
+with UCD.Properties;
 
-   --------------------
-   -- Unsigned types --
-   --------------------
+package body UCD.Hangul_Syllable_Type_Loader is
 
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
+   ----------
+   -- Load --
+   ----------
 
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
-   type Unsigned_9  is mod 2 ** 9  with Size => 9;
+   procedure Load (UCD_Root : Wide_Wide_String) is
+      HST_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("hst");
+      HST_NA       : constant not null UCD.Properties.Property_Value_Access :=
+        UCD.Properties.Resolve (HST_Property, "Not_Applicable");
+      Value_Field  : constant Data_File_Loaders.Field_Index := 1;
+      --  Index of the data field with the value of the property.
 
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
+      Loader : UCD.Data_File_Loaders.File_Loader;
 
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+   begin
+      --  Setup default value for all characters.
 
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
-   type Unsigned_17 is mod 2 ** 17 with Size => 17;
+      HST_NA.Is_Used := True;
 
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
+      for Code in UCD.Code_Point loop
+         UCD.Characters.Set (Code, HST_Property, HST_NA);
+      end loop;
 
-   type Unsigned_64 is mod 2 ** 64 with Size => 64;
+      Loader.Open (UCD_Root, "HangulSyllableType.txt");
 
-   --------------------------
-   -- UTF-8 encoding types --
-   --------------------------
+      while not Loader.End_Of_File loop
+         declare
+            First_Code : UCD.Code_Point;
+            Last_Code  : UCD.Code_Point;
 
-   type UTF_8_Code_Unit is new Unsigned_8;
+         begin
+            Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
-   type UTF_8_Offset is range -2 ** 15 .. 2 ** 15 - 1;
-   subtype UTF_8_Count is UTF_8_Offset range 0 .. UTF_8_Offset'Last;
+            declare
+               Value : constant not null Properties.Property_Value_Access :=
+                 UCD.Properties.Resolve
+                   (HST_Property, Loader.Get_Field (Value_Field));
 
-end Gen_UCD;
+            begin
+               for Code in First_Code .. Last_Code loop
+                  UCD.Characters.Set (Code, HST_Property, Value);
+               end loop;
+            end;
+
+            Loader.Skip_Line;
+         end;
+      end loop;
+   end Load;
+
+end UCD.Hangul_Syllable_Type_Loader;

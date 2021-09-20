@@ -21,42 +21,47 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD is
+with UCD;
 
-   pragma Pure;
+generic
+   type Data_Type is private;
+   type Data_Type_Array is array (UCD.Code_Point) of Data_Type;
 
-   --------------------
-   -- Unsigned types --
-   --------------------
+package Gen_UCD.Generic_Compressed_Stage_Table is
 
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
+   Group_Size : constant := 256;
 
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
-   type Unsigned_9  is mod 2 ** 9  with Size => 9;
+   type Group_Count is new Natural;
+   subtype Group_Offset is Group_Count;
 
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
+   type Data_Count is new Natural;
+   subtype Data_Offset is Data_Count;
 
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+   type Compressed_Stage_Table is tagged limited private;
 
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
-   type Unsigned_17 is mod 2 ** 17 with Size => 17;
+   procedure Build
+     (Self : in out Compressed_Stage_Table'Class; Data : Data_Type_Array);
 
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
+   function Index_Table_Last
+     (Self : Compressed_Stage_Table'Class) return Group_Count;
 
-   type Unsigned_64 is mod 2 ** 64 with Size => 64;
+   function Index_Table_Element
+     (Self   : Compressed_Stage_Table'Class;
+      Offset : Group_Offset) return Data_Offset;
 
-   --------------------------
-   -- UTF-8 encoding types --
-   --------------------------
+   function Data_Table_Last return Data_Count;
 
-   type UTF_8_Code_Unit is new Unsigned_8;
+   function Data_Table_Element (Offset : Data_Offset) return Data_Type;
 
-   type UTF_8_Offset is range -2 ** 15 .. 2 ** 15 - 1;
-   subtype UTF_8_Count is UTF_8_Offset range 0 .. UTF_8_Offset'Last;
+private
 
-end Gen_UCD;
+   type Group_Array is
+     array (Gen_UCD.Unsigned_32 range <>) of Gen_UCD.Unsigned_32;
+
+   type Group_Array_Access is access all Group_Array;
+
+   type Compressed_Stage_Table is tagged limited record
+      Group_Data : Group_Array_Access;
+   end record;
+
+end Gen_UCD.Generic_Compressed_Stage_Table;

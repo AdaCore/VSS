@@ -28,6 +28,7 @@ with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.UCD_Casing;
 with VSS.Implementation.UCD_Casing_UTF8;
+with VSS.Implementation.UCD_Normalization_UTF8;
 
 package body VSS.Implementation.UTF8_String_Handlers is
 
@@ -70,10 +71,30 @@ package body VSS.Implementation.UTF8_String_Handlers is
    --  Decode UTF8 encoded character started at given offset and change offset
    --  to point to the beginning of the next character.
 
+   procedure Unchecked_Backward_Decode
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point);
+   --  Change offset to the point of the previous character and decode
+   --  character at this position.
+
+   procedure Unchecked_Backward_Decode
+     (Source_Data : VSS.Implementation.Strings.String_Data;
+      Offset      : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code        : out VSS.Unicode.Code_Point);
+   --  Change offset to the point of the previous character and decode
+   --  character at this position.
+
    procedure Unchecked_Forward
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Position : in out VSS.Implementation.Strings.Cursor);
    --  Move cursor to position of the next character
+
+   --  procedure Unchecked_Forward
+   --    (Source_Data : VSS.Implementation.Strings.String_Data;
+   --     Offset      : in out VSS.Unicode.UTF8_Code_Unit_Count);
+   --  --  Move cursor to position of the next character
+
    procedure Unchecked_Backward
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Position : in out VSS.Implementation.Strings.Cursor);
@@ -96,6 +117,28 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Length      : VSS.Implementation.Strings.Character_Count);
    --  Append given slice of the data to the target. Convert target
    --  from in-place to heap based implementation when necessary.
+
+   procedure Unchecked_Append
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count);
+   --  Append given slice of the data to the target. Convert target
+   --  from in-place to heap based implementation when necessary.
+
+   procedure Unchecked_Insert
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;
+      Into        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count);
+   --  Insert given slice of the data into the target starting from the given
+   --  position. Convert target from in-place to heap based implementation
+   --  when necessary.
 
    Growth_Factor            : constant := 32;
    --  The growth factor controls how much extra space is allocated when
@@ -171,6 +214,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
       return VSS.Implementation.UCD_Casing_UTF8.Mapping_Information;
    --  Returns case mapping information for given mapping and character.
 
+   function Get_Decomposition_Information
+     (Decomposition_Data :
+        VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset_Array;
+      Code               : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information;
+   --  Returns decomposition information for given data and character.
+
    procedure Convert_Case_Simple
      (Source_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
@@ -187,6 +237,16 @@ package body VSS.Implementation.UTF8_String_Handlers is
       To_Lower       : Boolean;
       Result_Data    : in out VSS.Implementation.Strings.String_Data);
    --  Common code for full case conversions.
+
+   procedure Decomposite
+     (Source_Storage     :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Source_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Decomposition_Data :
+        VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset_Array;
+      Result_Data        : out VSS.Implementation.Strings.String_Data);
+   --  Common code to decomposite string according to given decomposition
+   --  mapping (canonical or compatibility) and to do canonical reordering.
 
    --------------------------
    -- After_Last_Character --
@@ -923,6 +983,291 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Pointer  => Destination.all'Address);
    end Copy_To_Heap;
 
+   -----------------
+   -- Decomposite --
+   -----------------
+
+   procedure Decomposite
+     (Source_Storage     :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Source_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Decomposition_Data :
+        VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset_Array;
+      Result_Data        : out VSS.Implementation.Strings.String_Data)
+   is
+      use all type VSS.Implementation.UCD_Normalization_UTF8.CCC_Values;
+      use type VSS.Unicode.Code_Point;
+
+      procedure Reorder_And_Insert
+        (Result_Data : in out VSS.Implementation.Strings.String_Data;
+         Result_Size : in out VSS.Unicode.UTF8_Code_Unit_Count;
+         CCC         : VSS.Implementation.UCD_Normalization_UTF8.CCC_Values;
+         Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         Offset      : VSS.Unicode.UTF8_Code_Unit_Offset;
+         Size        : VSS.Unicode.UTF8_Code_Unit_Count);
+      --  Insert given encoded character into the string preserving canonical
+      --  ordering.
+
+      ------------------------
+      -- Reorder_And_Insert --
+      ------------------------
+
+      procedure Reorder_And_Insert
+        (Result_Data : in out VSS.Implementation.Strings.String_Data;
+         Result_Size : in out VSS.Unicode.UTF8_Code_Unit_Count;
+         CCC         : VSS.Implementation.UCD_Normalization_UTF8.CCC_Values;
+         Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+         Offset      : VSS.Unicode.UTF8_Code_Unit_Offset;
+         Size        : VSS.Unicode.UTF8_Code_Unit_Count)
+      is
+         Previous_Offset : VSS.Unicode.UTF8_Code_Unit_Offset;
+         Previous_Code   : VSS.Unicode.Code_Point;
+         Previous_Info   :
+           VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information;
+         Insert_Offset   : VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      begin
+         Previous_Offset := Result_Size;
+
+         loop
+            Insert_Offset := Previous_Offset;
+
+            exit when Previous_Offset = 0;
+
+            Unchecked_Backward_Decode
+              (Result_Data, Previous_Offset, Previous_Code);
+
+            Previous_Info :=
+              Get_Decomposition_Information
+                (Decomposition_Data, Previous_Code);
+
+            exit when Previous_Info.CCC = CCC_NR
+                        or Previous_Info.CCC <= CCC;
+         end loop;
+
+         Unchecked_Insert
+           (Result_Data,
+            Result_Size,
+            Insert_Offset,
+            Storage,
+            Offset,
+            Size,
+            1);
+      end Reorder_And_Insert;
+
+      Result_Size : VSS.Unicode.UTF8_Code_Unit_Count := 0;
+      Code        : VSS.Unicode.Code_Point;
+      Info        :
+        VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information;
+      Start       : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Out_Start   : VSS.Unicode.UTF8_Code_Unit_Offset;
+      Offset      : VSS.Unicode.UTF8_Code_Unit_Offset := 0;
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Last_CCC    : VSS.Implementation.UCD_Normalization_UTF8.CCC_Values :=
+        VSS.Implementation.UCD_Normalization_UTF8.CCC_NR;
+
+   begin
+      loop
+         --  Check whether source string is in normalization form, and attempt
+         --  to lookup for maximum length of normalized data.
+
+         Start  := Offset;
+         Length := 0;
+
+         loop
+            Out_Start := Offset;
+
+            exit when Offset >= Source_Size;
+
+            Unchecked_Decode_Forward (Source_Storage, Offset, Code);
+
+            Info := Get_Decomposition_Information (Decomposition_Data, Code);
+
+            exit when not Info.Decomposition_QC;
+            --  Copy data and run normalization
+
+            exit when Last_CCC > Info.CCC and Info.CCC /= CCC_NR;
+            --  Copy data and run reordering
+
+            Last_CCC := Info.CCC;
+            Length   := Length + 1;
+         end loop;
+
+         --  Copy found normalized data if any
+
+         if Start /= Out_Start then
+            Unchecked_Append
+              (Result_Data,
+               Result_Size,
+               Source_Storage,
+               Start,
+               Out_Start - Start,
+               Length);
+         end if;
+
+         exit when Out_Start >= Source_Size;
+         --  Source text has been processed completely, exit.
+
+         if Info.Decomposition_QC then
+            --  Apply canonical ordering algoriphm to the next character in
+            --  the source string.
+
+            Reorder_And_Insert
+              (Result_Data,
+               Result_Size,
+               Info.CCC,
+               Source_Storage,
+               Out_Start,
+               Offset - Out_Start);
+
+         else
+            --  Apply decomposition mapping
+
+            if Code in 16#AC00# .. 16#AC00# + 11_172 then
+               --  Hangul syllables are decomposed algorithmically.
+
+               declare
+                  use type VSS.Unicode.UTF8_Code_Unit;
+
+                  S_Base  : constant := 16#AC00#;
+                  L_Base  : constant := 16#1100#;
+                  V_Base  : constant := 16#1161#;
+                  T_Base  : constant := 16#11A7#;
+
+                  T_Count : constant := 28;
+                  N_Count : constant := 588;  --  V_Count * T_Count
+
+                  S_Index : constant VSS.Unicode.Code_Point := Code - S_Base;
+                  L_Index : constant VSS.Unicode.Code_Point :=
+                    S_Index / N_Count;
+                  V_Index : constant VSS.Unicode.Code_Point :=
+                    (S_Index mod N_Count) / T_Count;
+                  T_Index : constant VSS.Unicode.Code_Point :=
+                    S_Index mod T_Count;
+                  L_Part  : constant VSS.Unicode.Code_Point :=
+                    L_Base + L_Index;
+                  V_Part  : constant VSS.Unicode.Code_Point :=
+                    V_Base + V_Index;
+                  T_Part  : constant VSS.Unicode.Code_Point :=
+                    T_Base + T_Index;
+
+                  Aux : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                    (0 .. 8);
+
+               begin
+                  --  First byte of encoded seqeunce for all characters of the
+                  --  decomposition is always 16#E1#, thus don't compute it and
+                  --  ignore corresponding bits in L_Part/V_Part/T_Part.
+
+                  Aux (0) := 16#E1#;
+                  Aux (1) :=
+                    16#80#
+                      or VSS.Unicode.UTF8_Code_Unit
+                           ((L_Part / 16#40#) mod 16#40#);
+                  Aux (2) :=
+                    16#80# or VSS.Unicode.UTF8_Code_Unit (L_Part mod 16#40#);
+
+                  Aux (3) := 16#E1#;
+                  Aux (4) :=
+                    16#80#
+                      or VSS.Unicode.UTF8_Code_Unit
+                           ((V_Part / 16#40#) mod 16#40#);
+                  Aux (5) :=
+                    16#80# or VSS.Unicode.UTF8_Code_Unit (V_Part mod 16#40#);
+
+                  if T_Index = 0 then
+                     Unchecked_Append
+                       (Result_Data,
+                        Result_Size,
+                        Aux,
+                        0,
+                        6,
+                        2);
+
+                  else
+                     Aux (6) := 16#E1#;
+                     Aux (7) :=
+                       16#80#
+                         or VSS.Unicode.UTF8_Code_Unit
+                              ((T_Part / 16#40#) mod 16#40#);
+                     Aux (8) :=
+                       16#80#
+                         or VSS.Unicode.UTF8_Code_Unit (T_Part mod 16#40#);
+
+                     Unchecked_Append
+                       (Result_Data,
+                        Result_Size,
+                        Aux,
+                        0,
+                        9,
+                        3);
+                  end if;
+
+                  Last_CCC := CCC_NR;
+               end;
+
+            elsif Info.First_CCC /= CCC_NR
+              and Last_CCC /= CCC_NR
+              and Last_CCC > Info.First_CCC
+            then
+               --  Reordering is necessary
+
+               declare
+                  Next_Offset : VSS.Unicode.UTF8_Code_Unit_Offset :=
+                    Info.Offset;
+                  New_Offset  : VSS.Unicode.UTF8_Code_Unit_Offset;
+                  New_Code    : VSS.Unicode.Code_Point;
+                  New_Info    : VSS.Implementation.UCD_Normalization_UTF8
+                                  .Mapping_Information;
+
+               begin
+                  loop
+                     New_Offset := Next_Offset;
+
+                     exit when Next_Offset >= Info.Offset + Info.Size;
+
+                     Unchecked_Decode_Forward
+                       (VSS.Implementation.UCD_Normalization_UTF8
+                          .UTF8_Data_Table,
+                        Next_Offset,
+                        New_Code);
+
+                     New_Info :=
+                       Get_Decomposition_Information
+                         (Decomposition_Data, New_Code);
+
+                     if Last_CCC > New_Info.CCC then
+                        Reorder_And_Insert
+                          (Result_Data,
+                           Result_Size,
+                           New_Info.CCC,
+                           VSS.Implementation.UCD_Normalization_UTF8
+                             .UTF8_Data_Table,
+                           New_Offset,
+                           Next_Offset - New_Offset);
+
+                     else
+                        raise Program_Error;
+                     end if;
+                  end loop;
+               end;
+
+            else
+               Unchecked_Append
+                 (Result_Data,
+                  Result_Size,
+                  VSS.Implementation.UCD_Normalization_UTF8.UTF8_Data_Table,
+                  Info.Offset,
+                  Info.Size,
+                  Info.Length);
+               Last_CCC := Info.Last_CCC;
+            end if;
+         end if;
+
+         exit when Offset >= Source_Size;
+      end loop;
+   end Decomposite;
+
    ------------
    -- Delete --
    ------------
@@ -1420,6 +1765,36 @@ package body VSS.Implementation.UTF8_String_Handlers is
           (Mapping (Group) + Offset);
    end Get_Case_Mapping_Information;
 
+   -----------------------------------
+   -- Get_Decomposition_Information --
+   -----------------------------------
+
+   function Get_Decomposition_Information
+     (Decomposition_Data :
+        VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset_Array;
+      Code               : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information
+   is
+      use type VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset;
+      use type VSS.Unicode.Code_Point;
+
+      Group  :
+        constant VSS.Implementation.UCD_Normalization_UTF8.Mapping_Group :=
+          VSS.Implementation.UCD_Normalization_UTF8.Mapping_Group
+            (Code
+               / VSS.Implementation.UCD_Normalization_UTF8.Mapping_Group_Size);
+      Offset : constant
+        VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset :=
+          VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset
+            (Code
+             mod VSS.Implementation.UCD_Normalization_UTF8.Mapping_Group_Size);
+
+   begin
+      return
+        VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Table
+          (Decomposition_Data (Group) + Offset);
+   end Get_Decomposition_Information;
+
    -------------------
    -- Has_Character --
    -------------------
@@ -1699,6 +2074,98 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Reallocate (Data, Capacity, Size);
       end if;
    end Mutate;
+
+   ---------------
+   -- Normalize --
+   ---------------
+
+   overriding procedure Normalize
+     (Self   : UTF8_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data)
+   is
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      if Source = null or else Source.Length = 0 then
+         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
+           (Result);
+
+      else
+         Self.Initialize (Result);
+
+         case Form is
+            when VSS.Strings.Normalization_Form_D =>
+               Decomposite
+                 (Source.Storage,
+                  Source.Size,
+                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
+                  Result);
+
+            when VSS.Strings.Normalization_Form_C =>
+               raise Program_Error;
+
+            when VSS.Strings.Normalization_Form_KD =>
+               Decomposite
+                 (Source.Storage,
+                  Source.Size,
+                  VSS.Implementation.UCD_Normalization_UTF8
+                    .Compatibility_Index,
+                  Result);
+
+            when VSS.Strings.Normalization_Form_KC =>
+               raise Program_Error;
+         end case;
+      end if;
+   end Normalize;
+
+   ---------------
+   -- Normalize --
+   ---------------
+
+   overriding procedure Normalize
+     (Self   : UTF8_In_Place_String_Handler;
+      Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data)
+   is
+      Source : UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      if Source.Length = 0 then
+         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
+           (Result);
+
+      else
+         Self.Initialize (Result);
+
+         case Form is
+            when VSS.Strings.Normalization_Form_D =>
+               Decomposite
+                 (Source.Storage,
+                  Source.Size,
+                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
+                  Result);
+
+            when VSS.Strings.Normalization_Form_C =>
+               raise Program_Error;
+
+            when VSS.Strings.Normalization_Form_KD =>
+               Decomposite
+                 (Source.Storage,
+                  Source.Size,
+                  VSS.Implementation.UCD_Normalization_UTF8
+                    .Compatibility_Index,
+                  Result);
+
+            when VSS.Strings.Normalization_Form_KC =>
+               raise Program_Error;
+         end case;
+      end if;
+   end Normalize;
 
    ----------------
    -- Reallocate --
@@ -2090,6 +2557,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    procedure Unchecked_Append
      (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;
       Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       From        : VSS.Unicode.UTF8_Code_Unit_Index;
       Size        : VSS.Unicode.UTF8_Code_Unit_Count;
@@ -2104,34 +2572,56 @@ package body VSS.Implementation.UTF8_String_Handlers is
             if Target.Size + Size <= In_Place_Storage_Capacity then
                Target.Storage (Target.Size .. Target.Size + Size - 1) :=
                  Storage (From .. From + Size - 1);
-               Target.Size := Target.Size + Size;
+               Target.Size   := Target.Size + Size;
                Target.Length := Target.Length + Length;
 
+               Target_Size   := Target.Size;
+
+               return;
+
             else
-               raise Program_Error;
+               Copy_To_Heap (Target_Data, 0, Target.Size + Size);
             end if;
-         end;
-
-      else
-         declare
-            Target : UTF8_String_Data_Access
-              with Import, Convention => Ada,
-                   Address => Target_Data.Pointer'Address;
-
-         begin
-            if Target = null then
-               Target := Allocate (0, Size);
-
-            elsif Target.Size + Size > Target.Bulk then
-               Reallocate (Target, 0, Target.Size + Size);
-            end if;
-
-            Target.Storage (Target.Size .. Target.Size + Size - 1) :=
-              Storage (From .. From + Size - 1);
-            Target.Size := Target.Size + Size;
-            Target.Length := Target.Length + Length;
          end;
       end if;
+
+      declare
+         Target : UTF8_String_Data_Access
+           with Import, Convention => Ada,
+                Address => Target_Data.Pointer'Address;
+
+      begin
+         if Target = null then
+            Target := Allocate (0, Size);
+
+         elsif Target.Size + Size > Target.Bulk then
+            Reallocate (Target, 0, Target.Size + Size);
+         end if;
+
+         Target.Storage (Target.Size .. Target.Size + Size - 1) :=
+           Storage (From .. From + Size - 1);
+         Target.Size   := Target.Size + Size;
+         Target.Length := Target.Length + Length;
+
+         Target_Size   := Target.Size;
+      end;
+   end Unchecked_Append;
+
+   ----------------------
+   -- Unchecked_Append --
+   ----------------------
+
+   procedure Unchecked_Append
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count)
+   is
+      Target_Size : VSS.Unicode.UTF8_Code_Unit_Count;
+
+   begin
+      Unchecked_Append (Target_Data, Target_Size, Storage, From, Size, Length);
    end Unchecked_Append;
 
    ------------------------
@@ -2174,6 +2664,74 @@ package body VSS.Implementation.UTF8_String_Handlers is
          end loop;
       end if;
    end Unchecked_Backward;
+
+   -------------------------------
+   -- Unchecked_Backward_Decode --
+   -------------------------------
+
+   procedure Unchecked_Backward_Decode
+     (Source_Data : VSS.Implementation.Strings.String_Data;
+      Offset      : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code        : out VSS.Unicode.Code_Point) is
+   begin
+      if Source_Data.In_Place then
+         declare
+            Source : UTF8_In_Place_Data
+              with Import, Convention => Ada, Address => Source_Data'Address;
+
+         begin
+            Unchecked_Backward_Decode (Source.Storage, Offset, Code);
+         end;
+
+      else
+         declare
+            Source : UTF8_String_Data_Access
+              with Import, Convention => Ada,
+                   Address => Source_Data.Pointer'Address;
+
+         begin
+            Unchecked_Backward_Decode (Source.Storage, Offset, Code);
+         end;
+      end if;
+   end Unchecked_Backward_Decode;
+
+   -------------------------------
+   -- Unchecked_Backward_Decode --
+   -------------------------------
+
+   procedure Unchecked_Backward_Decode
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point) is
+   begin
+      Offset := Offset - 1;
+
+      loop
+         declare
+            Code : constant VSS.Unicode.UTF8_Code_Unit := Storage (Offset);
+
+         begin
+            case Code is
+               when 16#80# .. 16#BF# =>
+                  Offset  := Offset - 1;
+
+               when 16#00# .. 16#7F#
+                  | 16#C2# .. 16#DF#
+                  | 16#E0# .. 16#EF# =>
+
+                  exit;
+
+               when 16#F0# .. 16#F4# =>
+                  exit;
+
+               when others =>
+                  raise Program_Error with "string data is corrupted";
+            end case;
+         end;
+      end loop;
+
+      Code := Unchecked_Decode (Storage, Offset);
+   end Unchecked_Backward_Decode;
 
    ----------------------
    -- Unchecked_Decode --
@@ -2362,6 +2920,64 @@ package body VSS.Implementation.UTF8_String_Handlers is
       --    Position.UTF16_Offset + 1
       --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
    end Unchecked_Forward;
+
+   ----------------------
+   -- Unchecked_Insert --
+   ----------------------
+
+   procedure Unchecked_Insert
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;
+      Into        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count) is
+   begin
+      if Target_Data.In_Place then
+         declare
+            Target : UTF8_In_Place_Data
+              with Import, Convention => Ada, Address => Target_Data'Address;
+
+         begin
+            if Target.Size + Size <= In_Place_Storage_Capacity then
+               Target.Storage (Into + Size .. Target.Size + Size - 1) :=
+                 Target.Storage (Into .. Target.Size - 1);
+               Target.Storage (Into .. Into + Size - 1) :=
+                 Storage (From .. From + Size - 1);
+               Target.Size   := Target.Size + Size;
+               Target.Length := Target.Length + Length;
+
+               Target_Size   := Target.Size;
+
+            else
+               raise Program_Error;
+            end if;
+         end;
+
+      else
+         declare
+            Target : UTF8_String_Data_Access
+              with Import, Convention => Ada,
+                   Address => Target_Data.Pointer'Address;
+
+         begin
+            if Target = null then
+               Target := Allocate (0, Size);
+
+            elsif Target.Size + Size > Target.Bulk then
+               --  Reallocate (Target, 0, Target.Size + Size);
+               raise Program_Error;
+            end if;
+
+            raise Program_Error;
+            --  Target.Storage (Target.Size .. Target.Size + Size - 1) :=
+            --    Storage (From .. From + Size - 1);
+            --  Target.Size := Target.Size + Size;
+            --  Target.Length := Target.Length + Length;
+         end;
+      end if;
+   end Unchecked_Insert;
 
    -----------------
    -- Unreference --

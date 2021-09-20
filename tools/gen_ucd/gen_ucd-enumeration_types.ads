@@ -21,25 +21,44 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package Gen_UCD.Unsigned_Types is
+private with Ada.Containers.Hashed_Maps;
+with Ada.Wide_Wide_Text_IO;
 
-   pragma Pure;
+with UCD.Properties;
 
-   type Unsigned_1  is mod 2 ** 1  with Size => 1;
-   type Unsigned_2  is mod 2 ** 2  with Size => 2;
-   type Unsigned_3  is mod 2 ** 3  with Size => 3;
-   type Unsigned_4  is mod 2 ** 4  with Size => 4;
-   type Unsigned_5  is mod 2 ** 5  with Size => 5;
-   type Unsigned_6  is mod 2 ** 6  with Size => 7;
+package Gen_UCD.Enumeration_Types is
 
-   type Unsigned_8  is mod 2 ** 8  with Size => 8;
+   type Enumeration_Type is tagged limited private;
 
-   type Unsigned_11 is mod 2 ** 11 with Size => 11;
+   procedure Initialize
+     (Self     : in out Enumeration_Type'Class;
+      Property : not null UCD.Properties.Property_Access);
+   --  Initialize mapping of used enumeration property values to continuous
+   --  range of natural numbers used for internal representation.
 
-   type Unsigned_14 is mod 2 ** 14 with Size => 14;
+   function Representation
+     (Self : Enumeration_Type'Class;
+      Code : UCD.Code_Point) return Natural;
+   --  Return internal representation of the given value of the property.
 
-   type Unsigned_16 is mod 2 ** 16 with Size => 16;
+   procedure Generate_Type_Declaration
+     (Self : Enumeration_Type'Class;
+      File : Ada.Wide_Wide_Text_IO.File_Type);
+   --  Generate enumeration type declaration and necessary representation
+   --  clauses.
 
-   type Unsigned_32 is mod 2 ** 32 with Size => 32;
+private
 
-end Gen_UCD.Unsigned_Types;
+   package Property_Value_Integer_Maps is
+     new Ada.Containers.Hashed_Maps
+       (UCD.Properties.Property_Value_Access,
+        Natural,
+        UCD.Properties.Hash,
+        UCD.Properties."=");
+
+   type Enumeration_Type is tagged limited record
+      Property : UCD.Properties.Property_Access;
+      Map      : Property_Value_Integer_Maps.Map;
+   end record;
+
+end Gen_UCD.Enumeration_Types;

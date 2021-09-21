@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.JSON.Streams.Content_Handlers;
+with VSS.JSON.Content_Handlers;
 private with VSS.JSON.Pull_Readers.Simple;
 with VSS.Text_Streams;
 
@@ -54,7 +54,7 @@ private
      limited new VSS.JSON.Push_Readers.JSON_Push_Reader
    with record
       Reader  : VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader;
-      Content : VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access;
+      Content : VSS.JSON.Content_Handlers.JSON_Content_Handler_Access;
       Error   : VSS.JSON.Pull_Readers.JSON_Reader_Error
         := VSS.JSON.Pull_Readers.No_Error;
       Message : VSS.Strings.Virtual_String;
@@ -62,7 +62,7 @@ private
 
    overriding procedure Set_Content_Handler
      (Self : in out JSON_Simple_Push_Reader;
-      To   : VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access);
+      To   : VSS.JSON.Content_Handlers.JSON_Content_Handler_Access);
    --  Set content handler to process stream.
 
 end VSS.JSON.Push_Readers.Simple;

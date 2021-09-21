@@ -51,7 +51,7 @@ package body VSS.JSON.Push_Readers.Simple is
 
    procedure Parse (Self : in out JSON_Simple_Push_Reader'Class) is
 
-      use type VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access;
+      use type VSS.JSON.Content_Handlers.JSON_Content_Handler_Access;
 
       procedure Process_Custom_Error;
       --  Process error reported by the handlers if any.
@@ -181,7 +181,7 @@ package body VSS.JSON.Push_Readers.Simple is
 
    overriding procedure Set_Content_Handler
      (Self : in out JSON_Simple_Push_Reader;
-      To   : VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access) is
+      To   : VSS.JSON.Content_Handlers.JSON_Content_Handler_Access) is
    begin
       Self.Content := To;
    end Set_Content_Handler;

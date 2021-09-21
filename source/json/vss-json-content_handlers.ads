@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -25,7 +25,7 @@
 
 with VSS.Strings;
 
-package VSS.JSON.Streams.Content_Handlers is
+package VSS.JSON.Content_Handlers is
 
    pragma Preelaborate;
 
@@ -141,4 +141,4 @@ package VSS.JSON.Streams.Content_Handlers is
 
    procedure Null_Value (Self : in out JSON_Content_Handler'Class);
 
-end VSS.JSON.Streams.Content_Handlers;
+end VSS.JSON.Content_Handlers;

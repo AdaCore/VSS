@@ -25,13 +25,13 @@
 
 with Ada.Assertions;
 
-with VSS.JSON.Streams.Content_Handlers;
+with VSS.JSON.Content_Handlers;
 with VSS.Strings;
 
 procedure Test_JSON_Content_Handler is
 
    type Test_Content_Handler is
-     limited new VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler
+     limited new VSS.JSON.Content_Handlers.JSON_Content_Handler
    with record
       Status : Boolean := False;
    end record;

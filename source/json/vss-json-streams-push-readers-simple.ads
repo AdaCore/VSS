@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 
 with VSS.JSON.Streams.Content_Handlers;
-private with VSS.JSON.Streams.Pull.Readers.Simple;
+private with VSS.JSON.Pull_Readers.Simple;
 with VSS.Text_Streams;
 
 package VSS.JSON.Streams.Push.Readers.Simple is
@@ -53,10 +53,10 @@ private
    type JSON_Simple_Push_Reader is
      limited new VSS.JSON.Streams.Push.Readers.JSON_Push_Reader
    with record
-      Reader  : VSS.JSON.Streams.Pull.Readers.Simple.JSON_Simple_Pull_Reader;
+      Reader  : VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader;
       Content : VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access;
-      Error   : VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error
-        := VSS.JSON.Streams.Pull.Readers.No_Error;
+      Error   : VSS.JSON.Pull_Readers.JSON_Reader_Error
+        := VSS.JSON.Pull_Readers.No_Error;
       Message : VSS.Strings.Virtual_String;
    end record;
 

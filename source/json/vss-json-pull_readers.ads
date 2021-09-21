@@ -20,11 +20,11 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Abstract API of the JSON "push" reader.
+--  Abstract API of the JSON "pull" reader.
 
 with VSS.Strings;
 
-package VSS.JSON.Streams.Pull.Readers is
+package VSS.JSON.Pull_Readers is
 
    pragma Preelaborate;
 
@@ -117,4 +117,4 @@ package VSS.JSON.Streams.Pull.Readers is
 
    procedure Skip_Current_Value (Self : in out JSON_Pull_Reader) is abstract;
 
-end VSS.JSON.Streams.Pull.Readers;
+end VSS.JSON.Pull_Readers;

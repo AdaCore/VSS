@@ -39,10 +39,10 @@ package body VSS.JSON.Streams.Push.Readers.Simple is
    ---------------
 
    function Has_Error (Self : JSON_Simple_Push_Reader'Class) return Boolean is
-      use type VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error;
+      use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    begin
-      return Self.Error /= VSS.JSON.Streams.Pull.Readers.No_Error;
+      return Self.Error /= VSS.JSON.Pull_Readers.No_Error;
    end Has_Error;
 
    -----------
@@ -65,7 +65,7 @@ package body VSS.JSON.Streams.Push.Readers.Simple is
       procedure Process_Custom_Error is
       begin
          if not Success then
-            Self.Error   := VSS.JSON.Streams.Pull.Readers.Custom_Error;
+            Self.Error   := VSS.JSON.Pull_Readers.Custom_Error;
             Self.Message := Self.Reader.Error_Message;
          end if;
       end Process_Custom_Error;
@@ -73,21 +73,21 @@ package body VSS.JSON.Streams.Push.Readers.Simple is
    begin
       while Success loop
          case Self.Reader.Read_Next is
-            when VSS.JSON.Streams.Pull.Readers.No_Token =>
+            when VSS.JSON.Pull_Readers.No_Token =>
                --  Initial state, should not appear, because parsing has been
                --  started by call of Read_Next.
 
                null;
 
-            when VSS.JSON.Streams.Pull.Readers.Invalid =>
+            when VSS.JSON.Pull_Readers.Invalid =>
                case Self.Reader.Error is
-                  when VSS.JSON.Streams.Pull.Readers.No_Error =>
+                  when VSS.JSON.Pull_Readers.No_Error =>
                      --  Must never happen.
 
                      null;
 
-                  when VSS.JSON.Streams.Pull.Readers.Custom_Error
-                     | VSS.JSON.Streams.Pull.Readers.Not_Valid
+                  when VSS.JSON.Pull_Readers.Custom_Error
+                     | VSS.JSON.Pull_Readers.Not_Valid
                   =>
                      Self.Error   := Self.Reader.Error;
                      Self.Message := Self.Reader.Error_Message;
@@ -95,7 +95,7 @@ package body VSS.JSON.Streams.Push.Readers.Simple is
                      exit;
 
                   when
-                       VSS.JSON.Streams.Pull.Readers.Premature_End_Of_Document
+                       VSS.JSON.Pull_Readers.Premature_End_Of_Document
                   =>
                      --  It is normal case for non-blocking parsing, nothing
                      --  do to.
@@ -103,70 +103,70 @@ package body VSS.JSON.Streams.Push.Readers.Simple is
                      exit;
                end case;
 
-            when VSS.JSON.Streams.Pull.Readers.Start_Document =>
+            when VSS.JSON.Pull_Readers.Start_Document =>
                if Self.Content /= null then
                   Self.Content.Start_Document (Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.End_Document =>
+            when VSS.JSON.Pull_Readers.End_Document =>
                if Self.Content /= null then
                   Self.Content.End_Document (Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.Start_Array =>
+            when VSS.JSON.Pull_Readers.Start_Array =>
                if Self.Content /= null then
                   Self.Content.Start_Array (Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.End_Array =>
+            when VSS.JSON.Pull_Readers.End_Array =>
                if Self.Content /= null then
                   Self.Content.End_Array (Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.Start_Object =>
+            when VSS.JSON.Pull_Readers.Start_Object =>
                if Self.Content /= null then
                   Self.Content.Start_Object (Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.End_Object =>
+            when VSS.JSON.Pull_Readers.End_Object =>
                if Self.Content /= null then
                   Self.Content.End_Object (Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.Key_Name =>
+            when VSS.JSON.Pull_Readers.Key_Name =>
                if Self.Content /= null then
                   Self.Content.Key_Name (Self.Reader.Key_Name, Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.String_Value =>
+            when VSS.JSON.Pull_Readers.String_Value =>
                if Self.Content /= null then
                   Self.Content.String_Value
                     (Self.Reader.String_Value, Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.Number_Value =>
+            when VSS.JSON.Pull_Readers.Number_Value =>
                if Self.Content /= null then
                   Self.Content.Number_Value
                     (Self.Reader.Number_Value, Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.Boolean_Value =>
+            when VSS.JSON.Pull_Readers.Boolean_Value =>
                if Self.Content /= null then
                   Self.Content.Boolean_Value
                     (Self.Reader.Boolean_Value, Success);
                   Process_Custom_Error;
                end if;
 
-            when VSS.JSON.Streams.Pull.Readers.Null_Value =>
+            when VSS.JSON.Pull_Readers.Null_Value =>
                if Self.Content /= null then
                   Self.Content.Null_Value (Success);
                   Process_Custom_Error;

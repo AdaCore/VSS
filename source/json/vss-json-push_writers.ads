@@ -21,14 +21,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.JSON.Streams.Content_Handlers;
+with VSS.JSON.Content_Handlers;
 private with VSS.Strings;
 with VSS.Text_Streams;
 
 package VSS.JSON.Push_Writers is
 
    type JSON_Simple_Push_Writer is
-     limited new VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler
+     limited new VSS.JSON.Content_Handlers.JSON_Content_Handler
        with private;
 
    procedure Set_Stream
@@ -40,7 +40,7 @@ package VSS.JSON.Push_Writers is
 private
 
    type JSON_Simple_Push_Writer is
-     limited new VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler
+     limited new VSS.JSON.Content_Handlers.JSON_Content_Handler
    with record
       Configured_Stream : VSS.Text_Streams.Output_Text_Stream_Access;
       Effective_Stream  : VSS.Text_Streams.Output_Text_Stream_Access;

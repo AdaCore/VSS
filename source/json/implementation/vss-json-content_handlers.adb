@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,7 +23,7 @@
 
 with Ada.Assertions;
 
-package body VSS.JSON.Streams.Content_Handlers is
+package body VSS.JSON.Content_Handlers is
 
    -------------------
    -- Boolean_Value --
@@ -266,4 +266,4 @@ package body VSS.JSON.Streams.Content_Handlers is
       end if;
    end String_Value;
 
-end VSS.JSON.Streams.Content_Handlers;
+end VSS.JSON.Content_Handlers;

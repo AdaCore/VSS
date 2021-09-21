@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.JSON.Streams.Content_Handlers;
+with VSS.JSON.Content_Handlers;
 
 package VSS.JSON.Push_Readers is
 
@@ -31,7 +31,7 @@ package VSS.JSON.Push_Readers is
 
    not overriding procedure Set_Content_Handler
      (Self : in out JSON_Push_Reader;
-      To   : VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler_Access)
+      To   : VSS.JSON.Content_Handlers.JSON_Content_Handler_Access)
       is abstract;
    --  Set content handler to process stream.
 

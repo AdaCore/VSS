@@ -25,7 +25,7 @@ with VSS.JSON.Streams.Content_Handlers;
 private with VSS.Strings;
 with VSS.Text_Streams;
 
-package VSS.JSON.Streams.Push.Writers is
+package VSS.JSON.Push_Writers is
 
    type JSON_Simple_Push_Writer is
      limited new VSS.JSON.Streams.Content_Handlers.JSON_Content_Handler
@@ -91,4 +91,4 @@ private
    overriding function Error_Message
      (Self : JSON_Simple_Push_Writer) return VSS.Strings.Virtual_String;
 
-end VSS.JSON.Streams.Push.Writers;
+end VSS.JSON.Push_Writers;

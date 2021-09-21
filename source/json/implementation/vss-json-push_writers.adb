@@ -29,7 +29,7 @@ with VSS.Implementation.String_Handlers;
 with VSS.Strings.Internals;
 with VSS.Unicode;
 
-package body VSS.JSON.Streams.Push.Writers is
+package body VSS.JSON.Push_Writers is
 
    use type VSS.Text_Streams.Output_Text_Stream_Access;
 
@@ -761,4 +761,4 @@ package body VSS.JSON.Streams.Push.Writers is
       end if;
    end String_Value;
 
-end VSS.JSON.Streams.Push.Writers;
+end VSS.JSON.Push_Writers;

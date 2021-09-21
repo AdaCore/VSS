@@ -27,7 +27,7 @@ with Ada.Text_IO;
 with Interfaces;
 
 with VSS.JSON.Streams.Events;
-with VSS.JSON.Streams.Push.Writers;
+with VSS.JSON.Push_Writers;
 with VSS.Stream_Element_Vectors.Conversions;
 with VSS.Strings.Conversions;
 with VSS.Text_Streams.Memory_UTF8_Output;
@@ -76,7 +76,7 @@ procedure Test_JSON_Writer is
 
    procedure Test_Output_Failure
      (Writer : in out
-        VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer'Class);
+        VSS.JSON.Push_Writers.JSON_Simple_Push_Writer'Class);
 
    -------------------------
    -- Test_Output_Failure --
@@ -84,7 +84,7 @@ procedure Test_JSON_Writer is
 
    procedure Test_Output_Failure
      (Writer : in out
-        VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer'Class)
+        VSS.JSON.Push_Writers.JSON_Simple_Push_Writer'Class)
    is
       type Test_Event is record
          Length : VSS.Strings.Character_Count;
@@ -274,7 +274,7 @@ procedure Test_JSON_Writer is
 
    Stream  :
      aliased VSS.Text_Streams.Memory_UTF8_Output.Memory_UTF8_Output_Stream;
-   Writer  : aliased VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer;
+   Writer  : aliased VSS.JSON.Push_Writers.JSON_Simple_Push_Writer;
    Success : Boolean := True;
 
 begin
@@ -402,7 +402,7 @@ begin
    end;
 
    declare
-      Writer : aliased VSS.JSON.Streams.Push.Writers.JSON_Simple_Push_Writer;
+      Writer : aliased VSS.JSON.Push_Writers.JSON_Simple_Push_Writer;
 
    begin
       Test_Output_Failure (Writer);

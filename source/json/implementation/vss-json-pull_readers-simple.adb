@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,13 +21,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.JSON.Streams.Readers.Simple is
+package body VSS.JSON.Pull_Readers.Simple is
 
    ------------
    -- At_End --
    ------------
 
-   overriding function At_End (Self : JSON_Simple_Reader) return Boolean is
+   overriding function At_End
+     (Self : JSON_Simple_Pull_Reader) return Boolean is
    begin
       return Self.Parser.At_End;
    end At_End;
@@ -37,7 +38,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    -------------------
 
    overriding function Boolean_Value
-     (Self : JSON_Simple_Reader) return Boolean is
+     (Self : JSON_Simple_Pull_Reader) return Boolean is
    begin
       return Self.Parser.Boolean_Value;
    end Boolean_Value;
@@ -46,7 +47,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    -- Clear --
    -----------
 
-   overriding procedure Clear (Self : in out JSON_Simple_Reader) is
+   overriding procedure Clear (Self : in out JSON_Simple_Pull_Reader) is
    begin
       raise Program_Error;
    end Clear;
@@ -56,8 +57,8 @@ package body VSS.JSON.Streams.Readers.Simple is
    -----------
 
    overriding function Error
-     (Self : JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Reader_Error is
+     (Self : JSON_Simple_Pull_Reader)
+      return VSS.JSON.Pull_Readers.JSON_Reader_Error is
    begin
       return Self.Parser.Error;
    end Error;
@@ -67,7 +68,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    -------------------
 
    overriding function Error_Message
-     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String is
+     (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String is
    begin
       return Self.Parser.Error_Message;
    end Error_Message;
@@ -77,8 +78,8 @@ package body VSS.JSON.Streams.Readers.Simple is
    ----------------
 
    overriding function Event_Kind
-     (Self : JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Event_Kind is
+     (Self : JSON_Simple_Pull_Reader)
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
    begin
       return Self.Parser.Event_Kind;
    end Event_Kind;
@@ -88,7 +89,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    --------------
 
    overriding function Key_Name
-     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String is
+     (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String is
    begin
       return Self.Parser.String_Value;
    end Key_Name;
@@ -98,7 +99,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    ------------------
 
    overriding function Number_Value
-     (Self : JSON_Simple_Reader) return VSS.JSON.JSON_Number is
+     (Self : JSON_Simple_Pull_Reader) return VSS.JSON.JSON_Number is
    begin
       return Self.Parser.Number_Value;
    end Number_Value;
@@ -108,7 +109,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    -----------------
 
    overriding procedure Raise_Error
-     (Self    : in out JSON_Simple_Reader;
+     (Self    : in out JSON_Simple_Pull_Reader;
       Message : VSS.Strings.Virtual_String) is
    begin
       raise Program_Error;
@@ -119,8 +120,8 @@ package body VSS.JSON.Streams.Readers.Simple is
    ---------------
 
    overriding function Read_Next
-     (Self : in out JSON_Simple_Reader)
-      return VSS.JSON.Streams.Readers.JSON_Event_Kind is
+     (Self : in out JSON_Simple_Pull_Reader)
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
    begin
       Self.Parser.Parse;
 
@@ -132,7 +133,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    ----------------
 
    procedure Set_Stream
-     (Self   : in out JSON_Simple_Reader'Class;
+     (Self   : in out JSON_Simple_Pull_Reader'Class;
       Stream : not null VSS.Text_Streams.Input_Text_Stream_Access) is
    begin
       Self.Parser.Set_Stream (Stream);
@@ -143,7 +144,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    ------------------------
 
    overriding procedure Skip_Current_Array
-     (Self : in out JSON_Simple_Reader) is
+     (Self : in out JSON_Simple_Pull_Reader) is
    begin
       pragma Assert (Self.Is_Start_Array);
 
@@ -161,7 +162,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    -------------------------
 
    overriding procedure Skip_Current_Object
-     (Self : in out JSON_Simple_Reader) is
+     (Self : in out JSON_Simple_Pull_Reader) is
    begin
       pragma Assert (Self.Is_Start_Object);
 
@@ -182,7 +183,7 @@ package body VSS.JSON.Streams.Readers.Simple is
    ------------------------
 
    overriding procedure Skip_Current_Value
-     (Self : in out JSON_Simple_Reader) is
+     (Self : in out JSON_Simple_Pull_Reader) is
    begin
       case Self.Event_Kind is
          when No_Token =>
@@ -219,9 +220,9 @@ package body VSS.JSON.Streams.Readers.Simple is
    ------------------
 
    overriding function String_Value
-     (Self : JSON_Simple_Reader) return VSS.Strings.Virtual_String is
+     (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String is
    begin
       return Self.Parser.String_Value;
    end String_Value;
 
-end VSS.JSON.Streams.Readers.Simple;
+end VSS.JSON.Pull_Readers.Simple;

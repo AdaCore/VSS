@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,9 +20,18 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  VSS: common packages for tests.
 
-package VSS.JSON.Streams is
+with "../vss_config";
 
-   pragma Preelaborate;
+project VSS_Test_Common is
 
-end VSS.JSON.Streams;
+   for Languages use ("Ada");
+   for Object_Dir use VSS_Config.Tests_Object_Dir;
+   for Source_Dirs use ("../../testsuite/common");
+
+   package Compiler is
+      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
+   end Compiler;
+
+end VSS_Test_Common;

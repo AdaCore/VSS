@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,13 +21,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.JSON.Streams.Readers is
+package body VSS.JSON.Pull_Readers is
 
    ---------------
    -- Has_Error --
    ---------------
 
-   function Has_Error (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Has_Error (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Error /= No_Error;
    end Has_Error;
@@ -37,7 +37,7 @@ package body VSS.JSON.Streams.Readers is
    ----------------------
 
    function Is_Boolean_Value
-     (Self : JSON_Stream_Reader'Class) return Boolean is
+     (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Boolean_Value;
    end Is_Boolean_Value;
@@ -46,7 +46,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_End_Array --
    ------------------
 
-   function Is_End_Array (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_End_Array (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = End_Array;
    end Is_End_Array;
@@ -55,7 +55,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_End_Document --
    ---------------------
 
-   function Is_End_Document (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_End_Document (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = End_Document;
    end Is_End_Document;
@@ -64,7 +64,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_End_Object --
    -------------------
 
-   function Is_End_Object (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_End_Object (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = End_Object;
    end Is_End_Object;
@@ -73,7 +73,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_Key_Name --
    -----------------
 
-   function Is_Key_Name (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_Key_Name (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Key_Name;
    end Is_Key_Name;
@@ -82,7 +82,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_Null_Value --
    -------------------
 
-   function Is_Null_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_Null_Value (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Null_Value;
    end Is_Null_Value;
@@ -91,7 +91,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_Number_Value --
    ---------------------
 
-   function Is_Number_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_Number_Value (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Number_Value;
    end Is_Number_Value;
@@ -100,7 +100,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_Start_Array --
    --------------------
 
-   function Is_Start_Array (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_Start_Array (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Start_Array;
    end Is_Start_Array;
@@ -110,7 +110,7 @@ package body VSS.JSON.Streams.Readers is
    -----------------------
 
    function Is_Start_Document
-     (Self : JSON_Stream_Reader'Class) return Boolean is
+     (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Start_Document;
    end Is_Start_Document;
@@ -119,7 +119,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_Start_Object --
    ---------------------
 
-   function Is_Start_Object (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_Start_Object (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = Start_Object;
    end Is_Start_Object;
@@ -128,7 +128,7 @@ package body VSS.JSON.Streams.Readers is
    -- Is_String_Value --
    ---------------------
 
-   function Is_String_Value (Self : JSON_Stream_Reader'Class) return Boolean is
+   function Is_String_Value (Self : JSON_Pull_Reader'Class) return Boolean is
    begin
       return Self.Event_Kind = String_Value;
    end Is_String_Value;
@@ -137,11 +137,11 @@ package body VSS.JSON.Streams.Readers is
    -- Read_Next --
    ---------------
 
-   procedure Read_Next (Self : in out JSON_Stream_Reader'Class) is
+   procedure Read_Next (Self : in out JSON_Pull_Reader'Class) is
       Dummy : constant JSON_Event_Kind := Self.Read_Next;
 
    begin
       null;
    end Read_Next;
 
-end VSS.JSON.Streams.Readers;
+end VSS.JSON.Pull_Readers;

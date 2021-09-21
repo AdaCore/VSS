@@ -35,6 +35,8 @@
 
 package Ada.Strings.Wide_Wide_Unbounded.VSS_Aux is
 
+   pragma Preelaborate;
+
    procedure Set_String
      (U      : out Unbounded_Wide_Wide_String;
       Length : Positive;

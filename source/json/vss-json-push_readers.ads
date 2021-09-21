@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,47 +21,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Strings;
+with VSS.JSON.Content_Handlers;
 
-package VSS.JSON.Events is
+package VSS.JSON.Push_Readers is
 
    pragma Preelaborate;
 
-   type JSON_Event_Kind is
-     (None,
-      Start_Array,
-      End_Array,
-      Start_Object,
-      End_Object,
-      Key_Name,
-      String_Value,
-      Number_Value,
-      Boolean_Value,
-      Null_Value);
+   type JSON_Push_Reader is limited interface;
 
-   type JSON_Event (Kind : JSON_Event_Kind := None) is record
-      case Kind is
-         when None =>
-            null;
+   not overriding procedure Set_Content_Handler
+     (Self : in out JSON_Push_Reader;
+      To   : VSS.JSON.Content_Handlers.JSON_Content_Handler_Access)
+      is abstract;
+   --  Set content handler to process stream.
 
-         when Start_Array | End_Array | Start_Object | End_Object =>
-            null;
-
-         when Key_Name =>
-            Key : VSS.Strings.Virtual_String;
-
-         when String_Value =>
-            String_Value : VSS.Strings.Virtual_String;
-
-         when Number_Value =>
-            Number_Value : VSS.JSON.JSON_Number;
-
-         when Boolean_Value =>
-            Boolean_Value : Boolean;
-
-         when Null_Value =>
-            null;
-      end case;
-   end record;
-
-end VSS.JSON.Events;
+end VSS.JSON.Push_Readers;

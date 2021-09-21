@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -25,11 +25,13 @@
 
 with VSS.Strings;
 
-package VSS.JSON.Streams.Content_Handlers is
+package VSS.JSON.Content_Handlers is
 
    pragma Preelaborate;
 
    type JSON_Content_Handler is limited interface;
+
+   type JSON_Content_Handler_Access is access all JSON_Content_Handler'Class;
 
    procedure Start_Document
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
@@ -76,6 +78,13 @@ package VSS.JSON.Streams.Content_Handlers is
 
    procedure Null_Value
      (Self : in out JSON_Content_Handler; Success : in out Boolean) is null;
+
+   function Error_Message
+     (Self : JSON_Content_Handler) return VSS.Strings.Virtual_String
+      is abstract;
+   --  Return diagnosis message for error detected by handler. Usually called
+   --  by the reader to get diagnosis and provide it for higher level
+   --  component.
 
    --  Convinience subprograms to report integer and float value using Ada
    --  types
@@ -132,4 +141,4 @@ package VSS.JSON.Streams.Content_Handlers is
 
    procedure Null_Value (Self : in out JSON_Content_Handler'Class);
 
-end VSS.JSON.Streams.Content_Handlers;
+end VSS.JSON.Content_Handlers;

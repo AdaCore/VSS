@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -28,17 +28,17 @@ with Ada.Text_IO;
 with Interfaces;
 
 with VSS.Strings.Conversions;
-with VSS.JSON.Streams.Readers.Simple;
+with VSS.JSON.Pull_Readers.Simple;
 
 with Tests_Text_Streams;
 
 procedure Test_JSON_Reader is
 
-   use all type VSS.JSON.Streams.Readers.JSON_Event_Kind;
-   use all type VSS.JSON.Streams.Readers.JSON_Reader_Error;
+   use all type VSS.JSON.Pull_Readers.JSON_Event_Kind;
+   use all type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    Input       : aliased Tests_Text_Streams.Memory_UTF8_Input_Stream;
-   Reader      : VSS.JSON.Streams.Readers.Simple.JSON_Simple_Reader;
+   Reader      : VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader;
    Count       : Natural := 0;
    Perfomance  : Boolean := False;
    Incremental : Boolean := False;
@@ -115,11 +115,11 @@ begin
                if Reader.Error /= Premature_End_Of_Document then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
 
                      & ' '
-                     & VSS.JSON.Streams.Readers.JSON_Reader_Error'Image
+                     & VSS.JSON.Pull_Readers.JSON_Reader_Error'Image
                          (Reader.Error)
                      & " """
                      & VSS.Strings.Conversions.To_UTF_8_String
@@ -147,7 +147,7 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " """
                      & VSS.Strings.Conversions.To_UTF_8_String
@@ -161,7 +161,7 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " """
                      & VSS.Strings.Conversions.To_UTF_8_String
@@ -175,7 +175,7 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & ' '
                      & VSS.JSON.JSON_Number_Kind'Image
@@ -200,7 +200,7 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind)
                      & " "
                      & Boolean'Image (Reader.Boolean_Value));
@@ -212,7 +212,7 @@ begin
                if not Perfomance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
-                     VSS.JSON.Streams.Readers.JSON_Event_Kind'Image
+                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
                        (Reader.Event_Kind));
                end if;
          end case;

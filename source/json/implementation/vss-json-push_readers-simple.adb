@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.JSON.Streams.Push.Readers.Simple is
+package body VSS.JSON.Push_Readers.Simple is
 
    -------------------
    -- Error_Message --
@@ -197,4 +197,4 @@ package body VSS.JSON.Streams.Push.Readers.Simple is
       Self.Reader.Set_Stream (Stream);
    end Set_Stream;
 
-end VSS.JSON.Streams.Push.Readers.Simple;
+end VSS.JSON.Push_Readers.Simple;

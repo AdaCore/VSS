@@ -23,7 +23,7 @@
 
 with VSS.Strings;
 
-package VSS.JSON.Streams.Events is
+package VSS.JSON.Events is
 
    pragma Preelaborate;
 
@@ -64,4 +64,4 @@ package VSS.JSON.Streams.Events is
       end case;
    end record;
 
-end VSS.JSON.Streams.Events;
+end VSS.JSON.Events;

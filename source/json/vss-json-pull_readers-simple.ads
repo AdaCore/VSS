@@ -24,7 +24,7 @@
 private with VSS.JSON.Implementation.Parsers;
 with VSS.Text_Streams;
 
-package VSS.JSON.Streams.Pull.Readers.Simple is
+package VSS.JSON.Pull_Readers.Simple is
 
    type JSON_Simple_Pull_Reader is limited new JSON_Pull_Reader with private;
 
@@ -47,14 +47,14 @@ private
 
    overriding function Error
      (Self : JSON_Simple_Pull_Reader)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error;
+      return VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    overriding function Error_Message
      (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
 
    overriding function Event_Kind
      (Self : JSON_Simple_Pull_Reader)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind;
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
 
    overriding function Key_Name
      (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
@@ -68,7 +68,7 @@ private
 
    overriding function Read_Next
      (Self : in out JSON_Simple_Pull_Reader)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind;
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
 
    overriding procedure Skip_Current_Array
      (Self : in out JSON_Simple_Pull_Reader);
@@ -82,4 +82,4 @@ private
    overriding function String_Value
      (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
 
-end VSS.JSON.Streams.Pull.Readers.Simple;
+end VSS.JSON.Pull_Readers.Simple;

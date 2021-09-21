@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.JSON.Streams.Pull.Readers is
+package body VSS.JSON.Pull_Readers is
 
    ---------------
    -- Has_Error --
@@ -144,4 +144,4 @@ package body VSS.JSON.Streams.Pull.Readers is
       null;
    end Read_Next;
 
-end VSS.JSON.Streams.Pull.Readers;
+end VSS.JSON.Pull_Readers;

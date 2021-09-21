@@ -21,7 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body VSS.JSON.Streams.Pull.Readers.Simple is
+package body VSS.JSON.Pull_Readers.Simple is
 
    ------------
    -- At_End --
@@ -58,7 +58,7 @@ package body VSS.JSON.Streams.Pull.Readers.Simple is
 
    overriding function Error
      (Self : JSON_Simple_Pull_Reader)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error is
+      return VSS.JSON.Pull_Readers.JSON_Reader_Error is
    begin
       return Self.Parser.Error;
    end Error;
@@ -79,7 +79,7 @@ package body VSS.JSON.Streams.Pull.Readers.Simple is
 
    overriding function Event_Kind
      (Self : JSON_Simple_Pull_Reader)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind is
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
    begin
       return Self.Parser.Event_Kind;
    end Event_Kind;
@@ -121,7 +121,7 @@ package body VSS.JSON.Streams.Pull.Readers.Simple is
 
    overriding function Read_Next
      (Self : in out JSON_Simple_Pull_Reader)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind is
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
    begin
       Self.Parser.Parse;
 
@@ -225,4 +225,4 @@ package body VSS.JSON.Streams.Pull.Readers.Simple is
       return Self.Parser.String_Value;
    end String_Value;
 
-end VSS.JSON.Streams.Pull.Readers.Simple;
+end VSS.JSON.Pull_Readers.Simple;

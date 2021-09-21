@@ -25,7 +25,7 @@
 --  This parser supports normal parsing model as well as incremental parsing.
 --  It use Input_Text_Stream interface as data source.
 
-with VSS.JSON.Streams.Pull.Readers;
+with VSS.JSON.Pull_Readers;
 with VSS.Strings;
 with VSS.Text_Streams;
 private with VSS.Unicode;
@@ -46,12 +46,12 @@ package VSS.JSON.Implementation.Parsers is
 
    function Event_Kind
      (Self : JSON_Parser'Class)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind;
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
    --  Return current event.
 
    function Error
      (Self : JSON_Parser'Class)
-      return VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error;
+      return VSS.JSON.Pull_Readers.JSON_Reader_Error;
    --  Return current error.
 
    function Error_Message
@@ -100,10 +100,10 @@ private
    type JSON_Parser is tagged limited record
       Stream      : VSS.Text_Streams.Input_Text_Stream_Access;
       Stack       : Parse_Stack;
-      Event       : VSS.JSON.Streams.Pull.Readers.JSON_Event_Kind :=
-        VSS.JSON.Streams.Pull.Readers.No_Token;
-      Error       : VSS.JSON.Streams.Pull.Readers.JSON_Reader_Error :=
-        VSS.JSON.Streams.Pull.Readers.No_Error;
+      Event       : VSS.JSON.Pull_Readers.JSON_Event_Kind :=
+        VSS.JSON.Pull_Readers.No_Token;
+      Error       : VSS.JSON.Pull_Readers.JSON_Reader_Error :=
+        VSS.JSON.Pull_Readers.No_Error;
       Message     : VSS.Strings.Virtual_String;
       C           : Wide_Wide_Character;
       Buffer      : VSS.Strings.Virtual_String;

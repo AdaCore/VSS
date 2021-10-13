@@ -331,6 +331,9 @@ package body Gen_UCD.Casing is
       --  have all necessary data in one place, primary to mininize CPU cache
       --  usage.
 
+      overriding function "="
+        (Left : Mapping_Record; Right : Mapping_Record) return Boolean;
+
       type Mapping_Array is array (UCD.Code_Point) of Mapping_Record;
 
       type Mapping_Array_Access is access all Mapping_Array;
@@ -349,6 +352,20 @@ package body Gen_UCD.Casing is
         array (Case_Mapping) of Compressed_Stage_Table.Compressed_Stage_Table;
 
       UTF_8_Data : Gen_UCD.Compressed_UTF_8_Data.Compressed_UTF_8_Data;
+
+      ---------
+      -- "=" --
+      ---------
+
+      overriding function "="
+        (Left : Mapping_Record; Right : Mapping_Record) return Boolean
+      is
+         function To_Unsigned_32 is
+           new Ada.Unchecked_Conversion (Mapping_Record, Unsigned_32);
+
+      begin
+         return To_Unsigned_32 (Left) = To_Unsigned_32 (Right);
+      end "=";
 
       --------------
       -- Compress --

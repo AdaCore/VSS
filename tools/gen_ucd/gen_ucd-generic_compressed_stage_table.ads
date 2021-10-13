@@ -27,6 +27,12 @@ generic
    type Data_Type is private;
    type Data_Type_Array is array (UCD.Code_Point) of Data_Type;
 
+   with function "="
+     (Left : Data_Type; Right : Data_Type) return Boolean is <>;
+   --  Function to check equality of two items, it is necessary to be able
+   --  to use Unchecked_Union types for Data_Type, because default
+   --  implementation of "=" for them raise exception.
+
 package Gen_UCD.Generic_Compressed_Stage_Table is
 
    Group_Size : constant := 256;

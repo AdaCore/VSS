@@ -895,7 +895,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
             VSS.Implementation.UCD_Casing.Apply (Context, Info.Context_Change);
 
             if not Skip then
-               if Info.Has_Mapping then
+               if Info.Changes then
                   Unchecked_Append
                     (Result_Data,
                      VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
@@ -938,7 +938,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                 Get_Case_Mapping_Information (Mapping, Code);
 
          begin
-            if Info.Has_Mapping then
+            if Info.Changes then
                Unchecked_Append
                  (Result_Data,
                   VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
@@ -1709,7 +1709,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       --  to be larger that largest case mapping, thus all checks for this case
       --  are omitted to don't have useless code.
 
-      if Info.Has_Mapping then
+      if Info.Changes then
          Target.Storage (0 .. Info.Count - 1) :=
            VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
              (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table

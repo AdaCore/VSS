@@ -304,22 +304,22 @@ package body Gen_UCD.Casing is
       --  VSS.Implementation.UCD_Casing.
 
       type Simplified_Mapping_Record is record
-         Offset     : Unsigned_14 := 0;
-         Length     : Unsigned_2  := 0;
-         Size       : Unsigned_3  := 0;
+         Offset     : Unsigned_15 := 0;
+         Length     : Unsigned_5  := 0;
+         Size       : Unsigned_6  := 0;
          Changes    : Boolean     := False;
-         Reserved_1 : Unsigned_2  := 0;
-         Reserved_2 : Unsigned_6  := 0;
-         Reserved_3 : Unsigned_4  := 0;
+         Reserved_1 : Unsigned_1  := 0;
+         Reserved_2 : Unsigned_3  := 0;
+         Reserved_3 : Unsigned_1  := 0;
       end record;
       for Simplified_Mapping_Record'Size use 32;
       for Simplified_Mapping_Record use record
-         Offset     at 0 range 0 .. 13;
-         Reserved_1 at 0 range 14 .. 15;
-         Length     at 0 range 16 .. 17;
-         Reserved_2 at 0 range 18 .. 23;
-         Size       at 0 range 24 .. 26;
-         Reserved_3 at 0 range 27 .. 30;
+         Offset     at 0 range 0 .. 14;
+         Reserved_1 at 0 range 15 .. 15;
+         Length     at 0 range 16 .. 20;
+         Reserved_2 at 0 range 21 .. 23;
+         Size       at 0 range 24 .. 29;
+         Reserved_3 at 0 range 30 .. 30;
          Changes    at 0 range 31 .. 31;
       end record;
       --  This declaration must be synchronized with type declaration in the
@@ -332,21 +332,21 @@ package body Gen_UCD.Casing is
       --  usage.
 
       type Contextual_Mapping_Record is record
-         Offset         : Unsigned_14 := 0;
+         Offset         : Unsigned_15 := 0;
          Length         : Unsigned_2  := 0;
          Size           : Unsigned_3  := 0;
          Context_Change : Casing_Context_Change;
          Cased          : Boolean     := False;
          Case_Ignorable : Boolean     := False;
          Changes        : Boolean     := False;
-         Reserved_1     : Unsigned_2  := 0;
+         Reserved_1     : Unsigned_1  := 0;
          Reserved_2     : Unsigned_1  := 0;
          Reserved_3     : Unsigned_1  := 0;
       end record;
       for Contextual_Mapping_Record'Size use 32;
       for Contextual_Mapping_Record use record
-         Offset         at 0 range 0 .. 13;
-         Reserved_1     at 0 range 14 .. 15;
+         Offset         at 0 range 0 .. 14;
+         Reserved_1     at 0 range 15 .. 15;
          Length         at 0 range 16 .. 17;
          Context_Change at 0 range 18 .. 23;
          Size           at 0 range 24 .. 26;
@@ -532,16 +532,16 @@ package body Gen_UCD.Casing is
          if Mapping in Simple_Case_Mapping then
             Raw_Mapping (Mapping) (Character).Simplified.Changes := True;
             Raw_Mapping (Mapping) (Character).Simplified.Offset  :=
-              Unsigned_14 (Offset);
+              Unsigned_15 (Offset);
             Raw_Mapping (Mapping) (Character).Simplified.Size    :=
-              Unsigned_3 (Size);
+              Unsigned_6 (Size);
             Raw_Mapping (Mapping) (Character).Simplified.Length  :=
-              Unsigned_2 (Length);
+              Unsigned_5 (Length);
 
          else
             Raw_Mapping (Mapping) (Character).Contextual.Changes := True;
             Raw_Mapping (Mapping) (Character).Contextual.Offset  :=
-              Unsigned_14 (Offset);
+              Unsigned_15 (Offset);
             Raw_Mapping (Mapping) (Character).Contextual.Size    :=
               Unsigned_3 (Size);
             Raw_Mapping (Mapping) (Character).Contextual.Length  :=
@@ -643,7 +643,7 @@ package body Gen_UCD.Casing is
         (Character : UCD.Code_Point;
          To        : Boolean) is
       begin
-         for Mapping in Case_Mapping loop
+         for Mapping in Full_Case_Mapping loop
             Raw_Mapping (Mapping) (Character).Contextual.Context_Change
               .Continue_Final_Sigma := To;
          end loop;
@@ -657,7 +657,7 @@ package body Gen_UCD.Casing is
         (Character : UCD.Code_Point;
          To        : Boolean) is
       begin
-         for Mapping in Case_Mapping loop
+         for Mapping in Full_Case_Mapping loop
             Raw_Mapping (Mapping) (Character).Contextual.Context_Change
               .Enter_Final_Sigma := To;
          end loop;
@@ -760,7 +760,15 @@ package body Gen_UCD.Casing is
 
       Put_Line
         (File,
-         "   subtype Casing_Character_Count is");
+         "   subtype Simplified_Casing_Character_Count is");
+      Put_Line
+        (File,
+         "     VSS.Implementation.Strings.Character_Count range 0 .. 18;");
+      New_Line (File);
+
+      Put_Line
+        (File,
+         "   subtype Contextual_Casing_Character_Count is");
       Put_Line
         (File,
          "     VSS.Implementation.Strings.Character_Count range 0 .. 3;");
@@ -768,7 +776,14 @@ package body Gen_UCD.Casing is
 
       Put_Line
         (File,
-         "   subtype Casing_UTF8_Code_Unit_Count is");
+         "   subtype Simplified_Casing_UTF8_Code_Unit_Count is");
+      Put_Line
+        (File,
+         "     VSS.Unicode.UTF8_Code_Unit_Count range 0 .. 33;");
+      New_Line (File);
+      Put_Line
+        (File,
+         "   subtype Contextual_Casing_UTF8_Code_Unit_Count is");
       Put_Line
         (File,
          "     VSS.Unicode.UTF8_Code_Unit_Count range 0 .. 6;");
@@ -778,8 +793,9 @@ package body Gen_UCD.Casing is
         (File,
          "   type Simplified_Mapping_Information is record");
       Put_Line (File, "      Offset  : Casing_UTF8_Data_Offset;");
-      Put_Line (File, "      Length  : Casing_Character_Count;");
-      Put_Line (File, "      Count   : Casing_UTF8_Code_Unit_Count;");
+      Put_Line (File, "      Length  : Simplified_Casing_Character_Count;");
+      Put_Line
+        (File, "      Count   : Simplified_Casing_UTF8_Code_Unit_Count;");
       Put_Line (File, "      Changes : Boolean;");
       Put_Line
         (File,
@@ -789,9 +805,9 @@ package body Gen_UCD.Casing is
         (File,
          "   for Simplified_Mapping_Information'Size use 32;");
       Put_Line (File, "   for Simplified_Mapping_Information use record");
-      Put_Line (File, "      Offset  at 0 range 0 .. 13;");
-      Put_Line (File, "      Length  at 0 range 16 .. 17;");
-      Put_Line (File, "      Count   at 0 range 24 .. 26;");
+      Put_Line (File, "      Offset  at 0 range 0 .. 14;");
+      Put_Line (File, "      Length  at 0 range 16 .. 20;");
+      Put_Line (File, "      Count   at 0 range 24 .. 29;");
       Put_Line (File, "      Changes at 0 range 31 .. 31;");
       Put_Line (File, "   end record;");
       New_Line (File);
@@ -800,8 +816,11 @@ package body Gen_UCD.Casing is
         (File,
          "   type Contextual_Mapping_Information is record");
       Put_Line (File, "      Offset         : Casing_UTF8_Data_Offset;");
-      Put_Line (File, "      Length         : Casing_Character_Count;");
-      Put_Line (File, "      Count          : Casing_UTF8_Code_Unit_Count;");
+      Put_Line
+        (File, "      Length         : Contextual_Casing_Character_Count;");
+      Put_Line
+        (File,
+         "      Count          : Contextual_Casing_UTF8_Code_Unit_Count;");
       Put_Line
         (File,
          "      Context_Change :"
@@ -817,7 +836,7 @@ package body Gen_UCD.Casing is
         (File,
          "   for Contextual_Mapping_Information'Size use 32;");
       Put_Line (File, "   for Contextual_Mapping_Information use record");
-      Put_Line (File, "      Offset         at 0 range 0 .. 13;");
+      Put_Line (File, "      Offset         at 0 range 0 .. 14;");
       Put_Line (File, "      Length         at 0 range 16 .. 17;");
       Put_Line (File, "      Context_Change at 0 range 18 .. 23;");
       Put_Line (File, "      Count          at 0 range 24 .. 26;");

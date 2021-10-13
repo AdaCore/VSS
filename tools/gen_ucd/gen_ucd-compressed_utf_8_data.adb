@@ -43,6 +43,14 @@ package body Gen_UCD.Compressed_UTF_8_Data is
       Found   : Boolean := False;
 
    begin
+      if Data.Is_Empty then
+         Offset := 0;
+         Size   := 0;
+         Length := 0;
+
+         return;
+      end if;
+
       Size   := Gen_UCD.UTF_8_Offset (Encoded.Length);
       Length := Natural (Data.Length);
 

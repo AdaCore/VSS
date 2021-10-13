@@ -47,13 +47,14 @@ package body Gen_UCD.Casing is
          Simple_Titlecase,
          Simple_Uppercase,
          Simple_Case_Folding,
+         NFKC_Casefold,
          Full_Lowercase,
          Full_Titlecase,
          Full_Uppercase,
          Full_Case_Folding);
 
       subtype Simple_Case_Mapping is Case_Mapping
-        range Simple_Lowercase .. Simple_Case_Folding;
+        range Simple_Lowercase .. NFKC_Casefold;
 
       subtype Full_Case_Mapping is Case_Mapping
         range Full_Lowercase .. Full_Case_Folding;
@@ -126,22 +127,24 @@ package body Gen_UCD.Casing is
    -----------
 
    procedure Build is
-      SUC_Property : constant not null UCD.Properties.Property_Access :=
+      SUC_Property     : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("suc");
-      SLC_Property : constant not null UCD.Properties.Property_Access :=
+      SLC_Property     : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("slc");
-      STC_Property : constant not null UCD.Properties.Property_Access :=
+      STC_Property     : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("stc");
-      SCF_Property : constant not null UCD.Properties.Property_Access :=
+      SCF_Property     : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("scf");
-      LC_Property  : constant not null UCD.Properties.Property_Access :=
+      LC_Property      : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("lc");
-      TC_Property  : constant not null UCD.Properties.Property_Access :=
+      TC_Property      : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("tc");
-      UC_Property  : constant not null UCD.Properties.Property_Access :=
+      UC_Property      : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("uc");
-      CF_Property  : constant not null UCD.Properties.Property_Access :=
+      CF_Property      : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("cf");
+      NFKC_CF_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("NFKC_CF");
 
       Cased_Property : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("Cased");
@@ -196,6 +199,9 @@ package body Gen_UCD.Casing is
               UCD.Characters.Get (Code, UC_Property);
             CF_Value  : constant UCD.Properties.Property_Value_Access :=
               UCD.Characters.Get (Code, CF_Property);
+
+            NFKC_CF_Value : constant UCD.Properties.Property_Value_Access :=
+              UCD.Characters.Get (Code, NFKC_CF_Property);
 
             Cased_Value   : constant Boolean :=
               UCD.Characters.Get (Code, Cased_Property) = Cased_Y;
@@ -260,6 +266,11 @@ package body Gen_UCD.Casing is
             elsif SCF_Value /= null then
                Database.Set
                  (Code, Database.Full_Case_Folding, SCF_Value.String);
+            end if;
+
+            if NFKC_CF_Value /= null then
+               Database.Set
+                 (Code, Database.NFKC_Casefold, NFKC_CF_Value.String);
             end if;
 
             Database.Set_Cased (Code, Cased_Value);
@@ -892,6 +903,8 @@ package body Gen_UCD.Casing is
         (Database.Full_Uppercase, "Full_Uppercase_Index");
       Generate_Index_Table
         (Database.Full_Case_Folding, "Full_Case_Folding_Index");
+
+      Generate_Index_Table (Database.NFKC_Casefold, "NFKC_Casefold_Index");
 
       --  Generate mapping data table.
 

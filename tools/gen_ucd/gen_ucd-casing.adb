@@ -318,7 +318,7 @@ package body Gen_UCD.Casing is
          Context_Change : Casing_Context_Change;
          Cased          : Boolean     := False;
          Case_Ignorable : Boolean     := False;
-         Has_Mapping    : Boolean     := False;
+         Changes        : Boolean     := False;
          NFD_QC         : Boolean     := False;
          Reserved_1     : Unsigned_2  := 0;
          Reserved_2     : Unsigned_1  := 0;
@@ -334,7 +334,7 @@ package body Gen_UCD.Casing is
          Cased          at 0 range 28 .. 28;
          Case_Ignorable at 0 range 29 .. 29;
          NFD_QC         at 0 range 30 .. 30;
-         Has_Mapping    at 0 range 31 .. 31;
+         Changes        at 0 range 31 .. 31;
       end record;
       --  This declaration must be synchronized with type declaration in the
       --  generated code.
@@ -482,10 +482,10 @@ package body Gen_UCD.Casing is
       begin
          UTF_8_Data.Append_Data (Data, Offset, Size, Length);
 
-         Raw_Mapping (Mapping) (Character).Has_Mapping := True;
-         Raw_Mapping (Mapping) (Character).Offset      := Unsigned_14 (Offset);
-         Raw_Mapping (Mapping) (Character).Size        := Unsigned_3 (Size);
-         Raw_Mapping (Mapping) (Character).Length      := Unsigned_2 (Length);
+         Raw_Mapping (Mapping) (Character).Changes := True;
+         Raw_Mapping (Mapping) (Character).Offset  := Unsigned_14 (Offset);
+         Raw_Mapping (Mapping) (Character).Size    := Unsigned_3 (Size);
+         Raw_Mapping (Mapping) (Character).Length  := Unsigned_2 (Length);
 
          Max_Length  := Natural'Max (Max_Length, Length);
          Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));
@@ -741,7 +741,10 @@ package body Gen_UCD.Casing is
       Put_Line (File, "      Cased          : Boolean;");
       Put_Line (File, "      Case_Ignorable : Boolean;");
       Put_Line (File, "      NFD_QC         : Boolean;");
-      Put_Line (File, "      Has_Mapping    : Boolean;");
+      Put_Line (File, "      Changes        : Boolean;");
+      Put_Line
+        (File,
+         "      --  Equivalent of Changes_On_<mapping> for the given mapping");
       Put_Line (File, "   end record;");
       Put_Line
         (File,
@@ -754,7 +757,7 @@ package body Gen_UCD.Casing is
       Put_Line (File, "      Cased          at 0 range 28 .. 28;");
       Put_Line (File, "      Case_Ignorable at 0 range 29 .. 29;");
       Put_Line (File, "      NFD_QC         at 0 range 30 .. 30;");
-      Put_Line (File, "      Has_Mapping    at 0 range 31 .. 31;");
+      Put_Line (File, "      Changes        at 0 range 31 .. 31;");
       Put_Line (File, "   end record;");
       New_Line (File);
 

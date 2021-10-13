@@ -67,10 +67,6 @@ package body Gen_UCD.Casing is
         (Character : UCD.Code_Point;
          To        : Boolean);
 
-      procedure Set_NFD_QC
-        (Character : UCD.Code_Point;
-         To        : Boolean);
-
       procedure Set_Final_Sigma_Enter
         (Character : UCD.Code_Point;
          To        : Boolean);
@@ -165,12 +161,6 @@ package body Gen_UCD.Casing is
         UCD.Properties.Property_Value_Access :=
           UCD.Properties.Resolve (CCC_Property, "Above");
 
-      NFD_QC_Property : constant not null UCD.Properties.Property_Access :=
-        UCD.Properties.Resolve ("NFD_QC");
-      NFD_QC_Y        : constant not null
-        UCD.Properties.Property_Value_Access :=
-          UCD.Properties.Resolve (NFD_QC_Property, "Y");
-
    begin
       Put_Line ("   ... casing");
 
@@ -211,9 +201,6 @@ package body Gen_UCD.Casing is
               UCD.Characters.Get (Code, CCC_Property) = CCC_0;
             CCC_230_Value : constant Boolean :=
               UCD.Characters.Get (Code, CCC_Property) = CCC_230;
-
-            NFD_QC_Value : constant Boolean :=
-              UCD.Characters.Get (Code, NFD_QC_Property) = NFD_QC_Y;
 
          begin
             if SUC_Value /= null then
@@ -269,7 +256,6 @@ package body Gen_UCD.Casing is
                  (Code, Database.Full_Case_Folding, SCF_Value.String);
             end if;
 
-            Database.Set_NFD_QC (Code, NFD_QC_Value);
             Database.Set_Cased (Code, Cased_Value);
             Database.Set_Case_Ignorable (Code, CI_Value);
 
@@ -319,9 +305,9 @@ package body Gen_UCD.Casing is
          Cased          : Boolean     := False;
          Case_Ignorable : Boolean     := False;
          Changes        : Boolean     := False;
-         NFD_QC         : Boolean     := False;
          Reserved_1     : Unsigned_2  := 0;
          Reserved_2     : Unsigned_1  := 0;
+         Reserved_3     : Unsigned_1  := 0;
       end record;
       for Mapping_Record'Size use 32;
       for Mapping_Record use record
@@ -333,7 +319,7 @@ package body Gen_UCD.Casing is
          Reserved_2     at 0 range 27 .. 27;
          Cased          at 0 range 28 .. 28;
          Case_Ignorable at 0 range 29 .. 29;
-         NFD_QC         at 0 range 30 .. 30;
+         Reserved_3     at 0 range 30 .. 30;
          Changes        at 0 range 31 .. 31;
       end record;
       --  This declaration must be synchronized with type declaration in the
@@ -604,19 +590,6 @@ package body Gen_UCD.Casing is
          end loop;
       end Set_Final_Sigma_Enter;
 
-      ----------------
-      -- Set_NFD_QC --
-      ----------------
-
-      procedure Set_NFD_QC
-        (Character : UCD.Code_Point;
-         To        : Boolean) is
-      begin
-         for Mapping in Case_Mapping loop
-            Raw_Mapping (Mapping) (Character).NFD_QC := To;
-         end loop;
-      end Set_NFD_QC;
-
       ------------------------
       -- UTF_8_Data_Element --
       ------------------------
@@ -740,7 +713,6 @@ package body Gen_UCD.Casing is
          & " VSS.Implementation.UCD_Casing.Casing_Context_Change;");
       Put_Line (File, "      Cased          : Boolean;");
       Put_Line (File, "      Case_Ignorable : Boolean;");
-      Put_Line (File, "      NFD_QC         : Boolean;");
       Put_Line (File, "      Changes        : Boolean;");
       Put_Line
         (File,
@@ -756,7 +728,6 @@ package body Gen_UCD.Casing is
       Put_Line (File, "      Count          at 0 range 24 .. 26;");
       Put_Line (File, "      Cased          at 0 range 28 .. 28;");
       Put_Line (File, "      Case_Ignorable at 0 range 29 .. 29;");
-      Put_Line (File, "      NFD_QC         at 0 range 30 .. 30;");
       Put_Line (File, "      Changes        at 0 range 31 .. 31;");
       Put_Line (File, "   end record;");
       New_Line (File);

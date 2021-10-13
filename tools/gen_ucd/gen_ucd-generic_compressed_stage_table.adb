@@ -32,6 +32,11 @@ package body Gen_UCD.Generic_Compressed_Stage_Table is
    Result_Data       : Compressed_Array_Access;
    Result_Data_Last  : Gen_UCD.Unsigned_32;
 
+   function Is_Equal
+     (Left : Compressed_Array; Right : Compressed_Array) return Boolean;
+   --  Compare two arrays. Default implementation doesn't work when Data_Type
+   --  is Unchecked_Union type.
+
    -----------
    -- Build --
    -----------
@@ -80,7 +85,9 @@ package body Gen_UCD.Generic_Compressed_Stage_Table is
             Reused := False;
 
             for Offset in 0 .. Result_Data_Last - Group_Size + 1 loop
-               if Result_Data (Offset .. Offset + Group_Size - 1) = Source then
+               if Is_Equal
+                    (Result_Data (Offset .. Offset + Group_Size - 1), Source)
+               then
                   Self.Group_Data (Group) := Offset;
                   Reused := True;
 
@@ -137,5 +144,25 @@ package body Gen_UCD.Generic_Compressed_Stage_Table is
    begin
       return Group_Count (Self.Group_Data'Last);
    end Index_Table_Last;
+
+   --------------
+   -- Is_Equal --
+   --------------
+
+   function Is_Equal
+     (Left : Compressed_Array; Right : Compressed_Array) return Boolean is
+   begin
+      if Left'Length /= Right'Length then
+         return False;
+      end if;
+
+      for J in 0 .. Gen_UCD.Unsigned_32 (Left'Length) - 1 loop
+         if Left (Left'First + J) /= Right (Right'First + J) then
+            return False;
+         end if;
+      end loop;
+
+      return True;
+   end Is_Equal;
 
 end Gen_UCD.Generic_Compressed_Stage_Table;

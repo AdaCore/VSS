@@ -244,7 +244,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Result_Data    : in out VSS.Implementation.Strings.String_Data);
    --  Common code for full case conversions.
 
-   procedure Decomposite
+   procedure Decompose
      (Source_Storage     :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Source_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
@@ -994,7 +994,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    -- Decomposite --
    -----------------
 
-   procedure Decomposite
+   procedure Decompose
      (Source_Storage     :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Source_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
@@ -1273,7 +1273,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          exit when Offset >= Source_Size;
       end loop;
-   end Decomposite;
+   end Decompose;
 
    ------------
    -- Delete --
@@ -2222,7 +2222,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          case Form is
             when VSS.Strings.Normalization_Form_D =>
-               Decomposite
+               Decompose
                  (Source.Storage,
                   Source.Size,
                   VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
@@ -2232,7 +2232,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                raise Program_Error;
 
             when VSS.Strings.Normalization_Form_KD =>
-               Decomposite
+               Decompose
                  (Source.Storage,
                   Source.Size,
                   VSS.Implementation.UCD_Normalization_UTF8
@@ -2268,7 +2268,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          case Form is
             when VSS.Strings.Normalization_Form_D =>
-               Decomposite
+               Decompose
                  (Source.Storage,
                   Source.Size,
                   VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
@@ -2278,7 +2278,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                raise Program_Error;
 
             when VSS.Strings.Normalization_Form_KD =>
-               Decomposite
+               Decompose
                  (Source.Storage,
                   Source.Size,
                   VSS.Implementation.UCD_Normalization_UTF8

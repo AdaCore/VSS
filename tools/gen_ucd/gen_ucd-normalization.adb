@@ -42,6 +42,8 @@ package body Gen_UCD.Normalization is
 
    type Decomposition_Kind is (Canonical, Compatibility);
 
+   type Composition_Quick_Check is (No, Maybe, Yes);
+
    function Full_Decomposition
      (Code          : UCD.Code_Point;
       Decomposition : Decomposition_Kind;
@@ -73,9 +75,17 @@ package body Gen_UCD.Normalization is
         (Character : UCD.Code_Point;
          To        : Boolean);
 
+      procedure Set_NFC_QC
+        (Character : UCD.Code_Point;
+         To        : Composition_Quick_Check);
+
       procedure Set_NFKD_QC
         (Character : UCD.Code_Point;
          To        : Boolean);
+
+      procedure Set_NFKC_QC
+        (Character : UCD.Code_Point;
+         To        : Composition_Quick_Check);
 
       procedure Compress;
 
@@ -128,11 +138,29 @@ package body Gen_UCD.Normalization is
         UCD.Properties.Property_Value_Access :=
           UCD.Properties.Resolve (NFD_QC_Property, "Y");
 
+      NFC_QC_Property  : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("NFC_QC");
+      NFC_QC_Y         : constant not null
+        UCD.Properties.Property_Value_Access :=
+          UCD.Properties.Resolve (NFC_QC_Property, "Y");
+      NFC_QC_M         : constant not null
+        UCD.Properties.Property_Value_Access :=
+          UCD.Properties.Resolve (NFC_QC_Property, "M");
+
       NFKD_QC_Property : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("NFKD_QC");
       NFKD_QC_Y        : constant not null
         UCD.Properties.Property_Value_Access :=
           UCD.Properties.Resolve (NFKD_QC_Property, "Y");
+
+      NFKC_QC_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("NFKC_QC");
+      NFKC_QC_Y        : constant not null
+        UCD.Properties.Property_Value_Access :=
+          UCD.Properties.Resolve (NFKC_QC_Property, "Y");
+      NFKC_QC_M        : constant not null
+        UCD.Properties.Property_Value_Access :=
+          UCD.Properties.Resolve (NFKC_QC_Property, "M");
 
    begin
       Put_Line ("   ... normalization");
@@ -150,8 +178,20 @@ package body Gen_UCD.Normalization is
               UCD.Characters.Get (Code, DT_Property);
             NFD_QC_Value  : constant Boolean :=
               UCD.Characters.Get (Code, NFD_QC_Property) = NFD_QC_Y;
+            NFC_QC_Value  : constant Composition_Quick_Check :=
+              (if UCD.Characters.Get (Code, NFC_QC_Property) = NFC_QC_Y
+               then Yes
+               elsif UCD.Characters.Get (Code, NFC_QC_Property) = NFC_QC_M
+               then Maybe
+               else No);
             NFKD_QC_Value : constant Boolean :=
               UCD.Characters.Get (Code, NFKD_QC_Property) = NFKD_QC_Y;
+            NFKC_QC_Value : constant Composition_Quick_Check :=
+              (if UCD.Characters.Get (Code, NFKC_QC_Property) = NFKC_QC_Y
+               then Yes
+               elsif UCD.Characters.Get (Code, NFKC_QC_Property) = NFKC_QC_M
+               then Maybe
+               else No);
 
          begin
             if DT_Value = DT_None then
@@ -185,7 +225,9 @@ package body Gen_UCD.Normalization is
 
             Database.Set_CCC (Code, CCC_Enumeration.Representation (Code));
             Database.Set_NFD_QC (Code, NFD_QC_Value);
+            Database.Set_NFC_QC (Code, NFC_QC_Value);
             Database.Set_NFKD_QC (Code, NFKD_QC_Value);
+            Database.Set_NFKC_QC (Code, NFKC_QC_Value);
          end;
       end loop;
 
@@ -201,19 +243,20 @@ package body Gen_UCD.Normalization is
    package body Database is
 
       type Mapping_Record is record
-         Decomposition_QC : Boolean     := True;
-         CCC              : Unsigned_6  := 0;
-         Offset           : Unsigned_14 := 0;
-         Size             : Unsigned_6  := 0;
-         Length           : Unsigned_5  := 0;
-         First_CCC        : Unsigned_6  := 0;
-         Last_CCC         : Unsigned_6  := 0;
-         Reserved_1       : Unsigned_2  := 0;
-         Reserved_2       : Unsigned_2  := 0;
-         Reserved_3       : Unsigned_3  := 0;
-         Reserved_4       : Unsigned_2  := 0;
-         Reserved_5       : Unsigned_2  := 0;
-         Reserved_6       : Unsigned_9  := 0;
+         Decomposition_QC : Boolean                 := True;
+         Composition_QC   : Composition_Quick_Check := Yes;
+         CCC              : Unsigned_6              := 0;
+         Offset           : Unsigned_14             := 0;
+         Size             : Unsigned_6              := 0;
+         Length           : Unsigned_5              := 0;
+         First_CCC        : Unsigned_6              := 0;
+         Last_CCC         : Unsigned_6              := 0;
+         Reserved_1       : Unsigned_2              := 0;
+         Reserved_2       : Unsigned_2              := 0;
+         Reserved_3       : Unsigned_3              := 0;
+         Reserved_4       : Unsigned_2              := 0;
+         Reserved_5       : Unsigned_2              := 0;
+         Reserved_6       : Unsigned_7              := 0;
       end record;
       for Mapping_Record'Size use 64;
       for Mapping_Record use record
@@ -228,7 +271,8 @@ package body Gen_UCD.Normalization is
          First_CCC        at 0 range 40 .. 45;
          Reserved_5       at 0 range 46 .. 47;
          Last_CCC         at 0 range 48 .. 53;
-         Reserved_6       at 0 range 54 .. 62;
+         Reserved_6       at 0 range 54 .. 60;
+         Composition_QC   at 0 range 61 .. 62;
          Decomposition_QC at 0 range 63 .. 63;
       end record;
       --  This declaration must be synchronized with type declaration in the
@@ -441,6 +485,17 @@ package body Gen_UCD.Normalization is
       end Set_Compatibility_Decomposition;
 
       ----------------
+      -- Set_NFC_QC --
+      ----------------
+
+      procedure Set_NFC_QC
+        (Character : UCD.Code_Point;
+         To        : Composition_Quick_Check) is
+      begin
+         Raw_Mapping (Canonical) (Character).Composition_QC := To;
+      end Set_NFC_QC;
+
+      ----------------
       -- Set_NFD_QC --
       ----------------
 
@@ -450,6 +505,17 @@ package body Gen_UCD.Normalization is
       begin
          Raw_Mapping (Canonical) (Character).Decomposition_QC := To;
       end Set_NFD_QC;
+
+      -----------------
+      -- Set_NFKC_QC --
+      -----------------
+
+      procedure Set_NFKC_QC
+        (Character : UCD.Code_Point;
+         To        : Composition_Quick_Check) is
+      begin
+         Raw_Mapping (Compatibility) (Character).Composition_QC := To;
+      end Set_NFKC_QC;
 
       -----------------
       -- Set_NFKD_QC --
@@ -629,8 +695,14 @@ package body Gen_UCD.Normalization is
 
       Put_Line
         (File,
+         "   type Composition_Quick_Check is (No, Maybe, Yes);");
+      New_Line (File);
+
+      Put_Line
+        (File,
          "   type Mapping_Information is record");
       Put_Line (File, "      Decomposition_QC : Boolean;");
+      Put_Line (File, "      Composition_QC   : Composition_Quick_Check;");
       Put_Line (File, "      CCC              : CCC_Values;");
       Put_Line
         (File, "      Offset           : Normalization_UTF8_Data_Offset;");
@@ -651,6 +723,7 @@ package body Gen_UCD.Normalization is
       Put_Line (File, "      CCC              at 0 range 32 .. 37;");
       Put_Line (File, "      First_CCC        at 0 range 40 .. 45;");
       Put_Line (File, "      Last_CCC         at 0 range 48 .. 53;");
+      Put_Line (File, "      Composition_QC   at 0 range 61 .. 62;");
       Put_Line (File, "      Decomposition_QC at 0 range 63 .. 63;");
       Put_Line (File, "   end record;");
       New_Line (File);

@@ -23,6 +23,7 @@
 
 pragma Ada_2022;
 
+with Ada.Containers;
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Ada.Strings;                       use Ada.Strings;
 with Ada.Strings.Wide_Wide_Fixed;       use Ada.Strings.Wide_Wide_Fixed;
@@ -87,6 +88,15 @@ package body Gen_UCD.Normalization is
         (Character : UCD.Code_Point;
          To        : Composition_Quick_Check);
 
+      procedure Register_First_Code (Character : UCD.Code_Point);
+
+      procedure Register_Last_Code (Character : UCD.Code_Point);
+
+      procedure Set_Composition_Mapping
+        (First   : UCD.Code_Point;
+         Last    : UCD.Code_Point;
+         Primary : UCD.Code_Point);
+
       procedure Compress;
 
       function UTF_8_Data_Index_Last return Gen_UCD.UTF_8_Offset;
@@ -108,6 +118,13 @@ package body Gen_UCD.Normalization is
       function Mapping_Index_Group_Size
         (Decomposition : Decomposition_Kind) return Natural;
 
+      function Composition_First_Index_Last return Natural;
+
+      function Composition_Last_Index_Last return Natural;
+
+      function Composition_Data_Element
+        (First : Natural; Last : Natural) return UCD.Code_Point;
+
       procedure Print_Statistics;
 
    end Database;
@@ -119,6 +136,11 @@ package body Gen_UCD.Normalization is
    procedure Build is
       CCC_Property     : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("ccc");
+      Comp_Ex_Property : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("Comp_Ex");
+      Comp_Ex_N        : constant not null
+        UCD.Properties.Property_Value_Access :=
+          UCD.Properties.Resolve (Comp_Ex_Property, "N");
 
       DT_Property      : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("dt");
@@ -162,6 +184,14 @@ package body Gen_UCD.Normalization is
         UCD.Properties.Property_Value_Access :=
           UCD.Properties.Resolve (NFKC_QC_Property, "M");
 
+      type Boolean_Array is array (UCD.Code_Point) of Boolean with Pack;
+
+      Is_Primary_Composite : Boolean_Array := (others => False);
+      Is_First_Code        : Boolean_Array := (others => False);
+      Is_Last_Code         : Boolean_Array := (others => False);
+      --  Code point is first or last code point of decomposition mapping of
+      --  primary composite character.
+
    begin
       Put_Line ("   ... normalization");
 
@@ -171,11 +201,23 @@ package body Gen_UCD.Normalization is
 
       --  Process properties of each character. Do it in reverse order, it
       --  produce little bit smaller table.
+      --
+      --  Also, do first step of analysis of information for canonical
+      --  composition: prepare list of characters that is primary composite,
+      --  first or last characters of canonical decomposition of primary
+      --  composite characters.
 
       for Code in reverse UCD.Code_Point loop
          declare
+            use type Ada.Containers.Count_Type;
+
+            Comp_Ex_Value : constant UCD.Properties.Property_Value_Access :=
+              UCD.Characters.Get (Code, Comp_Ex_Property);
+
             DT_Value      : constant UCD.Properties.Property_Value_Access :=
               UCD.Characters.Get (Code, DT_Property);
+            DM_Value      : constant UCD.Properties.Property_Value_Access :=
+              UCD.Characters.Get (Code, DM_Property);
             NFD_QC_Value  : constant Boolean :=
               UCD.Characters.Get (Code, NFD_QC_Property) = NFD_QC_Y;
             NFC_QC_Value  : constant Composition_Quick_Check :=
@@ -194,6 +236,21 @@ package body Gen_UCD.Normalization is
                else No);
 
          begin
+            --  Process informatiomn for canonical composition
+
+            if DT_Value = DT_Canonical and then Comp_Ex_Value = Comp_Ex_N then
+               if DM_Value.String.Length /= 2 then
+                  --  Decomposition mapping must have two elements as of
+                  --  Unicode 13
+
+                  raise Program_Error;
+               end if;
+
+               Is_Primary_Composite (Code)                   := True;
+               Is_First_Code (DM_Value.String.First_Element) := True;
+               Is_Last_Code (DM_Value.String.Last_Element)   := True;
+            end if;
+
             if DT_Value = DT_None then
                null;
 
@@ -231,6 +288,36 @@ package body Gen_UCD.Normalization is
          end;
       end loop;
 
+      --  Register characters that is first or last characters of the
+      --  canonical decomposition mapping of primary composite characters.
+
+      for Code in UCD.Code_Point loop
+         if Is_First_Code (Code) then
+            Database.Register_First_Code (Code);
+         end if;
+
+         if Is_Last_Code (Code) then
+            Database.Register_Last_Code (Code);
+         end if;
+      end loop;
+
+      --  Register mappings for composition
+
+      for Code in UCD.Code_Point loop
+         if Is_Primary_Composite (Code) then
+            declare
+               DM_Value : constant UCD.Properties.Property_Value_Access :=
+                 UCD.Characters.Get (Code, DM_Property);
+
+            begin
+               Database.Set_Composition_Mapping
+                 (DM_Value.String.First_Element,
+                  DM_Value.String.Last_Element,
+                  Code);
+            end;
+         end if;
+      end loop;
+
       Database.Compress;
 
       Database.Print_Statistics;
@@ -251,14 +338,18 @@ package body Gen_UCD.Normalization is
          Length           : Unsigned_5              := 0;
          First_CCC        : Unsigned_6              := 0;
          Last_CCC         : Unsigned_6              := 0;
+         First_Code_Index : Unsigned_9              := 0;
+         Last_Code_Index  : Unsigned_6              := 0;
          Reserved_1       : Unsigned_2              := 0;
-         Reserved_2       : Unsigned_16             := 0;
+         Reserved_2       : Unsigned_1              := 0;
       end record;
       for Mapping_Record'Size use 64;
       for Mapping_Record use record
          Offset           at 0 range 0 .. 13;
          Reserved_1       at 0 range 14 .. 15;
-         Reserved_2       at 0 range 16 .. 31;
+         First_Code_Index at 0 range 16 .. 24;
+         Last_Code_Index  at 0 range 25 .. 30;
+         Reserved_2       at 0 range 31 .. 31;
          Size             at 0 range 32 .. 37;
          CCC              at 0 range 38 .. 43;
          First_CCC        at 0 range 44 .. 49;
@@ -282,6 +373,15 @@ package body Gen_UCD.Normalization is
 
       Raw_Mapping : array (Decomposition_Kind) of Mapping_Array_Access;
 
+      First_Code_Count : Natural := 0;
+      Last_Code_Count  : Natural := 0;
+
+      type Composition_Mapping is
+        array (Unsigned_6, Unsigned_9) of UCD.Code_Point;
+
+      Raw_Composition_Mapping : Composition_Mapping :=
+        (others => (others => 0));
+
       Max_Length  : Natural := 0;
       Max_UTF_8   : Natural := 0;
       Total_UTF_8 : Natural := 0;
@@ -295,6 +395,35 @@ package body Gen_UCD.Normalization is
           of Compressed_Stage_Table.Compressed_Stage_Table;
 
       UTF_8_Data : Gen_UCD.Compressed_UTF_8_Data.Compressed_UTF_8_Data;
+
+      ------------------------------
+      -- Composition_Data_Element --
+      ------------------------------
+
+      function Composition_Data_Element
+        (First : Natural; Last : Natural) return UCD.Code_Point is
+      begin
+         return
+           Raw_Composition_Mapping (Unsigned_6 (Last), Unsigned_9 (First));
+      end Composition_Data_Element;
+
+      ----------------------------------
+      -- Composition_First_Index_Last --
+      ----------------------------------
+
+      function Composition_First_Index_Last return Natural is
+      begin
+         return First_Code_Count;
+      end Composition_First_Index_Last;
+
+      ---------------------------------
+      -- Composition_Last_Index_Last --
+      ---------------------------------
+
+      function Composition_Last_Index_Last return Natural is
+      begin
+         return Last_Code_Count;
+      end Composition_Last_Index_Last;
 
       --------------
       -- Compress --
@@ -397,7 +526,41 @@ package body Gen_UCD.Normalization is
             & " bytes (compressed size is"
             & Natural'Wide_Wide_Image (Natural (UTF_8_Data.Last_Index) + 1)
             & " bytes)");
+
+         Put_Line
+           ("         first code points of mappings is"
+            & Natural'Wide_Wide_Image (First_Code_Count)
+            & ", last code points of mappings is"
+            & Natural'Wide_Wide_Image (Last_Code_Count));
       end Print_Statistics;
+
+      -------------------------
+      -- Register_First_Code --
+      -------------------------
+
+      procedure Register_First_Code (Character : UCD.Code_Point) is
+      begin
+         First_Code_Count := First_Code_Count + 1;
+
+         for Mapping in Decomposition_Kind loop
+            Raw_Mapping (Mapping) (Character).First_Code_Index :=
+              Unsigned_9 (First_Code_Count);
+         end loop;
+      end Register_First_Code;
+
+      ------------------------
+      -- Register_Last_Code --
+      ------------------------
+
+      procedure Register_Last_Code (Character : UCD.Code_Point) is
+      begin
+         Last_Code_Count := Last_Code_Count + 1;
+
+         for Mapping in Decomposition_Kind loop
+            Raw_Mapping (Mapping) (Character).Last_Code_Index :=
+              Unsigned_6 (Last_Code_Count);
+         end loop;
+      end Register_Last_Code;
 
       ---------------------------------
       -- Set_Canonical_Decomposition --
@@ -475,6 +638,20 @@ package body Gen_UCD.Normalization is
          Max_UTF_8   := Natural'Max (Max_UTF_8, Natural (Size));
          Total_UTF_8 := Total_UTF_8 + Natural (Size);
       end Set_Compatibility_Decomposition;
+
+      -----------------------------
+      -- Set_Composition_Mapping --
+      -----------------------------
+
+      procedure Set_Composition_Mapping
+        (First   : UCD.Code_Point;
+         Last    : UCD.Code_Point;
+         Primary : UCD.Code_Point) is
+      begin
+         Raw_Composition_Mapping
+           (Raw_Mapping (Canonical) (Last).Last_Code_Index,
+            Raw_Mapping (Canonical) (First).First_Code_Index) := Primary;
+      end Set_Composition_Mapping;
 
       ----------------
       -- Set_NFC_QC --
@@ -645,6 +822,7 @@ package body Gen_UCD.Normalization is
 
       Put_Line (File, "with VSS.Implementation.Strings;");
       Put_Line (File, "with VSS.Implementation.UTF8_Encoding;");
+      Put_Line (File, "with VSS.Implementation.UCD_Normalization_Common;");
       Put_Line (File, "with VSS.Unicode;");
       Put_Line (File, "with Interfaces;");
       New_Line (File);
@@ -704,12 +882,24 @@ package body Gen_UCD.Normalization is
         (File, "      Length           : Normalization_Character_Count;");
       Put_Line (File, "      First_CCC        : CCC_Values;");
       Put_Line (File, "      Last_CCC         : CCC_Values;");
+      Put_Line (File, "      First_Index      :");
+      Put_Line
+        (File,
+         "        VSS.Implementation.UCD_Normalization_Common"
+         & ".First_Mapping_Code_Offset;");
+      Put_Line (File, "      Last_Index       :");
+      Put_Line
+        (File,
+         "        VSS.Implementation.UCD_Normalization_Common"
+         & ".Last_Mapping_Code_Offset;");
       Put_Line (File, "   end record;");
       Put_Line
         (File,
          "   for Mapping_Information'Size use 64;");
       Put_Line (File, "   for Mapping_Information use record");
       Put_Line (File, "      Offset           at 0 range 0 .. 13;");
+      Put_Line (File, "      First_Index      at 0 range 16 .. 24;");
+      Put_Line (File, "      Last_Index       at 0 range 25 .. 30;");
       Put_Line (File, "      Size             at 0 range 32 .. 37;");
       Put_Line (File, "      CCC              at 0 range 38 .. 43;");
       Put_Line (File, "      First_CCC        at 0 range 44 .. 49;");
@@ -844,6 +1034,83 @@ package body Gen_UCD.Normalization is
       end;
 
       Put_Line (File, "end VSS.Implementation.UCD_Normalization_UTF8;");
+
+      --  Generate common composition data
+
+      Put_Line (File, "pragma Restrictions (No_Elaboration_Code);");
+      New_Line (File);
+
+      Put_Line (File, "with VSS.Unicode;");
+      New_Line (File);
+
+      Put_Line
+        (File, "package VSS.Implementation.UCD_Normalization_Common is");
+      New_Line (File);
+      Put_Line (File, "   pragma Preelaborate;");
+      New_Line (File);
+
+      Put_Line
+        (File,
+         "   type First_Mapping_Code_Offset is range 0 .."
+         & Natural'Wide_Wide_Image (Database.Composition_First_Index_Last)
+         & ';');
+      Put_Line
+        (File,
+         "   type Last_Mapping_Code_Offset is range 0 .."
+         & Natural'Wide_Wide_Image (Database.Composition_Last_Index_Last)
+         & ';');
+      New_Line (File);
+
+      Put_Line (File, "   Composition_Mapping :");
+      Put_Line
+        (File,
+         "     constant array (Last_Mapping_Code_Offset,"
+         & " First_Mapping_Code_Offset)");
+      Put_Line (File, "       of VSS.Unicode.Code_Point :=");
+      Put (File, "        (");
+
+      for L in 0 .. Database.Composition_Last_Index_Last loop
+         if L /= 0 then
+            Put (File, ",");
+            New_Line (File);
+            Put (File, "         ");
+         end if;
+
+         Put (File, "(");
+
+         for F in 0 .. Database.Composition_First_Index_Last loop
+            declare
+               package Code_Point_IO is
+                 new Ada.Wide_Wide_Text_IO.Integer_IO (UCD.Code_Point);
+               use Code_Point_IO;
+
+               Image : Wide_Wide_String (1 .. 11);
+
+            begin
+               Put (Image, Database.Composition_Data_Element (F, L), 16);
+
+               if F = 0 then
+                  null;
+
+               elsif F mod 6 = 0 then
+                  Put_Line (File, ",");
+                  Put (File, "          ");
+
+               else
+                  Put (File, ", ");
+               end if;
+
+               Put (File, Trim (Image, Both));
+            end;
+         end loop;
+
+         Put (File, ")");
+      end loop;
+
+      Put_Line (File, ");");
+      New_Line (File);
+
+      Put_Line (File, "end VSS.Implementation.UCD_Normalization_Common;");
    end Generate;
 
 end Gen_UCD.Normalization;

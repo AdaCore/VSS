@@ -88,6 +88,14 @@ package body Gen_UCD.Normalization is
         (Character : UCD.Code_Point;
          To        : Composition_Quick_Check);
 
+      procedure Set_NFC_Has_Starter
+        (Character : UCD.Code_Point;
+         To        : Boolean);
+
+      procedure Set_NFKC_Has_Starter
+        (Character : UCD.Code_Point;
+         To        : Boolean);
+
       procedure Register_First_Code (Character : UCD.Code_Point);
 
       procedure Register_Last_Code (Character : UCD.Code_Point);
@@ -136,6 +144,9 @@ package body Gen_UCD.Normalization is
    procedure Build is
       CCC_Property     : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("ccc");
+      CCC_NR           : constant UCD.Properties.Property_Value_Access :=
+        UCD.Properties.Resolve (CCC_Property, "0");
+
       Comp_Ex_Property : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("Comp_Ex");
       Comp_Ex_N        : constant not null
@@ -318,6 +329,163 @@ package body Gen_UCD.Normalization is
          end if;
       end loop;
 
+      for Code in UCD.Code_Point loop
+         declare
+
+            function Has_Starter
+              (CCC_Value : UCD.Properties.Property_Value_Access;
+               Mapping   : UCD.Code_Point_Vectors.Vector) return Boolean;
+            --  Returns True when character has starters in the full
+            --  decomposition mapping.
+
+            -----------------
+            -- Has_Starter --
+            -----------------
+
+            function Has_Starter
+              (CCC_Value : UCD.Properties.Property_Value_Access;
+               Mapping   : UCD.Code_Point_Vectors.Vector) return Boolean
+            is
+               Mapping_Length : constant Natural := Natural (Mapping.Length);
+               Found          : Boolean          := False;
+
+            begin
+               if Mapping.Is_Empty then
+                  --  No mapping, check whether character is starter
+
+                  --  ???? Last character of pair of primary character
+                  --  decomposition ????
+
+                  Found := CCC_Value = CCC_NR;
+
+               elsif CCC_Value = CCC_NR then
+                  --  Starter, but it has decomposition.
+
+                  --  Lookup for starter character inside full decomposition
+                  --  mapping.
+
+                  for J in 1 .. Mapping_Length loop
+                     declare
+                        J_CCC_Value :
+                          constant UCD.Properties.Property_Value_Access :=
+                            UCD.Characters.Get (Mapping (J), CCC_Property);
+
+                     begin
+                        if J_CCC_Value = CCC_NR then
+                           Found := True;
+
+                           exit;
+                        end if;
+                     end;
+                  end loop;
+
+                  --  Implementation of the canonical composition algorithm
+                  --  use some assumptions for optimization:
+                  --
+                  --   - if full decompositon mapping contains starters
+                  --     then the first character of the full decomposition
+                  --     mapping is starter (more starters may be present
+                  --     inside the full decomposition mapping)
+                  --
+                  --   - such starter isn't last character of any pair of
+                  --     the canonical decomposition of the any primary
+                  --     composable character
+                  --
+                  --   Fail if some of these rules violated for some
+                  --   character.
+
+                  if Found then
+                     declare
+                        First_CCC_Value                               :
+                        constant UCD.Properties.Property_Value_Access :=
+                          UCD.Characters.Get
+                            (Mapping.First_Element, CCC_Property);
+
+                     begin
+                        --   First character must be starter character.
+
+                        if First_CCC_Value /= CCC_NR then
+                           raise Program_Error;
+                        end if;
+
+                        --  and must not be last character of any pair of
+                        --  canonical decomposition of the primary
+                        --  composable character
+
+                        if Is_Last_Code (Mapping.First_Element) then
+                           raise Program_Error;
+                        end if;
+                     end;
+                  end if;
+
+               else
+                  --  Check that there are no starters inside the decomposition
+
+                  for J in reverse 1 .. Natural (Mapping.Length) loop
+                     declare
+                        CCC_Value : constant
+                          UCD.Properties.Property_Value_Access :=
+                            UCD.Characters.Get (Mapping (J), CCC_Property);
+
+                     begin
+                        if CCC_Value = CCC_NR then
+                           raise Program_Error;
+                        end if;
+                     end;
+                  end loop;
+               end if;
+
+               return Found;
+            end Has_Starter;
+
+            CCC_Value  : constant UCD.Properties.Property_Value_Access :=
+              UCD.Characters.Get (Code, CCC_Property);
+            DT_Value   : constant UCD.Properties.Property_Value_Access :=
+              UCD.Characters.Get (Code, DT_Property);
+            D_Mapping  : constant UCD.Code_Point_Vectors.Vector :=
+              (if DT_Value = DT_Canonical
+               then Full_Decomposition
+                      (Code,
+                       Canonical,
+                       DT_Property, DT_None, DT_Canonical,
+                       DM_Property)
+               else UCD.Code_Point_Vectors.Empty_Vector);
+            KD_Mapping : constant UCD.Code_Point_Vectors.Vector :=
+              (if DT_Value /= DT_None
+               then Full_Decomposition
+                      (Code,
+                       Compatibility,
+                       DT_Property, DT_None, DT_Canonical,
+                       DM_Property)
+               else UCD.Code_Point_Vectors.Empty_Vector);
+
+         begin
+            --  Process informatiomn for canonical composition
+
+            if DT_Value = DT_None then
+               --  No decomposition
+
+               Database.Set_NFC_Has_Starter (Code, CCC_Value = CCC_NR);
+               Database.Set_NFKC_Has_Starter (Code, CCC_Value = CCC_NR);
+
+            elsif DT_Value = DT_Canonical then
+               --  Canonical decomposition
+
+               Database.Set_NFC_Has_Starter
+                 (Code, Has_Starter (CCC_Value, D_Mapping));
+               Database.Set_NFKC_Has_Starter
+                 (Code, Has_Starter (CCC_Value, D_Mapping));
+
+            else
+               --  All kinds of compatibility decomposition
+
+               Database.Set_NFC_Has_Starter (Code, CCC_Value = CCC_NR);
+               Database.Set_NFKC_Has_Starter
+                 (Code, Has_Starter (CCC_Value, KD_Mapping));
+            end if;
+         end;
+      end loop;
+
       Database.Compress;
 
       Database.Print_Statistics;
@@ -340,8 +508,8 @@ package body Gen_UCD.Normalization is
          Last_CCC         : Unsigned_6              := 0;
          First_Code_Index : Unsigned_9              := 0;
          Last_Code_Index  : Unsigned_6              := 0;
+         Has_Starter      : Boolean                 := False;
          Reserved_1       : Unsigned_2              := 0;
-         Reserved_2       : Unsigned_1              := 0;
       end record;
       for Mapping_Record'Size use 64;
       for Mapping_Record use record
@@ -349,7 +517,7 @@ package body Gen_UCD.Normalization is
          Reserved_1       at 0 range 14 .. 15;
          First_Code_Index at 0 range 16 .. 24;
          Last_Code_Index  at 0 range 25 .. 30;
-         Reserved_2       at 0 range 31 .. 31;
+         Has_Starter      at 0 range 31 .. 31;
          Size             at 0 range 32 .. 37;
          CCC              at 0 range 38 .. 43;
          First_CCC        at 0 range 44 .. 49;
@@ -653,6 +821,17 @@ package body Gen_UCD.Normalization is
             Raw_Mapping (Canonical) (First).First_Code_Index) := Primary;
       end Set_Composition_Mapping;
 
+      -------------------------
+      -- Set_NFC_Has_Starter --
+      -------------------------
+
+      procedure Set_NFC_Has_Starter
+        (Character : UCD.Code_Point;
+         To        : Boolean) is
+      begin
+         Raw_Mapping (Canonical) (Character).Has_Starter := To;
+      end Set_NFC_Has_Starter;
+
       ----------------
       -- Set_NFC_QC --
       ----------------
@@ -674,6 +853,17 @@ package body Gen_UCD.Normalization is
       begin
          Raw_Mapping (Canonical) (Character).Decomposition_QC := To;
       end Set_NFD_QC;
+
+      --------------------------
+      -- Set_NFKC_Has_Starter --
+      --------------------------
+
+      procedure Set_NFKC_Has_Starter
+        (Character : UCD.Code_Point;
+         To        : Boolean) is
+      begin
+         Raw_Mapping (Compatibility) (Character).Has_Starter := To;
+      end Set_NFKC_Has_Starter;
 
       -----------------
       -- Set_NFKC_QC --
@@ -892,6 +1082,7 @@ package body Gen_UCD.Normalization is
         (File,
          "        VSS.Implementation.UCD_Normalization_Common"
          & ".Last_Mapping_Code_Offset;");
+      Put_Line (File, "      Has_Starter      : Boolean;");
       Put_Line (File, "   end record;");
       Put_Line
         (File,
@@ -900,6 +1091,7 @@ package body Gen_UCD.Normalization is
       Put_Line (File, "      Offset           at 0 range 0 .. 13;");
       Put_Line (File, "      First_Index      at 0 range 16 .. 24;");
       Put_Line (File, "      Last_Index       at 0 range 25 .. 30;");
+      Put_Line (File, "      Has_Starter      at 0 range 31 .. 31;");
       Put_Line (File, "      Size             at 0 range 32 .. 37;");
       Put_Line (File, "      CCC              at 0 range 38 .. 43;");
       Put_Line (File, "      First_CCC        at 0 range 44 .. 49;");

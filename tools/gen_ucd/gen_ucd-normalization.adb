@@ -71,6 +71,9 @@ package body Gen_UCD.Normalization is
       procedure Set_CCC
         (Character : UCD.Code_Point;
          To        : Natural);
+      --  Sets CCC/Last_CCC/First_CCC members of the record. Need to be called
+      --  before Set_Canonical_Decomposition/Set_Compatibility_Decomposition
+      --  because they set Last_CCC/First_CCC members.
 
       procedure Set_NFD_QC
         (Character : UCD.Code_Point;
@@ -247,6 +250,12 @@ package body Gen_UCD.Normalization is
                else No);
 
          begin
+            Database.Set_CCC (Code, CCC_Enumeration.Representation (Code));
+            Database.Set_NFD_QC (Code, NFD_QC_Value);
+            Database.Set_NFC_QC (Code, NFC_QC_Value);
+            Database.Set_NFKD_QC (Code, NFKD_QC_Value);
+            Database.Set_NFKC_QC (Code, NFKC_QC_Value);
+
             --  Process informatiomn for canonical composition
 
             if DT_Value = DT_Canonical and then Comp_Ex_Value = Comp_Ex_N then
@@ -290,12 +299,6 @@ package body Gen_UCD.Normalization is
                      DT_Property, DT_None, DT_Canonical,
                      DM_Property));
             end if;
-
-            Database.Set_CCC (Code, CCC_Enumeration.Representation (Code));
-            Database.Set_NFD_QC (Code, NFD_QC_Value);
-            Database.Set_NFC_QC (Code, NFC_QC_Value);
-            Database.Set_NFKD_QC (Code, NFKD_QC_Value);
-            Database.Set_NFKC_QC (Code, NFKC_QC_Value);
          end;
       end loop;
 
@@ -769,8 +772,12 @@ package body Gen_UCD.Normalization is
         (Character : UCD.Code_Point;
          To        : Natural) is
       begin
-         Raw_Mapping (Canonical) (Character).CCC := Unsigned_6 (To);
-         Raw_Mapping (Compatibility) (Character).CCC := Unsigned_6 (To);
+         Raw_Mapping (Canonical) (Character).CCC       := Unsigned_6 (To);
+         Raw_Mapping (Canonical) (Character).First_CCC := Unsigned_6 (To);
+         Raw_Mapping (Canonical) (Character).Last_CCC  := Unsigned_6 (To);
+         Raw_Mapping (Compatibility) (Character).CCC       := Unsigned_6 (To);
+         Raw_Mapping (Compatibility) (Character).Last_CCC  := Unsigned_6 (To);
+         Raw_Mapping (Compatibility) (Character).First_CCC := Unsigned_6 (To);
       end Set_CCC;
 
       -------------------------------------

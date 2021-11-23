@@ -1449,6 +1449,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          From   : VSS.Unicode.UTF8_Code_Unit_Offset;
          Offset : out VSS.Unicode.UTF8_Code_Unit_Offset;
          Size   : out VSS.Unicode.UTF8_Code_Unit_Count;
+         Code   : out VSS.Unicode.Code_Point;
          Info   : out
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information)
          return Boolean;
@@ -1471,6 +1472,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Skip_Compositon : out Boolean;
          Starter_Offset  : out VSS.Unicode.UTF8_Code_Unit_Offset;
          Starter_Size    : out VSS.Unicode.UTF8_Code_Unit_Count;
+         Starter_Code    : out VSS.Unicode.Code_Point;
          Starter_Info    : out
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information;
          Previous_CCC    : out
@@ -1483,6 +1485,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Result_Size : in out VSS.Unicode.UTF8_Code_Unit_Count;
          From_Offset : VSS.Unicode.UTF8_Code_Unit_Offset;
          From_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+         From_Code   : VSS.Unicode.Code_Point;
          From_Info   :
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information)
              with Pre => From_Info.CCC = CCC_NR;
@@ -1498,6 +1501,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Starter_Found      : out Boolean;
          Starter_Offset     : out VSS.Unicode.UTF8_Code_Unit_Offset;
          Starter_Size       : out VSS.Unicode.UTF8_Code_Unit_Count;
+         Starter_Code       : out VSS.Unicode.Code_Point;
          Starter_Info       : out
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information);
       --  Lookup for the last character in the string that is starter
@@ -1512,6 +1516,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Result_Size : in out VSS.Unicode.UTF8_Code_Unit_Count;
          From_Offset : VSS.Unicode.UTF8_Code_Unit_Offset;
          From_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+         From_Code   : VSS.Unicode.Code_Point;
          From_Info   :
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information)
       is
@@ -1526,6 +1531,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          Current_Starter_Offset : VSS.Unicode.UTF8_Code_Unit_Offset;
          Current_Starter_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+         Current_Starter_Code   : VSS.Unicode.Code_Point;
          Current_Starter_Info   :
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information;
 
@@ -1540,6 +1546,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          Current_Starter_Offset := From_Offset;
          Current_Starter_Size   := From_Size;
+         Current_Starter_Code   := From_Code;
          Current_Starter_Info   := From_Info;
 
          loop
@@ -1609,6 +1616,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                          - Current_Starter_Size - Current_Size;
 
                      Current_Starter_Size := New_Starter_Size;
+                     Current_Starter_Code := New_Starter_Code;
                      Current_Starter_Info :=
                        Get_Decomposition_Information
                          (Decomposition_Data, New_Starter_Code);
@@ -1664,6 +1672,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                          - Current_Starter_Size - Current_Size;
 
                      Current_Starter_Size := New_Starter_Size;
+                     Current_Starter_Code := New_Starter_Code;
                      Current_Starter_Info :=
                        Get_Decomposition_Information
                          (Decomposition_Data, New_Starter_Code);
@@ -1671,6 +1680,121 @@ package body VSS.Implementation.UTF8_String_Handlers is
                      Current_Consumed := True;
                   end if;
                end if;
+
+            elsif Current_Code in 16#1161# .. 16#1175#
+              and Current_Starter_Code in 16#1100# .. 16#1112#
+            then
+               declare
+                  Starter_Buffer :
+                    VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                      (0 .. 3);
+                  L_Index        : VSS.Unicode.Code_Point;
+                  V_Index        : VSS.Unicode.Code_Point;
+                  LV_Index       : VSS.Unicode.Code_Point;
+
+               begin
+                  L_Index  := Current_Starter_Code - L_Base;
+                  V_Index  := Current_Code - V_Base;
+                  LV_Index := L_Index * N_Count + V_Index * T_Count;
+
+                  Current_Starter_Code := S_Base + LV_Index;
+                  Current_Starter_Info :=
+                    Get_Decomposition_Information
+                      (Decomposition_Data, Current_Starter_Code);
+
+                  --  Encoded size of all possible characters are, same, so
+                  --  reuse variable.
+
+                  Unchecked_Delete
+                    (Result_Data,
+                     Result_Size,
+                     Current_Offset,
+                     Current_Size,
+                     1);
+
+                  VSS.Implementation.UTF8_Encoding.Encode
+                    (Current_Starter_Code,
+                     Current_Starter_Size,
+                     Starter_Buffer (0),
+                     Starter_Buffer (1),
+                     Starter_Buffer (2),
+                     Starter_Buffer (3));
+
+                  Unchecked_Replace
+                    (Result_Data,
+                     Result_Size,
+                     Current_Starter_Offset,
+                     Current_Starter_Size,
+                     1,
+                     Starter_Buffer,
+                     Starter_Buffer'First,
+                     Current_Starter_Size,
+                     1);
+
+                  Next_Offset := Next_Offset - Current_Size;
+
+                  Current_Consumed := True;
+               end;
+
+            elsif Current_Code in 16#11A8# .. 16#11C2#
+              and Current_Starter_Code in 16#AC00# .. 16#D7A3#
+            then
+               declare
+                  Starter_Buffer :
+                    VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                      (0 .. 3);
+                  S_Index        : VSS.Unicode.Code_Point;
+                  T_Index        : VSS.Unicode.Code_Point;
+
+               begin
+                  S_Index := Current_Starter_Code - S_Base;
+                  T_Index := S_Index mod T_Count;
+
+                  if T_Index = 0 then
+                     --  Starter is LV_Syllable, can compose with
+                     --  current T_Jamo.
+
+                     T_Index  := Current_Code - T_Base;
+
+                     Current_Starter_Code := Current_Starter_Code + T_Index;
+                     Current_Starter_Info :=
+                       Get_Decomposition_Information
+                         (Decomposition_Data, Current_Starter_Code);
+
+                     --  Encoded size of all possible characters are, same, so
+                     --  reuse variable.
+
+                     Unchecked_Delete
+                       (Result_Data,
+                        Result_Size,
+                        Current_Offset,
+                        Current_Size,
+                        1);
+
+                     VSS.Implementation.UTF8_Encoding.Encode
+                       (Current_Starter_Code,
+                        Current_Starter_Size,
+                        Starter_Buffer (0),
+                        Starter_Buffer (1),
+                        Starter_Buffer (2),
+                        Starter_Buffer (3));
+
+                     Unchecked_Replace
+                       (Result_Data,
+                        Result_Size,
+                        Current_Starter_Offset,
+                        Current_Starter_Size,
+                        1,
+                        Starter_Buffer,
+                        Starter_Buffer'First,
+                        Current_Starter_Size,
+                        1);
+
+                     Next_Offset := Next_Offset - Current_Size;
+
+                     Current_Consumed := True;
+                  end if;
+               end;
             end if;
 
             if not Current_Consumed then
@@ -1681,6 +1805,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                if Current_Info.CCC = CCC_NR then
                   Current_Starter_Offset := Current_Offset;
                   Current_Starter_Size   := Current_Size;
+                  Current_Starter_Code   := Current_Code;
                   Current_Starter_Info   := Current_Info;
                end if;
             end if;
@@ -1701,6 +1826,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Skip_Compositon : out Boolean;
          Starter_Offset  : out VSS.Unicode.UTF8_Code_Unit_Offset;
          Starter_Size    : out VSS.Unicode.UTF8_Code_Unit_Count;
+         Starter_Code    : out VSS.Unicode.Code_Point;
          Starter_Info    : out
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information;
          Previous_CCC    : out
@@ -1824,6 +1950,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
             Skip_Compositon := Current_Info.First_Index = 0;
             Starter_Offset  := From_Offset;
             Starter_Size    := Next_Offset - From_Offset;
+            Starter_Code    := Current_Code;
             Starter_Info    := Current_Info;
          end if;
       end Apply_Decomposition;
@@ -1837,11 +1964,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
          From   : VSS.Unicode.UTF8_Code_Unit_Offset;
          Offset : out VSS.Unicode.UTF8_Code_Unit_Offset;
          Size   : out VSS.Unicode.UTF8_Code_Unit_Count;
+         Code   : out VSS.Unicode.Code_Point;
          Info   : out
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information)
-         return Boolean
-      is
-         Code : VSS.Unicode.Code_Point;
+         return Boolean is
 
       begin
          if From = 0 then
@@ -1881,13 +2007,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Starter_Found      : out Boolean;
          Starter_Offset     : out VSS.Unicode.UTF8_Code_Unit_Offset;
          Starter_Size       : out VSS.Unicode.UTF8_Code_Unit_Count;
+         Starter_Code       : out VSS.Unicode.Code_Point;
          Starter_Info       : out
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information)
       is
-         Current_Offset     : VSS.Unicode.UTF8_Code_Unit_Offset :=
-           Result_Size;
-         Current_Size       : VSS.Unicode.UTF8_Code_Unit_Count;
-         Current_Info       :
+         Current_Offset : VSS.Unicode.UTF8_Code_Unit_Offset := Result_Size;
+         Current_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+         Current_Code   : VSS.Unicode.Code_Point;
+         Current_Info   :
            VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information;
 
       begin
@@ -1902,6 +2029,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   Current_Offset,
                   Current_Offset,
                   Current_Size,
+                  Current_Code,
                   Current_Info);
 
                Need_Decomposition :=
@@ -1912,6 +2040,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   Starter_Found    := True;
                   Starter_Offset   := Current_Offset;
                   Starter_Size     := Current_Size;
+                  Starter_Code     := Current_Code;
                   Starter_Info     := Current_Info;
 
                   exit;
@@ -2151,6 +2280,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                            Result_Size,
                            Starter_Offset,
                            Starter_Size,
+                           Starter_Code,
                            Starter_Info);
                      end if;
 
@@ -2165,6 +2295,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                      Starter_Found      : Boolean;
                      Starter_Offset     : VSS.Unicode.UTF8_Code_Unit_Offset;
                      Starter_Size       : VSS.Unicode.UTF8_Code_Unit_Count;
+                     Starter_Code       : VSS.Unicode.Code_Point;
                      Starter_Info       :
                        VSS.Implementation.UCD_Normalization_UTF8
                          .Mapping_Information;
@@ -2180,6 +2311,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                         Starter_Found,
                         Starter_Offset,
                         Starter_Size,
+                        Starter_Code,
                         Starter_Info);
 
                      if Need_Decomposition then
@@ -2200,6 +2332,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                               Skip_Composition,
                               Starter_Offset,
                               Starter_Size,
+                              Starter_Code,
                               Starter_Info,
                               Last_CCC);
                         end;
@@ -2291,6 +2424,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                            Result_Size,
                            Starter_Offset,
                            Starter_Size,
+                           Starter_Code,
                            Starter_Info);
                      end if;
                   end;
@@ -2463,9 +2597,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
                      --  Character may compose with previous character.
 
                      declare
-                        Starter_Code   : VSS.Unicode.Code_Point;
                         Starter_Offset : VSS.Unicode.UTF8_Code_Unit_Offset;
                         Starter_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+                        Starter_Code   : VSS.Unicode.Code_Point;
                         Starter_Info   :
                           VSS.Implementation.UCD_Normalization_UTF8
                             .Mapping_Information;
@@ -2503,6 +2637,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                                  Result_Size,
                                  Starter_Offset,
                                  Starter_Size,
+                                 Starter_Code,
                                  Starter_Info);
                            end if;
 
@@ -2527,6 +2662,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                      Starter_Found      : Boolean;
                      Starter_Offset     : VSS.Unicode.UTF8_Code_Unit_Offset;
                      Starter_Size       : VSS.Unicode.UTF8_Code_Unit_Count;
+                     Starter_Code       : VSS.Unicode.Code_Point;
                      Starter_Info       :
                        VSS.Implementation.UCD_Normalization_UTF8
                          .Mapping_Information;
@@ -2542,6 +2678,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                         Starter_Found,
                         Starter_Offset,
                         Starter_Size,
+                        Starter_Code,
                         Starter_Info);
 
                      if Need_Decomposition then
@@ -2562,6 +2699,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                               Skip_Composition,
                               Starter_Offset,
                               Starter_Size,
+                              Starter_Code,
                               Starter_Info,
                               Last_CCC);
                         end;
@@ -2662,6 +2800,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                            Result_Size,
                            Starter_Offset,
                            Starter_Size,
+                           Starter_Code,
                            Starter_Info);
                      end if;
                   end;

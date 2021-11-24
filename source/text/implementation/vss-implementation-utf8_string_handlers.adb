@@ -296,9 +296,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Decomposition_Data :
         VSS.Implementation.UCD_Normalization_UTF8.Mapping_Data_Offset_Array;
       Result_Data        : out VSS.Implementation.Strings.String_Data);
-   --  Common code to decomposite string according to given decomposition
+   --  Common code to decompose string according to given decomposition
    --  mapping (canonical or compatibility), to do canonical reordering, and
-   --  to canonically composite.
+   --  to canonically compose.
 
    procedure Append_Reordered
      (Result_Data        : in out VSS.Implementation.Strings.String_Data;
@@ -774,10 +774,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          else
             pragma Warnings (Off);
+            --  Disable warnings, this code is never executed for now,
+            --  however, may need to be completed later.
+
             Last_CCC := Current_Info.CCC;
-            pragma Warnings (On);
 
             raise Program_Error;
+
+            pragma Warnings (On);
          end if;
       end loop;
    end Append_Reordered;
@@ -1460,7 +1464,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       function Has_Decomposition
         (Info : VSS.Implementation.UCD_Normalization_UTF8.Mapping_Information)
          return Boolean;
-      --  Returns True when character has full decomposition.
+      --  Return True when character has full decomposition.
 
       procedure Apply_Decomposition
         (Result_Data     : in out VSS.Implementation.Strings.String_Data;
@@ -1684,6 +1688,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
             elsif Current_Code in 16#1161# .. 16#1175#
               and Current_Starter_Code in 16#1100# .. 16#1112#
             then
+               --  Hangul Syllable Composition:
+               --
+               --  Leading consonant + Vowel => LV_Syllable
+
                declare
                   Starter_Buffer :
                     VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
@@ -1739,6 +1747,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
             elsif Current_Code in 16#11A8# .. 16#11C2#
               and Current_Starter_Code in 16#AC00# .. 16#D7A3#
             then
+               --  Hangul Syllable Composition:
+               --
+               --  LV_Syllable + Traling consonant => LVT_Syllable
+
                declare
                   Starter_Buffer :
                     VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array

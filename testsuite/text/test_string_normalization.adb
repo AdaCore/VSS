@@ -92,7 +92,27 @@ begin
                  Get_Field (Loader, 4);
 
             begin
-               --  NFC: not implemented
+               --  NFC
+
+               declare
+                  C1N : constant VSS.Strings.Virtual_String :=
+                    C1.To_Normalized (VSS.Strings.Normalization_Form_C);
+                  C2N : constant VSS.Strings.Virtual_String :=
+                    C2.To_Normalized (VSS.Strings.Normalization_Form_C);
+                  C3N : constant VSS.Strings.Virtual_String :=
+                    C3.To_Normalized (VSS.Strings.Normalization_Form_C);
+                  C4N : constant VSS.Strings.Virtual_String :=
+                    C4.To_Normalized (VSS.Strings.Normalization_Form_C);
+                  C5N : constant VSS.Strings.Virtual_String :=
+                    C5.To_Normalized (VSS.Strings.Normalization_Form_C);
+
+               begin
+                  Test_Support.Assert (C2 = C1N);
+                  Test_Support.Assert (C2 = C2N);
+                  Test_Support.Assert (C2 = C3N);
+                  Test_Support.Assert (C4 = C4N);
+                  Test_Support.Assert (C4 = C5N);
+               end;
 
                --  NFD
 
@@ -116,7 +136,27 @@ begin
                   Test_Support.Assert (C5 = C5N);
                end;
 
-               --  NFKC: not implemented
+               --  NFKC
+
+               declare
+                  C1N : constant VSS.Strings.Virtual_String :=
+                    C1.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                  C2N : constant VSS.Strings.Virtual_String :=
+                    C2.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                  C3N : constant VSS.Strings.Virtual_String :=
+                    C3.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                  C4N : constant VSS.Strings.Virtual_String :=
+                    C4.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                  C5N : constant VSS.Strings.Virtual_String :=
+                    C5.To_Normalized (VSS.Strings.Normalization_Form_KC);
+
+               begin
+                  Test_Support.Assert (C4 = C1N);
+                  Test_Support.Assert (C4 = C2N);
+                  Test_Support.Assert (C4 = C3N);
+                  Test_Support.Assert (C4 = C4N);
+                  Test_Support.Assert (C4 = C5N);
+               end;
 
                --  NFKD
 

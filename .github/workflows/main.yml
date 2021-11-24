@@ -26,10 +26,10 @@ jobs:
           toolchain_dir: ./cached_gnat
       - name: Get UCD.zip
         run: |
-          curl -C - -o UCD-13.0.0.zip https://www.unicode.org/Public/13.0.0/ucd/UCD.zip
+          curl -C - -o UCD-14.0.0.zip https://www.unicode.org/Public/14.0.0/ucd/UCD.zip
           mkdir vss/data
           mkdir vss/data/ucd
-          unzip UCD-13.0.0.zip -d vss/data/ucd
+          unzip UCD-14.0.0.zip -d vss/data/ucd
       - name: Build and test
         shell: bash
         run: |

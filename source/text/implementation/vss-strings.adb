@@ -48,6 +48,27 @@ package body VSS.Strings is
    --  subprogram or exception handling added to the caller subprogram.
 
    ---------
+   -- "&" --
+   ---------
+
+   function "&"
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         declare
+            Offset : VSS.Implementation.Strings.Cursor_Offset;
+
+         begin
+            Result.Data := Left.Data;
+            VSS.Implementation.Strings.Reference (Result.Data);
+            VSS.Implementation.Strings.Handler (Result.Data).Append
+              (Result.Data, Right.Data, Offset);
+         end;
+      end return;
+   end "&";
+
+   ---------
    -- "<" --
    ---------
 
@@ -964,28 +985,98 @@ package body VSS.Strings is
       Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
       return Boolean
    is
-      pragma Unreferenced (Case_Sensitivity);
-
       use type VSS.Implementation.Strings.Character_Count;
 
       Self_Handler   :
         constant not null VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Self.Data);
       Prefix_Handler :
-        constant not null  VSS.Implementation.Strings.String_Handler_Access :=
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
           VSS.Implementation.Strings.Handler (Prefix.Data);
 
    begin
-      if Self_Handler.Length (Self.Data)
-           < Prefix_Handler.Length (Prefix.Data)
-      then
-         return False;
+      case Case_Sensitivity is
+         when Case_Sensitive =>
+            if Self_Handler.Length (Self.Data)
+                 < Prefix_Handler.Length (Prefix.Data)
+            then
+               return False;
 
-      else
-         return
-           Self_Handler.Starts_With
-             (Self.Data, Prefix_Handler.all, Prefix.Data);
-      end if;
+            else
+               return
+                 Self_Handler.Starts_With
+                   (Self.Data, Prefix_Handler.all, Prefix.Data);
+            end if;
+
+         when Default_Caseless =>
+            raise Program_Error;
+
+         when Canonical_Caseless =>
+            raise Program_Error;
+
+         when Compatibility_Caseless =>
+            raise Program_Error;
+
+         when Identifier_Caseless =>
+            declare
+               Self_NFD         : VSS.Implementation.Strings.String_Data;
+               Prefix_NFD       : VSS.Implementation.Strings.String_Data;
+               Self_CF_Mapped   : VSS.Implementation.Strings.String_Data;
+               Prefix_CF_Mapped : VSS.Implementation.Strings.String_Data;
+               Self_CF_NFC      : VSS.Implementation.Strings.String_Data;
+               Prefix_CF_NFC    : VSS.Implementation.Strings.String_Data;
+
+            begin
+               Self_Handler.Normalize
+                 (Self.Data, VSS.Strings.Normalization_Form_D, Self_NFD);
+               VSS.Implementation.Strings.Handler (Self_NFD).Convert_Case
+                 (Self_NFD,
+                  VSS.Implementation.String_Handlers.NFKC_Casefold,
+                  Self_CF_Mapped);
+               VSS.Implementation.Strings.Handler (Self_CF_Mapped).Normalize
+                 (Self_CF_Mapped,
+                  VSS.Strings.Normalization_Form_C,
+                  Self_CF_NFC);
+
+               Prefix_Handler.Normalize
+                 (Prefix.Data, VSS.Strings.Normalization_Form_D, Prefix_NFD);
+               VSS.Implementation.Strings.Handler (Prefix_NFD).Convert_Case
+                 (Prefix_NFD,
+                  VSS.Implementation.String_Handlers.NFKC_Casefold,
+                  Prefix_CF_Mapped);
+               VSS.Implementation.Strings.Handler (Prefix_CF_Mapped).Normalize
+                 (Prefix_CF_Mapped,
+                  VSS.Strings.Normalization_Form_C,
+                  Prefix_CF_NFC);
+
+               return Result : constant Boolean :=
+                 (if VSS.Implementation.Strings.Handler
+                    (Self_CF_NFC).Length (Self_CF_NFC)
+                  < VSS.Implementation.Strings.Handler
+                    (Prefix_CF_NFC).Length (Prefix_CF_NFC)
+                  then False
+                  else
+                     VSS.Implementation.Strings.Handler
+                    (Self_CF_NFC).Starts_With
+                  (Self_CF_NFC,
+                       VSS.Implementation.Strings.Handler (Prefix_CF_NFC).all,
+                       Prefix_CF_NFC))
+               do
+                  VSS.Implementation.Strings.Handler (Self_NFD).Unreference
+                    (Self_NFD);
+                  VSS.Implementation.Strings.Handler
+                    (Self_CF_Mapped).Unreference (Self_CF_Mapped);
+                  VSS.Implementation.Strings.Handler (Self_CF_NFC).Unreference
+                    (Self_CF_NFC);
+                  VSS.Implementation.Strings.Handler (Prefix_NFD).Unreference
+                    (Prefix_NFD);
+                  VSS.Implementation.Strings.Handler
+                    (Prefix_CF_Mapped).Unreference (Prefix_CF_Mapped);
+                  VSS.Implementation.Strings.Handler
+                    (Prefix_CF_NFC).Unreference (Prefix_CF_NFC);
+               end return;
+            end;
+      end case;
    end Starts_With;
 
    ------------------

@@ -24,6 +24,7 @@
 with VSS.Implementation.String_Configuration;
 pragma Warnings (Off, ".* is an internal GNAT unit");
 with Ada.Strings.Unbounded.Aux;
+with Ada.Strings.Wide_Wide_Unbounded.Aux;
 with Ada.Strings.Wide_Wide_Unbounded.VSS_Aux;
 pragma Warnings (On, ".* is an internal GNAT unit");
 
@@ -184,6 +185,52 @@ package body VSS.Strings.Conversions is
             end if;
          end if;
       end return;
+   end To_Virtual_String;
+
+   -----------------------
+   -- To_Virtual_String --
+   -----------------------
+
+   function To_Virtual_String
+     (Item : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String)
+      return Virtual_String
+   is
+      Success : Boolean;
+      Data    :
+        Ada.Strings.Wide_Wide_Unbounded.Aux.Big_Wide_Wide_String_Access;
+      Last    : Natural;
+
+   begin
+      return Result : Virtual_String do
+         --  Retrieve data from unbounded string.
+
+         Ada.Strings.Wide_Wide_Unbounded.Aux.Get_Wide_Wide_String
+           (Item, Data, Last);
+
+         if Last /= 0 then
+            --  First, attempt to place data in the storage inside the object
+            --  of Virtual_String type.
+
+            VSS.Implementation.String_Configuration.In_Place_Handler
+              .From_Wide_Wide_String
+                (Data (1 .. Last), Result.Data, Success);
+
+            if not Success then
+               --  Operation may fail for two reasons: source data is not
+               --  well-formed UTF-8 or there is not enoght memory to store
+               --  string in in-place storage.
+
+               VSS.Implementation.String_Configuration.Default_Handler
+                 .From_Wide_Wide_String
+                   (Data (1 .. Last), Result.Data, Success);
+            end if;
+
+            if not Success then
+               raise Constraint_Error with "Invalid UCS-4 data";
+            end if;
+         end if;
+      end return;
+
    end To_Virtual_String;
 
    -------------------------

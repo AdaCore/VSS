@@ -188,9 +188,9 @@ package VSS.Strings is
       Right : Virtual_String) return Boolean;
    --  Compare two strings in binary order of code points.
 
-   --  function "&"
-   --    (Left  : Virtual_String;
-   --     Right : Virtual_String) return Virtual_String;
+   function "&"
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Virtual_String;
    --  function "&"
    --    (Left  : Virtual_String;
    --     Right : VSS.Characters.Virtual_Character) return Virtual_String;

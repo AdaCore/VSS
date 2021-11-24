@@ -45,6 +45,7 @@ package VSS.Implementation.String_Handlers is
      (Simple_Lowercase,
       Simple_Titlecase,
       Simple_Uppercase,
+      NFKC_Casefold,
       Lowercase,
       Titlecase,
       Uppercase);

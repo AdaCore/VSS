@@ -913,6 +913,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
                VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
                Result);
 
+         when VSS.Implementation.String_Handlers.NFKC_Casefold =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.NFKC_Casefold_Index,
+               Result);
+
          when VSS.Implementation.String_Handlers.Lowercase =>
             Convert_Case_Full
               (Source.Storage,
@@ -979,6 +986,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
               (Source.Storage,
                Source.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.NFKC_Casefold =>
+            Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.NFKC_Casefold_Index,
                Result);
 
          when VSS.Implementation.String_Handlers.Lowercase =>
@@ -3311,6 +3325,23 @@ package body VSS.Implementation.UTF8_String_Handlers is
                      Get_Simplified_Case_Mapping_Information
                        (VSS.Implementation.UCD_Casing_UTF8
                           .Simple_Uppercase_Index,
+                        Code);
+
+            begin
+               Changes := Info.Changes;
+               Length  := Info.Length;
+               Offset  := Info.Offset;
+               Size    := Info.Count;
+            end;
+
+         when VSS.Implementation.String_Handlers.NFKC_Casefold =>
+            declare
+               Info : constant
+                 VSS.Implementation.UCD_Casing_UTF8
+                   .Simplified_Mapping_Information :=
+                     Get_Simplified_Case_Mapping_Information
+                       (VSS.Implementation.UCD_Casing_UTF8
+                          .NFKC_Casefold_Index,
                         Code);
 
             begin

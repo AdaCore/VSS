@@ -48,6 +48,27 @@ package body VSS.Strings is
    --  subprogram or exception handling added to the caller subprogram.
 
    ---------
+   -- "&" --
+   ---------
+
+   function "&"
+     (Left  : Virtual_String;
+      Right : Virtual_String) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         declare
+            Offset : VSS.Implementation.Strings.Cursor_Offset;
+
+         begin
+            Result.Data := Left.Data;
+            VSS.Implementation.Strings.Reference (Result.Data);
+            VSS.Implementation.Strings.Handler (Result.Data).Append
+              (Result.Data, Right.Data, Offset);
+         end;
+      end return;
+   end "&";
+
+   ---------
    -- "<" --
    ---------
 

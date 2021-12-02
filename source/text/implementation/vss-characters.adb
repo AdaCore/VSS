@@ -345,4 +345,35 @@ package body VSS.Characters is
       end return;
    end Get_Uppercase_Mapping;
 
+   ----------------
+   -- Is_Control --
+   ----------------
+
+   function Is_Control (Self : Virtual_Character) return Boolean is
+   begin
+      return Get_General_Category (Self) = Control;
+   end Is_Control;
+
+   ---------------
+   -- Is_Format --
+   ---------------
+
+   function Is_Format (Self : Virtual_Character) return Boolean is
+   begin
+      return
+        Get_General_Category (Self)
+          in Format | Line_Separator | Paragraph_Separator;
+   end Is_Format;
+
+   ----------------
+   -- Is_Graphic --
+   ----------------
+
+   function Is_Graphic (Self : Virtual_Character) return Boolean is
+   begin
+      return
+        Get_General_Category (Self)
+          in Letter | Mark | Number | Punctuation | Symbol | Space_Separator;
+   end Is_Graphic;
+
 end VSS.Characters;

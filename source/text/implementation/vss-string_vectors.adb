@@ -89,6 +89,18 @@ package body VSS.String_Vectors is
       end if;
    end Append;
 
+   -------------------------
+   -- Append_Syntax_Sugar --
+   -------------------------
+
+   procedure Append_Syntax_Sugar
+     (Self : in out Virtual_String_Vector;
+      Item : VSS.Strings.Virtual_String) is
+   begin
+      VSS.Implementation.String_Vectors.Append
+        (Self.Data, VSS.Strings.Internals.Data_Access_Constant (Item).all);
+   end Append_Syntax_Sugar;
+
    -----------
    -- Clear --
    -----------
@@ -103,9 +115,19 @@ package body VSS.String_Vectors is
    --------------
 
    function Contains
-     (Self : Virtual_String_Vector'Class;
-      Item : VSS.Strings.Virtual_String) return Boolean is
+     (Self             : Virtual_String_Vector'Class;
+      Item             : VSS.Strings.Virtual_String;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity :=
+        VSS.Strings.Case_Sensitive)
+      return Boolean
+   is
+      use type VSS.Strings.Case_Sensitivity;
+
    begin
+      if Case_Sensitivity /= VSS.Strings.Case_Sensitive then
+         raise Program_Error;
+      end if;
+
       return
         VSS.Implementation.String_Vectors.Contains
           (Self.Data,

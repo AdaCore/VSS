@@ -162,4 +162,18 @@ package VSS.Characters is
      (Self : Virtual_Character) return Virtual_Character;
    --  Return value of the Simple_Uppercase_Mapping property of the character.
 
+   function Is_Graphic (Self : Virtual_Character) return Boolean;
+   --  Return True when character belong to Graphic type, which includes
+   --  characters with general category Letter, Mark, Number, Punctuation,
+   --  Symbol, and Space_Separator.
+
+   function Is_Format (Self : Virtual_Character) return Boolean;
+   --  Return True when character belong to Format type, which includes
+   --  characters with general category Format, Line_Separator, and
+   --  Paragraph_Separator.
+
+   function Is_Control (Self : Virtual_Character) return Boolean;
+   --  Return True when character belong to Format type, which includes
+   --  characters with general category Control.
+
 end VSS.Characters;

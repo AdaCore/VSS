@@ -89,8 +89,11 @@ package VSS.String_Vectors is
    --  Replace a string vector item with given Index by a new value.
 
    function Contains
-     (Self : Virtual_String_Vector'Class;
-      Item : VSS.Strings.Virtual_String) return Boolean;
+     (Self             : Virtual_String_Vector'Class;
+      Item             : VSS.Strings.Virtual_String;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity :=
+        VSS.Strings.Case_Sensitive)
+      return Boolean;
    --  Return True when vector contains given string.
 
    function Join_Lines

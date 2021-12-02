@@ -22,6 +22,13 @@
 ------------------------------------------------------------------------------
 --  Vector of strings and operations on it.
 
+pragma Warnings (Off);
+pragma Ada_2020;
+pragma Ada_2022;
+pragma Warnings (On);
+--  GNAT: different versions of compiler use different pragmas to enable
+--  Ada 2022 features.
+
 with Ada.Iterator_Interfaces;
 
 private with Ada.Finalization;
@@ -39,7 +46,9 @@ package VSS.String_Vectors is
      with
        Constant_Indexing => Element,
        Default_Iterator  => Iterate,
-       Iterator_Element  => VSS.Strings.Virtual_String;
+       Iterator_Element  => VSS.Strings.Virtual_String,
+       Aggregate         => (Empty       => Empty_Virtual_String_Vector,
+                             Add_Unnamed => Append_Syntax_Sugar);
 
    Empty_Virtual_String_Vector : constant Virtual_String_Vector;
 
@@ -127,6 +136,13 @@ package VSS.String_Vectors is
    function Iterate
      (Self : Virtual_String_Vector'Class) return Reversible_Iterator;
    --  Return an interator over each element in the vector
+
+   --  Syntax sugar for Ada 2022 aggregates
+
+   procedure Append_Syntax_Sugar
+     (Self : in out Virtual_String_Vector;
+      Item : VSS.Strings.Virtual_String);
+   --  Append operation to match expected profile of Aggregate aspect.
 
 private
 

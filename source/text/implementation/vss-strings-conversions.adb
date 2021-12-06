@@ -21,12 +21,16 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with VSS.Implementation.String_Configuration;
 pragma Warnings (Off, ".* is an internal GNAT unit");
 with Ada.Strings.Unbounded.Aux;
+with Ada.Strings.Unbounded.VSS_Aux;
 with Ada.Strings.Wide_Wide_Unbounded.Aux;
 with Ada.Strings.Wide_Wide_Unbounded.VSS_Aux;
 pragma Warnings (On, ".* is an internal GNAT unit");
+
+with VSS.Implementation.String_Configuration;
+with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Encoding;
 
 package body VSS.Strings.Conversions is
 
@@ -67,6 +71,68 @@ package body VSS.Strings.Conversions is
              (Handler.Element (Item.Data, Position));
       end loop;
    end Set_Wide_Wide_String;
+
+   -------------------------------
+   -- To_Unbounded_UTF_8_String --
+   -------------------------------
+
+   function To_Unbounded_UTF_8_String
+     (Item : Virtual_String'Class)
+      return Ada.Strings.Unbounded.Unbounded_String
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Success  : Boolean;
+
+      procedure Set (S : out String);
+
+      ---------
+      -- Set --
+      ---------
+
+      procedure Set (S : out String) is
+         U_Buffer :
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
+         S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
+         Length   : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+         Last     : Natural := 0;
+
+      begin
+         Handler.Before_First_Character (Item.Data, Position);
+
+         while Handler.Forward (Item.Data, Position) loop
+            VSS.Implementation.UTF8_Encoding.Encode
+              (Handler.Element (Item.Data, Position),
+               Length,
+               U_Buffer (1),
+               U_Buffer (2),
+               U_Buffer (3),
+               U_Buffer (4));
+
+            S (Last + 1 .. Last + Natural (Length)) :=
+              S_Buffer (1 .. Natural (Length));
+
+            Last := Last + Natural (Length);
+         end loop;
+
+         pragma Assert (Last = S'Last);
+      end Set;
+
+   begin
+      Handler.After_Last_Character (Item.Data, Position);
+      Success := Handler.Backward (Item.Data, Position);
+
+      return Result : Ada.Strings.Unbounded.Unbounded_String do
+         if Success then
+            Ada.Strings.Unbounded.VSS_Aux.Set_String
+              (Result,
+               Natural (Handler.Last_UTF8_Offset (Item.Data, Position)) + 1,
+               Set'Access);
+         end if;
+      end return;
+   end To_Unbounded_UTF_8_String;
 
    -----------------------------------
    -- To_Unbounded_Wide_Wide_String --

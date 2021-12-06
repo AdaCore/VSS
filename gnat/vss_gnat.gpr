@@ -31,6 +31,7 @@ project VSS_GNAT is
    for Source_Dirs use ("../source/text/gnat");
 
    package Compiler is
+      for Switches ("a-suvsau.adb") use ("-g", "-gnatpg", "-O2");
       for Switches ("a-szuvau.adb") use ("-g", "-gnatpg", "-O2");
    end Compiler;
 

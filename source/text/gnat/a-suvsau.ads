@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2021, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,45 +20,21 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Conversion between standard string types and Magic_String.
 
-with Ada.Strings.Unbounded;
-with Ada.Strings.UTF_Encoding;
-with Ada.Strings.Wide_Wide_Unbounded;
+--  This child package of Ada.Strings.Unbounded provides some specialized
+--  access functions which are intended to allow more efficient use of the
+--  facilities of Ada.Strings.Unbounded by VSS.
 
-package VSS.Strings.Conversions is
+package Ada.Strings.Unbounded.VSS_Aux is
 
    pragma Preelaborate;
 
-   function To_Virtual_String
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String;
+   procedure Set_String
+     (U      : out Unbounded_String;
+      Length : Positive;
+      Set    : not null access procedure (S : out String));
+   pragma Inline (Set_String);
+   --  Create an unbounded string U with the given Length, using Set to fill
+   --  the contents of U.
 
-   function To_Virtual_String
-     (Item : Ada.Strings.Unbounded.Unbounded_String) return Virtual_String;
-   --  Convert UTF-8 encoded unbounded string into Virtual_String.
-
-   function To_Virtual_String
-     (Item : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String)
-      return Virtual_String;
-   --  Convert UCS-4 encoded unbounded string into Virtual_String.
-
-   function To_UTF_8_String
-     (Item : Virtual_String'Class)
-      return Ada.Strings.UTF_Encoding.UTF_8_String;
-   --  Convert virtual string into UTF-8 encoded string.
-
-   function To_Unbounded_UTF_8_String
-     (Item : Virtual_String'Class)
-      return Ada.Strings.Unbounded.Unbounded_String;
-   --  Convert virtual string into UTF-8 encoded unbounded string.
-
-   function To_Wide_Wide_String
-     (Item : Virtual_String'Class) return Wide_Wide_String;
-   --  Convert virtual string into Wide_Wide_String.
-
-   function To_Unbounded_Wide_Wide_String
-     (Item : Virtual_String'Class)
-      return Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
-   --  Convert virtual string into Wide_Wide_String.
-
-end VSS.Strings.Conversions;
+end Ada.Strings.Unbounded.VSS_Aux;

@@ -110,7 +110,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Steps (PC) := Step;
 
          case Code.Kind is
-            when Character | Match =>
+            when Character | Class | Match =>
                Next.Append ((PC, New_Tags));
             when Split =>
                Append_State (Cursor, PC + Code.Next, New_Tags);
@@ -192,6 +192,11 @@ package body VSS.Regular_Expressions.Pike_Engines is
                               Append_State (Pos.all, X.PC + Code.Next, X.Tags);
                            end if;
 
+                        when Class =>
+                           if Char in Code.From .. Code.To then
+                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                           end if;
+
                         when Match =>
                            Found := True;
                            Final_Tags := X.Tags;
@@ -269,6 +274,15 @@ package body VSS.Regular_Expressions.Pike_Engines is
       Result.Has_Match := Found;
    end Match;
 
+   ----------------
+   -- On_Destroy --
+   ----------------
+
+   overriding procedure On_Destroy (Self : in out Engine) is
+   begin
+      null;
+   end On_Destroy;
+
    -----------
    -- Parse --
    -----------
@@ -315,6 +329,9 @@ package body VSS.Regular_Expressions.Pike_Engines is
       function Create_Character
         (Value : VSS.Characters.Virtual_Character) return Node;
       --  Generate <char[next:unliked]>
+
+      function Create_Character_Range
+        (From, To : VSS.Characters.Virtual_Character) return Node;
 
       function Create_Sequence (Left, Right : Node) return Node;
       --  Generate <left[next:right]><right[next:unliked]>
@@ -376,6 +393,20 @@ package body VSS.Regular_Expressions.Pike_Engines is
            (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
             Ends    => First_Instruction);
       end Create_Character;
+
+      function Create_Character_Range
+        (From, To : VSS.Characters.Virtual_Character) return Node
+      is
+         Code : constant Instruction :=
+           (Kind => Class,
+            Next => To_Be_Patched,
+            From => From,
+            To   => To);
+      begin
+         return
+           (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
+            Ends    => First_Instruction);
+      end Create_Character_Range;
 
       ------------------
       -- Create_Empty --
@@ -453,10 +484,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
       package Parser is new VSS.Regular_Expressions.ECMA_Parser (Node);
 
       --  The final program is
-      -- <save tag=1>
-      -- <AST.program>
-      -- <save tag=2>
-      -- <match>
+      --  <save tag=1>
+      --  <AST.program>
+      --  <save tag=2>
+      --  <match>
 
       Save_1 : constant Instruction :=
         (Kind => Save,
@@ -482,7 +513,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Result => Root);
 
       for Code of Root.Program loop
-         if Code.Kind = Character then
+         if Code.Kind in Character | Class then
             Max_Threads := Max_Threads + 1;
          end if;
       end loop;
@@ -499,14 +530,5 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       Fit := True;
    end Parse;
-
-   ----------------
-   -- On_Destroy --
-   ----------------
-
-   overriding procedure On_Destroy (Self : in out Engine) is
-   begin
-      null;
-   end On_Destroy;
 
 end VSS.Regular_Expressions.Pike_Engines;

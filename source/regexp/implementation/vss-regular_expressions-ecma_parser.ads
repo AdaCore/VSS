@@ -33,6 +33,9 @@ generic
    with function Create_Character (Value : VSS.Characters.Virtual_Character)
      return Node is <>;
 
+   with function Create_Character_Range
+     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+
    with function Create_Sequence (Left, Right : Node) return Node is <>;
    with function Create_Alternative (Left, Right : Node) return Node is <>;
    with function Create_Star (Left : Node) return Node is <>;

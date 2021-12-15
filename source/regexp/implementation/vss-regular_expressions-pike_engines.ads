@@ -49,6 +49,7 @@ private
      (No_Operation,  --  To able accept an empty string
       Split,         --  Create an alternative thread of execution
       Character,     --  Accept one Virtual_Character
+      Class,         --  Accept one Virtual_Character from a class
       Match,         --  Mark accepted string prefix as a regexp match
       Save);         --  Save subgroup bound
    --  VM instruction kinds
@@ -62,6 +63,8 @@ private
             Fallback : Instruction_Address;
          when Character =>
             Character : VSS.Characters.Virtual_Character;
+         when Class =>
+            From, To : VSS.Characters.Virtual_Character;
          when Save =>
             Tag : Tag_Number;
          when No_Operation | Match =>

@@ -36,41 +36,63 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
       procedure Expect
         (Value : VSS.Characters.Virtual_Character;
-         Ok    : out Boolean);
+         Ok    : in out Boolean);
       --  if Cursor points to Value, then forwart Cursor and set Ok to True,
       --  otherwise set Ok to False.
 
       procedure Alternative (Value : out Node; Ok : in out Boolean);
       procedure Disjunction (Value : out Node; Ok : in out Boolean);
-      procedure Term (Value : out Node; Ok : in out Boolean);
-      procedure Atom (Value : out Node; Ok : in out Boolean);
+
+      procedure Term (Value : out Node; Ok : in out Boolean)
+        with Pre => Ok;
+
+      procedure Atom (Value : out Node; Ok : in out Boolean)
+        with Pre => Ok;
+
+      procedure Character_Class (Value : out Node; Ok : in out Boolean)
+        with Pre => Ok;
+
+      procedure Class_Ranges (Value : out Node; Ok : in out Boolean);
+
+      procedure Class_Atom
+        (Value : out VSS.Characters.Virtual_Character;
+         Ok    : in out Boolean);
 
       procedure Alternative (Value : out Node; Ok : in out Boolean) is
          Right : Node;
       begin
-         if Ok and Cursor.Has_Element then
+         if Ok and (not Cursor.Has_Element
+                    or else Cursor.Element in ')' | '|')
+         then
+            Value := Create_Empty;
+
+         elsif Ok then
             Term (Value, Ok);
 
-            declare
-               Save : constant Boolean := Ok;
-            begin
-               while Ok and Cursor.Has_Element loop
-                  Term (Right, Ok);
+            while Ok
+              and then Cursor.Has_Element
+              and then Cursor.Element not in ')' | '|'
+            loop
+               Term (Right, Ok);
 
-                  if Ok then
-                     Value := Create_Sequence (Value, Right);
-                  end if;
-               end loop;
-
-               Ok := Save;
-            end;
-         elsif Ok then
-            Value := Create_Empty;
+               if Ok then
+                  Value := Create_Sequence (Value, Right);
+               end if;
+            end loop;
          end if;
       end Alternative;
 
       procedure Atom (Value : out Node; Ok : in out Boolean) is
       begin
+         if not Cursor.Has_Element then
+            if Error.Is_Empty then
+               Error := "Unexpected end of string while atom expected.";
+            end if;
+
+            Ok := False;
+            return;
+         end if;
+
          case Cursor.Element is
             when '(' =>
                Expect ('(', Ok);
@@ -78,15 +100,62 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                Expect (':', Ok);
                Disjunction (Value, Ok);
                Expect (')', Ok);
-            when '^' | '$' | '\' | '.' | '*' | '+' | '?' | ')' |
-               '[' | ']' | '{' | '}' | '|'
-               =>
+            when '[' =>
+               Character_Class (Value, Ok);
+
+            when ')' | '|' =>
+               raise Program_Error;
+
+            when '^' | '$' | '\' | '.' | '*' | '+' | '?' | ']' | '{' | '}' =>
+               if Error.Is_Empty then
+                  Error := "Unexpected '";
+                  Error.Append (Cursor.Element);
+                  Error.Append ("' while atom expected.");
+               end if;
+
                Ok := False;
             when others =>
                Value := Create_Character (Cursor.Element);
                Expect (Cursor.Element, Ok);
          end case;
       end Atom;
+
+      procedure Character_Class (Value : out Node; Ok : in out Boolean) is
+      begin
+         Expect ('[', Ok);
+         Class_Ranges (Value, Ok);
+         Expect (']', Ok);
+      end Character_Class;
+
+      procedure Class_Atom
+        (Value : out VSS.Characters.Virtual_Character;
+         Ok    : in out Boolean) is
+      begin
+         if not Ok
+           or else not Cursor.Has_Element
+           or else Cursor.Element in '\' | ']'
+         then
+            Ok := False;
+            Value := ' ';
+            return;
+         end if;
+
+         Value := Cursor.Element;
+         Expect (Cursor.Element, Ok);
+      end Class_Atom;
+
+      procedure Class_Ranges (Value : out Node; Ok : in out Boolean) is
+         From : VSS.Characters.Virtual_Character;
+         To   : VSS.Characters.Virtual_Character;
+      begin
+         Class_Atom (From, Ok);
+         Expect ('-', Ok);
+         Class_Atom (To, Ok);
+
+         if Ok then
+            Value := Create_Character_Range (From, To);
+         end if;
+      end Class_Ranges;
 
       procedure Disjunction (Value : out Node; Ok : in out Boolean) is
          Right : Node;
@@ -108,19 +177,32 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
       procedure Expect
         (Value : VSS.Characters.Virtual_Character;
-         Ok    : out Boolean) is
+         Ok    : in out Boolean) is
       begin
-         Ok :=  Cursor.Has_Element
-           and then Cursor.Element = Value
-           and then (Cursor.Forward or True);
+         if Ok then
+            Ok := Cursor.Has_Element and then Cursor.Element = Value;
+
+            if not Ok and not Error.Is_Empty then
+               --  Error is already set. No other diagnostic is required.
+               null;
+            elsif not Cursor.Has_Element then
+               Error := "Unexpected end of string while '";
+               Error.Append (Value);
+               Error.Append ("' expected.");
+            elsif Cursor.Element /= Value then
+               Error := "Got '";
+               Error.Append (Cursor.Element);
+               Error.Append ("' while '");
+               Error.Append (Value);
+               Error.Append ("' expected.");
+            end if;
+
+            Ok := Ok and then (Cursor.Forward or True);
+         end if;
       end Expect;
 
       procedure Term (Value : out Node; Ok : in out Boolean) is
       begin
-         if not Ok then
-            return;
-         end if;
-
          Atom (Value, Ok);
 
          if Ok and then Cursor.Has_Element and then Cursor.Element = '*' then
@@ -133,7 +215,9 @@ package body VSS.Regular_Expressions.ECMA_Parser is
    begin
       Disjunction (Result, Ok);
 
-      if not Ok or Cursor.Has_Element then
+      if not Error.Is_Empty then
+         null;
+      elsif not Ok or Cursor.Has_Element then
          Error := "Unable to parse";
       end if;
    end Parse_Pattern;

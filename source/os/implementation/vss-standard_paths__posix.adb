@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,42 +20,20 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: Text processing subproject
 
-with "vss_config";
-with "vss_gnat";
+package body VSS.Standard_Paths is
 
-project VSS_Text is
+   -----------------------
+   -- Writable_Location --
+   -----------------------
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Object_Dir;
-   for Source_Dirs use
-     ("../source/os",
-      "../source/os/implementation",
-      "../source/streams",
-      "../source/streams/implementation",
-      "../source/text",
-      "../source/text/implementation",
-      "../source/text/ucd");
+   function Writable_Location
+     (Location : Standard_Location) return VSS.Strings.Virtual_String
+   is
+      pragma Unreferenced (Location);
 
-   package Compiler renames VSS_Config.Compiler;
+   begin
+      return VSS.Strings.Empty_Virtual_String;
+   end Writable_Location;
 
-   package Linker renames VSS_Config.Linker;
-
-   package Naming is
-      case VSS_Config.OS_API is
-         when "unix" | "osx" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__posix.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__posix.adb";
-
-         when "Windows_NT" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__windows.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__windows.adb";
-      end case;
-   end Naming;
-
-end VSS_Text;
+end VSS.Standard_Paths;

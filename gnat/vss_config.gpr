@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,6 +23,10 @@
 --  Configuration project for all subprojects of the VSS.
 
 abstract project VSS_Config is
+
+   type OS_API_Kind is ("unix", "osx", "Windows_NT");
+   OS_API : OS_API_Kind :=
+     external ("VSS_OS", external ("OS", "unix"));
 
    type VSS_Build_Kind is ("dev", "prod", "coverage");
    Build_Mode : VSS_Build_Kind :=

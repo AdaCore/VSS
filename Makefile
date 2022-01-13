@@ -29,6 +29,7 @@ generate:
 
 build_tests:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_text_tests.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_os_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_json_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_stream_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_regexp_tests.gpr
@@ -61,6 +62,7 @@ check_text:
 		echo "   $$f"; .objs/tests/test_string_casing_w3c_i18n $$f || return 1; \
 	done
 	.objs/tests/test_word_iterators data/ucd
+	.objs/tests/test_standard_paths
 
 check_json:
 	.objs/tests/test_json_content_handler

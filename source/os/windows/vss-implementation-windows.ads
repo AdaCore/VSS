@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,53 +20,28 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: Text processing subproject
+--  Low level binding to Windows API.
 
-with "vss_config";
-with "vss_gnat";
+with Interfaces.C;
+pragma Warnings (Off, """System.Win32"" is an internal GNAT unit");
+with System.Win32;
 
-project VSS_Text is
+package VSS.Implementation.Windows is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Object_Dir;
+   type HANDLE is new System.Win32.HANDLE;
 
-   OS_Source_Dirs := ();
+   type BOOL is new System.Win32.BOOL;
 
-   case VSS_Config.OS_API is
-      when "unix" | "osx" =>
-         null;
+   FALSE : constant := System.Win32.FALSE;
 
-      when "Windows_NT" =>
-         OS_Source_Dirs := ("../source/os/windows");
-   end case;
+   type DWORD is new System.Win32.DWORD;
 
-   for Source_Dirs use
-     ("../source/os",
-      "../source/os/implementation",
-      "../source/streams",
-      "../source/streams/implementation",
-      "../source/text",
-      "../source/text/implementation",
-      "../source/text/ucd") & OS_Source_Dirs;
+   type LPCWSTR is access constant Interfaces.C.char16_t;
+   type LPWSTR is access all Interfaces.C.char16_t;
 
-   package Compiler renames VSS_Config.Compiler;
+   TOKEN_QUERY : constant := 16#0008#;
 
-   package Linker renames VSS_Config.Linker;
+   ERROR_INSUFFICIENT_BUFFER : constant := 122;
+   ERROR_ENVVAR_NOT_FOUND    : constant := 203;
 
-   package Naming is
-      case VSS_Config.OS_API is
-         when "unix" | "osx" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__posix.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__posix.adb";
-
-         when "Windows_NT" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__windows.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__windows.adb";
-      end case;
-   end Naming;
-
-end VSS_Text;
+end VSS.Implementation.Windows;

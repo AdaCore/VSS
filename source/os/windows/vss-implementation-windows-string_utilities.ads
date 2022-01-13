@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,53 +20,35 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: Text processing subproject
+--  Low level binding to Windows API. String utilities.
 
-with "vss_config";
-with "vss_gnat";
+with VSS.Strings;
 
-project VSS_Text is
+package VSS.Implementation.Windows.String_Utilities is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Object_Dir;
+   type char16_array_access is access all Interfaces.C.char16_array;
+   --  String in Windows W native format, allocated with Ada allocator.
 
-   OS_Source_Dirs := ();
+   function From_Native_String
+     (Item : Interfaces.C.char16_array) return VSS.Strings.Virtual_String;
+   --  Convert string from W format of WinAPI into Virtual_String.
 
-   case VSS_Config.OS_API is
-      when "unix" | "osx" =>
-         null;
+   function To_New_Native_String
+     (Item : VSS.Strings.Virtual_String) return char16_array_access;
+   --  Convert Virtual_String into native representation. Allocated object
+   --  may be larger then required to store data, nul terminator is added
+   --  at the end of the actual data. If given Virtual_String is 'null'
+   --  then function return null.
+   --
+   --  Memory is allocated by Ada allocator, and must be deallocated with Free
+   --  below. Ownership of the string can't be passed to Windows C API.
 
-      when "Windows_NT" =>
-         OS_Source_Dirs := ("../source/os/windows");
-   end case;
+   function New_Native_String_Buffer
+     (Size : Interfaces.C.size_t) return char16_array_access;
+   --  Allocates buffer of given size. First index of the allocated buffer
+   --  is zero. Additional element is always added for nul terminator.
 
-   for Source_Dirs use
-     ("../source/os",
-      "../source/os/implementation",
-      "../source/streams",
-      "../source/streams/implementation",
-      "../source/text",
-      "../source/text/implementation",
-      "../source/text/ucd") & OS_Source_Dirs;
+   procedure Free (Item : in out char16_array_access);
+   --  Deallocate memory allocated by New_Native_String.
 
-   package Compiler renames VSS_Config.Compiler;
-
-   package Linker renames VSS_Config.Linker;
-
-   package Naming is
-      case VSS_Config.OS_API is
-         when "unix" | "osx" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__posix.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__posix.adb";
-
-         when "Windows_NT" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__windows.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__windows.adb";
-      end case;
-   end Naming;
-
-end VSS_Text;
+end VSS.Implementation.Windows.String_Utilities;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,53 +20,27 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: Text processing subproject
+--  Low level binding to Windows API (KERNEL32.DLL).
 
-with "vss_config";
-with "vss_gnat";
+package VSS.Implementation.Windows.Kernel32 is
 
-project VSS_Text is
+   pragma Linker_Options ("-lkernel32");
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Object_Dir;
+   function CloseHandle (hObject : HANDLE) return BOOL
+     with Import, Convention => Stdcall, Link_Name => "CloseHandle";
 
-   OS_Source_Dirs := ();
+   function GetCurrentProcess return HANDLE
+     with Import, Convention => Stdcall, Link_Name => "GetCurrentProcess";
 
-   case VSS_Config.OS_API is
-      when "unix" | "osx" =>
-         null;
+   function GetLastError return DWORD
+     with Import, Convention => Stdcall, Link_Name => "GetLastError";
 
-      when "Windows_NT" =>
-         OS_Source_Dirs := ("../source/os/windows");
-   end case;
+   function GetEnvironmentVariable
+     (lpName   : LPCWSTR;
+      lpBuffer : LPWSTR;
+      nSize    : DWORD) return DWORD
+     with Import,
+          Convention => Stdcall,
+          Link_Name  => "GetEnvironmentVariableW";
 
-   for Source_Dirs use
-     ("../source/os",
-      "../source/os/implementation",
-      "../source/streams",
-      "../source/streams/implementation",
-      "../source/text",
-      "../source/text/implementation",
-      "../source/text/ucd") & OS_Source_Dirs;
-
-   package Compiler renames VSS_Config.Compiler;
-
-   package Linker renames VSS_Config.Linker;
-
-   package Naming is
-      case VSS_Config.OS_API is
-         when "unix" | "osx" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__posix.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__posix.adb";
-
-         when "Windows_NT" =>
-            for Implementation ("VSS.Implementation.Environment_Utilities")
-              use "vss-implementation-environment_utilities__windows.adb";
-            for Implementation ("VSS.Standard_Paths")
-              use "vss-standard_paths__windows.adb";
-      end case;
-   end Naming;
-
-end VSS_Text;
+end VSS.Implementation.Windows.Kernel32;

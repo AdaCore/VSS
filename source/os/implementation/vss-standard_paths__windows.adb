@@ -21,6 +21,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Interfaces.C;
+
+with VSS.Implementation.Environment_Utilities;
+with VSS.Implementation.Windows.String_Utilities;
+with VSS.Implementation.Windows.Advapi32;
+with VSS.Implementation.Windows.Kernel32;
+with VSS.Implementation.Windows.Userenv;
+
 package body VSS.Standard_Paths is
 
    -----------------------
@@ -32,8 +40,93 @@ package body VSS.Standard_Paths is
    is
       pragma Unreferenced (Location);
 
+      use type VSS.Implementation.Windows.BOOL;
+      use type VSS.Implementation.Windows.DWORD;
+
+      Result         : VSS.Strings.Virtual_String;
+
+      Process_Handle : VSS.Implementation.Windows.HANDLE;
+      Token_Handle   : VSS.Implementation.Windows.HANDLE;
+      Success        : VSS.Implementation.Windows.BOOL;
+      Buffer_Size    : VSS.Implementation.Windows.DWORD := 0;
+
    begin
-      return VSS.Strings.Empty_Virtual_String;
+      --  Attempt to obtain user profile directory via WinAPI call.
+
+      Process_Handle := VSS.Implementation.Windows.Kernel32.GetCurrentProcess;
+      --  GetCurrentProcess returns pseudo handle, it not need to be closed
+      --  after use.
+
+      Success :=
+        VSS.Implementation.Windows.Advapi32.OpenProcessToken
+          (Process_Handle,
+           VSS.Implementation.Windows.TOKEN_QUERY,
+           Token_Handle);
+
+      if Success /= VSS.Implementation.Windows.FALSE then
+         Success :=
+           VSS.Implementation.Windows.Userenv.GetUserProfileDirectory
+             (Token_Handle, null, Buffer_Size);
+         --  Request minimum buffer size, operation fails, however, minimum
+         --  buffer size is written.
+
+         if Success = VSS.Implementation.Windows.FALSE
+           and VSS.Implementation.Windows.Kernel32.GetLastError
+                 = VSS.Implementation.Windows.ERROR_INSUFFICIENT_BUFFER
+           and Buffer_Size /= 0
+         then
+            declare
+               C_Buffer : Interfaces.C.char16_array
+                           (0 .. Interfaces.C.size_t (Buffer_Size));
+
+            begin
+               Success :=
+                 VSS.Implementation.Windows.Userenv.GetUserProfileDirectory
+                   (Token_Handle,
+                    C_Buffer (C_Buffer'First)'Unchecked_Access,
+                    Buffer_Size);
+
+               if Success /= VSS.Implementation.Windows.FALSE then
+                  Result :=
+                    VSS.Implementation.Windows.String_Utilities
+                      .From_Native_String (C_Buffer);
+               end if;
+            end;
+         end if;
+
+         Success :=
+           VSS.Implementation.Windows.Kernel32.CloseHandle (Token_Handle);
+         pragma Assert (Success /= VSS.Implementation.Windows.FALSE);
+      end if;
+
+      --  XXX Checks that directory exists and writable are not implemented
+
+      if Result.Is_Empty then
+         --  Construct value using environment variables.
+
+         Result :=
+           VSS.Implementation.Environment_Utilities.Get_Env ("USERPROFILE");
+      end if;
+
+      if Result.Is_Empty then
+         Result :=
+           VSS.Implementation.Environment_Utilities.Get_Env ("HOMEDRIVE");
+         Result.Append
+           (VSS.Implementation.Environment_Utilities.Get_Env ("HOMEPATH"));
+      end if;
+
+      if Result.Is_Empty then
+         Result :=
+           VSS.Implementation.Environment_Utilities.Get_Env ("HOME");
+      end if;
+
+      if Result.Is_Empty then
+         Result :=
+           VSS.Implementation.Environment_Utilities.Get_Env ("SystemDrive");
+         Result.Append ('/');
+      end if;
+
+      return Result;
    end Writable_Location;
 
 end VSS.Standard_Paths;

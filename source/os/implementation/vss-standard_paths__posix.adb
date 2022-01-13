@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.Environment_Utilities;
+
 package body VSS.Standard_Paths is
 
    -----------------------
@@ -32,8 +34,16 @@ package body VSS.Standard_Paths is
    is
       pragma Unreferenced (Location);
 
+      HOME_Value : constant VSS.Strings.Virtual_String :=
+        VSS.Implementation.Environment_Utilities.Get_Env ("HOME");
+
    begin
-      return VSS.Strings.Empty_Virtual_String;
+      if HOME_Value.Is_Empty then
+         return "/";
+
+      else
+         return HOME_Value;
+      end if;
    end Writable_Location;
 
 end VSS.Standard_Paths;

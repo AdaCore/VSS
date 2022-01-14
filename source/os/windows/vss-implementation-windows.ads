@@ -39,6 +39,8 @@ package VSS.Implementation.Windows is
    type LPCWSTR is access constant Interfaces.C.char16_t;
    type LPWSTR is access all Interfaces.C.char16_t;
 
+   MAX_PATH : constant := 260;
+
    TOKEN_QUERY : constant := 16#0008#;
 
    ERROR_INSUFFICIENT_BUFFER : constant := 122;

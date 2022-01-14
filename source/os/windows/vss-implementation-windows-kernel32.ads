@@ -43,4 +43,15 @@ package VSS.Implementation.Windows.Kernel32 is
           Convention => Stdcall,
           Link_Name  => "GetEnvironmentVariableW";
 
+   function GetTempPath
+     (nBufferLength : DWORD;
+      lpBuffer      : LPWSTR) return DWORD
+      with Import, Convention => Stdcall, Link_Name => "GetTempPathW";
+
+   function GetLongPathName
+     (lpszShortPath : LPCWSTR;
+      lpszLongPath  : LPWSTR;
+      cchBuffer     : DWORD) return DWORD
+      with Import, Convention => Stdcall, Link_Name => "GetLongPathNameW";
+
 end VSS.Implementation.Windows.Kernel32;

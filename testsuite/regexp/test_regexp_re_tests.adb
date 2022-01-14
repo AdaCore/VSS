@@ -32,9 +32,11 @@ procedure Test_RegExp_RE_Tests is
       Check   : out Check_Value);
 
    procedure Verify
-     (Match  : VSS.Regular_Expressions.Regular_Expression_Match;
+     (Line   : Wide_Wide_String;
+      Match  : VSS.Regular_Expressions.Regular_Expression_Match;
       Expr   : VSS.Strings.Virtual_String;
-      Expect : VSS.Strings.Virtual_String);
+      Expect : VSS.Strings.Virtual_String;
+      Total  : in out Natural);
 
    function Image (Value : VSS.Strings.Character_Count)
      return VSS.Strings.Virtual_String;
@@ -111,9 +113,11 @@ procedure Test_RegExp_RE_Tests is
    ------------
 
    procedure Verify
-     (Match  : VSS.Regular_Expressions.Regular_Expression_Match;
+     (Line   : Wide_Wide_String;
+      Match  : VSS.Regular_Expressions.Regular_Expression_Match;
       Expr   : VSS.Strings.Virtual_String;
-      Expect : VSS.Strings.Virtual_String)
+      Expect : VSS.Strings.Virtual_String;
+      Total  : in out Natural)
    is
       use type VSS.Strings.Character_Count;
       use type VSS.Strings.Virtual_String;
@@ -132,14 +136,12 @@ procedure Test_RegExp_RE_Tests is
                      Result.Append (Match.Captured);
 
                   when '1' .. '9' =>  --  $X - the X group
-                     Result.Append (Match.Captured);
-
                      declare
                         Index : constant Positive :=
                           Natural'Wide_Wide_Value
                             ((1 => Wide_Wide_Character (Cursor.Element)));
                      begin
-                        Result.Append (Match.Captured (Index - 1));
+                        Result.Append (Match.Captured (Index));
                      end;
 
                   when '-' =>  --  &-[X] - the X group start offset
@@ -195,12 +197,14 @@ procedure Test_RegExp_RE_Tests is
       end loop;
 
       if Result = Expect then
-         Ada.Wide_Wide_Text_IO.Put ("PASS: ");
+         Total := Total + 1;  --  PASS
       else
-         Ada.Wide_Wide_Text_IO.Put ("DIFF: (");
+         Ada.Wide_Wide_Text_IO.Put ("DIFF: ");
+         Ada.Wide_Wide_Text_IO.Put (Line);
+         Ada.Wide_Wide_Text_IO.Put (" /= <");
          Ada.Wide_Wide_Text_IO.Put
            (VSS.Strings.Conversions.To_Wide_Wide_String (Result));
-         Ada.Wide_Wide_Text_IO.Put (") ");
+         Ada.Wide_Wide_Text_IO.Put_Line (">");
       end if;
    end Verify;
 
@@ -246,27 +250,30 @@ begin
                   case Check.Kind is
                      when Match =>
                         if Last_Match.Has_Match then
-                           Verify (Last_Match, Check.Expr, Check.Expect);
+                           Verify
+                             (Line,
+                              Last_Match,
+                              Check.Expr,
+                              Check.Expect,
+                              Total);
                         else
                            Ada.Wide_Wide_Text_IO.Put ("DONT: ");
+                           Ada.Wide_Wide_Text_IO.Put_Line (Line);
                         end if;
                      when Dont_Match =>
                         if Last_Match.Has_Match then
                            Ada.Wide_Wide_Text_IO.Put ("MISS: ");
+                           Ada.Wide_Wide_Text_IO.Put_Line (Line);
                         else
-                           Ada.Wide_Wide_Text_IO.Put ("PASS: ");
+                           Total := Total + 1;  --  PASS
                         end if;
                      when Skip =>
                         null;
                   end case;
-
-                  Total := Total + 1;
                else
                   Ada.Wide_Wide_Text_IO.Put ("SKIP: ");
+                  Ada.Wide_Wide_Text_IO.Put_Line (Line);
                end if;
-
-               Ada.Wide_Wide_Text_IO.Put_Line (Line);
-
             exception
                when others =>
                   Ada.Wide_Wide_Text_IO.Put ("CRASH: ");

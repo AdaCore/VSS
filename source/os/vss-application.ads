@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,38 +20,16 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
---  This parser accepts regular expression patterns described in the ECMAScript
---  2020 standard.
 
-with VSS.Characters;
-with VSS.Strings.Character_Iterators;
+with VSS.Environments;
+with VSS.String_Vectors;
 
-generic
-   type Node is private;
+package VSS.Application is
 
-   with function Create_Character (Value : VSS.Characters.Virtual_Character)
-     return Node is <>;
+   function Arguments return VSS.String_Vectors.Virtual_String_Vector;
+   --  Return arguments of the application
 
-   with function Create_Character_Range
-     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+   function System_Environment return VSS.Environments.Process_Environment;
+   --  Return system environment of the application
 
-   with function Create_Sequence (Left, Right : Node) return Node is <>;
-   with function Create_Alternative (Left, Right : Node) return Node is <>;
-   with function Create_Star (Left : Node) return Node is <>;
-
-   with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
-
-   with function Create_Empty return Node is <>;
-
-package VSS.Regular_Expressions.ECMA_Parser is
-
-   pragma Preelaborate;
-
-   procedure Parse_Pattern
-     (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator;
-      Error  : out VSS.Strings.Virtual_String;
-      Result : out Node);
-
-end VSS.Regular_Expressions.ECMA_Parser;
+end VSS.Application;

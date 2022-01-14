@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,38 +20,35 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
---  This parser accepts regular expression patterns described in the ECMAScript
---  2020 standard.
+--  Low level binding to Windows API. String utilities.
 
-with VSS.Characters;
-with VSS.Strings.Character_Iterators;
+with VSS.Strings;
 
-generic
-   type Node is private;
+package VSS.Implementation.Windows.String_Utilities is
 
-   with function Create_Character (Value : VSS.Characters.Virtual_Character)
-     return Node is <>;
+   type char16_array_access is access all Interfaces.C.char16_array;
+   --  String in Windows W native format, allocated with Ada allocator.
 
-   with function Create_Character_Range
-     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+   function From_Native_String
+     (Item : Interfaces.C.char16_array) return VSS.Strings.Virtual_String;
+   --  Convert string from W format of WinAPI into Virtual_String.
 
-   with function Create_Sequence (Left, Right : Node) return Node is <>;
-   with function Create_Alternative (Left, Right : Node) return Node is <>;
-   with function Create_Star (Left : Node) return Node is <>;
+   function To_New_Native_String
+     (Item : VSS.Strings.Virtual_String) return char16_array_access;
+   --  Convert Virtual_String into native representation. Allocated object
+   --  may be larger then required to store data, nul terminator is added
+   --  at the end of the actual data. If given Virtual_String is 'null'
+   --  then function return null.
+   --
+   --  Memory is allocated by Ada allocator, and must be deallocated with Free
+   --  below. Ownership of the string can't be passed to Windows C API.
 
-   with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
+   function New_Native_String_Buffer
+     (Size : Interfaces.C.size_t) return char16_array_access;
+   --  Allocates buffer of given size. First index of the allocated buffer
+   --  is zero. Additional element is always added for nul terminator.
 
-   with function Create_Empty return Node is <>;
+   procedure Free (Item : in out char16_array_access);
+   --  Deallocate memory allocated by New_Native_String.
 
-package VSS.Regular_Expressions.ECMA_Parser is
-
-   pragma Preelaborate;
-
-   procedure Parse_Pattern
-     (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator;
-      Error  : out VSS.Strings.Virtual_String;
-      Result : out Node);
-
-end VSS.Regular_Expressions.ECMA_Parser;
+end VSS.Implementation.Windows.String_Utilities;

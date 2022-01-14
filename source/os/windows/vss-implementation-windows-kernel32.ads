@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,38 +20,38 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
---  This parser accepts regular expression patterns described in the ECMAScript
---  2020 standard.
+--  Low level binding to Windows API (KERNEL32.DLL).
 
-with VSS.Characters;
-with VSS.Strings.Character_Iterators;
+package VSS.Implementation.Windows.Kernel32 is
 
-generic
-   type Node is private;
+   pragma Linker_Options ("-lkernel32");
 
-   with function Create_Character (Value : VSS.Characters.Virtual_Character)
-     return Node is <>;
+   function CloseHandle (hObject : HANDLE) return BOOL
+     with Import, Convention => Stdcall, Link_Name => "CloseHandle";
 
-   with function Create_Character_Range
-     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+   function GetCurrentProcess return HANDLE
+     with Import, Convention => Stdcall, Link_Name => "GetCurrentProcess";
 
-   with function Create_Sequence (Left, Right : Node) return Node is <>;
-   with function Create_Alternative (Left, Right : Node) return Node is <>;
-   with function Create_Star (Left : Node) return Node is <>;
+   function GetLastError return DWORD
+     with Import, Convention => Stdcall, Link_Name => "GetLastError";
 
-   with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
+   function GetEnvironmentVariable
+     (lpName   : LPCWSTR;
+      lpBuffer : LPWSTR;
+      nSize    : DWORD) return DWORD
+     with Import,
+          Convention => Stdcall,
+          Link_Name  => "GetEnvironmentVariableW";
 
-   with function Create_Empty return Node is <>;
+   function GetTempPath
+     (nBufferLength : DWORD;
+      lpBuffer      : LPWSTR) return DWORD
+      with Import, Convention => Stdcall, Link_Name => "GetTempPathW";
 
-package VSS.Regular_Expressions.ECMA_Parser is
+   function GetLongPathName
+     (lpszShortPath : LPCWSTR;
+      lpszLongPath  : LPWSTR;
+      cchBuffer     : DWORD) return DWORD
+      with Import, Convention => Stdcall, Link_Name => "GetLongPathNameW";
 
-   pragma Preelaborate;
-
-   procedure Parse_Pattern
-     (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator;
-      Error  : out VSS.Strings.Virtual_String;
-      Result : out Node);
-
-end VSS.Regular_Expressions.ECMA_Parser;
+end VSS.Implementation.Windows.Kernel32;

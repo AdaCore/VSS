@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,38 +20,55 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
---  This parser accepts regular expression patterns described in the ECMAScript
---  2020 standard.
 
-with VSS.Characters;
-with VSS.Strings.Character_Iterators;
+with VSS.Implementation.Environment_Utilities;
 
-generic
-   type Node is private;
+package body VSS.Standard_Paths is
 
-   with function Create_Character (Value : VSS.Characters.Virtual_Character)
-     return Node is <>;
+   -----------------------
+   -- Writable_Location --
+   -----------------------
 
-   with function Create_Character_Range
-     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+   function Writable_Location
+     (Location : Standard_Location) return VSS.Strings.Virtual_String is
+   begin
+      case Location is
+         when Home_Location =>
+            declare
+               HOME_Value : constant VSS.Strings.Virtual_String :=
+                 VSS.Implementation.Environment_Utilities.Get_Env ("HOME");
 
-   with function Create_Sequence (Left, Right : Node) return Node is <>;
-   with function Create_Alternative (Left, Right : Node) return Node is <>;
-   with function Create_Star (Left : Node) return Node is <>;
+            begin
+               if HOME_Value.Is_Empty then
+                  --  XXX Call NSHomeDirectory on Mac OS
 
-   with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
+                  return "/";
 
-   with function Create_Empty return Node is <>;
+               else
+                  return HOME_Value;
+                  --  XXX Cleanup, normalization, and NFD conversion
+                  --  (on Mac OS) need to be done
+               end if;
+            end;
 
-package VSS.Regular_Expressions.ECMA_Parser is
+         when Temp_Location =>
+            declare
+               TMPDIR_Value : constant VSS.Strings.Virtual_String :=
+                 VSS.Implementation.Environment_Utilities.Get_Env ("TMPDIR");
 
-   pragma Preelaborate;
+            begin
+               if TMPDIR_Value.Is_Empty then
+                  --  XXX Call NSTemporaryDirectory on Mac OS
 
-   procedure Parse_Pattern
-     (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator;
-      Error  : out VSS.Strings.Virtual_String;
-      Result : out Node);
+                  return "/tmp";
 
-end VSS.Regular_Expressions.ECMA_Parser;
+               else
+                  return TMPDIR_Value;
+                  --  XXX Cleanup, normalization, and NFD conversion
+                  --  (on Mac OS) need to be done
+               end if;
+            end;
+      end case;
+   end Writable_Location;
+
+end VSS.Standard_Paths;

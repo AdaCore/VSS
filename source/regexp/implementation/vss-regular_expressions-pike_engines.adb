@@ -303,7 +303,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  For each AST subtree we generate a piece of program.
       --  Some instructions in the piece are left unlinked.
       --  They should be patched to link them to instructions in other pieces.
-      --  A piece runs from very first instruction to some unliked instruction.
+      --  A piece runs from very first instruction to some unlinked instruction
       --  Relative instruction addresses make program pieces position
       --  independent.
 
@@ -311,7 +311,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Program     : Instruction_Vectors.Vector;
          --  A slice of program. It runs from the first instruction
          Ends        : Address_Vectors.Vector;
-         --  List of unliked instructions to back-patch
+         --  List of unlinked instructions to back-patch
       end record;
 
       To_Be_Patched : constant Instruction_Address := Instruction_Address'Last;
@@ -328,25 +328,31 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       function Create_Character
         (Value : VSS.Characters.Virtual_Character) return Node;
-      --  Generate <char[next:unliked]>
+      --  Generate <char[next:unlinked]>
 
       function Create_Character_Range
         (From, To : VSS.Characters.Virtual_Character) return Node;
+      --  Generate <class[from,to,next:unlinked]>
 
       function Create_Sequence (Left, Right : Node) return Node;
-      --  Generate <left[next:right]><right[next:unliked]>
+      --  Generate <left[next:right]><right[next:unlinked]>
 
       function Create_Alternative (Left, Right : Node) return Node;
       --  Generate <split r>
-      --           <left[next:unliked]>
-      --           <r:right[next:unliked]>
+      --           <left[next:unlinked]>
+      --           <r:right[next:unlinked]>
 
       function Create_Star (Left : Node) return Node;
-      --  Generate <s:split[fallback:unliked]>
+      --  Generate <s:split[fallback:unlinked]>
       --           <left[next:s]>
 
+      function Create_Group (Left : Node; Group : Positive) return Node;
+      --  Generate <save[2*group+1,next:1]>
+      --           <left[next:s]>
+      --           <s:save[2*group+2,next:unlinked]>
+
       function Create_Empty return Node;
-      --  Generate <nop[next:unliked]>
+      --  Generate <nop[next:unlinked]>
 
       ------------------------
       -- Create_Alternative --
@@ -421,6 +427,38 @@ package body VSS.Regular_Expressions.Pike_Engines is
            (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
             Ends    => First_Instruction);
       end Create_Empty;
+
+      ------------------
+      -- Create_Group --
+      ------------------
+
+      function Create_Group (Left : Node; Group : Positive) return Node is
+         Open : constant Instruction :=
+           (Kind => Save,
+            Tag  => Tag_Number (2 * Group + 1),
+            Next => 1);
+
+         Close : constant Instruction :=
+           (Kind => Save,
+            Tag  => Tag_Number (2 * Group + 2),
+            Next => To_Be_Patched);
+      begin
+         return Result : Node :=
+           (Program => Open & Left.Program & Close,
+            Ends    => Address_Vectors.Empty_Vector)
+         do
+            --  Patch left ends to connect them to the Close
+            for J of Left.Ends loop
+               Patch
+                 (Result.Program (J + 1),
+                  Result.Program.Last_Index - J - 1);
+            end loop;
+
+            Result.Ends.Append (Result.Program.Last_Index);
+
+            Self.Last_Tag := Tag_Number'Max (Self.Last_Tag, Close.Tag);
+         end return;
+      end Create_Group;
 
       ---------------------
       -- Create_Sequence --
@@ -507,6 +545,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
       Cursor      : VSS.Strings.Character_Iterators.Character_Iterator :=
         Pattern.First_Character;
    begin
+      Self.Last_Tag := 2;
+
       Parser.Parse_Pattern
         (Cursor => Cursor,
          Error  => Error,
@@ -520,7 +560,6 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       Self.Initialize (Options, Error, Pattern);
       Self.Max_Threads := Max_Threads;
-      Self.Last_Tag := 2;
       Self.Program := Save_1 & Root.Program & Save_2 & Final;
 
       --  Patch ends to connect them to Save_2

@@ -29,15 +29,44 @@ project VSS_Text is
 
    for Languages use ("Ada");
    for Object_Dir use VSS_Config.Object_Dir;
+
+   OS_Source_Dirs := ();
+
+   case VSS_Config.OS_API is
+      when "unix" | "osx" =>
+         null;
+
+      when "Windows_NT" =>
+         OS_Source_Dirs := ("../source/os/windows");
+   end case;
+
    for Source_Dirs use
-     ("../source/streams",
+     ("../source/os",
+      "../source/os/implementation",
+      "../source/streams",
       "../source/streams/implementation",
       "../source/text",
       "../source/text/implementation",
-      "../source/text/ucd");
+      "../source/text/ucd") & OS_Source_Dirs;
 
    package Compiler renames VSS_Config.Compiler;
 
    package Linker renames VSS_Config.Linker;
+
+   package Naming is
+      case VSS_Config.OS_API is
+         when "unix" | "osx" =>
+            for Implementation ("VSS.Implementation.Environment_Utilities")
+              use "vss-implementation-environment_utilities__posix.adb";
+            for Implementation ("VSS.Standard_Paths")
+              use "vss-standard_paths__posix.adb";
+
+         when "Windows_NT" =>
+            for Implementation ("VSS.Implementation.Environment_Utilities")
+              use "vss-implementation-environment_utilities__windows.adb";
+            for Implementation ("VSS.Standard_Paths")
+              use "vss-standard_paths__windows.adb";
+      end case;
+   end Naming;
 
 end VSS_Text;

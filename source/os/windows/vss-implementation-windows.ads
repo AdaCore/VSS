@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,38 +20,30 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
---  This parser accepts regular expression patterns described in the ECMAScript
---  2020 standard.
+--  Low level binding to Windows API.
 
-with VSS.Characters;
-with VSS.Strings.Character_Iterators;
+with Interfaces.C;
+pragma Warnings (Off, """System.Win32"" is an internal GNAT unit");
+with System.Win32;
 
-generic
-   type Node is private;
+package VSS.Implementation.Windows is
 
-   with function Create_Character (Value : VSS.Characters.Virtual_Character)
-     return Node is <>;
+   type HANDLE is new System.Win32.HANDLE;
 
-   with function Create_Character_Range
-     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+   type BOOL is new System.Win32.BOOL;
 
-   with function Create_Sequence (Left, Right : Node) return Node is <>;
-   with function Create_Alternative (Left, Right : Node) return Node is <>;
-   with function Create_Star (Left : Node) return Node is <>;
+   FALSE : constant := System.Win32.FALSE;
 
-   with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
+   type DWORD is new System.Win32.DWORD;
 
-   with function Create_Empty return Node is <>;
+   type LPCWSTR is access constant Interfaces.C.char16_t;
+   type LPWSTR is access all Interfaces.C.char16_t;
 
-package VSS.Regular_Expressions.ECMA_Parser is
+   MAX_PATH : constant := 260;
 
-   pragma Preelaborate;
+   TOKEN_QUERY : constant := 16#0008#;
 
-   procedure Parse_Pattern
-     (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator;
-      Error  : out VSS.Strings.Virtual_String;
-      Result : out Node);
+   ERROR_INSUFFICIENT_BUFFER : constant := 122;
+   ERROR_ENVVAR_NOT_FOUND    : constant := 203;
 
-end VSS.Regular_Expressions.ECMA_Parser;
+end VSS.Implementation.Windows;

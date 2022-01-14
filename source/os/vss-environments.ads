@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,38 +20,31 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
---  This parser accepts regular expression patterns described in the ECMAScript
---  2020 standard.
 
-with VSS.Characters;
-with VSS.Strings.Character_Iterators;
+with VSS.Strings;
 
-generic
-   type Node is private;
+package VSS.Environments is
 
-   with function Create_Character (Value : VSS.Characters.Virtual_Character)
-     return Node is <>;
+   type Process_Environment is tagged private;
 
-   with function Create_Character_Range
-     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+   function Contains
+     (Self : Process_Environment'Class;
+      Name : VSS.Strings.Virtual_String) return Boolean;
+   --  Return True when environment variable with the given name is set in
+   --  the environment.
 
-   with function Create_Sequence (Left, Right : Node) return Node is <>;
-   with function Create_Alternative (Left, Right : Node) return Node is <>;
-   with function Create_Star (Left : Node) return Node is <>;
+   function Value
+     (Self    : Process_Environment'Class;
+      Name    : VSS.Strings.Virtual_String;
+      Default : VSS.Strings.Virtual_String := VSS.Strings.Empty_Virtual_String)
+      return VSS.Strings.Virtual_String;
+   --  Return value of the environment variable with the given name or given
+   --  default value otherwise.
 
-   with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
+private
 
-   with function Create_Empty return Node is <>;
+   type Process_Environment is tagged record
+      null;
+   end record;
 
-package VSS.Regular_Expressions.ECMA_Parser is
-
-   pragma Preelaborate;
-
-   procedure Parse_Pattern
-     (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator;
-      Error  : out VSS.Strings.Virtual_String;
-      Result : out Node);
-
-end VSS.Regular_Expressions.ECMA_Parser;
+end VSS.Environments;

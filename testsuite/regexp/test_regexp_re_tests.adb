@@ -122,6 +122,30 @@ procedure Test_RegExp_RE_Tests is
       use type VSS.Strings.Character_Count;
       use type VSS.Strings.Virtual_String;
       use type VSS.Characters.Virtual_Character;
+
+      function Read_Natural
+        (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator)
+         return Natural;
+      --  Read natural number from given cursor. Move the cursor to next char.
+
+      function Read_Natural
+        (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator)
+         return Natural
+      is
+         To   : VSS.Strings.Cursors.Markers.Character_Marker;
+         From : constant VSS.Strings.Cursors.Markers.Character_Marker :=
+           Cursor.Marker;
+      begin
+         while Cursor.Element in '0' .. '9' loop
+            To := Cursor.Marker;
+            exit when not Cursor.Forward;
+         end loop;
+
+         return Natural'Wide_Wide_Value
+           (VSS.Strings.Conversions.To_Wide_Wide_String
+              (Expr.Slice (From, To)));
+      end Read_Natural;
+
       Result : VSS.Strings.Virtual_String;
       Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
         Expr.First_Character;
@@ -137,11 +161,11 @@ procedure Test_RegExp_RE_Tests is
 
                   when '1' .. '9' =>  --  $X - the X group
                      declare
-                        Index : constant Positive :=
-                          Natural'Wide_Wide_Value
-                            ((1 => Wide_Wide_Character (Cursor.Element)));
+                        Index : constant Positive := Read_Natural (Cursor);
                      begin
                         Result.Append (Match.Captured (Index));
+                        --  step back to last digit:
+                        pragma Assert (Cursor.Backward);
                      end;
 
                   when '-' =>  --  &-[X] - the X group start offset
@@ -151,9 +175,7 @@ procedure Test_RegExp_RE_Tests is
                      pragma Assert (Cursor.Element in '0' .. '9');
 
                      declare
-                        Index : constant Natural :=
-                          Natural'Wide_Wide_Value
-                            ((1 => Wide_Wide_Character (Cursor.Element)));
+                        Index : constant Natural := Read_Natural (Cursor);
 
                         Marker : constant
                           VSS.Strings.Cursors.Markers.Character_Marker :=
@@ -162,7 +184,6 @@ procedure Test_RegExp_RE_Tests is
                         Result.Append (Image (Marker.Character_Index - 1));
                      end;
 
-                     pragma Assert (Cursor.Forward);
                      pragma Assert (Cursor.Element = ']');
 
                   when '+' =>  --  &+[X] - the X group end offset
@@ -172,9 +193,7 @@ procedure Test_RegExp_RE_Tests is
                      pragma Assert (Cursor.Element in '0' .. '9');
 
                      declare
-                        Index : constant Natural :=
-                          Natural'Wide_Wide_Value
-                            ((1 => Wide_Wide_Character (Cursor.Element)));
+                        Index : constant Natural := Read_Natural (Cursor);
 
                         Marker : constant
                           VSS.Strings.Cursors.Markers.Character_Marker :=
@@ -183,7 +202,6 @@ procedure Test_RegExp_RE_Tests is
                         Result.Append (Image (Marker.Character_Index));
                      end;
 
-                     pragma Assert (Cursor.Forward);
                      pragma Assert (Cursor.Element = ']');
 
                   when others =>

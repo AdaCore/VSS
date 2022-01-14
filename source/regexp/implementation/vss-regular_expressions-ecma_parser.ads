@@ -39,6 +39,10 @@ generic
    with function Create_Sequence (Left, Right : Node) return Node is <>;
    with function Create_Alternative (Left, Right : Node) return Node is <>;
    with function Create_Star (Left : Node) return Node is <>;
+
+   with function Create_Group
+     (Left : Node; Group : Positive) return Node is <>;
+
    with function Create_Empty return Node is <>;
 
 package VSS.Regular_Expressions.ECMA_Parser is

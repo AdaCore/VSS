@@ -58,6 +58,8 @@ package body VSS.Regular_Expressions.ECMA_Parser is
         (Value : out VSS.Characters.Virtual_Character;
          Ok    : in out Boolean);
 
+      Next_Group : Positive := 1;  --  Group counter
+
       procedure Alternative (Value : out Node; Ok : in out Boolean) is
          Right : Node;
       begin
@@ -96,10 +98,22 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          case Cursor.Element is
             when '(' =>
                Expect ('(', Ok);
-               Expect ('?', Ok);
-               Expect (':', Ok);
-               Disjunction (Value, Ok);
-               Expect (')', Ok);
+
+               if Cursor.Element = '?' then
+                  Expect ('?', Ok);
+                  Expect (':', Ok);
+                  Disjunction (Value, Ok);
+                  Expect (')', Ok);
+               else  --  empty GroupSpecifier
+                  declare
+                     Group : constant Positive := Next_Group;
+                  begin
+                     Next_Group := Next_Group + 1;
+                     Disjunction (Value, Ok);
+                     Value := Create_Group (Value, Group);
+                     Expect (')', Ok);
+                  end;
+               end if;
             when '[' =>
                Character_Class (Value, Ok);
 

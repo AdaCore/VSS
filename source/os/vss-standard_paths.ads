@@ -25,7 +25,9 @@ with VSS.Strings;
 
 package VSS.Standard_Paths is
 
-   type Standard_Location is (Home_Location);
+   type Standard_Location is
+     (Home_Location,
+      Temp_Location);
 
    function Writable_Location
      (Location : Standard_Location) return VSS.Strings.Virtual_String;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -955,6 +955,27 @@ package body VSS.Strings is
          end if;
       end return;
    end Slice;
+
+   -----------
+   -- Split --
+   -----------
+
+   function Split
+     (Self                : Virtual_String'Class;
+      Separator           : VSS.Characters.Virtual_Character;
+      Keep_Empty_Segments : Boolean                      := True;
+      Case_Sensitivity    : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return VSS.String_Vectors.Virtual_String_Vector is
+   begin
+      return Result : VSS.String_Vectors.Virtual_String_Vector do
+         VSS.Implementation.Strings.Handler (Self.Data).Split
+           (Self.Data,
+            VSS.Characters.Virtual_Character'Pos (Separator),
+            Keep_Empty_Segments,
+            Case_Sensitivity,
+            VSS.String_Vectors.Internals.Data_Access (Result).all);
+      end return;
+   end Split;
 
    -----------------
    -- Split_Lines --

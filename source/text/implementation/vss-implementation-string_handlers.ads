@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                     Copyright (C) 2020-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -302,6 +302,17 @@ package VSS.Implementation.String_Handlers is
    --  Return slice of the string.
    --  Default implementation construct slice by processing individual
    --  characters.
+
+   not overriding procedure Split
+     (Self             : Abstract_String_Handler;
+      Data             : VSS.Implementation.Strings.String_Data;
+      Separator        : VSS.Unicode.Code_Point;
+      Keep_Empty_Parts : Boolean;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity;
+      Items            : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+   --  Split the string into substrings where separator occurs and return
+   --  list of those strings.
 
    not overriding procedure Split_Lines
      (Self            : Abstract_String_Handler;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                     Copyright (C) 2020-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -24,6 +24,7 @@
 with System.Storage_Elements;
 
 with VSS.Implementation.String_Configuration;
+with VSS.Strings;
 
 package body VSS.Implementation.String_Handlers is
 
@@ -539,6 +540,69 @@ package body VSS.Implementation.String_Handlers is
          Target := VSS.Implementation.Strings.Null_String_Data;
       end if;
    end Slice;
+
+   -----------
+   -- Split --
+   -----------
+
+   not overriding procedure Split
+     (Self             : Abstract_String_Handler;
+      Data             : VSS.Implementation.Strings.String_Data;
+      Separator        : VSS.Unicode.Code_Point;
+      Keep_Empty_Parts : Boolean;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity;
+      Items            : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
+   is
+      procedure Append;
+      --  Append found substring to the results
+
+      Handler  : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      Current  : VSS.Implementation.Strings.Cursor;
+      Previous : VSS.Implementation.Strings.Cursor;
+      From     : VSS.Implementation.Strings.Cursor;
+      Success  : Boolean with Unreferenced;
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append is
+         Item : VSS.Implementation.Strings.String_Data;
+
+      begin
+         if Current.Index /= From.Index then
+            Handler.Slice (Data, From, Previous, Item);
+            VSS.Implementation.String_Vectors.Append (Items, Item);
+            VSS.Implementation.Strings.Unreference (Item);
+
+         elsif Keep_Empty_Parts then
+            VSS.Implementation.String_Vectors.Append
+              (Items, VSS.Implementation.Strings.Null_String_Data);
+         end if;
+      end Append;
+
+   begin
+      Handler.Before_First_Character (Data, From);
+      Success := Handler.Forward (Data, From);
+
+      Handler.Before_First_Character (Data, Current);
+      Previous := Current;
+
+      while Handler.Forward (Data, Current) loop
+         if Handler.Element (Data, Current) = Separator then
+            Append;
+
+            From    := Current;
+            Success := Handler.Forward (Data, From);
+         end if;
+
+         Previous := Current;
+      end loop;
+
+      Append;
+   end Split;
 
    -----------------
    -- Starts_With --

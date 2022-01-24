@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -358,6 +358,15 @@ package VSS.Strings is
 
    function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
    --  Convert given string into virtual string.
+
+   function Split
+     (Self                : Virtual_String'Class;
+      Separator           : VSS.Characters.Virtual_Character;
+      Keep_Empty_Segments : Boolean                      := True;
+      Case_Sensitivity    : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return VSS.String_Vectors.Virtual_String_Vector;
+   --  Split the string into substrings where separator orrurs and return list
+   --  of those strings.
 
    function Split_Lines
      (Self            : Virtual_String'Class;

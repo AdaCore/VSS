@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2022, AdaCore                     --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,50 +20,51 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
-with "vss_test_common";
+with VSS.Application;
+with VSS.Environments;
 
-project VSS_Text_Tests is
+with VSS.String_Vectors;
+with VSS.Strings;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use
-     ("../../testsuite/text",
-      "../../tools/ucd");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_environment.adb",
-                 "test_grapheme_cluster_iterators.adb",
-                 "test_line_iterators.adb",
-                 "test_string_append",
-                 "test_string_casing.adb",
-                 "test_string_casing_w3c_i18n.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_normalization",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split",
-                 "test_string_split_lines",
-                 "test_string_vector",
-                 "test_word_iterators");
+with Test_Support;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+procedure Test_Environment is
+   use type VSS.Strings.Virtual_String;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+begin
+   --  Undefined environment variable
 
-end VSS_Text_Tests;
+   declare
+      V0 : constant VSS.Strings.Virtual_String :=
+        VSS.Application.System_Environment.Value ("VSS_ENV0");
+
+   begin
+      Test_Support.Assert (V0.Is_Null);
+   end;
+
+   --  Defined environment variable, value contains platform specific
+   --  path separator thus can't be checked.
+
+   declare
+      V1 : constant VSS.Strings.Virtual_String :=
+        VSS.Application.System_Environment.Value ("VSS_ENV1");
+
+   begin
+      Test_Support.Assert (not V1.Is_Null);
+      Test_Support.Assert (not V1.Is_Empty);
+   end;
+
+   --  Defined environment variable as list of paths.
+
+   declare
+      VP1 : constant VSS.String_Vectors.Virtual_String_Vector :=
+        VSS.Application.System_Environment.Value_Paths ("VSS_ENV1");
+
+   begin
+      Test_Support.Assert (VP1.Length = 3);
+      Test_Support.Assert (VP1 (1) = "A");
+      Test_Support.Assert (VP1 (2) = "B");
+      Test_Support.Assert (VP1 (3) = "C");
+   end;
+end Test_Environment;

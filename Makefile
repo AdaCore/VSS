@@ -16,6 +16,11 @@ GPRINSTALL_FLAGS = --prefix=$(PREFIX) --exec-subdir=$(INSTALL_EXEC_DIR)\
  --lib-subdir=$(INSTALL_ALI_DIR) --project-subdir=$(INSTALL_PROJECT_DIR)\
  --link-lib-subdir=$(INSTALL_LIBRARY_DIR) --sources-subdir=$(INSTALL_INCLUDE_DIR)
 
+ifeq ($(OS),Windows_NT)
+	VSS_PS=;
+else
+	VSS_PS=:
+endif
 
 all:
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
@@ -56,6 +61,7 @@ check_text:
 	.objs/tests/test_string_normalization data/ucd
 	.objs/tests/test_string_replace
 	.objs/tests/test_string_slice
+	.objs/tests/test_string_split
 	.objs/tests/test_string_split_lines
 	.objs/tests/test_string_vector
 	for f in testsuite/text/w3c-i18n-tests-casing/*.txt; do \
@@ -63,6 +69,7 @@ check_text:
 	done
 	.objs/tests/test_word_iterators data/ucd
 	.objs/tests/test_standard_paths
+	VSS_ENV1="A$(VSS_PS)B$(VSS_PS)C" .objs/tests/test_environment
 
 check_json:
 	.objs/tests/test_json_content_handler

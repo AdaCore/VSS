@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                     Copyright (C) 2020-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -56,12 +56,16 @@ project VSS_Text is
    package Naming is
       case VSS_Config.OS_API is
          when "unix" | "osx" =>
+            for Implementation ("VSS.Environments.Platform")
+              use "vss-environments-platform__posix.adb";
             for Implementation ("VSS.Implementation.Environment_Utilities")
               use "vss-implementation-environment_utilities__posix.adb";
             for Implementation ("VSS.Standard_Paths")
               use "vss-standard_paths__posix.adb";
 
          when "Windows_NT" =>
+            for Implementation ("VSS.Environments.Platform")
+              use "vss-environments-platform__windows.adb";
             for Implementation ("VSS.Implementation.Environment_Utilities")
               use "vss-implementation-environment_utilities__windows.adb";
             for Implementation ("VSS.Standard_Paths")

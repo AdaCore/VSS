@@ -56,6 +56,7 @@ check_text:
 	.objs/tests/test_string_normalization data/ucd
 	.objs/tests/test_string_replace
 	.objs/tests/test_string_slice
+	.objs/tests/test_string_split
 	.objs/tests/test_string_split_lines
 	.objs/tests/test_string_vector
 	for f in testsuite/text/w3c-i18n-tests-casing/*.txt; do \

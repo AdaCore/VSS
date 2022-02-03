@@ -111,6 +111,6 @@ clean:
 	rm -rf .objs re_tests
 
 install:
-	gprinstall $(GPRINSTALL_FLAGS)/gnat -p -P gnat/vss_gnat.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/text -p -P gnat/vss_text.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/json -p -P gnat/vss_json.gpr
+	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr
+	gprinstall $(GPRINSTALL_FLAGS)/text -f -p -P gnat/vss_text.gpr
+	gprinstall $(GPRINSTALL_FLAGS)/json -f -p -P gnat/vss_json.gpr

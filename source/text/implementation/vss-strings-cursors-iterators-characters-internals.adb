@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,8 +20,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
-
-with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Cursors.Iterators.Characters.Internals is
 
@@ -79,53 +77,5 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
          raise Program_Error;
       end if;
    end Character;
-
-   ---------------------
-   -- First_Character --
-   ---------------------
-
-   function First_Character
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
-   is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Data);
-      Dummy   : Boolean;
-
-   begin
-      return Result :
-        VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
-      do
-         Result.Connect (Self'Unrestricted_Access);
-
-         Handler.Before_First_Character (Self.Data, Result.Position);
-         Dummy := Handler.Forward (Self.Data, Result.Position);
-      end return;
-   end First_Character;
-
-   --------------------
-   -- Last_Character --
-   --------------------
-
-   function Last_Character
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
-   is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Data);
-      Dummy   : Boolean;
-
-   begin
-      return Result :
-        VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
-      do
-         Result.Connect (Self'Unrestricted_Access);
-
-         Handler.After_Last_Character (Self.Data, Result.Position);
-         Dummy := Handler.Backward (Self.Data, Result.Position);
-      end return;
-   end Last_Character;
 
 end VSS.Strings.Cursors.Iterators.Characters.Internals;

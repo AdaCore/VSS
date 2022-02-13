@@ -480,9 +480,11 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Characters.Internals.First_Character
-          (Self);
+      return Result :
+               VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         Result.Set_At_First (Self);
+      end return;
    end First_Character;
 
    ----------------------------
@@ -641,9 +643,11 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Characters.Internals.Last_Character
-          (Self);
+      return Result :
+               VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         Result.Set_At_Last (Self);
+      end return;
    end Last_Character;
 
    ---------------------------

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -90,6 +90,94 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
       return False;
    end Has_Element;
+
+   --------------------
+   -- Set_After_Last --
+   --------------------
+
+   procedure Set_After_Last
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.After_Last_Character (On.Data, Self.Position);
+   end Set_After_Last;
+
+   ------------------
+   -- Set_At_First --
+   ------------------
+
+   procedure Set_At_First
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Dummy   : Boolean;
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.Before_First_Character (On.Data, Self.Position);
+      Dummy := Handler.Forward (On.Data, Self.Position);
+   end Set_At_First;
+
+   -----------------
+   -- Set_At_Last --
+   -----------------
+
+   procedure Set_At_Last
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Dummy   : Boolean;
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.After_Last_Character (On.Data, Self.Position);
+      Dummy := Handler.Backward (On.Data, Self.Position);
+   end Set_At_Last;
+
+   ----------------------
+   -- Set_Before_First --
+   ----------------------
+
+   procedure Set_Before_First
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.Before_First_Character (On.Data, Self.Position);
+   end Set_Before_First;
 
    ---------------------
    -- String_Modified --

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -27,6 +27,8 @@ with VSS.Strings.Conversions;
 with VSS.Unicode;
 
 with VSS.Strings.Cursors.Markers;
+
+with Test_Support;
 
 procedure Test_Character_Iterators is
 
@@ -114,7 +116,15 @@ procedure Test_Character_Iterators is
      (' ', 40, 40, 23, 23));  --  ' ' 19
 
    procedure Test_Forward;
+   procedure Test_Forward_From_Before_First;
    procedure Test_Backward;
+   procedure Test_Backward_After_Last;
+
+   procedure Test_Common_Backward
+     (J : in out VSS.Strings.Character_Iterators.Character_Iterator);
+
+   procedure Test_Common_Forward
+     (J : in out VSS.Strings.Character_Iterators.Character_Iterator);
 
    -------------------
    -- Test_Backward --
@@ -123,6 +133,35 @@ procedure Test_Character_Iterators is
    procedure Test_Backward is
       J : VSS.Strings.Character_Iterators.Character_Iterator :=
         S.Last_Character;
+
+   begin
+      Test_Common_Backward (J);
+   end Test_Backward;
+
+   ------------------------------
+   -- Test_Backward_After_Last --
+   ------------------------------
+
+   procedure Test_Backward_After_Last is
+      J : VSS.Strings.Character_Iterators.Character_Iterator;
+
+   begin
+      J.Set_After_Last (S);
+
+      Test_Support.Assert (not J.Has_Element);
+
+      Test_Support.Assert (J.Backward);
+
+      Test_Common_Backward (J);
+   end Test_Backward_After_Last;
+
+   --------------------------
+   -- Test_Common_Backward --
+   --------------------------
+
+   procedure Test_Common_Backward
+     (J : in out VSS.Strings.Character_Iterators.Character_Iterator)
+   is
       C : VSS.Strings.Character_Count := D'Last;
       M : VSS.Strings.Cursors.Markers.Character_Marker;
 
@@ -294,15 +333,15 @@ procedure Test_Character_Iterators is
             exit;
          end if;
       end loop;
-   end Test_Backward;
+   end Test_Common_Backward;
 
-   ------------------
-   -- Test_Forward --
-   ------------------
+   -------------------------
+   -- Test_Common_Forward --
+   -------------------------
 
-   procedure Test_Forward is
-      J : VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.First_Character;
+   procedure Test_Common_Forward
+     (J : in out VSS.Strings.Character_Iterators.Character_Iterator)
+   is
       C : VSS.Strings.Character_Index := 1;
       M : VSS.Strings.Cursors.Markers.Character_Marker;
 
@@ -474,9 +513,39 @@ procedure Test_Character_Iterators is
             exit;
          end if;
       end loop;
+   end Test_Common_Forward;
+
+   ------------------
+   -- Test_Forward --
+   ------------------
+
+   procedure Test_Forward is
+      J : VSS.Strings.Character_Iterators.Character_Iterator :=
+        S.First_Character;
+   begin
+      Test_Common_Forward (J);
    end Test_Forward;
+
+   ------------------------------------
+   -- Test_Forward_From_Before_First --
+   ------------------------------------
+
+   procedure Test_Forward_From_Before_First is
+      J : VSS.Strings.Character_Iterators.Character_Iterator;
+
+   begin
+      J.Set_Before_First (S);
+
+      Test_Support.Assert (not J.Has_Element);
+
+      Test_Support.Assert (J.Forward);
+
+      Test_Common_Forward (J);
+   end Test_Forward_From_Before_First;
 
 begin
    Test_Forward;
+   Test_Forward_From_Before_First;
    Test_Backward;
+   Test_Backward_After_Last;
 end Test_Character_Iterators;

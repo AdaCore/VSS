@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -24,16 +24,6 @@
 package VSS.Strings.Cursors.Iterators.Characters.Internals is
 
    pragma Preelaborate;
-
-   function First_Character
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return character iterator pointing to the first character of the string
-
-   function Last_Character
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return character iterator pointing to the last character of the string
 
    function Character
      (Self     : Virtual_String'Class;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -35,6 +35,18 @@ package VSS.Strings.Cursors.Iterators.Characters is
    function Element
      (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
    --  Return character pointed by iterator.
+
+   procedure Set_At_First
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Initialize iterator to point to the first text element of the given
+   --  string.
+
+   procedure Set_At_Last
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Initialize iterator to point to the last text element of the given
+   --  string.
 
 private
 

@@ -42,10 +42,22 @@ package VSS.Strings.Cursors.Iterators.Characters is
    --  Initialize iterator to point to the first text element of the given
    --  string.
 
+   procedure Set_Before_First
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Initialize iterator to point before the first text element of the given
+   --  string.
+
    procedure Set_At_Last
      (Self : in out Character_Iterator;
       On   : VSS.Strings.Virtual_String'Class);
    --  Initialize iterator to point to the last text element of the given
+   --  string.
+
+   procedure Set_After_Last
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Initialize iterator to point after the last text element of the given
    --  string.
 
 private

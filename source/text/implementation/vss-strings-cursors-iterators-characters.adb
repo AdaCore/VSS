@@ -91,6 +91,27 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       return False;
    end Has_Element;
 
+   --------------------
+   -- Set_After_Last --
+   --------------------
+
+   procedure Set_After_Last
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.After_Last_Character (On.Data, Self.Position);
+   end Set_After_Last;
+
    ------------------
    -- Set_At_First --
    ------------------
@@ -136,6 +157,27 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Handler.After_Last_Character (On.Data, Self.Position);
       Dummy := Handler.Backward (On.Data, Self.Position);
    end Set_At_Last;
+
+   ----------------------
+   -- Set_Before_First --
+   ----------------------
+
+   procedure Set_Before_First
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.Before_First_Character (On.Data, Self.Position);
+   end Set_Before_First;
 
    ---------------------
    -- String_Modified --

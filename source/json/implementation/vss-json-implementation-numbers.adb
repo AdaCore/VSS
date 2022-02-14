@@ -23,6 +23,7 @@
 
 package body VSS.JSON.Implementation.Numbers is
 
+   use type Interfaces.Integer_64;
    use type Interfaces.Unsigned_64;
 
    Digit_Zero : constant VSS.Unicode.Code_Point := 16#00_0030#;
@@ -64,6 +65,32 @@ package body VSS.JSON.Implementation.Numbers is
    end Append_Digit;
 
    ---------------
+   -- Exp_Digit --
+   ---------------
+
+   procedure Exp_Digit
+     (Self  : in out Parsing_State;
+      Digit : VSS.Unicode.Code_Point) is
+   begin
+      Append_Digit (Self.Exp_Value, Digit, Self.Error);
+   end Exp_Digit;
+
+   ----------------
+   -- Frac_Digit --
+   ----------------
+
+   procedure Frac_Digit
+     (Self  : in out Parsing_State;
+      Digit : VSS.Unicode.Code_Point) is
+   begin
+      Append_Digit (Self.Value, Digit, Self.Error);
+
+      if Self.Error = Not_A_Error then
+         Self.Scale := Self.Scale - 1;
+      end if;
+   end Frac_Digit;
+
+   ---------------
    -- Int_Digit --
    ---------------
 
@@ -71,8 +98,17 @@ package body VSS.JSON.Implementation.Numbers is
      (Self  : in out Parsing_State;
       Digit : VSS.Unicode.Code_Point) is
    begin
-      Append_Digit (Self.Int_Value, Digit, Self.Error);
+      Append_Digit (Self.Value, Digit, Self.Error);
    end Int_Digit;
+
+   ----------------
+   -- Is_Integer --
+   ----------------
+
+   function Is_Integer (Self : Parsing_State) return Boolean is
+   begin
+      return Self.Scale = 0 and Self.Exp_Value = 0;
+   end Is_Integer;
 
    --------------------
    -- To_JSON_Number --
@@ -83,8 +119,6 @@ package body VSS.JSON.Implementation.Numbers is
       String_Value : VSS.Strings.Virtual_String;
       To           : out VSS.JSON.JSON_Number)
    is
-      use type Interfaces.Integer_64;
-
       Max_Positive : constant Interfaces.Unsigned_64 :=
         Interfaces.Unsigned_64 (Interfaces.Integer_64'Last);
       --  Maximum absolute value of the maximum positive integer.
@@ -98,33 +132,33 @@ package body VSS.JSON.Implementation.Numbers is
          To := (Out_Of_Range, String_Value);
 
       else
-         if Self.Exp_Value /= 0 or else Self.Frac_Value /= 0 then
+         if Self.Exp_Value /= 0 or else Self.Scale /= 0 then
             raise Program_Error;
          end if;
 
          if Self.Minus then
-            if Self.Int_Value > Max_Negative then
+            if Self.Value > Max_Negative then
                To := (Out_Of_Range, String_Value);
 
-            elsif Self.Int_Value = Max_Negative then
+            elsif Self.Value = Max_Negative then
                To := (JSON_Integer, String_Value, Interfaces.Integer_64'First);
 
             else
                To :=
                  (JSON_Integer,
                   String_Value,
-                  -Interfaces.Integer_64 (Self.Int_Value));
+                  -Interfaces.Integer_64 (Self.Value));
             end if;
 
          else
-            if Self.Int_Value > Max_Positive then
+            if Self.Value > Max_Positive then
                To := (Out_Of_Range, String_Value);
 
             else
                To :=
                  (JSON_Integer,
                   String_Value,
-                  Interfaces.Integer_64 (Self.Int_Value));
+                  Interfaces.Integer_64 (Self.Value));
             end if;
          end if;
       end if;

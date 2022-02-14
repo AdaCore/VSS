@@ -113,7 +113,6 @@ private
       Code_Unit_1  : VSS.Unicode.UTF16_Code_Unit;
       Code_Unit_2  : VSS.Unicode.UTF16_Code_Unit;
       Number_State : VSS.JSON.Implementation.Numbers.Parsing_State;
-      Is_Float     : Standard.Boolean;
    end record;
 
    procedure Push

@@ -185,7 +185,7 @@ begin
                           when VSS.JSON.None => "",
                           when VSS.JSON.Out_Of_Range =>
                             VSS.Strings.Conversions.To_UTF_8_String
-                              (Reader.String_Value),
+                              (Reader.Number_Value.String_Value),
                           when VSS.JSON.JSON_Integer =>
                             Interfaces.Integer_64'Image
                               (Reader.Number_Value.Integer_Value),

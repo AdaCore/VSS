@@ -33,8 +33,8 @@ package VSS.JSON.Implementation.Numbers is
    type Parsing_State is record
       Error      : Parsing_Error_States   := Not_A_Error;
       Minus      : Boolean                := False;
-      Int_Value  : Interfaces.Unsigned_64 := 0;
-      Frac_Value : Interfaces.Unsigned_64 := 0;
+      Value      : Interfaces.Unsigned_64 := 0;
+      Scale      : Interfaces.Integer_64  := 0;
       Exp_Minus  : Boolean                := False;
       Exp_Value  : Interfaces.Unsigned_64 := 0;
    end record;
@@ -45,10 +45,26 @@ package VSS.JSON.Implementation.Numbers is
    --  Process next digit of 'int' expression. Digit must be valid character
    --  inside '0' .. '9' range.
 
+   procedure Frac_Digit
+     (Self  : in out Parsing_State;
+      Digit : VSS.Unicode.Code_Point);
+   --  Process next digit of 'frac' expression. Digit must be valid character
+   --  inside '0' .. '9' range.
+
+   procedure Exp_Digit
+     (Self  : in out Parsing_State;
+      Digit : VSS.Unicode.Code_Point);
+   --  Process next digit of 'exp' expression. Digit must be valid character
+   --  inside '0' .. '9' range.
+
    procedure To_JSON_Number
      (Self         : Parsing_State;
       String_Value : VSS.Strings.Virtual_String;
       To           : out VSS.JSON.JSON_Number);
    --  Converts parsed value to JSON_Number and set it to To parameter.
+
+   function Is_Integer (Self : Parsing_State) return Boolean;
+   --  XXX Auxiliary subprogram to help to migrate to own implementation of
+   --  string to number conversion.
 
 end VSS.JSON.Implementation.Numbers;

@@ -526,18 +526,10 @@ package body VSS.JSON.Implementation.Parsers is
 
       begin
          if not Self.Is_Float then
-            begin
-               Self.Number :=
-                 (Kind          => VSS.JSON.JSON_Integer,
-                  String_Value  => Self.String_Value,
-                  Integer_Value => Interfaces.Integer_64'Value (Image));
-
-            exception
-               when Constraint_Error =>
-                  Self.Number :=
-                    (Kind         => VSS.JSON.Out_Of_Range,
-                     String_Value => Self.String_Value);
-            end;
+            VSS.JSON.Implementation.Numbers.To_JSON_Number
+              (Self.Number_State,
+               Self.String_Value,
+               Self.Number);
 
          else
             begin
@@ -568,12 +560,14 @@ package body VSS.JSON.Implementation.Parsers is
 
       else
          Self.Buffer.Clear;
+         Self.Number_State := (others => <>);
          Self.Is_Float := False;
 
          case Self.C is
             when Hyphen_Minus =>
                State := Int;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Number_State.Minus := True;
 
             when Digit_Zero =>
                State := Frac_Or_Exp;
@@ -582,6 +576,8 @@ package body VSS.JSON.Implementation.Parsers is
             when Digit_One .. Digit_Nine =>
                State := Int_Digits;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               VSS.JSON.Implementation.Numbers.Int_Digit
+                 (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
             when others =>
                raise Program_Error;
@@ -628,6 +624,8 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Int_Digits;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Int_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
                      return Self.Report_Error ("digit expected");
@@ -638,6 +636,8 @@ package body VSS.JSON.Implementation.Parsers is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Int_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Decimal_Point =>
                      State := Frac_Digit;

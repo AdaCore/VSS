@@ -181,17 +181,19 @@ begin
                      & VSS.JSON.JSON_Number_Kind'Image
                        (Reader.Number_Value.Kind)
                      & ' '
+                     & VSS.Strings.Conversions.To_UTF_8_String
+                       (Reader.Number_Value.String_Value)
                      & (case Reader.Number_Value.Kind is
                           when VSS.JSON.None => "",
-                          when VSS.JSON.Out_Of_Range =>
-                            VSS.Strings.Conversions.To_UTF_8_String
-                              (Reader.Number_Value.String_Value),
+                          when VSS.JSON.Out_Of_Range => "",
                           when VSS.JSON.JSON_Integer =>
-                            Interfaces.Integer_64'Image
-                              (Reader.Number_Value.Integer_Value),
-                          when VSS.JSON.JSON_Float =>
-                            Interfaces.IEEE_Float_64'Image
-                              (Reader.Number_Value.Float_Value)));
+                            ' '
+                              & Interfaces.Integer_64'Image
+                                  (Reader.Number_Value.Integer_Value),
+                          when VSS.JSON.JSON_Float   =>
+                            ' '
+                              & Interfaces.IEEE_Float_64'Image
+                                  (Reader.Number_Value.Float_Value)));
                end if;
 
             when Boolean_Value =>

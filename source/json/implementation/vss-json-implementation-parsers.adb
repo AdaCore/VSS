@@ -1123,26 +1123,26 @@ package body VSS.JSON.Implementation.Parsers is
                Self.Code_Unit_1 := 0;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UX =>
                State := Escape_UXX;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXX =>
                State := Escape_UXXX;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXX =>
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
                if Self.Code_Unit_1 not in 16#D800# .. 16#DFFF# then
@@ -1185,28 +1185,28 @@ package body VSS.JSON.Implementation.Parsers is
                Self.Code_Unit_2 := 0;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UX =>
                State := Escape_UXXXX_Escape_UXX;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UXX =>
                State := Escape_UXXXX_Escape_UXXX;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UXXX =>
                State := Character_Data;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
                if Self.Code_Unit_2 not in 16#DC00# .. 16#DFFF# then

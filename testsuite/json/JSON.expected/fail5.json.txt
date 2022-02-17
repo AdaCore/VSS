@@ -1,0 +1,5 @@
+START_DOCUMENT
+START_ARRAY
+STRING_VALUE "double extra comma"
+INVALID NOT_VALID "value expected"
+END_DOCUMENT

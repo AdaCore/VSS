@@ -40,8 +40,6 @@ package body VSS.JSON.Implementation.Numbers.Clinger is
       use type Interfaces.Unsigned_64;
 
    begin
-      Success := False;
-
       if Significand < 2 ** 53 then  --  9007199254740992
          declare
             Aux : constant Interfaces.IEEE_Float_64 :=

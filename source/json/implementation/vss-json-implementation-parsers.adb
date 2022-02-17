@@ -22,10 +22,7 @@
 ------------------------------------------------------------------------------
 --  RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange Format"
 
-with Ada.Strings.UTF_Encoding;
-
 with VSS.Characters;
-with VSS.Strings.Conversions;
 
 package body VSS.JSON.Implementation.Parsers is
 
@@ -514,47 +511,6 @@ package body VSS.JSON.Implementation.Parsers is
       --
       --  zero = %x30                ; 0
 
-      procedure Convert_Number;
-
-      --------------------
-      -- Convert_Number --
-      --------------------
-
-      procedure Convert_Number is
-         Image : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
-           VSS.Strings.Conversions.To_UTF_8_String (Self.Buffer);
-
-      begin
-         if not Self.Is_Float then
-            begin
-               Self.Number :=
-                 (Kind          => VSS.JSON.JSON_Integer,
-                  String_Value  => Self.String_Value,
-                  Integer_Value => Interfaces.Integer_64'Value (Image));
-
-            exception
-               when Constraint_Error =>
-                  Self.Number :=
-                    (Kind         => VSS.JSON.Out_Of_Range,
-                     String_Value => Self.String_Value);
-            end;
-
-         else
-            begin
-               Self.Number :=
-                 (Kind         => VSS.JSON.JSON_Float,
-                  String_Value => Self.String_Value,
-                  Float_Value  => Interfaces.IEEE_Float_64'Value (Image));
-
-            exception
-               when Constraint_Error =>
-                  Self.Number :=
-                    (Kind         => VSS.JSON.Out_Of_Range,
-                     String_Value => Self.String_Value);
-            end;
-         end if;
-      end Convert_Number;
-
       State : Number_State;
 
    begin
@@ -568,12 +524,13 @@ package body VSS.JSON.Implementation.Parsers is
 
       else
          Self.Buffer.Clear;
-         Self.Is_Float := False;
+         Self.Number_State := (others => <>);
 
          case Self.C is
             when Hyphen_Minus =>
                State := Int;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Number_State.Minus := True;
 
             when Digit_Zero =>
                State := Frac_Or_Exp;
@@ -582,6 +539,8 @@ package body VSS.JSON.Implementation.Parsers is
             when Digit_One .. Digit_Nine =>
                State := Int_Digits;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               VSS.JSON.Implementation.Numbers.Int_Digit
+                 (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
             when others =>
                raise Program_Error;
@@ -601,7 +560,10 @@ package body VSS.JSON.Implementation.Parsers is
 
                   Self.C := Wide_Wide_Character'Last;
 
-                  Convert_Number;
+                  VSS.JSON.Implementation.Numbers.To_JSON_Number
+                    (Self.Number_State,
+                     Self.String_Value,
+                     Self.Number);
 
                   return True;
 
@@ -628,6 +590,8 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Int_Digits;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Int_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
                      return Self.Report_Error ("digit expected");
@@ -638,21 +602,24 @@ package body VSS.JSON.Implementation.Parsers is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Int_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Decimal_Point =>
                      State := Frac_Digit;
-                     Self.Is_Float := True;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
-                     Self.Is_Float := True;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;
@@ -661,18 +628,19 @@ package body VSS.JSON.Implementation.Parsers is
                case Self.C is
                   when Decimal_Point =>
                      State := Frac_Digit;
-                     Self.Is_Float := True;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
-                     Self.Is_Float := True;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;
@@ -683,6 +651,8 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Frac_Digits;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Frac_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
                      return Self.Report_Error ("frac digit expected");
@@ -693,6 +663,8 @@ package body VSS.JSON.Implementation.Parsers is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Frac_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
@@ -700,7 +672,10 @@ package body VSS.JSON.Implementation.Parsers is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;
@@ -711,11 +686,14 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Exp_Digits;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Exp_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Hyphen_Minus =>
                      State := Exp_Digit;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Number_State.Exp_Minus := True;
 
                   when Plus_Sign =>
                      State := Exp_Digit;
@@ -732,6 +710,8 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Exp_Digits;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Exp_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
                      return Self.Report_Error ("exp digit expected");
@@ -742,9 +722,14 @@ package body VSS.JSON.Implementation.Parsers is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Exp_Digit
+                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;
@@ -1130,7 +1115,9 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Escape_U;
 
                   when others =>
-                     raise Program_Error;
+                     return
+                       Self.Report_Error
+                         ("invalid character in escape sequence");
                end case;
 
             when Escape_U =>
@@ -1138,26 +1125,26 @@ package body VSS.JSON.Implementation.Parsers is
                Self.Code_Unit_1 := 0;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UX =>
                State := Escape_UXX;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXX =>
                State := Escape_UXXX;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXX =>
                if not Hex_To_Code (Self.Code_Unit_1) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
                if Self.Code_Unit_1 not in 16#D800# .. 16#DFFF# then
@@ -1170,7 +1157,7 @@ package body VSS.JSON.Implementation.Parsers is
 
                else
                   return
-                    Self.Report_Error ("Low surrogate code point unexpected");
+                    Self.Report_Error ("high surrogate code point unexpected");
                end if;
 
             when Escape_UXXXX =>
@@ -1181,7 +1168,7 @@ package body VSS.JSON.Implementation.Parsers is
                   when others =>
                      return
                        Self.Report_Error
-                         ("Escaped low surrogate code point expected");
+                         ("escaped low surrogate code point expected");
                end case;
 
             when Escape_UXXXX_Escape =>
@@ -1192,7 +1179,7 @@ package body VSS.JSON.Implementation.Parsers is
                   when others =>
                      return
                        Self.Report_Error
-                         ("Escaped low surrogate code point expected");
+                         ("escaped low surrogate code point expected");
                end case;
 
             when Escape_UXXXX_Escape_U =>
@@ -1200,33 +1187,33 @@ package body VSS.JSON.Implementation.Parsers is
                Self.Code_Unit_2 := 0;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UX =>
                State := Escape_UXXXX_Escape_UXX;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UXX =>
                State := Escape_UXXXX_Escape_UXXX;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UXXX =>
                State := Character_Data;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
-                  raise Program_Error;
+                  return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
                if Self.Code_Unit_2 not in 16#DC00# .. 16#DFFF# then
                   return
-                    Self.Report_Error ("Low surrogate code point expected");
+                    Self.Report_Error ("low surrogate code point expected");
                end if;
 
                declare

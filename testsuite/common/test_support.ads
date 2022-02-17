@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -29,6 +29,7 @@ package Test_Support is
 
    procedure Assert
      (Condition : Boolean;
+      Message   : String := "";
       Location  : String := GNAT.Source_Info.Source_Location);
 
 end Test_Support;

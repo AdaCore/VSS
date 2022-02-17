@@ -1,0 +1,6 @@
+START_DOCUMENT
+START_OBJECT
+KEY_NAME "Numbers cannot be hex"
+NUMBER_VALUE JSON_INTEGER 0  0
+INVALID NOT_VALID "value separator or end object expected"
+END_DOCUMENT

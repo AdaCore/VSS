@@ -25,6 +25,7 @@
 --  This parser supports normal parsing model as well as incremental parsing.
 --  It use Input_Text_Stream interface as data source.
 
+private with VSS.JSON.Implementation.Numbers;
 with VSS.JSON.Pull_Readers;
 with VSS.Strings;
 with VSS.Text_Streams;
@@ -98,20 +99,20 @@ private
    procedure Pop (Self : in out Parse_Stack'Class);
 
    type JSON_Parser is tagged limited record
-      Stream      : VSS.Text_Streams.Input_Text_Stream_Access;
-      Stack       : Parse_Stack;
-      Event       : VSS.JSON.Pull_Readers.JSON_Event_Kind :=
+      Stream       : VSS.Text_Streams.Input_Text_Stream_Access;
+      Stack        : Parse_Stack;
+      Event        : VSS.JSON.Pull_Readers.JSON_Event_Kind :=
         VSS.JSON.Pull_Readers.No_Token;
-      Error       : VSS.JSON.Pull_Readers.JSON_Reader_Error :=
+      Error        : VSS.JSON.Pull_Readers.JSON_Reader_Error :=
         VSS.JSON.Pull_Readers.No_Error;
-      Message     : VSS.Strings.Virtual_String;
-      C           : Wide_Wide_Character;
-      Buffer      : VSS.Strings.Virtual_String;
-      Boolean     : Standard.Boolean;
-      Number      : VSS.JSON.JSON_Number;
-      Code_Unit_1 : VSS.Unicode.UTF16_Code_Unit;
-      Code_Unit_2 : VSS.Unicode.UTF16_Code_Unit;
-      Is_Float    : Standard.Boolean;
+      Message      : VSS.Strings.Virtual_String;
+      C            : Wide_Wide_Character;
+      Buffer       : VSS.Strings.Virtual_String;
+      Boolean      : Standard.Boolean;
+      Number       : VSS.JSON.JSON_Number;
+      Code_Unit_1  : VSS.Unicode.UTF16_Code_Unit;
+      Code_Unit_2  : VSS.Unicode.UTF16_Code_Unit;
+      Number_State : VSS.JSON.Implementation.Numbers.Parsing_State;
    end record;
 
    procedure Push

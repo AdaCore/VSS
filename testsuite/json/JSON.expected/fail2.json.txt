@@ -1,0 +1,5 @@
+START_DOCUMENT
+START_ARRAY
+STRING_VALUE "Unclosed array"
+INVALID NOT_VALID "value separator of end array expected"
+END_DOCUMENT

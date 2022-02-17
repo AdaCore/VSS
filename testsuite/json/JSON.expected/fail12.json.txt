@@ -1,0 +1,5 @@
+START_DOCUMENT
+START_OBJECT
+KEY_NAME "Illegal invocation"
+INVALID NOT_VALID "value expected"
+END_DOCUMENT

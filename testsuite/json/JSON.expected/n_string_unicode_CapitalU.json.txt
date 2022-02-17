@@ -1,0 +1,3 @@
+START_DOCUMENT
+INVALID NOT_VALID "invalid character in escape sequence"
+END_DOCUMENT

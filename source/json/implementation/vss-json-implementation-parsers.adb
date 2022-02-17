@@ -1155,7 +1155,7 @@ package body VSS.JSON.Implementation.Parsers is
 
                else
                   return
-                    Self.Report_Error ("Low surrogate code point unexpected");
+                    Self.Report_Error ("high surrogate code point unexpected");
                end if;
 
             when Escape_UXXXX =>
@@ -1166,7 +1166,7 @@ package body VSS.JSON.Implementation.Parsers is
                   when others =>
                      return
                        Self.Report_Error
-                         ("Escaped low surrogate code point expected");
+                         ("escaped low surrogate code point expected");
                end case;
 
             when Escape_UXXXX_Escape =>
@@ -1177,7 +1177,7 @@ package body VSS.JSON.Implementation.Parsers is
                   when others =>
                      return
                        Self.Report_Error
-                         ("Escaped low surrogate code point expected");
+                         ("escaped low surrogate code point expected");
                end case;
 
             when Escape_UXXXX_Escape_U =>
@@ -1211,7 +1211,7 @@ package body VSS.JSON.Implementation.Parsers is
 
                if Self.Code_Unit_2 not in 16#DC00# .. 16#DFFF# then
                   return
-                    Self.Report_Error ("Low surrogate code point expected");
+                    Self.Report_Error ("low surrogate code point expected");
                end if;
 
                declare

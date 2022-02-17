@@ -1115,7 +1115,9 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Escape_U;
 
                   when others =>
-                     raise Program_Error;
+                     return
+                       Self.Report_Error
+                         ("invalid character in escape sequence");
                end case;
 
             when Escape_U =>

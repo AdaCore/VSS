@@ -30,6 +30,11 @@ jobs:
           mkdir vss/data
           mkdir vss/data/ucd
           unzip UCD-14.0.0.zip -d vss/data/ucd
+      - name: Get parse-number-fxx-test-data repository
+        uses: actions/checkout@v2
+        with:
+          repository: nigeltao/parse-number-fxx-test-data
+          path: ./vss/data/parse-number-fxx-test-data
       - name: Build and test
         shell: bash
         run: |

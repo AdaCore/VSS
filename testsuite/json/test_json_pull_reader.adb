@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -32,7 +32,7 @@ with VSS.JSON.Pull_Readers.Simple;
 
 with Tests_Text_Streams;
 
-procedure Test_JSON_Reader is
+procedure Test_JSON_Pull_Reader is
 
    use all type VSS.JSON.Pull_Readers.JSON_Event_Kind;
    use all type VSS.JSON.Pull_Readers.JSON_Reader_Error;
@@ -226,4 +226,4 @@ begin
    end;
 
    Ada.Text_IO.Close (Log_File);
-end Test_JSON_Reader;
+end Test_JSON_Pull_Reader;

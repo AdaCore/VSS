@@ -1,0 +1,4 @@
+START_DOCUMENT
+START_OBJECT
+INVALID NOT_VALID "unexpected end of document"
+END_DOCUMENT

@@ -22,10 +22,7 @@
 ------------------------------------------------------------------------------
 --  RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange Format"
 
-with Ada.Strings.UTF_Encoding;
-
 with VSS.Characters;
-with VSS.Strings.Conversions;
 
 package body VSS.JSON.Implementation.Parsers is
 
@@ -514,39 +511,6 @@ package body VSS.JSON.Implementation.Parsers is
       --
       --  zero = %x30                ; 0
 
-      procedure Convert_Number;
-
-      --------------------
-      -- Convert_Number --
-      --------------------
-
-      procedure Convert_Number is
-         Image : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
-           VSS.Strings.Conversions.To_UTF_8_String (Self.Buffer);
-
-      begin
-         if VSS.JSON.Implementation.Numbers.Is_Integer (Self.Number_State) then
-            VSS.JSON.Implementation.Numbers.To_JSON_Number
-              (Self.Number_State,
-               Self.String_Value,
-               Self.Number);
-
-         else
-            begin
-               Self.Number :=
-                 (Kind         => VSS.JSON.JSON_Float,
-                  String_Value => Self.String_Value,
-                  Float_Value  => Interfaces.IEEE_Float_64'Value (Image));
-
-            exception
-               when Constraint_Error =>
-                  Self.Number :=
-                    (Kind         => VSS.JSON.Out_Of_Range,
-                     String_Value => Self.String_Value);
-            end;
-         end if;
-      end Convert_Number;
-
       State : Number_State;
 
    begin
@@ -596,7 +560,10 @@ package body VSS.JSON.Implementation.Parsers is
 
                   Self.C := Wide_Wide_Character'Last;
 
-                  Convert_Number;
+                  VSS.JSON.Implementation.Numbers.To_JSON_Number
+                    (Self.Number_State,
+                     Self.String_Value,
+                     Self.Number);
 
                   return True;
 
@@ -649,7 +616,10 @@ package body VSS.JSON.Implementation.Parsers is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;
@@ -667,7 +637,10 @@ package body VSS.JSON.Implementation.Parsers is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;
@@ -699,7 +672,10 @@ package body VSS.JSON.Implementation.Parsers is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;
@@ -750,7 +726,10 @@ package body VSS.JSON.Implementation.Parsers is
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
-                     Convert_Number;
+                     VSS.JSON.Implementation.Numbers.To_JSON_Number
+                       (Self.Number_State,
+                        Self.String_Value,
+                        Self.Number);
 
                      return True;
                end case;

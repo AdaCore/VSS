@@ -31,12 +31,17 @@ package VSS.JSON.Implementation.Numbers is
    type Parsing_Error_States is (Not_A_Error, Out_Of_Range, Precision_Lost);
 
    type Parsing_State is record
-      Error      : Parsing_Error_States   := Not_A_Error;
-      Minus      : Boolean                := False;
-      Value      : Interfaces.Unsigned_64 := 0;
-      Scale      : Interfaces.Integer_64  := 0;
-      Exp_Minus  : Boolean                := False;
-      Exp_Value  : Interfaces.Unsigned_64 := 0;
+      Error                     : Parsing_Error_States   := Not_A_Error;
+      Minus                     : Boolean                := False;
+      Significand               : Interfaces.Unsigned_64 := 0;
+      Mantissa_Is_Inexact       : Boolean                := False;
+      Collected_Mantissa_Digits : Interfaces.Unsigned_32 := 0;
+      Exponent_Adjustment       : Interfaces.Integer_32  := 0;
+      Has_Fractional            : Boolean                := False;
+      Has_Exponent              : Boolean                := False;
+      Exp_Minus                 : Boolean                := False;
+      Exp_Value                 : Interfaces.Integer_32  := 0;
+      Collected_Exponent_Digits : Interfaces.Unsigned_32 := 0;
    end record;
 
    procedure Int_Digit

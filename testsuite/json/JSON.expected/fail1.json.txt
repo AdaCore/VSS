@@ -1,0 +1,3 @@
+START_DOCUMENT
+STRING_VALUE "A JSON payload should be an object or array, not a string."
+END_DOCUMENT

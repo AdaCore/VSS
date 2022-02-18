@@ -23,7 +23,7 @@
 
 with Ada.Strings.Unbounded;
 
-separate (Test_Stream_Element_Buffer)
+separate (Test_Stream_Element_Vector)
 
 procedure Test_Conversions is
    U : constant Ada.Strings.Unbounded.Unbounded_String :=

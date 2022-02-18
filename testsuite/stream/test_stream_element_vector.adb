@@ -27,7 +27,7 @@ with VSS.Stream_Element_Vectors.Conversions;
 
 with Test_Support;
 
-procedure Test_Stream_Element_Buffer is
+procedure Test_Stream_Element_Vector is
 
    use type Ada.Streams.Stream_Element;
    use type Ada.Streams.Stream_Element_Offset;
@@ -151,4 +151,4 @@ begin
    Test_Assignment_And_Modification;
    Test_Element_Iterator;
    Test_Conversions;
-end Test_Stream_Element_Buffer;
+end Test_Stream_Element_Vector;

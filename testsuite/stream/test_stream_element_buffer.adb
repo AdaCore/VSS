@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,7 +23,9 @@
 
 with Ada.Streams;
 
-with VSS.Stream_Element_Vectors;
+with VSS.Stream_Element_Vectors.Conversions;
+
+with Test_Support;
 
 procedure Test_Stream_Element_Buffer is
 
@@ -36,6 +38,9 @@ procedure Test_Stream_Element_Buffer is
 
    procedure Test_Element_Iterator;
    --  Test element iterator.
+
+   procedure Test_Conversions;
+   --  Test conversions from/to standard String/Unbounded_String;
 
    --------------------------------------
    -- Test_Assignment_And_Modification --
@@ -65,6 +70,12 @@ procedure Test_Stream_Element_Buffer is
          raise Program_Error;
       end if;
    end Test_Assignment_And_Modification;
+
+   ----------------------
+   -- Test_Conversions --
+   ----------------------
+
+   procedure Test_Conversions is separate;
 
    ---------------------------
    -- Test_Element_Iterator --
@@ -107,4 +118,5 @@ procedure Test_Stream_Element_Buffer is
 begin
    Test_Assignment_And_Modification;
    Test_Element_Iterator;
+   Test_Conversions;
 end Test_Stream_Element_Buffer;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -23,9 +23,11 @@
 
 with Ada.Streams;
 
-with VSS.Stream_Element_Vectors;
+with VSS.Stream_Element_Vectors.Conversions;
 
-procedure Test_Stream_Element_Buffer is
+with Test_Support;
+
+procedure Test_Stream_Element_Vector is
 
    use type Ada.Streams.Stream_Element;
    use type Ada.Streams.Stream_Element_Offset;
@@ -36,6 +38,9 @@ procedure Test_Stream_Element_Buffer is
 
    procedure Test_Element_Iterator;
    --  Test element iterator.
+
+   procedure Test_Conversions;
+   --  Test conversions from/to standard String/Unbounded_String;
 
    --------------------------------------
    -- Test_Assignment_And_Modification --
@@ -65,6 +70,12 @@ procedure Test_Stream_Element_Buffer is
          raise Program_Error;
       end if;
    end Test_Assignment_And_Modification;
+
+   ----------------------
+   -- Test_Conversions --
+   ----------------------
+
+   procedure Test_Conversions is separate;
 
    ---------------------------
    -- Test_Element_Iterator --
@@ -102,9 +113,42 @@ procedure Test_Stream_Element_Buffer is
       if Count /= Buffer.Length then
          raise Program_Error;
       end if;
+
+      --  Check content of the vector using Ada 2012 iterator and syntax sugar
+      --  (normal order)
+
+      Count := 0;
+
+      for E of Buffer loop
+         Count := Count + 1;
+
+         Test_Support.Assert
+           (E = Ada.Streams.Stream_Element (Character'Pos ('Z') - Count + 1));
+      end loop;
+
+      --  Check that previous loop has been executed expected number of times.
+
+      Test_Support.Assert (Count = Buffer.Length);
+
+      --  Check content of the vector using Ada 2012 iterator and syntax sugar
+      --  (reverse order)
+
+      Count := Buffer.Length;
+
+      for E of reverse Buffer loop
+         Test_Support.Assert
+           (E = Ada.Streams.Stream_Element (Character'Pos ('Z') - Count + 1));
+
+         Count := Count - 1;
+      end loop;
+
+      --  Check that previous loop has been executed expected number of times.
+
+      Test_Support.Assert (Count = 0);
    end Test_Element_Iterator;
 
 begin
    Test_Assignment_And_Modification;
    Test_Element_Iterator;
-end Test_Stream_Element_Buffer;
+   Test_Conversions;
+end Test_Stream_Element_Vector;

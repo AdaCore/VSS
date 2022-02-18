@@ -48,7 +48,7 @@ check_text:
 	.objs/tests/test_converters
 	.objs/tests/test_grapheme_cluster_iterators data/ucd
 	.objs/tests/test_line_iterators
-	.objs/tests/test_stream_element_buffer
+	.objs/tests/test_stream_element_vector
 	.objs/tests/test_text_streams
 	.objs/tests/test_string_append
 	.objs/tests/test_string_casing

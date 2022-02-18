@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2022, AdaCore                     --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,24 +21,19 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "../vss_config";
-with "../vss_text";
-with "vss_test_common";
+with Ada.Strings.Unbounded;
 
-project VSS_Stream_Tests is
+separate (Test_Stream_Element_Vector)
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/stream");
-   for Main use ("test_stream_element_vector.adb",
-                 "test_text_streams.adb");
+procedure Test_Conversions is
+   U : constant Ada.Strings.Unbounded.Unbounded_String :=
+     Ada.Strings.Unbounded.To_Unbounded_String ("ABC123");
+   V : constant VSS.Stream_Element_Vectors.Stream_Element_Vector :=
+     VSS.Stream_Element_Vectors.Conversions.Unchecked_From_Unbounded_String
+       (U);
+   S : constant String :=
+     VSS.Stream_Element_Vectors.Conversions.Unchecked_To_String (V);
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-   end Compiler;
-
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
-
-end VSS_Stream_Tests;
+begin
+   Test_Support.Assert (S = Ada.Strings.Unbounded.To_String (U));
+end Test_Conversions;

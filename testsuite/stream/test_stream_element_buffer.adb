@@ -113,6 +113,38 @@ procedure Test_Stream_Element_Buffer is
       if Count /= Buffer.Length then
          raise Program_Error;
       end if;
+
+      --  Check content of the vector using Ada 2012 iterator and syntax sugar
+      --  (normal order)
+
+      Count := 0;
+
+      for E of Buffer loop
+         Count := Count + 1;
+
+         Test_Support.Assert
+           (E = Ada.Streams.Stream_Element (Character'Pos ('Z') - Count + 1));
+      end loop;
+
+      --  Check that previous loop has been executed expected number of times.
+
+      Test_Support.Assert (Count = Buffer.Length);
+
+      --  Check content of the vector using Ada 2012 iterator and syntax sugar
+      --  (reverse order)
+
+      Count := Buffer.Length;
+
+      for E of reverse Buffer loop
+         Test_Support.Assert
+           (E = Ada.Streams.Stream_Element (Character'Pos ('Z') - Count + 1));
+
+         Count := Count - 1;
+      end loop;
+
+      --  Check that previous loop has been executed expected number of times.
+
+      Test_Support.Assert (Count = 0);
    end Test_Element_Iterator;
 
 begin

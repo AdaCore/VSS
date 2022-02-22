@@ -21,7 +21,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Warnings (Off, "unrecognized pragma");
+pragma Ada_2020;
 pragma Ada_2022;
+pragma Warnings (On, "unrecognized pragma");
 
 with Ada.Unchecked_Conversion;
 

@@ -281,10 +281,16 @@ package body VSS.JSON.Implementation.Numbers is
             end if;
 
             if Success then
-               To :=
-                 (JSON_Float,
-                  String_Value,
-                  (if Self.Minus then -Number else Number));
+               if Number'Valid then
+                  To :=
+                    (JSON_Float,
+                     String_Value,
+                     (if Self.Minus then -Number else Number));
+
+               else
+                  To := (Out_Of_Range, String_Value);
+               end if;
+
                Success := True;
 
                return;

@@ -257,10 +257,12 @@ package body VSS.JSON.Implementation.Numbers is
 
          return;
 
-      elsif not Self.Mantissa_Is_Inexact then
+      else
          if Self.Significand = 0 then
             --  It is important to check significand to zero before main
-            --  algorithm to avoid additional checks.
+            --  algorithm to avoid additional checks. Significand equal to
+            --  zero is always exact, because all leading zeros are ignored
+            --  during parsing.
 
             To :=
               (JSON_Float, String_Value, (if Self.Minus then -0.0 else 0.0));
@@ -269,15 +271,43 @@ package body VSS.JSON.Implementation.Numbers is
          end if;
 
          declare
-            Number  : Interfaces.IEEE_Float_64;
-            Success : Boolean;
+            Number     : Interfaces.IEEE_Float_64;
+            Number_Aux : Interfaces.IEEE_Float_64;
+            Success    : Boolean := False;
 
          begin
-            Clinger.Convert (Self.Significand, Exponent, Number, Success);
+            if not Self.Mantissa_Is_Inexact then
+               --  If significant is exact number attempt to convert it by
+               --  fastest algoriphm.
+
+               Clinger.Convert (Self.Significand, Exponent, Number, Success);
+            end if;
 
             if not Success then
                Eisel_Lemire.Convert
                  (Self.Significand, Exponent, Number, Success);
+
+               if Success and Self.Mantissa_Is_Inexact then
+                  --  When significan is not exact try to compute value for
+                  --  the next value of significand.
+
+                  Eisel_Lemire.Convert
+                    (Self.Significand + 1, Exponent, Number_Aux, Success);
+
+                  --  If computed value is not equal to first one, more
+                  --  complicated conversion need to be used, thus fail.
+                  --  Infinity values are invalid in Ada, thus need to be
+                  --  checked separately, otherwise Constraint_Error is
+                  --  raised in data validity checking mode.
+
+                  if (Number'Valid or Number_Aux'Valid)
+                    and (not Number'Valid
+                           or else not Number_Aux'Valid
+                           or else Number /= Number_Aux)
+                  then
+                     Success := False;
+                  end if;
+               end if;
             end if;
 
             if Success then

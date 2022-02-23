@@ -21,6 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Warnings (Off, "unrecognized pragma");
+pragma Ada_2020;
+pragma Ada_2022;
+pragma Warnings (On, "unrecognized pragma");
+
 with Ada.Unchecked_Conversion;
 
 with VSS.JSON.Implementation.Numbers.Tables;
@@ -38,10 +43,6 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
      new Ada.Unchecked_Conversion
            (Interfaces.Unsigned_32, Interfaces.Integer_32);
 
-   function F64 is
-     new Ada.Unchecked_Conversion
-           (Interfaces.Unsigned_64, Interfaces.IEEE_Float_64);
-
    function clz
      (Value : Interfaces.Unsigned_64) return Interfaces.Integer_32
      with Import,
@@ -56,6 +57,70 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
    --  Multiplication of two 64-bit usnigned integers into 128-bit values,
    --  splitted into high and low 64-bit unsigned integers. On x86_64 it is
    --  optimized into single instruction.
+
+   procedure Compute_Product_Approximation
+     (W       : Interfaces.Unsigned_64;
+      Q       : Interfaces.Integer_32;
+      L       : out Interfaces.Unsigned_64;
+      H       : out Interfaces.Unsigned_64);
+   --  Compute or rather approximate w * 5**q and return a pair of
+   --  64-bit words approximating the result, with the "high" part
+   --  corresponding to the most significant bits and the low part
+   --  corresponding to the least significant bits.
+
+   function Power (Q : Interfaces.Integer_32) return Interfaces.Integer_32;
+
+   procedure To_Binary_Float
+     (M : Interfaces.Unsigned_64;
+      P : Interfaces.Integer_32;
+      N : out Interfaces.IEEE_Float_64);
+
+   -----------------------------------
+   -- Compute_Product_Approximation --
+   -----------------------------------
+
+   procedure Compute_Product_Approximation
+     (W       : Interfaces.Unsigned_64;
+      Q       : Interfaces.Integer_32;
+      L       : out Interfaces.Unsigned_64;
+      H       : out Interfaces.Unsigned_64)
+   is
+      Bit_Precision  : constant := Mantissa_Explicit_Bits + 3;
+
+      Precision_Mask : constant Interfaces.Unsigned_64 :=
+        (if Bit_Precision < 64
+         then Interfaces.Shift_Right (16#FFFF_FFFF_FFFF_FFFF#, Bit_Precision)
+         else 16#FFFF_FFFF_FFFF_FFFF#);
+
+      FL : Interfaces.Unsigned_64;
+      FH : Interfaces.Unsigned_64;
+      SL : Interfaces.Unsigned_64;
+      SH : Interfaces.Unsigned_64;
+
+   begin
+      --  For small values of q, e.g., q in [0,27], the answer is always exact
+      --  because the first call of Multiply gives the exact answer.
+
+      Multiply (W, Tables.Powers_Of_Five (Q).L, FL, FH);
+
+      if (FH and Precision_Mask) = Precision_Mask then
+         --  could further guard with  (lower + w < lower)
+
+         --  regarding the second product, we only need SH, but our
+         --  expectation is that the compiler will optimize this extra
+         --  work away if needed.
+
+         Multiply (W, Tables.Powers_Of_Five (Q).H, SL, SH);
+         FL := @ + SH;
+
+         if SH > FL then
+            FH := @ + 1;
+         end if;
+      end if;
+
+      L := FL;
+      H := FH;
+   end Compute_Product_Approximation;
 
    -------------
    -- Convert --
@@ -88,215 +153,160 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       Number       : out Interfaces.IEEE_Float_64;
       Success      : out Boolean)
    is
-      --  Names of variables corresponds to used in paper.
+      --  Names of objects correspond to used in paper.
 
       W  : Interfaces.Unsigned_64          := Significand;
       Q  : constant Interfaces.Integer_32  := Exponent_10;
       L  : Interfaces.Integer_32;
+      U  : Interfaces.Integer_32;
       ZH : Interfaces.Unsigned_64;
       ZL : Interfaces.Unsigned_64;
       M  : Interfaces.Unsigned_64;
       P  : Interfaces.Integer_32;
-      U  : Interfaces.Integer_32;
-
-      YH : Interfaces.Unsigned_64;
-      YL : Interfaces.Unsigned_64;
-      MH : Interfaces.Unsigned_64;
-      ML : Interfaces.Unsigned_64;
 
    begin
-      if Q not in -307 .. 288 then
-         Success := False;
+      --  Corner cases of zero and infinity are processed before call of this
+      --  subprogram and thus omitted here.
 
-         return;
-      end if;
-
-      --  Normalize the significand W. The (W != 0) precondition means that a
-      --  non-zero bit exists.
-
+      --  We want the most significant bit of W to be 1. Shift if needed.
       L := clz (W);
       W := Interfaces.Shift_Left (W, Natural (L));
 
-      --  Calculate the return value's base-2 exponent. We might tweak it by
-      --  ±1 later, but its initial value comes from a linear scaling of Q,
-      --  converting from power-of-10 to power-of-2, and adjusting by L.
-      --
-      --  The magic constants are:
-      --   - 1087 = 1023 + 64. The 1023 is the f64 exponent bias. The 64 is
-      --     because the look-up table uses 64-bit mantissas.
-      --   - 217706 is such that the ratio 217706 / 65536 ≈ 3.321930 is close
-      --     enough (over the practical range of exp10) to log(10) / log(2) ≈
-      --     3.321928.
-      --   - 65536 = 1<<16 is arbitrary but a power of 2, so division is a
-      --     shift.
-      --
-      --  Equality of the linearly-scaled value and the actual power-of-2,
-      --  over the range of Q arguments that this function accepts, is
-      --  confirmed by script/print-mpb-powers-of-10.go
-      --
-      --  Note, arithmetic shift is required here, it is available for
-      --  modular types only, thus use unchecked conversion to convert
-      --  signed integer into modular and back.
+      --  The required precision is Mantissa_Explicit_Bits + 3 because
+      --  1. We need the implicit bit
+      --  2. We need an extra bit for rounding purposes
+      --  3. We might lose a bit due to the "upperbit" routine (result too
+      --  small, requiring a shift)
 
-      P :=
-        I32 (Interfaces.Shift_Right_Arithmetic (U32 (217706 * Q), 16))
-          + 1_087 - L;
+      Compute_Product_Approximation (W, Q, ZL, ZH);
 
-      --  Look up the (possibly truncated) base-2 representation of (10 ** Q).
-      --  The look-up table was constructed so that it is already normalized:
-      --  the table entry's significand's MSB (most significant bit) is on.
-      --
-      --  Multiply the two significands. Normalization means that both
-      --  significands are at least (1<<63), so the 128-bit product must be at
-      --  least (1<<126). The high 64 bits of the product, ZH, must therefore
-      --  be at least (1<<62).
-      --
-      --  As a consequence, ZH has either 0 or 1 leading zeroes. Shifting ZH
-      --  right by either 9 or 10 bits (depending on ZH's MSB) will therefore
-      --  leave the top 10 MSBs (bits 54 ..= 63) off and the 11th MSB (bit 53)
-      --  on.
+      if ZL = 16#FFFF_FFFF_FFFF_FFFF# then
+         --  could guard it further
 
-      Multiply (W, Tables.Powers_Of_Ten (Q).L, ZL, ZH);
+         --  In some very rare cases, this could happen, in which case we
+         --  might need a more accurate computation that what we can provide
+         --  cheaply. This is very, very unlikely.
 
-      --  Before we shift right by at least 9 bits, recall that the look-up
-      --  table entry was possibly truncated. We have so far only calculated
-      --  a lower bound for the product (W * e), where e is (10 ** Q). The
-      --  upper bound would add a further (W * 1) to the 128-bit product,
-      --  which overflows the lower 64-bit limb if ((ZL + W) < W).
-      --
-      --  If overflow occurs, that adds 1 to ZH. Since we're about to shift
-      --  right by at least 9 bits, that carried 1 can be ignored unless the
-      --  higher 64-bit limb's low 9 bits are all on.
-      --
-      --  For example, parsing "9999999999999999999" will take the if-true
-      --  branch here, since:
-      --   - ZH = 0x4563918244F3FFFF
-      --   - ZL = 0x8000000000000000
-      --   - W  = 0x8AC7230489E7FFFF
-
-      if (ZH and 16#1FF#) = 16#1FF# and (ZL + W) < W then
-      --  if (ZH and 16#1FF#) = 16#1FF# and (ZL + W) < ZL then
-         --  Refine our calculation of (W * e). Before, our approximation of e
-         --  used a "low resolution" 64-bit significand. Now use a "high
-         --  resolution" 128-bit significand. We've already calculated
-         --  Z = (W * bits_0_to_63_incl_of_e).
-         --  Now calculate Y = (W * bits_64_to_127_incl_of_e).
-
-         Multiply (W, Tables.Powers_Of_Ten (Q).H, YL, YH);
-
-         --  Merge the 128-bit Z and 128-bit Y, which overlap by 64 bits, to
-         --  calculate the 192-bit product of the 64-bit W by the 128-bit e.
-         --  As we exit this if-block, we only care about the high 128 bits
-         --  (MH and ML) of that 192-bit product.
-         --
-         --  For example, parsing "1.234e-45" will take the if-true branch
-         --  here, since:
-         --   - ZH = 0x70B7E3696DB29FFF
-         --   - ZL = 0xE040000000000000
-         --   - YH = 0x33718BBEAB0E0D7A
-         --   - YL = 0xA880000000000000
-
-         MH := ZH;
-         ML := ZL + YH;
-
-         if ML < ZL then
-            MH := MH + 1;
-         end if;
-
-         --  The "high resolution" approximation of e is still a lower bound.
-         --  Once again, see if the upper bound is large enough to produce a
-         --  different result. This time, if it does, give up instead of
-         --  reaching for an even more precise approximation to e.
-         --
-         --  This three-part check is similar to the two-part check that
-         --  guarded the if block that we're now in, but it has an extra term
-         --  for the middle 64 bits (checking that adding 1 to merged_lo would
-         --  overflow).
-         --
-         --  For example, parsing "5.9604644775390625e-8" will take the
-         --  if-true branch here, since:
-         --   - MH = 0x7FFFFFFFFFFFFFFF
-         --   - ML = 0xFFFFFFFFFFFFFFFF
-         --   - YL = 0x4DB3FFC120988200
-         --   - W  = 0xD3C21BCECCEDA100
-
-         if (MH and 16#1FF#) = 16#1FF# and (ML + 1) = 0 and (YL + W) < W then
+         if Q not in -27 .. 55 then
             Success := False;
 
             return;
          end if;
 
-         --  Replace the 128-bit x with merged.
-
-         ZH := MH;
-         ZL := ML;
+         --  Always good because 5**q <2**128 when q>=0, and otherwise, for
+         --  q<0, we have 5**-q<2**64 and the 128-bit reciprocal allows for
+         --  exact computation.
       end if;
 
-      --  As mentioned above, shifting ZH right by either 9 or 10 bits will
-      --  leave the top 10 MSBs (bits 54 ..= 63) off and the 11th MSB (bit 53)
-      --  on. If the MSB (before shifting) was on, adjust P for the larger
-      --  shift.
+      --  The Compute_Product_Approximation subprogram can be slightly slower
+      --  than a branchless approach:
       --
-      --  Having bit 53 on (and higher bits off) means that M is a 54-bit
-      --  number.
+      --    value128 product = compute_product(q, w);
+      --
+      --  but in practice, we can win big with the
+      --  Compute_Product_Approximation if its additional branch is easily
+      --  predicted. Which is best is data specific.
 
       U := Interfaces.Integer_32 (Interfaces.Shift_Right (ZH, 63));
-      M := Interfaces.Shift_Right (ZH, Natural (U + 9));
-      P := P - I32 (1 xor U32 (U));
+      M :=
+        Interfaces.Shift_Right
+          (ZH, Natural (U + 64 - Mantissa_Explicit_Bits - 3));
+      P := Power (Q) + U - L - Minimum_Exponent;
 
-      --  IEEE 754 rounds to-nearest with ties rounded to-even. Rounding
-      --  to-even can be tricky. If we're half-way between two exactly
-      --  representable numbers (x's low 73 bits are zero and the next 2 bits
-      --  that matter are "01"), give up instead of trying to pick the winner.
-      --
-      --  Technically, we could tighten the condition by changing "73" to "73
-      --  or 74, depending on msb", but a flat "73" is simpler.
-      --
-      --  For example, parsing "1e+23" will take the if-true branch here,
-      --  since:
-      --   - ZH = 0x54B40B1F852BDA00
-      --   - M  = 0x002A5A058FC295ED
+      if P <= 0 then
+         --  we have a subnormal?
 
-      if ZL = 0 and (ZH and 16#1FF#) = 0 and (M and 2#11#) = 2#01# then
-         Success := False;
+         --  Here have that answer.power2 <= 0 so -answer.power2 >= 0
+
+         if -P + 1 >= 64 then
+            --  if we have more than 64 bits below the minimum exponent, you
+            --  have a zero for sure.
+
+            P := 0;
+            M := 0;
+
+            To_Binary_Float (M, P, Number);
+            Success := True;
+
+            return;
+         end if;
+
+         --  Next line is safe because -answer.power2 + 1 < 64
+
+         M := Interfaces.Shift_Right (M, Natural (-P + 1));
+
+         --  Thankfully, we can't have both "round-to-even" and subnormals
+         --  because "round-to-even" only occurs for powers close to 0.
+
+         M := @ + (M and 1);   --  Round up
+         M := Interfaces.Shift_Right (M, 1);
+
+         --  There is a weird scenario where we don't have a subnormal but
+         --  just. Suppose we start with 2.2250738585072013e-308, we end up
+         --  with 0x3fffffffffffff x 2^-1023-53 which is technically subnormal
+         --  whereas 0x40000000000000 x 2^-1023-53 is normal. Now, we need to
+         --  round up 0x3fffffffffffff x 2^-1023-53 and once we do, we are no
+         --  longer subnormal, but we can only know this after rounding.
+         --  So we only declare a subnormal if we are smaller than the
+         --  threshold.
+
+         P :=
+           (if M < Interfaces.Shift_Left (1, Mantissa_Explicit_Bits)
+            then 0
+            else 1);
+
+         To_Binary_Float (M, P, Number);
+         Success := True;
 
          return;
       end if;
 
-      --  If we're not halfway then it's rounding to-nearest. Starting with a
-      --  54-bit number, carry the lowest bit (bit 0) up if it's on.
-      --  Regardless of whether it was on or off, shifting right by one then
-      --  produces a 53-bit number. If carrying up overflowed, shift again.
-
-      M := M + (M and 1);
-      M := Interfaces.Shift_Right (M, 1);
-
-      --  This if block is equivalent to (but benchmarks slightly faster
-      --  than) the following branchless form:
-      --     uint64_t overflow_adjustment = ret_mantissa >> 53;
-      --     ret_mantissa >>= overflow_adjustment;
-      --     ret_exp2 += overflow_adjustment;
+      --  Usually, we round *up*, but if we fall right in between and and we
+      --  have an even basis, we need to round down.
       --
-      --  For example, parsing "7.2057594037927933e+16" will take the if-true
-      --  branch here, since:
-      --   - ZH = 0x7FFFFFFFFFFFFE80
-      --   - M  = 0x0020000000000000
+      --  We are only concerned with the cases where 5**q fits in single
+      --  64-bit word.
+      if ZL <= 1
+        and Q in Min_Exponent_Round_To_Even .. Max_Exponent_Round_To_Even
+        and (M and 2#11#) = 2#01#
+      then
+         --  We may fall between two floats!
 
-      if Interfaces.Shift_Right (M, 53) > 0 then
-         M := Interfaces.Shift_Right (M, 1);
-         P := P + 1;
+         --  To be in-between two floats we need that in doing
+         --
+         --     answer.mantissa =
+         --       product.high >>
+         --         (upperbit + 64 - binary::mantissa_explicit_bits() - 3);
+         --
+         --  ... we dropped out only zeroes. But if this happened, then we can
+         --  go back!!!
+
+         if Interfaces.Shift_Left
+              (M, Natural (U + 64 - Mantissa_Explicit_Bits - 3))
+           = ZH
+         then
+            M := @ and not 1;  --  Flip it so that we do not round up
+         end if;
       end if;
 
-      --  Starting with a 53-bit number, IEEE 754 double-precision normal
-      --  numbers have an implicit mantissa bit. Mask that away and keep the
-      --  low 52 bits.
+      M := @ + (M and 1);  --  round up
+      M := Interfaces.Shift_Right (M, 1);
 
-      M := M and 16#000F_FFFF_FFFF_FFFF#;
+      if M >= Interfaces.Shift_Left (2, Mantissa_Explicit_Bits) then
+         M := Interfaces.Shift_Left (1, Mantissa_Explicit_Bits);
+         P := @ + 1;  --  Undo previous addition
+      end if;
 
-      --  Pack the bits and return.
+      M := @ and not Interfaces.Shift_Left (1, Mantissa_Explicit_Bits);
 
-      Number  :=
-        F64 (M or (Interfaces.Shift_Left (Interfaces.Unsigned_64 (P), 52)));
+      if P >= Infinite_Power then
+         --  infinity
+
+         P := Infinite_Power;
+         M := 0;
+      end if;
+
+      To_Binary_Float (M, P, Number);
       Success := True;
    end Convert;
 
@@ -319,5 +329,66 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       L := Interfaces.Unsigned_64 (R mod 2 ** 64);
       H := Interfaces.Unsigned_64 (R / 2 ** 64);
    end Multiply;
+
+   -----------
+   -- Power --
+   -----------
+
+   function Power (Q : Interfaces.Integer_32) return Interfaces.Integer_32 is
+   begin
+      --  For q in (0,350), we have that
+      --
+      --     f = (((152170 + 65536) * q ) >> 16);
+      --
+      --  is equal to
+      --
+      --     floor(p) + q
+      --
+      --  where
+      --
+      --     p = log(5**q)/log(2) = q * log(5)/log(2)
+      --
+      --  For negative values of q in (-400,0), we have that
+      --
+      --     f = (((152170 + 65536) * q ) >> 16);
+      --
+      --  is equal to
+      --
+      --     -ceil(p) + q
+      --
+      --  where
+      --
+      --     p = log(5**-q)/log(2) = -q * log(5)/log(2)
+
+      --  Note, arithmetic shift is required here, it is available for
+      --  modular types only, thus use unchecked conversion to convert
+      --  signed integer into modular and back.
+
+      return
+        I32
+          (Interfaces.Shift_Right_Arithmetic (U32 ((152170 + 65536) * Q), 16))
+        + 63;
+   end Power;
+
+   ---------------------
+   -- To_Binary_Float --
+   ---------------------
+
+   procedure To_Binary_Float
+     (M : Interfaces.Unsigned_64;
+      P : Interfaces.Integer_32;
+      N : out Interfaces.IEEE_Float_64)
+   is
+      N_U64 : Interfaces.Unsigned_64 with Address => N'Address;
+      --  This subprogram should be able to process Inf values, which is not
+      --  valid value of floating point type in Ada, thus exception is raised
+      --  in validity checks mode. To prevent this overlapped variable is used.
+
+   begin
+      N_U64 :=
+        M
+          or Interfaces.Shift_Left
+               (Interfaces.Unsigned_64 (P), Mantissa_Explicit_Bits);
+   end To_Binary_Float;
 
 end VSS.JSON.Implementation.Numbers.Eisel_Lemire;

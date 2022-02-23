@@ -328,11 +328,12 @@ procedure Test_JSON_Decimal_To_Number is
    --
    --  P : VSS.JSON.Implementation.Numbers.Parsing_State;
    --  N : VSS.JSON.JSON_Number;
-   --  S : constant VSS.Strings.Virtual_String := "1.8011670033376514";
-   --  F : constant Interfaces.IEEE_Float_64 := 1.8011670033376514;
+   --  S : constant String := "358416272e-33";
+   --  F : constant Interfaces.IEEE_Float_64 := 358416272.0e-33;
 
 begin
    --  Process_String (P, S);
+   --  P.Has_Fractional := True;
    --  VSS.JSON.Implementation.Numbers.To_JSON_Number
    --    (P, VSS.Strings.Conversions.To_Virtual_String (S), N);
    --  Test_Support.Assert (N.Float_Value = F);

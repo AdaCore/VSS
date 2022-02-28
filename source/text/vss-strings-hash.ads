@@ -24,5 +24,5 @@
 with Ada.Containers;
 
 function VSS.Strings.Hash
-  (Self : VSS.Strings.Virtual_String'Class)
+  (Self : VSS.Strings.Virtual_String)
    return Ada.Containers.Hash_Type;

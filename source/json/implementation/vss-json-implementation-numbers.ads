@@ -68,8 +68,4 @@ package VSS.JSON.Implementation.Numbers is
       To           : out VSS.JSON.JSON_Number);
    --  Converts parsed value to JSON_Number and set it to To parameter.
 
-   function Is_Integer (Self : Parsing_State) return Boolean;
-   --  XXX Auxiliary subprogram to help to migrate to own implementation of
-   --  string to number conversion.
-
 end VSS.JSON.Implementation.Numbers;

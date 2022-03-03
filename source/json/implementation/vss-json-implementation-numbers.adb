@@ -157,19 +157,6 @@ package body VSS.JSON.Implementation.Numbers is
       end if;
    end Int_Digit;
 
-   ----------------
-   -- Is_Integer --
-   ----------------
-
-   function Is_Integer (Self : Parsing_State) return Boolean is
-   begin
-      return
-        Self.Exponent_Adjustment = 0
-          and Self.Exp_Value = 0
-          --  and not Self.Has_Exponent
-          and not Self.Mantissa_Is_Inexact;
-   end Is_Integer;
-
    --------------------
    -- To_JSON_Number --
    --------------------

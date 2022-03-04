@@ -109,6 +109,7 @@ procedure Test_JSON_Decimal_To_Number is
                   Mode := Int;
 
                elsif C = '.' then
+                  VSS.JSON.Implementation.Numbers.Decimal_Point (State);
                   Mode := Frac;
 
                else
@@ -123,6 +124,7 @@ procedure Test_JSON_Decimal_To_Number is
                     (State, Character'Pos (C));
 
                elsif C = '.' then
+                  VSS.JSON.Implementation.Numbers.Decimal_Point (State);
                   Mode := Frac;
 
                elsif C in 'e' | 'E' then

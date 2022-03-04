@@ -524,7 +524,7 @@ package body VSS.JSON.Implementation.Parsers is
 
       else
          Self.Buffer.Clear;
-         Self.Number_State := (others => <>);
+         VSS.JSON.Implementation.Numbers.Reset (Self.Number_State);
 
          case Self.C is
             when Hyphen_Minus =>
@@ -609,6 +609,8 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Frac_Digit;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Decimal_Point
+                       (Self.Number_State);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
@@ -630,6 +632,8 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Frac_Digit;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Decimal_Point
+                       (Self.Number_State);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;

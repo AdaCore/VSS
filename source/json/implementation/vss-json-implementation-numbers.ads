@@ -68,4 +68,19 @@ package VSS.JSON.Implementation.Numbers is
       To           : out VSS.JSON.JSON_Number);
    --  Converts parsed value to JSON_Number and set it to To parameter.
 
+private
+
+   type Decoded_Float is record
+      Mantissa : Interfaces.Unsigned_64 := 0;
+      Power    : Interfaces.Integer_32  := 0;
+   end record;
+
+   overriding function "="
+     (Left : Decoded_Float; Right : Decoded_Float) return Boolean;
+
+   procedure Encode_IEEE_Float
+     (M : Interfaces.Unsigned_64;
+      P : Interfaces.Integer_32;
+      N : out Interfaces.IEEE_Float_64);
+
 end VSS.JSON.Implementation.Numbers;

@@ -70,11 +70,6 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
 
    function Power (Q : Interfaces.Integer_32) return Interfaces.Integer_32;
 
-   procedure To_Binary_Float
-     (M : Interfaces.Unsigned_64;
-      P : Interfaces.Integer_32;
-      N : out Interfaces.IEEE_Float_64);
-
    -----------------------------------
    -- Compute_Product_Approximation --
    -----------------------------------
@@ -150,7 +145,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
    procedure Convert
      (Significand  : Interfaces.Unsigned_64;
       Exponent_10  : Interfaces.Integer_32;
-      Number       : out Interfaces.IEEE_Float_64;
+      Number       : out Decoded_Float;
       Success      : out Boolean)
    is
       --  Names of objects correspond to used in paper.
@@ -225,7 +220,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
             P := 0;
             M := 0;
 
-            To_Binary_Float (M, P, Number);
+            Number := (M, P);
             Success := True;
 
             return;
@@ -255,7 +250,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
             then 0
             else 1);
 
-         To_Binary_Float (M, P, Number);
+         Number := (M, P);
          Success := True;
 
          return;
@@ -306,7 +301,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
          M := 0;
       end if;
 
-      To_Binary_Float (M, P, Number);
+      Number := (M, P);
       Success := True;
    end Convert;
 
@@ -369,26 +364,5 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
           (Interfaces.Shift_Right_Arithmetic (U32 ((152170 + 65536) * Q), 16))
         + 63;
    end Power;
-
-   ---------------------
-   -- To_Binary_Float --
-   ---------------------
-
-   procedure To_Binary_Float
-     (M : Interfaces.Unsigned_64;
-      P : Interfaces.Integer_32;
-      N : out Interfaces.IEEE_Float_64)
-   is
-      N_U64 : Interfaces.Unsigned_64 with Address => N'Address;
-      --  This subprogram should be able to process Inf values, which is not
-      --  valid value of floating point type in Ada, thus exception is raised
-      --  in validity checks mode. To prevent this overlapped variable is used.
-
-   begin
-      N_U64 :=
-        M
-          or Interfaces.Shift_Left
-               (Interfaces.Unsigned_64 (P), Mantissa_Explicit_Bits);
-   end To_Binary_Float;
 
 end VSS.JSON.Implementation.Numbers.Eisel_Lemire;

@@ -27,7 +27,7 @@
 --  blog post https://nigeltao.github.io/blog/2020/eisel-lemire.html, and
 --  reference implementation https://github.com/fastfloat/fast_float
 
-package VSS.JSON.Implementation.Numbers.Eisel_Lemire is
+private package VSS.JSON.Implementation.Numbers.Eisel_Lemire is
 
    pragma Preelaborate;
 
@@ -44,7 +44,7 @@ package VSS.JSON.Implementation.Numbers.Eisel_Lemire is
    procedure Convert
      (Significand  : Interfaces.Unsigned_64;
       Exponent_10  : Interfaces.Integer_32;
-      Number       : out Interfaces.IEEE_Float_64;
+      Number       : out Decoded_Float;
       Success      : out Boolean)
      with Pre =>
        Significand /= 0

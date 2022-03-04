@@ -48,6 +48,38 @@ package body VSS.JSON.Implementation.Numbers is
    --  Decimal_Digits_Limit : constant := 50_000;
    --  --  Limit of decimal digits to avoid integer overflow of exponent.
 
+   ---------
+   -- "=" --
+   ---------
+
+   overriding function "="
+     (Left : Decoded_Float; Right : Decoded_Float) return Boolean is
+   begin
+      return Left.Mantissa = Right.Mantissa and then Left.Power = Right.Power;
+   end "=";
+
+   -----------------------
+   -- Encode_IEEE_Float --
+   -----------------------
+
+   procedure Encode_IEEE_Float
+     (M : Interfaces.Unsigned_64;
+      P : Interfaces.Integer_32;
+      N : out Interfaces.IEEE_Float_64)
+   is
+      N_U64 : Interfaces.Unsigned_64 with Address => N'Address;
+      --  This subprogram should be able to process Inf values, which is not
+      --  valid value of floating point type in Ada, thus exception is raised
+      --  in validity checks mode. To prevent this overlapped variable is used.
+
+   begin
+      N_U64 :=
+        M
+          or Interfaces.Shift_Left
+              (Interfaces.Unsigned_64 (P),
+               Eisel_Lemire.Mantissa_Explicit_Bits);
+   end Encode_IEEE_Float;
+
    ---------------
    -- Exp_Digit --
    ---------------
@@ -258,7 +290,8 @@ package body VSS.JSON.Implementation.Numbers is
          end if;
 
          declare
-            Number     : Interfaces.IEEE_Float_64;
+            Number     : Decoded_Float;
+            Number_1   : Decoded_Float;
             Number_Aux : Interfaces.IEEE_Float_64;
             Success    : Boolean := False;
 
@@ -267,7 +300,17 @@ package body VSS.JSON.Implementation.Numbers is
                --  If significant is exact number attempt to convert it by
                --  fastest algoriphm.
 
-               Clinger.Convert (Self.Significand, Exponent, Number, Success);
+               Clinger.Convert
+                 (Self.Significand, Exponent, Number_Aux, Success);
+
+               if Success then
+                  To :=
+                    (JSON_Float,
+                     String_Value,
+                     (if Self.Minus then -Number_Aux else Number_Aux));
+
+                  return;
+               end if;
             end if;
 
             if not Success then
@@ -279,30 +322,26 @@ package body VSS.JSON.Implementation.Numbers is
                   --  the next value of significand.
 
                   Eisel_Lemire.Convert
-                    (Self.Significand + 1, Exponent, Number_Aux, Success);
+                    (Self.Significand + 1, Exponent, Number_1, Success);
 
                   --  If computed value is not equal to first one, more
                   --  complicated conversion need to be used, thus fail.
-                  --  Infinity values are invalid in Ada, thus need to be
-                  --  checked separately, otherwise Constraint_Error is
-                  --  raised in data validity checking mode.
 
-                  if (Number'Valid or Number_Aux'Valid)
-                    and (not Number'Valid
-                           or else not Number_Aux'Valid
-                           or else Number /= Number_Aux)
-                  then
+                  if Number /= Number_1 then
                      Success := False;
                   end if;
                end if;
             end if;
 
             if Success then
-               if Number'Valid then
+               if Number.Power /= Eisel_Lemire.Infinite_Power then
+                  Encode_IEEE_Float
+                    (Number.Mantissa, Number.Power, Number_Aux);
+
                   To :=
                     (JSON_Float,
                      String_Value,
-                     (if Self.Minus then -Number else Number));
+                     (if Self.Minus then -Number_Aux else Number_Aux));
 
                else
                   To := (Out_Of_Range, String_Value);

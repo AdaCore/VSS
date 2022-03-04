@@ -322,23 +322,21 @@ package body VSS.JSON.Implementation.Numbers is
                end if;
             end if;
 
-            if not Success then
+            Eisel_Lemire.Convert
+              (Self.Significand, Exponent, Number, Success);
+
+            if Success and Self.Mantissa_Is_Inexact then
+               --  When significan is not exact try to compute value for
+               --  the next value of significand.
+
                Eisel_Lemire.Convert
-                 (Self.Significand, Exponent, Number, Success);
+                 (Self.Significand + 1, Exponent, Number_1, Success);
 
-               if Success and Self.Mantissa_Is_Inexact then
-                  --  When significan is not exact try to compute value for
-                  --  the next value of significand.
+               --  If computed value is not equal to first one, more
+               --  complicated conversion need to be used, thus fail.
 
-                  Eisel_Lemire.Convert
-                    (Self.Significand + 1, Exponent, Number_1, Success);
-
-                  --  If computed value is not equal to first one, more
-                  --  complicated conversion need to be used, thus fail.
-
-                  if Number /= Number_1 then
-                     Success := False;
-                  end if;
+               if Number /= Number_1 then
+                  Success := False;
                end if;
             end if;
 

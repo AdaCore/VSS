@@ -79,8 +79,8 @@ private
      (Left : Decoded_Float; Right : Decoded_Float) return Boolean;
 
    procedure Encode_IEEE_Float
-     (M : Interfaces.Unsigned_64;
-      P : Interfaces.Integer_32;
-      N : out Interfaces.IEEE_Float_64);
+     (Decoded  : Decoded_Float;
+      Negative : Boolean;
+      Encoded  : out Interfaces.IEEE_Float_64);
 
 end VSS.JSON.Implementation.Numbers;

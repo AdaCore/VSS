@@ -41,12 +41,6 @@ package body VSS.JSON.Implementation.Numbers is
 
    Digit_Zero : constant VSS.Unicode.Code_Point := 16#00_0030#;
 
-   Decimal_Mantissa_Digits_Max : constant := 19;
-   --  Maximum number of significant digits of the mantissa to be read.
-   --  Unsigned_64 is able to represent this number of digits. It is enought
-   --  to represent absolute value of Integer_64 too. Number of digits of
-   --  IEEE_Float_64 is less than this number.
-
    Decimal_Exponent_Digits_Max : constant := 9;
    --  Maximum number of digits of the exponent.
 
@@ -62,6 +56,18 @@ package body VSS.JSON.Implementation.Numbers is
    begin
       return Left.Mantissa = Right.Mantissa and then Left.Power = Right.Power;
    end "=";
+
+   -------------------
+   -- Decimal_Point --
+   -------------------
+
+   procedure Decimal_Point (Self : in out Parsing_State) is
+   begin
+      Self.Has_Fractional := True;
+
+      VSS.JSON.Implementation.Packed_Decimals.Append_Decimal_Point
+        (Self.Decimal);
+   end Decimal_Point;
 
    -----------------------
    -- Encode_IEEE_Float --
@@ -130,34 +136,10 @@ package body VSS.JSON.Implementation.Numbers is
          return;
       end if;
 
-      Self.Has_Fractional := True;
-
-      if Self.Significand = 0 and Digit = Digit_Zero then
-         --  Mantissa is zero and digit is zero too, adjust exponent
-
-         Self.Exponent_Adjustment := Self.Exponent_Adjustment - 1;
-
-      elsif Self.Collected_Mantissa_Digits < Decimal_Mantissa_Digits_Max then
-         Self.Significand :=
-           Self.Significand * 10 + Interfaces.Unsigned_64 (Digit - Digit_Zero);
-         Self.Exponent_Adjustment := Self.Exponent_Adjustment - 1;
-         Self.Collected_Mantissa_Digits := Self.Collected_Mantissa_Digits + 1;
-
-      else
-         Self.Mantissa_Is_Inexact :=
-           Self.Mantissa_Is_Inexact or (Digit /= Digit_Zero);
-         --  Self.Parsed_Digits := Self.Parsed_Digits + 1;
-
-         --  if Self.Parsed_Digits >= Decimal_Digits_Limit then
-         --     --  Stop processing of unreasonably long numbers.
-         --
-         --     Self.Error := Out_Of_Range;
-         --  end if;
-
-      --  else
-      end if;
-      --
-      --  Self.Parsed_Digits := Self.Parsed_Digits + 1;
+      VSS.JSON.Implementation.Packed_Decimals.Append_Fractional
+        (Self.Decimal,
+         VSS.JSON.Implementation.Packed_Decimals.Decimal_Digit
+           (Digit - Digit_Zero));
    end Frac_Digit;
 
    ---------------
@@ -172,31 +154,28 @@ package body VSS.JSON.Implementation.Numbers is
          return;
       end if;
 
-      if Self.Significand = 0 and Digit = Digit_Zero then
-         --  Leading digit zero, nothing to do.
-
-         null;
-
-      elsif Self.Collected_Mantissa_Digits < Decimal_Mantissa_Digits_Max then
-         Self.Significand                  :=
-           Self.Significand * 10 + Interfaces.Unsigned_64 (Digit - Digit_Zero);
-         Self.Collected_Mantissa_Digits :=
-           Self.Collected_Mantissa_Digits + 1;
-
-      else
-         Self.Mantissa_Is_Inexact :=
-           Self.Mantissa_Is_Inexact or (Digit /= Digit_Zero);
-         Self.Exponent_Adjustment := Self.Exponent_Adjustment + 1;
-
-         --  Self.Parsed_Digits := Self.Parsed_Digits + 1;
-
-         --  if Self.Parsed_Digits >= Decimal_Digits_Limit then
-         --     --  Stop processing of unreasonably long numbers.
-         --
-         --     Self.Error := Out_Of_Range;
-         --  end if;
-      end if;
+      VSS.JSON.Implementation.Packed_Decimals.Append_Integral
+        (Self.Decimal,
+         VSS.JSON.Implementation.Packed_Decimals.Decimal_Digit
+           (Digit - Digit_Zero));
    end Int_Digit;
+
+   -----------
+   -- Reset --
+   -----------
+
+   procedure Reset (Self : in out Parsing_State) is
+   begin
+      Self.Error                     := Not_A_Error;
+      Self.Minus                     := False;
+      Self.Has_Fractional            := False;
+      Self.Has_Exponent              := False;
+      Self.Exp_Minus                 := False;
+      Self.Exp_Value                 := 0;
+      Self.Collected_Exponent_Digits := 0;
+
+      VSS.JSON.Implementation.Packed_Decimals.Clear (Self.Decimal);
+   end Reset;
 
    --------------------
    -- To_JSON_Number --
@@ -217,9 +196,9 @@ package body VSS.JSON.Implementation.Numbers is
         Interfaces.Unsigned_64 (-Interfaces.Integer_64'First);
       --  Maximum absolute value of the minimum negative integer.
 
-      Exponent     : constant Interfaces.Integer_32 :=
-        (if Self.Exp_Minus then -Self.Exp_Value else Self.Exp_Value)
-        + Self.Exponent_Adjustment;
+      Mantissa     : Interfaces.Unsigned_64;
+      Exponent     : Interfaces.Integer_32;
+      Inexact      : Boolean;
 
    begin
       if Self.Error /= Not_A_Error then
@@ -228,40 +207,46 @@ package body VSS.JSON.Implementation.Numbers is
          return;
       end if;
 
+      VSS.JSON.Implementation.Packed_Decimals.Decode_As_Integer
+        (Self.Decimal, Mantissa, Exponent, Inexact);
+
+      Exponent :=
+        @ + (if Self.Exp_Minus then -Self.Exp_Value else Self.Exp_Value);
+
       --  Integer literals
 
       if not Self.Has_Fractional and not Self.Has_Exponent then
          --  Number has format of the integer value
 
-         if Self.Mantissa_Is_Inexact or Exponent /= 0 then
+         if Inexact or Exponent /= 0 then
             To := (Out_Of_Range, String_Value);
 
             return;
          end if;
 
          if Self.Minus then
-            if Self.Significand > Max_Negative then
+            if Mantissa > Max_Negative then
                To := (Out_Of_Range, String_Value);
 
-            elsif Self.Significand = Max_Negative then
+            elsif Mantissa = Max_Negative then
                To := (JSON_Integer, String_Value, Interfaces.Integer_64'First);
 
             else
                To :=
                  (JSON_Integer,
                   String_Value,
-                  -Interfaces.Integer_64 (Self.Significand));
+                  -Interfaces.Integer_64 (Mantissa));
             end if;
 
          else
-            if Self.Significand > Max_Positive then
+            if Mantissa > Max_Positive then
                To := (Out_Of_Range, String_Value);
 
             else
                To :=
                  (JSON_Integer,
                   String_Value,
-                  Interfaces.Integer_64 (Self.Significand));
+                  Interfaces.Integer_64 (Mantissa));
             end if;
          end if;
 
@@ -286,7 +271,7 @@ package body VSS.JSON.Implementation.Numbers is
          return;
 
       else
-         if Self.Significand = 0 then
+         if Mantissa = 0 then
             --  It is important to check significand to zero before main
             --  algorithm to avoid additional checks. Significand equal to
             --  zero is always exact, because all leading zeros are ignored
@@ -305,12 +290,11 @@ package body VSS.JSON.Implementation.Numbers is
             Success    : Boolean := False;
 
          begin
-            if not Self.Mantissa_Is_Inexact then
+            if not Inexact then
                --  If significant is exact number attempt to convert it by
                --  fastest algoriphm.
 
-               Clinger.Convert
-                 (Self.Significand, Exponent, Number_Aux, Success);
+               Clinger.Convert (Mantissa, Exponent, Number_Aux, Success);
 
                if Success then
                   To :=
@@ -322,15 +306,14 @@ package body VSS.JSON.Implementation.Numbers is
                end if;
             end if;
 
-            Eisel_Lemire.Convert
-              (Self.Significand, Exponent, Number, Success);
+            Eisel_Lemire.Convert (Mantissa, Exponent, Number, Success);
 
-            if Success and Self.Mantissa_Is_Inexact then
+            if Success and Inexact then
                --  When significan is not exact try to compute value for
                --  the next value of significand.
 
                Eisel_Lemire.Convert
-                 (Self.Significand + 1, Exponent, Number_1, Success);
+                 (Mantissa + 1, Exponent, Number_1, Success);
 
                --  If computed value is not equal to first one, more
                --  complicated conversion need to be used, thus fail.

@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 --  Utilities to read/write numbers.
 
+with VSS.JSON.Implementation.Packed_Decimals;
 with VSS.Unicode;
 
 package VSS.JSON.Implementation.Numbers is
@@ -33,22 +34,27 @@ package VSS.JSON.Implementation.Numbers is
    type Parsing_State is record
       Error                     : Parsing_Error_States   := Not_A_Error;
       Minus                     : Boolean                := False;
-      Significand               : Interfaces.Unsigned_64 := 0;
-      Mantissa_Is_Inexact       : Boolean                := False;
-      Collected_Mantissa_Digits : Interfaces.Unsigned_32 := 0;
-      Exponent_Adjustment       : Interfaces.Integer_32  := 0;
       Has_Fractional            : Boolean                := False;
       Has_Exponent              : Boolean                := False;
       Exp_Minus                 : Boolean                := False;
       Exp_Value                 : Interfaces.Integer_32  := 0;
       Collected_Exponent_Digits : Interfaces.Unsigned_32 := 0;
+      Decimal                   :
+        VSS.JSON.Implementation.Packed_Decimals.Packed_Decimal;
    end record;
+
+   procedure Reset (Self : in out Parsing_State);
+   --  Reset state to initial.
 
    procedure Int_Digit
      (Self  : in out Parsing_State;
       Digit : VSS.Unicode.Code_Point);
    --  Process next digit of 'int' expression. Digit must be valid character
    --  inside '0' .. '9' range.
+
+   procedure Decimal_Point (Self : in out Parsing_State);
+   --  Process decimal point between integral and fractional parts of the
+   --  number.
 
    procedure Frac_Digit
      (Self  : in out Parsing_State;

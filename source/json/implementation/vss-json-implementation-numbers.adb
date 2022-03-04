@@ -21,6 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Warnings (Off, "unrecognized pragma");
+pragma Ada_2020;
+pragma Ada_2022;
+pragma Warnings (On, "unrecognized pragma");
+
 with VSS.JSON.Implementation.Numbers.Clinger;
 with VSS.JSON.Implementation.Numbers.Counters;
 with VSS.JSON.Implementation.Numbers.Eisel_Lemire;
@@ -63,21 +68,25 @@ package body VSS.JSON.Implementation.Numbers is
    -----------------------
 
    procedure Encode_IEEE_Float
-     (M : Interfaces.Unsigned_64;
-      P : Interfaces.Integer_32;
-      N : out Interfaces.IEEE_Float_64)
+     (Decoded  : Decoded_Float;
+      Negative : Boolean;
+      Encoded  : out Interfaces.IEEE_Float_64)
    is
-      N_U64 : Interfaces.Unsigned_64 with Address => N'Address;
+      N_U64 : Interfaces.Unsigned_64 with Address => Encoded'Address;
       --  This subprogram should be able to process Inf values, which is not
       --  valid value of floating point type in Ada, thus exception is raised
       --  in validity checks mode. To prevent this overlapped variable is used.
 
    begin
       N_U64 :=
-        M
+        Decoded.Mantissa
           or Interfaces.Shift_Left
-              (Interfaces.Unsigned_64 (P),
+              (Interfaces.Unsigned_64 (Decoded.Power),
                Eisel_Lemire.Mantissa_Explicit_Bits);
+
+      if Negative then
+         N_U64 := @ or 16#8000_0000_0000_0000#;
+      end if;
    end Encode_IEEE_Float;
 
    ---------------
@@ -335,13 +344,9 @@ package body VSS.JSON.Implementation.Numbers is
 
             if Success then
                if Number.Power /= Eisel_Lemire.Infinite_Power then
-                  Encode_IEEE_Float
-                    (Number.Mantissa, Number.Power, Number_Aux);
+                  Encode_IEEE_Float (Number, Self.Minus, Number_Aux);
 
-                  To :=
-                    (JSON_Float,
-                     String_Value,
-                     (if Self.Minus then -Number_Aux else Number_Aux));
+                  To := (JSON_Float, String_Value, Number_Aux);
 
                else
                   To := (Out_Of_Range, String_Value);

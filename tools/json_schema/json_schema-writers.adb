@@ -66,6 +66,20 @@ package body JSON_Schema.Writers is
       Done           : in out String_Sets.Set);
    --  The same for "type: object" schema
 
+   procedure Write_Record_Component
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Property : JSON_Schema.Property;
+      Required : Boolean);
+   --  Write record component declaration for given Property
+
+   procedure Write_Derived_Type
+     (Name           : VSS.Strings.Virtual_String;
+      Schema         : Schema_Access;
+      Map            : JSON_Schema.Readers.Schema_Map;
+      Optional_Types : String_Sets.Set;
+      Done           : in out String_Sets.Set);
+   --  The same for "allOf:[]" schema
+
    procedure Write_Enumeration_Type
      (Name   : VSS.Strings.Virtual_String;
       Schema : Schema_Access);
@@ -123,7 +137,7 @@ package body JSON_Schema.Writers is
    --  Check if schema isn't an enumeration
 
    Reserved_Words : constant VSS.String_Vectors.Virtual_String_Vector :=
-     ["function", "interface", "all", "type"];
+     ["function", "interface", "all", "type", "body"];
 
    Integer_Or_String : constant JSON_Schema.Simple_Type_Vectors.Vector :=
      [Definitions.An_Integer, Definitions.A_String];
@@ -297,12 +311,16 @@ package body JSON_Schema.Writers is
       Put ("package Enum is");
       New_Line;
       New_Line;
+
       Write_Named_Types (Map, Optional_Types, Done, Only_If => Is_Enum'Access);
+
       Put ("end Enum;");
       New_Line;
       New_Line;
+
       Write_Named_Types
         (Map, Optional_Types, Done, Only_If => Is_Not_Enum'Access);
+
       Put ("private");
       New_Line;
       Put ("type Integer_Vector is tagged null record;");
@@ -351,6 +369,87 @@ package body JSON_Schema.Writers is
       end if;
    end Write_Comment;
 
+   ------------------------
+   -- Write_Derived_Type --
+   ------------------------
+
+   procedure Write_Derived_Type
+     (Name           : VSS.Strings.Virtual_String;
+      Schema         : Schema_Access;
+      Map            : JSON_Schema.Readers.Schema_Map;
+      Optional_Types : String_Sets.Set;
+      Done           : in out String_Sets.Set)
+   is
+      use type VSS.Strings.Virtual_String;
+
+      Next : Schema_Access := Schema;
+
+      Done_Fields : String_Sets.Set;
+   begin
+      --  Write dependencies
+      for Used of Schema.All_Of loop
+         if not Used.Ref.Is_Empty then
+            Write_Named_Type
+              (Used.Ref,
+               Map (Used.Ref),
+               Map,
+               Optional_Types,
+               Done);
+         end if;
+
+         for Property of Used.Properties loop
+            if not Property.Schema.Ref.Is_Empty
+              and then Property.Schema.Ref /= Name
+            then
+               Write_Named_Type
+                 (Property.Schema.Ref,
+                  Map (Property.Schema.Ref),
+                  Map,
+                  Optional_Types,
+                  Done);
+            end if;
+         end loop;
+      end loop;
+
+      pragma Assert (Schema.All_Of.Last_Index = 2);
+      Put ("type ");
+      Put (Ref_To_Type_Name (Name));
+      Put (" is ");
+
+      Put ("record");
+      New_Line;
+
+      while Next /= null loop
+         for Property of Next.Properties loop
+            if not Done_Fields.Contains (Property.Name) then
+               Write_Record_Component
+                 (Map, Property, Next.Required.Contains (Property.Name));
+               Done_Fields.Include (Property.Name);
+            end if;
+         end loop;
+
+         for Item of Next.All_Of loop
+            for Property of Item.Properties loop
+               if not Done_Fields.Contains (Property.Name) then
+                  Write_Record_Component
+                    (Map, Property, Item.Required.Contains (Property.Name));
+                  Done_Fields.Include (Property.Name);
+               end if;
+            end loop;
+         end loop;
+
+         if Next.All_Of.Is_Empty then
+            Next := null;
+         else
+            Next := Map (Next.All_Of.First_Element.Ref);
+         end if;
+      end loop;
+
+      Put ("end record;");
+      New_Line;
+      New_Line;
+   end Write_Derived_Type;
+
    ----------------------------
    -- Write_Enumeration_Type --
    ----------------------------
@@ -395,6 +494,10 @@ package body JSON_Schema.Writers is
       elsif not Schema.Enum.Is_Empty then
          Done.Insert (Name);
          Write_Enumeration_Type (Name, Schema);
+      elsif not Schema.All_Of.Is_Empty then
+         Done.Insert (Name);
+         Write_Derived_Type
+           (Name, Schema, Map, Optional_Types, Done);
       elsif not Schema.Properties.Is_Empty then
          Done.Insert (Name);
          Write_Record_Type (Name, Schema, Map, Optional_Types, Done);
@@ -403,6 +506,10 @@ package body JSON_Schema.Writers is
       then
          Done.Insert (Name);
          Write_Any_Object (Name);
+      else
+         Put ("--  Left:");
+         Put (Name);
+         New_Line;
       end if;
 
       if Optional_Types.Contains (Ref_To_Type_Name (Name)) then
@@ -418,7 +525,7 @@ package body JSON_Schema.Writers is
      (Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set;
-      Only_If           : access
+      Only_If        : access
         function (Schema : Schema_Access) return Boolean) is
    begin
       for Cursor in Map.Iterate loop
@@ -490,16 +597,14 @@ package body JSON_Schema.Writers is
       end loop;
    end Write_Public_Vectors;
 
-   -----------------------
-   -- Write_Record_Type --
-   -----------------------
+   ----------------------------
+   -- Write_Record_Component --
+   ----------------------------
 
-   procedure Write_Record_Type
-     (Name           : VSS.Strings.Virtual_String;
-      Schema         : Schema_Access;
-      Map            : JSON_Schema.Readers.Schema_Map;
-      Optional_Types : String_Sets.Set;
-      Done           : in out String_Sets.Set)
+   procedure Write_Record_Component
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Property : JSON_Schema.Property;
+      Required : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -597,7 +702,47 @@ package body JSON_Schema.Writers is
 
          return Result;
       end Field_Type;
+
    begin
+      declare
+         Field_Name : constant VSS.Strings.Virtual_String :=
+           Escape_Keywords (Property.Name);
+
+         Field_Type : VSS.Strings.Virtual_String :=
+           Write_Record_Component.Field_Type (Property.Schema, Required);
+      begin
+         if Field_Name.To_Lowercase = Field_Type.To_Lowercase then
+            Field_Type.Prepend (".");
+            Field_Type.Prepend (Package_Name);
+         end if;
+
+         Put (Field_Name);
+         Put (" : ");
+         Put (Field_Type);
+         Put (";");
+         New_Line;
+
+         Write_Comment (Property.Schema.Description, 6);
+      end;
+   end Write_Record_Component;
+
+   -----------------------
+   -- Write_Record_Type --
+   -----------------------
+
+   procedure Write_Record_Type
+     (Name           : VSS.Strings.Virtual_String;
+      Schema         : Schema_Access;
+      Map            : JSON_Schema.Readers.Schema_Map;
+      Optional_Types : String_Sets.Set;
+      Done           : in out String_Sets.Set)
+   is
+      use type VSS.Strings.Virtual_String;
+
+      Type_Name : constant VSS.Strings.Virtual_String :=
+        Ref_To_Type_Name (Name);
+   begin
+      --  Write dependencies
       for Property of Schema.Properties loop
          if not Property.Schema.Ref.Is_Empty
            and then Property.Schema.Ref /= Name
@@ -612,32 +757,14 @@ package body JSON_Schema.Writers is
       end loop;
 
       Put ("type ");
-      Put (Ref_To_Type_Name (Name));
-      Put (" is record");
+      Put (Type_Name);
+      Put (" is ");
+      Put ("record");
       New_Line;
 
       for Property of Schema.Properties loop
-         declare
-            Field_Name : constant VSS.Strings.Virtual_String :=
-              Escape_Keywords (Property.Name);
-
-            Field_Type : VSS.Strings.Virtual_String :=
-              Write_Record_Type.Field_Type
-                (Property.Schema, Schema.Required.Contains (Property.Name));
-         begin
-            if Field_Name.To_Lowercase = Field_Type.To_Lowercase then
-               Field_Type.Prepend (".");
-               Field_Type.Prepend (Package_Name);
-            end if;
-
-            Put (Field_Name);
-            Put (" : ");
-            Put (Field_Type);
-            Put (";");
-            New_Line;
-
-            Write_Comment (Property.Schema.Description, 6);
-         end;
+         Write_Record_Component
+           (Map, Property, Schema.Required.Contains (Property.Name));
       end loop;
 
       Put ("end record;");

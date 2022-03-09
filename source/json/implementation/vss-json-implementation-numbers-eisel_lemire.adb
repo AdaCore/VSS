@@ -150,7 +150,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
         Interfaces.Integer_32 ((Interfaces.Shift_Right (Mantissa, 63) xor 1));
 
    begin
-      Number.Mantissa :=
+      Number.Significand :=
         Interfaces.Shift_Left (Mantissa, Natural (High_Leading_Zeros));
 
       Number.Power :=
@@ -488,7 +488,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
          Callback (Number, Interfaces.Integer_32'Min (Shift, 64));
 
          Number.Power :=
-           (if Number.Mantissa
+           (if Number.Significand
                  < Interfaces.Shift_Left (1, Mantissa_Explicit_Bits)
             then 0
             else 1);
@@ -504,22 +504,22 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
 
       --  Check for carry
 
-      if Number.Mantissa
+      if Number.Significand
            >= Interfaces.Shift_Left (2, Mantissa_Explicit_Bits)
       then
-         Number.Mantissa :=
+         Number.Significand :=
            Interfaces.Shift_Left (1, Mantissa_Explicit_Bits);
          Number.Power := @ + 1;
       end if;
 
       --  Check for infinite: we could have carried to an infinite power.
 
-      Number.Mantissa :=
+      Number.Significand :=
         @ and not Interfaces.Shift_Left (1, Mantissa_Explicit_Bits);
 
       if Number.Power >= Infinite_Power then
          Number.Power := Infinite_Power;
-         Number.Mantissa := 0;
+         Number.Significand := 0;
 
          raise Program_Error;
       end if;
@@ -542,7 +542,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
            then 0
            else Interfaces.Shift_Left (1, Natural (Shift - 1)));
       Truncated_Bits : constant Interfaces.Unsigned_64 :=
-        Number.Mantissa and Mask;
+        Number.Significand and Mask;
       Is_Above       : constant Boolean := Truncated_Bits > Halfway;
       Is_Halfway     : constant Boolean := Truncated_Bits = Halfway;
       Is_Odd         : Boolean;
@@ -551,17 +551,17 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       --  Shift digits into position
 
       if Shift = Interfaces.Unsigned_64'Size then
-         Number.Mantissa := 0;
+         Number.Significand := 0;
 
       else
-         Number.Mantissa :=
-           Interfaces.Shift_Right (Number.Mantissa, Natural (Shift));
+         Number.Significand :=
+           Interfaces.Shift_Right (Number.Significand, Natural (Shift));
       end if;
 
       Number.Power := @ + Shift;
-      Is_Odd := (Number.Mantissa and 2#1#) = 2#1#;
+      Is_Odd := (Number.Significand and 2#1#) = 2#1#;
 
-      Number.Mantissa :=
+      Number.Significand :=
         @ + (if Callback (Is_Odd, Is_Halfway, Is_Above) then 1 else 0);
    end Generic_Round_Nearest_Tie_Even;
 
@@ -575,9 +575,9 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
    begin
       Decode_IEEE_Float (Value, Number);
 
-      Number.Mantissa := Interfaces.Shift_Left (Number.Mantissa, 1);
-      Number.Mantissa := @ + 1;
-      Number.Power    := @ - 1;
+      Number.Significand := Interfaces.Shift_Left (Number.Significand, 1);
+      Number.Significand := @ + 1;
+      Number.Power       := @ - 1;
    end Halfway;
 
    --------------
@@ -667,8 +667,8 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
             raise Program_Error;
 
          else
-            Number.Mantissa :=
-              Interfaces.Shift_Right (Number.Mantissa, Natural (Shift));
+            Number.Significand :=
+              Interfaces.Shift_Right (Number.Significand, Natural (Shift));
          end if;
 
          Number.Power := @ + Shift;
@@ -690,7 +690,8 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       Encode_IEEE_Float (Aux, False, B);
 
       Halfway (B, Theor);
-      VSS.JSON.Implementation.Big_Integers.Set (Theor_Digits, Theor.Mantissa);
+      VSS.JSON.Implementation.Big_Integers.Set
+        (Theor_Digits, Theor.Significand);
 
       Theor_Exp := Theor.Power;
 
@@ -764,7 +765,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       VSS.JSON.Implementation.Big_Integers.Multiply_Power_10
         (Mantissa, Exponent);
       VSS.JSON.Implementation.Big_Integers.Get_High_64
-        (Mantissa, Number.Mantissa, Truncated);
+        (Mantissa, Number.Significand, Truncated);
 
       Number.Power :=
         VSS.JSON.Implementation.Big_Integers.Size (Mantissa) - 64 + Bias;

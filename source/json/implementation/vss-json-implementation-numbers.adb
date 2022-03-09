@@ -53,7 +53,9 @@ package body VSS.JSON.Implementation.Numbers is
    overriding function "="
      (Left : Decoded_Float; Right : Decoded_Float) return Boolean is
    begin
-      return Left.Mantissa = Right.Mantissa and then Left.Power = Right.Power;
+      return
+        Left.Significand = Right.Significand
+          and then Left.Power = Right.Power;
    end "=";
 
    -------------------
@@ -84,7 +86,7 @@ package body VSS.JSON.Implementation.Numbers is
 
    begin
       N_U64 :=
-        Decoded.Mantissa
+        Decoded.Significand
           or Interfaces.Shift_Left
               (Interfaces.Unsigned_64 (Decoded.Power),
                Eisel_Lemire.Mantissa_Explicit_Bits);
@@ -346,8 +348,8 @@ package body VSS.JSON.Implementation.Numbers is
                Big_Mantissa : VSS.JSON.Implementation.Big_Integers.Big_Integer;
                Big_Exponent : Interfaces.Integer_32;
                Error        : constant Decoded_Float :=
-                 (Mantissa => Number.Mantissa,
-                  Power    => Number.Power - Eisel_Lemire.Invalid_Bias);
+                 (Significand => Number.Significand,
+                  Power       => Number.Power - Eisel_Lemire.Invalid_Bias);
 
             begin
                VSS.JSON.Implementation.Packed_Decimals.Decode_As_Big_Integer

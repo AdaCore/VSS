@@ -24,11 +24,16 @@
 
 with Interfaces;
 
+with VSS.JSON.Implementation.Big_Integers;
+
 package VSS.JSON.Implementation.Packed_Decimals is
 
    pragma Preelaborate;
 
-   Number_Of_Digits : constant := 768;
+   Number_Of_Digits : constant := 784;
+   --  Exact value of 64bit IEEE float can be up to 768 digits. One additional
+   --  digit is necessary for rounding. Also, this value must be adjusted to
+   --  internal limb representation which is 64bit.
 
    type Decimal_Digit is range 0 .. 9;
 
@@ -51,6 +56,12 @@ package VSS.JSON.Implementation.Packed_Decimals is
       Significand      : out Interfaces.Unsigned_64;
       Power_Adjustment : out Interfaces.Integer_32;
       Truncated        : out Boolean);
+
+   procedure Decode_As_Big_Integer
+     (Self         : Packed_Decimal;
+      Exponent     : Interfaces.Integer_32;
+      Big_Mantissa : out VSS.JSON.Implementation.Big_Integers.Big_Integer;
+      Big_Exponent : out Interfaces.Integer_32);
 
 private
 

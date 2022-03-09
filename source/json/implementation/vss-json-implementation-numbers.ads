@@ -77,8 +77,8 @@ package VSS.JSON.Implementation.Numbers is
 private
 
    type Decoded_Float is record
-      Mantissa : Interfaces.Unsigned_64 := 0;  --  XXX rename to Significand
-      Power    : Interfaces.Integer_32  := 0;
+      Significand : Interfaces.Unsigned_64 := 0;
+      Power       : Interfaces.Integer_32  := 0;
    end record;
 
    overriding function "="

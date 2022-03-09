@@ -25,6 +25,7 @@ pragma Warnings (Off, "unrecognized pragma");
 pragma Ada_2020;
 pragma Ada_2022;
 pragma Warnings (On, "unrecognized pragma");
+pragma Warnings (Off, "array aggregate using ()");
 
 with Ada.Unchecked_Conversion;
 
@@ -48,7 +49,6 @@ package body VSS.JSON.Implementation.Packed_Decimals is
    Digits_In_U8  : constant :=
      Interfaces.Unsigned_8'Size / Decimal_Digit'Value_Size;
 
-   pragma Warnings (Off, "array aggregate using ()");
    Power_Of_10 : constant
      array (Interfaces.Unsigned_32 range 1 .. 16) of Interfaces.Unsigned_64 :=
      (10,
@@ -67,7 +67,6 @@ package body VSS.JSON.Implementation.Packed_Decimals is
       100000000000000,
       1000000000000000,
       10000000000000000);
-   pragma Warnings (On, "array aggregate using ()");
 
    procedure Append
      (U64    : in out Unsigned_64_Array;
@@ -79,6 +78,24 @@ package body VSS.JSON.Implementation.Packed_Decimals is
      (Limb  : Interfaces.Unsigned_64;
       Count : Interfaces.Unsigned_32;
       Value : out Interfaces.Unsigned_64);
+
+   procedure Add
+     (Mantissa : in out VSS.JSON.Implementation.Big_Integers.Big_Integer;
+      Power    : Interfaces.Unsigned_64;
+      Value    : Interfaces.Unsigned_64);
+
+   ---------
+   -- Add --
+   ---------
+
+   procedure Add
+     (Mantissa : in out VSS.JSON.Implementation.Big_Integers.Big_Integer;
+      Power    : Interfaces.Unsigned_64;
+      Value    : Interfaces.Unsigned_64) is
+   begin
+      VSS.JSON.Implementation.Big_Integers.Multiply (Mantissa, Power);
+      VSS.JSON.Implementation.Big_Integers.Add (Mantissa, Value);
+   end Add;
 
    ------------
    -- Append --
@@ -220,6 +237,99 @@ package body VSS.JSON.Implementation.Packed_Decimals is
         (Value and Mask_4) * 100_000_000
            + (Interfaces.Shift_Right (Value, 32) and Mask_4);
    end Decode;
+
+   ---------------------------
+   -- Decode_As_Big_Integer --
+   ---------------------------
+
+   procedure Decode_As_Big_Integer
+     (Self         : Packed_Decimal;
+      Exponent     : Interfaces.Integer_32;
+      Big_Mantissa : out VSS.JSON.Implementation.Big_Integers.Big_Integer;
+      Big_Exponent : out Interfaces.Integer_32)
+   is
+      Max_Decimal_Digits : constant := 769;
+      --  Maximum number of significant digits of the mantissa to be read.
+      --  Maximal number of exact digits of 64bit IEEE float is 768 and one
+      --  more digit is used for rounding.
+
+      U64_Limb_Decimal_Digits : constant := 16;
+
+      Total_Digits : constant Interfaces.Unsigned_32 :=
+        Self.Integral_Count + Self.Last_Non_Zero;
+      Aux          : Interfaces.Unsigned_64;
+      Digit_Count  : Interfaces.Unsigned_32 := 0;
+      Step_Digits  : Interfaces.Unsigned_32;
+      Limb_Index   : U64_Limb_Offset := 0;
+
+   begin
+      Big_Exponent :=
+        Exponent
+          + Interfaces.Integer_32
+             (Interfaces.Unsigned_32'Min (Total_Digits, 19));
+
+      while Digit_Count < Max_Decimal_Digits
+        and Digit_Count < Self.Integral_Count
+      loop
+         Step_Digits :=
+           Interfaces.Unsigned_32'Min
+             (U64_Limb_Decimal_Digits,
+              Interfaces.Unsigned_32'Min
+                (Max_Decimal_Digits - Digit_Count,
+                 Self.Integral_Count - Digit_Count));
+
+         Decode (Self.U64 (Limb_Index), Step_Digits, Aux);
+
+         Digit_Count := @ + Step_Digits;
+         Limb_Index  := @ + 1;
+
+         if Digit_Count = Max_Decimal_Digits then
+            raise Program_Error;
+
+         else
+            Add (Big_Mantissa, Power_Of_10 (Step_Digits), Aux);
+         end if;
+      end loop;
+
+      pragma Assert
+        (Self.Fractional_Offset = U64_Limb_Offset'Last
+           or Self.Fractional_Offset = Limb_Index);
+
+      if Self.Fractional_Offset = U64_Limb_Offset'Last
+        or Self.Last_Non_Zero = 0
+      then
+         Big_Exponent := @ - Interfaces.Integer_32 (Digit_Count);
+
+         --  No fractional part or fractional part contains zeros only.
+
+         return;
+      end if;
+
+      while Digit_Count < Max_Decimal_Digits
+        and Digit_Count < Total_Digits
+      loop
+         Step_Digits :=
+           Interfaces.Unsigned_32'Min
+             (U64_Limb_Decimal_Digits,
+              Interfaces.Unsigned_32'Min
+                (Max_Decimal_Digits - Digit_Count,
+                 Total_Digits - Digit_Count));
+
+         Decode (Self.U64 (Limb_Index), Step_Digits, Aux);
+
+         Digit_Count := @ + Step_Digits;
+         Limb_Index  := @ + 1;
+
+         if Digit_Count = Max_Decimal_Digits then
+            raise Program_Error;
+
+         else
+            Add (Big_Mantissa, Power_Of_10 (Step_Digits), Aux);
+         end if;
+      end loop;
+
+      Big_Exponent := @ - Interfaces.Integer_32 (Digit_Count);
+   end Decode_As_Big_Integer;
 
    -----------------------
    -- Decode_As_Integer --

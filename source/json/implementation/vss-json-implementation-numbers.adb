@@ -26,10 +26,9 @@ pragma Ada_2020;
 pragma Ada_2022;
 pragma Warnings (On, "unrecognized pragma");
 
+with VSS.JSON.Implementation.Big_Integers;
 with VSS.JSON.Implementation.Numbers.Clinger;
-with VSS.JSON.Implementation.Numbers.Counters;
 with VSS.JSON.Implementation.Numbers.Eisel_Lemire;
-with VSS.Strings.Conversions;
 
 package body VSS.JSON.Implementation.Numbers is
 
@@ -319,6 +318,11 @@ package body VSS.JSON.Implementation.Numbers is
                --  complicated conversion need to be used, thus fail.
 
                if Number /= Number_1 then
+                  Eisel_Lemire.Compute_Error
+                    (Mantissa,
+                     Exponent,
+                     Number);
+
                   Success := False;
                end if;
             end if;
@@ -337,27 +341,41 @@ package body VSS.JSON.Implementation.Numbers is
 
                return;
             end if;
+
+            declare
+               Big_Mantissa : VSS.JSON.Implementation.Big_Integers.Big_Integer;
+               Big_Exponent : Interfaces.Integer_32;
+               Error        : constant Decoded_Float :=
+                 (Mantissa => Number.Mantissa,
+                  Power    => Number.Power - Eisel_Lemire.Invalid_Bias);
+
+            begin
+               VSS.JSON.Implementation.Packed_Decimals.Decode_As_Big_Integer
+                 (Self.Decimal, Exponent, Big_Mantissa, Big_Exponent);
+
+               if Big_Exponent >= 0 then
+                  Eisel_Lemire.Scale_Positive
+                    (Big_Mantissa, Big_Exponent, Number);
+
+               else
+                  Eisel_Lemire.Scale_Negative
+                    (Big_Mantissa, Big_Exponent, Error, Number);
+               end if;
+
+            end;
+
+            if Number.Power /= Eisel_Lemire.Infinite_Power then
+               Encode_IEEE_Float (Number, Self.Minus, Number_Aux);
+
+               To := (JSON_Float, String_Value, Number_Aux);
+
+            else
+               To := (Out_Of_Range, String_Value);
+            end if;
+
+            return;
          end;
       end if;
-
-      --  Fallback to use of 'Value attribute
-
-      declare
-         Image : constant String :=
-           VSS.Strings.Conversions.To_UTF_8_String (String_Value);
-         Value : constant Interfaces.IEEE_Float_64 :=
-           Interfaces.IEEE_Float_64'Value (Image);
-
-      begin
-         Counters.Standard_Value_Total := Counters.Standard_Value_Total + 1;
-
-         if Value'Valid then
-            To := (JSON_Float, String_Value, Value);
-
-         else
-            To := (Out_Of_Range, String_Value);
-         end if;
-      end;
    end To_JSON_Number;
 
 end VSS.JSON.Implementation.Numbers;

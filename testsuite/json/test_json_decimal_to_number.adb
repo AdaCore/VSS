@@ -28,7 +28,7 @@ with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 with Interfaces;
 
-with VSS.JSON.Implementation.Numbers.Counters;
+with VSS.JSON.Implementation.Numbers;
 with VSS.Strings.Conversions;
 
 with Test_Support;
@@ -186,10 +186,6 @@ procedure Test_JSON_Decimal_To_Number is
       First     : Positive;
       Binary    : Interfaces.Unsigned_64;
 
-      SVT       : Interfaces.Unsigned_64
-        renames VSS.JSON.Implementation.Numbers.Counters.Standard_Value_Total;
-      Old_SVT   : Interfaces.Unsigned_64;
-
    begin
       Ada.Text_IO.Open (File, Ada.Text_IO.In_File, File_Name);
 
@@ -243,8 +239,6 @@ procedure Test_JSON_Decimal_To_Number is
                   B2    : String (1 .. 20);
 
                begin
-                  Old_SVT := SVT;
-
                   First := Separator;
 
                   Process_String (State, Buffer (Separator .. Last));
@@ -283,39 +277,21 @@ procedure Test_JSON_Decimal_To_Number is
                         B2 := "Out-Of-Range        ";
                      end if;
 
-                     if Old_SVT /= SVT then
-                        --  Ignore case when 'Value attribute is used for
-                        --  conversion, but report it.
-
-                        --  if (R.Kind /= VSS.JSON.Out_Of_Range
-                        --        and then To_Unsigned_64
-                        --           (R.Float_Value) /= Binary)
-                        --  Ada.Text_IO.Put (Buffer (First .. Last));
-                        --  Ada.Text_IO.Put (' ');
-                        --  Ada.Text_IO.Put (B1);
-                        --  Ada.Text_IO.Put (' ');
-                        --  Ada.Text_IO.Put (B2);
-                        --  Ada.Text_IO.New_Line;
-
-                        null;
-
-                     else
-                        if R.Kind = VSS.JSON.Out_Of_Range
-                          or else To_Unsigned_64 (R.Float_Value) /= Binary
-                        then
-                           Ada.Text_IO.Put ("FAIL: ");
-                           Ada.Text_IO.Put (Buffer (First .. Last));
-                           Ada.Text_IO.Put (' ');
-                           Ada.Text_IO.Put (B1);
-                           Ada.Text_IO.Put (' ');
-                           Ada.Text_IO.Put (B2);
-                           Ada.Text_IO.New_Line;
-                        end if;
-
-                        Test_Support.Assert
-                          (To_Unsigned_64 (R.Float_Value) = Binary,
-                           B2 & " (expected " & B1 & ')');
+                     if R.Kind = VSS.JSON.Out_Of_Range
+                       or else To_Unsigned_64 (R.Float_Value) /= Binary
+                     then
+                        Ada.Text_IO.Put ("FAIL: ");
+                        Ada.Text_IO.Put (Buffer (First .. Last));
+                        Ada.Text_IO.Put (' ');
+                        Ada.Text_IO.Put (B1);
+                        Ada.Text_IO.Put (' ');
+                        Ada.Text_IO.Put (B2);
+                        Ada.Text_IO.New_Line;
                      end if;
+
+                     Test_Support.Assert
+                       (To_Unsigned_64 (R.Float_Value) = Binary,
+                        B2 & " (expected " & B1 & ')');
                   end if;
                end;
             end if;
@@ -346,17 +322,11 @@ begin
       Run_Test (Ada.Command_Line.Argument (J));
    end loop;
 
-   Ada.Text_IO.Put_Line
-     (Integer'Image (T)
-      & Interfaces.Unsigned_64'Image
-          (VSS.JSON.Implementation.Numbers.Counters.Standard_Value_Total));
+   Ada.Text_IO.Put_Line (Integer'Image (T));
 
 exception
    when others =>
-      Ada.Text_IO.Put_Line
-        (Integer'Image (T)
-         & Interfaces.Unsigned_64'Image
-              (VSS.JSON.Implementation.Numbers.Counters.Standard_Value_Total));
+      Ada.Text_IO.Put_Line (Integer'Image (T));
 
       raise;
 end Test_JSON_Decimal_To_Number;

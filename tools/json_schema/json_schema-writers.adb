@@ -58,6 +58,17 @@ package body JSON_Schema.Writers is
    --  corresponding type is included in Optional_Types set. Update Done as
    --  described above.
 
+   procedure Write_Anonymous_Type
+     (Enclosing_Type : VSS.Strings.Virtual_String;
+      Property_Name  : VSS.Strings.Virtual_String;
+      Schema         : Schema_Access;
+      Map            : JSON_Schema.Readers.Schema_Map;
+      Optional_Types : String_Sets.Set;
+      Done           : in out String_Sets.Set;
+      Required       : Boolean);
+   --  Write a dedicated type for a schema property that contains a nested
+   --  schema. Currently only single level of nesting is implemented.
+
    procedure Write_Record_Type
      (Name           : VSS.Strings.Virtual_String;
       Schema         : Schema_Access;
@@ -67,10 +78,12 @@ package body JSON_Schema.Writers is
    --  The same for "type: object" schema
 
    procedure Write_Record_Component
-     (Map      : JSON_Schema.Readers.Schema_Map;
+     (Name     : VSS.Strings.Virtual_String;
+      Map      : JSON_Schema.Readers.Schema_Map;
       Property : JSON_Schema.Property;
       Required : Boolean);
-   --  Write record component declaration for given Property
+   --  Write record component declaration for given Property. Name is a name of
+   --  the schema containing the property.
 
    procedure Write_Derived_Type
      (Name           : VSS.Strings.Virtual_String;
@@ -136,11 +149,22 @@ package body JSON_Schema.Writers is
      (Schema.Enum.Is_Empty);
    --  Check if schema isn't an enumeration
 
+   function Field_Type
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Schema   : Schema_Access;
+      Required : Boolean;
+      Fallback : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String;
+   --  Return an Ada type name for given Schema. Fallback if a type name for
+   --  properties with nested schema declaration.
+
    Reserved_Words : constant VSS.String_Vectors.Virtual_String_Vector :=
      ["function", "interface", "all", "type", "body"];
 
    Integer_Or_String : constant JSON_Schema.Simple_Type_Vectors.Vector :=
      [Definitions.An_Integer, Definitions.A_String];
+
+   String_Or_Null : constant JSON_Schema.Simple_Type_Vectors.Vector :=
+     [Definitions.A_String, Definitions.A_Null];
 
    Package_Name : constant VSS.Strings.Virtual_String := "DAP.Tools";
 
@@ -172,6 +196,103 @@ package body JSON_Schema.Writers is
          return "a_" & Name;
       end if;
    end Escape_Keywords;
+
+   ----------------
+   -- Field_Type --
+   ----------------
+
+   function Field_Type
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Schema   : Schema_Access;
+      Required : Boolean;
+      Fallback : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String
+   is
+      use type JSON_Schema.Simple_Type_Vectors.Vector;
+
+      Result : VSS.Strings.Virtual_String :=
+        (if Required then VSS.Strings.Empty_Virtual_String
+         else "Optional_");
+   begin
+      if not Schema.Ref.Is_Empty then
+         Result.Append (Ref_To_Type_Name (Schema.Ref));
+
+         if Is_Enum (Map (Schema.Ref)) then
+            Result.Prepend ("Enum.");
+         end if;
+
+      elsif not Schema.Additional_Properties.Is_Boolean
+        and then Schema.Additional_Properties.Schema /= null
+      then
+         Result := "Any_Object";  --  TODO: Make more precise type???
+      elsif Schema.Kind.Last_Index = 7 then
+         Result.Append ("Any_Value");
+      elsif Schema.Kind = Integer_Or_String then
+         Result.Append ("Integer_Or_String");
+      elsif Schema.Kind = String_Or_Null then
+         --  To represent `null` it uses Is_Null function
+         Result.Append ("VSS.Strings.Virtual_String");
+      elsif Schema.Kind.Last_Index = 1 then
+         case Schema.Kind (1) is
+            when Definitions.A_Boolean =>
+               --  Let's don't use Optional_Boolean because
+               --  all absent boolean fields work as False
+               Result := "Boolean";
+
+            when Definitions.An_Integer =>
+               Result.Append ("Integer");
+
+            when Definitions.A_Null =>
+               raise Program_Error;
+
+            when Definitions.A_Number =>
+               Result.Append ("Float");
+
+            when Definitions.A_String =>
+               --  Instead of Optional_String use just Virtual_String,
+               --  to check for an absent value use Is_Null.
+               Result := "VSS.Strings.Virtual_String";
+
+            when Definitions.An_Array =>
+               declare
+                  Item : constant Schema_Access :=
+                    Schema.Items.First_Element;
+               begin
+                  --  TODO: Optional vectors???
+                  if not Item.Ref.Is_Empty then
+                     Result := Ref_To_Type_Name (Item.Ref);
+                     Result.Append ("_Vector");
+                  else
+                     case Item.Kind (1) is
+                        when Definitions.A_Boolean =>
+                           Result := "Boolean_Vector";
+
+                        when Definitions.An_Integer =>
+                           Result := "Integer_Vector";
+
+                        when Definitions.A_Null
+                           | Definitions.An_Array
+                           | Definitions.An_Object =>
+                           raise Program_Error;
+
+                        when Definitions.A_Number =>
+                           Result := "Float_Vector";
+
+                        when Definitions.A_String =>
+                           Result :=
+                             "VSS.String_Vectors.Virtual_String_Vector";
+                     end case;
+                  end if;
+               end;
+
+            when Definitions.An_Object =>
+               Result.Append (Fallback);
+         end case;
+      else
+         Result.Append ("YYY");
+      end if;
+
+      return Result;
+   end Field_Type;
 
    ----------------------
    -- Find_Array_Types --
@@ -299,6 +420,7 @@ package body JSON_Schema.Writers is
       Put ("type Any_Value is null record;");
       Write_Optional_Type ("Any_Value");
       Write_Optional_Type ("Integer");
+      Write_Optional_Type ("Float");
       Put ("type Integer_Or_String is null record;");
       New_Line;
       Write_Optional_Type ("Integer_Or_String");
@@ -330,6 +452,60 @@ package body JSON_Schema.Writers is
       Put (Package_Name);
       Put (";");
    end Write;
+
+   --------------------------
+   -- Write_Anonymous_Type --
+   --------------------------
+
+   procedure Write_Anonymous_Type
+     (Enclosing_Type : VSS.Strings.Virtual_String;
+      Property_Name  : VSS.Strings.Virtual_String;
+      Schema         : Schema_Access;
+      Map            : JSON_Schema.Readers.Schema_Map;
+      Optional_Types : String_Sets.Set;
+      Done           : in out String_Sets.Set;
+      Required       : Boolean)
+   is
+      use type VSS.Strings.Virtual_String;
+
+      Type_Name : constant VSS.Strings.Virtual_String :=
+        Ref_To_Type_Name (Enclosing_Type)
+        & "_" & Property_Name;
+   begin
+      --  Write dependencies
+      for Property of Schema.Properties loop
+         if not Property.Schema.Ref.Is_Empty then
+            Write_Named_Type
+              (Property.Schema.Ref,
+               Map (Property.Schema.Ref),
+               Map,
+               Optional_Types,
+               Done);
+         end if;
+      end loop;
+
+      Put ("type ");
+      Put (Type_Name);
+      Put (" is ");
+      Put ("record");
+      New_Line;
+
+      for Property of Schema.Properties loop
+         Write_Record_Component
+           (Enclosing_Type,
+            Map,
+            Property,
+            Schema.Required.Contains (Property.Name));
+      end loop;
+
+      Put ("end record;");
+      New_Line;
+      New_Line;
+
+      if not Required then
+         Write_Optional_Type (Type_Name);
+      end if;
+   end Write_Anonymous_Type;
 
    ----------------------
    -- Write_Any_Object --
@@ -407,6 +583,20 @@ package body JSON_Schema.Writers is
                   Map,
                   Optional_Types,
                   Done);
+            elsif Property.Schema.Kind.Last_Index = 1 then
+               case Property.Schema.Kind (1) is
+                  when Definitions.An_Object =>
+                     Write_Anonymous_Type
+                       (Name,
+                        Property.Name,
+                        Property.Schema,
+                        Map,
+                        Optional_Types,
+                        Done,
+                        Property.Schema.Required.Contains (Property.Name));
+                  when others =>
+                     null;
+               end case;
             end if;
          end loop;
       end loop;
@@ -423,7 +613,7 @@ package body JSON_Schema.Writers is
          for Property of Next.Properties loop
             if not Done_Fields.Contains (Property.Name) then
                Write_Record_Component
-                 (Map, Property, Next.Required.Contains (Property.Name));
+                 (Name, Map, Property, Next.Required.Contains (Property.Name));
                Done_Fields.Include (Property.Name);
             end if;
          end loop;
@@ -432,7 +622,11 @@ package body JSON_Schema.Writers is
             for Property of Item.Properties loop
                if not Done_Fields.Contains (Property.Name) then
                   Write_Record_Component
-                    (Map, Property, Item.Required.Contains (Property.Name));
+                    (Name,
+                     Map,
+                     Property,
+                     Item.Required.Contains (Property.Name));
+
                   Done_Fields.Include (Property.Name);
                end if;
             end loop;
@@ -602,114 +796,22 @@ package body JSON_Schema.Writers is
    ----------------------------
 
    procedure Write_Record_Component
-     (Map      : JSON_Schema.Readers.Schema_Map;
+     (Name     : VSS.Strings.Virtual_String;
+      Map      : JSON_Schema.Readers.Schema_Map;
       Property : JSON_Schema.Property;
       Required : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
-      function Field_Type
-        (Schema   : Schema_Access;
-         Required : Boolean)
-         return VSS.Strings.Virtual_String;
-      --  Return an Ada type name for given Schema
-
-      function Field_Type
-        (Schema   : Schema_Access;
-         Required : Boolean)
-         return VSS.Strings.Virtual_String
-      is
-         use type JSON_Schema.Simple_Type_Vectors.Vector;
-
-         Result : VSS.Strings.Virtual_String :=
-           (if Required then VSS.Strings.Empty_Virtual_String
-            else "Optional_");
-      begin
-         if not Schema.Ref.Is_Empty then
-            Result.Append (Ref_To_Type_Name (Schema.Ref));
-
-            if Is_Enum (Map (Schema.Ref)) then
-               Result.Prepend ("Enum.");
-            end if;
-
-         elsif not Schema.Additional_Properties.Is_Boolean
-           and then Schema.Additional_Properties.Schema /= null
-         then
-            Result := "Any_Object";  --  TODO: Make more precise type???
-         elsif Schema.Kind.Last_Index = 7 then
-            Result.Append ("Any_Value");
-         elsif Schema.Kind = Integer_Or_String then
-            Result.Append ("Integer_Or_String");
-         elsif Schema.Kind.Last_Index = 1 then
-            case Schema.Kind (1) is
-               when Definitions.A_Boolean =>
-                  --  Let's don't use Optional_Boolean because
-                  --  all absent boolean fields work as False
-                  Result := "Boolean";
-
-               when Definitions.An_Integer =>
-                  Result.Append ("Integer");
-
-               when Definitions.A_Null =>
-                  raise Program_Error;
-
-               when Definitions.A_Number =>
-                  Result.Append ("Float");
-
-               when Definitions.A_String =>
-                  --  Instead of Optional_String use just Virtual_String,
-                  --  to check for an absent value use Is_Null.
-                  Result := "VSS.Strings.Virtual_String";
-
-               when Definitions.An_Array =>
-                  declare
-                     Item : constant Schema_Access :=
-                       Schema.Items.First_Element;
-                  begin
-                     --  TODO: Optional vectors???
-                     if not Item.Ref.Is_Empty then
-                        Result := Ref_To_Type_Name (Item.Ref);
-                        Result.Append ("_Vector");
-                     else
-                        case Item.Kind (1) is
-                           when Definitions.A_Boolean =>
-                              Result := "Boolean_Vector";
-
-                           when Definitions.An_Integer =>
-                              Result := "Integer_Vector";
-
-                           when Definitions.A_Null
-                              | Definitions.An_Array
-                              | Definitions.An_Object =>
-                              raise Program_Error;
-
-                           when Definitions.A_Number =>
-                              Result := "Float_Vector";
-
-                           when Definitions.A_String =>
-                              Result :=
-                                "VSS.String_Vectors.Virtual_String_Vector";
-                        end case;
-                     end if;
-                  end;
-
-               when others =>
-                  Result.Append ("XXX");
-            end case;
-         else
-            Result.Append ("YYY");
-         end if;
-
-         return Result;
-      end Field_Type;
-
+      Fallback : constant VSS.Strings.Virtual_String :=
+        Ref_To_Type_Name (Name) & "_" & Property.Name;
    begin
       declare
          Field_Name : constant VSS.Strings.Virtual_String :=
            Escape_Keywords (Property.Name);
 
          Field_Type : VSS.Strings.Virtual_String :=
-           Write_Record_Component.Field_Type (Property.Schema, Required);
+           Writers.Field_Type (Map, Property.Schema, Required, Fallback);
       begin
          if Field_Name.To_Lowercase = Field_Type.To_Lowercase then
             Field_Type.Prepend (".");
@@ -764,7 +866,10 @@ package body JSON_Schema.Writers is
 
       for Property of Schema.Properties loop
          Write_Record_Component
-           (Map, Property, Schema.Required.Contains (Property.Name));
+           (Name,
+            Map,
+            Property,
+            Schema.Required.Contains (Property.Name));
       end loop;
 
       Put ("end record;");

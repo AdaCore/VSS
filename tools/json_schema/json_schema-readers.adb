@@ -241,7 +241,7 @@ package body JSON_Schema.Readers is
                Value.Dependencies := (False, Schema => Nested);
             end if;
 
-         elsif Key = "enum" or Key = "_enum" then
+         elsif Key = "enum" then
             pragma Assert (Reader.Is_Start_Array);
 
             Reader.Read_Next;
@@ -254,6 +254,9 @@ package body JSON_Schema.Readers is
 
             pragma Assert (Reader.Is_End_Array);
             Reader.Read_Next;
+         elsif Key = "_enum" then
+            --  Some undocumented kind of enumeration???
+            Reader.Skip_Current_Value;
 
          elsif Key = "type" then
             pragma Assert (Reader.Is_Start_Array or Reader.Is_String_Value);

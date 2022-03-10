@@ -156,6 +156,8 @@ package body JSON_Schema.Writers is
       Fallback : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String;
    --  Return an Ada type name for given Schema. Fallback if a type name for
    --  properties with nested schema declaration.
+   --  Return an empty string for string properties with just one enumeration
+   --  literal defined, so we can skip such properties in the type declaration.
 
    Reserved_Words : constant VSS.String_Vectors.Virtual_String_Vector :=
      ["function", "interface", "all", "type", "body"];
@@ -248,9 +250,16 @@ package body JSON_Schema.Writers is
                Result.Append ("Float");
 
             when Definitions.A_String =>
-               --  Instead of Optional_String use just Virtual_String,
-               --  to check for an absent value use Is_Null.
-               Result := "VSS.Strings.Virtual_String";
+
+               if Schema.Enum.Length = 1 then
+                  --  If string type redefined as an enum with just one literal
+                  --  then skip this property by returning an empty type name.
+                  Result := VSS.Strings.Empty_Virtual_String;
+               else
+                  --  Instead of Optional_String use just Virtual_String,
+                  --  to check for an absent value use Is_Null.
+                  Result := "VSS.Strings.Virtual_String";
+               end if;
 
             when Definitions.An_Array =>
                declare
@@ -813,7 +822,10 @@ package body JSON_Schema.Writers is
          Field_Type : VSS.Strings.Virtual_String :=
            Writers.Field_Type (Map, Property.Schema, Required, Fallback);
       begin
-         if Field_Name.To_Lowercase = Field_Type.To_Lowercase then
+         if Field_Type.Is_Empty then
+            --  Skip unneeded properties
+            return;
+         elsif Field_Name.To_Lowercase = Field_Type.To_Lowercase then
             Field_Type.Prepend (".");
             Field_Type.Prepend (Package_Name);
          end if;

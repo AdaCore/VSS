@@ -31,7 +31,7 @@ with VSS.Strings.Conversions;
 with VSS.Text_Streams.Memory_UTF8_Input;
 
 with JSON_Schema.Readers;
-with JSON_Schema.Writers;
+with JSON_Schema.Writers.Types;
 
 procedure JSON_Schema.Driver is
    Arg    : constant VSS.Strings.Virtual_String :=
@@ -70,6 +70,6 @@ begin
    Reader.Read_Next;
 
    JSON_Schema.Readers.Read (Reader, Schema, Other);
-   JSON_Schema.Writers.Write (Other);
+   JSON_Schema.Writers.Types.Write (Other);
 --   Ada.Wide_Wide_Text_IO.Put_Line (" Hello!");
 end JSON_Schema.Driver;

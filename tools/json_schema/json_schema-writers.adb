@@ -104,10 +104,17 @@ package body JSON_Schema.Writers is
    --  and write corresponding Ada types. Name is top named schema, while
    --  Property (if not empty) is a corresponding property.
 
-   procedure Write_Public_Vectors (Array_Types : String_Sets.Set);
+   procedure Write_Public_Vectors (Array_Types : Readers.Schema_Map);
    --  Write vector type public declarations for each item of Array_Types
 
-   procedure Write_Private_Vectors (Array_Types : String_Sets.Set);
+   type Declaration_Kind is (Specification, Implemenetation);
+
+   procedure Write_Vector_Operations
+     (Array_Types : Readers.Schema_Map;
+      Kind        : Declaration_Kind);
+   --  Write vector type operations for each item of Array_Types
+
+   procedure Write_Private_Vectors (Array_Types : Readers.Schema_Map);
    --  Write vector type private declarations for each item of Array_Types
 
    function Escape_Keywords (Name : VSS.Strings.Virtual_String)
@@ -125,8 +132,9 @@ package body JSON_Schema.Writers is
    --  optional properties.
 
    procedure Find_Array_Types
-     (Schema : Schema_Access;
-      Result : in out String_Sets.Set);
+     (Map    : JSON_Schema.Readers.Schema_Map;
+      Schema : Schema_Access;
+      Result : in out Readers.Schema_Map);
    --  Scan Schema recursively and find all types that are referenced as items
    --  in an array schema.
 
@@ -146,6 +154,9 @@ package body JSON_Schema.Writers is
 
    procedure Write_Any_Object (Name : VSS.Strings.Virtual_String);
    --  Write an Ada type that represents an unrestricted object
+
+   procedure Write_Type_Package (Map : JSON_Schema.Readers.Schema_Map);
+   --  Write package specificatio with type declarations
 
    function Is_Enum (Schema : Schema_Access) return Boolean is
      (not Schema.Enum.Is_Empty);
@@ -330,27 +341,31 @@ package body JSON_Schema.Writers is
    ----------------------
 
    procedure Find_Array_Types
-     (Schema : Schema_Access;
-      Result : in out String_Sets.Set)
+     (Map    : JSON_Schema.Readers.Schema_Map;
+      Schema : Schema_Access;
+      Result : in out Readers.Schema_Map)
    is
       use type Definitions.Simple_Types;
+
+      Ref : VSS.Strings.Virtual_String;
    begin
       if Schema.Kind.Last_Index = 1
         and then Schema.Kind (1) = Definitions.An_Array
         and then not Schema.Items.First_Element.Ref.Is_Empty
       then
          pragma Assert (Schema.Items.Last_Index = 1);
-         Result.Include (Ref_To_Type_Name (Schema.Items.First_Element.Ref));
+         Ref := Schema.Items.First_Element.Ref;
+         Result.Include (Ref_To_Type_Name (Ref), Map (Ref));
       end if;
 
       for Item of Schema.All_Of loop
          if Item.Ref.Is_Empty then
-            Find_Array_Types (Item, Result);
+            Find_Array_Types (Map, Item, Result);
          end if;
       end loop;
 
       for Property of Schema.Properties loop
-         Find_Array_Types (Property.Schema, Result);
+         Find_Array_Types (Map, Property.Schema, Result);
       end loop;
    end Find_Array_Types;
 
@@ -428,83 +443,8 @@ package body JSON_Schema.Writers is
    -----------
 
    procedure Write (Map : JSON_Schema.Readers.Schema_Map) is
-      Optional_Types : String_Sets.Set;
-      Array_Types    : String_Sets.Set;
-      Done           : String_Sets.Set;
    begin
-      for Schema of Map loop
-         Find_Optional_Types (Schema, Optional_Types);
-         Find_Array_Types (Schema, Array_Types);
-      end loop;
-
-      Put ("with VSS.Strings;");
-      New_Line;
-      Put ("with VSS.String_Vectors;");
-      New_Line;
-
-      Put ("package ");
-      Put (Package_Name);
-      Put (" is");
-      New_Line;
-      Put ("type Any_Object is tagged null record;");
-      New_Line;
-      Put ("type Any_Value is null record;");
-      Write_Optional_Type ("Any_Value");
-      Write_Optional_Type ("Integer");
-      Write_Optional_Type ("Float");
-      Put ("type Integer_Or_String is null record;");
-      New_Line;
-      Write_Optional_Type ("Integer_Or_String");
-      New_Line;
-      Put ("type Integer_Vector is tagged private;");
-      New_Line;
-
-      Write_Public_Vectors (Array_Types);
-      New_Line;
-
-      --  Write all enumenration types. Use a nested package to avoid
-      --  name colisions between enumeration literals and types.
-      Put ("package Enum is");
-      New_Line;
-      New_Line;
-
-      for Cursor in Map.Iterate loop
-         declare
-            Name : constant VSS.Strings.Virtual_String :=
-              JSON_Schema.Readers.Schema_Maps.Key (Cursor);
-
-            Schema : constant Schema_Access :=
-              JSON_Schema.Readers.Schema_Maps.Element (Cursor);
-
-            Type_Name : constant VSS.Strings.Virtual_String :=
-              Ref_To_Type_Name (Name);
-         begin
-            Write_Enumeration_Types
-              (Type_Name,
-               "",
-               Schema,
-               not Optional_Types.Contains (Type_Name));
-
-            if not Schema.Enum.Is_Empty then
-               Done.Insert (Name);
-            end if;
-         end;
-      end loop;
-
-      Put ("end Enum;");
-      New_Line;
-      New_Line;
-
-      Write_Named_Types (Map, Optional_Types, Done);
-
-      Put ("private");
-      New_Line;
-      Put ("type Integer_Vector is tagged null record;");
-      New_Line;
-      Write_Private_Vectors (Array_Types);
-      Put ("end ");
-      Put (Package_Name);
-      Put (";");
+      Write_Type_Package (Map);
    end Write;
 
    --------------------------
@@ -859,14 +799,58 @@ package body JSON_Schema.Writers is
    -- Write_Private_Vectors --
    ---------------------------
 
-   procedure Write_Private_Vectors (Array_Types : String_Sets.Set) is
+   procedure Write_Private_Vectors (Array_Types : Readers.Schema_Map) is
    begin
-      for Item of Array_Types loop
-         Put ("type ");
-         Put (Item);
-         Put ("_Vector is tagged null record;");
-         New_Line;
-         New_Line;
+      for Cursor in Array_Types.Iterate loop
+         declare
+            use type VSS.Strings.Virtual_String;
+
+            Item : constant VSS.Strings.Virtual_String :=
+              Readers.Schema_Maps.Key (Cursor);
+            Schema : constant Schema_Access :=
+              Readers.Schema_Maps.Element (Cursor);
+            Element_Type : constant VSS.Strings.Virtual_String :=
+              (if Is_Enum (Schema) then "Enum." & Item else Item);
+         begin
+            Put ("type ");
+            Put (Item);
+            Put ("_Array is array (Positive range <>) of aliased ");
+            Put (Element_Type);
+            Put (";");
+            New_Line;
+            Put ("type ");
+            Put (Item);
+            Put ("_Array_Access is access ");
+            Put (Item);
+            Put ("_Array;");
+            New_Line;
+            Put ("type ");
+            Put (Item);
+            Put ("_Vector is new Ada.Finalization.Controlled with record");
+            New_Line;
+            Put ("Data   : ");
+            Put (Item);
+            Put ("_Array_Access;");
+            New_Line;
+            Put ("Length : Natural := 0;");
+            New_Line;
+            Put ("end record;");
+            New_Line;
+            New_Line;
+
+            Put ("overriding procedure Adjust (Self : in out ");
+            Put (Item);
+            Put ("_Vector);");
+            New_Line;
+            New_Line;
+
+            Put ("overriding procedure Finalize (Self : in out ");
+            Put (Item);
+            Put ("_Vector);");
+            New_Line;
+            New_Line;
+
+         end;
       end loop;
    end Write_Private_Vectors;
 
@@ -874,14 +858,27 @@ package body JSON_Schema.Writers is
    -- Write_Public_Vectors --
    --------------------------
 
-   procedure Write_Public_Vectors (Array_Types : String_Sets.Set) is
+   procedure Write_Public_Vectors (Array_Types : Readers.Schema_Map) is
    begin
-      for Item of Array_Types loop
-         Put ("type ");
-         Put (Item);
-         Put ("_Vector is tagged private;");
-         New_Line;
-         New_Line;
+      for Cursor in Array_Types.Iterate loop
+         declare
+            Item : constant VSS.Strings.Virtual_String :=
+              Readers.Schema_Maps.Key (Cursor);
+         begin
+            Put ("type ");
+            Put (Item);
+            Put ("_Vector is tagged private");
+            New_Line;
+            Put ("with Variable_Indexing => Get_");
+            Put (Item);
+            Put ("_Variable_Reference,");
+            New_Line;
+            Put ("Constant_Indexing => Get_");
+            Put (Item);
+            Put ("_Constant_Reference;");
+            New_Line;
+            New_Line;
+         end;
       end loop;
    end Write_Public_Vectors;
 
@@ -973,5 +970,340 @@ package body JSON_Schema.Writers is
       New_Line;
       New_Line;
    end Write_Record_Type;
+
+   ------------------------
+   -- Write_Type_Package --
+   ------------------------
+
+   procedure Write_Type_Package (Map : JSON_Schema.Readers.Schema_Map) is
+      Optional_Types : String_Sets.Set;
+      Array_Types    : Readers.Schema_Map;
+      Done           : String_Sets.Set;
+   begin
+      for Schema of Map loop
+         Find_Optional_Types (Schema, Optional_Types);
+         Find_Array_Types (Map, Schema, Array_Types);
+      end loop;
+
+      Put ("with Ada.Finalization;");
+      New_Line;
+      Put ("with VSS.Strings;");
+      New_Line;
+      Put ("with VSS.String_Vectors;");
+      New_Line;
+
+      Put ("package ");
+      Put (Package_Name);
+      Put (" is");
+      New_Line;
+      Put ("type Any_Object is tagged null record;");
+      New_Line;
+      Put ("type Any_Value is null record;");
+      Write_Optional_Type ("Any_Value");
+      Write_Optional_Type ("Integer");
+      Write_Optional_Type ("Float");
+      Put ("type Integer_Or_String is null record;");
+      New_Line;
+      Write_Optional_Type ("Integer_Or_String");
+      New_Line;
+      Put ("type Integer_Vector is tagged private;");
+      New_Line;
+
+      Write_Public_Vectors (Array_Types);
+      New_Line;
+
+      --  Write all enumenration types. Use a nested package to avoid
+      --  name colisions between enumeration literals and types.
+      Put ("package Enum is");
+      New_Line;
+      New_Line;
+
+      for Cursor in Map.Iterate loop
+         declare
+            Name : constant VSS.Strings.Virtual_String :=
+              JSON_Schema.Readers.Schema_Maps.Key (Cursor);
+
+            Schema : constant Schema_Access :=
+              JSON_Schema.Readers.Schema_Maps.Element (Cursor);
+
+            Type_Name : constant VSS.Strings.Virtual_String :=
+              Ref_To_Type_Name (Name);
+         begin
+            Write_Enumeration_Types
+              (Type_Name,
+               "",
+               Schema,
+               not Optional_Types.Contains (Type_Name));
+
+            if not Schema.Enum.Is_Empty then
+               Done.Insert (Name);
+            end if;
+         end;
+      end loop;
+
+      Put ("end Enum;");
+      New_Line;
+      New_Line;
+
+      Write_Named_Types (Map, Optional_Types, Done);
+
+      Write_Vector_Operations (Array_Types, Specification);
+      Put ("private");
+      New_Line;
+      Put ("type Integer_Vector is tagged null record;");
+      New_Line;
+      Write_Private_Vectors (Array_Types);
+      Put ("end ");
+      Put (Package_Name);
+      Put (";");
+      New_Line;
+
+      Put ("with Ada.Unchecked_Deallocation;");
+      New_Line;
+      New_Line;
+      Put ("package body ");
+      Put (Package_Name);
+      Put (" is");
+      New_Line;
+      Write_Vector_Operations (Array_Types, Implemenetation);
+      Put ("end ");
+      Put (Package_Name);
+      Put (";");
+   end Write_Type_Package;
+
+   -----------------------------
+   -- Write_Vector_Operations --
+   -----------------------------
+
+   procedure Write_Vector_Operations
+     (Array_Types : Readers.Schema_Map;
+      Kind        : Declaration_Kind)
+   is
+      use type VSS.Strings.Virtual_String;
+   begin
+      for Cursor in Array_Types.Iterate loop
+         declare
+            Item : constant VSS.Strings.Virtual_String :=
+              Readers.Schema_Maps.Key (Cursor);
+            Schema : constant Schema_Access :=
+              Readers.Schema_Maps.Element (Cursor);
+            Element_Type : constant VSS.Strings.Virtual_String :=
+              (if Is_Enum (Schema) then "Enum." & Item else Item);
+         begin
+
+            if Kind = Implemenetation then
+               Put ("procedure Free is new Ada.Unchecked_Deallocation");
+               New_Line;
+               Put ("(");
+               Put (Item);
+               Put ("_Array, ");
+               Put (Item);
+               Put ("_Array_Access);");
+               New_Line;
+               New_Line;
+
+               Put ("overriding procedure Adjust (Self : in out ");
+               Put (Item);
+               Put ("_Vector) is");
+               New_Line;
+               Put ("begin");
+               New_Line;
+               Put ("if Self.Length > 0 then");
+               New_Line;
+               Put ("Self.Data :=");
+               New_Line;
+               Put ("new ");
+               Put (Item);
+               Put ("_Array'(Self.Data (1 .. Self.Length));");
+               New_Line;
+               Put ("end if;");
+               New_Line;
+               Put ("end Adjust;");
+
+               New_Line;
+               New_Line;
+
+               Put ("overriding procedure Finalize (Self : in out ");
+               Put (Item);
+               Put ("_Vector) is");
+               New_Line;
+               Put ("begin");
+               New_Line;
+               Put ("Free (Self.Data);");
+               New_Line;
+               Put ("Self.Length := 0;");
+               New_Line;
+               Put ("end Finalize;");
+               New_Line;
+               New_Line;
+            end if;
+
+            Put ("function Length (Self : ");
+            Put (Item);
+            Put ("_Vector) return Natural");
+
+            if Kind = Implemenetation then
+               Put (" is (Self.Length)");
+            end if;
+
+            Put (";");
+            New_Line;
+            New_Line;
+
+            Put ("procedure Clear (Self : in out ");
+            Put (Item);
+            Put ("_Vector)");
+
+            if Kind = Implemenetation then
+               Put (" is");
+               New_Line;
+               Put ("begin");
+               New_Line;
+               Put ("   Self.Length := 0;");
+               New_Line;
+               Put ("end Clear");
+            end if;
+
+            Put (";");
+            New_Line;
+            New_Line;
+            Put ("procedure Append");
+            New_Line;
+            Put ("(Self : in out ");
+            Put (Item);
+            Put ("_Vector;");
+            New_Line;
+            Put ("Value : ");
+            Put (Element_Type);
+            Put (")");
+
+            if Kind = Implemenetation then
+               Put (" is");
+               New_Line;
+               Put ("Init_Length : constant Positive :=");
+               New_Line;
+
+               Put ("Positive'Max (1, 256 / ");
+               Put (Element_Type);
+               Put ("'Size);");
+               New_Line;
+               Put ("Self_Data_Saved : ");
+               Put (Item);
+               Put ("_Array_Access := Self.Data;");
+               New_Line;
+               Put ("begin");
+               New_Line;
+               Put ("if Self.Length = 0 then");
+               New_Line;
+               Put ("Self.Data := new ");
+               Put (Item);
+               Put ("_Array (1 .. Init_Length);");
+               New_Line;
+               Put ("elsif Self.Length = Self.Data'Last then");
+               New_Line;
+               Put ("Self.Data :=");
+               New_Line;
+               Put ("new ");
+               Put (Item);
+               Put ("_Array'");
+               Put ("(Self.Data.all");
+               New_Line;
+               Put (" & ");
+               Put (Item);
+               Put ("_Array'(1 .. Self.Length => <>));");
+               New_Line;
+               Put ("Free (Self_Data_Saved);");
+               New_Line;
+               Put ("end if;");
+               New_Line;
+               Put ("Self.Length := Self.Length + 1;");
+               New_Line;
+               Put ("Self.Data (Self.Length) := Value;");
+               New_Line;
+               Put ("end Append");
+            end if;
+
+            Put (";");
+            New_Line;
+            New_Line;
+
+            if Kind = Specification then
+               Put ("type ");
+               Put (Item);
+               Put ("_Variable_Reference");
+               New_Line;
+               Put ("(Element : not null access ");
+               Put (Element_Type);
+               Put (") is null record");
+               New_Line;
+               Put ("with Implicit_Dereference => Element;");
+               New_Line;
+               New_Line;
+            end if;
+
+            Put ("not overriding function Get_");
+            Put (Item);
+            Put ("_Variable_Reference");
+            New_Line;
+            Put ("(Self : aliased in out ");
+            Put (Item);
+            Put ("_Vector;");
+            New_Line;
+            Put ("Index : Positive)");
+            New_Line;
+            Put ("return ");
+            Put (Item);
+            Put ("_Variable_Reference");
+            New_Line;
+
+            if Kind = Specification then
+               Put ("with Inline;");
+            else
+               Put ("is (Element => Self.Data (Index)'Access);");
+            end if;
+
+            New_Line;
+            New_Line;
+
+            if Kind = Specification then
+               Put ("type ");
+               Put (Item);
+               Put ("_Constant_Reference");
+               New_Line;
+               Put ("(Element : not null access constant ");
+               Put (Element_Type);
+               Put (") is null record");
+               New_Line;
+               Put ("with Implicit_Dereference => Element;");
+               New_Line;
+               New_Line;
+            end if;
+
+            Put ("not overriding function Get_");
+            Put (Item);
+            Put ("_Constant_Reference");
+            New_Line;
+            Put ("(Self : aliased in out ");
+            Put (Item);
+            Put ("_Vector;");
+            New_Line;
+            Put ("Index : Positive)");
+            New_Line;
+            Put ("return ");
+            Put (Item);
+            Put ("_Constant_Reference");
+            New_Line;
+
+            if Kind = Specification then
+               Put ("with Inline;");
+            else
+               Put ("is (Element => Self.Data (Index)'Access);");
+            end if;
+
+            New_Line;
+            New_Line;
+         end;
+      end loop;
+   end Write_Vector_Operations;
 
 end JSON_Schema.Writers;

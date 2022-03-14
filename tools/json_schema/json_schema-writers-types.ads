@@ -21,6 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package JSON_Schema.Writers is
-   pragma Preelaborate;
-end JSON_Schema.Writers;
+with JSON_Schema.Readers;
+
+package JSON_Schema.Writers.Types is
+
+   procedure Write (Map : JSON_Schema.Readers.Schema_Map);
+   --  Generate types for schemas of given Map
+
+end JSON_Schema.Writers.Types;

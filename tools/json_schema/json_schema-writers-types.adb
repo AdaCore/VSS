@@ -30,7 +30,7 @@ with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
 with VSS.Strings.Hash;
 
-package body JSON_Schema.Writers is
+package body JSON_Schema.Writers.Types is
 
    package String_Sets is new Ada.Containers.Hashed_Sets
      (VSS.Strings.Virtual_String,
@@ -902,7 +902,7 @@ package body JSON_Schema.Writers is
            Escape_Keywords (Property.Name);
 
          Field_Type : VSS.Strings.Virtual_String :=
-           Writers.Field_Type (Map, Property.Schema, Required, Fallback);
+           Writers.Types.Field_Type (Map, Property.Schema, Required, Fallback);
       begin
          if Field_Type.Is_Empty then
             --  Skip unneeded properties
@@ -1306,4 +1306,4 @@ package body JSON_Schema.Writers is
       end loop;
    end Write_Vector_Operations;
 
-end JSON_Schema.Writers;
+end JSON_Schema.Writers.Types;

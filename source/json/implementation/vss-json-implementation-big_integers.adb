@@ -32,19 +32,19 @@ package body VSS.JSON.Implementation.Big_Integers is
    use type Interfaces.Unsigned_64;
 
    procedure Scalar_Add
-     (A : Interfaces.Unsigned_64;
-      B : Interfaces.Unsigned_64;
-      V : aliased out Interfaces.Unsigned_64;
-      C : out Interfaces.Unsigned_64);
+     (Left     : Interfaces.Unsigned_64;
+      Right    : Interfaces.Unsigned_64;
+      Result   : aliased out Interfaces.Unsigned_64;
+      Overflow : out Interfaces.Unsigned_64);
    --  Add of two 64-bit unsigned integers. Return result and overflow.
 
    procedure Scalar_Multiply
-     (A : Interfaces.Unsigned_64;
-      B : Interfaces.Unsigned_64;
-      V : out Interfaces.Unsigned_64;
-      C : in out Interfaces.Unsigned_64);
+     (Left     : Interfaces.Unsigned_64;
+      Right    : Interfaces.Unsigned_64;
+      Result   : out Interfaces.Unsigned_64;
+      Overflow : in out Interfaces.Unsigned_64);
    --  Multiplication of two 64-bit usnigned integers into 128-bit values,
-   --  add add of carry. Result is splitted into high and low 64-bit unsigned
+   --  add of carry. Result is splitted into high and low 64-bit unsigned
    --  integers. On x86_64 it is optimized into few instructions.
 
    procedure Add
@@ -58,6 +58,10 @@ package body VSS.JSON.Implementation.Big_Integers is
      (Self : in out Big_Integer; Y : Limb_Array; From : Interfaces.Integer_32);
    --  Add bigint to bigint starting from index. Used in grade school
    --  multiplication
+
+   procedure Multiply
+     (Self : in out Big_Integer;
+      Y    : Limb_Array);
 
    procedure Clear (Self : in out Big_Integer);
 
@@ -76,7 +80,8 @@ package body VSS.JSON.Implementation.Big_Integers is
    --  Resize the vector, without bounds checking if the new size is longer
    --  than the vector, assign value to each appended item.
 
-   procedure Set (Self : in out Big_Integer; Value : Limb_Array);
+   procedure Set (Self : in out Big_Integer; Value : Limb_Array)
+     with Pre => Value (Value'Last) /= 0;
 
    procedure Shift_Left
      (Self : in out Big_Integer; Amount : Interfaces.Integer_32);
@@ -286,10 +291,6 @@ package body VSS.JSON.Implementation.Big_Integers is
       end if;
    end Multiply;
 
-   procedure Multiply
-     (Self : in out Big_Integer;
-      Y    : Limb_Array);
-
    --------------
    -- Multiply --
    --------------
@@ -453,22 +454,22 @@ package body VSS.JSON.Implementation.Big_Integers is
    ----------------
 
    procedure Scalar_Add
-     (A : Interfaces.Unsigned_64;
-      B : Interfaces.Unsigned_64;
-      V : aliased out Interfaces.Unsigned_64;
-      C : out Interfaces.Unsigned_64)
+     (Left     : Interfaces.Unsigned_64;
+      Right    : Interfaces.Unsigned_64;
+      Result   : aliased out Interfaces.Unsigned_64;
+      Overflow : out Interfaces.Unsigned_64)
    is
       function Add
-        (X : Interfaces.Unsigned_64;
-         Y : Interfaces.Unsigned_64;
-         Z : access Interfaces.Unsigned_64)
+        (Left   : Interfaces.Unsigned_64;
+         Right  : Interfaces.Unsigned_64;
+         Result : access Interfaces.Unsigned_64)
          return Boolean
-         with Import,
-              Convention    => Intrinsic,
-              External_Name => "__builtin_add_overflow";
+        with Import,
+             Convention    => Intrinsic,
+             External_Name => "__builtin_add_overflow";
 
    begin
-      C := (if Add (A, B, V'Access) then 1 else 0);
+      Overflow := (if Add (Left, Right, Result'Access) then 1 else 0);
    end Scalar_Add;
 
    ---------------------
@@ -476,20 +477,20 @@ package body VSS.JSON.Implementation.Big_Integers is
    ---------------------
 
    procedure Scalar_Multiply
-     (A : Interfaces.Unsigned_64;
-      B : Interfaces.Unsigned_64;
-      V : out Interfaces.Unsigned_64;
-      C : in out Interfaces.Unsigned_64)
+     (Left     : Interfaces.Unsigned_64;
+      Right    : Interfaces.Unsigned_64;
+      Result   : out Interfaces.Unsigned_64;
+      Overflow : in out Interfaces.Unsigned_64)
    is
       use type Interfaces.Unsigned_128;
 
       R : constant Interfaces.Unsigned_128 :=
-        Interfaces.Unsigned_128 (A) * Interfaces.Unsigned_128 (B)
-          + Interfaces.Unsigned_128 (C);
+        Interfaces.Unsigned_128 (Left) * Interfaces.Unsigned_128 (Right)
+          + Interfaces.Unsigned_128 (Overflow);
 
    begin
-      V := Interfaces.Unsigned_64 (R mod 2 ** 64);
-      C := Interfaces.Unsigned_64 (R / 2 ** 64);
+      Result   := Interfaces.Unsigned_64 (R mod 2 ** 64);
+      Overflow := Interfaces.Unsigned_64 (R / 2 ** 64);
    end Scalar_Multiply;
 
    ---------

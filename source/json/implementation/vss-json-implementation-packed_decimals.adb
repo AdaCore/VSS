@@ -27,8 +27,6 @@ pragma Ada_2022;
 pragma Warnings (On, "unrecognized pragma");
 pragma Warnings (Off, "array aggregate using ()");
 
-with Ada.Unchecked_Conversion;
-
 package body VSS.JSON.Implementation.Packed_Decimals is
 
    use type Interfaces.Integer_32;

@@ -96,36 +96,46 @@ package VSS.Strings is
    function To_Magic_Text
      (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text;
 
-   function First_Character
+   function Before_First_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing before the first character of the stirng.
+
+   function At_First_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing to the first character of the stirng.
 
-   function Last_Character
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return iterator pointing to the last character of the stirng.
-
-   function Character
+   function At_Character
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing to the character at given position. Cursor
    --  must belong to the same string.
 
-   function First_Grapheme_Cluster
+   function At_Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing to the last character of the stirng.
+
+   function After_Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing after the last character of the stirng.
+
+   function At_First_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the first grapheme cluster of the string.
 
-   function Last_Grapheme_Cluster
+   function At_Last_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the last grapheme cluster of the string.
 
-   function Grapheme_Cluster
+   function At_Grapheme_Cluster
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
@@ -133,31 +143,31 @@ package VSS.Strings is
    --  Return iterator pointing to the grapheme cluster of the string at the
    --  given position.
 
-   function First_Word
+   function At_First_Word
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
    --  Return iterator pointing to the first word of the string.
 
-   function Last_Word
+   function At_Last_Word
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
    --  Return iterator pointing to the last word of the string.
 
-   function Word
+   function At_Word
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
    --  Return iterator pointing to the word of the string at the given
    --  position.
 
-   function First_Line
+   function At_First_Line
      (Self            : Virtual_String'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean := False)
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
    --  Return iterator pointing to the first logical line of the string.
 
-   function Line
+   function At_Line
      (Self            : Virtual_String'Class;
       Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
@@ -165,7 +175,7 @@ package VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
    --  Return iterator pointing to the line at given position.
 
-   --  function Last_Line
+   --  function At_Last_Line
    --    (Self            : Virtual_String'Class;
    --     Terminators     : Line_Terminator_Set := New_Line_Function;
    --     Keep_Terminator : Boolean := False)

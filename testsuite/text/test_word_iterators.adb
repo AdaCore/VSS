@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -48,7 +48,7 @@ procedure Test_Word_Iterators is
    is
       use type VSS.Strings.Virtual_String;
 
-      JF : VSS.Strings.Word_Iterators.Word_Iterator := String.First_Word;
+      JF : VSS.Strings.Word_Iterators.Word_Iterator := String.At_First_Word;
       --  JB : VSS.Strings.Word_Iterators.Word_Iterator := String.Last_Word;
       S  : Positive := 1;
 

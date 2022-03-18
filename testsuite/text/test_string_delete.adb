@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -31,13 +31,13 @@ procedure Test_String_Delete is
 
    S     : VSS.Strings.Virtual_String := "Hello, world!";
    J0    : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-     S.First_Character;
+     S.At_First_Character;
    J1    : VSS.Strings.Character_Iterators.Character_Iterator :=
-     S.First_Character;
+     S.At_First_Character;
    J2    : VSS.Strings.Character_Iterators.Character_Iterator :=
-     S.Last_Character;
+     S.At_Last_Character;
    J3    : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-     S.Last_Character;
+     S.At_Last_Character;
    Dummy : Boolean;
 
 begin

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -156,7 +156,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       end Step_Backward;
 
       Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
-        Subject.First_Character;
+        Subject.At_First_Character;
 
       Pos : constant not null
         VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
@@ -543,7 +543,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
       Error       : VSS.Strings.Virtual_String;
       Root        : Node;
       Cursor      : VSS.Strings.Character_Iterators.Character_Iterator :=
-        Pattern.First_Character;
+        Pattern.At_First_Character;
+
    begin
       Self.Last_Tag := 2;
 

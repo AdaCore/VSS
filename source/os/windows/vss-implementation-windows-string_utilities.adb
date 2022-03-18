@@ -163,7 +163,7 @@ package body VSS.Implementation.Windows.String_Utilities is
       Result   : char16_array_access;
       Last     : Interfaces.C.size_t := 0;
       Position : VSS.Strings.Character_Iterators.Character_Iterator :=
-        Item.First_Character;
+        Item.Before_First_Character;
       Code     : VSS.Unicode.Code_Point;
 
    begin
@@ -172,29 +172,24 @@ package body VSS.Implementation.Windows.String_Utilities is
            New_Native_String_Buffer
              (Interfaces.C.size_t (Item.Character_Length) * 2);
 
-         if Position.Has_Element then
-            loop
-               Code :=
-                 VSS.Characters.Virtual_Character'Pos (Position.Element);
+         while Position.Forward loop
+            Code := VSS.Characters.Virtual_Character'Pos (Position.Element);
 
-               if Code <= 16#FFFF# then
-                  Result (Last) := Interfaces.C.char16_t'Val (Code);
-                  Last := Last + 1;
+            if Code <= 16#FFFF# then
+               Result (Last) := Interfaces.C.char16_t'Val (Code);
+               Last := Last + 1;
 
-               else
-                  Result (Last) :=
-                    Interfaces.C.char16_t'Val
-                      (High_Surrogate_First_Store + Code / 16#400#);
-                  Last := Last + 1;
-                  Result (Last) :=
-                    Interfaces.C.char16_t'Val
-                      (Low_Surrogate_First + Code mod 16#400#);
-                  Last := Last + 1;
-               end if;
-
-               exit when not Position.Forward;
-            end loop;
-         end if;
+            else
+               Result (Last) :=
+                 Interfaces.C.char16_t'Val
+                   (High_Surrogate_First_Store + Code / 16#400#);
+               Last := Last + 1;
+               Result (Last) :=
+                 Interfaces.C.char16_t'Val
+                   (Low_Surrogate_First + Code mod 16#400#);
+               Last := Last + 1;
+            end if;
+         end loop;
 
          Result (Last) := Interfaces.C.char16_t'Val (0);
       end if;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -41,7 +41,7 @@ procedure Test_String_Insert is
 
       S : VSS.Strings.Virtual_String := "Z";
       J : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.First_Character;
+        S.At_First_Character;
 
    begin
       --  Test result insert of the character operation, as well as correct
@@ -68,7 +68,7 @@ procedure Test_String_Insert is
 
       S : VSS.Strings.Virtual_String := "Hello!";
       J : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.Last_Character;
+        S.At_Last_Character;
 
    begin
       S.Insert (J, ", world");

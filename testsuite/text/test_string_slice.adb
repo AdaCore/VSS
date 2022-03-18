@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -47,9 +47,9 @@ procedure Test_String_Slice is
      VSS.Strings.To_Virtual_String ("⊗∬ 𝛻𝜕 ");
 
    J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
-     S.First_Character;
+     S.At_First_Character;
    J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
-     S.First_Character;
+     S.At_First_Character;
    D  : Boolean with Unreferenced;
 
 begin
@@ -114,13 +114,13 @@ begin
       JCV : VSS.Strings.Character_Iterators.Character_Iterator;
       JLV : VSS.Strings.Line_Iterators.Line_Iterator;
       JC1 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-        S1.First_Character;
+        S1.At_First_Character;
       JC2 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-        S2.First_Character;
+        S2.At_First_Character;
       JL1 : constant VSS.Strings.Line_Iterators.Line_Iterator           :=
-        S1.First_Line;
+        S1.At_First_Line;
       JL2 : constant VSS.Strings.Line_Iterators.Line_Iterator           :=
-        S2.First_Line;
+        S2.At_First_Line;
 
       R   : VSS.Strings.Virtual_String;
 

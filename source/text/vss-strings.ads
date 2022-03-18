@@ -96,15 +96,15 @@ package VSS.Strings is
    function To_Magic_Text
      (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text;
 
+   function Before_First_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing before the first character of the stirng.
+
    function At_First_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing to the first character of the stirng.
-
-   function At_Last_Character
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return iterator pointing to the last character of the stirng.
 
    function At_Character
      (Self     : Virtual_String'Class;
@@ -112,6 +112,16 @@ package VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing to the character at given position. Cursor
    --  must belong to the same string.
+
+   function At_Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing to the last character of the stirng.
+
+   function After_Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+   --  Return iterator pointing after the last character of the stirng.
 
    function At_First_Grapheme_Cluster
      (Self : Virtual_String'Class)

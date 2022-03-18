@@ -169,6 +169,21 @@ package body VSS.Strings is
       VSS.Implementation.Strings.Reference (Self.Data);
    end Adjust;
 
+   --------------------------
+   -- After_Last_Character --
+   --------------------------
+
+   function After_Last_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+   begin
+      return Result :
+               VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         Result.Set_After_Last (Self);
+      end return;
+   end After_Last_Character;
+
    ------------
    -- Append --
    ------------
@@ -384,6 +399,21 @@ package body VSS.Strings is
    begin
       return VSS.Strings.Cursors.Iterators.Words.Internals.Word (Self, Start);
    end At_Word;
+
+   ----------------------------
+   -- Before_First_Character --
+   ----------------------------
+
+   function Before_First_Character
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+   begin
+      return Result :
+               VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         Result.Set_Before_First (Self);
+      end return;
+   end Before_First_Character;
 
    ----------------------
    -- Character_Length --

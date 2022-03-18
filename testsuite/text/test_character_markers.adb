@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -42,9 +42,9 @@ procedure Test_Character_Markers is
    procedure Test_Append is
       S1  : VSS.Strings.Virtual_String := "Hello, ";
       M11 : constant VSS.Strings.Markers.Character_Marker :=
-        S1.First_Character.Marker;
+        S1.At_First_Character.Marker;
       M12 : constant VSS.Strings.Markers.Character_Marker :=
-        S1.Last_Character.Marker;
+        S1.At_Last_Character.Marker;
 
    begin
       S1.Append ("world");
@@ -65,19 +65,19 @@ procedure Test_Character_Markers is
    procedure Test_Insert is
       S1  : VSS.Strings.Virtual_String := "AC";
       J1  : VSS.Strings.Character_Iterators.Character_Iterator :=
-        S1.First_Character;
+        S1.At_First_Character;
       M11 : constant VSS.Strings.Markers.Character_Marker :=
-        S1.First_Character.Marker;
+        S1.At_First_Character.Marker;
       M12 : constant VSS.Strings.Markers.Character_Marker :=
-        S1.Last_Character.Marker;
+        S1.At_Last_Character.Marker;
 
       S2  : VSS.Strings.Virtual_String := "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       J2  : VSS.Strings.Character_Iterators.Character_Iterator :=
-        S2.First_Character;
+        S2.At_First_Character;
       M21 : constant VSS.Strings.Markers.Character_Marker :=
-        S2.First_Character.Marker;
+        S2.At_First_Character.Marker;
       M22 : constant VSS.Strings.Markers.Character_Marker :=
-        S2.Last_Character.Marker;
+        S2.At_Last_Character.Marker;
 
    begin
       Test_Support.Assert (J1.Forward);
@@ -112,9 +112,9 @@ procedure Test_Character_Markers is
 
       S  : constant VSS.Strings.Virtual_String := "Hello, world!";
       J1 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.First_Character with Unreferenced;
+        S.At_First_Character with Unreferenced;
       J2 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.Last_Character with Unreferenced;
+        S.At_Last_Character with Unreferenced;
 
    begin
       --  Test finalization of the markers inside the vector container.
@@ -123,8 +123,8 @@ procedure Test_Character_Markers is
          V : Marker_Vectors.Vector;
 
       begin
-         V.Append (S.First_Character.Marker);
-         V.Append (S.Last_Character.Marker);
+         V.Append (S.At_First_Character.Marker);
+         V.Append (S.At_Last_Character.Marker);
       end;
    end Test_Vectors_Finalization;
 

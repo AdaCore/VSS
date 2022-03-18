@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -200,7 +200,7 @@ procedure Test_Line_Iterators is
       use type VSS.Strings.Virtual_String;
 
       J : VSS.Strings.Line_Iterators.Line_Iterator :=
-        Source_String.First_Line (Terminators, Keep_Terminator);
+        Source_String.At_First_Line (Terminators, Keep_Terminator);
       C : Natural := 1;
 
    begin
@@ -307,7 +307,7 @@ procedure Test_Line_Iterators is
    begin
       declare
          JL : VSS.Strings.Line_Iterators.Line_Iterator :=
-           Source_String.First_Line (Terminators, Keep_Terminator);
+           Source_String.At_First_Line (Terminators, Keep_Terminator);
 
       begin
          for K in 2 .. Restart_Line loop
@@ -316,7 +316,7 @@ procedure Test_Line_Iterators is
 
          declare
             JC : VSS.Strings.Character_Iterators.Character_Iterator :=
-              Source_String.Character (JL.First_Marker);
+              Source_String.At_Character (JL.First_Marker);
 
          begin
             for K in 1 .. JL.Character_Length / 2 loop
@@ -329,7 +329,7 @@ procedure Test_Line_Iterators is
 
       declare
          J : VSS.Strings.Line_Iterators.Line_Iterator :=
-           Source_String.Line (M, Terminators, Keep_Terminator);
+           Source_String.At_Line (M, Terminators, Keep_Terminator);
          C : Positive := Restart_Line;
 
       begin
@@ -385,7 +385,7 @@ procedure Test_Line_Iterators is
    procedure Test_U902_007 is
       Text : constant VSS.Strings.Virtual_String := "f";
       J    : constant VSS.Strings.Line_Iterators.Line_Iterator :=
-        Text.First_Line (Keep_Terminator => True);
+        Text.At_First_Line (Keep_Terminator => True);
       LT   : VSS.Strings.Virtual_String;
 
    begin

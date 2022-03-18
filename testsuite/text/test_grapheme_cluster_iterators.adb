@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -49,9 +49,9 @@ procedure Test_Grapheme_Cluster_Iterators is
       use type VSS.Strings.Virtual_String;
 
       JF : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        String.First_Grapheme_Cluster;
+        String.At_First_Grapheme_Cluster;
       JB : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        String.Last_Grapheme_Cluster;
+        String.At_Last_Grapheme_Cluster;
       S  : Positive := 1;
 
    begin

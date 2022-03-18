@@ -132,7 +132,7 @@ procedure Test_Character_Iterators is
 
    procedure Test_Backward is
       J : VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.Last_Character;
+        S.At_Last_Character;
 
    begin
       Test_Common_Backward (J);
@@ -249,9 +249,9 @@ procedure Test_Character_Iterators is
 
          declare
             J1 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-              S.Character (J);
+              S.At_Character (J);
             J2 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-              S.Character (M);
+              S.At_Character (M);
 
          begin
             if not J1.Has_Element then
@@ -429,9 +429,9 @@ procedure Test_Character_Iterators is
 
          declare
             J1 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-              S.Character (J);
+              S.At_Character (J);
             J2 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
-              S.Character (M);
+              S.At_Character (M);
 
          begin
             if not J1.Has_Element then
@@ -521,7 +521,7 @@ procedure Test_Character_Iterators is
 
    procedure Test_Forward is
       J : VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.First_Character;
+        S.At_First_Character;
    begin
       Test_Common_Forward (J);
    end Test_Forward;

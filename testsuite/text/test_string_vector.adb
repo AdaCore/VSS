@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                     Copyright (C) 2020-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -328,13 +328,13 @@ begin
 
    for Item of V2 loop
       if not Item.Is_Empty then
-         Revert.Append (Item.First_Character.Element);
+         Revert.Append (Item.At_First_Character.Element);
       end if;
    end loop;
 
    for Item of reverse V2 loop
       if not Item.Is_Empty then
-         Revert.Append (Item.First_Character.Element);
+         Revert.Append (Item.At_First_Character.Element);
       end if;
    end loop;
 

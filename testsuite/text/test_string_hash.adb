@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                     Copyright (C) 2020-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -29,10 +29,9 @@ procedure Test_String_Hash is
 
    N  : VSS.Strings.Virtual_String;
    pragma Warnings (Off, N);
-   E  : VSS.Strings.Virtual_String := VSS.Strings.To_Virtual_String ("");
-   S1 : VSS.Strings.Virtual_String := VSS.Strings.To_Virtual_String ("foobar");
-   S2 : VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ("кириллица");
+   E  : constant VSS.Strings.Virtual_String := "";
+   S1 : constant VSS.Strings.Virtual_String := "foobar";
+   S2 : constant VSS.Strings.Virtual_String := "кириллица";
 
 begin
    if N.Hash /= 16#CBF2_9CE4_8422_2325# then

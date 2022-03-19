@@ -754,21 +754,33 @@ package body JSON_Schema.Writers.Types is
    is
       Done : String_Sets.Set;
    begin
+      Put ("with Ada.Containers.Doubly_Linked_Lists;");
+      New_Line;
       Put ("with Ada.Finalization;");
+      New_Line;
+      Put ("with VSS.JSON.Events;");
       New_Line;
       Put ("with VSS.Strings;");
       New_Line;
       Put ("with VSS.String_Vectors;");
+      New_Line;
       New_Line;
 
       Put ("package ");
       Put (Package_Name);
       Put (" is");
       New_Line;
-      Put ("type Any_Object is tagged null record;");
+      Put
+        ("package JSON_Event_Lists is new Ada.Containers.Doubly_Linked_Lists");
       New_Line;
-      Put ("type Any_Value is null record;");
-      Write_Optional_Type ("Any_Value");
+      Put ("(VSS.JSON.Events.JSON_Event, VSS.JSON.Events.""="");");
+      New_Line;
+      New_Line;
+      Put ("type Any_Value is new JSON_Event_Lists.List with null record;");
+      New_Line;
+      Put ("type Any_Object is new Any_Value with null record;");
+      New_Line;
+      New_Line;
       Write_Optional_Type ("Integer");
       Write_Optional_Type ("Float");
       Put ("type Integer_Or_String (Is_String : Boolean := False) is record");

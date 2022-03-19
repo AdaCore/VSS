@@ -23,6 +23,8 @@
 
 pragma Ada_2022;
 
+with JSON_Schema.Writers.Outputs;
+
 package body JSON_Schema.Writers.Types is
 
    procedure Write_Named_Types
@@ -260,6 +262,7 @@ package body JSON_Schema.Writers.Types is
 
       Array_Types.Insert ("Integer", null);
       Write_Type_Package (Map, Optional_Types, Array_Types);
+      JSON_Schema.Writers.Outputs.Generate_Writers (Map, Optional_Types);
    end Write;
 
    --------------------------

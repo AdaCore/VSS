@@ -23,20 +23,7 @@
 
 pragma Ada_2022;
 
-with Ada.Containers.Hashed_Sets;
-with Ada.Wide_Wide_Text_IO;
-
-with VSS.Strings.Character_Iterators;
-with VSS.Strings.Conversions;
-with VSS.Strings.Hash;
-
 package body JSON_Schema.Writers.Types is
-
-   package String_Sets is new Ada.Containers.Hashed_Sets
-     (VSS.Strings.Virtual_String,
-      VSS.Strings.Hash,
-      VSS.Strings."=",
-      VSS.Strings."=");
 
    procedure Write_Named_Types
      (Map            : JSON_Schema.Readers.Schema_Map;
@@ -95,19 +82,8 @@ package body JSON_Schema.Writers.Types is
       Schema : Schema_Access);
    --  The same for enumeration schema
 
-   procedure Write_Enumeration_Types
-     (Name      : VSS.Strings.Virtual_String;
-      Property  : VSS.Strings.Virtual_String;
-      Schema    : Schema_Access;
-      Required  : Boolean);
-   --  Traverse all types in Schema recursively, find enumeration schemes
-   --  and write corresponding Ada types. Name is top named schema, while
-   --  Property (if not empty) is a corresponding property.
-
    procedure Write_Public_Vectors (Array_Types : Readers.Schema_Map);
    --  Write vector type public declarations for each item of Array_Types
-
-   type Declaration_Kind is (Specification, Implemenetation);
 
    procedure Write_Vector_Operations
      (Array_Types : Readers.Schema_Map;
@@ -116,10 +92,6 @@ package body JSON_Schema.Writers.Types is
 
    procedure Write_Private_Vectors (Array_Types : Readers.Schema_Map);
    --  Write vector type private declarations for each item of Array_Types
-
-   function Escape_Keywords (Name : VSS.Strings.Virtual_String)
-     return VSS.Strings.Virtual_String;
-   --  Add a prefix when Name is in the Reserved_Words list
 
    function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String;
@@ -138,11 +110,6 @@ package body JSON_Schema.Writers.Types is
    --  Scan Schema recursively and find all types that are referenced as items
    --  in an array schema.
 
-   procedure Put (Text : VSS.Strings.Virtual_String);
-   --  Write Text to stdout
-   procedure New_Line;
-   --  Write a line terminator to stdout
-
    procedure Write_Comment
      (Description : VSS.Strings.Virtual_String;
       Indent      : Natural);
@@ -155,7 +122,10 @@ package body JSON_Schema.Writers.Types is
    procedure Write_Any_Object (Name : VSS.Strings.Virtual_String);
    --  Write an Ada type that represents an unrestricted object
 
-   procedure Write_Type_Package (Map : JSON_Schema.Readers.Schema_Map);
+   procedure Write_Type_Package
+     (Map            : JSON_Schema.Readers.Schema_Map;
+      Optional_Types : String_Sets.Set;
+      Array_Types    : Readers.Schema_Map);
    --  Write package specificatio with type declarations
 
    function Is_Enum (Schema : Schema_Access) return Boolean is
@@ -172,63 +142,6 @@ package body JSON_Schema.Writers.Types is
    --  Return an empty string for string properties with just one enumeration
    --  literal defined, so we can skip such properties in the type declaration.
 
-   Reserved_Words : constant VSS.String_Vectors.Virtual_String_Vector :=
-   ["function", "interface", "all", "type", "body",
-     "private", "protected", "new", "exception", "entry", "goto", "end",
-     "boolean"];
-
-   Integer_Or_String : constant JSON_Schema.Simple_Type_Vectors.Vector :=
-     [Definitions.An_Integer, Definitions.A_String];
-
-   String_Or_Null : constant JSON_Schema.Simple_Type_Vectors.Vector :=
-     [Definitions.A_String, Definitions.A_Null];
-
-   Package_Name : constant VSS.Strings.Virtual_String := "DAP.Tools";
-
-   ---------------------
-   -- Escape_Keywords --
-   ---------------------
-
-   function Escape_Keywords (Name : VSS.Strings.Virtual_String)
-     return VSS.Strings.Virtual_String
-   is
-      use type VSS.Strings.Virtual_String;
-   begin
-      if Name.Starts_With ("__") then
-         declare
-            Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
-              Name.First_Character;
-         begin
-            if Cursor.Forward and then Cursor.Forward then
-               return Name.Slice (Cursor, Name.Last_Character);
-            else
-               raise Program_Error;
-            end if;
-         end;
-      elsif not Reserved_Words.Contains (Name) then
-         declare
-            --  Replace all spaces with underscores
-            Words : constant VSS.String_Vectors.Virtual_String_Vector :=
-              Name.Split (' ');
-            Result : VSS.Strings.Virtual_String;
-         begin
-            for J in 1 .. Words.Length loop
-               if J > 1 then
-                  Result.Append ("_");
-               end if;
-
-               Result.Append (Words.Element (J));
-            end loop;
-
-            return Result;
-         end;
-      elsif Name.Starts_With ("i") or Name.Starts_With ("a") then
-         return "an_" & Name;
-      else
-         return "a_" & Name;
-      end if;
-   end Escape_Keywords;
-
    ----------------
    -- Field_Type --
    ----------------
@@ -239,101 +152,14 @@ package body JSON_Schema.Writers.Types is
       Required : Boolean;
       Fallback : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String
    is
-      use type JSON_Schema.Simple_Type_Vectors.Vector;
+      Name : VSS.Strings.Virtual_String;
+      Prefix : VSS.Strings.Virtual_String;
 
-      Result : VSS.Strings.Virtual_String :=
-        (if Required then VSS.Strings.Empty_Virtual_String
-         else "Optional_");
    begin
-      if not Schema.Ref.Is_Empty then
-         Result.Append (Ref_To_Type_Name (Schema.Ref));
+      Get_Field_Type (Map, Schema, Required, Fallback, Name, Prefix);
+      Prefix.Append (Name);
 
-         if Is_Enum (Map (Schema.Ref)) then
-            Result.Prepend ("Enum.");
-         end if;
-
-      elsif not Schema.Additional_Properties.Is_Boolean
-        and then Schema.Additional_Properties.Schema /= null
-      then
-         Result := "Any_Object";  --  TODO: Make more precise type???
-      elsif Schema.Kind.Last_Index = 7 then
-         Result.Append ("Any_Value");
-      elsif Schema.Kind = Integer_Or_String then
-         Result.Append ("Integer_Or_String");
-      elsif Schema.Kind = String_Or_Null then
-         --  To represent `null` it uses Is_Null function
-         Result.Append ("VSS.Strings.Virtual_String");
-      elsif Schema.Kind.Last_Index = 1 then
-         case Schema.Kind (1) is
-            when Definitions.A_Boolean =>
-               --  Let's don't use Optional_Boolean because
-               --  all absent boolean fields work as False
-               Result := "Boolean";
-
-            when Definitions.An_Integer =>
-               Result.Append ("Integer");
-
-            when Definitions.A_Null =>
-               raise Program_Error;
-
-            when Definitions.A_Number =>
-               Result.Append ("Float");
-
-            when Definitions.A_String =>
-
-               if Required and Schema.Enum.Length = 1 then
-                  --  If string type redefined as an enum with just one literal
-                  --  then skip this property by returning an empty type name.
-                  Result := VSS.Strings.Empty_Virtual_String;
-               elsif Schema.Enum.Length > 1 then
-                  Result.Prepend ("Enum.");
-                  Result.Append (Fallback);
-               else
-                  --  Instead of Optional_String use just Virtual_String,
-                  --  to check for an absent value use Is_Null.
-                  Result := "VSS.Strings.Virtual_String";
-               end if;
-
-            when Definitions.An_Array =>
-               declare
-                  Item : constant Schema_Access :=
-                    Schema.Items.First_Element;
-               begin
-                  --  TODO: Optional vectors???
-                  if not Item.Ref.Is_Empty then
-                     Result := Ref_To_Type_Name (Item.Ref);
-                     Result.Append ("_Vector");
-                  else
-                     case Item.Kind (1) is
-                        when Definitions.A_Boolean =>
-                           Result := "Boolean_Vector";
-
-                        when Definitions.An_Integer =>
-                           Result := "Integer_Vector";
-
-                        when Definitions.A_Null
-                           | Definitions.An_Array
-                           | Definitions.An_Object =>
-                           raise Program_Error;
-
-                        when Definitions.A_Number =>
-                           Result := "Float_Vector";
-
-                        when Definitions.A_String =>
-                           Result :=
-                             "VSS.String_Vectors.Virtual_String_Vector";
-                     end case;
-                  end if;
-               end;
-
-            when Definitions.An_Object =>
-               Result.Append (Fallback);
-         end case;
-      else
-         Result.Append ("YYY");
-      end if;
-
-      return Result;
+      return Prefix;
    end Field_Type;
 
    ----------------------
@@ -406,25 +232,6 @@ package body JSON_Schema.Writers.Types is
       end loop;
    end Find_Optional_Types;
 
-   --------------
-   -- New_Line --
-   --------------
-
-   procedure New_Line is
-   begin
-      Ada.Wide_Wide_Text_IO.New_Line;
-   end New_Line;
-
-   ---------
-   -- Put --
-   ---------
-
-   procedure Put (Text : VSS.Strings.Virtual_String) is
-   begin
-      Ada.Wide_Wide_Text_IO.Put
-        (VSS.Strings.Conversions.To_Wide_Wide_String (Text));
-   end Put;
-
    ---------------
    -- Type_Name --
    ---------------
@@ -443,8 +250,16 @@ package body JSON_Schema.Writers.Types is
    -----------
 
    procedure Write (Map : JSON_Schema.Readers.Schema_Map) is
+      Optional_Types : String_Sets.Set;
+      Array_Types    : Readers.Schema_Map;
    begin
-      Write_Type_Package (Map);
+      for Schema of Map loop
+         Find_Optional_Types (Schema, Optional_Types);
+         Find_Array_Types (Map, Schema, Array_Types);
+      end loop;
+
+      Array_Types.Insert ("Integer", null);
+      Write_Type_Package (Map, Optional_Types, Array_Types);
    end Write;
 
    --------------------------
@@ -665,49 +480,6 @@ package body JSON_Schema.Writers.Types is
       New_Line;
    end Write_Enumeration_Type;
 
-   -----------------------------
-   -- Write_Enumeration_Types --
-   -----------------------------
-
-   procedure Write_Enumeration_Types
-     (Name     : VSS.Strings.Virtual_String;
-      Property : VSS.Strings.Virtual_String;
-      Schema   : Schema_Access;
-      Required : Boolean)
-   is
-   begin
-      if Schema.Enum.Length > 1 then
-         declare
-            Type_Name : VSS.Strings.Virtual_String := Name;
-         begin
-            if not Property.Is_Empty then
-               Type_Name.Append ("_");
-               Type_Name.Append (Property);
-            end if;
-
-            Write_Enumeration_Type (Type_Name, Schema);
-
-            if not Required then
-               Write_Optional_Type (Type_Name);
-            end if;
-         end;
-      end if;
-
-      for Item of Schema.All_Of loop
-         if Item.Ref.Is_Empty then
-            Write_Enumeration_Types (Name, Property, Item, True);
-         end if;
-      end loop;
-
-      for Property of Schema.Properties loop
-         Write_Enumeration_Types
-           (Name,
-            Property.Name,
-            Property.Schema,
-            Schema.Required.Contains (Property.Name));
-      end loop;
-   end Write_Enumeration_Types;
-
    ----------------------
    -- Write_Named_Type --
    ----------------------
@@ -728,8 +500,7 @@ package body JSON_Schema.Writers.Types is
          Write_Enumeration_Type (Ref_To_Type_Name (Name), Schema);
       elsif not Schema.All_Of.Is_Empty then
          Done.Insert (Name);
-         Write_Derived_Type
-           (Name, Schema, Map, Optional_Types, Done);
+         Write_Derived_Type (Name, Schema, Map, Optional_Types, Done);
       elsif not Schema.Properties.Is_Empty then
          Done.Insert (Name);
          Write_Record_Type (Name, Schema, Map, Optional_Types, Done);
@@ -810,7 +581,8 @@ package body JSON_Schema.Writers.Types is
             Schema : constant Schema_Access :=
               Readers.Schema_Maps.Element (Cursor);
             Element_Type : constant VSS.Strings.Virtual_String :=
-              (if Is_Enum (Schema) then "Enum." & Item else Item);
+              (if Schema /= null and then Is_Enum (Schema)
+               then "Enum." & Item else Item);
          begin
             Put ("type ");
             Put (Item);
@@ -975,16 +747,13 @@ package body JSON_Schema.Writers.Types is
    -- Write_Type_Package --
    ------------------------
 
-   procedure Write_Type_Package (Map : JSON_Schema.Readers.Schema_Map) is
+   procedure Write_Type_Package
+     (Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
-      Array_Types    : Readers.Schema_Map;
-      Done           : String_Sets.Set;
+      Array_Types    : Readers.Schema_Map)
+   is
+      Done : String_Sets.Set;
    begin
-      for Schema of Map loop
-         Find_Optional_Types (Schema, Optional_Types);
-         Find_Array_Types (Map, Schema, Array_Types);
-      end loop;
-
       Put ("with Ada.Finalization;");
       New_Line;
       Put ("with VSS.Strings;");
@@ -1006,8 +775,6 @@ package body JSON_Schema.Writers.Types is
       New_Line;
       Write_Optional_Type ("Integer_Or_String");
       New_Line;
-      Put ("type Integer_Vector is tagged private;");
-      New_Line;
 
       Write_Public_Vectors (Array_Types);
       New_Line;
@@ -1018,28 +785,43 @@ package body JSON_Schema.Writers.Types is
       New_Line;
       New_Line;
 
-      for Cursor in Map.Iterate loop
-         declare
-            Name : constant VSS.Strings.Virtual_String :=
-              JSON_Schema.Readers.Schema_Maps.Key (Cursor);
+      declare
+         procedure On_Enumeration_Type
+           (Name     : VSS.Strings.Virtual_String;
+            Property : VSS.Strings.Virtual_String;
+            Schema   : Schema_Access;
+            Optional : Boolean);
+         --  Generate enumeration type for Schema
 
-            Schema : constant Schema_Access :=
-              JSON_Schema.Readers.Schema_Maps.Element (Cursor);
-
-            Type_Name : constant VSS.Strings.Virtual_String :=
-              Ref_To_Type_Name (Name);
+         procedure On_Enumeration_Type
+           (Name     : VSS.Strings.Virtual_String;
+            Property : VSS.Strings.Virtual_String;
+            Schema   : Schema_Access;
+            Optional : Boolean)
+         is
+            Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
          begin
-            Write_Enumeration_Types
-              (Type_Name,
-               "",
-               Schema,
-               not Optional_Types.Contains (Type_Name));
-
-            if not Schema.Enum.Is_Empty then
-               Done.Insert (Name);
+            if Property.Is_Empty then
+               Done.Include (Name);
             end if;
-         end;
-      end loop;
+
+            if Schema.Enum.Length > 1 then
+               if not Property.Is_Empty then
+                  Type_Name.Append ("_");
+                  Type_Name.Append (Property);
+               end if;
+
+               Write_Enumeration_Type (Type_Name, Schema);
+
+               if Optional then
+                  Write_Optional_Type (Type_Name);
+               end if;
+            end if;
+         end On_Enumeration_Type;
+      begin
+         Each_Enumeration_Type
+           (Map, Optional_Types, On_Enumeration_Type'Access);
+      end;
 
       Put ("end Enum;");
       New_Line;
@@ -1049,8 +831,6 @@ package body JSON_Schema.Writers.Types is
 
       Write_Vector_Operations (Array_Types, Specification);
       Put ("private");
-      New_Line;
-      Put ("type Integer_Vector is tagged null record;");
       New_Line;
       Write_Private_Vectors (Array_Types);
       Put ("end ");
@@ -1069,6 +849,8 @@ package body JSON_Schema.Writers.Types is
       Put ("end ");
       Put (Package_Name);
       Put (";");
+      New_Line;
+      New_Line;
    end Write_Type_Package;
 
    -----------------------------
@@ -1088,7 +870,8 @@ package body JSON_Schema.Writers.Types is
             Schema : constant Schema_Access :=
               Readers.Schema_Maps.Element (Cursor);
             Element_Type : constant VSS.Strings.Virtual_String :=
-              (if Is_Enum (Schema) then "Enum." & Item else Item);
+              (if Schema /= null and then Is_Enum (Schema)
+               then "Enum." & Item else Item);
          begin
 
             if Kind = Implemenetation then
@@ -1283,7 +1066,7 @@ package body JSON_Schema.Writers.Types is
             Put (Item);
             Put ("_Constant_Reference");
             New_Line;
-            Put ("(Self : aliased in out ");
+            Put ("(Self : aliased ");
             Put (Item);
             Put ("_Vector;");
             New_Line;

@@ -184,7 +184,7 @@ package body JSON_Schema.Writers is
       then
          Result := "Any_Object";  --  TODO: Make more precise type???
       elsif Schema.Kind.Last_Index = 7 then
-         Result.Append ("Any_Value");
+         Result := "Any_Value";
       elsif Schema.Kind = Integer_Or_String then
          Result.Append ("Integer_Or_String");
       elsif Schema.Kind = String_Or_Null then

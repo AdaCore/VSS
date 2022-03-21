@@ -561,12 +561,16 @@ package body JSON_Schema.Writers.Outputs is
       Get_Field_Type
         (Map, Property.Schema, True, Fallback, Type_Name, Type_Prefix);
 
-      if Type_Name.Is_Empty then
-         --  Skip unneeded properties
-         return;
-      end if;
-
-      if not Required and Type_Name = "Virtual_String" then
+      if Property.Schema.Enum.Length = 1 then
+         --  Write constant property
+         Put ("Handler.Key_Name (""");
+         Put (Property.Name);
+         Put (""");");
+         Put ("Handler.String_Value (""");
+         Put (Property.Schema.Enum.Element (1));
+         Put (""");");
+         New_Line;
+      elsif not Required and Type_Name = "Virtual_String" then
          Put ("if not Value.");
          Put (Field_Name);
          Put (".Is_Null then");

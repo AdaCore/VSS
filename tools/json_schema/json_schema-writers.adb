@@ -23,6 +23,7 @@
 
 pragma Ada_2022;
 
+with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Wide_Wide_Text_IO;
 
 with VSS.Strings.Character_Iterators;
@@ -113,6 +114,95 @@ package body JSON_Schema.Writers is
          end;
       end loop;
    end Each_Enumeration_Type;
+
+   -------------------
+   -- Each_Property --
+   -------------------
+
+   procedure Each_Property
+     (Map    : JSON_Schema.Readers.Schema_Map;
+      Schema : Schema_Access;
+      Action : access procedure
+        (Property : JSON_Schema.Property;
+         Required : Boolean))
+   is
+      use type VSS.Strings.Virtual_String;
+
+      function Equal_Name (Left, Right : JSON_Schema.Property) return Boolean
+        is (Left.Name = Right.Name);
+
+      package Property_Lists is new Ada.Containers.Doubly_Linked_Lists
+        (Property, Equal_Name);
+
+      procedure Prepend
+        (List     : in out Property_Lists.List;
+         Property : JSON_Schema.Property);
+      --  If property in the list, then move it at the beggining, otherwise
+      --  prepend it to the list.
+
+      -------------
+      -- Prepend --
+      -------------
+
+      procedure Prepend
+        (List     : in out Property_Lists.List;
+         Property : JSON_Schema.Property)
+      is
+         Cursor : Property_Lists.Cursor := List.Find (Property);
+      begin
+         if Property_Lists.Has_Element (Cursor) then
+            declare
+               Value : constant JSON_Schema.Property :=
+                 Property_Lists.Element (Cursor);
+            begin
+               List.Delete (Cursor);
+               List.Prepend (Value);
+            end;
+         else
+            List.Prepend (Property);
+         end if;
+      end Prepend;
+
+      List : Property_Lists.List;
+      --  A list of collected properties. Items in the list are ordered.
+      --  If we found a property in a parent schema then we move the property
+      --  to the beggining of the list instead of creating a new one.
+
+      Required : String_Sets.Set;
+      --  Set of required properties
+
+      Next : Schema_Access := Schema;
+   begin
+      loop
+         for Property of reverse Next.Properties loop
+            Prepend (List, Property);
+
+            if Next.Required.Contains (Property.Name) then
+               Required.Include (Property.Name);
+            end if;
+         end loop;
+
+         for Item of Next.All_Of loop
+            for Property of reverse Item.Properties loop
+               Prepend (List, Property);
+
+               if Item.Required.Contains (Property.Name) then
+                  Required.Include (Property.Name);
+               end if;
+            end loop;
+         end loop;
+
+         if Next.All_Of.Is_Empty then
+            exit;
+         else
+            Next := Map (Next.All_Of.First_Element.Ref);
+         end if;
+      end loop;
+
+      for Property of List loop
+         Action (Property, Required.Contains (Property.Name));
+      end loop;
+   end Each_Property;
 
    ---------------------
    -- Escape_Keywords --

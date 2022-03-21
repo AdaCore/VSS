@@ -62,6 +62,15 @@ package JSON_Schema.Writers is
    --  * Schema - corresponding enumeration schema
    --  * Optional - True if enumeration schema is used in not-required property
 
+   procedure Each_Property
+     (Map    : JSON_Schema.Readers.Schema_Map;
+      Schema : Schema_Access;
+      Action : access procedure
+        (Property : JSON_Schema.Property;
+         Required : Boolean));
+   --  For given Schema traverse allOf items, collect all properties and call
+   --  the Action procedure for each such property.
+
    function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String;
    --  Convert $ref to a type name

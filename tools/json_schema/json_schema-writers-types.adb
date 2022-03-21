@@ -370,9 +370,17 @@ package body JSON_Schema.Writers.Types is
    is
       use type VSS.Strings.Virtual_String;
 
-      Next : Schema_Access := Schema;
+      procedure On_Property
+        (Property : JSON_Schema.Property;
+         Required : Boolean);
+      --  Generate component declaration for given property
 
-      Done_Fields : String_Sets.Set;
+      procedure On_Property
+        (Property : JSON_Schema.Property;
+         Required : Boolean) is
+      begin
+         Write_Record_Component (Name, Map, Property, Required);
+      end On_Property;
    begin
       --  Write dependencies
       for Used of Schema.All_Of loop
@@ -421,35 +429,7 @@ package body JSON_Schema.Writers.Types is
       Put ("record");
       New_Line;
 
-      while Next /= null loop
-         for Property of Next.Properties loop
-            if not Done_Fields.Contains (Property.Name) then
-               Write_Record_Component
-                 (Name, Map, Property, Next.Required.Contains (Property.Name));
-               Done_Fields.Include (Property.Name);
-            end if;
-         end loop;
-
-         for Item of Next.All_Of loop
-            for Property of Item.Properties loop
-               if not Done_Fields.Contains (Property.Name) then
-                  Write_Record_Component
-                    (Name,
-                     Map,
-                     Property,
-                     Item.Required.Contains (Property.Name));
-
-                  Done_Fields.Include (Property.Name);
-               end if;
-            end loop;
-         end loop;
-
-         if Next.All_Of.Is_Empty then
-            Next := null;
-         else
-            Next := Map (Next.All_Of.First_Element.Ref);
-         end if;
-      end loop;
+      Writers.Each_Property (Map, Schema, On_Property'Access);
 
       Put ("end record;");
       New_Line;

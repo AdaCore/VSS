@@ -46,8 +46,7 @@ package body JSON_Schema.Writers.Types is
 
    procedure Write_Anonymous_Type
      (Enclosing_Type : VSS.Strings.Virtual_String;
-      Property_Name  : VSS.Strings.Virtual_String;
-      Schema         : Schema_Access;
+      Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set;
@@ -271,8 +270,7 @@ package body JSON_Schema.Writers.Types is
 
    procedure Write_Anonymous_Type
      (Enclosing_Type : VSS.Strings.Virtual_String;
-      Property_Name  : VSS.Strings.Virtual_String;
-      Schema         : Schema_Access;
+      Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set;
@@ -282,14 +280,14 @@ package body JSON_Schema.Writers.Types is
 
       Type_Name : constant VSS.Strings.Virtual_String :=
         Ref_To_Type_Name (Enclosing_Type)
-        & "_" & Property_Name;
+        & "_" & Property.Name;
    begin
       --  Write dependencies
-      for Property of Schema.Properties loop
-         if not Property.Schema.Ref.Is_Empty then
+      for Item of Property.Schema.Properties loop
+         if not Item.Schema.Ref.Is_Empty then
             Write_Named_Type
-              (Property.Schema.Ref,
-               Map (Property.Schema.Ref),
+              (Item.Schema.Ref,
+               Map (Item.Schema.Ref),
                Map,
                Optional_Types,
                Done);
@@ -302,12 +300,12 @@ package body JSON_Schema.Writers.Types is
       Put ("record");
       New_Line;
 
-      for Property of Schema.Properties loop
+      for Item of Property.Schema.Properties loop
          Write_Record_Component
            (Enclosing_Type,
             Map,
-            Property,
-            Schema.Required.Contains (Property.Name));
+            Item,
+            Property.Schema.Required.Contains (Item.Name));
       end loop;
 
       Put ("end record;");
@@ -408,8 +406,7 @@ package body JSON_Schema.Writers.Types is
                   when Definitions.An_Object =>
                      Write_Anonymous_Type
                        (Name,
-                        Property.Name,
-                        Property.Schema,
+                        Property,
                         Map,
                         Optional_Types,
                         Done,

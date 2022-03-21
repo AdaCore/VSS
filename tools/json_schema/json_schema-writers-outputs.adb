@@ -43,6 +43,11 @@ package body JSON_Schema.Writers.Outputs is
       Schema : Schema_Access;
       Kind   : Declaration_Kind);
 
+   procedure Write_Anonymous_Type
+     (Enclosing_Type : VSS.Strings.Virtual_String;
+      Property       : JSON_Schema.Property;
+      Map            : JSON_Schema.Readers.Schema_Map);
+
    procedure Write_Output_Specification
      (Type_Name : VSS.Strings.Virtual_String;
       Prefix    : VSS.Strings.Virtual_String);
@@ -167,6 +172,85 @@ package body JSON_Schema.Writers.Outputs is
       New_Line;
    end Generate_Writers;
 
+   procedure Write_Anonymous_Type
+     (Enclosing_Type : VSS.Strings.Virtual_String;
+      Property       : JSON_Schema.Property;
+      Map            : JSON_Schema.Readers.Schema_Map)
+   is
+      use type VSS.Strings.Virtual_String;
+
+      procedure On_Property
+        (Property : JSON_Schema.Property;
+         Required : Boolean);
+      --  Generate component output code for given property
+
+      procedure On_Property
+        (Property : JSON_Schema.Property;
+         Required : Boolean) is
+      begin
+         Write_Record_Component (Enclosing_Type, Map, Property, Required);
+      end On_Property;
+
+      Schema : Schema_Access renames Property.Schema;
+
+      Type_Name : constant VSS.Strings.Virtual_String :=
+        Ref_To_Type_Name (Enclosing_Type)
+        & "_" & Property.Name;
+   begin
+      Write_Output_Specification (Type_Name, "");
+      Put (" is");
+      New_Line;
+
+      --  Write output procedures for anonymous schemas
+      for Used of Schema.All_Of loop
+         for Property of Used.Properties loop
+            if Property.Schema.Kind.Last_Index = 1 then
+               case Property.Schema.Kind (1) is
+                  when Definitions.An_Object =>
+                     Write_Anonymous_Type
+                       (Enclosing_Type,
+                        Property,
+                        Map);
+                  when others =>
+                     null;
+               end case;
+            end if;
+         end loop;
+      end loop;
+
+      Put ("begin");
+      New_Line;
+
+      if not Schema.All_Of.Is_Empty then
+         Put ("Handler.Start_Object;");
+         New_Line;
+         Writers.Each_Property (Map, Schema, On_Property'Access);
+         Put ("Handler.End_Object;");
+         New_Line;
+      elsif not Schema.Properties.Is_Empty then
+         Put ("Handler.Start_Object;");
+         New_Line;
+         for Property of Schema.Properties loop
+            Write_Record_Component
+              (Enclosing_Type,
+               Map,
+               Property,
+               Schema.Required.Contains (Property.Name));
+         end loop;
+         Put ("Handler.End_Object;");
+         New_Line;
+      else
+         Put ("Output_Any_Value (Handler, Value);");
+         New_Line;
+      end if;
+
+      Put ("end Output_");
+      Put (Type_Name);
+      Put (";");
+      New_Line;
+      New_Line;
+   end Write_Anonymous_Type;
+
    ---------------------
    -- Write_Enum_Body --
    ---------------------
@@ -254,6 +338,18 @@ package body JSON_Schema.Writers.Outputs is
    is
       Type_Name : constant VSS.Strings.Virtual_String :=
         Ref_To_Type_Name (Name);
+
+      procedure On_Property
+        (Property : JSON_Schema.Property;
+         Required : Boolean);
+      --  Generate component output code for given property
+
+      procedure On_Property
+        (Property : JSON_Schema.Property;
+         Required : Boolean) is
+      begin
+         Write_Record_Component (Name, Map, Property, Required);
+      end On_Property;
    begin
       if not Schema.Enum.Is_Empty then
          return;
@@ -270,11 +366,32 @@ package body JSON_Schema.Writers.Outputs is
 
       Put (" is");
       New_Line;
+
+      --  Write output procedures for anonymous schemas
+      for Used of Schema.All_Of loop
+         for Property of Used.Properties loop
+            if Property.Schema.Kind.Last_Index = 1 then
+               case Property.Schema.Kind (1) is
+                  when Definitions.An_Object =>
+                     Write_Anonymous_Type
+                       (Name,
+                        Property,
+                        Map);
+                  when others =>
+                     null;
+               end case;
+            end if;
+         end loop;
+      end loop;
+
       Put ("begin");
       New_Line;
 
       if not Schema.All_Of.Is_Empty then
-         Put ("null;  --  Derived type");
+         Put ("Handler.Start_Object;");
+         New_Line;
+         Writers.Each_Property (Map, Schema, On_Property'Access);
+         Put ("Handler.End_Object;");
          New_Line;
       elsif not Schema.Properties.Is_Empty then
          Put ("Handler.Start_Object;");
@@ -289,7 +406,7 @@ package body JSON_Schema.Writers.Outputs is
          Put ("Handler.End_Object;");
          New_Line;
       else
-         Put ("null;  --  Any_Object");
+         Put ("Output_Any_Value (Handler, Value);");
          New_Line;
       end if;
 
@@ -384,6 +501,13 @@ package body JSON_Schema.Writers.Outputs is
             Put (Suffix);
             Put (")));");
             New_Line;
+         elsif Type_Name = "Float" then
+            Put ("Handler.Float_Value");
+            Put ("(Interfaces.IEEE_Float_64 (Value.");
+            Put (Field_Name);
+            Put (Suffix);
+            Put ("));");
+            New_Line;
          elsif Type_Name = "Boolean" then
             Put ("Handler.Boolean_Value (Value.");
             Put (Field_Name);
@@ -398,7 +522,6 @@ package body JSON_Schema.Writers.Outputs is
             Put (".Length loop");
             New_Line;
             Write_Value (Field_Name, Drop_Last_Word (Type_Name), " (J)");
-            New_Line;
             Put ("end loop;");
             New_Line;
             Put ("Handler.End_Array;");

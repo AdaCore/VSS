@@ -172,6 +172,10 @@ package body JSON_Schema.Writers.Outputs is
       New_Line;
    end Generate_Writers;
 
+   --------------------------
+   -- Write_Anonymous_Type --
+   --------------------------
+
    procedure Write_Anonymous_Type
      (Enclosing_Type : VSS.Strings.Virtual_String;
       Property       : JSON_Schema.Property;
@@ -183,6 +187,22 @@ package body JSON_Schema.Writers.Outputs is
         (Property : JSON_Schema.Property;
          Required : Boolean);
       --  Generate component output code for given property
+
+      procedure On_Anonymous_Schema (Property : JSON_Schema.Property);
+      --  Generate anonymous type for given property
+
+      -------------------------
+      -- On_Anonymous_Schema --
+      -------------------------
+
+      procedure On_Anonymous_Schema (Property : JSON_Schema.Property) is
+      begin
+         Write_Anonymous_Type (Enclosing_Type, Property, Map);
+      end On_Anonymous_Schema;
+
+      -----------------
+      -- On_Property --
+      -----------------
 
       procedure On_Property
         (Property : JSON_Schema.Property;
@@ -202,21 +222,7 @@ package body JSON_Schema.Writers.Outputs is
       New_Line;
 
       --  Write output procedures for anonymous schemas
-      for Used of Schema.All_Of loop
-         for Property of Used.Properties loop
-            if Property.Schema.Kind.Last_Index = 1 then
-               case Property.Schema.Kind (1) is
-                  when Definitions.An_Object =>
-                     Write_Anonymous_Type
-                       (Enclosing_Type,
-                        Property,
-                        Map);
-                  when others =>
-                     null;
-               end case;
-            end if;
-         end loop;
-      end loop;
+      Each_Anonymous_Schema (Schema, On_Anonymous_Schema'Access);
 
       Put ("begin");
       New_Line;
@@ -336,13 +342,29 @@ package body JSON_Schema.Writers.Outputs is
       Schema : Schema_Access;
       Kind   : Declaration_Kind)
    is
-      Type_Name : constant VSS.Strings.Virtual_String :=
-        Ref_To_Type_Name (Name);
-
       procedure On_Property
         (Property : JSON_Schema.Property;
          Required : Boolean);
       --  Generate component output code for given property
+
+      procedure On_Anonymous_Schema (Property : JSON_Schema.Property);
+      --  Generate anonymous type for given property
+
+      Type_Name : constant VSS.Strings.Virtual_String :=
+        Ref_To_Type_Name (Name);
+
+      -------------------------
+      -- On_Anonymous_Schema --
+      -------------------------
+
+      procedure On_Anonymous_Schema (Property : JSON_Schema.Property) is
+      begin
+         Write_Anonymous_Type (Name, Property, Map);
+      end On_Anonymous_Schema;
+
+      -----------------
+      -- On_Property --
+      -----------------
 
       procedure On_Property
         (Property : JSON_Schema.Property;
@@ -368,21 +390,7 @@ package body JSON_Schema.Writers.Outputs is
       New_Line;
 
       --  Write output procedures for anonymous schemas
-      for Used of Schema.All_Of loop
-         for Property of Used.Properties loop
-            if Property.Schema.Kind.Last_Index = 1 then
-               case Property.Schema.Kind (1) is
-                  when Definitions.An_Object =>
-                     Write_Anonymous_Type
-                       (Name,
-                        Property,
-                        Map);
-                  when others =>
-                     null;
-               end case;
-            end if;
-         end loop;
-      end loop;
+      Each_Anonymous_Schema (Schema, On_Anonymous_Schema'Access);
 
       Put ("begin");
       New_Line;

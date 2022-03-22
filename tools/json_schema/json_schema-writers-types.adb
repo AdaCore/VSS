@@ -373,12 +373,35 @@ package body JSON_Schema.Writers.Types is
          Required : Boolean);
       --  Generate component declaration for given property
 
+      procedure On_Anonymous_Schema (Property : JSON_Schema.Property);
+      --  Generate anonymous type for given property
+
+      -------------------------
+      -- On_Anonymous_Schema --
+      -------------------------
+
+      procedure On_Anonymous_Schema (Property : JSON_Schema.Property) is
+      begin
+         Write_Anonymous_Type
+           (Name,
+            Property,
+            Map,
+            Optional_Types,
+            Done,
+            Property.Schema.Required.Contains (Property.Name));
+      end On_Anonymous_Schema;
+
+      -----------------
+      -- On_Property --
+      -----------------
+
       procedure On_Property
         (Property : JSON_Schema.Property;
          Required : Boolean) is
       begin
          Write_Record_Component (Name, Map, Property, Required);
       end On_Property;
+
    begin
       --  Write dependencies
       for Used of Schema.All_Of loop
@@ -401,22 +424,11 @@ package body JSON_Schema.Writers.Types is
                   Map,
                   Optional_Types,
                   Done);
-            elsif Property.Schema.Kind.Last_Index = 1 then
-               case Property.Schema.Kind (1) is
-                  when Definitions.An_Object =>
-                     Write_Anonymous_Type
-                       (Name,
-                        Property,
-                        Map,
-                        Optional_Types,
-                        Done,
-                        Property.Schema.Required.Contains (Property.Name));
-                  when others =>
-                     null;
-               end case;
             end if;
          end loop;
       end loop;
+
+      Each_Anonymous_Schema (Schema, On_Anonymous_Schema'Access);
 
       pragma Assert (Schema.All_Of.Last_Index = 2);
       Put ("type ");

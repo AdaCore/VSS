@@ -43,6 +43,28 @@ package body JSON_Schema.Writers is
      [Definitions.A_String, Definitions.A_Null];
 
    ---------------------------
+   -- Each_Anonymous_Schema --
+   ---------------------------
+
+   procedure Each_Anonymous_Schema
+     (Schema : Schema_Access;
+      Action : access procedure (Property : JSON_Schema.Property)) is
+   begin
+      for Used of Schema.All_Of loop
+         for Property of Used.Properties loop
+            if Property.Schema.Kind.Last_Index = 1 then
+               case Property.Schema.Kind (1) is
+                  when Definitions.An_Object =>
+                     Action (Property);
+                  when others =>
+                     null;
+               end case;
+            end if;
+         end loop;
+      end loop;
+   end Each_Anonymous_Schema;
+
+   ---------------------------
    -- Each_Enumeration_Type --
    ---------------------------
 

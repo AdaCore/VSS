@@ -71,6 +71,11 @@ package JSON_Schema.Writers is
    --  For given Schema traverse allOf items, collect all properties and call
    --  the Action procedure for each such property.
 
+   procedure Each_Anonymous_Schema
+     (Schema : Schema_Access;
+      Action : access procedure (Property : JSON_Schema.Property));
+   --  Call Action for each schema nested in given Schema
+
    function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String;
    --  Convert $ref to a type name

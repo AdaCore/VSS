@@ -93,6 +93,12 @@ package JSON_Schema.Writers is
    --  literal defined, so we can skip such properties in the type declaration.
    --  If type is defined in a package, then return package name in Prefix.
 
+   procedure Get_Element_Type
+     (Map       : JSON_Schema.Readers.Schema_Map;
+      Schema    : Schema_Access;
+      Type_Name : out VSS.Strings.Virtual_String;
+      Prefix    : out VSS.Strings.Virtual_String);
+
    Package_Name : constant VSS.Strings.Virtual_String := "DAP.Tools";
 
 end JSON_Schema.Writers;

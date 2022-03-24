@@ -270,6 +270,24 @@ package body JSON_Schema.Writers is
       end if;
    end Escape_Keywords;
 
+   procedure Get_Element_Type
+     (Map       : JSON_Schema.Readers.Schema_Map;
+      Schema    : Schema_Access;
+      Type_Name : out VSS.Strings.Virtual_String;
+      Prefix    : out VSS.Strings.Virtual_String) is
+   begin
+      if Schema.Kind.Last_Index = 1 then
+         case Schema.Kind (1) is
+            when Definitions.An_Array =>
+               Get_Field_Type
+                 (Map, Schema.Items.First_Element,
+                  True, "", Type_Name, Prefix);
+            when others =>
+               null;
+         end case;
+      end if;
+   end Get_Element_Type;
+
    procedure Get_Field_Type
      (Map       : JSON_Schema.Readers.Schema_Map;
       Schema    : Schema_Access;

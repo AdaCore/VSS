@@ -21,6 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Ada_2020;
+pragma Extensions_Allowed (On);
 pragma Ada_2022;
 
 with Ada.Containers.Doubly_Linked_Lists;

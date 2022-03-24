@@ -1,0 +1,16 @@
+name = "json_schema"
+description = "JSON Schema to Ada converter"
+version = "1.0.0"
+
+authors = ["Max Reznik"]
+maintainers = ["Max Reznik <reznik@adacore.com>"]
+maintainers-logins = ["reznikmm"]
+project-files = ["../../gnat/tools/json_schema.gpr"]
+executables = ["gen_json"]
+
+[[depends-on]]
+vss = "*"
+
+[[pins]]
+
+vss = { path = "../.." }

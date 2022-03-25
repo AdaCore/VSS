@@ -58,29 +58,6 @@ package body JSON_Schema.Writers.Outputs is
       Property : JSON_Schema.Property;
       Required : Boolean);
 
-   function Drop_Last_Word
-     (Text : VSS.Strings.Virtual_String)
-      return VSS.Strings.Virtual_String;
-
-   --------------------
-   -- Drop_Last_Word --
-   --------------------
-
-   function Drop_Last_Word
-     (Text : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String
-   is
-      List : constant VSS.String_Vectors.Virtual_String_Vector :=
-        Text.Split ('_');
-      Result : VSS.Strings.Virtual_String := List (1);
-   begin
-      for J in 2 .. List.Length - 1 loop
-         Result.Append ("_");
-         Result.Append (List (J));
-      end loop;
-
-      return Result;
-   end Drop_Last_Word;
-
    ----------------------
    -- Generate_Writers --
    ----------------------
@@ -523,17 +500,25 @@ package body JSON_Schema.Writers.Outputs is
             Put (");");
             New_Line;
          elsif Type_Name.Ends_With ("_Vector") then
-            Put ("Handler.Start_Array;");
-            New_Line;
-            Put ("for J in 1 .. Value.");
-            Put (Field_Name);
-            Put (".Length loop");
-            New_Line;
-            Write_Value (Field_Name, Drop_Last_Word (Type_Name), " (J)");
-            Put ("end loop;");
-            New_Line;
-            Put ("Handler.End_Array;");
-            New_Line;
+            declare
+               Item_Type   : VSS.Strings.Virtual_String;
+               Type_Prefix : VSS.Strings.Virtual_String;
+            begin
+               Get_Element_Type
+                 (Map, Property.Schema, Item_Type, Type_Prefix);
+
+               Put ("Handler.Start_Array;");
+               New_Line;
+               Put ("for J in 1 .. Value.");
+               Put (Field_Name);
+               Put (".Length loop");
+               New_Line;
+               Write_Value (Field_Name, Item_Type, " (J)");
+               Put ("end loop;");
+               New_Line;
+               Put ("Handler.End_Array;");
+               New_Line;
+            end;
          elsif Type_Name = "Integer_Or_String" then
             Put ("if Value.");
             Put (Field_Name);

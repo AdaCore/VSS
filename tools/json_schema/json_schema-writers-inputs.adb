@@ -567,8 +567,7 @@ package body JSON_Schema.Writers.Inputs is
 
       procedure Write_Value
         (Field_Name  : VSS.Strings.Virtual_String;
-         Type_Name   : VSS.Strings.Virtual_String;
-         Type_Prefix : VSS.Strings.Virtual_String);
+         Type_Name   : VSS.Strings.Virtual_String);
 
       -----------------
       -- Write_Value --
@@ -576,13 +575,10 @@ package body JSON_Schema.Writers.Inputs is
 
       procedure Write_Value
         (Field_Name  : VSS.Strings.Virtual_String;
-         Type_Name   : VSS.Strings.Virtual_String;
-         Type_Prefix : VSS.Strings.Virtual_String)
-      is
-         pragma Unreferenced (Type_Prefix);
+         Type_Name   : VSS.Strings.Virtual_String) is
       begin
          if Type_Name = "Any_Object" then
-            Write_Value (Field_Name, "Any_Value", "");
+            Write_Value (Field_Name, "Any_Value");
          elsif Type_Name = "Virtual_String" then
             Put ("if Reader.Is_String_Value then "); New_Line;
             Put (Field_Name);
@@ -633,13 +629,8 @@ package body JSON_Schema.Writers.Inputs is
                Item_Type   : VSS.Strings.Virtual_String;
                Type_Prefix : VSS.Strings.Virtual_String;
             begin
-               if Type_Name = "Virtual_String_Vector" then
-                  Item_Type := "Virtual_String";
-                  Type_Prefix := "VSS.Strings.";
-               else
-                  Get_Element_Type
-                    (Map, Property.Schema, Item_Type, Type_Prefix);
-               end if;
+               Get_Element_Type
+                 (Map, Property.Schema, Item_Type, Type_Prefix);
 
                Put ("if Success and Reader.Is_Start_Array then"); New_Line;
                Put ("Reader.Read_Next;"); New_Line;
@@ -651,7 +642,7 @@ package body JSON_Schema.Writers.Inputs is
                Put (Item_Type);
                Put (";"); New_Line;
                Put ("begin"); New_Line;
-               Write_Value ("Item", Item_Type, Type_Prefix);
+               Write_Value ("Item", Item_Type);
                Put (Field_Name);
                Put (".Append (Item);"); New_Line;
                Put ("end;"); New_Line;
@@ -668,11 +659,10 @@ package body JSON_Schema.Writers.Inputs is
             Put (Field_Name);
             Put (".Is_String then");
             New_Line;
-            Write_Value
-              (Field_Name & ".String", "Virtual_String", "VSS.Strings.");
+            Write_Value (Field_Name & ".String", "Virtual_String");
             Put ("else");
             New_Line;
-            Write_Value (Field_Name & ".Integer", "Integer", "");
+            Write_Value (Field_Name & ".Integer", "Integer");
             Put ("end if;");
             New_Line;
          else
@@ -712,29 +702,28 @@ package body JSON_Schema.Writers.Inputs is
          Put ("end if;");
          New_Line;
       elsif not Required and Type_Name = "Virtual_String" then
-         Write_Value ("Value." & Field_Name, Type_Name, Type_Prefix);
+         Write_Value ("Value." & Field_Name, Type_Name);
       elsif not Required and Type_Name = "Virtual_String_Vector" then
-         Write_Value ("Value." & Field_Name, Type_Name, "VSS.Strings.");
+         Write_Value ("Value." & Field_Name, Type_Name);
       elsif not Required and Type_Name.Ends_With ("_Vector") then
-         Write_Value ("Value." & Field_Name, Type_Name, Type_Prefix);
+         Write_Value ("Value." & Field_Name, Type_Name);
       elsif not Required and Type_Name = "Boolean" then
-         Write_Value ("Value." & Field_Name, Type_Name, Type_Prefix);
+         Write_Value ("Value." & Field_Name, Type_Name);
       elsif (not Required and Property.Schema.Kind.Last_Index = 7)
         or
           (not Required
            and then not Property.Schema.Additional_Properties.Is_Boolean
            and then Property.Schema.Additional_Properties.Schema /= null)
       then
-         Write_Value ("Value." & Field_Name, Type_Name, Type_Prefix);
+         Write_Value ("Value." & Field_Name, Type_Name);
       elsif Required then
-         Write_Value ("Value." & Field_Name, Type_Name, Type_Prefix);
+         Write_Value ("Value." & Field_Name, Type_Name);
       else
          Put ("Value.");
          Put (Field_Name);
          Put (" := (Is_Set => True, Value => <>);");
          New_Line;
-         Write_Value
-           ("Value." & Field_Name & ".Value", Type_Name, Type_Prefix);
+         Write_Value ("Value." & Field_Name & ".Value", Type_Name);
       end if;
    end Write_Record_Component;
 

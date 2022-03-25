@@ -21,8 +21,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2022;
-
 with JSON_Schema.Writers.Inputs;
 with JSON_Schema.Writers.Outputs;
 

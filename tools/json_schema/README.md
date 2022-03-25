@@ -5,6 +5,9 @@ This tool reads JSON Schema (Draft 04) and generates
 * Subprograms to convert JSON into Ada value for these Ada types
 * Subprograms to convert values Ada values to JSON
 
+Currently the tool is able to generate Ada code for
+[Debug Adapter Protocol](https://microsoft.github.io/debug-adapter-protocol/).
+
 ## Build
 
 You can build the tool with [Alire](https://alire.ada.dev):

@@ -21,9 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Warnings (Off, "unrecognized pragma");
 pragma Ada_2020;
 pragma Extensions_Allowed (On);
 pragma Ada_2022;
+pragma Warnings (On, "unrecognized pragma");
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Wide_Wide_Text_IO;
@@ -272,6 +274,10 @@ package body JSON_Schema.Writers is
       end if;
    end Escape_Keywords;
 
+   ----------------------
+   -- Get_Element_Type --
+   ----------------------
+
    procedure Get_Element_Type
      (Map       : JSON_Schema.Readers.Schema_Map;
       Schema    : Schema_Access;
@@ -284,11 +290,20 @@ package body JSON_Schema.Writers is
                Get_Field_Type
                  (Map, Schema.Items.First_Element,
                   True, "", Type_Name, Prefix);
+
+               if Type_Name.Is_Empty then
+                  Type_Name := "Virtual_String";
+                  Prefix := "VSS.Strings.";
+               end if;
             when others =>
                null;
          end case;
       end if;
    end Get_Element_Type;
+
+   --------------------
+   -- Get_Field_Type --
+   --------------------
 
    procedure Get_Field_Type
      (Map       : JSON_Schema.Readers.Schema_Map;

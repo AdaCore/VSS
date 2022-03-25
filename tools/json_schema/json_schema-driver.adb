@@ -71,5 +71,4 @@ begin
 
    JSON_Schema.Readers.Read (Reader, Schema, Other);
    JSON_Schema.Writers.Types.Write (Other);
---   Ada.Wide_Wide_Text_IO.Put_Line (" Hello!");
 end JSON_Schema.Driver;

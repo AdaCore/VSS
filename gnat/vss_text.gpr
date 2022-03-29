@@ -56,6 +56,8 @@ project VSS_Text is
    package Naming is
       case VSS_Config.OS_API is
          when "unix" | "osx" =>
+            for Implementation ("VSS.Application.Platform")
+              use "vss-application-platform__posix.adb";
             for Implementation ("VSS.Environments.Platform")
               use "vss-environments-platform__posix.adb";
             for Implementation ("VSS.Implementation.Environment_Utilities")
@@ -64,6 +66,8 @@ project VSS_Text is
               use "vss-standard_paths__posix.adb";
 
          when "Windows_NT" =>
+            for Implementation ("VSS.Application.Platform")
+              use "vss-application-platform__windows.adb";
             for Implementation ("VSS.Environments.Platform")
               use "vss-environments-platform__windows.adb";
             for Implementation ("VSS.Implementation.Environment_Utilities")

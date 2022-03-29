@@ -23,13 +23,22 @@
 
 package body VSS.Application is
 
+   package Platform is
+
+      function Arguments return VSS.String_Vectors.Virtual_String_Vector;
+      --  Returns arguments provided in command line, except executable name.
+
+   end Platform;
+
+   package body Platform is separate;
+
    ---------------
    -- Arguments --
    ---------------
 
    function Arguments return VSS.String_Vectors.Virtual_String_Vector is
    begin
-      return VSS.String_Vectors.Empty_Virtual_String_Vector;
+      return Platform.Arguments;
    end Arguments;
 
    ------------------------

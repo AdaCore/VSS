@@ -20,39 +20,49 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Low level binding to Windows API. String utilities.
 
-with VSS.Strings;
+with Interfaces.C.Pointers;
 
-package VSS.Implementation.Windows.String_Utilities is
+with VSS.Implementation.Windows.Kernel32;
+with VSS.Implementation.Windows.Shell32;
+with VSS.Implementation.Windows.String_Utilities;
 
-   type char16_array_access is access all Interfaces.C.char16_array;
-   --  String in Windows W native format, allocated with Ada allocator.
+separate (VSS.Application)
+package body Platform is
 
-   function From_Native_String
-     (Item : Interfaces.C.char16_array) return VSS.Strings.Virtual_String;
-   --  Convert string from W format of WinAPI into Virtual_String.
+   type LPWSTR_Array is
+     array (Natural range <>) of aliased VSS.Implementation.Windows.LPWSTR;
 
-   function To_New_Native_String
-     (Item : VSS.Strings.Virtual_String) return char16_array_access;
-   --  Convert Virtual_String into native representation. Allocated object
-   --  may be larger then required to store data, nul terminator is added
-   --  at the end of the actual data. If given Virtual_String is 'null'
-   --  then function return null.
-   --
-   --  Memory is allocated by Ada allocator, and must be deallocated with Free
-   --  below. Ownership of the string can't be passed to Windows C API.
+   package LPWSTR_Pointers is
+     new Interfaces.C.Pointers
+           (Natural, VSS.Implementation.Windows.LPWSTR, LPWSTR_Array, null);
 
-   function New_Native_String_Buffer
-     (Size : Interfaces.C.size_t) return char16_array_access;
-   --  Allocates buffer of given size. First index of the allocated buffer
-   --  is zero. Additional element is always added for nul terminator.
+   ---------------
+   -- Arguments --
+   ---------------
 
-   procedure Free (Item : in out char16_array_access);
-   --  Deallocate memory allocated by New_Native_String.
+   function Arguments return VSS.String_Vectors.Virtual_String_Vector is
+      Argc : Interfaces.C.int;
+      Argv : constant VSS.Implementation.Windows.LPWSTR_Pointer :=
+        VSS.Implementation.Windows.Shell32.CommandLineToArgv
+          (VSS.Implementation.Windows.LPCWSTR
+             (VSS.Implementation.Windows.Kernel32.GetCommandLine),
+           Argc);
+      Args : constant LPWSTR_Array :=
+        LPWSTR_Pointers.Value
+          (LPWSTR_Pointers.Pointer (Argv), Interfaces.C.ptrdiff_t (Argc));
 
-   function From_Native_String
-     (Item : LPWSTR) return VSS.Strings.Virtual_String;
-   --  Convert string from W format of WinAPI into Virtual_String.
+   begin
+      return Result : VSS.String_Vectors.Virtual_String_Vector do
+         for J in 1 .. Args'Last loop
+            Result.Append
+              (VSS.Implementation.Windows.String_Utilities.From_Native_String
+                 (Args (J)));
+            null;
+         end loop;
 
-end VSS.Implementation.Windows.String_Utilities;
+         VSS.Implementation.Windows.Kernel32.LocalFree (Argv);
+      end return;
+   end Arguments;
+
+end Platform;

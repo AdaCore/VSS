@@ -31,7 +31,9 @@ project VSS_OS_Tests is
    for Languages use ("Ada");
    for Object_Dir use VSS_Config.Tests_Object_Dir;
    for Source_Dirs use ("../../testsuite/os");
-   for Main use ("test_standard_paths.adb");
+   for Main use
+     ("test_application_arguments.adb",
+      "test_standard_paths.adb");
 
    package Compiler is
       for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");

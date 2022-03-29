@@ -20,39 +20,52 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Low level binding to Windows API. String utilities.
+--  This is GNAT specific package, it use symbols declared in argv.c file
+--  of the GNAT Run Time Library.
+--
+--  Note: only UTF-8 locales are supported.
 
-with VSS.Strings;
+with Interfaces.C.Pointers;
+with Interfaces.C.Strings;
 
-package VSS.Implementation.Windows.String_Utilities is
+with VSS.Strings.Conversions;
 
-   type char16_array_access is access all Interfaces.C.char16_array;
-   --  String in Windows W native format, allocated with Ada allocator.
+separate (VSS.Application)
+package body Platform is
 
-   function From_Native_String
-     (Item : Interfaces.C.char16_array) return VSS.Strings.Virtual_String;
-   --  Convert string from W format of WinAPI into Virtual_String.
+   type chars_ptr_Array is
+     array (Natural range <>) of aliased Interfaces.C.Strings.chars_ptr;
 
-   function To_New_Native_String
-     (Item : VSS.Strings.Virtual_String) return char16_array_access;
-   --  Convert Virtual_String into native representation. Allocated object
-   --  may be larger then required to store data, nul terminator is added
-   --  at the end of the actual data. If given Virtual_String is 'null'
-   --  then function return null.
-   --
-   --  Memory is allocated by Ada allocator, and must be deallocated with Free
-   --  below. Ownership of the string can't be passed to Windows C API.
+   package chars_ptr_Pointers is
+     new Interfaces.C.Pointers
+       (Natural,
+        Interfaces.C.Strings.chars_ptr,
+        chars_ptr_Array,
+        Interfaces.C.Strings.Null_Ptr);
 
-   function New_Native_String_Buffer
-     (Size : Interfaces.C.size_t) return char16_array_access;
-   --  Allocates buffer of given size. First index of the allocated buffer
-   --  is zero. Additional element is always added for nul terminator.
+   GNAT_Argc : constant Interfaces.C.int
+     with Import, Convention => C, External_Name => "gnat_argc";
+   GNAT_Argv : constant chars_ptr_Pointers.Pointer
+     with Import, Convention => C, External_Name => "gnat_argv";
 
-   procedure Free (Item : in out char16_array_access);
-   --  Deallocate memory allocated by New_Native_String.
+   ---------------
+   -- Arguments --
+   ---------------
 
-   function From_Native_String
-     (Item : LPWSTR) return VSS.Strings.Virtual_String;
-   --  Convert string from W format of WinAPI into Virtual_String.
+   function Arguments return VSS.String_Vectors.Virtual_String_Vector is
+      Args : constant chars_ptr_Array :=
+        chars_ptr_Pointers.Value
+          (GNAT_Argv, Interfaces.C.ptrdiff_t (GNAT_Argc));
 
-end VSS.Implementation.Windows.String_Utilities;
+   begin
+      return Result : VSS.String_Vectors.Virtual_String_Vector do
+         for Index in 1 .. Args'Last loop
+            Result.Append
+              (VSS.Strings.Conversions.To_Virtual_String
+                 (Interfaces.C.Strings.Value (Args (Index))));
+            --  XXX Locale specific converter should be used here.
+         end loop;
+      end return;
+   end Arguments;
+
+end Platform;

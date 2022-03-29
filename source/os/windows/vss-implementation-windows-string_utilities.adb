@@ -32,6 +32,9 @@ package body VSS.Implementation.Windows.String_Utilities is
 
    use type Interfaces.C.size_t;
 
+   function wcslen (Item : LPWSTR) return Interfaces.C.size_t
+     with Import, Convention => C, External_Name => "wcslen";
+
    ----------
    -- Free --
    ----------
@@ -117,6 +120,20 @@ package body VSS.Implementation.Windows.String_Utilities is
          Free (Aux);
 
          raise;
+   end From_Native_String;
+
+   ------------------------
+   -- From_Native_String --
+   ------------------------
+
+   function From_Native_String
+     (Item : LPWSTR) return VSS.Strings.Virtual_String
+   is
+      Aux : constant Interfaces.C.char16_array (0 .. wcslen (Item) - 1)
+        with Import, Convention => C, Address => Item.all'Address;
+
+   begin
+      return From_Native_String (Aux);
    end From_Native_String;
 
    ------------------------------

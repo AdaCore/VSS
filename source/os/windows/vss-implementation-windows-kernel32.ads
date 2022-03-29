@@ -29,6 +29,9 @@ package VSS.Implementation.Windows.Kernel32 is
    function CloseHandle (hObject : HANDLE) return BOOL
      with Import, Convention => Stdcall, Link_Name => "CloseHandle";
 
+   function GetCommandLine return LPWSTR
+     with Import, Convention => Stdcall, Link_Name => "GetCommandLineW";
+
    function GetCurrentProcess return HANDLE
      with Import, Convention => Stdcall, Link_Name => "GetCurrentProcess";
 
@@ -53,5 +56,8 @@ package VSS.Implementation.Windows.Kernel32 is
       lpszLongPath  : LPWSTR;
       cchBuffer     : DWORD) return DWORD
       with Import, Convention => Stdcall, Link_Name => "GetLongPathNameW";
+
+   procedure LocalFree (hMem : LPWSTR_Pointer)
+     with Import, Convention => StdCall, Link_Name => "LocalFree";
 
 end VSS.Implementation.Windows.Kernel32;

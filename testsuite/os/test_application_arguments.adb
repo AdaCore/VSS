@@ -20,27 +20,24 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
-with "vss_test_common";
+with VSS.Application;
+with VSS.String_Vectors;
+with VSS.Strings;
 
-project VSS_OS_Tests is
+with Test_Support;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/os");
-   for Main use
-     ("test_application_arguments.adb",
-      "test_standard_paths.adb");
+procedure Test_Application_Arguments is
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-   end Compiler;
+   use type VSS.Strings.Virtual_String;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   Args : constant VSS.String_Vectors.Virtual_String_Vector :=
+     VSS.Application.Arguments;
 
-end VSS_OS_Tests;
+begin
+   Test_Support.Assert (Args.Length = 4);
+   Test_Support.Assert (Args (1) = "hello");
+   Test_Support.Assert (Args (2) = "привет");
+   Test_Support.Assert (Args (3) = "გამარჯობა");
+   Test_Support.Assert (Args (4) = "👋");
+end Test_Application_Arguments;

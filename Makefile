@@ -69,6 +69,7 @@ check_text:
 	done
 	.objs/tests/test_word_iterators data/ucd
 	.objs/tests/test_standard_paths
+	.objs/tests/test_application_arguments hello привет გამარჯობა 👋
 	VSS_ENV1="A$(VSS_PS)B$(VSS_PS)C" .objs/tests/test_environment
 
 check_json:

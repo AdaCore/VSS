@@ -44,9 +44,9 @@ package body Platform is
         Interfaces.C.Strings.Null_Ptr);
 
    GNAT_Argc : constant Interfaces.C.int
-     with Import, Convention => C, Link_Name => "gnat_argc";
+     with Import, Convention => C, External_Name => "gnat_argc";
    GNAT_Argv : constant chars_ptr_Pointers.Pointer
-     with Import, Convention => C, Link_Name => "gnat_argv";
+     with Import, Convention => C, External_Name => "gnat_argv";
 
    ---------------
    -- Arguments --

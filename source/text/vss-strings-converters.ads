@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -38,8 +38,9 @@ package VSS.Strings.Converters is
       --  characters (uFFFD) are added at place of error and conversion
       --  continues.
 
-      Ignore_BOM);
-      --  Ignore BOM at the beginning if present.
+      Process_BOM);
+      --  Process BOM by converter. When enabled, decoder will skip BOM, and
+      --  encoder will generate BOM.
 
    type Converter_Flags is array (Converter_Flag) of Boolean
      with Pack;

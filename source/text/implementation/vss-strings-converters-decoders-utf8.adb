@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -222,7 +222,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       Self.Lower    := 16#80#;
       Self.Upper    := 16#BF#;
       Self.Error    := False;
-      Self.Skip_BOM := Self.Flags (Ignore_BOM);
+      Self.Skip_BOM := Self.Flags (Process_BOM);
    end Reset_State;
 
 end VSS.Strings.Converters.Decoders.UTF8;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -288,7 +288,7 @@ begin
       S : VSS.Strings.Virtual_String;
 
    begin
-      D.Initialize ("utf-8", (Ignore_BOM => True, others => False));
+      D.Initialize ("utf-8", (Process_BOM => True, others => False));
 
       if not D.Is_Valid then
          raise Program_Error;
@@ -306,7 +306,7 @@ begin
       S : VSS.Strings.Virtual_String;
 
    begin
-      D.Initialize ("utf-8", (Ignore_BOM => True, others => False));
+      D.Initialize ("utf-8", (Process_BOM => True, others => False));
 
       if not D.Is_Valid then
          raise Program_Error;

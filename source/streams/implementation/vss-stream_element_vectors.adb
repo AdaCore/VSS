@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -73,7 +73,7 @@ package body VSS.Stream_Element_Vectors is
    ------------
 
    procedure Append
-     (Self : in out Stream_Element_Vector;
+     (Self : in out Stream_Element_Vector'Class;
       Item : Ada.Streams.Stream_Element)
    is
       Source : Data_Access := Self.Data;

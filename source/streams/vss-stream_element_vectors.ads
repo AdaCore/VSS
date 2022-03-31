@@ -57,6 +57,11 @@ package VSS.Stream_Element_Vectors is
       Item : Ada.Streams.Stream_Element);
    --  Append stream element to the end of the buffer
 
+   procedure Append
+     (Self : in out Stream_Element_Vector'Class;
+      Item : Stream_Element_Vector'Class);
+   --  Append stream element vector to the end of the buffer
+
    overriding function "="
      (Left  : Stream_Element_Vector;
       Right : Stream_Element_Vector) return Boolean;

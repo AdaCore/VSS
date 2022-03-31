@@ -97,6 +97,44 @@ package body VSS.Stream_Element_Vectors is
       Self.Data.Storage (Self.Data.Length) := Item;
    end Append;
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
+     (Self : in out Stream_Element_Vector'Class;
+      Item : Stream_Element_Vector'Class)
+   is
+      Prefix : Data_Access := Self.Data;
+      Suffix : constant Data_Access := Item.Data;
+
+   begin
+      if Suffix = null or else Suffix.Length = 0 then
+         return;
+      end if;
+
+      if Prefix = null then
+         Self.Data :=
+           new Data_Record
+             (Ada.Streams.Stream_Element_Offset'Max
+                (Suffix.Size, Self.Capacity));
+         Self.Data.Length := Suffix.Length;
+         Self.Data.Storage (Suffix.Storage'Range) := Suffix.Storage;
+
+      else
+         Self.Data :=
+           new Data_Record
+                 (Ada.Streams.Stream_Element_Offset'Max
+                    (Prefix.Length + Item.Length, Self.Capacity));
+         Self.Data.Length := Prefix.Length + Item.Length;
+         Self.Data.Storage (1 .. Prefix.Length) :=
+           Prefix.Storage (1 .. Prefix.Length);
+         Self.Data.Storage (Prefix.Length + 1 .. Self.Data.Length) :=
+           Item.Data.Storage (1 .. Item.Data.Length);
+         Free (Prefix);
+      end if;
+   end Append;
+
    -------------
    -- Element --
    -------------

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,31 +20,28 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+--  UTF-8 encoder.
 
-package VSS.Strings.Converters is
+private package VSS.Strings.Converters.Encoders.UTF8 is
 
-   pragma Preelaborate;
+   type UTF8_Encoder is new Abstract_Encoder with private;
 
-   type Converter_Flag is
-     (Stateless,
-      --  Coverter doesn't save state between two conversions, and report an
-      --  error when provided data is incomplete.
+private
 
-      Stop_On_Error,
-      --  Stop conversion on first found error and report it. Consequential
-      --  calls of converter's will do nothing, till its state is reset.
-      --
-      --  Otherwise, errors of conversion are reported, one or more replacement
-      --  characters (uFFFD) are added at place of error and conversion
-      --  continues.
+   type UTF8_Encoder is new Abstract_Encoder with null record;
 
-      Process_BOM);
-      --  Process BOM by converter. When enabled, decoder will skip BOM, and
-      --  encoder will generate BOM.
+   overriding procedure Initialize
+     (Self  : in out UTF8_Encoder;
+      Flags : Converter_Flags);
 
-   type Converter_Flags is array (Converter_Flag) of Boolean
-     with Pack;
+   overriding procedure Encode
+     (Self   : in out UTF8_Encoder;
+      Source : VSS.Unicode.Code_Point;
+      Target : in out VSS.Stream_Element_Vectors.Stream_Element_Vector'Class);
 
-   Default_Converter_Flags : constant Converter_Flags := (others => False);
+   overriding function Has_Error (Self : UTF8_Encoder) return Boolean;
 
-end VSS.Strings.Converters;
+   overriding function Error_Message
+     (Self : UTF8_Encoder) return VSS.Strings.Virtual_String;
+
+end VSS.Strings.Converters.Encoders.UTF8;

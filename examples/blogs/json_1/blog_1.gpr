@@ -1,0 +1,13 @@
+
+with "../../../gnat/vss_json.gpr";
+
+project Blog_1 is
+
+   for Object_Dir use ".objs";
+   for Main use ("write_message.adb", "read_message.adb");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g");
+   end Compiler;
+
+end Blog_1;

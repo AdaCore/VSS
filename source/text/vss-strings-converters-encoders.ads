@@ -80,7 +80,10 @@ private
    Zero_Width_No_Break_Space_Character :
      constant VSS.Unicode.Code_Point := 16#FEFF#;
 
-   type Abstract_Encoder is abstract tagged limited null record;
+   type Abstract_Encoder is abstract tagged limited record
+      Flags       : Converter_Flags;
+      BOM_Written : Boolean;
+   end record;
 
    type Encoder_Access is access all Abstract_Encoder'Class;
 
@@ -105,8 +108,7 @@ private
    not overriding function Error_Message
      (Self : Abstract_Encoder) return VSS.Strings.Virtual_String is abstract;
 
-   not overriding procedure Reset_State
-     (Self : in out Abstract_Encoder) is abstract;
+   not overriding procedure Reset_State (Self : in out Abstract_Encoder);
 
    type Virtual_String_Encoder is
      new Ada.Finalization.Limited_Controlled with record

@@ -28,10 +28,7 @@ private package VSS.Strings.Converters.Encoders.UTF8 is
 
 private
 
-   type UTF8_Encoder is new Abstract_Encoder with record
-      Flags       : Converter_Flags;
-      BOM_Written : Boolean;
-   end record;
+   type UTF8_Encoder is new Abstract_Encoder with null record;
 
    overriding procedure Initialize
      (Self  : in out UTF8_Encoder;
@@ -46,7 +43,5 @@ private
 
    overriding function Error_Message
      (Self : UTF8_Encoder) return VSS.Strings.Virtual_String;
-
-   overriding procedure Reset_State (Self : in out UTF8_Encoder);
 
 end VSS.Strings.Converters.Encoders.UTF8;

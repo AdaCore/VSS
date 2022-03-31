@@ -87,7 +87,7 @@ package body VSS.Strings.Converters.Encoders is
       return VSS.Stream_Element_Vectors.Stream_Element_Vector is
    begin
       return Result : VSS.Stream_Element_Vectors.Stream_Element_Vector do
-         if not Item.Is_Empty and Self.Encoder /= null then
+         if Self.Encoder /= null then
             Self.Encoder.Encode (Item.Data, Result);
          end if;
       end return;
@@ -108,6 +108,12 @@ package body VSS.Strings.Converters.Encoders is
       Position : VSS.Implementation.Strings.Cursor;
 
    begin
+      if not Self.BOM_Written then
+         Self.BOM_Written := True;
+         Abstract_Encoder'Class (Self).Encode
+           (Zero_Width_No_Break_Space_Character, Target);
+      end if;
+
       Handler.Before_First_Character (Source, Position);
 
       while Handler.Forward (Source, Position)
@@ -182,5 +188,14 @@ package body VSS.Strings.Converters.Encoders is
    begin
       return Self.Encoder /= null;
    end Is_Valid;
+
+   -----------------
+   -- Reset_State --
+   -----------------
+
+   not overriding procedure Reset_State (Self : in out Abstract_Encoder) is
+   begin
+      Self.BOM_Written := not Self.Flags (Process_BOM);
+   end Reset_State;
 
 end VSS.Strings.Converters.Encoders;

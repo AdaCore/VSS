@@ -93,13 +93,4 @@ package body VSS.Strings.Converters.Encoders.UTF8 is
       Self.Reset_State;
    end Initialize;
 
-   -----------------
-   -- Reset_State --
-   -----------------
-
-   overriding procedure Reset_State (Self : in out UTF8_Encoder) is
-   begin
-      Self.BOM_Written := not Self.Flags (Process_BOM);
-   end Reset_State;
-
 end VSS.Strings.Converters.Encoders.UTF8;

@@ -481,5 +481,29 @@ begin
       Test_Support.Assert (Encoder.Error_Message.Is_Empty);
    end;
 
+   --  Check processing of the BOM and single character
+
+   declare
+      use type Ada.Streams.Stream_Element_Array;
+
+      Encoder        : VSS.Strings.Converters.Encoders.Virtual_String_Encoder;
+      Encoded_Vector :
+        constant VSS.Stream_Element_Vectors.Stream_Element_Vector :=
+          VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector
+           (D1 & Character'Pos ('Z'));
+      Result         : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+
+   begin
+      Encoder.Initialize ("utf-8", (Process_BOM => True, others => False));
+
+      Test_Support.Assert (Encoder.Is_Valid);
+
+      Result := Encoder.Encode ('Z');
+
+      Test_Support.Assert (Result = Encoded_Vector);
+      Test_Support.Assert (not Encoder.Has_Error);
+      Test_Support.Assert (Encoder.Error_Message.Is_Empty);
+   end;
+
    Run_Encoder_Test (D6, E6);
 end Test_Converters;

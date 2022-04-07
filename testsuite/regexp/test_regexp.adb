@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2022, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,27 +20,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: RegExp processing subproject tests
 
-with "../vss_config";
-with "../vss_regexp";
-with "vss_test_common";
+with Test_Support;
 
-project VSS_RegExp_Tests is
+procedure Test_Regexp is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/regexp");
-   for Main use
-     ("test_regexp.adb",
-      "test_regexp_re_tests.adb");
+   procedure Test_V406_014 is separate;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-   end Compiler;
-
-   package Binder is
-      for Switches ("Ada") use ("-W8");
-   end Binder;
-
-end VSS_RegExp_Tests;
+begin
+   Test_V406_014;
+end Test_Regexp;

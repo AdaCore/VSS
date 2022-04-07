@@ -88,6 +88,7 @@ check_json:
 	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected
 
 check_regexp: re_tests
+	.objs/tests/test_regexp
 	.objs/tests/test_regexp_re_tests < re_tests
 
 check_install:

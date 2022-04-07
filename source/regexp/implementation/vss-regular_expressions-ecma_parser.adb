@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -48,6 +48,15 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
       procedure Atom (Value : out Node; Ok : in out Boolean)
         with Pre => Ok;
+
+      procedure Atom_Escape (Value : out Node; Ok : in out Boolean)
+        with Pre => Ok;
+
+      procedure Unicode_Property_Value_Characters
+        (Value : out VSS.Strings.Virtual_String; Ok : in out Boolean);
+
+      procedure Lone_Unicode_Property_Name_Or_Value
+        (Value : out Node; Ok : in out Boolean);
 
       procedure Character_Class (Value : out Node; Ok : in out Boolean)
         with Pre => Ok;
@@ -120,7 +129,11 @@ package body VSS.Regular_Expressions.ECMA_Parser is
             when ')' | '|' =>
                raise Program_Error;
 
-            when '^' | '$' | '\' | '.' | '*' | '+' | '?' | ']' | '{' | '}' =>
+            when '\' =>
+               Expect ('\', Ok);
+               Atom_Escape (Value, Ok);
+
+            when '^' | '$' | '.' | '*' | '+' | '?' | ']' | '{' | '}' =>
                if Error.Is_Empty then
                   Error := "Unexpected '";
                   Error.Append (Cursor.Element);
@@ -133,6 +146,14 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                Expect (Cursor.Element, Ok);
          end case;
       end Atom;
+
+      procedure Atom_Escape (Value : out Node; Ok : in out Boolean) is
+      begin
+         Expect ('p', Ok);
+         Expect ('{', Ok);
+         Lone_Unicode_Property_Name_Or_Value (Value, Ok);
+         Expect ('}', Ok);
+      end Atom_Escape;
 
       procedure Character_Class (Value : out Node; Ok : in out Boolean) is
       begin
@@ -215,6 +236,23 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
       end Expect;
 
+      procedure Lone_Unicode_Property_Name_Or_Value
+        (Value : out Node; Ok : in out Boolean)
+      is
+         Name : VSS.Strings.Virtual_String;
+         Set  : Name_Sets.General_Category_Set;
+      begin
+         Unicode_Property_Value_Characters (Name, Ok);
+
+         if Ok then
+            Name_Sets.To_General_Category_Set (Name, Set, Ok);
+
+            if Ok then
+               Value := Create_General_Category_Set (Set);
+            end if;
+         end if;
+      end Lone_Unicode_Property_Name_Or_Value;
+
       procedure Term (Value : out Node; Ok : in out Boolean) is
       begin
          Atom (Value, Ok);
@@ -224,6 +262,23 @@ package body VSS.Regular_Expressions.ECMA_Parser is
             Value := Create_Star (Value);
          end if;
       end Term;
+
+      procedure Unicode_Property_Value_Characters
+        (Value : out VSS.Strings.Virtual_String; Ok : in out Boolean) is
+      begin
+         if Ok then
+            Value.Clear;
+
+            Ok := False;
+
+            while Cursor.Has_Element and then
+              Cursor.Element in 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9'
+            loop
+               Value.Append (Cursor.Element);
+               Ok := Cursor.Forward or True;
+            end loop;
+         end if;
+      end Unicode_Property_Value_Characters;
 
       Ok : Boolean := True;
    begin

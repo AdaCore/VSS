@@ -110,7 +110,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Steps (PC) := Step;
 
          case Code.Kind is
-            when Character | Class | Match =>
+            when Character | Class | Category | Match =>
                Next.Append ((PC, New_Tags));
             when Split =>
                Append_State (Cursor, PC + Code.Next, New_Tags);
@@ -194,6 +194,14 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
                         when Class =>
                            if Char in Code.From .. Code.To then
+                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                           end if;
+
+                        when Category =>
+                           if Name_Sets.Contains
+                               (Code.Category,
+                                VSS.Characters.Get_General_Category (Char))
+                           then
                               Append_State (Pos.all, X.PC + Code.Next, X.Tags);
                            end if;
 
@@ -334,6 +342,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
         (From, To : VSS.Characters.Virtual_Character) return Node;
       --  Generate <class[from,to,next:unlinked]>
 
+      function Create_General_Category_Set
+        (Value : Name_Sets.General_Category_Set) return Node;
+      --  Generate <category[next:unlinked]>
+
       function Create_Sequence (Left, Right : Node) return Node;
       --  Generate <left[next:right]><right[next:unlinked]>
 
@@ -427,6 +439,23 @@ package body VSS.Regular_Expressions.Pike_Engines is
            (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
             Ends    => First_Instruction);
       end Create_Empty;
+
+      ---------------------------------
+      -- Create_General_Category_Set --
+      ---------------------------------
+
+      function Create_General_Category_Set
+        (Value : Name_Sets.General_Category_Set) return Node
+      is
+         Code : constant Instruction :=
+           (Kind     => Category,
+            Next     => To_Be_Patched,
+            Category => Value);
+      begin
+         return
+           (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
+            Ends    => First_Instruction);
+      end Create_General_Category_Set;
 
       ------------------
       -- Create_Group --

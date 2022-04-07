@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2022, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,42 +20,53 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
---  This parser accepts regular expression patterns described in the ECMAScript
---  2020 standard.
+
+pragma Warnings (Off);
+pragma Ada_2020;
+pragma Ada_2022;
+pragma Warnings (On);
 
 with VSS.Characters;
-with VSS.Strings.Character_Iterators;
-with VSS.Regular_Expressions.Name_Sets;
 
-generic
-   type Node is private;
-
-   with function Create_Character (Value : VSS.Characters.Virtual_Character)
-     return Node is <>;
-
-   with function Create_Character_Range
-     (From, To : VSS.Characters.Virtual_Character) return Node is <>;
-
-   with function Create_General_Category_Set
-     (Value : Name_Sets.General_Category_Set) return Node is <>;
-
-   with function Create_Sequence (Left, Right : Node) return Node is <>;
-   with function Create_Alternative (Left, Right : Node) return Node is <>;
-   with function Create_Star (Left : Node) return Node is <>;
-
-   with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
-
-   with function Create_Empty return Node is <>;
-
-package VSS.Regular_Expressions.ECMA_Parser is
-
+package VSS.Regular_Expressions.Name_Sets is
    pragma Preelaborate;
 
-   procedure Parse_Pattern
-     (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator;
-      Error  : out VSS.Strings.Virtual_String;
-      Result : out Node);
+   type General_Category_Set is private
+     with Aggregate => (Empty       => Empty,
+                        Add_Unnamed => Include);
 
-end VSS.Regular_Expressions.ECMA_Parser;
+   function Empty return General_Category_Set;
+   --  Return an empty set
+
+   procedure Include
+     (Self  : in out General_Category_Set;
+      Value : VSS.Characters.General_Category);
+   --  Include a value into set
+
+   function Contains
+     (Self  : General_Category_Set;
+      Value : VSS.Characters.General_Category) return Boolean
+     with Inline;
+   --  Check if set contains a value
+
+   procedure To_General_Category_Set
+     (Name  : VSS.Strings.Virtual_String;
+      Value : out General_Category_Set;
+      Ok    : out Boolean);
+   --  Return set corresponding to well-known name
+
+   procedure Initialize;
+   --  Initialize internal data. The call of it is optional
+
+private
+
+   type General_Category_Set is array
+     (VSS.Characters.General_Category) of Boolean
+       with Pack, Default_Component_Value => False;
+
+   function Contains
+     (Self  : General_Category_Set;
+      Value : VSS.Characters.General_Category) return Boolean is
+        (Self (Value));
+
+end VSS.Regular_Expressions.Name_Sets;

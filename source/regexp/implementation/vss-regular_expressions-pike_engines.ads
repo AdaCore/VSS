@@ -101,4 +101,6 @@ private
       Options : Match_Options := No_Match_Options;
       Result  : out Match_Access);
 
+   overriding function Capture_Group_Count (Self : Engine) return Natural;
+
 end VSS.Regular_Expressions.Pike_Engines;

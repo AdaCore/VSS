@@ -41,6 +41,7 @@ jobs:
           export PATH=`ls -d $PWD/cached_gnat/*/bin |tr '\n' ':'`$PATH
           make -C vss all check coverage BUILD_MODE=${{ matrix.build_mode }}
           make -C vss install check_install PREFIX=/tmp BUILD_MODE=${{ matrix.build_mode }}
+          make -C vss misc BUILD_MODE=${{ matrix.build_mode }}
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         if: ${{ matrix.build_mode == 'coverage' }}

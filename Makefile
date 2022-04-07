@@ -121,3 +121,8 @@ install:
 	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/text -f -p -P gnat/vss_text.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/json -f -p -P gnat/vss_json.gpr
+
+misc: # Check compilation of other projects
+	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr
+	gprbuild $(GPRBUILD_FLAGS) -aPgnat examples/regexp/grep.gpr
+	gprbuild $(GPRBUILD_FLAGS) examples/blogs/json_1/blog_1.gpr

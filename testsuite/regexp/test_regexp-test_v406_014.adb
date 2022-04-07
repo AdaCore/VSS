@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2022, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,27 +20,26 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: RegExp processing subproject tests
 
-with "../vss_config";
-with "../vss_regexp";
-with "vss_test_common";
+with VSS.Regular_Expressions;
+with VSS.Strings.Character_Iterators;
 
-project VSS_RegExp_Tests is
+separate (Test_Regexp)
+procedure Test_V406_014 is
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use ("../../testsuite/regexp");
-   for Main use
-     ("test_regexp.adb",
-      "test_regexp_re_tests.adb");
+   use type VSS.Strings.Virtual_String;
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-   end Compiler;
+   --  Check what Last_Marker can be used to obtain slice from the subject
+   --  string object.
 
-   package Binder is
-      for Switches ("Ada") use ("-W8");
-   end Binder;
+   S : constant VSS.Strings.Virtual_String := "@param A";
+   R : constant VSS.Regular_Expressions.Regular_Expression :=
+     VSS.Regular_Expressions.To_Regular_Expression ("@(param|return)");
+   M : VSS.Regular_Expressions.Regular_Expression_Match;
 
-end VSS_RegExp_Tests;
+begin
+   M := R.Match (S);
+
+   Test_Support.Assert
+     (S.Slice (M.Last_Marker, S.At_Last_Character) = "m A");
+end Test_V406_014;

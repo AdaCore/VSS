@@ -242,10 +242,10 @@ package body JSON_Schema.Writers is
       if Name.Starts_With ("__") then
          declare
             Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
-              Name.First_Character;
+              Name.At_First_Character;
          begin
             if Cursor.Forward and then Cursor.Forward then
-               return Name.Slice (Cursor, Name.Last_Character);
+               return Name.Slice (Cursor, Name.At_Last_Character);
             else
                raise Program_Error;
             end if;

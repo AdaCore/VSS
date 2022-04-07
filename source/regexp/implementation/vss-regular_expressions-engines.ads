@@ -49,6 +49,9 @@ package VSS.Regular_Expressions.Engines is
    not overriding procedure On_Destroy (Self : in out Engine) is abstract;
    --  This is called before deallocation
 
+   not overriding function Capture_Group_Count
+     (Self : Engine) return Natural is abstract;
+
    procedure Initialize
      (Self    : in out Engine'Class;
       Options : VSS.Regular_Expressions.Pattern_Options;

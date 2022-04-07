@@ -33,6 +33,15 @@ with VSS.Implementation.String_Handlers;
 
 package body VSS.Regular_Expressions.Pike_Engines is
 
+   -------------------------
+   -- Capture_Group_Count --
+   -------------------------
+
+   overriding function Capture_Group_Count (Self : Engine) return Natural is
+   begin
+      return Natural (Self.Last_Tag / 2) - 1;
+   end Capture_Group_Count;
+
    -----------
    -- Match --
    -----------
@@ -61,7 +70,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       end record;
 
       procedure Step_Backward
-        (Text : VSS.Strings.Virtual_String;
+        (Text : VSS.Strings.Virtual_String'Class;
          Cursor : in out VSS.Implementation.Strings.Cursor);
       --  Shift Cursor one character backward in string Text
 
@@ -110,7 +119,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Steps (PC) := Step;
 
          case Code.Kind is
-            when Character | Class | Match =>
+            when Character | Class | Category | Match =>
                Next.Append ((PC, New_Tags));
             when Split =>
                Append_State (Cursor, PC + Code.Next, New_Tags);
@@ -132,7 +141,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       -------------------
 
       procedure Step_Backward
-        (Text   : VSS.Strings.Virtual_String;
+        (Text   : VSS.Strings.Virtual_String'Class;
          Cursor : in out VSS.Implementation.Strings.Cursor)
       is
          use type VSS.Unicode.UTF8_Code_Unit_Offset;
@@ -197,6 +206,14 @@ package body VSS.Regular_Expressions.Pike_Engines is
                               Append_State (Pos.all, X.PC + Code.Next, X.Tags);
                            end if;
 
+                        when Category =>
+                           if Name_Sets.Contains
+                               (Code.Category,
+                                VSS.Characters.Get_General_Category (Char))
+                           then
+                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                           end if;
+
                         when Match =>
                            Found := True;
                            Final_Tags := X.Tags;
@@ -245,7 +262,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          declare
             Index : Tag_Number := Final_Tags'First;
          begin
-            Result.Subject := Subject;
+            Result.Connect (Subject);
 
             for J in Result.Markers'Range loop
                declare
@@ -255,11 +272,11 @@ package body VSS.Regular_Expressions.Pike_Engines is
                   To   : VSS.Implementation.Strings.Cursor renames
                     Final_Tags (Index + 1);
                begin
-                  Step_Backward (Result.Subject, To);
+                  Step_Backward (Result.Get_Owner.all, To);
 
                   Result.Markers (J) :=
                     VSS.Strings.Cursors.Markers.Internals.New_Segment_Marker
-                      (Result.Subject,
+                      (Result.Owner.all,
                        First => From,
                        Last  => To);
 
@@ -333,6 +350,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
       function Create_Character_Range
         (From, To : VSS.Characters.Virtual_Character) return Node;
       --  Generate <class[from,to,next:unlinked]>
+
+      function Create_General_Category_Set
+        (Value : Name_Sets.General_Category_Set) return Node;
+      --  Generate <category[next:unlinked]>
 
       function Create_Sequence (Left, Right : Node) return Node;
       --  Generate <left[next:right]><right[next:unlinked]>
@@ -427,6 +448,23 @@ package body VSS.Regular_Expressions.Pike_Engines is
            (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
             Ends    => First_Instruction);
       end Create_Empty;
+
+      ---------------------------------
+      -- Create_General_Category_Set --
+      ---------------------------------
+
+      function Create_General_Category_Set
+        (Value : Name_Sets.General_Category_Set) return Node
+      is
+         Code : constant Instruction :=
+           (Kind     => Category,
+            Next     => To_Be_Patched,
+            Category => Value);
+      begin
+         return
+           (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
+            Ends    => First_Instruction);
+      end Create_General_Category_Set;
 
       ------------------
       -- Create_Group --

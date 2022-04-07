@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2022, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,40 +20,53 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  This package is for internal use only.
 
-with VSS.Implementation.Referrers;
-with VSS.Implementation.Strings;
+pragma Warnings (Off);
+pragma Ada_2020;
+pragma Ada_2022;
+pragma Warnings (On);
 
-package VSS.Strings.Internals is
+with VSS.Characters;
 
+package VSS.Regular_Expressions.Name_Sets is
    pragma Preelaborate;
 
-   type String_Data_Constant_Access is
-     access constant VSS.Implementation.Strings.String_Data;
-   --  This type intended to be used for "hack" code only to use internal
-   --  low level string processing API to improve performance of critical
-   --  part of the code. It was initially defined to avoid performance penalty
-   --  in multitasking applications due to management of accessibility level
-   --  value.
+   type General_Category_Set is private
+     with Aggregate => (Empty       => Empty,
+                        Add_Unnamed => Include);
 
-   function To_Virtual_String
-     (Item : in out VSS.Implementation.Strings.String_Data)
-      return VSS.Strings.Virtual_String;
-   --  Convert string data into virtual string. Data is references.
+   function Empty return General_Category_Set;
+   --  Return an empty set
 
-   function Data_Access_Constant
-     (Self : VSS.Strings.Virtual_String'Class)
-      return not null VSS.Strings.Internals.String_Data_Constant_Access;
-   --  Return access to string data member of the Virtual_String.
+   procedure Include
+     (Self  : in out General_Category_Set;
+      Value : VSS.Characters.General_Category);
+   --  Include a value into set
 
-   function To_Virtual_String_Access
-     (Item : VSS.Implementation.Referrers.Magic_String_Access)
-      return VSS.Implementation.Referrers.Virtual_String_Access with Inline;
-   function To_Magic_String_Access
-     (Item : VSS.Implementation.Referrers.Virtual_String_Access)
-      return VSS.Implementation.Referrers.Magic_String_Access with Inline;
-   --  Do type conversion. It is intended to be used inside the
-   --  VSS.Implementation.Refrrals package.
+   function Contains
+     (Self  : General_Category_Set;
+      Value : VSS.Characters.General_Category) return Boolean
+     with Inline;
+   --  Check if set contains a value
 
-end VSS.Strings.Internals;
+   procedure To_General_Category_Set
+     (Name  : VSS.Strings.Virtual_String;
+      Value : out General_Category_Set;
+      Ok    : out Boolean);
+   --  Return set corresponding to well-known name
+
+   procedure Initialize;
+   --  Initialize internal data. The call of it is optional
+
+private
+
+   type General_Category_Set is array
+     (VSS.Characters.General_Category) of Boolean
+       with Pack, Default_Component_Value => False;
+
+   function Contains
+     (Self  : General_Category_Set;
+      Value : VSS.Characters.General_Category) return Boolean is
+        (Self (Value));
+
+end VSS.Regular_Expressions.Name_Sets;

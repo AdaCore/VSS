@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -27,6 +27,7 @@ with System.Atomic_Counters;
 with VSS.Regular_Expressions.Engines;
 with VSS.Regular_Expressions.Matches;
 with VSS.Regular_Expressions.Pike_Engines;
+with VSS.Implementation.Referrers;
 
 package body VSS.Regular_Expressions is
    pragma Warnings (Off);
@@ -86,8 +87,7 @@ package body VSS.Regular_Expressions is
      (Self : Regular_Expression'Class) return Natural
    is
    begin
-      return
-        raise Program_Error with "Unimplemented function Capture_Group_Count";
+      return Self.Data.Capture_Group_Count;
    end Capture_Group_Count;
 
    -------------------------
@@ -112,12 +112,17 @@ package body VSS.Regular_Expressions is
    function Captured
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0)
-      return VSS.Strings.Virtual_String
-   is
+      return VSS.Strings.Virtual_String is
    begin
-      return Self.Data.Subject.Slice
-        (From => Self.First_Marker (Index),
-         To   => Self.Last_Marker (Index));
+      if Self.Is_Valid then
+         return
+           Self.Data.Get_Owner.Slice
+             (From => Self.First_Marker (Index),
+              To   => Self.Last_Marker (Index));
+
+      else
+         return VSS.Strings.Empty_Virtual_String;
+      end if;
    end Captured;
 
    --------------
@@ -127,12 +132,17 @@ package body VSS.Regular_Expressions is
    function Captured
      (Self : Regular_Expression_Match'Class;
       Name : VSS.Strings.Virtual_String)
-      return VSS.Strings.Virtual_String
-   is
+      return VSS.Strings.Virtual_String is
    begin
-      return Self.Data.Subject.Slice
-        (From => Self.First_Marker (Name),
-         To   => Self.Last_Marker (Name));
+      if Self.Is_Valid then
+         return
+           Self.Data.Get_Owner.Slice
+             (From => Self.First_Marker (Name),
+              To   => Self.Last_Marker (Name));
+
+      else
+         return VSS.Strings.Empty_Virtual_String;
+      end if;
    end Captured;
 
    ------------------
@@ -233,8 +243,10 @@ package body VSS.Regular_Expressions is
    --------------
 
    function Is_Valid (Self : Regular_Expression_Match'Class) return Boolean is
+      use type VSS.Implementation.Referrers.Magic_String_Access;
+
    begin
-      return Self.Data /= null;
+      return Self.Data /= null and then Self.Data.Owner /= null;
    end Is_Valid;
 
    -----------------

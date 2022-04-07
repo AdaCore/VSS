@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -115,7 +115,7 @@ private
    ---------------------------
 
    type Character_Cursor_Base is
-     abstract new VSS.Strings.Referal_Base
+     abstract new VSS.Implementation.Referrers.Referal_Base
        and VSS.Strings.Cursors.Abstract_Character_Cursor with
    record
       Position : aliased VSS.Implementation.Strings.Cursor;
@@ -158,7 +158,7 @@ private
    -----------------------------------
 
    type Character_Cursor_Limited_Base is
-     abstract new VSS.Strings.Referal_Limited_Base
+     abstract new VSS.Implementation.Referrers.Referal_Limited_Base
        and VSS.Strings.Cursors.Abstract_Character_Cursor with
    record
       Position : aliased VSS.Implementation.Strings.Cursor;
@@ -207,7 +207,7 @@ private
    -------------------------
 
    type Segment_Cursor_Base is
-     abstract new VSS.Strings.Referal_Base
+     abstract new VSS.Implementation.Referrers.Referal_Base
        and VSS.Strings.Cursors.Abstract_Segment_Cursor with
    record
       First_Position : aliased VSS.Implementation.Strings.Cursor;
@@ -258,7 +258,7 @@ private
    ---------------------------------
 
    type Segment_Cursor_Limited_Base is
-     abstract limited new VSS.Strings.Referal_Limited_Base
+     abstract limited new VSS.Implementation.Referrers.Referal_Limited_Base
        and VSS.Strings.Cursors.Abstract_Segment_Cursor with
    record
       First_Position : aliased VSS.Implementation.Strings.Cursor;

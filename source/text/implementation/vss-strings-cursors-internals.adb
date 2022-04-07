@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -57,21 +57,21 @@ package body VSS.Strings.Cursors.Internals is
 
    function Is_Owner
      (Self  : VSS.Strings.Cursors.Abstract_Cursor'Class;
-      Owner : VSS.Strings.Virtual_String'Class) return Boolean is
+      Owner : VSS.Strings.Virtual_String'Class) return Boolean
+   is
+      use type VSS.Implementation.Referrers.Magic_String_Access;
+
    begin
-      if Self in VSS.Strings.Cursors.Character_Cursor_Limited_Base'Class then
+      if Self in VSS.Implementation.Referrers.Referal_Base'Class then
          return
-           VSS.Strings.Cursors.Character_Cursor_Limited_Base (Self).Owner
+           VSS.Implementation.Referrers.Referal_Base (Self).Owner
              = Owner'Unrestricted_Access;
 
-      elsif Self in VSS.Strings.Cursors.Character_Cursor_Base'Class then
+      elsif Self
+              in VSS.Implementation.Referrers.Referal_Limited_Base'Class
+      then
          return
-           VSS.Strings.Cursors.Character_Cursor_Base'Class (Self).Owner
-             = Owner'Unrestricted_Access;
-
-      elsif Self in VSS.Strings.Cursors.Segment_Cursor_Limited_Base'Class then
-         return
-           VSS.Strings.Cursors.Segment_Cursor_Limited_Base'Class (Self).Owner
+           VSS.Implementation.Referrers.Referal_Limited_Base (Self).Owner
              = Owner'Unrestricted_Access;
 
       else

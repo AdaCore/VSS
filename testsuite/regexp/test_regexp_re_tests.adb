@@ -32,6 +32,7 @@ with VSS.Strings;
 with VSS.Strings.Cursors.Markers;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
+with VSS.String_Vectors;
 
 procedure Test_RegExp_RE_Tests is
    pragma Assertion_Policy (Check);
@@ -64,9 +65,62 @@ procedure Test_RegExp_RE_Tests is
    function Image (Value : VSS.Strings.Character_Count)
      return VSS.Strings.Virtual_String;
 
+   function Expand_Sample (Value : VSS.Strings.Virtual_String)
+     return VSS.Strings.Virtual_String;
+   --  Interprete `\x{AA}`
+
    Space : constant Ada.Strings.Wide_Wide_Maps.Wide_Wide_Character_Set :=
      Ada.Strings.Wide_Wide_Maps.To_Set
        (Ada.Characters.Wide_Wide_Latin_1.HT);
+
+   -------------------
+   -- Expand_Sample --
+   -------------------
+
+   function Expand_Sample (Value : VSS.Strings.Virtual_String)
+     return VSS.Strings.Virtual_String
+   is
+      List : constant VSS.String_Vectors.Virtual_String_Vector :=
+        Value.Split ('\');
+
+      Result : VSS.Strings.Virtual_String := List (1);
+   begin
+
+      for J in 2 .. List.Length loop
+         if List (J).Starts_With ("x{") then
+            declare
+               use type VSS.Characters.Virtual_Character;
+
+               Item  : constant VSS.Strings.Virtual_String := List (J);
+               Value : VSS.Strings.Virtual_String;
+               X     : VSS.Strings.Character_Iterators.Character_Iterator :=
+                 Item.At_First_Character;
+            begin
+               if X.Forward then --  Skip x
+                  while X.Forward and then X.Element /= '}' loop
+                     Value.Append (X.Element);
+                  end loop;
+
+                  Result.Append
+                    (VSS.Characters.Virtual_Character'Val
+                      (Positive'Value
+                        ("16#" &
+                         VSS.Strings.Conversions.To_UTF_8_String (Value) &
+                         "#")));
+
+                  if X.Forward then --  Skip }
+                     Result.Append (Item.Slice (X, Item.At_Last_Character));
+                  end if;
+               end if;
+            end;
+         else
+            Result.Append ('\');
+            Result.Append (List (J));
+         end if;
+      end loop;
+
+      return Result;
+   end Expand_Sample;
 
    -----------
    -- Image --
@@ -110,8 +164,18 @@ procedure Test_RegExp_RE_Tests is
             Last   => To (J));
       end loop;
 
-      Pattern := VSS.Strings.To_Virtual_String (Line (From (1) .. To (1)));
+      if Line (From (1)) /= '/' then
+         Pattern := VSS.Strings.To_Virtual_String (Line (From (1) .. To (1)));
+      elsif Line (To (1)) = '/' then  --  Pattern is `/regexp/`
+         Pattern := VSS.Strings.To_Virtual_String
+              (Line (From (1) + 1 .. To (1) - 1));
+      else  --  Pattern in form of `/regexp/FLAGS` isn't supported yet
+         Check := (Kind => Skip);
+         return;
+      end if;
+
       Sample := VSS.Strings.To_Virtual_String (Line (From (2) .. To (2)));
+      Sample := Expand_Sample (Sample);
 
       declare
          Status : constant Wide_Wide_String := Line (From (3) .. To (3));
@@ -122,7 +186,8 @@ procedure Test_RegExp_RE_Tests is
             when 'y' =>
                Check := (Match,
                          VSS.Strings.To_Virtual_String (Expr),
-                         VSS.Strings.To_Virtual_String (Expect));
+                         Expand_Sample
+                           (VSS.Strings.To_Virtual_String (Expect)));
             when 'n' =>
                Check := (Kind => Dont_Match);
             when others =>   --  'c'  --  compile error
@@ -265,7 +330,7 @@ begin
          then
             --  skip comments and special lines
             null;
-         elsif Line (1) not in ''' | '/' then
+         elsif Line (1) not in ''' then
             declare
                use type VSS.Strings.Virtual_String;
 
@@ -324,5 +389,6 @@ begin
       end;
    end loop;
 
+   Ada.Wide_Wide_Text_IO.Put ("PASSED:");
    Ada.Wide_Wide_Text_IO.Put_Line (Total'Wide_Wide_Image);
 end Test_RegExp_RE_Tests;

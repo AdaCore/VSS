@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -26,6 +26,7 @@
 
 with VSS.Characters;
 with VSS.Strings.Character_Iterators;
+with VSS.Regular_Expressions.Name_Sets;
 
 generic
    type Node is private;
@@ -35,6 +36,9 @@ generic
 
    with function Create_Character_Range
      (From, To : VSS.Characters.Virtual_Character) return Node is <>;
+
+   with function Create_General_Category_Set
+     (Value : Name_Sets.General_Category_Set) return Node is <>;
 
    with function Create_Sequence (Left, Right : Node) return Node is <>;
    with function Create_Alternative (Left, Right : Node) return Node is <>;

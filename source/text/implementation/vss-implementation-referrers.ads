@@ -24,10 +24,13 @@
 with Ada.Finalization;
 
 with VSS.Implementation.Strings;
+limited with VSS.Strings;
 
 package VSS.Implementation.Referrers is
 
    pragma Preelaborate;
+
+   type Virtual_String_Access is access all VSS.Strings.Virtual_String'Class;
 
    type Magic_String_Base is tagged;
 
@@ -110,8 +113,22 @@ package VSS.Implementation.Referrers is
    --  Removed and Inserted parameters are sizes of the removed and inserted
    --  segments. All their members are valid.
 
+   function Get_Owner
+     (Self : Referal_Limited_Base'Class) return Virtual_String_Access
+        with Inline;
+   --  Return owner as access to Virtual_String object.
+
    overriding procedure Finalize (Self : in out Referal_Limited_Base);
    --  Invalidate referal state and disconnect from the string object.
+
+   procedure Connect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : aliased VSS.Strings.Virtual_String'Class);
+   --  Connect referal to string object
+
+   -----------------------
+   -- Magic_String_Base --
+   -----------------------
 
    type Magic_String_Base is
      abstract new Ada.Finalization.Controlled with record

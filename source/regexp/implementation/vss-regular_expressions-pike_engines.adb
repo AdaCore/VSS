@@ -61,7 +61,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       end record;
 
       procedure Step_Backward
-        (Text : VSS.Strings.Virtual_String;
+        (Text : VSS.Strings.Virtual_String'Class;
          Cursor : in out VSS.Implementation.Strings.Cursor);
       --  Shift Cursor one character backward in string Text
 
@@ -132,7 +132,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       -------------------
 
       procedure Step_Backward
-        (Text   : VSS.Strings.Virtual_String;
+        (Text   : VSS.Strings.Virtual_String'Class;
          Cursor : in out VSS.Implementation.Strings.Cursor)
       is
          use type VSS.Unicode.UTF8_Code_Unit_Offset;
@@ -245,7 +245,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          declare
             Index : Tag_Number := Final_Tags'First;
          begin
-            Result.Subject := Subject;
+            Result.Connect (Subject);
 
             for J in Result.Markers'Range loop
                declare
@@ -255,11 +255,11 @@ package body VSS.Regular_Expressions.Pike_Engines is
                   To   : VSS.Implementation.Strings.Cursor renames
                     Final_Tags (Index + 1);
                begin
-                  Step_Backward (Result.Subject, To);
+                  Step_Backward (Result.Get_Owner.all, To);
 
                   Result.Markers (J) :=
                     VSS.Strings.Cursors.Markers.Internals.New_Segment_Marker
-                      (Result.Subject,
+                      (Result.Owner.all,
                        First => From,
                        Last  => To);
 

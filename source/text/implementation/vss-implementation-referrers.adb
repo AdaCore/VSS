@@ -23,6 +23,8 @@
 
 with Ada.Exceptions;
 
+with VSS.Strings.Internals;
+
 package body VSS.Implementation.Referrers is
 
    ------------
@@ -82,6 +84,19 @@ package body VSS.Implementation.Referrers is
       end if;
 
       Self.Owner := Owner;
+   end Connect;
+
+   -------------
+   -- Connect --
+   -------------
+
+   procedure Connect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : aliased VSS.Strings.Virtual_String'Class) is
+   begin
+      Self.Connect
+        (VSS.Strings.Internals.To_Magic_String_Access
+           (Owner'Unrestricted_Access));
    end Connect;
 
    ----------------
@@ -184,6 +199,16 @@ package body VSS.Implementation.Referrers is
          Self.Disconnect;
       end if;
    end Finalize;
+
+   ---------------
+   -- Get_Owner --
+   ---------------
+
+   function Get_Owner
+     (Self : Referal_Limited_Base'Class) return Virtual_String_Access is
+   begin
+      return VSS.Strings.Internals.To_Virtual_String_Access (Self.Owner);
+   end Get_Owner;
 
    ----------------------------
    -- Notify_String_Modified --

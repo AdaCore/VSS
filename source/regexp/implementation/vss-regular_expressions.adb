@@ -87,8 +87,7 @@ package body VSS.Regular_Expressions is
      (Self : Regular_Expression'Class) return Natural
    is
    begin
-      return
-        raise Program_Error with "Unimplemented function Capture_Group_Count";
+      return Self.Data.Capture_Group_Count;
    end Capture_Group_Count;
 
    -------------------------

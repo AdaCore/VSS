@@ -33,6 +33,15 @@ with VSS.Implementation.String_Handlers;
 
 package body VSS.Regular_Expressions.Pike_Engines is
 
+   -------------------------
+   -- Capture_Group_Count --
+   -------------------------
+
+   overriding function Capture_Group_Count (Self : Engine) return Natural is
+   begin
+      return Natural (Self.Last_Tag / 2) - 1;
+   end Capture_Group_Count;
+
    -----------
    -- Match --
    -----------

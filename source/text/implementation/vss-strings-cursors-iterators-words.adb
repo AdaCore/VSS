@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -315,9 +315,11 @@ package body VSS.Strings.Cursors.Iterators.Words is
    -------------
 
    overriding function Forward (Self : in out Word_Iterator) return Boolean is
+      Data               : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler            : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+          VSS.Implementation.Strings.Handler (Data);
       Left               : VSS.Implementation.Strings.Cursor;
       Left_Properties    : VSS.Implementation.UCD_Core.Core_Data_Record;
       Right              : VSS.Implementation.Strings.Cursor;
@@ -329,7 +331,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       Self.First_Position := Self.Last_Position;
-      Success := Handler.Forward (Self.Owner.Data, Self.First_Position);
+      Success := Handler.Forward (Data, Self.First_Position);
 
       if not Success then
          --  End of the string has been reached.
@@ -340,13 +342,13 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
       Right            := Self.First_Position;
       Right_Properties :=
-        Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
+        Extract_Core_Data (Handler.Element (Data, Right));
 
       loop
          Left            := Right;
          Left_Properties := Right_Properties;
 
-         Success := Handler.Forward (Self.Owner.Data, Right);
+         Success := Handler.Forward (Data, Right);
 
          if not Success then
             --  End of line has been reached
@@ -358,7 +360,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
          end if;
 
          Right_Properties :=
-           Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
+           Extract_Core_Data (Handler.Element (Data, Right));
 
          if Left_Properties.WB = WB_CR
            and Right_Properties.WB = WB_LF
@@ -406,7 +408,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
                Left            := Right;
                Left_Properties := Right_Properties;
 
-               Success := Handler.Forward (Self.Owner.Data, Right);
+               Success := Handler.Forward (Data, Right);
 
                if not Success then
                   --  End of the string is reached
@@ -418,7 +420,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
                end if;
 
                Right_Properties :=
-                 Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
+                 Extract_Core_Data (Handler.Element (Data, Right));
 
                exit when Right_Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
             end loop;
@@ -447,7 +449,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_LE | WB_HL
                 and Right_Properties.WB in WB_ML | WB_MB | WB_SQ)
-           and then Apply_WB6 (Handler, Self.Owner.Data, Right)
+           and then Apply_WB6 (Handler, Data, Right)
          then
             --  Rule WB6
 
@@ -455,7 +457,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_ML | WB_MB | WB_SQ
                 and Right_Properties.WB in WB_LE | WB_HL)
-           and then Apply_WB7 (Handler, Self.Owner.Data, Starter)
+           and then Apply_WB7 (Handler, Data, Starter)
          then
             --  Rule WB7
 
@@ -470,7 +472,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_HL
                 and Right_Properties.WB = WB_DQ)
-           and then Apply_WB7b (Handler, Self.Owner.Data, Right)
+           and then Apply_WB7b (Handler, Data, Right)
          then
             --  Rule WB7b
 
@@ -478,7 +480,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_DQ
                 and Right_Properties.WB = WB_HL)
-           and then Apply_WB7c (Handler, Self.Owner.Data, Starter)
+           and then Apply_WB7c (Handler, Data, Starter)
          then
             --  Rule WB7c
 
@@ -507,7 +509,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_MN | WB_MB | WB_SQ
                 and Right_Properties.WB = WB_NU)
-           and then Apply_WB11 (Handler, Self.Owner.Data, Starter)
+           and then Apply_WB11 (Handler, Data, Starter)
          then
             --  Rule WB11
 
@@ -515,7 +517,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_NU
                 and Right_Properties.WB in WB_MN | WB_MB | WB_SQ)
-           and then Apply_WB12 (Handler, Self.Owner.Data, Right)
+           and then Apply_WB12 (Handler, Data, Right)
          then
             --  Rule WB12
 
@@ -544,7 +546,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_RI
                 and Right_Properties.WB = WB_RI)
-           and then Apply_WB15_WB16 (Handler, Self.Owner.Data, Starter)
+           and then Apply_WB15_WB16 (Handler, Data, Starter)
          then
             --  Rule WB15
             --  Rule WB16
@@ -570,13 +572,15 @@ package body VSS.Strings.Cursors.Iterators.Words is
    -----------------
 
    overriding function Has_Element (Self : Word_Iterator) return Boolean is
+      Data    : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+          VSS.Implementation.Strings.Handler (Data);
 
    begin
       return
-        Self.First_Position.Index in 1 .. Handler.Length (Self.Owner.Data);
+        Self.First_Position.Index in 1 .. Handler.Length (Data);
    end Has_Element;
 
    ----------------
@@ -609,16 +613,18 @@ package body VSS.Strings.Cursors.Iterators.Words is
      (Self     : in out Word_Iterator'Class;
       Position : VSS.Implementation.Strings.Cursor)
    is
+      Data    : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+          VSS.Implementation.Strings.Handler (Data);
       Success : Boolean with Unreferenced;
 
    begin
       if Position.Index = 0 then
          raise Program_Error;
 
-      elsif Position.Index > Handler.Length (Self.Owner.Data) then
+      elsif Position.Index > Handler.Length (Data) then
          --  After last character of the string.
 
          Self.First_Position := Position;
@@ -627,11 +633,11 @@ package body VSS.Strings.Cursors.Iterators.Words is
       elsif Position.Index = 1 then
          --  First character of the string, it starts first grapheme cluster.
 
-         Handler.Before_First_Character (Self.Owner.Data, Self.First_Position);
-         Handler.Before_First_Character (Self.Owner.Data, Self.Last_Position);
+         Handler.Before_First_Character (Data, Self.First_Position);
+         Handler.Before_First_Character (Data, Self.Last_Position);
          Success := Self.Forward;
 
-      elsif Position.Index = Handler.Length (Self.Owner.Data) then
+      elsif Position.Index = Handler.Length (Data) then
          raise Program_Error;
 
       else

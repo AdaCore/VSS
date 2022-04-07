@@ -21,8 +21,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Exceptions;
-
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
@@ -35,17 +33,6 @@ with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
 package body VSS.Strings is
-
-   procedure Notify_String_Modified
-     (Self     : in out Virtual_String'Class;
-      From     : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset);
-   --  Do notification about modification of the string. If some notification
-   --  handler raises exception it is stored, and notification continued.
-   --  First stored exception will be reraised before exit, thus call to this
-   --  subprogram should be done at the end of the body of the caller
-   --  subprogram or exception handling added to the caller subprogram.
 
    ---------
    -- "&" --
@@ -143,23 +130,6 @@ package body VSS.Strings is
    -- Adjust --
    ------------
 
-   overriding procedure Adjust (Self : in out Referal_Base) is
-      Owner : constant Magic_String_Access := Self.Owner;
-
-   begin
-      Self.Owner    := null;
-      Self.Next     := null;
-      Self.Previous := null;
-
-      if Owner /= null then
-         Self.Connect (Owner);
-      end if;
-   end Adjust;
-
-   ------------
-   -- Adjust --
-   ------------
-
    overriding procedure Adjust (Self : in out Virtual_String) is
    begin
       Self.Head := null;
@@ -204,7 +174,7 @@ package body VSS.Strings is
       Handler.Append
         (Self.Data, VSS.Characters.Virtual_Character'Pos (Item), Offset);
 
-      Notify_String_Modified (Self, Start, (0, 0, 0), Offset);
+      Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Append;
 
    ------------
@@ -230,7 +200,7 @@ package body VSS.Strings is
 
       Handler.Append (Self.Data, Item.Data, Offset);
 
-      Notify_String_Modified (Self, Start, (0, 0, 0), Offset);
+      Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Append;
 
    ------------------
@@ -436,48 +406,6 @@ package body VSS.Strings is
       VSS.Implementation.Strings.Unreference (Self.Data);
    end Clear;
 
-   -------------
-   -- Connect --
-   -------------
-
-   procedure Connect
-     (Self  : in out Referal_Base'Class;
-      Owner : not null Magic_String_Access) is
-   begin
-      if Owner.Head = null then
-         Owner.Head := Self'Unchecked_Access;
-         Owner.Tail := Self'Unchecked_Access;
-
-      else
-         Owner.Tail.Next := Self'Unchecked_Access;
-         Self.Previous := Owner.Tail;
-         Owner.Tail := Self'Unchecked_Access;
-      end if;
-
-      Self.Owner := Owner;
-   end Connect;
-
-   -------------
-   -- Connect --
-   -------------
-
-   procedure Connect
-     (Self  : in out Referal_Limited_Base'Class;
-      Owner : not null Magic_String_Access) is
-   begin
-      if Owner.Limited_Head = null then
-         Owner.Limited_Head := Self'Unchecked_Access;
-         Owner.Limited_Tail := Self'Unchecked_Access;
-
-      else
-         Owner.Limited_Tail.Next := Self'Unchecked_Access;
-         Self.Previous := Owner.Limited_Tail;
-         Owner.Limited_Tail := Self'Unchecked_Access;
-      end if;
-
-      Self.Owner := Owner;
-   end Connect;
-
    ------------
    -- Delete --
    ------------
@@ -515,64 +443,6 @@ package body VSS.Strings is
          Self.Notify_String_Modified (From_Cursor, Size, (0, 0, 0));
       end if;
    end Delete;
-
-   ----------------
-   -- Disconnect --
-   ----------------
-
-   procedure Disconnect (Self : in out Referal_Base'Class) is
-   begin
-      if Self.Owner /= null then
-         if Self.Owner.Head = Self'Unchecked_Access then
-            Self.Owner.Head := Self.Owner.Head.Next;
-         end if;
-
-         if Self.Owner.Tail = Self'Unchecked_Access then
-            Self.Owner.Tail := Self.Owner.Tail.Previous;
-         end if;
-
-         if Self.Previous /= null then
-            Self.Previous.Next := Self.Next;
-         end if;
-
-         if Self.Next /= null then
-            Self.Next.Previous := Self.Previous;
-         end if;
-
-         Self.Owner    := null;
-         Self.Previous := null;
-         Self.Next     := null;
-      end if;
-   end Disconnect;
-
-   ----------------
-   -- Disconnect --
-   ----------------
-
-   procedure Disconnect (Self : in out Referal_Limited_Base'Class) is
-   begin
-      if Self.Owner /= null then
-         if Self.Owner.Limited_Head = Self'Unchecked_Access then
-            Self.Owner.Limited_Head := Self.Owner.Limited_Head.Next;
-         end if;
-
-         if Self.Owner.Limited_Tail = Self'Unchecked_Access then
-            Self.Owner.Limited_Tail := Self.Owner.Limited_Tail.Previous;
-         end if;
-
-         if Self.Previous /= null then
-            Self.Previous.Next := Self.Next;
-         end if;
-
-         if Self.Next /= null then
-            Self.Next.Previous := Self.Previous;
-         end if;
-
-         Self.Owner    := null;
-         Self.Previous := null;
-         Self.Next     := null;
-      end if;
-   end Disconnect;
 
    ---------------
    -- Ends_With --
@@ -616,43 +486,11 @@ package body VSS.Strings is
    begin
       --  Invalidate and disconnect all referals
 
-      while Self.Head /= null loop
-         Self.Head.Invalidate;
-         Self.Head.Disconnect;
-      end loop;
-
-      while Self.Limited_Head /= null loop
-         Self.Limited_Head.Invalidate;
-         Self.Limited_Head.Disconnect;
-      end loop;
+      VSS.Implementation.Referrers.Magic_String_Base (Self).Finalize;
 
       --  Unreference shared data
 
       VSS.Implementation.Strings.Unreference (Self.Data);
-   end Finalize;
-
-   --------------
-   -- Finalize --
-   --------------
-
-   overriding procedure Finalize (Self : in out Referal_Base) is
-   begin
-      if Self.Owner /= null then
-         Referal_Base'Class (Self).Invalidate;
-         Self.Disconnect;
-      end if;
-   end Finalize;
-
-   --------------
-   -- Finalize --
-   --------------
-
-   overriding procedure Finalize (Self : in out Referal_Limited_Base) is
-   begin
-      if Self.Owner /= null then
-         Referal_Limited_Base'Class (Self).Invalidate;
-         Self.Disconnect;
-      end if;
    end Finalize;
 
    ----------
@@ -743,76 +581,6 @@ package body VSS.Strings is
         VSS.Implementation.Strings.Handler (Self.Data).Is_Null (Self.Data);
    end Is_Null;
 
-   ----------------------------
-   -- Notify_String_Modified --
-   ----------------------------
-
-   procedure Notify_String_Modified
-     (Self     : in out Virtual_String'Class;
-      From     : VSS.Implementation.Strings.Cursor;
-      Removed  : VSS.Implementation.Strings.Cursor_Offset;
-      Inserted : VSS.Implementation.Strings.Cursor_Offset)
-   is
-      use type Ada.Exceptions.Exception_Id;
-
-      Occurrence : Ada.Exceptions.Exception_Occurrence;
-
-   begin
-      declare
-         Current : Referal_Limited_Access := Self.Limited_Head;
-         Next    : Referal_Limited_Access;
-
-      begin
-         while Current /= null loop
-            Next := Current.Next;
-
-            begin
-               Current.String_Modified (From, Removed, Inserted);
-
-            exception
-               when X : others =>
-                  if Ada.Exceptions.Exception_Identity (Occurrence)
-                    = Ada.Exceptions.Null_Id
-                  then
-                     --  Save first raised exception only.
-
-                     Ada.Exceptions.Save_Occurrence (Occurrence, X);
-                  end if;
-            end;
-
-            Current := Next;
-         end loop;
-      end;
-
-      declare
-         Current : Referal_Access := Self.Head;
-         Next    : Referal_Access;
-
-      begin
-         while Current /= null loop
-            Next := Current.Next;
-
-            begin
-               Current.String_Modified (From, Removed, Inserted);
-
-            exception
-               when X : others =>
-                  if Ada.Exceptions.Exception_Identity (Occurrence)
-                    = Ada.Exceptions.Null_Id
-                  then
-                     --  Save first raised exception only.
-
-                     Ada.Exceptions.Save_Occurrence (Occurrence, X);
-                  end if;
-            end;
-
-            Current := Next;
-         end loop;
-      end;
-
-      Ada.Exceptions.Reraise_Occurrence (Occurrence);
-   end Notify_String_Modified;
-
    -------------
    -- Prepend --
    -------------
@@ -830,7 +598,7 @@ package body VSS.Strings is
          VSS.Characters.Virtual_Character'Pos (Item),
          Offset);
 
-      Notify_String_Modified (Self, (1, 0, 0), (0, 0, 0), Offset);
+      Self.Notify_String_Modified ((1, 0, 0), (0, 0, 0), Offset);
    end Prepend;
 
    -------------
@@ -1172,15 +940,11 @@ package body VSS.Strings is
    function To_Magic_Text
      (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text is
    begin
-      return (Ada.Finalization.Controlled with
-                Data         => <>,
+      return
+        (VSS.Implementation.Referrers.Magic_String_Base with Data => <>);
                 --  Data => (if Self.Data = null
                 --           then null
                 --           else Self.Data.To_Text),
-                Head         => null,
-                Tail         => null,
-                Limited_Head => null,
-                Limited_Tail => null);
    end To_Magic_Text;
 
    -------------------

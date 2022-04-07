@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -125,9 +125,11 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Backward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
+      Data             : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler          : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+          VSS.Implementation.Strings.Handler (Data);
       Right            : VSS.Implementation.Strings.Cursor;
       Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Left             : VSS.Implementation.Strings.Cursor;
@@ -137,7 +139,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    begin
       Self.Last_Position := Self.First_Position;
-      Success := Handler.Backward (Self.Owner.Data, Self.Last_Position);
+      Success := Handler.Backward (Data, Self.Last_Position);
 
       if not Success then
          --  Start of the line has been reached.
@@ -149,13 +151,13 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       else
          Left := Self.Last_Position;
          Left_Properties :=
-           Extract_Core_Data (Handler.Element (Self.Owner.Data, Left));
+           Extract_Core_Data (Handler.Element (Data, Left));
 
          loop
             Right            := Left;
             Right_Properties := Left_Properties;
 
-            Success := Handler.Backward (Self.Owner.Data, Left);
+            Success := Handler.Backward (Data, Left);
 
             if not Success then
                --  Start of the string has been reached.
@@ -166,8 +168,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
             else
                Left_Properties :=
-                 Extract_Core_Data
-                   (Handler.Element (Self.Owner.Data, Left));
+                 Extract_Core_Data (Handler.Element (Data, Left));
 
                if Left_Properties.GCB = GCB_CR
                  and Right_Properties.GCB = GCB_LF
@@ -224,7 +225,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_ZWJ
                  and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Handler, Self.Owner.Data, Left)
+                 and then Apply_ExtPict (Handler, Data, Left)
                then
                   --  Rule 11.
 
@@ -232,7 +233,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_RI
                  and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Handler, Self.Owner.Data, Left)
+                 and then Apply_RI (Handler, Data, Left)
                then
                   --  Rule GB12.
                   --  Rule GB13.
@@ -286,9 +287,11 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    overriding function Forward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
+      Data             : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler          : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+          VSS.Implementation.Strings.Handler (Data);
       Left             : VSS.Implementation.Strings.Cursor;
       Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
       Right            : VSS.Implementation.Strings.Cursor;
@@ -298,7 +301,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    begin
       Self.First_Position := Self.Last_Position;
-      Success := Handler.Forward (Self.Owner.Data, Self.First_Position);
+      Success := Handler.Forward (Data, Self.First_Position);
 
       if not Success then
          --  End of the string has been reached.
@@ -309,13 +312,13 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       else
          Right    := Self.First_Position;
          Right_Properties :=
-           Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
+           Extract_Core_Data (Handler.Element (Data, Right));
 
          loop
             Left            := Right;
             Left_Properties := Right_Properties;
 
-            Success := Handler.Forward (Self.Owner.Data, Right);
+            Success := Handler.Forward (Data, Right);
 
             if not Success then
                --  End of line has been reached
@@ -327,7 +330,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
             else
                Right_Properties :=
-                 Extract_Core_Data (Handler.Element (Self.Owner.Data, Right));
+                 Extract_Core_Data (Handler.Element (Data, Right));
 
                if Left_Properties.GCB = GCB_CR
                  and Right_Properties.GCB = GCB_LF
@@ -385,7 +388,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_ZWJ
                  and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Handler, Self.Owner.Data, Left)
+                 and then Apply_ExtPict (Handler, Data, Left)
                then
                   --  Rule GB11.
 
@@ -393,7 +396,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_RI
                  and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Handler, Self.Owner.Data, Left)
+                 and then Apply_RI (Handler, Data, Left)
                then
                   --  Rule GB12.
                   --  Rule GB13.
@@ -421,13 +424,15 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    overriding function Has_Element
      (Self : Grapheme_Cluster_Iterator) return Boolean
    is
+      Data    : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+          VSS.Implementation.Strings.Handler (Data);
 
    begin
       return
-        Self.First_Position.Index in 1 .. Handler.Length (Self.Owner.Data);
+        Self.First_Position.Index in 1 .. Handler.Length (Data);
    end Has_Element;
 
    ----------------
@@ -460,9 +465,11 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self     : in out Grapheme_Cluster_Iterator'Class;
       Position : VSS.Implementation.Strings.Cursor)
    is
+      Data    : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler : constant not null
         VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Owner.Data);
+          VSS.Implementation.Strings.Handler (Data);
       Success : Boolean with Unreferenced;
 
    begin
@@ -472,7 +479,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          Self.First_Position := Position;
          Self.Last_Position  := Position;
 
-      elsif Position.Index > Handler.Length (Self.Owner.Data) then
+      elsif Position.Index > Handler.Length (Data) then
          --  After last character of the string.
 
          Self.First_Position := Position;
@@ -481,16 +488,16 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       elsif Position.Index = 1 then
          --  First character of the string, it starts first grapheme cluster.
 
-         Handler.Before_First_Character (Self.Owner.Data, Self.First_Position);
-         Handler.Before_First_Character (Self.Owner.Data, Self.Last_Position);
+         Handler.Before_First_Character (Data, Self.First_Position);
+         Handler.Before_First_Character (Data, Self.Last_Position);
          Success := Self.Forward;
 
-      elsif Position.Index = Handler.Length (Self.Owner.Data) then
+      elsif Position.Index = Handler.Length (Data) then
          --  Last character of the string, it ends last grapheme cluster.
 
          Self.Last_Position  := Position;
          Self.First_Position := Position;
-         Success := Handler.Forward (Self.Owner.Data, Self.First_Position);
+         Success := Handler.Forward (Data, Self.First_Position);
          Success := Self.Backward;
 
       else

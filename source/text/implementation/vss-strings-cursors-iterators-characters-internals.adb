@@ -30,7 +30,10 @@ package body VSS.Strings.Cursors.Iterators.Characters.Internals is
    function Character
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
+      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+   is
+      use type VSS.Implementation.Referrers.Magic_String_Access;
+
    begin
       if Position in Character_Cursor_Limited_Base'Class then
          declare

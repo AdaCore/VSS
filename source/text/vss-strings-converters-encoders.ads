@@ -23,6 +23,8 @@
 --  This package provides string data encoder from Virtual_String to external
 --  encoding.
 
+private with Ada.Finalization;
+
 with VSS.Stream_Element_Vectors;
 private with VSS.Unicode;
 

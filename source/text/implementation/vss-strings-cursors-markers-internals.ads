@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,6 +21,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with VSS.Implementation.Referrers;
 with VSS.Implementation.Strings;
 
 package VSS.Strings.Cursors.Markers.Internals is
@@ -28,13 +29,13 @@ package VSS.Strings.Cursors.Markers.Internals is
    pragma Preelaborate;
 
    function New_Character_Marker
-     (String   : VSS.Strings.Virtual_String'Class;
+     (String   : VSS.Implementation.Referrers.Magic_String_Base'Class;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Strings.Cursors.Markers.Character_Marker;
    --  Create new marker for the given string and position.
 
    function New_Segment_Marker
-     (String : VSS.Strings.Virtual_String'Class;
+     (String : VSS.Implementation.Referrers.Magic_String_Base'Class;
       First  : VSS.Implementation.Strings.Cursor;
       Last   : VSS.Implementation.Strings.Cursor)
       return VSS.Strings.Cursors.Markers.Segment_Marker;

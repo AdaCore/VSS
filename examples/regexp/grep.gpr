@@ -1,0 +1,14 @@
+
+with "vss_regexp.gpr";
+
+project Grep is
+
+   for Object_Dir use ".objs";
+   for Main use ("grep.adb");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g", "-gnatW8") &
+        VSS_RegExp.Compiler'Switches ("Ada");
+   end Compiler;
+
+end Grep;

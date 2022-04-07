@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -26,3 +26,4 @@ with Ada.Containers;
 function VSS.Strings.Hash
   (Self : VSS.Strings.Virtual_String)
    return Ada.Containers.Hash_Type;
+pragma Preelaborate (VSS.Strings.Hash);

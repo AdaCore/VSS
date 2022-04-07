@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -26,6 +26,7 @@
 with Ada.Containers.Vectors;
 with VSS.Characters;
 with VSS.Regular_Expressions.Engines;
+with VSS.Regular_Expressions.Name_Sets;
 
 private
 package VSS.Regular_Expressions.Pike_Engines is
@@ -50,6 +51,7 @@ private
       Split,         --  Create an alternative thread of execution
       Character,     --  Accept one Virtual_Character
       Class,         --  Accept one Virtual_Character from a class
+      Category,      --  Accept one Virtual_Character from a general category
       Match,         --  Mark accepted string prefix as a regexp match
       Save);         --  Save subgroup bound
    --  VM instruction kinds
@@ -65,6 +67,8 @@ private
             Character : VSS.Characters.Virtual_Character;
          when Class =>
             From, To : VSS.Characters.Virtual_Character;
+         when Category =>
+            Category : Name_Sets.General_Category_Set;
          when Save =>
             Tag : Tag_Number;
          when No_Operation | Match =>

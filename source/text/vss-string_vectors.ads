@@ -90,6 +90,9 @@ package VSS.String_Vectors is
       Index : Positive);
    --  Delete element at the given index.
 
+   procedure Delete_Last (Self : in out Virtual_String_Vector'Class);
+   --  Delete the last element.
+
    procedure Replace
      (Self  : in out Virtual_String_Vector'Class;
       Index : Positive;

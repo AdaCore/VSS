@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                     Copyright (C) 2020-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -230,6 +230,23 @@ package body VSS.String_Vectors is
    begin
       return (Index => Self.Last);
    end Last;
+
+   ------------------
+   -- Last_Element --
+   ------------------
+
+   function Last_Element
+     (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String is
+   begin
+      if Self.Data /= null and then Self.Data.Last /= 0 then
+         return
+           VSS.Strings.Internals.To_Virtual_String
+             (Self.Data.Data (Self.Data.Last));
+
+      else
+         return VSS.Strings.Empty_Virtual_String;
+      end if;
+   end Last_Element;
 
    ------------
    -- Length --

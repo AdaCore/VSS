@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2021, AdaCore                     --
+--                     Copyright (C) 2020-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -67,6 +67,10 @@ package VSS.String_Vectors is
      (Self  : Virtual_String_Vector'Class;
       Index : Positive) return VSS.Strings.Virtual_String;
    --  Return given element. Return "null" string when index is out of bound.
+
+   function Last_Element
+     (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String;
+   --  Return last element of the vector.
 
    procedure Clear (Self : in out Virtual_String_Vector'Class);
    --  Remove all strings from the vector

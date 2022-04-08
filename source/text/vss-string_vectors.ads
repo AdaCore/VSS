@@ -85,6 +85,11 @@ package VSS.String_Vectors is
       Item : Virtual_String_Vector'Class);
    --  Append strings of Item to the end of the vector.
 
+   procedure Delete
+     (Self  : in out Virtual_String_Vector'Class;
+      Index : Positive);
+   --  Delete element at the given index.
+
    procedure Replace
      (Self  : in out Virtual_String_Vector'Class;
       Index : Positive;

@@ -134,6 +134,19 @@ package body VSS.String_Vectors is
            VSS.Strings.Internals.Data_Access_Constant (Item).all);
    end Contains;
 
+   ------------
+   -- Delete --
+   ------------
+
+   procedure Delete
+     (Self  : in out Virtual_String_Vector'Class;
+      Index : Positive) is
+   begin
+      if Self.Data /= null and then Index <= Self.Data.Last then
+         VSS.Implementation.String_Vectors.Delete (Self.Data, Index);
+      end if;
+   end Delete;
+
    -------------
    -- Element --
    -------------

@@ -362,6 +362,12 @@ package VSS.Strings is
       From : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String;
    --  Return tail of the string starting from the given position.
 
+   function Tail_After
+     (Self  : Virtual_String'Class;
+      After : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String;
+   --  Return tail of the string starting from the first character after given
+   --  position.
+
    function Ends_With
      (Self             : Virtual_String'Class;
       Suffix           : Virtual_String'Class;

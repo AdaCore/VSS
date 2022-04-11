@@ -923,6 +923,35 @@ package body VSS.Strings is
       end case;
    end Starts_With;
 
+   ----------------
+   -- Tail_After --
+   ----------------
+
+   function Tail_After
+     (Self  : Virtual_String'Class;
+      After : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String
+   is
+      Handler        :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
+      First_Position : VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (After).all;
+      Last_Position  : VSS.Implementation.Strings.Cursor;
+      Success        : Boolean with Unreferenced;
+
+   begin
+      return Result : Virtual_String do
+         if VSS.Strings.Cursors.Internals.Is_Owner (After, Self) then
+            if Handler.Forward (Self.Data, First_Position) then
+               Handler.After_Last_Character (Self.Data, Last_Position);
+               Success := Handler.Backward (Self.Data, Last_Position);
+               Handler.Slice
+                 (Self.Data, First_Position, Last_Position, Result.Data);
+            end if;
+         end if;
+      end return;
+   end Tail_After;
+
    ----------
    -- Tail --
    ----------

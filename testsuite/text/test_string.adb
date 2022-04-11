@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                     Copyright (C) 2020-2022, AdaCore                     --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,51 +20,50 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  VSS: text processing subproject tests
 
-with "../vss_config";
-with "../vss_text";
-with "vss_test_common";
+with VSS.Strings.Character_Iterators;
 
-project VSS_Text_Tests is
+with Test_Support;
 
-   for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
-   for Source_Dirs use
-     ("../../testsuite/text",
-      "../../tools/ucd");
-   for Main use ("test_characters.adb",
-                 "test_character_iterators.adb",
-                 "test_character_markers.adb",
-                 "test_converters.adb",
-                 "test_environment.adb",
-                 "test_grapheme_cluster_iterators.adb",
-                 "test_line_iterators.adb",
-                 "test_string",
-                 "test_string_append",
-                 "test_string_casing.adb",
-                 "test_string_casing_w3c_i18n.adb",
-                 "test_string_compare",
-                 "test_string_conversions.adb",
-                 "test_string_delete",
-                 "test_string_hash",
-                 "test_string_insert",
-                 "test_string_buffer",
-                 "test_string_normalization",
-                 "test_string_replace",
-                 "test_string_slice",
-                 "test_string_split",
-                 "test_string_split_lines",
-                 "test_string_vector",
-                 "test_word_iterators");
+procedure Test_String is
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
-   end Compiler;
+   procedure Test_Tail;
 
-   package Binder is
-      for Switches ("Ada") use ("-Wb");
-   end Binder;
+   ---------------
+   -- Test_Tail --
+   ---------------
 
-end VSS_Text_Tests;
+   procedure Test_Tail is
+
+      use type VSS.Strings.Virtual_String;
+
+      S  : constant VSS.Strings.Virtual_String := "abcdefg";
+      --  JF : VSS.Strings.Character_Iterators.Character_Iterator :=
+      --    S.At_First_Character;
+      --  JL : VSS.Strings.Character_Iterators.Character_Iterator :=
+      --    S.At_Last_Character;
+      JC : VSS.Strings.Character_Iterators.Character_Iterator :=
+        S.At_First_Character;
+
+   begin
+      --  Move iterator to the character inside the string.
+
+      Test_Support.Assert (JC.Forward);
+      Test_Support.Assert (JC.Forward);
+      Test_Support.Assert (JC.Forward);
+
+      Test_Support.Assert (S.Tail_From (JC) = "defg");
+      Test_Support.Assert (S.Tail_After (JC) = "efg");
+
+      --  Corner cases.
+
+      Test_Support.Assert (S.Tail_From (S.At_First_Character) = "abcdefg");
+      Test_Support.Assert (S.Tail_After (S.At_First_Character) = "bcdefg");
+
+      Test_Support.Assert (S.Tail_From (S.At_Last_Character) = "g");
+      Test_Support.Assert (S.Tail_After (S.At_Last_Character).Is_Empty);
+   end Test_Tail;
+
+begin
+   Test_Tail;
+end Test_String;

@@ -63,6 +63,7 @@ check_text:
 	.objs/tests/test_string_slice
 	.objs/tests/test_string_split
 	.objs/tests/test_string_split_lines
+	.objs/tests/test_string
 	.objs/tests/test_string_vector
 	for f in testsuite/text/w3c-i18n-tests-casing/*.txt; do \
 		echo "   $$f"; .objs/tests/test_string_casing_w3c_i18n $$f || return 1; \

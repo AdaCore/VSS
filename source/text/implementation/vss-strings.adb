@@ -25,7 +25,7 @@ with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Internals;
-with VSS.Strings.Cursors.Iterators.Characters.Internals;
+with VSS.Strings.Cursors.Iterators.Characters;
 with VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals;
 with VSS.Strings.Cursors.Iterators.Lines.Internals;
 with VSS.Strings.Cursors.Iterators.Words.Internals;
@@ -212,9 +212,13 @@ package body VSS.Strings is
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Characters.Internals.Character
-          (Self, Position);
+      return Result :
+               VSS.Strings.Cursors.Iterators.Characters.Character_Iterator
+      do
+         if VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
+            Result.Set_At (Position);
+         end if;
+      end return;
    end At_Character;
 
    ------------------------
@@ -918,6 +922,66 @@ package body VSS.Strings is
             end;
       end case;
    end Starts_With;
+
+   ----------------
+   -- Tail_After --
+   ----------------
+
+   function Tail_After
+     (Self  : Virtual_String'Class;
+      After : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String
+   is
+      Handler        :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
+      First_Position : VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (After).all;
+      Last_Position  : VSS.Implementation.Strings.Cursor;
+      Success        : Boolean with Unreferenced;
+
+   begin
+      return Result : Virtual_String do
+         if VSS.Strings.Cursors.Internals.Is_Owner (After, Self) then
+            if Handler.Forward (Self.Data, First_Position) then
+               Handler.After_Last_Character (Self.Data, Last_Position);
+               Success := Handler.Backward (Self.Data, Last_Position);
+               Handler.Slice
+                 (Self.Data, First_Position, Last_Position, Result.Data);
+            end if;
+         end if;
+      end return;
+   end Tail_After;
+
+   ----------
+   -- Tail --
+   ----------
+
+   function Tail_From
+     (Self : Virtual_String'Class;
+      From : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String
+   is
+      Handler       :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
+      From_Position :
+        constant VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (From);
+      Last_Position : VSS.Implementation.Strings.Cursor;
+      Success       : Boolean with Unreferenced;
+
+   begin
+      return Result : Virtual_String do
+         if VSS.Strings.Cursors.Internals.Is_Owner (From, Self) then
+            Handler.After_Last_Character (Self.Data, Last_Position);
+            Success := Handler.Backward (Self.Data, Last_Position);
+            Handler.Slice
+              (Self.Data,
+               From_Position.all,
+               Last_Position,
+               Result.Data);
+         end if;
+      end return;
+   end Tail_From;
 
    ------------------
    -- To_Lowercase --

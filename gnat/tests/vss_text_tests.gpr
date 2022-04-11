@@ -40,6 +40,7 @@ project VSS_Text_Tests is
                  "test_environment.adb",
                  "test_grapheme_cluster_iterators.adb",
                  "test_line_iterators.adb",
+                 "test_string",
                  "test_string_append",
                  "test_string_casing.adb",
                  "test_string_casing_w3c_i18n.adb",

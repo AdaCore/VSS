@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2022, AdaCore                      --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,13 +21,49 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package VSS.Strings.Cursors.Iterators.Characters.Internals is
+with VSS.Strings.Character_Iterators;
 
-   pragma Preelaborate;
+with Test_Support;
 
-   function Character
-     (Self     : Virtual_String'Class;
-      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
+procedure Test_String is
 
-end VSS.Strings.Cursors.Iterators.Characters.Internals;
+   procedure Test_Tail;
+
+   ---------------
+   -- Test_Tail --
+   ---------------
+
+   procedure Test_Tail is
+
+      use type VSS.Strings.Virtual_String;
+
+      S  : constant VSS.Strings.Virtual_String := "abcdefg";
+      --  JF : VSS.Strings.Character_Iterators.Character_Iterator :=
+      --    S.At_First_Character;
+      --  JL : VSS.Strings.Character_Iterators.Character_Iterator :=
+      --    S.At_Last_Character;
+      JC : VSS.Strings.Character_Iterators.Character_Iterator :=
+        S.At_First_Character;
+
+   begin
+      --  Move iterator to the character inside the string.
+
+      Test_Support.Assert (JC.Forward);
+      Test_Support.Assert (JC.Forward);
+      Test_Support.Assert (JC.Forward);
+
+      Test_Support.Assert (S.Tail_From (JC) = "defg");
+      Test_Support.Assert (S.Tail_After (JC) = "efg");
+
+      --  Corner cases.
+
+      Test_Support.Assert (S.Tail_From (S.At_First_Character) = "abcdefg");
+      Test_Support.Assert (S.Tail_After (S.At_First_Character) = "bcdefg");
+
+      Test_Support.Assert (S.Tail_From (S.At_Last_Character) = "g");
+      Test_Support.Assert (S.Tail_After (S.At_Last_Character).Is_Empty);
+   end Test_Tail;
+
+begin
+   Test_Tail;
+end Test_String;

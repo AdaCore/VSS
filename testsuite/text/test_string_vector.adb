@@ -45,6 +45,7 @@ procedure Test_String_Vector is
    procedure Test_Append_Vector;
    procedure Test_Clear;
    procedure Test_Contains;
+   procedure Test_Delete;
 
    ------------------------
    -- Test_Append_Vector --
@@ -112,6 +113,30 @@ procedure Test_String_Vector is
 
       Test_Support.Assert (not V2.Contains ("abc"));
    end Test_Contains;
+
+   -----------------
+   -- Test_Delete --
+   -----------------
+
+   procedure Test_Delete is
+      V1 : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      V1.Append ("abc");
+      V1.Append (VSS.Strings.Empty_Virtual_String);
+      V1.Append ("def");
+
+      V1.Delete (2);
+      Test_Support.Assert (V1 (1) = "abc");
+      Test_Support.Assert (V1 (2) = "def");
+
+      V1.Delete_Last;
+      Test_Support.Assert (V1 (1) = "abc");
+
+      V1.Delete_Last;
+      Test_Support.Assert (V1.Is_Empty);
+   end Test_Delete;
+
    -------------------
    -- Test_Is_Empty --
    -------------------
@@ -266,21 +291,13 @@ begin
    V1.Append (VSS.Strings.Empty_Virtual_String);
    V1.Append (S2);
 
-   if V1.Length /= 3 then
-      raise Program_Error;
-   end if;
+   Test_Support.Assert (V1.Length = 3);
 
-   if V1 (1) /= S1 then
-      raise Program_Error;
-   end if;
+   Test_Support.Assert (V1 (1) = S1);
+   Test_Support.Assert (V1 (2).Is_Empty);
+   Test_Support.Assert (V1 (3) = S2);
 
-   if not V1 (2).Is_Empty then
-      raise Program_Error;
-   end if;
-
-   if V1 (3) /= S2 then
-      raise Program_Error;
-   end if;
+   Test_Support.Assert (V1.Last_Element = S2);
 
    --  Copy vector and append more data
 
@@ -288,25 +305,14 @@ begin
 
    V2.Append (S3);
 
-   if V2.Length /= 4 then
-      raise Program_Error;
-   end if;
+   Test_Support.Assert (V2.Length = 4);
 
-   if V2 (1) /= S1 then
-      raise Program_Error;
-   end if;
+   Test_Support.Assert (V2 (1) = S1);
+   Test_Support.Assert (V2 (2).Is_Empty);
+   Test_Support.Assert (V2 (3) = S2);
+   Test_Support.Assert (V2 (4) = S3);
 
-   if not V2 (2).Is_Empty then
-      raise Program_Error;
-   end if;
-
-   if V2 (3) /= S2 then
-      raise Program_Error;
-   end if;
-
-   if V2 (4) /= S3 then
-      raise Program_Error;
-   end if;
+   Test_Support.Assert (V2.Last_Element = S3);
 
    --  Check that first vector was not modified.
 
@@ -367,4 +373,5 @@ begin
    Test_Append_Vector;
    Test_Clear;
    Test_Contains;
+   Test_Delete;
 end Test_String_Vector;

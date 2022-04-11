@@ -130,6 +130,57 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Handler.After_Last_Character (On.Data, Self.Position);
    end Set_After_Last;
 
+   ------------
+   -- Set_At --
+   ------------
+
+   procedure Set_At
+     (Self     : in out Character_Iterator;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class) is
+   begin
+      if Position in Character_Cursor_Limited_Base'Class then
+         declare
+            P : Character_Cursor_Limited_Base'Class
+              renames Character_Cursor_Limited_Base'Class (Position);
+
+         begin
+            if Self.Owner /= P.Owner then
+               if Self.Owner /= null then
+                  Self.Disconnect;
+               end if;
+
+               if P.Owner /= null then
+                  Self.Connect (P.Owner);
+               end if;
+            end if;
+
+            Self.Position := P.Position;
+         end;
+
+      elsif Position in Character_Cursor_Base'Class then
+         declare
+            P : Character_Cursor_Base'Class
+              renames Character_Cursor_Base'Class (Position);
+
+         begin
+            if Self.Owner /= P.Owner then
+               if Self.Owner /= null then
+                  Self.Disconnect;
+               end if;
+
+               if P.Owner /= null then
+                  Self.Connect (P.Owner);
+               end if;
+            end if;
+
+            Self.Position := P.Position;
+         end;
+
+      else
+         raise Program_Error;
+      end if;
+   end Set_At;
+
    ------------------
    -- Set_At_First --
    ------------------

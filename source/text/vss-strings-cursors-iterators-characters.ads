@@ -60,6 +60,11 @@ package VSS.Strings.Cursors.Iterators.Characters is
    --  Initialize iterator to point after the last text element of the given
    --  string.
 
+   procedure Set_At
+     (Self     : in out Character_Iterator;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class);
+   --  Initialize iterator to point at the text element at given position.
+
 private
 
    type Character_Iterator is new Abstract_Character_Iterator with null record;

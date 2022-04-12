@@ -21,14 +21,28 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Test_Support;
+with VSS.Regular_Expressions;
+with VSS.Strings.Character_Iterators;
 
-procedure Test_Regexp is
+separate (Test_Regexp)
+procedure Test_V406_018 is
 
-   procedure Test_V406_014 is separate;
-   procedure Test_V406_018 is separate;
+   use type VSS.Strings.Virtual_String;
+
+   --  Check what Last_Marker can be used to obtain slice from the subject
+   --  string object.
+
+   S : constant VSS.Strings.Virtual_String := "6πR²";
+   R : constant VSS.Regular_Expressions.Regular_Expression :=
+     VSS.Regular_Expressions.To_Regular_Expression
+       ("[\p{L}\p{Nl}][\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}]*");
+   M : VSS.Regular_Expressions.Regular_Expression_Match;
 
 begin
-   Test_V406_014;
-   Test_V406_018;
-end Test_Regexp;
+   Test_Support.Assert (R.Is_Valid);
+
+   M := R.Match (S);
+
+   Test_Support.Assert (M.Has_Match);
+   Test_Support.Assert (S.Slice (M.First_Marker, M.Last_Marker) = "πR");
+end Test_V406_018;

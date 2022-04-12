@@ -40,14 +40,16 @@ package body VSS.Regular_Expressions.Name_Sets is
 
    Map : Category_Maps.Map;
 
-   -----------
-   -- Empty --
-   -----------
+   ----------
+   -- "or" --
+   ----------
 
-   function Empty return General_Category_Set is
+   overriding function "or"
+     (Left, Right : General_Category_Set) return General_Category_Set is
    begin
-      return Ignore : General_Category_Set;
-   end Empty;
+      return General_Category_Set
+        (Boolean_Array (Left) or Boolean_Array (Right));
+   end "or";
 
    -------------
    -- Include --

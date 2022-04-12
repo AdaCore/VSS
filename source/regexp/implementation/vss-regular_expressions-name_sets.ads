@@ -24,6 +24,7 @@
 pragma Warnings (Off);
 pragma Ada_2020;
 pragma Ada_2022;
+pragma Extensions_Allowed (On);  --  for square brackets in GCC 11
 pragma Warnings (On);
 
 with VSS.Characters;
@@ -34,6 +35,9 @@ package VSS.Regular_Expressions.Name_Sets is
    type General_Category_Set is private
      with Aggregate => (Empty       => Empty,
                         Add_Unnamed => Include);
+
+   function "or"
+     (Left, Right : General_Category_Set) return General_Category_Set;
 
    function Empty return General_Category_Set;
    --  Return an empty set
@@ -60,9 +64,15 @@ package VSS.Regular_Expressions.Name_Sets is
 
 private
 
-   type General_Category_Set is array
+   type Boolean_Array is array
      (VSS.Characters.General_Category) of Boolean
-       with Pack, Default_Component_Value => False;
+       with Pack;
+
+   type General_Category_Set is new Boolean_Array
+     with Default_Component_Value => False;
+
+   function Empty return General_Category_Set is
+     (General_Category_Set (Boolean_Array'[others => False]));
 
    function Contains
      (Self  : General_Category_Set;

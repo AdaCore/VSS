@@ -350,7 +350,7 @@ begin
 
                   if Last_Sample /= Sample then
                      Last_Sample := Sample;
-                     Last_Match := Last_Pattern.Match (Sample);
+                     Last_Match := Last_Pattern.Match (Last_Sample);
                   end if;
 
                   case Check.Kind is

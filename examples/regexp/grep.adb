@@ -36,11 +36,11 @@ begin
    if Reg_Exp.Is_Valid then
       while not Ada.Wide_Wide_Text_IO.End_Of_File loop
          declare
-            Line : Wide_Wide_String := Ada.Wide_Wide_Text_IO.Get_Line;
-            Text : VSS.Strings.Virtual_String :=
+            Line : constant Wide_Wide_String := Ada.Wide_Wide_Text_IO.Get_Line;
+            Text : constant VSS.Strings.Virtual_String :=
               VSS.Strings.To_Virtual_String (Line);
-            Match : constant VSS.Regular_Expressions.Regular_Expression_Match :=
-              Reg_Exp.Match (Text);
+            Match : constant VSS.Regular_Expressions.Regular_Expression_Match
+              := Reg_Exp.Match (Text);
          begin
             if Match.Has_Match then
                Ada.Wide_Wide_Text_IO.Put ("Match found");

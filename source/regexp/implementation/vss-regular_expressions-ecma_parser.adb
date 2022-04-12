@@ -40,42 +40,118 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       --  if Cursor points to Value, then forwart Cursor and set Ok to True,
       --  otherwise set Ok to False.
 
-      procedure Alternative (Value : out Node; Ok : in out Boolean);
-      procedure Disjunction (Value : out Node; Ok : in out Boolean);
+      type Node_Or_Class (Has_Node : Boolean := False) is record
+         Category : Name_Sets.General_Category_Set;
 
-      procedure Term (Value : out Node; Ok : in out Boolean)
+         case Has_Node is
+            when True =>
+               Node : ECMA_Parser.Node;
+            when False =>
+               null;
+         end case;
+      end record;
+      --  This type represent Node or/and Category_Set. It separates special
+      --  character class nodes into a dedicated field to optimize regexp like
+      --  `[\p{L}\p{Nl}_]`. For this expample first two character classes
+      --  populates Category filed and '_' populates Node field. Any of field
+      --  could be empty.
+
+      function To_Node (Value : Node_Or_Class) return Node;
+      --  Create a Node from Node_Or_Class
+
+      function From_Node (Value : Node) return Node_Or_Class is
+        (Has_Node => True,
+         Category => Name_Sets.Empty,
+         Node     => Value);
+      --  Create Node_Or_Class from a Node
+
+      function "or" (Left, Right : Node_Or_Class) return Node_Or_Class;
+      --  Return (left|right)
+
+      type Character_Or_Set (Is_Character : Boolean := False) is record
+         case Is_Character is
+            when True =>
+               Character : VSS.Characters.Virtual_Character;
+            when False =>
+               Category  : Name_Sets.General_Category_Set;
+         end case;
+      end record;
+
+      --  Procedures for each syntax rule:
+
+      procedure Alternative (Value : out Node_Or_Class; Ok : in out Boolean);
+      procedure Disjunction (Value : out Node_Or_Class; Ok : in out Boolean);
+
+      procedure Term (Value : out Node_Or_Class; Ok : in out Boolean)
         with Pre => Ok;
 
-      procedure Atom (Value : out Node; Ok : in out Boolean)
+      procedure Atom (Value : out Node_Or_Class; Ok : in out Boolean)
         with Pre => Ok;
 
-      procedure Atom_Escape (Value : out Node; Ok : in out Boolean)
+      procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean)
         with Pre => Ok;
 
       procedure Unicode_Property_Value_Characters
         (Value : out VSS.Strings.Virtual_String; Ok : in out Boolean);
 
       procedure Lone_Unicode_Property_Name_Or_Value
-        (Value : out Node; Ok : in out Boolean);
+        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean);
 
-      procedure Character_Class (Value : out Node; Ok : in out Boolean)
-        with Pre => Ok;
+      procedure Character_Class
+        (Value : out Node_Or_Class; Ok : in out Boolean)
+          with Pre => Ok;
 
-      procedure Class_Ranges (Value : out Node; Ok : in out Boolean);
+      procedure Class_Ranges (Value : out Node_Or_Class; Ok : in out Boolean);
 
       procedure Class_Atom
-        (Value : out VSS.Characters.Virtual_Character;
+        (Value : out Character_Or_Set;
+         Ok    : in out Boolean)
+        with Pre => Ok
+          and then Cursor.Has_Element
+          and then Cursor.Element /= ']';
+
+      procedure Class_Escape
+        (Value : out Character_Or_Set;
          Ok    : in out Boolean);
+
+      procedure Character_Class_Escape
+        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean);
 
       Next_Group : Positive := 1;  --  Group counter
 
-      procedure Alternative (Value : out Node; Ok : in out Boolean) is
-         Right : Node;
+      --  Implementations
+
+      function "or" (Left, Right : Node_Or_Class) return Node_Or_Class is
+         use type Name_Sets.General_Category_Set;
+
+      begin
+         if Left.Has_Node then
+            if Right.Has_Node then
+               return (Has_Node => True,
+                       Category => Left.Category or Right.Category,
+                       Node     => Create_Alternative (Left.Node, Right.Node));
+            else
+               return (Has_Node => True,
+                       Category => Left.Category or Right.Category,
+                       Node     => Left.Node);
+            end if;
+         elsif Right.Has_Node then
+            return (Has_Node => True,
+                    Category => Left.Category or Right.Category,
+                    Node     => Right.Node);
+         else
+            return (Has_Node => False,
+                    Category => Left.Category or Right.Category);
+         end if;
+      end "or";
+
+      procedure Alternative (Value : out Node_Or_Class; Ok : in out Boolean) is
+         Right : Node_Or_Class;
       begin
          if Ok and (not Cursor.Has_Element
                     or else Cursor.Element in ')' | '|')
          then
-            Value := Create_Empty;
+            Value := From_Node (Create_Empty);
 
          elsif Ok then
             Term (Value, Ok);
@@ -87,13 +163,14 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                Term (Right, Ok);
 
                if Ok then
-                  Value := Create_Sequence (Value, Right);
+                  Value := From_Node
+                    (Create_Sequence (To_Node (Value), To_Node (Right)));
                end if;
             end loop;
          end if;
       end Alternative;
 
-      procedure Atom (Value : out Node; Ok : in out Boolean) is
+      procedure Atom (Value : out Node_Or_Class; Ok : in out Boolean) is
       begin
          if not Cursor.Has_Element then
             if Error.Is_Empty then
@@ -119,7 +196,8 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                   begin
                      Next_Group := Next_Group + 1;
                      Disjunction (Value, Ok);
-                     Value := Create_Group (Value, Group);
+                     Value :=
+                       From_Node (Create_Group (To_Node (Value), Group));
                      Expect (')', Ok);
                   end;
                end if;
@@ -142,58 +220,170 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
                Ok := False;
             when others =>
-               Value := Create_Character (Cursor.Element);
+               Value := From_Node (Create_Character (Cursor.Element));
                Expect (Cursor.Element, Ok);
          end case;
       end Atom;
 
-      procedure Atom_Escape (Value : out Node; Ok : in out Boolean) is
+      procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean) is
+         Set : Name_Sets.General_Category_Set;
       begin
-         Expect ('p', Ok);
-         Expect ('{', Ok);
-         Lone_Unicode_Property_Name_Or_Value (Value, Ok);
-         Expect ('}', Ok);
+         Character_Class_Escape (Set, Ok);
+
+         if Ok then
+            Value := (Has_Node => False, Category => Set);
+         end if;
       end Atom_Escape;
 
-      procedure Character_Class (Value : out Node; Ok : in out Boolean) is
+      procedure Character_Class
+        (Value : out Node_Or_Class; Ok : in out Boolean) is
       begin
          Expect ('[', Ok);
          Class_Ranges (Value, Ok);
          Expect (']', Ok);
       end Character_Class;
 
+      procedure Character_Class_Escape
+        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean) is
+      begin
+         Expect ('p', Ok);
+         Expect ('{', Ok);
+         Lone_Unicode_Property_Name_Or_Value (Value, Ok);
+         Expect ('}', Ok);
+      end Character_Class_Escape;
+
       procedure Class_Atom
-        (Value : out VSS.Characters.Virtual_Character;
+        (Value : out Character_Or_Set;
          Ok    : in out Boolean) is
       begin
-         if not Ok
-           or else not Cursor.Has_Element
-           or else Cursor.Element in '\' | ']'
-         then
-            Ok := False;
-            Value := ' ';
-            return;
+         if Cursor.Element = '\' then
+            Expect ('\', Ok);
+            Class_Escape (Value, Ok);
+         else
+            Value := (Is_Character => True, Character => Cursor.Element);
+            Expect (Cursor.Element, Ok);
          end if;
-
-         Value := Cursor.Element;
-         Expect (Cursor.Element, Ok);
       end Class_Atom;
 
-      procedure Class_Ranges (Value : out Node; Ok : in out Boolean) is
-         From : VSS.Characters.Virtual_Character;
-         To   : VSS.Characters.Virtual_Character;
+      procedure Class_Escape
+        (Value : out Character_Or_Set;
+         Ok    : in out Boolean)
+      is
+         Set : Name_Sets.General_Category_Set;
       begin
-         Class_Atom (From, Ok);
-         Expect ('-', Ok);
-         Class_Atom (To, Ok);
+         Character_Class_Escape (Set, Ok);
 
          if Ok then
-            Value := Create_Character_Range (From, To);
+            Value := (Is_Character => False, Category => Set);
          end if;
+      end Class_Escape;
+
+      procedure Class_Ranges
+        (Value : out Node_Or_Class; Ok : in out Boolean)
+      is
+         function No_Close_Bracket return VSS.Strings.Virtual_String is
+            ("No ']' found");
+
+         procedure Append
+           (Item  : Character_Or_Set;
+            First : in out Boolean);
+         --  Convert Item to Node and append it to Value
+
+         procedure Append_Node
+           (Right : Node;
+            First : in out Boolean);
+         --  If First replace Value with a node, otherwise append it to Value
+
+         ------------
+         -- Append --
+         ------------
+
+         procedure Append
+           (Item  : Character_Or_Set;
+            First : in out Boolean)
+         is
+            Right : Node;
+         begin
+            if Item.Is_Character then
+               Right := Create_Character (Item.Character);
+            else
+               Right := Create_General_Category_Set (Item.Category);
+            end if;
+
+            Append_Node (Right, First);
+         end Append;
+
+         -----------------
+         -- Append_Node --
+         -----------------
+
+         procedure Append_Node
+           (Right : Node;
+            First : in out Boolean) is
+         begin
+            if First then
+               First := False;
+               Value := From_Node (Right);
+            else
+               Value := Value or From_Node (Right);
+            end if;
+         end Append_Node;
+
+         From  : Character_Or_Set;
+         To    : Character_Or_Set;
+         First : Boolean := True;
+      begin
+         if Ok and then Cursor.Has_Element and then Cursor.Element = ']' then
+            --  An empty character class
+            Value := (Has_Node => False, Category => Name_Sets.Empty);
+            return;
+         elsif Ok and then not Cursor.Has_Element then
+            Error := No_Close_Bracket;
+            Ok := False;
+         end if;
+
+         while Ok
+           and then Cursor.Has_Element
+           and then Cursor.Element /= ']'
+         loop
+            Class_Atom (From, Ok);
+
+            exit when not Ok;
+
+            if not Cursor.Has_Element then
+               Error := No_Close_Bracket;
+               Ok := False;
+            elsif Cursor.Element = '-' then
+               Expect ('-', Ok);
+
+               if not Cursor.Has_Element then
+                  Error := No_Close_Bracket;
+                  Ok := False;
+               elsif Cursor.Element = ']' then  --  like [...a-]
+                  Append (From, First);
+                  Append ((True, '-'), First);
+               else  --  like [...a-z...]
+                  Class_Atom (To, Ok);
+
+                  exit when not Ok;
+
+                  if From.Is_Character and To.Is_Character then
+                     Append_Node
+                       (Create_Character_Range (From.Character, To.Character),
+                        First);
+                  else
+                     Ok := False;
+                     Error := "Range boundary can't be a character class";
+                  end if;
+               end if;
+            else  --  like [...a...]
+               Append (From, First);
+            end if;
+         end loop;
       end Class_Ranges;
 
-      procedure Disjunction (Value : out Node; Ok : in out Boolean) is
-         Right : Node;
+      procedure Disjunction (Value : out Node_Or_Class; Ok : in out Boolean) is
+         Right : Node_Or_Class;
       begin
          Alternative (Value, Ok);
 
@@ -205,7 +395,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
             Alternative (Right, Ok);
 
             if Ok then
-               Value := Create_Alternative (Value, Right);
+               Value := Value or Right;
             end if;
          end loop;
       end Disjunction;
@@ -237,31 +427,42 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end Expect;
 
       procedure Lone_Unicode_Property_Name_Or_Value
-        (Value : out Node; Ok : in out Boolean)
+        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean)
       is
          Name : VSS.Strings.Virtual_String;
-         Set  : Name_Sets.General_Category_Set;
       begin
          Unicode_Property_Value_Characters (Name, Ok);
 
          if Ok then
-            Name_Sets.To_General_Category_Set (Name, Set, Ok);
-
-            if Ok then
-               Value := Create_General_Category_Set (Set);
-            end if;
+            Name_Sets.To_General_Category_Set (Name, Value, Ok);
          end if;
       end Lone_Unicode_Property_Name_Or_Value;
 
-      procedure Term (Value : out Node; Ok : in out Boolean) is
+      procedure Term (Value : out Node_Or_Class; Ok : in out Boolean) is
       begin
          Atom (Value, Ok);
 
          if Ok and then Cursor.Has_Element and then Cursor.Element = '*' then
             Expect (Cursor.Element, Ok);
-            Value := Create_Star (Value);
+            Value := From_Node (Create_Star (To_Node (Value)));
          end if;
       end Term;
+
+      function To_Node (Value : Node_Or_Class) return Node is
+         use type Name_Sets.General_Category_Set;
+
+         function Left return Node is
+           (if Value.Category = Name_Sets.Empty then Create_Empty
+            else Create_General_Category_Set (Value.Category));
+      begin
+         if not Value.Has_Node then
+            return Left;
+         elsif Value.Category = Name_Sets.Empty then
+            return Value.Node;
+         else
+            return Create_Alternative (Left, Value.Node);
+         end if;
+      end To_Node;
 
       procedure Unicode_Property_Value_Characters
         (Value : out VSS.Strings.Virtual_String; Ok : in out Boolean) is
@@ -280,9 +481,11 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
       end Unicode_Property_Value_Characters;
 
-      Ok : Boolean := True;
+      Ok    : Boolean := True;
+      Value : Node_Or_Class;
    begin
-      Disjunction (Result, Ok);
+      Disjunction (Value, Ok);
+      Result := To_Node (Value);
 
       if not Error.Is_Empty then
          null;

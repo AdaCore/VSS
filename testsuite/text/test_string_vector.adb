@@ -46,6 +46,7 @@ procedure Test_String_Vector is
    procedure Test_Clear;
    procedure Test_Contains;
    procedure Test_Delete;
+   procedure Test_Prepend;
 
    ------------------------
    -- Test_Append_Vector --
@@ -273,6 +274,24 @@ procedure Test_String_Vector is
       end;
    end Test_Join_Lines;
 
+   ------------------
+   -- Test_Prepend --
+   ------------------
+
+   procedure Test_Prepend is
+      V : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      V.Prepend ("a");
+      V.Prepend ("b");
+      V.Prepend ("c");
+
+      Test_Support.Assert (V.Length = 3);
+      Test_Support.Assert (V (1) = "c");
+      Test_Support.Assert (V (2) = "b");
+      Test_Support.Assert (V (3) = "a");
+   end Test_Prepend;
+
    S1 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("a");
    S2 : constant VSS.Strings.Virtual_String :=
@@ -374,4 +393,5 @@ begin
    Test_Clear;
    Test_Contains;
    Test_Delete;
+   Test_Prepend;
 end Test_String_Vector;

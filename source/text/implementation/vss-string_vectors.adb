@@ -295,6 +295,18 @@ package body VSS.String_Vectors is
       return (Index => Index);
    end Next;
 
+   -------------
+   -- Prepend --
+   -------------
+
+   procedure Prepend
+     (Self : in out Virtual_String_Vector'Class;
+      Item : VSS.Strings.Virtual_String'Class) is
+   begin
+      VSS.Implementation.String_Vectors.Prepend
+        (Self.Data, VSS.Strings.Internals.Data_Access_Constant (Item).all);
+   end Prepend;
+
    --------------
    -- Previous --
    --------------

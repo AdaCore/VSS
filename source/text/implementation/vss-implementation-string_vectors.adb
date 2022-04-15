@@ -295,6 +295,28 @@ package body VSS.Implementation.String_Vectors is
       end if;
    end Mutate;
 
+   -------------
+   -- Prepend --
+   -------------
+
+   procedure Prepend
+     (Self : in out String_Vector_Data_Access;
+      Item : VSS.Implementation.Strings.String_Data) is
+   begin
+      if Self = null then
+         Mutate (Self, 1, 0);
+
+      else
+         Mutate (Self, Self.Last + 1, Self.Last / Growth_Factor);
+      end if;
+
+      Self.Data (2 .. Self.Last + 1) := Self.Data (1 .. Self.Last);
+      Self.Last := Self.Last + 1;
+      Self.Data (1) := Item;
+
+      VSS.Implementation.Strings.Reference (Self.Data (1));
+   end Prepend;
+
    ---------------
    -- Reference --
    ---------------

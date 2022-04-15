@@ -56,6 +56,11 @@ package VSS.Implementation.String_Vectors is
    --  Appends given string to the end of the string vector with moving of the
    --  ownership of the string to the string vector.
 
+   procedure Prepend
+     (Self : in out String_Vector_Data_Access;
+      Item : VSS.Implementation.Strings.String_Data);
+   --  Prepend "copy" of the given string to the end of the string vector.
+
    procedure Delete
      (Self  : in out not null String_Vector_Data_Access;
       Index : Positive);

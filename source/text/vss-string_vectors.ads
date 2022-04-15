@@ -85,6 +85,11 @@ package VSS.String_Vectors is
       Item : Virtual_String_Vector'Class);
    --  Append strings of Item to the end of the vector.
 
+   procedure Prepend
+     (Self : in out Virtual_String_Vector'Class;
+      Item : VSS.Strings.Virtual_String'Class);
+   --  Insert given string before existing strings in the vector.
+
    procedure Delete
      (Self  : in out Virtual_String_Vector'Class;
       Index : Positive);

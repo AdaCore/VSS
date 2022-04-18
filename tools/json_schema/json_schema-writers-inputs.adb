@@ -79,8 +79,6 @@ package body JSON_Schema.Writers.Inputs is
      (Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set) is
    begin
-      Put ("with Interfaces;");
-      New_Line;
       Put ("with VSS.JSON.Pull_Readers;");
       New_Line;
       New_Line;
@@ -114,6 +112,8 @@ package body JSON_Schema.Writers.Inputs is
       Put ("package body ");
       Put (Package_Name);
       Put (".Inputs is");
+      New_Line;
+      Put ("pragma Style_Checks (Off);");
       New_Line;
       Put ("use type VSS.JSON.JSON_Number_Kind;"); New_Line;
       Put ("use type VSS.Strings.Virtual_String;"); New_Line;
@@ -540,7 +540,7 @@ package body JSON_Schema.Writers.Inputs is
       Writers.Each_Property (Map, Schema, Write_When_Clause'Access);
 
       Put ("when others =>"); New_Line;
-      Put ("Success := False;"); New_Line;
+      Put ("Reader.Skip_Current_Value;"); New_Line;
       Put ("end case;"); New_Line;
       Put ("end;"); New_Line;
       Put ("else"); New_Line;

@@ -66,8 +66,6 @@ package body JSON_Schema.Writers.Outputs is
      (Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set) is
    begin
-      Put ("with Interfaces;");
-      New_Line;
       Put ("with VSS.JSON.Content_Handlers;");
       New_Line;
       New_Line;
@@ -93,10 +91,12 @@ package body JSON_Schema.Writers.Outputs is
       Put (".Outputs;");
       New_Line;
 
+      Put ("with Interfaces;"); New_Line;
       Put ("package body ");
       Put (Package_Name);
       Put (".Outputs is");
       New_Line;
+      Put ("pragma Style_Checks (Off);");
       New_Line;
 
       Put ("procedure Output_Any_Value"); New_Line;

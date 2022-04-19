@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                        M A G I C   R U N T I M E                         --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -31,6 +31,108 @@ with Hello_World_Data;
 with Test_Support;
 
 procedure Test_String_Conversions is
+
+   procedure Do_Test
+     (UTF_32_Encoded : Wide_Wide_String;
+      UTF_8_Encoded  : Ada.Strings.UTF_Encoding.UTF_8_String);
+   --  Do test for given string
+
+   -------------
+   -- Do_Test --
+   -------------
+
+   procedure Do_Test
+     (UTF_32_Encoded : Wide_Wide_String;
+      UTF_8_Encoded  : Ada.Strings.UTF_Encoding.UTF_8_String)
+   is
+      use type Ada.Strings.Unbounded.Unbounded_String;
+      use type Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
+
+   begin
+      --  Virtual_String created from UTF-32 encoded Wide_Wide_String
+
+      declare
+         S : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String (UTF_32_Encoded);
+
+      begin
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_UTF_8_String (S) = UTF_8_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_UTF_8_String (S)
+              = Ada.Strings.Unbounded.To_Unbounded_String (UTF_8_Encoded));
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Wide_Wide_String (S) = UTF_32_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (S)
+              = Ada.Strings.Wide_Wide_Unbounded.To_Unbounded_Wide_Wide_String
+                  (UTF_32_Encoded));
+      end;
+
+      --  Virtual_String created from UTF-32 encoded Unbounded_Wide_Wide_String
+
+      declare
+         S : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.Conversions.To_Virtual_String
+             (Ada.Strings.Wide_Wide_Unbounded.To_Unbounded_Wide_Wide_String
+                (UTF_32_Encoded));
+
+      begin
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_UTF_8_String (S) = UTF_8_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_UTF_8_String (S)
+              = Ada.Strings.Unbounded.To_Unbounded_String (UTF_8_Encoded));
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Wide_Wide_String (S) = UTF_32_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (S)
+              = Ada.Strings.Wide_Wide_Unbounded.To_Unbounded_Wide_Wide_String
+                  (UTF_32_Encoded));
+      end;
+
+      --  Virtual_String created from UTF-8 encoded String
+
+      declare
+         S : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.Conversions.To_Virtual_String (UTF_8_Encoded);
+
+      begin
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_UTF_8_String (S) = UTF_8_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_UTF_8_String (S)
+              = Ada.Strings.Unbounded.To_Unbounded_String (UTF_8_Encoded));
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Wide_Wide_String (S) = UTF_32_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (S)
+              = Ada.Strings.Wide_Wide_Unbounded.To_Unbounded_Wide_Wide_String
+                  (UTF_32_Encoded));
+      end;
+
+      --  Virtual_String created from UTF-8 encoded Unbounded_String
+
+      declare
+         S : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.Conversions.To_Virtual_String
+             (Ada.Strings.Unbounded.To_Unbounded_String (UTF_8_Encoded));
+
+      begin
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_UTF_8_String (S) = UTF_8_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_UTF_8_String (S)
+              = Ada.Strings.Unbounded.To_Unbounded_String (UTF_8_Encoded));
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Wide_Wide_String (S) = UTF_32_Encoded);
+         Test_Support.Assert
+           (VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (S)
+              = Ada.Strings.Wide_Wide_Unbounded.To_Unbounded_Wide_Wide_String
+                  (UTF_32_Encoded));
+      end;
+   end Do_Test;
+
 begin
    --  Check conversion of "Hello, world!" in different languages. It is known
    --  all strings are well-formed, there should be no exceptions. Note, it is
@@ -86,10 +188,8 @@ begin
    --  handlers.
 
    declare
-      S1 : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.To_Virtual_String ("AБक𐌈");
-      S2 : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.To_Virtual_String ("AБक𐌈𐌈कБA");
+      S1 : constant Wide_Wide_String := "AБक𐌈";
+      S2 : constant Wide_Wide_String := "AБक𐌈𐌈कБA";
       E1 : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
         (1  => Character'Val (16#41#),
          2  => Character'Val (16#D0#),
@@ -124,13 +224,8 @@ begin
          20 => Character'Val (16#41#));
 
    begin
-      if VSS.Strings.Conversions.To_UTF_8_String (S1) /= E1 then
-         raise Program_Error;
-      end if;
-
-      if VSS.Strings.Conversions.To_UTF_8_String (S2) /= E2 then
-         raise Program_Error;
-      end if;
+      Do_Test (S1, E1);
+      Do_Test (S2, E2);
    end;
 
    --  Check that null string is handled properly.
@@ -149,78 +244,54 @@ begin
    --  successful.
 
    declare
-      S : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.To_Virtual_String
-          ("This is large string literal to test conversion from "
-           & " Wide_Wide_String to Virtual_String. At the time of initial "
-           & "development this string literal requires to have at least "
-           & "256 (two hundreds fithty six) characters to overflow unsigned "
-           & "8 (eight) bit wide Length member of the UTF-8 ib place string "
-           & "handler.")
-        with Unreferenced;
+      S : constant Wide_Wide_String :=
+        "This is large string literal to test conversion from "
+        & " Wide_Wide_String to Virtual_String. At the time of initial "
+        & "development this string literal requires to have at least "
+        & "256 (two hundreds fithty six) characters to overflow unsigned "
+        & "8 (eight) bit wide Length member of the UTF-8 ib place string "
+        & "handler.";
+      E : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
+        "This is large string literal to test conversion from "
+        & " Wide_Wide_String to Virtual_String. At the time of initial "
+        & "development this string literal requires to have at least "
+        & "256 (two hundreds fithty six) characters to overflow unsigned "
+        & "8 (eight) bit wide Length member of the UTF-8 ib place string "
+        & "handler.";
 
    begin
-      null;
+      Do_Test (S, E);
    end;
 
    --  Check conversion of the null and empty strings to
-   --  Unbounded_Wide_Wide_String.
+   --  Unbounded_String/Unbounded_Wide_Wide_String.
 
    declare
+      use type Ada.Strings.Unbounded.Unbounded_String;
       use type Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String;
 
-      N1 : VSS.Strings.Virtual_String;
-      N2 : constant VSS.Strings.Virtual_String := "";
-
-   begin
-      if VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (N1)
-        /= Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String
-      then
-         raise Program_Error;
-      end if;
-
-      if VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String (N2)
-        /= Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String
-      then
-         raise Program_Error;
-      end if;
-   end;
-
-   --  Check conversion of Unbounded_String.
-
-   declare
-      use type VSS.Strings.Virtual_String;
-
-      SS : constant Ada.Strings.Unbounded.Unbounded_String :=
-        Ada.Strings.Unbounded.To_Unbounded_String ("ABC");
-      ES : constant VSS.Strings.Virtual_String := "ABC";
-
-      SL : constant Ada.Strings.Unbounded.Unbounded_String :=
-        Ada.Strings.Unbounded.To_Unbounded_String
-          ("This is large string literal to test conversion from "
-           & " Wide_Wide_String to Virtual_String. At the time of initial "
-           & "development this string literal requires to have at least "
-           & "256 (two hundreds fithty six) characters to overflow unsigned "
-           & "8 (eight) bit wide Length member of the UTF-8 ib place string "
-           & "handler.");
-      EL : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.To_Virtual_String
-          ("This is large string literal to test conversion from "
-           & " Wide_Wide_String to Virtual_String. At the time of initial "
-           & "development this string literal requires to have at least "
-           & "256 (two hundreds fithty six) characters to overflow unsigned "
-           & "8 (eight) bit wide Length member of the UTF-8 ib place string "
-           & "handler.");
+      Null_Virtual_String  : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.Empty_Virtual_String;
+      --  VSS.Strings.Empty_Virtual_String is null string by convention.
+      Empty_Virtual_String : constant VSS.Strings.Virtual_String := "";
 
    begin
       Test_Support.Assert
-        (VSS.Strings.Conversions.To_Virtual_String (SS) = ES);
+        (VSS.Strings.Conversions.To_Unbounded_UTF_8_String
+           (Null_Virtual_String)
+         = Ada.Strings.Unbounded.Null_Unbounded_String);
+      Test_Support.Assert
+        (VSS.Strings.Conversions.To_Unbounded_UTF_8_String
+           (Empty_Virtual_String)
+         = Ada.Strings.Unbounded.Null_Unbounded_String);
 
       Test_Support.Assert
-        (VSS.Strings.Conversions.To_Virtual_String (SL) = EL);
-
+        (VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String
+           (Null_Virtual_String)
+         = Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String);
       Test_Support.Assert
-        (VSS.Strings.Conversions.To_Virtual_String
-           (Ada.Strings.Unbounded.Null_Unbounded_String).Is_Empty);
+        (VSS.Strings.Conversions.To_Unbounded_Wide_Wide_String
+           (Empty_Virtual_String)
+         = Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String);
    end;
 end Test_String_Conversions;

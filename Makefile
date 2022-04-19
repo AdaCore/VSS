@@ -59,7 +59,6 @@ check_text:
 	.objs/tests/test_string_insert
 	.objs/tests/test_string_buffer
 	.objs/tests/test_string_normalization data/ucd
-	.objs/tests/test_string_replace
 	.objs/tests/test_string_slice
 	.objs/tests/test_string_split
 	.objs/tests/test_string_split_lines

@@ -28,6 +28,7 @@ with Test_Support;
 procedure Test_String is
 
    procedure Test_Prepend;
+   procedure Test_Replace;
    procedure Test_Tail;
 
    ------------------
@@ -90,6 +91,61 @@ procedure Test_String is
       Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Long));
    end Test_Prepend;
 
+   ------------------
+   -- Test_Replace --
+   ------------------
+
+   procedure Test_Replace is
+
+      use type VSS.Strings.Virtual_String;
+
+   begin
+      declare
+         S  : VSS.Strings.Virtual_String := "Hello, bad world!";
+         J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_First_Character;
+         J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_Last_Character;
+
+      begin
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+
+         S.Replace (J1, J2, "good");
+
+         Test_Support.Assert (S = "Hello, good world!");
+      end;
+
+      declare
+         S  : VSS.Strings.Virtual_String := "x1z";
+         J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_First_Character;
+         J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_Last_Character;
+
+      begin
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J2.Backward);
+
+         S.Replace (J1, J2, 'y');
+
+         Test_Support.Assert (S = "xyz");
+      end;
+   end Test_Replace;
+
    ---------------
    -- Test_Tail --
    ---------------
@@ -127,5 +183,6 @@ procedure Test_String is
 
 begin
    Test_Prepend;
+   Test_Replace;
    Test_Tail;
 end Test_String;

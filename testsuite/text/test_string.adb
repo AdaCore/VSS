@@ -27,7 +27,124 @@ with Test_Support;
 
 procedure Test_String is
 
+   procedure Test_Prepend;
+   procedure Test_Replace;
    procedure Test_Tail;
+
+   ------------------
+   -- Test_Prepend --
+   ------------------
+
+   procedure Test_Prepend is
+
+      use type VSS.Strings.Virtual_String;
+
+      Single : constant Wide_Wide_String := ".";
+      Short  : constant Wide_Wide_String := "1234567890";
+      Long   : constant Wide_Wide_String := "abcdefghijklmnopqrstuvwxyz";
+
+      S     : VSS.Strings.Virtual_String;
+
+   begin
+      S.Prepend (VSS.Strings.To_Virtual_String (Single));
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (Single));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Short));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Short & Single));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Long));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Long & Short & Single));
+
+      S.Clear;
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Long));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Long));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Short));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Short & Long));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Single));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Single & Short & Long));
+
+      S.Clear;
+      S.Prepend (' ');
+      Test_Support.Assert (S = " ");
+
+      S.Clear;
+      S.Prepend (VSS.Strings.To_Virtual_String (Single));
+      S.Prepend (' ');
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Single));
+
+      S.Clear;
+      S.Prepend (VSS.Strings.To_Virtual_String (Short));
+      S.Prepend (' ');
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Short));
+
+      S.Clear;
+      S.Prepend (VSS.Strings.To_Virtual_String (Long));
+      S.Prepend (' ');
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Long));
+   end Test_Prepend;
+
+   ------------------
+   -- Test_Replace --
+   ------------------
+
+   procedure Test_Replace is
+
+      use type VSS.Strings.Virtual_String;
+
+   begin
+      declare
+         S  : VSS.Strings.Virtual_String := "Hello, bad world!";
+         J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_First_Character;
+         J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_Last_Character;
+
+      begin
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J1.Forward);
+
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+         Test_Support.Assert (J2.Backward);
+
+         S.Replace (J1, J2, "good");
+
+         Test_Support.Assert (S = "Hello, good world!");
+      end;
+
+      declare
+         S  : VSS.Strings.Virtual_String := "x1z";
+         J1 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_First_Character;
+         J2 : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_Last_Character;
+
+      begin
+         Test_Support.Assert (J1.Forward);
+         Test_Support.Assert (J2.Backward);
+
+         S.Replace (J1, J2, 'y');
+
+         Test_Support.Assert (S = "xyz");
+      end;
+   end Test_Replace;
 
    ---------------
    -- Test_Tail --
@@ -65,5 +182,7 @@ procedure Test_String is
    end Test_Tail;
 
 begin
+   Test_Prepend;
+   Test_Replace;
    Test_Tail;
 end Test_String;

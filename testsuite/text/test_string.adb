@@ -27,7 +27,68 @@ with Test_Support;
 
 procedure Test_String is
 
+   procedure Test_Prepend;
    procedure Test_Tail;
+
+   ------------------
+   -- Test_Prepend --
+   ------------------
+
+   procedure Test_Prepend is
+
+      use type VSS.Strings.Virtual_String;
+
+      Single : constant Wide_Wide_String := ".";
+      Short  : constant Wide_Wide_String := "1234567890";
+      Long   : constant Wide_Wide_String := "abcdefghijklmnopqrstuvwxyz";
+
+      S     : VSS.Strings.Virtual_String;
+
+   begin
+      S.Prepend (VSS.Strings.To_Virtual_String (Single));
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (Single));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Short));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Short & Single));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Long));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Long & Short & Single));
+
+      S.Clear;
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Long));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Long));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Short));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Short & Long));
+
+      S.Prepend (VSS.Strings.To_Virtual_String (Single));
+      Test_Support.Assert
+        (S = VSS.Strings.To_Virtual_String (Single & Short & Long));
+
+      S.Clear;
+      S.Prepend (' ');
+      Test_Support.Assert (S = " ");
+
+      S.Clear;
+      S.Prepend (VSS.Strings.To_Virtual_String (Single));
+      S.Prepend (' ');
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Single));
+
+      S.Clear;
+      S.Prepend (VSS.Strings.To_Virtual_String (Short));
+      S.Prepend (' ');
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Short));
+
+      S.Clear;
+      S.Prepend (VSS.Strings.To_Virtual_String (Long));
+      S.Prepend (' ');
+      Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Long));
+   end Test_Prepend;
 
    ---------------
    -- Test_Tail --
@@ -65,5 +126,6 @@ procedure Test_String is
    end Test_Tail;
 
 begin
+   Test_Prepend;
    Test_Tail;
 end Test_String;

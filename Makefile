@@ -23,8 +23,10 @@ else
 endif
 
 all:
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_json.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 
 generate:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr
@@ -94,13 +96,15 @@ check_regexp: re_tests
 check_install:
 	echo 'with "vss_text.gpr";'             >  example.gpr
 	echo 'with "vss_json.gpr";'             >> example.gpr
+	echo 'with "vss_regexp.gpr";'           >> example.gpr
 	echo 'project Example is'               >> example.gpr
 	echo '   for Main use ("example.adb");' >> example.gpr
 	echo 'end Example;'                     >> example.gpr
-	echo 'with VSS.Strings;'    >  example.adb
-	echo 'with VSS.JSON;'       >> example.adb
-	echo 'procedure Example is' >> example.adb
-	echo 'begin null; end;'     >> example.adb
+	echo 'with VSS.Strings;'                >  example.adb
+	echo 'with VSS.JSON;'                   >> example.adb
+	echo 'with VSS.Regular_Expressions;'    >> example.adb
+	echo 'procedure Example is'             >> example.adb
+	echo 'begin null; end;'                 >> example.adb
 	gprbuild -aP $(INSTALL_PROJECT_DIR) -P example.gpr
 	gprclean -aP $(INSTALL_PROJECT_DIR) -P example.gpr
 	rm -f example.*
@@ -121,6 +125,7 @@ install:
 	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/text -f -p -P gnat/vss_text.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/json -f -p -P gnat/vss_json.gpr
+	gprinstall $(GPRINSTALL_FLAGS)/regexp -f -p -P gnat/vss_regexp.gpr
 
 misc: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr

@@ -19,6 +19,16 @@ Compiler will produce `.objs/tools/gen_json` executable.
 
 ## Usage
 
+```
+Usage: gen_json [options] <json_schema>.json
+
+Where options:
+  --root-package <package> - A package for generated types
+  --enum-package <package> - A package for enumeration types
+  --header-file  <file>    - A copyright header file
+
+```
+
 Run `gen_json` with JSON Schema file as an argument.
 Generated code will be printed to `stdout`.
 Use `gnatchop` and `gnatpp` to get compilable sources.

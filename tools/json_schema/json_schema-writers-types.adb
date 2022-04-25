@@ -28,6 +28,7 @@ package body JSON_Schema.Writers.Types is
 
    procedure Write_Named_Types
      (Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set);
    --  Generate types for all named schemas in Map if they not present in Done
@@ -37,6 +38,7 @@ package body JSON_Schema.Writers.Types is
      (Name           : VSS.Strings.Virtual_String;
       Schema         : Schema_Access;
       Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set);
    --  Generate a type for single named Schema. Generate Optional_ type if
@@ -49,7 +51,7 @@ package body JSON_Schema.Writers.Types is
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set;
-      Required       : Boolean);
+      Required       : Boolean; Root_Package : VSS.Strings.Virtual_String);
    --  Write a dedicated type for a schema property that contains a nested
    --  schema. Currently only single level of nesting is implemented.
 
@@ -57,15 +59,17 @@ package body JSON_Schema.Writers.Types is
      (Name           : VSS.Strings.Virtual_String;
       Schema         : Schema_Access;
       Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set);
    --  The same for "type: object" schema
 
    procedure Write_Record_Component
-     (Name     : VSS.Strings.Virtual_String;
-      Map      : JSON_Schema.Readers.Schema_Map;
-      Property : JSON_Schema.Property;
-      Required : Boolean);
+     (Name         : VSS.Strings.Virtual_String;
+      Map          : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
+      Property     : JSON_Schema.Property;
+      Required     : Boolean);
    --  Write record component declaration for given Property. Name is a name of
    --  the schema containing the property.
 
@@ -73,6 +77,7 @@ package body JSON_Schema.Writers.Types is
      (Name           : VSS.Strings.Virtual_String;
       Schema         : Schema_Access;
       Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set);
    --  The same for "allOf:[]" schema
@@ -90,7 +95,9 @@ package body JSON_Schema.Writers.Types is
       Kind        : Declaration_Kind);
    --  Write vector type operations for each item of Array_Types
 
-   procedure Write_Private_Vectors (Array_Types : Readers.Schema_Map);
+   procedure Write_Private_Vectors
+    (Array_Types  : Readers.Schema_Map;
+     Enum_Package : VSS.Strings.Virtual_String);
    --  Write vector type private declarations for each item of Array_Types
 
    function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
@@ -124,6 +131,9 @@ package body JSON_Schema.Writers.Types is
 
    procedure Write_Type_Package
      (Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
+      Enum_Package   : VSS.Strings.Virtual_String;
+      Header         : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
       Array_Types    : Readers.Schema_Map);
    --  Write package specificatio with type declarations
@@ -249,7 +259,12 @@ package body JSON_Schema.Writers.Types is
    -- Write --
    -----------
 
-   procedure Write (Map : JSON_Schema.Readers.Schema_Map) is
+   procedure Write
+     (Map          : JSON_Schema.Readers.Schema_Map;
+      Root_Package : VSS.Strings.Virtual_String;
+      Enum_Package : VSS.Strings.Virtual_String;
+      Header       : VSS.String_Vectors.Virtual_String_Vector)
+   is
       Optional_Types : String_Sets.Set;
       Array_Types    : Readers.Schema_Map;
    begin
@@ -259,9 +274,16 @@ package body JSON_Schema.Writers.Types is
       end loop;
 
       Array_Types.Insert ("Integer", null);
-      Write_Type_Package (Map, Optional_Types, Array_Types);
-      JSON_Schema.Writers.Outputs.Generate_Writers (Map, Optional_Types);
-      JSON_Schema.Writers.Inputs.Generate_Readers (Map, Optional_Types);
+
+      Write_Type_Package
+        (Map, Root_Package, Enum_Package, Header,
+         Optional_Types, Array_Types);
+
+      JSON_Schema.Writers.Outputs.Generate_Writers
+        (Map, Root_Package, Enum_Package, Header, Optional_Types);
+
+      JSON_Schema.Writers.Inputs.Generate_Readers
+        (Map, Root_Package, Enum_Package, Header, Optional_Types);
    end Write;
 
    --------------------------
@@ -274,7 +296,8 @@ package body JSON_Schema.Writers.Types is
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set;
-      Required       : Boolean)
+      Required       : Boolean;
+      Root_Package   : VSS.Strings.Virtual_String)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -289,6 +312,7 @@ package body JSON_Schema.Writers.Types is
               (Item.Schema.Ref,
                Map (Item.Schema.Ref),
                Map,
+               Root_Package,
                Optional_Types,
                Done);
          end if;
@@ -304,6 +328,7 @@ package body JSON_Schema.Writers.Types is
          Write_Record_Component
            (Enclosing_Type,
             Map,
+            Root_Package,
             Item,
             Property.Schema.Required.Contains (Item.Name));
       end loop;
@@ -363,6 +388,7 @@ package body JSON_Schema.Writers.Types is
      (Name           : VSS.Strings.Virtual_String;
       Schema         : Schema_Access;
       Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set)
    is
@@ -388,7 +414,8 @@ package body JSON_Schema.Writers.Types is
             Map,
             Optional_Types,
             Done,
-            Property.Schema.Required.Contains (Property.Name));
+            Property.Schema.Required.Contains (Property.Name),
+            Root_Package);
       end On_Anonymous_Schema;
 
       -----------------
@@ -399,7 +426,7 @@ package body JSON_Schema.Writers.Types is
         (Property : JSON_Schema.Property;
          Required : Boolean) is
       begin
-         Write_Record_Component (Name, Map, Property, Required);
+         Write_Record_Component (Name, Map, Root_Package, Property, Required);
       end On_Property;
 
    begin
@@ -410,6 +437,7 @@ package body JSON_Schema.Writers.Types is
               (Used.Ref,
                Map (Used.Ref),
                Map,
+               Root_Package,
                Optional_Types,
                Done);
          end if;
@@ -422,6 +450,7 @@ package body JSON_Schema.Writers.Types is
                  (Property.Schema.Ref,
                   Map (Property.Schema.Ref),
                   Map,
+                  Root_Package,
                   Optional_Types,
                   Done);
             end if;
@@ -480,6 +509,7 @@ package body JSON_Schema.Writers.Types is
      (Name           : VSS.Strings.Virtual_String;
       Schema         : Schema_Access;
       Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set)
    is
@@ -492,10 +522,12 @@ package body JSON_Schema.Writers.Types is
          Write_Enumeration_Type (Ref_To_Type_Name (Name), Schema);
       elsif not Schema.All_Of.Is_Empty then
          Done.Insert (Name);
-         Write_Derived_Type (Name, Schema, Map, Optional_Types, Done);
+         Write_Derived_Type
+          (Name, Schema, Map, Root_Package, Optional_Types, Done);
       elsif not Schema.Properties.Is_Empty then
          Done.Insert (Name);
-         Write_Record_Type (Name, Schema, Map, Optional_Types, Done);
+         Write_Record_Type
+           (Name, Schema, Map, Root_Package, Optional_Types, Done);
       elsif Schema.Kind.Last_Index = 1
         and then Schema.Kind.First_Element = Definitions.An_Object
       then
@@ -518,6 +550,7 @@ package body JSON_Schema.Writers.Types is
 
    procedure Write_Named_Types
      (Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set) is
    begin
@@ -528,7 +561,8 @@ package body JSON_Schema.Writers.Types is
             Schema : constant Schema_Access :=
               JSON_Schema.Readers.Schema_Maps.Element (Cursor);
          begin
-            Write_Named_Type (Name, Schema, Map, Optional_Types, Done);
+            Write_Named_Type
+              (Name, Schema, Map, Root_Package, Optional_Types, Done);
          end;
       end loop;
    end Write_Named_Types;
@@ -562,7 +596,9 @@ package body JSON_Schema.Writers.Types is
    -- Write_Private_Vectors --
    ---------------------------
 
-   procedure Write_Private_Vectors (Array_Types : Readers.Schema_Map) is
+   procedure Write_Private_Vectors
+    (Array_Types  : Readers.Schema_Map;
+     Enum_Package : VSS.Strings.Virtual_String) is
    begin
       for Cursor in Array_Types.Iterate loop
          declare
@@ -573,8 +609,11 @@ package body JSON_Schema.Writers.Types is
             Schema : constant Schema_Access :=
               Readers.Schema_Maps.Element (Cursor);
             Element_Type : constant VSS.Strings.Virtual_String :=
-              (if Schema /= null and then Is_Enum (Schema)
-               then "Enum." & Item else Item);
+              (if Schema /= null
+                 and then Is_Enum (Schema)
+                 and then not Enum_Package.Is_Empty
+               then Enum_Package & "." & Item
+               else Item);
          begin
             Put ("type ");
             Put (Item);
@@ -651,10 +690,11 @@ package body JSON_Schema.Writers.Types is
    ----------------------------
 
    procedure Write_Record_Component
-     (Name     : VSS.Strings.Virtual_String;
-      Map      : JSON_Schema.Readers.Schema_Map;
-      Property : JSON_Schema.Property;
-      Required : Boolean)
+     (Name         : VSS.Strings.Virtual_String;
+      Map          : JSON_Schema.Readers.Schema_Map;
+      Root_Package : VSS.Strings.Virtual_String;
+      Property     : JSON_Schema.Property;
+      Required     : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -673,7 +713,7 @@ package body JSON_Schema.Writers.Types is
             return;
          elsif Field_Name.To_Lowercase = Field_Type.To_Lowercase then
             Field_Type.Prepend (".");
-            Field_Type.Prepend (Package_Name);
+            Field_Type.Prepend (Root_Package);
          end if;
 
          Put (Field_Name);
@@ -694,6 +734,7 @@ package body JSON_Schema.Writers.Types is
      (Name           : VSS.Strings.Virtual_String;
       Schema         : Schema_Access;
       Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
       Optional_Types : String_Sets.Set;
       Done           : in out String_Sets.Set)
    is
@@ -711,6 +752,7 @@ package body JSON_Schema.Writers.Types is
               (Property.Schema.Ref,
                Map (Property.Schema.Ref),
                Map,
+               Root_Package,
                Optional_Types,
                Done);
          end if;
@@ -726,6 +768,7 @@ package body JSON_Schema.Writers.Types is
          Write_Record_Component
            (Name,
             Map,
+            Root_Package,
             Property,
             Schema.Required.Contains (Property.Name));
       end loop;
@@ -741,11 +784,19 @@ package body JSON_Schema.Writers.Types is
 
    procedure Write_Type_Package
      (Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
+      Enum_Package   : VSS.Strings.Virtual_String;
+      Header         : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
       Array_Types    : Readers.Schema_Map)
    is
       Done : String_Sets.Set;
    begin
+      for Item of Header loop
+         Put (Item);
+         New_Line;
+      end loop;
+
       Put ("with Ada.Containers.Doubly_Linked_Lists;");
       New_Line;
       Put ("with Ada.Finalization;");
@@ -759,7 +810,7 @@ package body JSON_Schema.Writers.Types is
       New_Line;
 
       Put ("package ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (" is");
       New_Line;
       Put
@@ -800,9 +851,13 @@ package body JSON_Schema.Writers.Types is
 
       --  Write all enumenration types. Use a nested package to avoid
       --  name colisions between enumeration literals and types.
-      Put ("package Enum is");
-      New_Line;
-      New_Line;
+      if not Enum_Package.Is_Empty then
+         Put ("package ");
+         Put (Enum_Package);
+         Put (" is");
+         New_Line;
+         New_Line;
+      end if;
 
       declare
          procedure On_Enumeration_Type
@@ -842,31 +897,36 @@ package body JSON_Schema.Writers.Types is
            (Map, Optional_Types, On_Enumeration_Type'Access);
       end;
 
-      Put ("end Enum;");
-      New_Line;
-      New_Line;
+      if not Enum_Package.Is_Empty then
+         Put ("end ");
+         Put (Enum_Package);
+         Put (";");
+         New_Line;
+         New_Line;
+      end if;
 
-      Write_Named_Types (Map, Optional_Types, Done);
+      Write_Named_Types (Map, Root_Package, Optional_Types, Done);
 
       Write_Vector_Operations (Array_Types, Specification);
       Put ("private");
       New_Line;
-      Write_Private_Vectors (Array_Types);
+      Write_Private_Vectors (Array_Types, Enum_Package);
       Put ("end ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (";");
       New_Line;
 
+      Print_Vector (Header);
       Put ("with Ada.Unchecked_Deallocation;");
       New_Line;
       New_Line;
       Put ("package body ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (" is");
       New_Line;
       Write_Vector_Operations (Array_Types, Implemenetation);
       Put ("end ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (";");
       New_Line;
       New_Line;

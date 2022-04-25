@@ -421,6 +421,19 @@ package body JSON_Schema.Writers is
       Ada.Wide_Wide_Text_IO.New_Line;
    end New_Line;
 
+   ------------------
+   -- Print_Vector --
+   ------------------
+
+   procedure Print_Vector
+     (Header : VSS.String_Vectors.Virtual_String_Vector) is
+   begin
+      for Item of Header loop
+         Put (Item);
+         New_Line;
+      end loop;
+   end Print_Vector;
+
    ---------
    -- Put --
    ---------

@@ -27,6 +27,9 @@ package JSON_Schema.Writers.Outputs is
 
    procedure Generate_Writers
      (Map            : JSON_Schema.Readers.Schema_Map;
+      Root_Package   : VSS.Strings.Virtual_String;
+      Enum_Package   : VSS.Strings.Virtual_String;
+      Header         : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set);
    --  Generate Write routines types for schemas in given Map
 

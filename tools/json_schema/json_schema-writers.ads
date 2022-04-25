@@ -99,6 +99,6 @@ package JSON_Schema.Writers is
       Type_Name : out VSS.Strings.Virtual_String;
       Prefix    : out VSS.Strings.Virtual_String);
 
-   Package_Name : constant VSS.Strings.Virtual_String := "DAP.Tools";
+   procedure Print_Vector (Header : VSS.String_Vectors.Virtual_String_Vector);
 
 end JSON_Schema.Writers;

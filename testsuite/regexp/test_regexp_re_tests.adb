@@ -21,11 +21,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
 with Ada.Characters.Wide_Wide_Latin_1;
 with Ada.Strings.Wide_Wide_Fixed;
 with Ada.Strings.Wide_Wide_Maps;
 with Ada.Wide_Wide_Text_IO;
 
+with VSS.Application;
 with VSS.Characters;
 with VSS.Regular_Expressions;
 with VSS.Strings;
@@ -314,13 +316,28 @@ procedure Test_RegExp_RE_Tests is
       end if;
    end Verify;
 
-   Total : Natural := 0;
+   Total  : Natural := 0;
+   Expect : Natural;  --  Expectation for final Total value
 
    Last_Pattern : VSS.Regular_Expressions.Regular_Expression;
    Last_Sample  : VSS.Strings.Virtual_String;
    Last_Match   : VSS.Regular_Expressions.Regular_Expression_Match;
 
 begin
+   if VSS.Application.Arguments.Is_Empty then
+      Expect := 0;
+   elsif VSS.Application.Arguments.Last_Element.Starts_With ("-") then
+      Ada.Wide_Wide_Text_IO.Put_Line ("Usage: test_regexp_re_tests [count]");
+      Ada.Wide_Wide_Text_IO.New_Line;
+      Ada.Wide_Wide_Text_IO.Put_Line
+        ("where 'count' a number of requred tests to pass.");
+      return;
+   else
+      Expect := Natural'Wide_Wide_Value
+        (VSS.Strings.Conversions.To_Wide_Wide_String
+          (VSS.Application.Arguments.Last_Element));
+   end if;
+
    while not Ada.Wide_Wide_Text_IO.End_Of_File loop
       declare
          Line : constant Wide_Wide_String := Ada.Wide_Wide_Text_IO.Get_Line;
@@ -391,4 +408,9 @@ begin
 
    Ada.Wide_Wide_Text_IO.Put ("PASSED:");
    Ada.Wide_Wide_Text_IO.Put_Line (Total'Wide_Wide_Image);
+
+   if Expect > Total then
+      Ada.Wide_Wide_Text_IO.Put ("Execution failed! Not enough PASSED tests!");
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+   end if;
 end Test_RegExp_RE_Tests;

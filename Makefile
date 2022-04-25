@@ -16,6 +16,8 @@ GPRINSTALL_FLAGS = --prefix=$(PREFIX) --exec-subdir=$(INSTALL_EXEC_DIR)\
  --lib-subdir=$(INSTALL_ALI_DIR) --project-subdir=$(INSTALL_PROJECT_DIR)\
  --link-lib-subdir=$(INSTALL_LIBRARY_DIR) --sources-subdir=$(INSTALL_INCLUDE_DIR)
 
+OK_RE_TESTS := 400 # Number of re_tests to be passed
+
 ifeq ($(OS),Windows_NT)
 	VSS_PS=;
 else
@@ -91,7 +93,7 @@ check_json:
 
 check_regexp: re_tests
 	.objs/tests/test_regexp
-	.objs/tests/test_regexp_re_tests < re_tests
+	.objs/tests/test_regexp_re_tests $(OK_RE_TESTS) < re_tests
 
 check_install:
 	echo 'with "vss_text.gpr";'             >  example.gpr

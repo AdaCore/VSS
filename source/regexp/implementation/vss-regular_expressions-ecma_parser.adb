@@ -263,12 +263,39 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end Character_Class;
 
       procedure Character_Class_Escape
-        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean) is
+        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean)
+      is
+         use type Name_Sets.General_Category_Set;
+
+         Negate : Boolean;
       begin
-         Expect ('p', Ok);
+         if not Ok then
+            return;
+         elsif not Cursor.Has_Element then
+            Ok := False;
+            Error := "Unexpected end of string";
+            return;
+         end if;
+
+         case Cursor.Element is
+            when 'p' =>
+               Negate := False;
+            when 'P' =>
+               Negate := True;
+            when others =>
+               Ok := False;
+               Error := "Only \P or \p supported";
+               return;
+         end case;
+
+         Expect (Cursor.Element, Ok);
          Expect ('{', Ok);
          Lone_Unicode_Property_Name_Or_Value (Value, Ok);
          Expect ('}', Ok);
+
+         if Ok and Negate then
+            Value := not Value;
+         end if;
       end Character_Class_Escape;
 
       procedure Class_Atom

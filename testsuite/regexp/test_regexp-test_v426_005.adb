@@ -33,6 +33,9 @@ procedure Test_V426_005 is
 
    R1 : constant VSS.Regular_Expressions.Regular_Expression :=
      VSS.Regular_Expressions.To_Regular_Expression ("a[^\p{digit}a-fx]b");
+   R2 : constant VSS.Regular_Expressions.Regular_Expression :=
+     VSS.Regular_Expressions.To_Regular_Expression
+       ("a[^\P{Lowercase_Letter}x]b");
    M : VSS.Regular_Expressions.Regular_Expression_Match;
 
    A1B : constant VSS.Strings.Virtual_String := "a1b";
@@ -48,5 +51,14 @@ begin
    Test_Support.Assert (not M.Has_Match);
    M := R1.Match (AGB);
    Test_Support.Assert (M.Has_Match and then M.Captured = "aGb");
+
+   M := R2.Match (A1B);
+   Test_Support.Assert (not M.Has_Match);
+   M := R2.Match (ACB);
+   Test_Support.Assert (M.Has_Match and then M.Captured = "acb");
+   M := R2.Match (AXB);
+   Test_Support.Assert (not M.Has_Match);
+   M := R2.Match (AGB);
+   Test_Support.Assert (not M.Has_Match);
 
 end Test_V426_005;

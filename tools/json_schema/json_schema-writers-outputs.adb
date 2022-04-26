@@ -23,20 +23,6 @@
 
 package body JSON_Schema.Writers.Outputs is
 
-   procedure Write_Enum_Specification
-     (Name     : VSS.Strings.Virtual_String;
-      Property : VSS.Strings.Virtual_String;
-      Schema   : Schema_Access;
-      Optional : Boolean);
-   --  Generate Output procedure specification for an enumeration schema
-
-   procedure Write_Enum_Body
-     (Name     : VSS.Strings.Virtual_String;
-      Property : VSS.Strings.Virtual_String;
-      Schema   : Schema_Access;
-      Optional : Boolean);
-   --  Generate Output procedure body for an enumeration schema
-
    procedure Write_Named_Type
      (Map    : JSON_Schema.Readers.Schema_Map;
       Name   : VSS.Strings.Virtual_String;
@@ -64,13 +50,114 @@ package body JSON_Schema.Writers.Outputs is
 
    procedure Generate_Writers
      (Map            : JSON_Schema.Readers.Schema_Map;
-      Optional_Types : String_Sets.Set) is
+      Root_Package   : VSS.Strings.Virtual_String;
+      Enum_Package   : VSS.Strings.Virtual_String;
+      Header         : VSS.String_Vectors.Virtual_String_Vector;
+      Optional_Types : String_Sets.Set)
+   is
+      use type VSS.Strings.Virtual_String;
+
+      procedure Write_Enum_Specification
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean);
+      --  Generate Output procedure specification for an enumeration schema
+
+      procedure Write_Enum_Body
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean);
+      --  Generate Output procedure body for an enumeration schema
+
+      Enum_Prefix : constant VSS.Strings.Virtual_String :=
+        (if Enum_Package.Is_Empty then VSS.Strings.Empty_Virtual_String
+         else Enum_Package & ".");
+
+      ---------------------
+      -- Write_Enum_Body --
+      ---------------------
+
+      procedure Write_Enum_Body
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean)
+      is
+         pragma Unreferenced (Optional);
+
+         Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
+      begin
+         if Schema.Enum.Length > 1 then
+            if not Property.Is_Empty then
+               Type_Name.Append ("_");
+               Type_Name.Append (Property);
+            end if;
+
+            Write_Output_Specification (Type_Name, "Enum.");
+            Put (" is");
+            New_Line;
+            Put ("begin");
+            New_Line;
+            Put ("case Value is");
+            New_Line;
+            for Index in 1 .. Schema.Enum.Length loop
+               Put ("when ");
+               Put (Enum_Prefix);
+               Put (Escape_Keywords (Schema.Enum.Element (Index)));
+               Put (" =>");
+               New_Line;
+               Put ("Handler.String_Value (""");
+               Put (Schema.Enum.Element (Index));
+               Put (""");");
+               New_Line;
+            end loop;
+            Put ("end case;");
+            New_Line;
+
+            Put ("end Output_");
+            Put (Type_Name);
+            Put (";");
+            New_Line;
+            New_Line;
+         end if;
+      end Write_Enum_Body;
+
+      -------------------------
+      -- On_Enumeration_Type --
+      -------------------------
+
+      procedure Write_Enum_Specification
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean)
+      is
+         pragma Unreferenced (Optional);
+
+         Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
+      begin
+         if Schema.Enum.Length > 1 then
+            if not Property.Is_Empty then
+               Type_Name.Append ("_");
+               Type_Name.Append (Property);
+            end if;
+
+            Write_Output_Specification (Type_Name, Enum_Prefix);
+            Put (";");
+            New_Line;
+            New_Line;
+         end if;
+      end Write_Enum_Specification;
+
    begin
+      Print_Vector (Header);
       Put ("with VSS.JSON.Content_Handlers;");
       New_Line;
       New_Line;
       Put ("package ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (".Outputs is");
       New_Line;
       New_Line;
@@ -87,13 +174,14 @@ package body JSON_Schema.Writers.Outputs is
       end loop;
 
       Put ("end ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (".Outputs;");
       New_Line;
 
+      Print_Vector (Header);
       Put ("with Interfaces;"); New_Line;
       Put ("package body ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (".Outputs is");
       New_Line;
       Put ("pragma Style_Checks (Off);");
@@ -144,7 +232,7 @@ package body JSON_Schema.Writers.Outputs is
       end loop;
 
       Put ("end ");
-      Put (Package_Name);
+      Put (Root_Package);
       Put (".Outputs;");
       New_Line;
    end Generate_Writers;
@@ -233,81 +321,6 @@ package body JSON_Schema.Writers.Outputs is
       New_Line;
       New_Line;
    end Write_Anonymous_Type;
-
-   ---------------------
-   -- Write_Enum_Body --
-   ---------------------
-
-   procedure Write_Enum_Body
-     (Name     : VSS.Strings.Virtual_String;
-      Property : VSS.Strings.Virtual_String;
-      Schema   : Schema_Access;
-      Optional : Boolean)
-   is
-      pragma Unreferenced (Optional);
-
-      Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
-   begin
-      if Schema.Enum.Length > 1 then
-         if not Property.Is_Empty then
-            Type_Name.Append ("_");
-            Type_Name.Append (Property);
-         end if;
-
-         Write_Output_Specification (Type_Name, "Enum.");
-         Put (" is");
-         New_Line;
-         Put ("begin");
-         New_Line;
-         Put ("case Value is");
-         New_Line;
-         for Index in 1 .. Schema.Enum.Length loop
-            Put ("when Enum.");
-            Put (Escape_Keywords (Schema.Enum.Element (Index)));
-            Put (" =>");
-            New_Line;
-            Put ("Handler.String_Value (""");
-            Put (Schema.Enum.Element (Index));
-            Put (""");");
-            New_Line;
-         end loop;
-         Put ("end case;");
-         New_Line;
-
-         Put ("end Output_");
-         Put (Type_Name);
-         Put (";");
-         New_Line;
-         New_Line;
-      end if;
-   end Write_Enum_Body;
-
-   -------------------------
-   -- On_Enumeration_Type --
-   -------------------------
-
-   procedure Write_Enum_Specification
-     (Name     : VSS.Strings.Virtual_String;
-      Property : VSS.Strings.Virtual_String;
-      Schema   : Schema_Access;
-      Optional : Boolean)
-   is
-      pragma Unreferenced (Optional);
-
-      Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
-   begin
-      if Schema.Enum.Length > 1 then
-         if not Property.Is_Empty then
-            Type_Name.Append ("_");
-            Type_Name.Append (Property);
-         end if;
-
-         Write_Output_Specification (Type_Name, "Enum.");
-         Put (";");
-         New_Line;
-         New_Line;
-      end if;
-   end Write_Enum_Specification;
 
    ----------------------
    -- Write_Named_Type --

@@ -50,8 +50,9 @@ private
      (No_Operation,  --  To able accept an empty string
       Split,         --  Create an alternative thread of execution
       Character,     --  Accept one Virtual_Character
-      Class,         --  Accept one Virtual_Character from a class
+      Class,         --  Accept one Virtual_Character from a range
       Category,      --  Accept one Virtual_Character from a general category
+      Negate_Class,  --  Accept one Virtual_Character if not in a class/range
       Match,         --  Mark accepted string prefix as a regexp match
       Save);         --  Save subgroup bound
    --  VM instruction kinds
@@ -69,6 +70,10 @@ private
             From, To : VSS.Characters.Virtual_Character;
          when Category =>
             Category : Name_Sets.General_Category_Set;
+         when Negate_Class =>
+            --  Program to define char class starts from the next
+            --  instruction after Negate_Class
+            null;
          when Save =>
             Tag : Tag_Number;
          when No_Operation | Match =>

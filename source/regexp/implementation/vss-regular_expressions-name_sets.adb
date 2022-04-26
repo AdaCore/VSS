@@ -40,6 +40,16 @@ package body VSS.Regular_Expressions.Name_Sets is
 
    Map : Category_Maps.Map;
 
+   -----------
+   -- "not" --
+   -----------
+
+   overriding function "not" (Left : General_Category_Set)
+     return General_Category_Set is
+   begin
+      return General_Category_Set (not Boolean_Array (Left));
+   end "not";
+
    ----------
    -- "or" --
    ----------

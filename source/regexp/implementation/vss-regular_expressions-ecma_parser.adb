@@ -236,11 +236,30 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end Atom_Escape;
 
       procedure Character_Class
-        (Value : out Node_Or_Class; Ok : in out Boolean) is
+        (Value : out Node_Or_Class; Ok : in out Boolean)
+      is
+         use type Name_Sets.General_Category_Set;
+
+         Negate : Boolean := False;
       begin
          Expect ('[', Ok);
+
+         if Ok and then Cursor.Has_Element and then Cursor.Element = '^' then
+            Expect ('^', Ok);
+            Negate := True;
+         end if;
+
          Class_Ranges (Value, Ok);
          Expect (']', Ok);
+
+         if Ok and Negate then
+            case Value.Has_Node is
+               when True =>
+                  Value := From_Node (Create_Negated_Class (To_Node (Value)));
+               when False =>
+                  Value.Category := not Value.Category;
+            end case;
+         end if;
       end Character_Class;
 
       procedure Character_Class_Escape

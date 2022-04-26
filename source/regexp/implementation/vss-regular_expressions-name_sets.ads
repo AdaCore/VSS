@@ -39,6 +39,8 @@ package VSS.Regular_Expressions.Name_Sets is
    function "or"
      (Left, Right : General_Category_Set) return General_Category_Set;
 
+   function "not" (Left : General_Category_Set) return General_Category_Set;
+
    function Empty return General_Category_Set;
    --  Return an empty set
 

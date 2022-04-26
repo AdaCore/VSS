@@ -82,6 +82,12 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  non-character instructions and appends new thread states to the
       --  Next global variable.
 
+      function Character_In_Class
+        (PC   : Instruction_Address;
+         Char : VSS.Characters.Virtual_Character) return Boolean;
+      --  Check if Char in the class defined by a program started from PC.
+      --  Program should contain only Split and character instructions.
+
       package State_Vectors is new Ada.Containers.Vectors
         (Positive, Thread_State);
 
@@ -119,7 +125,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Steps (PC) := Step;
 
          case Code.Kind is
-            when Character | Class | Category | Match =>
+            when Character | Class | Category | Negate_Class | Match =>
                Next.Append ((PC, New_Tags));
             when Split =>
                Append_State (Cursor, PC + Code.Next, New_Tags);
@@ -135,6 +141,33 @@ package body VSS.Regular_Expressions.Pike_Engines is
                Append_State (Cursor, PC + Code.Next, New_Tags);
          end case;
       end Append_State;
+
+      function Character_In_Class
+        (PC   : Instruction_Address;
+         Char : VSS.Characters.Virtual_Character) return Boolean
+      is
+         Code : constant Instruction := Self.Program (PC);
+      begin
+         case Code.Kind is
+            when Character =>
+               return Code.Character = Char;
+
+            when Class =>
+               return Char in Code.From .. Code.To;
+
+            when Category =>
+               return Name_Sets.Contains
+                 (Code.Category,
+                  VSS.Characters.Get_General_Category (Char));
+
+            when Split =>
+               return Character_In_Class (PC + Code.Next, Char)
+                 or else Character_In_Class (PC + Code.Fallback, Char);
+
+            when others =>
+               raise Program_Error with "Unexpected code in char class";
+         end case;
+      end Character_In_Class;
 
       -------------------
       -- Step_Backward --
@@ -211,6 +244,11 @@ package body VSS.Regular_Expressions.Pike_Engines is
                                (Code.Category,
                                 VSS.Characters.Get_General_Category (Char))
                            then
+                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                           end if;
+
+                        when Negate_Class =>
+                           if not Character_In_Class (X.PC + 1, Char) then
                               Append_State (Pos.all, X.PC + Code.Next, X.Tags);
                            end if;
 
@@ -355,6 +393,9 @@ package body VSS.Regular_Expressions.Pike_Engines is
         (Value : Name_Sets.General_Category_Set) return Node;
       --  Generate <category[next:unlinked]>
 
+      function Create_Negated_Class (Left : Node) return Node;
+      --  Generate <s:negate[next:unlinked]><left[next:s]>
+
       function Create_Sequence (Left, Right : Node) return Node;
       --  Generate <left[next:right]><right[next:unlinked]>
 
@@ -497,6 +538,26 @@ package body VSS.Regular_Expressions.Pike_Engines is
             Self.Last_Tag := Tag_Number'Max (Self.Last_Tag, Close.Tag);
          end return;
       end Create_Group;
+
+      --------------------------
+      -- Create_Negated_Class --
+      --------------------------
+
+      function Create_Negated_Class (Left : Node) return Node is
+         Code : constant Instruction :=
+           (Kind  => Negate_Class,
+            Next  => To_Be_Patched);
+      begin
+         return Result : Node :=
+           (Program     => Code & Left.Program,
+            Ends        => First_Instruction)
+         do
+            --  Patch left ends to connect them to the Negate_Class
+            for J of Left.Ends loop
+               Patch (Result.Program (J + 1), -J);
+            end loop;
+         end return;
+      end Create_Negated_Class;
 
       ---------------------
       -- Create_Sequence --

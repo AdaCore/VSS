@@ -357,11 +357,29 @@ package body JSON_Schema.Writers.Inputs is
       Type_Name : VSS.Strings.Virtual_String;
       Schema    : Schema_Access)
    is
+      procedure Find_Any_Property
+        (Property : JSON_Schema.Property;
+         Ignore   : Boolean);
+      --  Check if any property exist
+
       procedure Write_Quoted_Property_Name
         (Property : JSON_Schema.Property;
          Ignore   : Boolean);
 
       First : Boolean := True;
+
+      -----------------------
+      -- Find_Any_Property --
+      -----------------------
+
+      procedure Find_Any_Property
+        (Property : JSON_Schema.Property;
+         Ignore   : Boolean)
+      is
+         pragma Unreferenced (Property);
+      begin
+         First := False;
+      end Find_Any_Property;
 
       --------------------------------
       -- Write_Quoted_Property_Name --
@@ -383,6 +401,16 @@ package body JSON_Schema.Writers.Inputs is
       end Write_Quoted_Property_Name;
 
    begin
+      Writers.Each_Property (Map, Schema, Find_Any_Property'Access);
+
+      if First then
+         --  We didn't find any nested properties for some reason.
+         --  Skip Minimal_Perfect_Hash instantiation.
+         return;
+      else
+         First := True;
+      end if;
+
       Put ("package ");
       Put (Type_Name);
       Put ("_Minimal_Perfect_Hash is new Minimal_Perfect_Hash ([");
@@ -594,7 +622,7 @@ package body JSON_Schema.Writers.Inputs is
          if Type_Name = "Any_Object" then
             Write_Value (Field_Name, "Any_Value");
          elsif Type_Name = "Virtual_String" then
-            Put ("if Reader.Is_String_Value then "); New_Line;
+            Put ("if Reader.Is_String_Value then"); New_Line;
             Put (Field_Name);
             Put (" := Reader.String_Value;"); New_Line;
             Put ("Reader.Read_Next;"); New_Line;
@@ -613,7 +641,7 @@ package body JSON_Schema.Writers.Inputs is
             Put ("Success := False;"); New_Line;
             Put ("end if;"); New_Line;
          elsif Type_Name = "Float" then
-            Put ("if Reader.Is_Number_Value then "); New_Line;
+            Put ("if Reader.Is_Number_Value then"); New_Line;
             Put ("if Reader.Number_Value.Kind = VSS.JSON.JSON_Integer then");
             New_Line;
 
@@ -631,7 +659,7 @@ package body JSON_Schema.Writers.Inputs is
             Put ("Success := False;"); New_Line;
             Put ("end if;"); New_Line;
          elsif Type_Name = "Boolean" then
-            Put ("if Reader.Is_Boolean_Value then "); New_Line;
+            Put ("if Reader.Is_Boolean_Value then"); New_Line;
             Put (Field_Name);
             Put (" := Reader.Boolean_Value;"); New_Line;
             Put ("Reader.Read_Next;"); New_Line;

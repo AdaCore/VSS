@@ -342,7 +342,7 @@ package body VSS.JSON.Implementation.Packed_Decimals is
       Max_Fast_Decimal_Digits : constant := 19;
       --  Maximum number of significant digits of the mantissa to be read.
       --  Unsigned_64 is able to represent this number of digits. It is
-      --  enought to represent absolute value of Integer_64 too. Number of
+      --  enough to represent absolute value of Integer_64 too. Number of
       --  digits of IEEE_Float_64 is less than this number.
 
       U64_Limb_Decimal_Digits : constant := 16;

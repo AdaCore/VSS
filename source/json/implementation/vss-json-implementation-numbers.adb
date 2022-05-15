@@ -293,7 +293,7 @@ package body VSS.JSON.Implementation.Numbers is
          begin
             if not Inexact then
                --  If significant is exact number attempt to convert it by
-               --  fastest algoriphm.
+               --  fastest algorithm.
 
                Clinger.Convert (Mantissa, Exponent, Number_Aux, Success);
 

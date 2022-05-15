@@ -24,7 +24,7 @@
 with VSS.Characters;
 private with VSS.Strings.Cursors.Markers;
 pragma Unreferenced (VSS.Strings.Cursors.Markers);
---  XXX GNAT 20210308 reports error whithout with clause above.
+--  XXX GNAT 20210308 reports error without with clause above.
 
 package VSS.Strings.Cursors.Iterators.Characters is
 

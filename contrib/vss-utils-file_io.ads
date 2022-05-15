@@ -34,6 +34,6 @@ package VSS.Utils.File_IO is
      (Name     : String;
       Encoding : String) return VSS.Strings.Virtual_String;
    --  Load content of the file, decode it and return result. Raise
-   --  Constraint_Error when encoding is not supported or dats decoding fails.
+   --  Constraint_Error when encoding is not supported or data decoding fails.
 
 end VSS.Utils.File_IO;

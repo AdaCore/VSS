@@ -230,7 +230,7 @@ package body VSS.Implementation.UTF8_Encoding is
       use type VSS.Unicode.UTF8_Code_Unit;
 
    begin
-      --  Protection against unitialized values
+      --  Protection against uninitialized values
       --  ??? This block is here to prevent CodePeer from flagging these
       --  as uninitialized out parameters. We should profile this on a
       --  real use case and assess whether this has a performance impact.

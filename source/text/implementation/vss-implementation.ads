@@ -20,7 +20,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Root of hierarhy of the internal implementation units. All code in this
+--  Root of hierarchy of the internal implementation units. All code in this
 --  hierarchy is subject to change. Applications MUST NOT use this package and
 --  its children packages.
 

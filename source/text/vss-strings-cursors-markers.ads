@@ -29,7 +29,7 @@ package VSS.Strings.Cursors.Markers is
      new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
 
    overriding function Is_Valid (Self : Character_Marker) return Boolean;
-   --  GNAT 20210421: This function is invisible overwise.
+   --  GNAT 20210421: This function is invisible otherwise.
 
    type Segment_Marker is
      new VSS.Strings.Cursors.Abstract_Segment_Cursor with private;

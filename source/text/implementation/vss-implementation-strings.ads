@@ -95,7 +95,7 @@ package VSS.Implementation.Strings is
      (Self  : in out Cursor;
       Start : Cursor;
       Size  : Cursor_Offset) return Boolean;
-   --  Fixup position of the cursor on delete operaton at the given position
+   --  Fixup position of the cursor on delete operation at the given position
    --  and size. Return False and set position to invalid value when position
    --  of the cursor has been deleted.
 
@@ -165,7 +165,7 @@ package VSS.Implementation.Strings is
 
    procedure Unreference (Data : in out String_Data) with Inline;
    --  Unreference given string data. It is wrapper around Handler and call of
-   --  its Unrteference subprogram when handler is not null. Data is set to
+   --  its Unreference subprogram when handler is not null. Data is set to
    --  "null" value before exit for safety.
 
 end VSS.Implementation.Strings;

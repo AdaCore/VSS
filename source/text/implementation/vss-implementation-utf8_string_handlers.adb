@@ -592,7 +592,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    begin
       if Suffix_Handler.all in UTF8_String_Handler then
-         --  The Suffix isn't storred "in place", so the result can't be stored
+         --  The Suffix isn't stored "in place", so the result can't be stored
          --  "in place" neither. Let's convert it into a shared data and then
          --  process as "in heap" string.
 
@@ -1351,7 +1351,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                     (0 .. 8);
 
                begin
-                  --  First byte of encoded seqeunce for all characters of the
+                  --  First byte of encoded sequence for all characters of the
                   --  decomposition is always 16#E1#, thus don't compute it and
                   --  ignore corresponding bits in L_Part/V_Part/T_Part.
 
@@ -1601,7 +1601,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   if New_Starter_Code /= 0 then
                      --  Starter and current character is decomposition mapping
                      --  of the primary composite, remove current character and
-                     --  relace starter by the primary composite found.
+                     --  replace starter by the primary composite found.
 
                      Unchecked_Delete
                        (Result_Data,
@@ -1657,7 +1657,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   if New_Starter_Code /= 0 then
                      --  Starter and current character is decomposition mapping
                      --  of the primary composite, remove current character and
-                     --  relace starter by the primary composite found.
+                     --  replace starter by the primary composite found.
 
                      Unchecked_Delete
                        (Result_Data,
@@ -1763,7 +1763,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
             then
                --  Hangul Syllable Composition:
                --
-               --  LV_Syllable + Traling consonant => LVT_Syllable
+               --  LV_Syllable + Trailing consonant => LVT_Syllable
 
                declare
                   Starter_Buffer :
@@ -2228,7 +2228,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
                            if Source_Info.Has_Starter then
                               --  It is tested previously, and need to be
-                              --  analyzed: first charater in the full
+                              --  analyzed: first character in the full
                               --  decomposition should be starter by our
                               --  convention, but it may composite with the
                               --  previous starter. NF * C_QC may be used
@@ -2281,7 +2281,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                                  --  XXX Only single character is processed
                                  --  here, thus Append_Reordered do
                                  --  unnecessary action, because it can
-                                 --  process seqeunce of characters. So, it
+                                 --  process sequence of characters. So, it
                                  --  is possible to optimize code here by
                                  --  adding another subprogram to process
                                  --  single character only.
@@ -2414,7 +2414,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                            else
                               --  XXX Only single character is processed here,
                               --  thus Append_Reordered do unnecessary action,
-                              --  because it can process seqeunce of
+                              --  because it can process sequence of
                               --  characters. So, it is possible to optimize
                               --  code here by adding another subprogram to
                               --  process single character only.
@@ -2737,7 +2737,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                      loop
                         --  if Source_Info.Has_Starter then
                         --  It is tested previously, and need to be
-                        --  analyzed: first charater in the full decomposition
+                        --  analyzed: first character in the full decomposition
                         --  should be starter by our convention, but it may
                         --  composite with the previous starter. NF*C_QC may
                         --  be used here to do check, or Last_Index /= 0...
@@ -2790,7 +2790,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                            else
                               --  XXX Only single character is processed here,
                               --  thus Append_Reordered do unnecessary action,
-                              --  because it can process seqeunce of
+                              --  because it can process sequence of
                               --  characters. So, it is possible to optimize
                               --  code here by adding another subprogram to
                               --  process single character only.
@@ -3080,7 +3080,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       begin
          if Item'Length >= Destination.Storage'Length then
-            --  There is not enoght space to store data
+            --  There is not enough space to store data
 
             Success := False;
 

@@ -337,9 +337,9 @@ package body Gen_UCD.Casing is
       --  generated code.
       --
       --  This record contains additional information that may be derived or
-      --  by copy of core properties when is in interest of casing algoriphms.
+      --  by copy of core properties when is in interest of casing algorithms.
       --  This not increase total amount of the data for UCD, but allows to
-      --  have all necessary data in one place, primary to mininize CPU cache
+      --  have all necessary data in one place, primary to minimize CPU cache
       --  usage.
 
       type Contextual_Mapping_Record is record
@@ -371,9 +371,9 @@ package body Gen_UCD.Casing is
       --  generated code.
       --
       --  This record contains additional information that may be derived or
-      --  by copy of core properties when is in interest of casing algoriphms.
+      --  by copy of core properties when is in interest of casing algorithms.
       --  This not increase total amount of the data for UCD, but allows to
-      --  have all necessary data in one place, primary to mininize CPU cache
+      --  have all necessary data in one place, primary to minimize CPU cache
       --  usage.
 
       type Mapping_Record (Is_Simplified : Boolean := False) is record

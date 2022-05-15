@@ -37,7 +37,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       procedure Expect
         (Value : VSS.Characters.Virtual_Character;
          Ok    : in out Boolean);
-      --  if Cursor points to Value, then forwart Cursor and set Ok to True,
+      --  if Cursor points to Value, then forward Cursor and set Ok to True,
       --  otherwise set Ok to False.
 
       type Node_Or_Class (Has_Node : Boolean := False) is record
@@ -52,7 +52,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end record;
       --  This type represent Node or/and Category_Set. It separates special
       --  character class nodes into a dedicated field to optimize regexp like
-      --  `[\p{L}\p{Nl}_]`. For this expample first two character classes
+      --  `[\p{L}\p{Nl}_]`. For this example first two character classes
       --  populates Category filed and '_' populates Node field. Any of field
       --  could be empty.
 

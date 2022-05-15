@@ -136,7 +136,7 @@ package body JSON_Schema.Writers.Types is
       Header         : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
       Array_Types    : Readers.Schema_Map);
-   --  Write package specificatio with type declarations
+   --  Write package specification with type declarations
 
    function Is_Enum (Schema : Schema_Access) return Boolean is
      (not Schema.Enum.Is_Empty);
@@ -849,8 +849,8 @@ package body JSON_Schema.Writers.Types is
       Write_Public_Vectors (Array_Types);
       New_Line;
 
-      --  Write all enumenration types. Use a nested package to avoid
-      --  name colisions between enumeration literals and types.
+      --  Write all enumeration types. Use a nested package to avoid
+      --  name collisions between enumeration literals and types.
       if not Enum_Package.Is_Empty then
          Put ("package ");
          Put (Enum_Package);

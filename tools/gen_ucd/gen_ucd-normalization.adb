@@ -256,7 +256,7 @@ package body Gen_UCD.Normalization is
             Database.Set_NFKD_QC (Code, NFKD_QC_Value);
             Database.Set_NFKC_QC (Code, NFKC_QC_Value);
 
-            --  Process informatiomn for canonical composition
+            --  Process information for canonical composition
 
             if DT_Value = DT_Canonical and then Comp_Ex_Value = Comp_Ex_N then
                if DM_Value.String.Length /= 2 then
@@ -385,7 +385,7 @@ package body Gen_UCD.Normalization is
                   --  Implementation of the canonical composition algorithm
                   --  use some assumptions for optimization:
                   --
-                  --   - if full decompositon mapping contains starters
+                  --   - if full decomposition mapping contains starters
                   --     then the first character of the full decomposition
                   --     mapping is starter (more starters may be present
                   --     inside the full decomposition mapping)
@@ -463,7 +463,7 @@ package body Gen_UCD.Normalization is
                else UCD.Code_Point_Vectors.Empty_Vector);
 
          begin
-            --  Process informatiomn for canonical composition
+            --  Process information for canonical composition
 
             if DT_Value = DT_None then
                --  No decomposition
@@ -534,8 +534,8 @@ package body Gen_UCD.Normalization is
       --
       --  This record contains additional information that may be derived or
       --  be copy of core properties when is in interest of normalization
-      --  algoriphms. This not increase total amount of the data for UCD, but
-      --  allows to have all necessary data in one place, primary to mininize
+      --  algorithms. This not increase total amount of the data for UCD, but
+      --  allows to have all necessary data in one place, primary to minimize
       --  CPU cache usage.
 
       type Mapping_Array is array (UCD.Code_Point) of Mapping_Record;

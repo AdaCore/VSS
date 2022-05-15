@@ -262,7 +262,8 @@ package VSS.Implementation.String_Handlers is
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append suffix string to the data.
-   --  The default implementatio append string in a character by character way.
+   --  The default implementation append string in a character by character
+   --  way.
    --
    --  Implementation must increment value of the Offset.
 

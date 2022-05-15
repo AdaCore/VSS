@@ -256,7 +256,7 @@ package body Gen_UCD.Normalization is
             Database.Set_NFKD_QC (Code, NFKD_QC_Value);
             Database.Set_NFKC_QC (Code, NFKC_QC_Value);
 
-            --  Process informatiomn for canonical composition
+            --  Process information for canonical composition
 
             if DT_Value = DT_Canonical and then Comp_Ex_Value = Comp_Ex_N then
                if DM_Value.String.Length /= 2 then
@@ -463,7 +463,7 @@ package body Gen_UCD.Normalization is
                else UCD.Code_Point_Vectors.Empty_Vector);
 
          begin
-            --  Process informatiomn for canonical composition
+            --  Process information for canonical composition
 
             if DT_Value = DT_None then
                --  No decomposition

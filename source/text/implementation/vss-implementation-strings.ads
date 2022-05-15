@@ -165,7 +165,7 @@ package VSS.Implementation.Strings is
 
    procedure Unreference (Data : in out String_Data) with Inline;
    --  Unreference given string data. It is wrapper around Handler and call of
-   --  its Unrteference subprogram when handler is not null. Data is set to
+   --  its Unreference subprogram when handler is not null. Data is set to
    --  "null" value before exit for safety.
 
 end VSS.Implementation.Strings;

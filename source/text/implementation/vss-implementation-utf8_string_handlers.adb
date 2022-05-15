@@ -1601,7 +1601,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   if New_Starter_Code /= 0 then
                      --  Starter and current character is decomposition mapping
                      --  of the primary composite, remove current character and
-                     --  relace starter by the primary composite found.
+                     --  replace starter by the primary composite found.
 
                      Unchecked_Delete
                        (Result_Data,
@@ -1657,7 +1657,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   if New_Starter_Code /= 0 then
                      --  Starter and current character is decomposition mapping
                      --  of the primary composite, remove current character and
-                     --  relace starter by the primary composite found.
+                     --  replace starter by the primary composite found.
 
                      Unchecked_Delete
                        (Result_Data,

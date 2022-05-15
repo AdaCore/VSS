@@ -1351,7 +1351,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                     (0 .. 8);
 
                begin
-                  --  First byte of encoded seqeunce for all characters of the
+                  --  First byte of encoded sequence for all characters of the
                   --  decomposition is always 16#E1#, thus don't compute it and
                   --  ignore corresponding bits in L_Part/V_Part/T_Part.
 
@@ -2281,7 +2281,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                                  --  XXX Only single character is processed
                                  --  here, thus Append_Reordered do
                                  --  unnecessary action, because it can
-                                 --  process seqeunce of characters. So, it
+                                 --  process sequence of characters. So, it
                                  --  is possible to optimize code here by
                                  --  adding another subprogram to process
                                  --  single character only.
@@ -2414,7 +2414,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                            else
                               --  XXX Only single character is processed here,
                               --  thus Append_Reordered do unnecessary action,
-                              --  because it can process seqeunce of
+                              --  because it can process sequence of
                               --  characters. So, it is possible to optimize
                               --  code here by adding another subprogram to
                               --  process single character only.
@@ -2790,7 +2790,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                            else
                               --  XXX Only single character is processed here,
                               --  thus Append_Reordered do unnecessary action,
-                              --  because it can process seqeunce of
+                              --  because it can process sequence of
                               --  characters. So, it is possible to optimize
                               --  code here by adding another subprogram to
                               --  process single character only.

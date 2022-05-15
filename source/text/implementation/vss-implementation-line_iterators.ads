@@ -41,7 +41,7 @@ package VSS.Implementation.Line_Iterators is
    --  are set to location of the first and last characters of the found
    --  line. Terminator_Position is location of the starting character of
    --  the line terminator sequence, or invalid cursor when there is no line
-   --  terminator seqeunce found (it is case of last line and moving outside
+   --  terminator sequence found (it is case of last line and moving outside
    --  of data).
 
    function Backward

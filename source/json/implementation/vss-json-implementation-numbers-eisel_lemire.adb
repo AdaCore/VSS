@@ -56,7 +56,7 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       B : Interfaces.Unsigned_64;
       L : out Interfaces.Unsigned_64;
       H : out Interfaces.Unsigned_64);
-   --  Multiplication of two 64-bit usnigned integers into 128-bit values,
+   --  Multiplication of two 64-bit unsigned integers into 128-bit values,
    --  splitted into high and low 64-bit unsigned integers. On x86_64 it is
    --  optimized into single instruction.
 

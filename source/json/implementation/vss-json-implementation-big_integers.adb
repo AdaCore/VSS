@@ -43,7 +43,7 @@ package body VSS.JSON.Implementation.Big_Integers is
       Right    : Interfaces.Unsigned_64;
       Result   : out Interfaces.Unsigned_64;
       Overflow : in out Interfaces.Unsigned_64);
-   --  Multiplication of two 64-bit usnigned integers into 128-bit values,
+   --  Multiplication of two 64-bit unsigned integers into 128-bit values,
    --  add of carry. Result is splitted into high and low 64-bit unsigned
    --  integers. On x86_64 it is optimized into few instructions.
 

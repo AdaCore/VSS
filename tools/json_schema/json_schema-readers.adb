@@ -32,7 +32,7 @@ package body JSON_Schema.Readers is
       Value  : out Schema_Access;
       Other  : out Schema_Map;
       Prefix : VSS.Strings.Virtual_String);
-   --  Parsea single object from JSON as a schema into the Value and include
+   --  Parse single object from JSON as a schema into the Value and include
    --  all sub-schemas into Other map. Use Prefix for subschema names.
 
    ----------

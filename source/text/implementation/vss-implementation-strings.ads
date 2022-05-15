@@ -95,7 +95,7 @@ package VSS.Implementation.Strings is
      (Self  : in out Cursor;
       Start : Cursor;
       Size  : Cursor_Offset) return Boolean;
-   --  Fixup position of the cursor on delete operaton at the given position
+   --  Fixup position of the cursor on delete operation at the given position
    --  and size. Return False and set position to invalid value when position
    --  of the cursor has been deleted.
 

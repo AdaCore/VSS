@@ -57,7 +57,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       type Tag_Array is array (1 .. Self.Last_Tag) of
         VSS.Implementation.Strings.Cursor;
       --  First two items represent whole match boundaries, while others
-      --  represent groups voubdaries.
+      --  represent groups boundaries.
       --  Odd items represent left boundaries, even items - right.
       --  Even items point to next character after the bound.
 

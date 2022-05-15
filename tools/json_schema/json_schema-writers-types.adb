@@ -136,7 +136,7 @@ package body JSON_Schema.Writers.Types is
       Header         : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
       Array_Types    : Readers.Schema_Map);
-   --  Write package specificatio with type declarations
+   --  Write package specification with type declarations
 
    function Is_Enum (Schema : Schema_Access) return Boolean is
      (not Schema.Enum.Is_Empty);

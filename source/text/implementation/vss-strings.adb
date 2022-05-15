@@ -1119,7 +1119,7 @@ package body VSS.Strings is
 
          if not Success then
             --  Operation may fail for two reasons: source data is not
-            --  well-formed UTF-8 or there is not enoght memory to store
+            --  well-formed UTF-8 or there is not enough memory to store
             --  string in in-place storage.
 
             VSS.Implementation.String_Configuration.Default_Handler

@@ -3080,7 +3080,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       begin
          if Item'Length >= Destination.Storage'Length then
-            --  There is not enoght space to store data
+            --  There is not enough space to store data
 
             Success := False;
 

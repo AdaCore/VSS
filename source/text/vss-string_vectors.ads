@@ -155,7 +155,7 @@ package VSS.String_Vectors is
 
    function Iterate
      (Self : Virtual_String_Vector'Class) return Reversible_Iterator;
-   --  Return an interator over each element in the vector
+   --  Return an iterator over each element in the vector
 
    --  Syntax sugar for Ada 2022 aggregates
 

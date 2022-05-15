@@ -534,7 +534,7 @@ package body Gen_UCD.Normalization is
       --
       --  This record contains additional information that may be derived or
       --  be copy of core properties when is in interest of normalization
-      --  algoriphms. This not increase total amount of the data for UCD, but
+      --  algorithms. This not increase total amount of the data for UCD, but
       --  allows to have all necessary data in one place, primary to minimize
       --  CPU cache usage.
 

@@ -87,7 +87,7 @@ private
       Keep_Terminator     : Boolean;
 
       Terminator_Position : VSS.Implementation.Strings.Cursor;
-      --  Poistion of the line terminator sequence. It is position of the
+      --  Position of the line terminator sequence. It is position of the
       --  first character of the terminator when Keep_Terminator is True,
       --  otherwise it is position of the last character of the terminator.
    end record;

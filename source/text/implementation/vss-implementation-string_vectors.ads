@@ -77,7 +77,7 @@ package VSS.Implementation.String_Vectors is
       Result         : in out VSS.Implementation.Strings.String_Data;
       Terminator     : VSS.Strings.Line_Terminator;
       Terminate_Last : Boolean);
-   --  Join string vertor's strings using given Terminator.
+   --  Join string vector's strings using given Terminator.
 
    function Contains
      (Self : String_Vector_Data_Access;

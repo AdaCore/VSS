@@ -1333,7 +1333,7 @@ package body VSS.JSON.Implementation.Parsers is
                         return False;
 
                      else
-                        --  Parse_Array always reeturns False for the first
+                        --  Parse_Array always returns False for the first
                         --  call: it reports Start_Array event.
 
                         raise Program_Error;
@@ -1344,7 +1344,7 @@ package body VSS.JSON.Implementation.Parsers is
                         return False;
 
                      else
-                        --  Parse_Object always reeturns False for the first
+                        --  Parse_Object always returns False for the first
                         --  call: it reports Start_Array event.
 
                         raise Program_Error;

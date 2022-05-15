@@ -86,7 +86,7 @@ package VSS.JSON.Content_Handlers is
    --  by the reader to get diagnosis and provide it for higher level
    --  component.
 
-   --  Convinience subprograms to report integer and float value using Ada
+   --  Convenience subprograms to report integer and float value using Ada
    --  types
 
    procedure Integer_Value

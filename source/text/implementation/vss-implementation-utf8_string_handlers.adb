@@ -592,7 +592,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    begin
       if Suffix_Handler.all in UTF8_String_Handler then
-         --  The Suffix isn't storred "in place", so the result can't be stored
+         --  The Suffix isn't stored "in place", so the result can't be stored
          --  "in place" neither. Let's convert it into a shared data and then
          --  process as "in heap" string.
 

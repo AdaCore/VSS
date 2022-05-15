@@ -20,7 +20,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Abstract_String_Hanlder is abstract set of operations on string data.
+--  Abstract_String_Handler is abstract set of operations on string data.
 --  It provides default generic implementation of some operations which
 --  derived handlers may override to provide better implementation.
 --

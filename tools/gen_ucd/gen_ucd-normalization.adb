@@ -385,7 +385,7 @@ package body Gen_UCD.Normalization is
                   --  Implementation of the canonical composition algorithm
                   --  use some assumptions for optimization:
                   --
-                  --   - if full decompositon mapping contains starters
+                  --   - if full decomposition mapping contains starters
                   --     then the first character of the full decomposition
                   --     mapping is starter (more starters may be present
                   --     inside the full decomposition mapping)

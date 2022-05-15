@@ -27,7 +27,7 @@ package VSS.Strings.Converters is
 
    type Converter_Flag is
      (Stateless,
-      --  Coverter doesn't save state between two conversions, and report an
+      --  Converter doesn't save state between two conversions, and report an
       --  error when provided data is incomplete.
 
       Stop_On_Error,

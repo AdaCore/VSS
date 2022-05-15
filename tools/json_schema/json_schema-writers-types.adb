@@ -850,7 +850,7 @@ package body JSON_Schema.Writers.Types is
       New_Line;
 
       --  Write all enumeration types. Use a nested package to avoid
-      --  name colisions between enumeration literals and types.
+      --  name collisions between enumeration literals and types.
       if not Enum_Package.Is_Empty then
          Put ("package ");
          Put (Enum_Package);

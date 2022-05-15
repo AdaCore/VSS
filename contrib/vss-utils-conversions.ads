@@ -32,6 +32,6 @@ package VSS.Utils.Conversions is
       Encoding : String) return VSS.Strings.Virtual_String;
    --  Decode string with given encoding into Virtual_String. Raise
    --  Constraint_Error when encoding is not supported or some error occurred
-   --  duting data decoding.
+   --  during data decoding.
 
 end VSS.Utils.Conversions;

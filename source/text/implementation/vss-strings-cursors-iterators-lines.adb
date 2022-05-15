@@ -192,7 +192,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
    begin
       if Current_Position.Index /= 1 then
-         --  Going backward till previos line terminator has been found.
+         --  Going backward till previous line terminator has been found.
 
          Dummy :=
            Handler.Forward

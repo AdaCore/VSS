@@ -2228,7 +2228,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
                            if Source_Info.Has_Starter then
                               --  It is tested previously, and need to be
-                              --  analyzed: first charater in the full
+                              --  analyzed: first character in the full
                               --  decomposition should be starter by our
                               --  convention, but it may composite with the
                               --  previous starter. NF * C_QC may be used
@@ -2737,7 +2737,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                      loop
                         --  if Source_Info.Has_Starter then
                         --  It is tested previously, and need to be
-                        --  analyzed: first charater in the full decomposition
+                        --  analyzed: first character in the full decomposition
                         --  should be starter by our convention, but it may
                         --  composite with the previous starter. NF*C_QC may
                         --  be used here to do check, or Last_Index /= 0...

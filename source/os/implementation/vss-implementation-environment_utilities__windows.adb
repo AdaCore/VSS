@@ -54,7 +54,7 @@ package body VSS.Implementation.Environment_Utilities is
          Result.Clear;
 
       else
-         --  Request minimun size of the buffer to store result.
+         --  Request minimum size of the buffer to store result.
          Size :=
            VSS.Implementation.Windows.Kernel32.GetEnvironmentVariable
              (C_Name (C_Name'First)'Unchecked_Access, null, 0);

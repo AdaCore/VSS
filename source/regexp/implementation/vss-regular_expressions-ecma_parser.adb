@@ -37,7 +37,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       procedure Expect
         (Value : VSS.Characters.Virtual_Character;
          Ok    : in out Boolean);
-      --  if Cursor points to Value, then forwart Cursor and set Ok to True,
+      --  if Cursor points to Value, then forward Cursor and set Ok to True,
       --  otherwise set Ok to False.
 
       type Node_Or_Class (Has_Node : Boolean := False) is record

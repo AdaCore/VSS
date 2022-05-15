@@ -163,7 +163,7 @@ package body JSON_Schema.Writers is
       procedure Prepend
         (List     : in out Property_Lists.List;
          Property : JSON_Schema.Property);
-      --  If property in the list, then move it at the beggining, otherwise
+      --  If property in the list, then move it at the beginning, otherwise
       --  prepend it to the list.
 
       -------------
@@ -192,7 +192,7 @@ package body JSON_Schema.Writers is
       List : Property_Lists.List;
       --  A list of collected properties. Items in the list are ordered.
       --  If we found a property in a parent schema then we move the property
-      --  to the beggining of the list instead of creating a new one.
+      --  to the beginning of the list instead of creating a new one.
 
       Required : String_Sets.Set;
       --  Set of required properties

@@ -1763,7 +1763,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
             then
                --  Hangul Syllable Composition:
                --
-               --  LV_Syllable + Traling consonant => LVT_Syllable
+               --  LV_Syllable + Trailing consonant => LVT_Syllable
 
                declare
                   Starter_Buffer :

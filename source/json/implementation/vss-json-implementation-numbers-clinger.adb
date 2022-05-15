@@ -67,7 +67,7 @@ package body VSS.JSON.Implementation.Numbers.Clinger is
             end if;
 
             --  There is the case when significand has enough unused
-            --  bits and exponent is in 22 + 16, then valur can be
+            --  bits and exponent is in 22 + 16, then value can be
             --  constructed by two multiplications.
             --
             --  XXX Not implemented;

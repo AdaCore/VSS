@@ -386,7 +386,7 @@ package VSS.Strings is
       Keep_Empty_Segments : Boolean                      := True;
       Case_Sensitivity    : VSS.Strings.Case_Sensitivity := Case_Sensitive)
       return VSS.String_Vectors.Virtual_String_Vector;
-   --  Split the string into substrings where separator orrurs and return list
+   --  Split the string into substrings where separator occurs and return list
    --  of those strings.
 
    function Split_Lines

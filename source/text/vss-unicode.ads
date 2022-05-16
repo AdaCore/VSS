@@ -26,7 +26,7 @@
 --
 --  Opposite to general Ada convention to use '1'-based indexing of the
 --  characters in the strings, here '0'-based indexing is used as more
---  appropriate for low level applications and interoparability.
+--  appropriate for low level applications and interoperability.
 
 with Interfaces;
 

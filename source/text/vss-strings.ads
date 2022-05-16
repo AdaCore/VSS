@@ -99,12 +99,12 @@ package VSS.Strings is
    function Before_First_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return iterator pointing before the first character of the stirng.
+   --  Return iterator pointing before the first character of the string.
 
    function At_First_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return iterator pointing to the first character of the stirng.
+   --  Return iterator pointing to the first character of the string.
 
    function At_Character
      (Self     : Virtual_String'Class;
@@ -116,12 +116,12 @@ package VSS.Strings is
    function At_Last_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return iterator pointing to the last character of the stirng.
+   --  Return iterator pointing to the last character of the string.
 
    function After_Last_Character
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
-   --  Return iterator pointing after the last character of the stirng.
+   --  Return iterator pointing after the last character of the string.
 
    function At_First_Grapheme_Cluster
      (Self : Virtual_String'Class)
@@ -346,7 +346,7 @@ package VSS.Strings is
       Segment : VSS.Strings.Cursors.Abstract_Cursor'Class)
       return Virtual_String;
    --  Returns slice of the string. Return "null" string when one of cursors
-   --  doesn't belog to given string or invalid cursors.
+   --  doesn't belong to given string or invalid cursors.
 
    function Starts_With
      (Self             : Virtual_String'Class;

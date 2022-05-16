@@ -39,7 +39,7 @@ package VSS.Stream_Element_Vectors is
    procedure Set_Capacity
      (Self     : in out Stream_Element_Vector'Class;
       Capacity : Ada.Streams.Stream_Element_Count);
-   --  Request to preallocate memory to store given number of stream elements.
+   --  Request to pre-allocate memory to store given number of stream elements.
 
    function Length
      (Self : Stream_Element_Vector'Class)

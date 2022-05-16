@@ -104,32 +104,32 @@ package body Tests_Text_Streams is
          when VSS.Implementation.UTF8_Encoding.Invalid_2_Of_2 =>
             Report_Error
               ("invalid UTF-8 sequence (wrong second code unit of"
-               & " two code units sequene)");
+               & " two code units sequence)");
 
          when VSS.Implementation.UTF8_Encoding.Invalid_2_Of_3 =>
             Report_Error
               ("invalid UTF-8 sequence (wrong second code unit of"
-               & " three code units sequene)");
+               & " three code units sequence)");
 
          when VSS.Implementation.UTF8_Encoding.Invalid_3_Of_3 =>
             Report_Error
               ("invalid UTF-8 sequence (wrong third code unit of"
-               & " three code units sequene)");
+               & " three code units sequence)");
 
          when VSS.Implementation.UTF8_Encoding.Invalid_2_Of_4 =>
             Report_Error
               ("invalid UTF-8 sequence (wrong second code unit of"
-               & " four code units sequene)");
+               & " four code units sequence)");
 
          when VSS.Implementation.UTF8_Encoding.Invalid_3_Of_4 =>
             Report_Error
               ("invalid UTF-8 sequence (wrong third code unit of"
-               & " four code units sequene)");
+               & " four code units sequence)");
 
          when VSS.Implementation.UTF8_Encoding.Invalid_4_Of_4 =>
             Report_Error
               ("invalid UTF-8 sequence (wrong forth code unit of"
-               & " four code units sequene)");
+               & " four code units sequence)");
       end case;
    end Get;
 

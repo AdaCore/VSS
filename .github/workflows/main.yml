@@ -27,7 +27,6 @@ jobs:
       - name: Get UCD.zip
         run: |
           curl -C - -o UCD-14.0.0.zip https://www.unicode.org/Public/14.0.0/ucd/UCD.zip
-          mkdir vss/data
           mkdir vss/data/ucd
           unzip UCD-14.0.0.zip -d vss/data/ucd
       - name: Get parse-number-fxx-test-data repository

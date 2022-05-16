@@ -117,7 +117,7 @@ package VSS.Regular_Expressions is
    function Captured
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0) return VSS.Strings.Virtual_String;
-   --  Return substring caprured by the Index capturing group. If capture group
+   --  Return substring captured by the Index capturing group. If capture group
    --  did not captured substring or there is no such captured group, returned
    --  string is null. Capture group 0 means substring matched by the entire
    --  pattern.

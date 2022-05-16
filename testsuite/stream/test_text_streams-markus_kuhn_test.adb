@@ -157,12 +157,12 @@ procedure Markus_Kuhn_Test is
    Error_Invalid_2_3 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String
        ("invalid UTF-8 sequence (wrong second code unit of"
-        & " three code units sequene)");
+        & " three code units sequence)");
 
    Error_Invalid_2_4 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String
        ("invalid UTF-8 sequence (wrong second code unit of"
-        & " four code units sequene)");
+        & " four code units sequence)");
 
    Case_3_1_1 : constant Malformed_Testcase :=
      (VSS.Stream_Element_Vectors.Conversions.To_Stream_Element_Vector

@@ -133,3 +133,17 @@ misc: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat examples/regexp/grep.gpr
 	gprbuild $(GPRBUILD_FLAGS) examples/blogs/json_1/blog_1.gpr
+
+spellcheck:
+	@STATUS=0; \
+	for J in source/*/*.ads; do \
+	  sed -e 's/#[^#]*#//g' -e "s/'\([A-Z]\)/ \1/g" $$J |   \
+	  aspell list --lang=en --home-dir=./data/ --ignore-case > /tmp/spell.txt; \
+	  if [ -s /tmp/spell.txt ] ; then \
+	    echo "\n$$J:"; sort -u -f /tmp/spell.txt; STATUS=1; \
+	  fi  \
+	done; \
+	if [ $$STATUS != 0 ] ; then \
+	   echo "\n\nFIX SPELLING or append exceptions to data/.aspell.en.pws !!!" ; \
+	   exit 1 ; \
+	fi

@@ -24,6 +24,8 @@ else
 	VSS_PS=:
 endif
 
+.PHONY: docs
+
 all:
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
@@ -117,7 +119,7 @@ re_tests:
 coverage:
 	gcov --verbose .objs/*
 
-docs: all
+docs:
 	make -C docs
 
 clean:

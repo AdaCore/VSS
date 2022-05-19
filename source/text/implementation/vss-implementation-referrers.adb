@@ -205,6 +205,16 @@ package body VSS.Implementation.Referrers is
    ---------------
 
    function Get_Owner
+     (Self : Referal_Base'Class) return Virtual_String_Access is
+   begin
+      return VSS.Strings.Internals.To_Virtual_String_Access (Self.Owner);
+   end Get_Owner;
+
+   ---------------
+   -- Get_Owner --
+   ---------------
+
+   function Get_Owner
      (Self : Referal_Limited_Base'Class) return Virtual_String_Access is
    begin
       return VSS.Strings.Internals.To_Virtual_String_Access (Self.Owner);

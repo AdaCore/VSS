@@ -77,6 +77,11 @@ package VSS.Implementation.Referrers is
    overriding procedure Finalize (Self : in out Referal_Base);
    --  Invalidate referal state and disconnect from the string object.
 
+   function Get_Owner
+     (Self : Referal_Base'Class) return Virtual_String_Access
+        with Inline;
+   --  Return owner as access to Virtual_String object.
+
    --------------------------
    -- Referal_Limited_Base --
    --------------------------

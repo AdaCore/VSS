@@ -38,7 +38,8 @@ package body JSON_Schema.Readers is
 
    Version_URL : constant array (Schema_Version) of URI :=
      (Draft_4 => "http://json-schema.org/draft-04/schema#",
-      Draft_6 => "http://json-schema.org/draft-06/schema#");
+      Draft_6 => "http://json-schema.org/draft-06/schema#",
+      Draft_7 => "http://json-schema.org/draft-07/schema#");
 
    function Id_Key (Value : Schema_Version) return VSS.Strings.Virtual_String;
    --  Return `$id` or `id` depending on schema version
@@ -118,6 +119,10 @@ package body JSON_Schema.Readers is
                   exit;
                end if;
             end loop;
+         elsif Key = "$comment" then
+            pragma Assert (Reader.Is_String_Value);
+            Value.Comment := Reader.String_Value;
+            Reader.Read_Next;
          elsif Key = "title" then
             pragma Assert (Reader.Is_String_Value);
             Value.Title := Reader.String_Value;
@@ -128,6 +133,14 @@ package body JSON_Schema.Readers is
             Reader.Read_Next;
          elsif Key = "default" then
             Read_Any_JSON_Value (Reader, Value.Default);
+         elsif Key = "readOnly" then
+            pragma Assert (Reader.Is_Boolean_Value);
+            Value.Read_Only := Reader.Boolean_Value;
+            Reader.Read_Next;
+         elsif Key = "writeOnly" then
+            pragma Assert (Reader.Is_Boolean_Value);
+            Value.Write_Only := Reader.Boolean_Value;
+            Reader.Read_Next;
          elsif Key = "examples" then
             pragma Assert (Reader.Is_Start_Array);
             Read_Any_JSON_Value (Reader, Value.Examples);
@@ -333,6 +346,28 @@ package body JSON_Schema.Readers is
             pragma Assert (Reader.Is_String_Value);
             Value.Format := Reader.String_Value;
             Reader.Read_Next;
+
+         elsif Key = "contentMediaType" then
+            pragma Assert (Reader.Is_String_Value);
+            Value.Content_Media_Type := Reader.String_Value;
+            Reader.Read_Next;
+
+         elsif Key = "contentEncoding" then
+            pragma Assert (Reader.Is_String_Value);
+            Value.Content_Encoding := Reader.String_Value;
+            Reader.Read_Next;
+
+         elsif Key = "if" then
+
+            Read (Reader, Value.If_Schema, Other, Prefix, Version);
+
+         elsif Key = "then" then
+
+            Read (Reader, Value.Then_Schema, Other, Prefix, Version);
+
+         elsif Key = "else" then
+
+            Read (Reader, Value.Else_Schema, Other, Prefix, Version);
 
          elsif Key = "allOf" or else Key = "anyOf" or else Key = "oneOf" then
             pragma Assert (Reader.Is_Start_Array);

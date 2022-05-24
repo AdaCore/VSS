@@ -21,6 +21,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+--  @private
+--
+--  This package is for internal use only.
+
 with VSS.Implementation.Referrers;
 with VSS.Implementation.Strings;
 

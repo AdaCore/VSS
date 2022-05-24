@@ -751,11 +751,9 @@ package body JSON_Schema.Writers.Inputs is
          Write_Value ("Value." & Field_Name, Type_Name);
       elsif not Required and Type_Name = "Boolean" then
          Write_Value ("Value." & Field_Name, Type_Name);
-      elsif (not Required and Property.Schema.Kind.Last_Index = 7)
-        or
-          (not Required
-           and then not Property.Schema.Additional_Properties.Is_Boolean
-           and then Property.Schema.Additional_Properties.Schema /= null)
+      elsif not Required and
+         (Property.Schema.Kind.Last_Index = 7 or
+           Property.Schema.Additional_Properties /= null)
       then
          Write_Value ("Value." & Field_Name, Type_Name);
       elsif Required then

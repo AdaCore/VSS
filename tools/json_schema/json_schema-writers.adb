@@ -326,9 +326,7 @@ package body JSON_Schema.Writers is
             Prefix := "Enum.";
          end if;
 
-      elsif not Schema.Additional_Properties.Is_Boolean
-        and then Schema.Additional_Properties.Schema /= null
-      then
+      elsif Schema.Additional_Properties /= null then
          Result := "Any_Object";  --  TODO: Make more precise type???
       elsif Schema.Kind.Last_Index = 7 then
          Result := "Any_Value";

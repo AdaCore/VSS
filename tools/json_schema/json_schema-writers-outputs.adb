@@ -617,11 +617,9 @@ package body JSON_Schema.Writers.Outputs is
 
          Put ("end if;");
          New_Line;
-      elsif (not Required and Property.Schema.Kind.Last_Index = 7)
-        or
-          (not Required
-           and then not Property.Schema.Additional_Properties.Is_Boolean
-           and then Property.Schema.Additional_Properties.Schema /= null)
+      elsif not Required and
+         (Property.Schema.Kind.Last_Index = 7 or
+           Property.Schema.Additional_Properties /= null)
       then
          Put ("if not Value.");
          Put (Field_Name);

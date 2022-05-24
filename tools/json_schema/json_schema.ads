@@ -21,18 +21,21 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 --
---  JSON Schema types for Draft 4 JSON Schema specification
+--  JSON Schema types for Draft 4 - Draft 6 JSON Schema specification
 
 with Ada.Containers.Vectors;
 
 with VSS.Strings;
 with VSS.String_Vectors;
 with VSS.JSON;
+with VSS.JSON.Events;
 
 package JSON_Schema is
    pragma Preelaborate;
 
    type Schema is tagged;
+   --  Core schema meta-schema
+
    type Schema_Access is access all Schema;
 
    package Definitions is
@@ -42,9 +45,9 @@ package JSON_Schema is
       type Schema_Array is new Schema_Vectors.Vector with null record;
       --  Min_Items = 1 ???
 
-      type Positive_Integer is new Integer range 0 .. Integer'Last;
+      type Non_Negative_Integer is new Integer range 0 .. Integer'Last;
 
-      type Positive_Integer_Default_0 is new Positive_Integer
+      type Non_Negative_Integer_Default_0 is new Non_Negative_Integer
         with Default_Value => 0;
 
       type Simple_Types is
@@ -58,17 +61,8 @@ package JSON_Schema is
 
       type String_Array is new VSS.String_Vectors.Virtual_String_Vector
         with null record;
-      --  Min_Items = 1, uniqueItems ???
+      --  uniqueItems = True
    end Definitions;
-
-   type Boolean_Or_Schema (Is_Boolean : Boolean := False) is record
-      case Is_Boolean is
-         when True =>
-            Boolean : Standard.Boolean;
-         when False =>
-            Schema  : JSON_Schema.Schema_Access;
-      end case;
-   end record;
 
    type String_Or_Schema (Is_String : Boolean := False) is record
       case Is_String is
@@ -89,45 +83,64 @@ package JSON_Schema is
    package Simple_Type_Vectors is new Ada.Containers.Vectors
      (Positive, Definitions.Simple_Types, Definitions."=");
 
+   package JSON_Event_Vectors is new Ada.Containers.Vectors
+     (Positive, VSS.JSON.Events.JSON_Event, VSS.JSON.Events."=");
+
+   type JSON_Value_Array is new JSON_Event_Vectors.Vector with null record;
+   --  Array of JSON values.
+
+   subtype URI is VSS.Strings.Virtual_String;
+   --  An absolute URI (starting with a scheme)
+
+   subtype URI_Reference is VSS.Strings.Virtual_String;
+   --  A relative path, fragment, or any other style of URI Reference
+   --  (per RFC 3986) is allowable
+
    type Schema is tagged limited record
-      Id                 : VSS.Strings.Virtual_String;
-      URI                : VSS.Strings.Virtual_String;
+      Id                 : URI_Reference;  --  $id (id in Draft 4)
+      Schema             : URI;  --  $schema
+      Ref                : URI_Reference; --  $ref
       Title              : VSS.Strings.Virtual_String;
       Description        : VSS.Strings.Virtual_String;
+      Examples           : JSON_Value_Array;  --  since Draft 6
       Multiple_Of        : VSS.JSON.JSON_Number;
       Maximum            : VSS.JSON.JSON_Number;
-      Exclusive_Maximum  : Boolean := False;
+      Exclusive_Maximum  : VSS.JSON.JSON_Number;
       Minimum            : VSS.JSON.JSON_Number;
-      Exclusive_Minimum  : Boolean := False;
-      Max_Length         : Definitions.Positive_Integer;  --  Optional?
-      Min_Length         : Definitions.Positive_Integer_Default_0;  --  Opt?
+      Exclusive_Minimum  : VSS.JSON.JSON_Number;
+      Max_Length         : Definitions.Non_Negative_Integer :=
+                            Definitions.Non_Negative_Integer'Last;
+      Min_Length         : Definitions.Non_Negative_Integer_Default_0;
       Pattern            : VSS.Strings.Virtual_String;  --  regexp?
-      Additional_Items   : Boolean_Or_Schema;
+      Additional_Items   : Schema_Access;
       Items              : Definitions.Schema_Array;  --  if a single Schema?
-      Max_Items          : Definitions.Positive_Integer :=
-                            Definitions.Positive_Integer'Last;
-      Min_Items          : Definitions.Positive_Integer_Default_0 := 0;
+      Max_Items          : Definitions.Non_Negative_Integer :=
+                            Definitions.Non_Negative_Integer'Last;
+      Min_Items          : Definitions.Non_Negative_Integer_Default_0 := 0;
       Unique_Items       : Boolean := False;
-      Max_Properties     : Definitions.Positive_Integer :=
-                            Definitions.Positive_Integer'Last;
-      Min_Properties     : Definitions.Positive_Integer_Default_0 := 0;
+      Contains           : Schema_Access;  --  since Draft 6
+      Max_Properties     : Definitions.Non_Negative_Integer :=
+                            Definitions.Non_Negative_Integer'Last;
+      Min_Properties     : Definitions.Non_Negative_Integer_Default_0 := 0;
       Required           : Definitions.String_Array;
 
-      Additional_Properties : Boolean_Or_Schema;
+      Additional_Properties : Schema_Access;
 
       Properties         : Property_Vectors.Vector;
       Pattern_Properties : Property_Vectors.Vector;
+      --  propertyNames": { "format": "regex" }
+
       Dependencies       : String_Or_Schema;
-      Enum               : Definitions.String_Array;
+      Property_Names     : Schema_Access;  --  since Draft 6
+      Const              : JSON_Event_Vectors.Vector;  --  since Draft 6
+      Enum               : Definitions.String_Array;  --  May by not a strings?
       Kind               : Simple_Type_Vectors.Vector;  -- "type"
       Format             : VSS.Strings.Virtual_String;
       All_Of             : Definitions.Schema_Array;
       Any_Of             : Definitions.Schema_Array;
       One_Of             : Definitions.Schema_Array;
       Negate             : Schema_Access;
-
-      Ref                : VSS.Strings.Virtual_String;
-      --  Value of the `$ref` attribute
    end record;
+   --  Default: `{}` or `True`
 
 end JSON_Schema;

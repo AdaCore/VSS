@@ -86,6 +86,9 @@ package JSON_Schema is
    package JSON_Event_Vectors is new Ada.Containers.Vectors
      (Positive, VSS.JSON.Events.JSON_Event, VSS.JSON.Events."=");
 
+   type JSON_Value is new JSON_Event_Vectors.Vector with null record;
+   --  Any JSON values.
+
    type JSON_Value_Array is new JSON_Event_Vectors.Vector with null record;
    --  Array of JSON values.
 
@@ -102,6 +105,7 @@ package JSON_Schema is
       Ref                : URI_Reference; --  $ref
       Title              : VSS.Strings.Virtual_String;
       Description        : VSS.Strings.Virtual_String;
+      Default            : JSON_Value;
       Examples           : JSON_Value_Array;  --  since Draft 6
       Multiple_Of        : VSS.JSON.JSON_Number;
       Maximum            : VSS.JSON.JSON_Number;

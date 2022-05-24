@@ -126,6 +126,8 @@ package body JSON_Schema.Readers is
             pragma Assert (Reader.Is_String_Value);
             Value.Description := Reader.String_Value;
             Reader.Read_Next;
+         elsif Key = "default" then
+            Read_Any_JSON_Value (Reader, Value.Default);
          elsif Key = "examples" then
             pragma Assert (Reader.Is_Start_Array);
             Read_Any_JSON_Value (Reader, Value.Examples);

@@ -20,6 +20,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+
 --  API to process string data as sequences of Unicode Code Points.
 
 private with Ada.Streams;

@@ -20,6 +20,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+--  @private
+--
 --  This package is for internal use only.
 
 with VSS.Implementation.Referrers;

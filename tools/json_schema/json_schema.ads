@@ -103,9 +103,12 @@ package JSON_Schema is
       Id                 : URI_Reference;  --  $id (id in Draft 4)
       Schema             : URI;  --  $schema
       Ref                : URI_Reference; --  $ref
+      Comment            : VSS.Strings.Virtual_String;  --  $comment (since 7)
       Title              : VSS.Strings.Virtual_String;
       Description        : VSS.Strings.Virtual_String;
       Default            : JSON_Value;
+      Read_Only          : Boolean := False;  --  since Draft 7
+      Write_Only         : Boolean := False;  --  since Draft 7
       Examples           : JSON_Value_Array;  --  since Draft 6
       Multiple_Of        : VSS.JSON.JSON_Number;
       Maximum            : VSS.JSON.JSON_Number;
@@ -140,6 +143,11 @@ package JSON_Schema is
       Enum               : Definitions.String_Array;  --  May by not a strings?
       Kind               : Simple_Type_Vectors.Vector;  -- "type"
       Format             : VSS.Strings.Virtual_String;
+      Content_Media_Type : VSS.Strings.Virtual_String;  --  since Draft 7
+      Content_Encoding   : VSS.Strings.Virtual_String;  --  since Draft 7
+      If_Schema          : Schema_Access;  --  since Draft 7
+      Then_Schema        : Schema_Access;  --  since Draft 7
+      Else_Schema        : Schema_Access;  --  since Draft 7
       All_Of             : Definitions.Schema_Array;
       Any_Of             : Definitions.Schema_Array;
       One_Of             : Definitions.Schema_Array;

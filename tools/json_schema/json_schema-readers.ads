@@ -27,7 +27,7 @@ with VSS.Strings.Hash;
 
 package JSON_Schema.Readers is
 
-   type Schema_Version is (Draft_4, Draft_6);
+   type Schema_Version is (Draft_4, Draft_6, Draft_7);
 
    package Schema_Maps is new Ada.Containers.Hashed_Maps
      (VSS.Strings.Virtual_String,

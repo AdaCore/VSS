@@ -20,6 +20,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+
 --  Utilities to handle strings as code units in UTF-family encodings.
 --
 --  This package is intended to be used by relatively low level code.

@@ -25,10 +25,15 @@
 with "vss_config";
 with "vss_gnat";
 
-project VSS_Text is
+library project VSS_Text is
 
    for Languages use ("Ada");
+
+   for Library_Name use "vss";
+   for Library_Kind use VSS_Config.Library_Kind;
+
    for Object_Dir use VSS_Config.Object_Dir;
+   for Library_Dir use VSS_Config.Library_Dir;
 
    OS_Source_Dirs := ();
 

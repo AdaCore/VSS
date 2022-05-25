@@ -32,12 +32,17 @@ abstract project VSS_Config is
    Build_Mode : VSS_Build_Kind :=
      external ("VSS_BUILD_MODE", external ("BUILD_MODE", "prod"));
 
+   type VSS_Library_Kind is ("relocatable", "static", "static-pic");
+   Library_Kind : VSS_Library_Kind :=
+     external ("VSS_LIBRARY_TYPE", external ("LIBRARY_TYPE", "static"));
+
    Superproject := external ("SUPERPROJECT", "");
 
    Ada_Switches := ();
    Ada_Coverage_Switches := ();
    Linker_Options := ();
 
+   Library_Dir      := "../.libs/" & Superproject;
    Object_Dir       := "../.objs/" & Superproject;
    Tests_Object_Dir := "../../.objs/" & Superproject & "/tests";
    Tools_Object_Dir := "../../.objs/" & Superproject & "/tools";

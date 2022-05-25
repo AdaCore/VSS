@@ -36,9 +36,17 @@ with VSS.Strings.Conversions;
 package body JSON_Schema.Writers is
 
    Reserved_Words : constant VSS.String_Vectors.Virtual_String_Vector :=
-   ["function", "interface", "all", "type", "body",
-     "private", "protected", "new", "exception", "entry", "goto", "end",
-     "boolean"];
+     ["abort", "abs", "abstract", "accept", "access", "aliased", "all", "and",
+      "array", "at", "begin", "body", "case", "constant", "declare", "delay",
+      "delta", "digits", "do", "else", "elsif", "end", "entry", "exception",
+      "exit", "for", "function", "generic", "goto", "if", "in", "interface",
+      "is", "limited", "loop", "mod", "new", "not", "null", "of", "or",
+      "others", "out", "overriding", "package", "pragma", "private",
+      "procedure", "protected", "raise", "range", "record", "rem", "renames",
+      "requeue", "return", "reverse", "select", "separate", "some", "subtype",
+      "synchronized", "tagged", "task", "terminate", "then", "type", "until",
+      "use", "when", "while", "with", "xor",
+      "boolean"];
 
    Integer_Or_String : constant JSON_Schema.Simple_Type_Vectors.Vector :=
      [Definitions.An_Integer, Definitions.A_String];

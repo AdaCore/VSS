@@ -446,6 +446,7 @@ package body JSON_Schema.Writers.Outputs is
       Required : Boolean)
    is
       use type VSS.Strings.Virtual_String;
+      use all type VSS.JSON.Events.JSON_Event_Kind;
 
       procedure Write_Key_And_Value
         (Field_Name : VSS.Strings.Virtual_String;
@@ -568,12 +569,26 @@ package body JSON_Schema.Writers.Outputs is
         (Map, Property.Schema, True, Fallback, Type_Name, Type_Prefix);
 
       if Property.Schema.Enum.Length = 1 then
-         --  Write constant property
+         --  Write constant property (single item enum)
          Put ("Handler.Key_Name (""");
          Put (Property.Name);
          Put (""");");
          Put ("Handler.String_Value (""");
          Put (Property.Schema.Enum.Element (1));
+         Put (""");");
+         New_Line;
+      elsif not Property.Schema.Const.Is_Empty then
+         --  Write constant property
+
+         --  Only string constant is supported for now.
+         pragma Assert
+          (Property.Schema.Const.First_Element.Kind = String_Value);
+
+         Put ("Handler.Key_Name (""");
+         Put (Property.Name);
+         Put (""");");
+         Put ("Handler.String_Value (""");
+         Put (Property.Schema.Const.First_Element.String_Value);
          Put (""");");
          New_Line;
       elsif not Required and Type_Name = "Virtual_String" then

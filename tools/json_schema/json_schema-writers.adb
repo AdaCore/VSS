@@ -354,7 +354,9 @@ package body JSON_Schema.Writers is
 
             when Definitions.A_String =>
 
-               if Required and Schema.Enum.Length = 1 then
+               if Required and
+                 (Schema.Enum.Length = 1 or not Schema.Const.Is_Empty)
+               then
                   --  If string type redefined as an enum with just one literal
                   --  then skip this property by returning an empty type name.
                   Result := VSS.Strings.Empty_Virtual_String;

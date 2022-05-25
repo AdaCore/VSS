@@ -123,7 +123,7 @@ docs:
 	make -C docs
 
 clean:
-	rm -rf .objs re_tests
+	rm -rf .objs .libs re_tests
 
 install:
 	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr

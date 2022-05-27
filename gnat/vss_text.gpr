@@ -36,6 +36,7 @@ library project VSS_Text is
    for Library_Dir use VSS_Config.Library_Dir;
 
    OS_Source_Dirs := ();
+   OS_Library_Options := ();
 
    case VSS_Config.OS_API is
       when "unix" | "osx" =>
@@ -43,7 +44,16 @@ library project VSS_Text is
 
       when "Windows_NT" =>
          OS_Source_Dirs := ("../source/os/windows");
+
+         case VSS_Config.Library_Kind is
+            when "relocatable" =>
+               OS_Library_Options := ("-luserenv");
+            when others=>
+               null;
+         end case;
    end case;
+
+   for Library_Options use OS_Library_Options;
 
    for Source_Dirs use
      ("../source/os",

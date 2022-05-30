@@ -43,6 +43,12 @@ package body JSON_Schema.Writers.Outputs is
       Map      : JSON_Schema.Readers.Schema_Map;
       Property : JSON_Schema.Property;
       Required : Boolean);
+   --  Generate output code for given Property represented by record component
+
+   procedure Write_Value
+     (Field     : VSS.Strings.Virtual_String;
+      Type_Name : VSS.Strings.Virtual_String);
+   --  Generate output code for given Field and Type_Name
 
    ----------------------
    -- Generate_Writers --
@@ -485,35 +491,7 @@ package body JSON_Schema.Writers.Outputs is
          Type_Name  : VSS.Strings.Virtual_String;
          Suffix     : VSS.Strings.Virtual_String) is
       begin
-         if Type_Name = "Any_Object" then
-            Write_Value (Field_Name, "Any_Value", Suffix);
-         elsif Type_Name = "Virtual_String" then
-            Put ("Handler.String_Value (Value.");
-            Put (Field_Name);
-            Put (Suffix);
-            Put (");");
-            New_Line;
-         elsif Type_Name = "Integer" then
-            Put ("Handler.Integer_Value");
-            Put ("(Interfaces.Integer_64 (Integer'(Value.");
-            Put (Field_Name);
-            Put (Suffix);
-            Put (")));");
-            New_Line;
-         elsif Type_Name = "Float" then
-            Put ("Handler.Float_Value");
-            Put ("(Interfaces.IEEE_Float_64 (Value.");
-            Put (Field_Name);
-            Put (Suffix);
-            Put ("));");
-            New_Line;
-         elsif Type_Name = "Boolean" then
-            Put ("Handler.Boolean_Value (Value.");
-            Put (Field_Name);
-            Put (Suffix);
-            Put (");");
-            New_Line;
-         elsif Type_Name.Ends_With ("_Vector") then
+         if Type_Name.Ends_With ("_Vector") then
             declare
                Item_Type   : VSS.Strings.Virtual_String;
                Type_Prefix : VSS.Strings.Virtual_String;
@@ -527,32 +505,14 @@ package body JSON_Schema.Writers.Outputs is
                Put (Field_Name);
                Put (".Length loop");
                New_Line;
-               Write_Value (Field_Name, Item_Type, " (J)");
+               Write_Value (Field_Name & " (J)", Item_Type);
                Put ("end loop;");
                New_Line;
                Put ("Handler.End_Array;");
                New_Line;
             end;
-         elsif Type_Name = "Integer_Or_String" then
-            Put ("if Value.");
-            Put (Field_Name);
-            Put (Suffix);
-            Put (".Is_String then");
-            New_Line;
-            Write_Value (Field_Name, "Virtual_String", Suffix & ".String");
-            Put ("else");
-            New_Line;
-            Write_Value (Field_Name, "Integer", Suffix & ".Integer");
-            Put ("end if;");
-            New_Line;
          else
-            Put ("Output_");
-            Put (Type_Name);
-            Put (" (Handler, Value.");
-            Put (Field_Name);
-            Put (Suffix);
-            Put (");");
-            New_Line;
+            Write_Value (Field_Name & Suffix, Type_Name);
          end if;
       end Write_Value;
 
@@ -657,5 +617,60 @@ package body JSON_Schema.Writers.Outputs is
          New_Line;
       end if;
    end Write_Record_Component;
+
+   -----------------
+   -- Write_Value --
+   -----------------
+
+   procedure Write_Value
+     (Field     : VSS.Strings.Virtual_String;
+      Type_Name : VSS.Strings.Virtual_String)
+   is
+      use type VSS.Strings.Virtual_String;
+   begin
+      if Type_Name = "Any_Object" then
+         Write_Value (Field, "Any_Value");
+      elsif Type_Name = "Virtual_String" then
+         Put ("Handler.String_Value (Value.");
+         Put (Field);
+         Put (");");
+         New_Line;
+      elsif Type_Name = "Integer" then
+         Put ("Handler.Integer_Value");
+         Put ("(Interfaces.Integer_64 (Integer'(Value.");
+         Put (Field);
+         Put (")));");
+         New_Line;
+      elsif Type_Name = "Float" then
+         Put ("Handler.Float_Value");
+         Put ("(Interfaces.IEEE_Float_64 (Value.");
+         Put (Field);
+         Put ("));");
+         New_Line;
+      elsif Type_Name = "Boolean" then
+         Put ("Handler.Boolean_Value (Value.");
+         Put (Field);
+         Put (");");
+         New_Line;
+      elsif Type_Name = "Integer_Or_String" then
+         Put ("if Value.");
+         Put (Field);
+         Put (".Is_String then");
+         New_Line;
+         Write_Value (Field & ".String", "Virtual_String");
+         Put ("else");
+         New_Line;
+         Write_Value (Field & ".Integer", "Integer");
+         Put ("end if;");
+         New_Line;
+      else
+         Put ("Output_");
+         Put (Type_Name);
+         Put (" (Handler, Value.");
+         Put (Field);
+         Put (");");
+         New_Line;
+      end if;
+   end Write_Value;
 
 end JSON_Schema.Writers.Outputs;

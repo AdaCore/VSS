@@ -1,0 +1,31 @@
+--
+--  Copyright (C) 2022, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  VSS: XML/HTML processing subproject
+
+with "vss_config";
+with "vss_text";
+
+project VSS_XML is
+
+   for Languages use ("Ada");
+
+   for Library_Name use "vss-xml";
+   for Library_Kind use VSS_Config.Library_Kind;
+
+   for Object_Dir use VSS_Config.Object_Dir;
+   for Library_Dir use VSS_Config.Library_Dir;
+   for Source_Dirs use
+     ("../source/html",
+      "../source/html/implementation",
+      "../source/xml",
+      "../source/xml/implementation");
+
+   package Compiler renames VSS_Config.Compiler;
+
+   package Linker renames VSS_Config.Linker;
+
+end VSS_XML;

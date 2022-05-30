@@ -24,10 +24,11 @@
 package body JSON_Schema.Writers.Outputs is
 
    procedure Write_Named_Type
-     (Map    : JSON_Schema.Readers.Schema_Map;
-      Name   : VSS.Strings.Virtual_String;
-      Schema : Schema_Access;
-      Kind   : Declaration_Kind);
+     (Map          : JSON_Schema.Readers.Schema_Map;
+      Enum_Package : VSS.Strings.Virtual_String;
+      Name         : VSS.Strings.Virtual_String;
+      Schema       : Schema_Access;
+      Kind         : Declaration_Kind);
 
    procedure Write_Anonymous_Type
      (Enclosing_Type : VSS.Strings.Virtual_String;
@@ -173,7 +174,7 @@ package body JSON_Schema.Writers.Outputs is
 
       for Cursor in Map.Iterate loop
          Write_Named_Type
-           (Map,
+           (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
             JSON_Schema.Readers.Schema_Maps.Element (Cursor),
             Specification);
@@ -231,7 +232,7 @@ package body JSON_Schema.Writers.Outputs is
 
       for Cursor in Map.Iterate loop
          Write_Named_Type
-           (Map,
+           (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
             JSON_Schema.Readers.Schema_Maps.Element (Cursor),
             Implemenetation);
@@ -333,11 +334,14 @@ package body JSON_Schema.Writers.Outputs is
    ----------------------
 
    procedure Write_Named_Type
-     (Map    : JSON_Schema.Readers.Schema_Map;
-      Name   : VSS.Strings.Virtual_String;
-      Schema : Schema_Access;
-      Kind   : Declaration_Kind)
+     (Map          : JSON_Schema.Readers.Schema_Map;
+      Enum_Package : VSS.Strings.Virtual_String;
+      Name         : VSS.Strings.Virtual_String;
+      Schema       : Schema_Access;
+      Kind         : Declaration_Kind)
    is
+      use type VSS.Strings.Virtual_String;
+
       procedure On_Property
         (Property : JSON_Schema.Property;
          Required : Boolean);
@@ -348,6 +352,10 @@ package body JSON_Schema.Writers.Outputs is
 
       Type_Name : constant VSS.Strings.Virtual_String :=
         Ref_To_Type_Name (Name);
+
+      Enum_Prefix : constant VSS.Strings.Virtual_String :=
+        (if Enum_Package.Is_Empty then VSS.Strings.Empty_Virtual_String
+         else Enum_Package & ".");
 
       -------------------------
       -- On_Anonymous_Schema --
@@ -397,6 +405,37 @@ package body JSON_Schema.Writers.Outputs is
          Writers.Each_Property (Map, Schema, On_Property'Access);
          Put ("Handler.End_Object;");
          New_Line;
+      elsif not Schema.Any_Of.Is_Empty then
+         Put ("case Value.Union.Kind is"); New_Line;
+
+         for Index in 1 .. Schema.Any_Of.Last_Index loop
+            declare
+               Item    : constant Schema_Access :=
+                 Schema.Any_Of.Element (Index);
+
+               Variant : constant VSS.Strings.Virtual_String :=
+                 Escape_Keywords (Variant_Name (Map, Item));
+
+               Fallback : constant VSS.Strings.Virtual_String :=
+                 Type_Name & "_" & Variant;
+
+               Type_Name   : VSS.Strings.Virtual_String;
+               Type_Prefix : VSS.Strings.Virtual_String;
+            begin
+               Put ("when ");
+               Put (Enum_Prefix);
+               Put (Variant);
+               Put (" =>");
+               New_Line;
+
+               Get_Field_Type
+                 (Map, Item, True, Fallback, Type_Name, Type_Prefix);
+
+               Write_Value ("Union." & Variant, Type_Name);
+            end;
+         end loop;
+
+         Put ("end case;"); New_Line;
       elsif not Schema.Properties.Is_Empty then
          Put ("Handler.Start_Object;");
          New_Line;

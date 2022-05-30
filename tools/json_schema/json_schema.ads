@@ -20,7 +20,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---
+
 --  JSON Schema types for Draft 4 - Draft 6 JSON Schema specification
 
 with Ada.Containers.Vectors;
@@ -155,4 +155,9 @@ package JSON_Schema is
    end record;
    --  Default: `{}` or `True`
 
+   function Is_True (Self : Schema'Class) return Boolean;
+   --  Check if given schema is "True". Than means it equals to `{}` JSON.
+
+   function Is_False (Self : Schema'Class) return Boolean;
+   --  Check if given schema is "False". Than means it equals to `not {}` JSON.
 end JSON_Schema;

@@ -293,7 +293,7 @@ package body JSON_Schema.Writers.Outputs is
       New_Line;
 
       --  Write output procedures for anonymous schemas
-      Each_Anonymous_Schema (Schema, On_Anonymous_Schema'Access);
+      Each_Anonymous_Schema (Map, Schema, On_Anonymous_Schema'Access);
 
       Put ("begin");
       New_Line;
@@ -386,7 +386,7 @@ package body JSON_Schema.Writers.Outputs is
       New_Line;
 
       --  Write output procedures for anonymous schemas
-      Each_Anonymous_Schema (Schema, On_Anonymous_Schema'Access);
+      Each_Anonymous_Schema (Map, Schema, On_Anonymous_Schema'Access);
 
       Put ("begin");
       New_Line;

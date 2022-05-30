@@ -59,7 +59,8 @@ package body JSON_Schema.Writers is
    ---------------------------
 
    procedure Each_Anonymous_Schema
-     (Schema : Schema_Access;
+     (Map    : JSON_Schema.Readers.Schema_Map;
+      Schema : Schema_Access;
       Action : access procedure (Property : JSON_Schema.Property)) is
    begin
       for Used of Schema.All_Of loop
@@ -73,6 +74,17 @@ package body JSON_Schema.Writers is
                end case;
             end if;
          end loop;
+      end loop;
+
+      for Used of Schema.Any_Of loop
+         if Used.Kind.Last_Index = 1 then
+            case Used.Kind (1) is
+               when Definitions.An_Object =>
+                  Action ((Escape_Keywords (Variant_Name (Map, Used)), Used));
+               when others =>
+                  null;
+            end case;
+         end if;
       end loop;
    end Each_Anonymous_Schema;
 
@@ -114,6 +126,12 @@ package body JSON_Schema.Writers is
          end if;
 
          for Item of Schema.All_Of loop
+            if Item.Ref.Is_Empty then
+               Traverse_Nested_Schemas (Name, Property, Item, True);
+            end if;
+         end loop;
+
+         for Item of Schema.Any_Of loop
             if Item.Ref.Is_Empty then
                Traverse_Nested_Schemas (Name, Property, Item, True);
             end if;
@@ -239,6 +257,79 @@ package body JSON_Schema.Writers is
    end Each_Property;
 
    ---------------------
+   -- Each_Union_Type --
+   ---------------------
+
+   procedure Each_Union_Type
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Optional : String_Sets.Set;
+      Action   : access procedure
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean))
+   is
+
+      procedure Traverse_Nested_Schemas
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean);
+      --  Traverse all types in Schema recursively, find anyOf schemes
+      --  and call Action for them. Name is toppest named schema, while
+      --  Property (if not empty) is a property corresponding to Schema.
+
+      -----------------------------
+      -- Traverse_Nested_Schemas --
+      -----------------------------
+
+      procedure Traverse_Nested_Schemas
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean) is
+      begin
+         if not Schema.Any_Of.Is_Empty then
+            Action (Name, Property, Schema, Optional);
+         end if;
+
+         for Item of Schema.All_Of loop
+            if Item.Ref.Is_Empty then
+               Traverse_Nested_Schemas (Name, Property, Item, True);
+            end if;
+         end loop;
+
+         for Property of Schema.Properties loop
+            Traverse_Nested_Schemas
+              (Name,
+               Property.Name,
+               Property.Schema,
+               not Schema.Required.Contains (Property.Name));
+         end loop;
+      end Traverse_Nested_Schemas;
+
+   begin
+      for Cursor in Map.Iterate loop
+         declare
+            Name : constant VSS.Strings.Virtual_String :=
+              JSON_Schema.Readers.Schema_Maps.Key (Cursor);
+
+            Schema : constant Schema_Access :=
+              JSON_Schema.Readers.Schema_Maps.Element (Cursor);
+
+            Type_Name : constant VSS.Strings.Virtual_String :=
+              Ref_To_Type_Name (Name);
+         begin
+            Traverse_Nested_Schemas
+              (Name,
+               "",
+               Schema,
+               Optional.Contains (Type_Name));
+         end;
+      end loop;
+   end Each_Union_Type;
+
+   ---------------------
    -- Escape_Keywords --
    ---------------------
 
@@ -334,7 +425,9 @@ package body JSON_Schema.Writers is
             Prefix := "Enum.";
          end if;
 
-      elsif Schema.Additional_Properties /= null then
+      elsif Schema.Additional_Properties /= null and then not
+         Schema.Additional_Properties.Is_False
+      then
          Result := "Any_Object";  --  TODO: Make more precise type???
       elsif Schema.Kind.Last_Index = 7 then
          Result := "Any_Value";
@@ -452,9 +545,9 @@ package body JSON_Schema.Writers is
         (VSS.Strings.Conversions.To_Wide_Wide_String (Text));
    end Put;
 
-   ---------------
-   -- Type_Name --
-   ---------------
+   ----------------------
+   -- Ref_To_Type_Name --
+   ----------------------
 
    function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String
@@ -464,5 +557,32 @@ package body JSON_Schema.Writers is
    begin
       return List.Element (List.Length);
    end Ref_To_Type_Name;
+
+   ------------------
+   -- Variant_Name --
+   ------------------
+
+   function Variant_Name
+     (Map       : JSON_Schema.Readers.Schema_Map;
+      Schema    : Schema_Access) return VSS.Strings.Virtual_String
+   is
+      use all type VSS.JSON.Events.JSON_Event_Kind;
+   begin
+      if Schema.Ref.Is_Empty then
+         for Property of Schema.Properties loop
+            --  Look for the first string `const` property
+            if not Property.Schema.Const.Is_Empty and then
+              Property.Schema.Const.First_Element.Kind = String_Value
+            then
+
+               return Property.Schema.Const.First_Element.String_Value;
+            end if;
+         end loop;
+
+         raise Program_Error with "No const found in anyOf item.";
+      else
+         return Variant_Name (Map, Map (Schema.Ref));
+      end if;
+   end Variant_Name;
 
 end JSON_Schema.Writers;

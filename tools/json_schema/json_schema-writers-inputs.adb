@@ -328,7 +328,7 @@ package body JSON_Schema.Writers.Inputs is
       New_Line;
 
       --  Write Input procedures for anonymous schemas
-      Each_Anonymous_Schema (Schema, Anonymous_Schema_Reader'Access);
+      Each_Anonymous_Schema (Map, Schema, Anonymous_Schema_Reader'Access);
 
       Put ("begin");
       New_Line;
@@ -486,7 +486,7 @@ package body JSON_Schema.Writers.Inputs is
 
       if Kind = Implemenetation then
          Write_Hash (Map, Type_Name, Schema);
-         Each_Anonymous_Schema (Schema, Hash_For_Anonymous_Schema'Access);
+         Each_Anonymous_Schema (Map, Schema, Hash_For_Anonymous_Schema'Access);
       end if;
 
       Write_Input_Specification (Type_Name, "");
@@ -502,7 +502,7 @@ package body JSON_Schema.Writers.Inputs is
       New_Line;
 
       --  Write Input procedures for anonymous schemas
-      Each_Anonymous_Schema (Schema, Anonymous_Schema_Reader'Access);
+      Each_Anonymous_Schema (Map, Schema, Anonymous_Schema_Reader'Access);
 
       Put ("begin");
       New_Line;

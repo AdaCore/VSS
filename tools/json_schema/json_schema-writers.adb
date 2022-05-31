@@ -167,6 +167,44 @@ package body JSON_Schema.Writers is
       end loop;
    end Each_Enumeration_Type;
 
+   ----------------------
+   -- Each_Holder_Type --
+   ----------------------
+
+   procedure Each_Holder_Type
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Holders  : VSS.String_Vectors.Virtual_String_Vector;
+      Action   : access procedure
+        (Name : VSS.Strings.Virtual_String))
+   is
+      Done : String_Sets.Set;
+   begin
+      for Item of Holders loop
+         declare
+            use type VSS.Strings.Virtual_String;
+
+            Pair   : constant VSS.String_Vectors.Virtual_String_Vector :=
+              Item.Split (Separator => ':');
+
+            Schema : constant Schema_Access := Map (Pair (1));
+         begin
+            for Property of Schema.Properties loop
+               if Property.Name = Pair (2) then
+                  declare
+                     Name : constant VSS.Strings.Virtual_String :=
+                       Property.Schema.Ref;
+                  begin
+                     if not Done.Contains (Name) then
+                        Action (Name);
+                        Done.Include (Name);
+                     end if;
+                  end;
+               end if;
+            end loop;
+         end;
+      end loop;
+   end Each_Holder_Type;
+
    -------------------
    -- Each_Property --
    -------------------
@@ -512,6 +550,20 @@ package body JSON_Schema.Writers is
 
       Type_Name := Result;
    end Get_Field_Type;
+
+   ---------------------
+   -- Is_Holder_Field --
+   ---------------------
+
+   function Is_Holder_Field
+     (Name     : VSS.Strings.Virtual_String;
+      Property : VSS.Strings.Virtual_String;
+      Holders  : VSS.String_Vectors.Virtual_String_Vector) return Boolean
+   is
+      use type VSS.Strings.Virtual_String;
+   begin
+      return Holders.Contains (Name & ":" & Property);
+   end Is_Holder_Field;
 
    --------------
    -- New_Line --

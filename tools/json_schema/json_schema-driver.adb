@@ -53,6 +53,9 @@ procedure JSON_Schema.Driver is
    --  avoid name clashes.
    Header_File  : VSS.Strings.Virtual_String;
    --  Header file - copyright/license to put on top of each file
+   Holders      : VSS.String_Vectors.Virtual_String_Vector;
+   --  Array of "holder" fields in form of "type:field" where a holder type
+   --  should be used instead of type.
 
    ------------------------
    -- Parse_Command_Line --
@@ -63,6 +66,7 @@ procedure JSON_Schema.Driver is
       Is_Root_Package : Boolean := False;
       Is_Enum_Package : Boolean := False;
       Is_Header_File  : Boolean := False;
+      Is_Holder       : Boolean := False;
    begin
       for Item of VSS.Application.Arguments loop
          if Is_Root_Package then
@@ -74,12 +78,17 @@ procedure JSON_Schema.Driver is
          elsif Is_Header_File then
             Is_Header_File := False;
             Header_File := Item;
+         elsif Is_Holder then
+            Is_Holder := False;
+            Holders.Append (Item);
          elsif Item = "--root-package" then
             Is_Root_Package := True;
          elsif Item = "--enum-package" then
             Is_Enum_Package := True;
          elsif Item = "--header-file" then
             Is_Header_File := True;
+         elsif Item = "--holder" then
+            Is_Holder := True;
          else
             Arg := Item;
          end if;
@@ -87,6 +96,7 @@ procedure JSON_Schema.Driver is
 
       return not Arg.Is_Empty
         and not Is_Header_File
+        and not Is_Holder
         and not Is_Root_Package
         and not Is_Enum_Package;
    end Parse_Command_Line;
@@ -134,6 +144,9 @@ begin
         ("  --enum-package <package> - A package for enumeration types");
       Ada.Wide_Wide_Text_IO.Put_Line
         ("  --header-file  <file>    - A copyright header file");
+      Ada.Wide_Wide_Text_IO.Put_Line
+        ("  --holder <type:field>    - Use holder to break circular " &
+         "dependency");
       return;
    end if;
 
@@ -167,5 +180,5 @@ begin
 
    JSON_Schema.Readers.Read (Reader, Schema, Other);
    JSON_Schema.Writers.Types.Write
-     (Other, Root_Package, Enum_Package, Header);
+     (Other, Root_Package, Enum_Package, Header, Holders);
 end JSON_Schema.Driver;

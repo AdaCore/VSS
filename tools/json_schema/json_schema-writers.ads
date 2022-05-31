@@ -94,6 +94,13 @@ package JSON_Schema.Writers is
    --  * Schema - corresponding anyOf schema
    --  * Optional - True if anyOf schema is used in not-required property
 
+   procedure Each_Holder_Type
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Holders  : VSS.String_Vectors.Virtual_String_Vector;
+      Action   : access procedure
+        (Name : VSS.Strings.Virtual_String));
+   --  Execute Action on each schema used in Holders
+
    function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String;
    --  Convert $ref to a type name
@@ -124,5 +131,11 @@ package JSON_Schema.Writers is
       Schema    : Schema_Access) return VSS.Strings.Virtual_String;
    --  Return a variant name for given Schema when schema is an element of
    --  anyOf schema
+
+   function Is_Holder_Field
+     (Name     : VSS.Strings.Virtual_String;
+      Property : VSS.Strings.Virtual_String;
+      Holders  : VSS.String_Vectors.Virtual_String_Vector) return Boolean;
+   --  Check if given Property in Schema should be presented as a holder type
 
 end JSON_Schema.Writers;

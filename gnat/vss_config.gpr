@@ -42,8 +42,8 @@ abstract project VSS_Config is
    Ada_Coverage_Switches := ();
    Linker_Options := ();
 
-   Library_Dir      := "../.libs/" & Superproject;
-   Object_Dir       := "../.objs/" & Superproject;
+   Library_Dir      := "../.libs/" & Superproject & "/" & Library_Kind;
+   Object_Dir       := "../.objs/" & Superproject & "/" & Library_Kind;
    Tests_Object_Dir := "../../.objs/" & Superproject & "/tests";
    Tools_Object_Dir := "../../.objs/" & Superproject & "/tools";
 

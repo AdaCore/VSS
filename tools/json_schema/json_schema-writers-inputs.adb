@@ -824,16 +824,15 @@ package body JSON_Schema.Writers.Inputs is
                Put ("end if;"); New_Line;
             end;
          elsif Type_Name = "Integer_Or_String" then
-            Put ("if ");
+            --  Turn Value into an integer to simplify `elsif` part
             Put (Field_Name);
-            Put (".Is_String then");
-            New_Line;
-            Write_Value (Field_Name & ".String", "Virtual_String");
-            Put ("else");
-            New_Line;
+            Put (" := (False, Integer => <>);"); New_Line;
+            Put ("if Reader.Is_String_Value then"); New_Line;
+            Put (Field_Name);
+            Put (" := (True, Reader.String_Value);"); New_Line;
+            Put ("Reader.Read_Next;"); New_Line;
+            Put ("els");
             Write_Value (Field_Name & ".Integer", "Integer");
-            Put ("end if;");
-            New_Line;
          else
             Put ("Input_");
             Put (Type_Name);

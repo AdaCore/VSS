@@ -72,9 +72,34 @@ package JSON_Schema.Writers is
    --  the Action procedure for each such property.
 
    procedure Each_Anonymous_Schema
-     (Schema : Schema_Access;
+     (Map    : JSON_Schema.Readers.Schema_Map;
+      Schema : Schema_Access;
       Action : access procedure (Property : JSON_Schema.Property));
    --  Call Action for each schema nested in given Schema
+
+   procedure Each_Union_Type
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Optional : String_Sets.Set;
+      Action   : access procedure
+        (Name     : VSS.Strings.Virtual_String;
+         Property : VSS.Strings.Virtual_String;
+         Schema   : Schema_Access;
+         Optional : Boolean));
+   --  Find `anyOf` schemas and call Action for them. Optional is set of
+   --  schema name those are used in not-required properties. The Action
+   --  procedure takes next arguments:
+   --  * Name - name of toppest named schema containing anyOf Schema
+   --  * Property - name of property if anyOf schema is nameless (when
+   --    schema declaration is embedded into a property declaration).
+   --  * Schema - corresponding anyOf schema
+   --  * Optional - True if anyOf schema is used in not-required property
+
+   procedure Each_Holder_Type
+     (Map      : JSON_Schema.Readers.Schema_Map;
+      Holders  : VSS.String_Vectors.Virtual_String_Vector;
+      Action   : access procedure
+        (Name : VSS.Strings.Virtual_String));
+   --  Execute Action on each schema used in Holders
 
    function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String;
@@ -100,5 +125,17 @@ package JSON_Schema.Writers is
       Prefix    : out VSS.Strings.Virtual_String);
 
    procedure Print_Vector (Header : VSS.String_Vectors.Virtual_String_Vector);
+
+   function Variant_Name
+     (Map       : JSON_Schema.Readers.Schema_Map;
+      Schema    : Schema_Access) return VSS.Strings.Virtual_String;
+   --  Return a variant name for given Schema when schema is an element of
+   --  anyOf schema
+
+   function Is_Holder_Field
+     (Name     : VSS.Strings.Virtual_String;
+      Property : VSS.Strings.Virtual_String;
+      Holders  : VSS.String_Vectors.Virtual_String_Vector) return Boolean;
+   --  Check if given Property in Schema should be presented as a holder type
 
 end JSON_Schema.Writers;

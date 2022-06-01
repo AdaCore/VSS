@@ -21,17 +21,37 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with JSON_Schema.Readers;
+package body JSON_Schema is
 
-package JSON_Schema.Writers.Inputs is
+   --------------
+   -- Is_False --
+   --------------
 
-   procedure Generate_Readers
-     (Map            : JSON_Schema.Readers.Schema_Map;
-      Root_Package   : VSS.Strings.Virtual_String;
-      Enum_Package   : VSS.Strings.Virtual_String;
-      Header         : VSS.String_Vectors.Virtual_String_Vector;
-      Holders        : VSS.String_Vectors.Virtual_String_Vector;
-      Optional_Types : String_Sets.Set);
-   --  Generate Write routines types for schemas in given Map
+   function Is_False (Self : Schema'Class) return Boolean is
+   begin
+      return Self.Negate /= null and then Self.Negate.Is_True;
+   end Is_False;
 
-end JSON_Schema.Writers.Inputs;
+   -------------
+   -- Is_True --
+   -------------
+
+   function Is_True (Self : Schema'Class) return Boolean is
+   begin
+      return Self.Additional_Items = null
+        and Self.Items.Is_Empty
+        and Self.Additional_Properties = null
+        and Self.Properties.Is_Empty
+        and Self.Pattern_Properties.Is_Empty
+        and Self.Property_Names = null
+        and Self.Const.Is_Empty
+        and Self.Enum.Is_Empty
+        and Self.Kind.Is_Empty
+        and Self.If_Schema = null
+        and Self.All_Of.Is_Empty
+        and Self.Any_Of.Is_Empty
+        and Self.One_Of.Is_Empty
+        and Self.Negate = null;
+   end Is_True;
+
+end JSON_Schema;

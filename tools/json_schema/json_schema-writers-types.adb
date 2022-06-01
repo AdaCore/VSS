@@ -326,10 +326,10 @@ package body JSON_Schema.Writers.Types is
          Optional_Types, Array_Types);
 
       JSON_Schema.Writers.Outputs.Generate_Writers
-        (Map, Root_Package, Enum_Package, Header, Optional_Types);
+        (Map, Root_Package, Enum_Package, Header, Holders, Optional_Types);
 
       JSON_Schema.Writers.Inputs.Generate_Readers
-        (Map, Root_Package, Enum_Package, Header, Optional_Types);
+        (Map, Root_Package, Enum_Package, Header, Holders, Optional_Types);
    end Write;
 
    --------------------------

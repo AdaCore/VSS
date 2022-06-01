@@ -574,8 +574,10 @@ package body JSON_Schema.Writers.Outputs is
       Is_Holder   : constant Boolean :=
         Writers.Is_Holder_Field (Name, Property.Name, Holders);
 
+      Value  : constant VSS.Strings.Virtual_String := ".Value";
+
       Suffix : constant VSS.Strings.Virtual_String :=
-        (if Is_Holder then ".Value" else VSS.Strings.Empty_Virtual_String);
+        (if Is_Holder then Value else VSS.Strings.Empty_Virtual_String);
 
       Type_Name   : VSS.Strings.Virtual_String;
       Type_Prefix : VSS.Strings.Virtual_String;

@@ -197,6 +197,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
          end if;
       end Step_Backward;
 
+      use type VSS.Strings.Character_Count;
+
       Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
         Subject.At_First_Character;
 
@@ -265,9 +267,9 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
                exit when not Again or (Next.Is_Empty and Found);
 
-               if not Found then
+               if not Found and not Options (Anchored_Match) then
                   --  Start new thread from the current character if we haven't
-                  --  found any match yet.
+                  --  found any match yet nor we are in anchored match.
                   Append_State (Pos.all, 1, Unset_Tags);
                end if;
             end;
@@ -293,9 +295,14 @@ package body VSS.Regular_Expressions.Pike_Engines is
          end;
       end loop;
 
-      if Found then
+      if Found and then
+        (not Options (Anchored_Match) or else
+         VSS.Strings.Character_Count (Final_Tags (Self.Last_Tag).Index) =
+            Subject.After_Last_Character.Character_Index)
+      then
          Result := new VSS.Regular_Expressions.Matches.Match
            (Length => Natural (Self.Last_Tag / 2));
+         Result.Has_Match := True;
 
          declare
             Index : Tag_Number := Final_Tags'First;
@@ -324,9 +331,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
          end;
       else
          Result := new VSS.Regular_Expressions.Matches.Match (Length => 0);
+         Result.Has_Match := False;
       end if;
-
-      Result.Has_Match := Found;
    end Match;
 
    ----------------

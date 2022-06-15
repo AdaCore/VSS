@@ -21,19 +21,28 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Test_Support;
+with VSS.Regular_Expressions;
+with VSS.Strings;
 
-procedure Test_Regexp is
-   pragma Style_Checks ("gnaty-s");
+separate (Test_Regexp)
+procedure Test_V615_026 is
+   --  Check Anchored_Match option.
 
-   procedure Test_V406_014 is separate;
-   procedure Test_V406_018 is separate;
-   procedure Test_V426_005 is separate;
-   procedure Test_V615_026 is separate;
+   R1 : constant VSS.Regular_Expressions.Regular_Expression :=
+     VSS.Regular_Expressions.To_Regular_Expression ("bc");
+   M : VSS.Regular_Expressions.Regular_Expression_Match;
 
+   X : constant VSS.Regular_Expressions.Match_Options :=
+     (VSS.Regular_Expressions.Anchored_Match => True);
+
+   ABC : constant VSS.Strings.Virtual_String := "abc";
+   BCD : constant VSS.Strings.Virtual_String := "bcd";
+   BC  : constant VSS.Strings.Virtual_String := "bc";
 begin
-   Test_V406_014;
-   Test_V406_018;
-   Test_V426_005;
-   Test_V615_026;
-end Test_Regexp;
+   M := R1.Match (ABC, X);
+   Test_Support.Assert (not M.Has_Match);
+   M := R1.Match (BCD, X);
+   Test_Support.Assert (not M.Has_Match);
+   M := R1.Match (BC, X);
+   Test_Support.Assert (M.Has_Match);
+end Test_V615_026;

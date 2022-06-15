@@ -47,7 +47,7 @@ package VSS.Regular_Expressions is
    No_Pattern_Options : constant Pattern_Options := (others => False);
 
    type Match_Option is
-     (Anchored_Match);
+     (Anchored_Match);  --  Match whole string
 
    type Match_Options is array (Match_Option) of Boolean;
 
@@ -60,6 +60,7 @@ package VSS.Regular_Expressions is
    ------------------------
 
    type Regular_Expression is tagged private;
+   pragma Preelaborable_Initialization (Regular_Expression);
 
    overriding function "="
      (Left : Regular_Expression; Right : Regular_Expression) return Boolean;

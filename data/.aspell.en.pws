@@ -5,13 +5,11 @@ caseless
 crlf
 dont
 encodings
-gpl
 grapheme
 ignorable
 json
 kd
 lf
-merchan
 multiline
 nel
 nonspacing
@@ -23,11 +21,10 @@ pre
 preelaborable
 preelaborate
 prepend
-runtime
+spdx
 substring
 substrings
 subtype
-tability
 titlecase
 ucs
 ufffd

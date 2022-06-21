@@ -1,25 +1,8 @@
-------------------------------------------------------------------------------
---                        M A G I C   R U N T I M E                         --
---                                                                          --
---                    Copyright (C) 2020-2022, AdaCore                      --
---                                                                          --
--- This library is free software;  you can redistribute it and/or modify it --
--- under terms of the  GNU General Public License  as published by the Free --
--- Software  Foundation;  either version 3,  or (at your  option) any later --
--- version. This library is distributed in the hope that it will be useful, --
--- but WITHOUT ANY WARRANTY;  without even the implied warranty of MERCHAN- --
--- TABILITY or FITNESS FOR A PARTICULAR PURPOSE.                            --
---                                                                          --
--- As a special exception under Section 7 of GPL version 3, you are granted --
--- additional permissions described in the GCC Runtime Library Exception,   --
--- version 3.1, as published by the Free Software Foundation.               --
---                                                                          --
--- You should have received a copy of the GNU General Public License and    --
--- a copy of the GCC Runtime Library Exception along with this program;     --
--- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
--- <http://www.gnu.org/licenses/>.                                          --
---                                                                          --
-------------------------------------------------------------------------------
+--
+--  Copyright (C) 2020-2022, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
 
 package body VSS.Regular_Expressions.ECMA_Parser is
 
@@ -85,7 +68,10 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       procedure Term (Value : out Node_Or_Class; Ok : in out Boolean)
         with Pre => Ok;
 
-      procedure Atom (Value : out Node_Or_Class; Ok : in out Boolean)
+      procedure Atom_Or_Assertion
+        (Value   : out Node_Or_Class;
+         Is_Atom : out Boolean;
+         Ok      : in out Boolean)
         with Pre => Ok;
 
       procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean)
@@ -170,8 +156,23 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
       end Alternative;
 
-      procedure Atom (Value : out Node_Or_Class; Ok : in out Boolean) is
+      procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean) is
+         Set : Name_Sets.General_Category_Set;
       begin
+         Character_Class_Escape (Set, Ok);
+
+         if Ok then
+            Value := (Has_Node => False, Category => Set);
+         end if;
+      end Atom_Escape;
+
+      procedure Atom_Or_Assertion
+        (Value   : out Node_Or_Class;
+         Is_Atom : out Boolean;
+         Ok      : in out Boolean) is
+      begin
+         Is_Atom := True;
+
          if not Cursor.Has_Element then
             if Error.Is_Empty then
                Error := "Unexpected end of string while atom expected.";
@@ -209,7 +210,18 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
             when '\' =>
                Expect ('\', Ok);
-               Atom_Escape (Value, Ok);
+
+               if Cursor.Has_Element and then Cursor.Element in 'b' | 'B' then
+                  Value := From_Node
+                    (Create_Simple_Assertion
+                      (if Cursor.Element = 'b' then Word_Boundary
+                       else No_Word_Boundary));
+
+                  Expect (Cursor.Element, Ok);
+
+               else
+                  Atom_Escape (Value, Ok);
+               end if;
 
             when '^' | '$' | '.' | '*' | '+' | '?' | ']' | '{' | '}' =>
                if Error.Is_Empty then
@@ -223,17 +235,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                Value := From_Node (Create_Character (Cursor.Element));
                Expect (Cursor.Element, Ok);
          end case;
-      end Atom;
-
-      procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean) is
-         Set : Name_Sets.General_Category_Set;
-      begin
-         Character_Class_Escape (Set, Ok);
-
-         if Ok then
-            Value := (Has_Node => False, Category => Set);
-         end if;
-      end Atom_Escape;
+      end Atom_Or_Assertion;
 
       procedure Character_Class
         (Value : out Node_Or_Class; Ok : in out Boolean)
@@ -485,12 +487,26 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end Lone_Unicode_Property_Name_Or_Value;
 
       procedure Term (Value : out Node_Or_Class; Ok : in out Boolean) is
+         Is_Atom : Boolean := False;
       begin
-         Atom (Value, Ok);
+         if Cursor.Has_Element and then Cursor.Element in '^' | '$' then
+            Value := From_Node
+              (Create_Simple_Assertion
+                (if Cursor.Element = '^' then Start_Of_Line else End_Of_Line));
+
+            Expect (Cursor.Element, Ok);
+         else
+            Atom_Or_Assertion (Value, Is_Atom, Ok);
+         end if;
 
          if Ok and then Cursor.Has_Element and then Cursor.Element = '*' then
-            Expect (Cursor.Element, Ok);
-            Value := From_Node (Create_Star (To_Node (Value)));
+            if Is_Atom then
+               Expect (Cursor.Element, Ok);
+               Value := From_Node (Create_Star (To_Node (Value)));
+            else
+               Ok := False;
+               Error := "The assertion is not quantifiable";
+            end if;
          end if;
       end Term;
 

@@ -1,25 +1,8 @@
-------------------------------------------------------------------------------
---                        M A G I C   R U N T I M E                         --
---                                                                          --
---                    Copyright (C) 2020-2022, AdaCore                      --
---                                                                          --
--- This library is free software;  you can redistribute it and/or modify it --
--- under terms of the  GNU General Public License  as published by the Free --
--- Software  Foundation;  either version 3,  or (at your  option) any later --
--- version. This library is distributed in the hope that it will be useful, --
--- but WITHOUT ANY WARRANTY;  without even the implied warranty of MERCHAN- --
--- TABILITY or FITNESS FOR A PARTICULAR PURPOSE.                            --
---                                                                          --
--- As a special exception under Section 7 of GPL version 3, you are granted --
--- additional permissions described in the GCC Runtime Library Exception,   --
--- version 3.1, as published by the Free Software Foundation.               --
---                                                                          --
--- You should have received a copy of the GNU General Public License and    --
--- a copy of the GCC Runtime Library Exception along with this program;     --
--- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
--- <http://www.gnu.org/licenses/>.                                          --
---                                                                          --
-------------------------------------------------------------------------------
+--
+--  Copyright (C) 2020-2022, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
 
 with VSS.Regular_Expressions.ECMA_Parser;
 with VSS.Strings.Character_Iterators;
@@ -75,18 +58,25 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  Shift Cursor one character backward in string Text
 
       procedure Append_State
-        (Cursor   : VSS.Implementation.Strings.Cursor;
+        (Cursor   : VSS.Strings.Character_Iterators.Character_Iterator;
+         Prev     : VSS.Characters.Virtual_Character;
          PC       : Instruction_Address;
          New_Tags : Tag_Array);
-      --  This procedure finds all states reachable from the given by
+      --  This procedure finds all states reachable from the given PC by
       --  non-character instructions and appends new thread states to the
-      --  Next global variable.
+      --  Next global variable. Cursor points to a next unprocessed character
+      --  if any. Prev is a previous character if Cursor isn't the first
+      --  character of the subject.
 
       function Character_In_Class
         (PC   : Instruction_Address;
          Char : VSS.Characters.Virtual_Character) return Boolean;
       --  Check if Char in the class defined by a program started from PC.
       --  Program should contain only Split and character instructions.
+
+      procedure Loop_Over_Characters
+        (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator);
+      --  Iterate over all characters of the Subject using Cursor
 
       package State_Vectors is new Ada.Containers.Vectors
         (Positive, Thread_State);
@@ -112,35 +102,82 @@ package body VSS.Regular_Expressions.Pike_Engines is
       ------------------
 
       procedure Append_State
-        (Cursor   : VSS.Implementation.Strings.Cursor;
+        (Cursor   : VSS.Strings.Character_Iterators.Character_Iterator;
+         Prev     : VSS.Characters.Virtual_Character;
          PC       : Instruction_Address;
          New_Tags : Tag_Array)
       is
+         function Is_Valid_Assertion (Kind : Simple_Assertion_Kind)
+           return Boolean;
+         --  Check given assertion
+
+         function Is_Word_Char (Char : VSS.Characters.Virtual_Character)
+           return Boolean is (Char in 'A' .. 'Z' | 'a' .. 'z' | '_');
+
+         ------------------------
+         -- Is_Valid_Assertion --
+         ------------------------
+
+         function Is_Valid_Assertion (Kind : Simple_Assertion_Kind)
+           return Boolean
+         is
+            use type VSS.Strings.Character_Index;
+         begin
+            case Kind is
+               when Start_Of_Line =>
+                  return Cursor.Character_Index = 1;
+               when End_Of_Line =>
+                  return not Cursor.Has_Element;
+               when Word_Boundary =>
+                  return (Cursor.Character_Index > 1 and then
+                           Is_Word_Char (Prev))
+                    xor (Cursor.Has_Element and then
+                           Is_Word_Char (Cursor.Element));
+               when No_Word_Boundary =>
+                  return not Is_Valid_Assertion (Word_Boundary);
+            end case;
+         end Is_Valid_Assertion;
+
          Code : constant Instruction := Self.Program (PC);
+         Next : constant Instruction_Address := PC + Code.Next;
+
       begin
          if Steps (PC) = Step then
-            return;
+            return;  --  Skip already processed PC
          end if;
 
          Steps (PC) := Step;
 
          case Code.Kind is
             when Character | Class | Category | Negate_Class | Match =>
-               Next.Append ((PC, New_Tags));
+               Match.Next.Append ((PC, New_Tags));
             when Split =>
-               Append_State (Cursor, PC + Code.Next, New_Tags);
-               Append_State (Cursor, PC + Code.Fallback, New_Tags);
+               Append_State (Cursor, Prev, Next, New_Tags);
+               Append_State (Cursor, Prev, PC + Code.Fallback, New_Tags);
             when Save =>
                declare
                   Updated : Tag_Array := New_Tags;
+
+                  Pos : constant not null
+                    VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+                     VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+                       (Cursor);
                begin
-                  Updated (Code.Tag) := Cursor;
-                  Append_State (Cursor, PC + Code.Next, Updated);
+                  Updated (Code.Tag) := Pos.all;
+                  Append_State (Cursor, Prev, Next, Updated);
                end;
+            when Assertion =>
+               if Is_Valid_Assertion (Code.Assertion) then
+                  Append_State (Cursor, Prev, Next, New_Tags);
+               end if;
             when No_Operation =>
-               Append_State (Cursor, PC + Code.Next, New_Tags);
+               Append_State (Cursor, Prev, Next, New_Tags);
          end case;
       end Append_State;
+
+      ------------------------
+      -- Character_In_Class --
+      ------------------------
 
       function Character_In_Class
         (PC   : Instruction_Address;
@@ -169,57 +206,19 @@ package body VSS.Regular_Expressions.Pike_Engines is
          end case;
       end Character_In_Class;
 
-      -------------------
-      -- Step_Backward --
-      -------------------
+      --------------------------
+      -- Loop_Over_Characters --
+      --------------------------
 
-      procedure Step_Backward
-        (Text   : VSS.Strings.Virtual_String'Class;
-         Cursor : in out VSS.Implementation.Strings.Cursor)
-      is
-         use type VSS.Unicode.UTF8_Code_Unit_Offset;
-         use type VSS.Unicode.UTF16_Code_Unit_Offset;
-         use type VSS.Implementation.Strings.String_Handler_Access;
-
-         Ignore : Boolean;
-         Data   : constant VSS.Strings.Internals.String_Data_Constant_Access :=
-           VSS.Strings.Internals.Data_Access_Constant (Text);
-
-         Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-           VSS.Implementation.Strings.Handler (Data.all);
+      procedure Loop_Over_Characters
+        (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator) is
       begin
-         if VSS.Implementation.Strings.Is_Invalid (Cursor) then
-            null;
-         elsif Handler = null then
-            Cursor := (0, -1, -1);
-         else
-            Ignore := Handler.Backward (Data.all, Cursor);
-         end if;
-      end Step_Backward;
-
-      use type VSS.Strings.Character_Count;
-
-      Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
-        Subject.At_First_Character;
-
-      Pos : constant not null
-        VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
-          VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (Cursor);
-      --  Access to position of the Cursor
-   begin
-      Active.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
-      Next.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
-
-      --  Start a new thread at the beginning of the sample
-      Append_State (Pos.all, 1, Unset_Tags);
-
-      if Cursor.Has_Element then
          loop
             declare
                Char : constant VSS.Characters.Virtual_Character :=
                  Cursor.Element;
 
-               --  Shift Cursor, Pos points to the next character after Char
+               --  Shift Cursor, so it points to the next character after Char
                Again : constant Boolean := Cursor.Forward;
             begin
                Active.Move (Source => Next);  --  Assign Next to Active
@@ -229,16 +228,17 @@ package body VSS.Regular_Expressions.Pike_Engines is
                for X of Active loop
                   declare
                      Code : constant Instruction := Self.Program (X.PC);
+                     Next : constant Instruction_Address := X.PC + Code.Next;
                   begin
                      case Code.Kind is
                         when Character =>
                            if Code.Character = Char then
-                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                              Append_State (Cursor, Char, Next, X.Tags);
                            end if;
 
                         when Class =>
                            if Char in Code.From .. Code.To then
-                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                              Append_State (Cursor, Char, Next, X.Tags);
                            end if;
 
                         when Category =>
@@ -246,12 +246,12 @@ package body VSS.Regular_Expressions.Pike_Engines is
                                (Code.Category,
                                 VSS.Characters.Get_General_Category (Char))
                            then
-                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                              Append_State (Cursor, Char, Next, X.Tags);
                            end if;
 
                         when Negate_Class =>
                            if not Character_In_Class (X.PC + 1, Char) then
-                              Append_State (Pos.all, X.PC + Code.Next, X.Tags);
+                              Append_State (Cursor, Char, Next, X.Tags);
                            end if;
 
                         when Match =>
@@ -270,10 +270,53 @@ package body VSS.Regular_Expressions.Pike_Engines is
                if not Found and not Options (Anchored_Match) then
                   --  Start new thread from the current character if we haven't
                   --  found any match yet nor we are in anchored match.
-                  Append_State (Pos.all, 1, Unset_Tags);
+                  Append_State (Cursor, Char, 1, Unset_Tags);
                end if;
             end;
          end loop;
+      end Loop_Over_Characters;
+
+      -------------------
+      -- Step_Backward --
+      -------------------
+
+      procedure Step_Backward
+        (Text   : VSS.Strings.Virtual_String'Class;
+         Cursor : in out VSS.Implementation.Strings.Cursor)
+      is
+         use type VSS.Implementation.Strings.String_Handler_Access;
+
+         Ignore : Boolean;
+
+         Data   : constant VSS.Strings.Internals.String_Data_Constant_Access :=
+           VSS.Strings.Internals.Data_Access_Constant (Text);
+
+         Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
+           VSS.Implementation.Strings.Handler (Data.all);
+      begin
+         if VSS.Implementation.Strings.Is_Invalid (Cursor) then
+            null;
+         elsif Handler = null then
+            Cursor := (others => <>);  --  Make it invalid
+         else
+            Ignore := Handler.Backward (Data.all, Cursor);
+         end if;
+      end Step_Backward;
+
+      use type VSS.Strings.Character_Count;
+
+      Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
+        Subject.At_First_Character;
+
+   begin
+      Active.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
+      Next.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
+
+      --  Start a new thread at the beginning of the sample
+      Append_State (Cursor, ' ', 1, Unset_Tags);
+
+      if Cursor.Has_Element then
+         Loop_Over_Characters (Cursor);
       end if;
 
       Active.Move (Source => Next);
@@ -394,6 +437,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
       function Create_Character_Range
         (From, To : VSS.Characters.Virtual_Character) return Node;
       --  Generate <class[from,to,next:unlinked]>
+
+      function Create_Simple_Assertion
+        (Kind : Simple_Assertion_Kind) return Node;
+      --  Generate <assertion[kind,next:unlinked]>
 
       function Create_General_Category_Set
         (Value : Name_Sets.General_Category_Set) return Node;
@@ -586,6 +633,23 @@ package body VSS.Regular_Expressions.Pike_Engines is
             end loop;
          end return;
       end Create_Sequence;
+
+      -----------------------------
+      -- Create_Simple_Assertion --
+      -----------------------------
+
+      function Create_Simple_Assertion
+        (Kind : Simple_Assertion_Kind) return Node
+      is
+         Code : constant Instruction :=
+           (Kind      => Assertion,
+            Next      => To_Be_Patched,
+            Assertion => Kind);
+      begin
+         return
+           (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
+            Ends    => First_Instruction);
+      end Create_Simple_Assertion;
 
       -----------------
       -- Create_Star --

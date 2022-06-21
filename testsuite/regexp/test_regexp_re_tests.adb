@@ -6,8 +6,6 @@
 
 with Ada.Command_Line;
 with Ada.Characters.Wide_Wide_Latin_1;
-with Ada.Strings.Wide_Wide_Fixed;
-with Ada.Strings.Wide_Wide_Maps;
 with Ada.Wide_Wide_Text_IO;
 
 with VSS.Application;
@@ -54,8 +52,8 @@ procedure Test_RegExp_RE_Tests is
      return VSS.Strings.Virtual_String;
    --  Interprete `\x{AA}`
 
-   Space : constant Ada.Strings.Wide_Wide_Maps.Wide_Wide_Character_Set :=
-     Ada.Strings.Wide_Wide_Maps.To_Set
+   Tab : constant VSS.Characters.Virtual_Character :=
+     VSS.Characters.Virtual_Character
        (Ada.Characters.Wide_Wide_Latin_1.HT);
 
    -------------------
@@ -115,7 +113,7 @@ procedure Test_RegExp_RE_Tests is
      return VSS.Strings.Virtual_String
    is
       Img : constant Wide_Wide_String :=
-        VSS.Strings.Character_Count'Wide_Wide_Image (Value);
+        VSS.Strings.Character_Count'Base'Wide_Wide_Image (Value);
    begin
       return VSS.Strings.To_Virtual_String (Img (2 .. Img'Last));
    end Image;
@@ -130,8 +128,8 @@ procedure Test_RegExp_RE_Tests is
       Sample  : out VSS.Strings.Virtual_String;
       Check   : out Check_Value)
    is
-      From : array (1 .. 5) of Positive;
-      To   : array (0 .. 5) of Natural := (others => 0);
+      List : constant VSS.String_Vectors.Virtual_String_Vector :=
+        VSS.Strings.To_Virtual_String (Line).Split (Tab);
    begin
       --  Parse 5 columns
       --  1 => pattern
@@ -139,40 +137,40 @@ procedure Test_RegExp_RE_Tests is
       --  3 => has match
       --  4 => expression to evaluate
       --  5 => evaluated value
-      for J in From'Range loop
-         Ada.Strings.Wide_Wide_Fixed.Find_Token
-           (Source => Line,
-            Set    => Space,
-            From   => To (J - 1) + 1,
-            Test   => Ada.Strings.Outside,
-            First  => From (J),
-            Last   => To (J));
-      end loop;
 
-      if Line (From (1)) /= '/' then
-         Pattern := VSS.Strings.To_Virtual_String (Line (From (1) .. To (1)));
-      elsif Line (To (1)) = '/' then  --  Pattern is `/regexp/`
-         Pattern := VSS.Strings.To_Virtual_String
-              (Line (From (1) + 1 .. To (1) - 1));
+      if not List (1).Starts_With ("/") then
+         Pattern := List (1);
+      elsif List (1).Ends_With ("/") then  --  Pattern is `/regexp/`
+         Pattern := List (1);
+
+         declare
+            From : VSS.Strings.Character_Iterators.Character_Iterator :=
+              Pattern.At_First_Character;
+            To : VSS.Strings.Character_Iterators.Character_Iterator :=
+              Pattern.At_Last_Character;
+         begin
+            if From.Forward and To.Backward then
+               Pattern := Pattern.Slice (From, To);
+            else
+               raise Program_Error;
+            end if;
+         end;
       else  --  Pattern in form of `/regexp/FLAGS` isn't supported yet
          Check := (Kind => Skip);
          return;
       end if;
 
-      Sample := VSS.Strings.To_Virtual_String (Line (From (2) .. To (2)));
+      Sample := List (2);
       Sample := Expand_Sample (Sample);
 
       declare
-         Status : constant Wide_Wide_String := Line (From (3) .. To (3));
-         Expr   : constant Wide_Wide_String := Line (From (4) .. To (4));
-         Expect : constant Wide_Wide_String := Line (From (5) .. To (5));
+         Status : constant VSS.Strings.Virtual_String := List (3);
+         Expr   : constant VSS.Strings.Virtual_String := List (4);
+         Expect : constant VSS.Strings.Virtual_String := List (5);
       begin
-         case Status (Status'First) is
+         case Status.At_First_Character.Element is
             when 'y' =>
-               Check := (Match,
-                         VSS.Strings.To_Virtual_String (Expr),
-                         Expand_Sample
-                           (VSS.Strings.To_Virtual_String (Expect)));
+               Check := (Match, Expr, Expand_Sample (Expect));
             when 'n' =>
                Check := (Kind => Dont_Match);
             when others =>   --  'c'  --  compile error
@@ -254,7 +252,9 @@ procedure Test_RegExp_RE_Tests is
                           VSS.Strings.Cursors.Markers.Character_Marker :=
                             Match.First_Marker (Index);
                      begin
-                        Result.Append (Image (Marker.Character_Index - 1));
+                        if Marker.Is_Valid then
+                           Result.Append (Image (Marker.Character_Index - 1));
+                        end if;
                      end;
 
                      pragma Assert (Cursor.Element = ']');
@@ -272,7 +272,9 @@ procedure Test_RegExp_RE_Tests is
                           VSS.Strings.Cursors.Markers.Character_Marker :=
                             Match.Last_Marker (Index);
                      begin
-                        Result.Append (Image (Marker.Character_Index));
+                        if Marker.Is_Valid then
+                           Result.Append (Image (Marker.Character_Index));
+                        end if;
                      end;
 
                      pragma Assert (Cursor.Element = ']');
@@ -345,7 +347,7 @@ begin
                      Last_Pattern :=
                        VSS.Regular_Expressions.To_Regular_Expression (Pattern);
 
-                     Last_Sample := VSS.Strings.Empty_Virtual_String;
+                     Last_Sample := "not-a-sample";
                   end if;
 
                   if Last_Sample /= Sample then

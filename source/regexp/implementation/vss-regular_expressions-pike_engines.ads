@@ -37,6 +37,7 @@ private
       Class,         --  Accept one Virtual_Character from a range
       Category,      --  Accept one Virtual_Character from a general category
       Negate_Class,  --  Accept one Virtual_Character if not in a class/range
+      Assertion,     --  Accept one assertion, like ^, $, \b, \B
       Match,         --  Mark accepted string prefix as a regexp match
       Save);         --  Save subgroup bound
    --  VM instruction kinds
@@ -58,6 +59,8 @@ private
             --  Program to define char class starts from the next
             --  instruction after Negate_Class
             null;
+         when Assertion =>
+            Assertion : Simple_Assertion_Kind;
          when Save =>
             Tag : Tag_Number;
          when No_Operation | Match =>

@@ -12,7 +12,7 @@ with VSS.Characters;
 with VSS.Strings.Character_Iterators;
 with VSS.Regular_Expressions.Name_Sets;
 
-generic
+private generic
    type Node is private;
 
    with function Create_Character (Value : VSS.Characters.Virtual_Character)
@@ -23,6 +23,9 @@ generic
 
    with function Create_General_Category_Set
      (Value : Name_Sets.General_Category_Set) return Node is <>;
+
+   with function Create_Simple_Assertion (Kind : Simple_Assertion_Kind)
+     return Node is <>;
 
    with function Create_Sequence (Left, Right : Node) return Node is <>;
    with function Create_Alternative (Left, Right : Node) return Node is <>;

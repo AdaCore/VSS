@@ -174,4 +174,7 @@ private
    overriding procedure Adjust (Self : in out Regular_Expression_Match);
    overriding procedure Finalize (Self : in out Regular_Expression_Match);
 
+   type Simple_Assertion_Kind is
+     (Start_Of_Line, End_Of_Line, Word_Boundary, No_Word_Boundary);
+
 end VSS.Regular_Expressions;

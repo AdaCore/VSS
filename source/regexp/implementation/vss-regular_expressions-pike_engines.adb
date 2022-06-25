@@ -7,7 +7,6 @@
 with VSS.Regular_Expressions.ECMA_Parser;
 with VSS.Strings.Character_Iterators;
 with VSS.Implementation.Strings;
-with VSS.Unicode;
 with VSS.Strings.Cursors.Internals;
 with VSS.Regular_Expressions.Matches;
 with VSS.Strings.Cursors.Markers.Internals;

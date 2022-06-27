@@ -6,6 +6,16 @@
 
 package body VSS.Strings.Cursors.Markers is
 
+   ----------------------
+   -- Character_Length --
+   ----------------------
+
+   overriding function Character_Length (Self : Segment_Marker)
+     return VSS.Strings.Character_Count is
+   begin
+      return Segment_Cursor_Base (Self).Character_Length;
+   end Character_Length;
+
    --------------
    -- Is_Valid --
    --------------
@@ -13,6 +23,15 @@ package body VSS.Strings.Cursors.Markers is
    overriding function Is_Valid (Self : Character_Marker) return Boolean is
    begin
       return Character_Cursor_Base (Self).Is_Valid;
+   end Is_Valid;
+
+   --------------
+   -- Is_Valid --
+   --------------
+
+   overriding function Is_Valid (Self : Segment_Marker) return Boolean is
+   begin
+      return Segment_Cursor_Base (Self).Is_Valid;
    end Is_Valid;
 
    ---------------------

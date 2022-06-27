@@ -203,6 +203,17 @@ package body VSS.Regular_Expressions is
         (Self.Marker (Name)).First_Marker;
    end First_Marker;
 
+   -----------------
+   -- Has_Capture --
+   -----------------
+
+   function Has_Capture
+     (Self  : Regular_Expression_Match'Class;
+      Index : Positive) return Boolean is
+   begin
+      return Self.Marker (Index).Is_Valid;
+   end Has_Capture;
+
    ---------------
    -- Has_Match --
    ---------------

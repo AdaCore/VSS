@@ -98,6 +98,11 @@ package VSS.Regular_Expressions is
    function Has_Match (Self : Regular_Expression_Match'Class) return Boolean;
    --  Return True when regular expression matched against the subject string.
 
+   function Has_Capture
+     (Self  : Regular_Expression_Match'Class;
+      Index : Positive) return Boolean;
+   --  Check if the capturing group with given Index has been captured.
+
    function Captured
      (Self  : Regular_Expression_Match'Class;
       Index : Natural := 0) return VSS.Strings.Virtual_String;

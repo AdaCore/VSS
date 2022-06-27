@@ -141,13 +141,29 @@ package VSS.XML.Implementation.HTML_Writer_Data is
    type Condition_Element_Flags is
      array (Condition_HTML_Element_Kind) of Boolean with Pack;
 
+   type Element_Flags is record
+      Specific : Condition_Element_Flags := (others => False);
+      --  Value for specific kind of elements.
+      Other    : Boolean := False;
+      --  Common value for all other kinds of elements.
+   end record;
+
+   function Value
+     (Self    : Element_Flags;
+      Element : HTML_Element_Kind) return Boolean;
+   --  Return value for the given element.
+
    type Start_Tag_First_Child_Conditions is record
       Text       : Boolean := False;
       Whitespace : Boolean := False;
       Comment    : Boolean := False;
-      Element    : Boolean := False;
-      HTML       : Condition_Element_Flags := (others => False);
+      Element    : Element_Flags := (others => <>);
    end record;
+
+   function Element
+     (Self    : Start_Tag_First_Child_Conditions;
+      Element : HTML_Element_Kind) return Boolean;
+   --  Returns value of the condition for given kind of the elements.
 
    type Omit_Start_Tag_Rules (May_Be_Omitted : Boolean := False) is record
       case May_Be_Omitted is
@@ -178,9 +194,8 @@ package VSS.XML.Implementation.HTML_Writer_Data is
             null;
 
          when True =>
-            Next_Sibling       : Start_Tag_First_Child_Conditions;
-            End_Of_Parent      : Boolean;
-            End_Of_HTML_Parent : Condition_Element_Flags;
+            Next_Sibling  : Start_Tag_First_Child_Conditions;
+            End_Of_Parent : Element_Flags;
       end case;
    end record;
 
@@ -262,12 +277,8 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       End_Tag   : Omit_End_Tag_Rules   := (May_Be_Omitted => False);
    end record;
 
-   --  Ignore_First_Child : constant Start_Tag_First_Child_Conditions :=
-   --    (Text       => False,
-   --     Whitespace => False,
-   --     Comment    => False,
-   --     Element    => False,
-   --     HTML       => (others => False));
+   All_Elements : constant Element_Flags :=
+     (Other => True, Specific => (others => True));
 
    Void_Element_Properties : constant Element_Properties :=
      (Kind      => Void,
@@ -298,21 +309,20 @@ package VSS.XML.Implementation.HTML_Writer_Data is
             (Whitespace => False,
              Text       => True,
              Comment    => False,
-             Element    => True,
-             HTML       =>
-               (link_Element | meta_Element | script_Element | style_Element
-                  | template_Element => False,
-                others               => True)),
+             Element    =>
+               (Other      => True,
+                Specific   =>
+                  (link_Element | meta_Element | script_Element
+                       | style_Element | template_Element => False,
+                   others                                 => True))),
             True),
          End_Tag   =>
            (True,
             (Whitespace => False,
              Text       => False,
              Comment    => False,
-             Element    => True,
-             HTML       => (others => True)),
-            True,
-            (others => True))),
+             Element    => All_Elements),
+            All_Elements)),
       br_Element      => Void_Element_Properties,
       --  button_Element,
       --  canvas_Element,
@@ -345,40 +355,40 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       --  h5_Element,
       --  h6_Element,
       head_Element     =>
-        (Normal, No,
-         (True,
-          (others => True),
-          (Text | Whitespace | Comment => False,
-           Element                     => True,
-           HTML                        => (others => True)),
-          True),
-         (True,
-          (Whitespace => False,
-           Text       => True,
-           Comment    => False,
-           Element    => True,
-           HTML       => (others => True)),
-          True,
-          (others => True))),
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag =>
+           (True,
+            (others => True),
+            (Text | Whitespace | Comment => False,
+             Element                     => All_Elements),
+            True),
+         End_Tag   =>
+           (True,
+            (Whitespace => False,
+             Text       => True,
+             Comment    => False,
+             Element    => All_Elements),
+            All_Elements)),
       --  header_Element,
       --  hgroup_Element,
       hr_Element       => Void_Element_Properties,
       html_Element     =>
-        (Normal, No,
-         (True,
-          (others => True),
-          (Text | Whitespace | Comment => False,
-           Element                     => True,
-           HTML                        => (others => True)),
-          False),
-         (True,
-          (Whitespace => False,
-           Text       => False,
-           Comment    => False,
-           Element    => True,
-           HTML       => (others => True)),
-          True,
-          (others => True))),
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag =>
+           (True,
+            (others => True),
+            (Text | Whitespace | Comment => False,
+             Element                     => All_Elements),
+            False),
+         End_Tag =>
+           (True,
+            (Whitespace => False,
+             Text       => False,
+             Comment    => False,
+             Element    => All_Elements),
+            All_Elements)),
       --  i_Element,
       --  iframe_Element,
       img_Element      => Void_Element_Properties,
@@ -392,15 +402,15 @@ package VSS.XML.Implementation.HTML_Writer_Data is
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
          End_Tag   =>
-           (May_Be_Omitted     => True,
-            Next_Sibling       =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
               (Whitespace => False,
                Text       => False,
                Comment    => False,
-               Element    => False,
-               HTML       => (li_Element => True, others => False)),
-            End_Of_Parent      => True,
-            End_Of_HTML_Parent => (others => True))),
+               Element    =>
+                 (Other    => False,
+                  Specific => (li_Element => True, others => False))),
+            End_Of_Parent  => All_Elements)),
       link_Element     => Void_Element_Properties,
       --  main_Element,
       --  map_Element,

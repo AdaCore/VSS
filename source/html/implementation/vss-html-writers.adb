@@ -366,28 +366,16 @@ package body VSS.HTML.Writers is
             if Self.Text.Is_Empty then
                case Event is
                   when Start_Tag =>
-                     if Self.Current.Last_Child.Element
-                          in Properties.End_Tag.Next_Sibling.HTML'Range
-                     then
-                        Omit :=
-                          Properties.End_Tag.Next_Sibling.HTML
-                            (Self.Current.Last_Child.Element);
-
-                     else
-                        Omit := Properties.End_Tag.Next_Sibling.Element;
-                     end if;
+                     Omit :=
+                       VSS.XML.Implementation.HTML_Writer_Data.Element
+                         (Properties.End_Tag.Next_Sibling,
+                          Self.Current.Last_Child.Element);
 
                   when End_Tag =>
-                     if Self.Current.Last_Child.Element
-                          in Properties.End_Tag.End_Of_HTML_Parent'Range
-                     then
-                        Omit :=
-                          Properties.End_Tag.End_Of_HTML_Parent
-                            (Self.Current.Last_Child.Element);
-
-                     else
-                        Omit := Properties.End_Tag.End_Of_Parent;
-                     end if;
+                     Omit :=
+                       VSS.XML.Implementation.HTML_Writer_Data.Value
+                         (Properties.End_Tag.End_Of_Parent,
+                          Self.Current.Last_Child.Element);
 
                   when Comment =>
                      Omit := Properties.End_Tag.Next_Sibling.Comment;
@@ -422,17 +410,10 @@ package body VSS.HTML.Writers is
                   if Self.Text.Is_Empty then
                      case Event is
                         when Start_Tag =>
-                           if Self.Current.Element
-                                in Properties.Start_Tag.First_Child.HTML'Range
-                           then
-                              Omit :=
-                                Properties.Start_Tag.First_Child.HTML
-                                  (Self.Current.Element);
-
-                           else
-                              Omit :=
-                                Properties.Start_Tag.First_Child.Element;
-                           end if;
+                           Omit :=
+                             VSS.XML.Implementation.HTML_Writer_Data.Element
+                               (Properties.Start_Tag.First_Child,
+                                Self.Current.Element);
 
                         when End_Tag =>
                            Omit :=

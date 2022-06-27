@@ -137,22 +137,16 @@ package body VSS.XML.Implementation.HTML_Writer_Data is
    video_Tag      : constant VSS.Strings.Virtual_String := "video";
    wbr_Tag        : constant VSS.Strings.Virtual_String := "wbr";
 
-   -----------
-   -- "and" --
-   -----------
+   -------------
+   -- Element --
+   -------------
 
-   function "and"
-     (Left  : Start_Tag_First_Child_Conditions;
-      Right : Start_Tag_First_Child_Conditions)
-      return Start_Tag_First_Child_Conditions is
+   function Element
+     (Self    : Start_Tag_First_Child_Conditions;
+      Element : HTML_Element_Kind) return Boolean is
    begin
-      return
-        (Text       => Left.Text and Right.Text,
-         Whitespace => Left.Whitespace and Right.Whitespace,
-         Comment    => Left.Comment and Right.Comment,
-         Element    => Left.Element and Right.Element,
-         HTML       => Left.HTML and Right.HTML);
-   end "and";
+      return Value (Self.Element, Element);
+   end Element;
 
    ---------------------
    -- To_HTML_Element --
@@ -539,5 +533,21 @@ package body VSS.XML.Implementation.HTML_Writer_Data is
 
       return Anonymous_Custom_Element;
    end To_HTML_Element;
+
+   -----------
+   -- Value --
+   -----------
+
+   function Value
+     (Self    : Element_Flags;
+      Element : HTML_Element_Kind) return Boolean is
+   begin
+      if Element in Self.Specific'Range then
+         return Self.Specific (Element);
+
+      else
+         return Self.Other;
+      end if;
+   end Value;
 
 end VSS.XML.Implementation.HTML_Writer_Data;

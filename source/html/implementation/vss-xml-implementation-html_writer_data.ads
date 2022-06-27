@@ -277,6 +277,8 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       End_Tag   : Omit_End_Tag_Rules   := (May_Be_Omitted => False);
    end record;
 
+   No_Elements  : constant Element_Flags :=
+     (Other => False, Specific => (others => False));
    All_Elements : constant Element_Flags :=
      (Other => True, Specific => (others => True));
 
@@ -286,36 +288,43 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       Start_Tag => (May_Be_Omitted => False),
       End_Tag   => (May_Be_Omitted => False));
 
+   Normal_No_Text_Properties : constant Element_Properties :=
+     (Kind      => Normal,
+      Text      => No,
+      Start_Tag => (May_Be_Omitted => False),
+      End_Tag   => (May_Be_Omitted => False));
+
    Properties : constant array (HTML_Element_Kind) of Element_Properties :=
      (
       --  a_Element,
       --  abbr_Element,
       --  address_Element,
-      area_Element    => Void_Element_Properties,
+      area_Element     => Void_Element_Properties,
       --  article_Element,
       --  aside_Element,
       --  audio_Element,
       --  b_Element,
-      base_Element    => Void_Element_Properties,
+      base_Element     => Void_Element_Properties,
       --  bdi_Element,
       --  bdo_Element,
       --  blockquote_Element,
-      body_Element    =>
+      body_Element     =>
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag =>
-           (True,
-            (others => True),
-            (Whitespace => False,
-             Text       => True,
-             Comment    => False,
-             Element    =>
-               (Other      => True,
-                Specific   =>
-                  (link_Element | meta_Element | script_Element
-                       | style_Element | template_Element => False,
-                   others                                 => True))),
-            True),
+           (May_Be_Omitted               => True,
+            Previous_Sibling_End_Omitted => (others => True),
+            First_Child                  =>
+              (Whitespace => False,
+               Text       => True,
+               Comment    => False,
+               Element    =>
+                 (Other      => True,
+                  Specific   =>
+                    (link_Element | meta_Element | script_Element
+                         | style_Element | template_Element => False,
+                     others                                 => True))),
+            Is_Empty                     => True),
          End_Tag   =>
            (True,
             (Whitespace => False,
@@ -323,24 +332,82 @@ package VSS.XML.Implementation.HTML_Writer_Data is
              Comment    => False,
              Element    => All_Elements),
             All_Elements)),
-      br_Element      => Void_Element_Properties,
+      br_Element       => Void_Element_Properties,
       --  button_Element,
       --  canvas_Element,
-      --  caption_Element,
+      caption_Element  =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => True,
+               Comment    => False,
+               Element    => All_Elements),
+            End_Of_Parent  => No_Elements)),
       --  cite_Element,
       --  code_Element,
-      col_Element     => Void_Element_Properties,
-      --  colgroup_Element,
+      col_Element      => Void_Element_Properties,
+      colgroup_Element =>
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag =>
+           (May_Be_Omitted               => True,
+            Previous_Sibling_End_Omitted =>
+              (colgroup_Element => False, others => True),
+            First_Child                  =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((col_Element => True, others => False), Other => False)),
+            Is_Empty                     => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => True,
+               Comment    => False,
+               Element    => All_Elements),
+            End_Of_Parent  => No_Elements)),
       --  data_Element,
       --  datalist_Element,
-      --  dd_Element,
+      dd_Element       =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element        =>
+                 ((dt_Element | dd_Element => True, others => False),
+                  False)),
+            End_Of_Parent  => All_Elements)),
       --  del_Element,
       --  details_Element,
       --  dfn_Element,
       --  dialog_Element,
       --  div_Element,
-      --  dl_Element,
-      --  dt_Element,
+      dl_Element       => Normal_No_Text_Properties,
+      dt_Element       =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace     => False,
+               Text           => False,
+               Comment        => False,
+               Element        =>
+                 ((dt_Element | dd_Element => True, others => False),
+                  False)),
+            End_Of_Parent  => No_Elements)),
       --  em_Element,
       embed_Element    => Void_Element_Properties,
       --  fieldset_Element,
@@ -422,48 +489,227 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       --  noscript_Element,
       --  object_Element,
       --  ol_Element,
-      --  optgroup_Element,
-      --  option_Element,
+      optgroup_Element =>
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((optgroup_Element => True, others => False),
+                  others => False)),
+            End_Of_Parent  => All_Elements)),
+      option_Element   =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((option_Element | optgroup_Element => True,
+                   others                            => False),
+                  others => False)),
+            End_Of_Parent  => All_Elements)),
       --  output_Element,
-      --  p_Element,
+      p_Element        =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 (Other    => False,
+                  Specific =>
+                    (address_Element | article_Element | aside_Element
+                       | blockquote_Element | details_Element | div_Element
+                       | dl_Element | fieldset_Element | figcaption_Element
+                       | figure_Element | footer_Element | form_Element
+                       | h1_Element | h2_Element | h3_Element | h4_Element
+                       | h5_Element | h6_Element | header_Element
+                       | hgroup_Element | hr_Element | main_Element
+                       | menu_Element | nav_Element | ol_Element | p_Element
+                       | pre_Element | section_Element | table_Element
+                       | ul_Element | Anonymous_Custom_Element => True,
+                     others => False))),
+            End_Of_Parent  =>
+              ((a_Element | audio_Element | del_Element | ins_Element
+                | map_Element | noscript_Element | video_Element => False,
+                others => True),
+               others => True))),
       --  picture_Element,
       --  pre_Element,
       --  progress_Element,
       --  q_Element,
-      --  rp_Element,
-      --  rt_Element,
+      rp_Element       =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element        =>
+                 ((rp_Element | rt_Element => True, others => False),
+                  False)),
+            End_Of_Parent  => All_Elements)),
+      rt_Element       =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element        =>
+                 ((rp_Element | rt_Element => True, others => False),
+                  False)),
+            End_Of_Parent  => All_Elements)),
+
       --  ruby_Element,
       --  s_Element,
       --  samp_Element,
-      script_Element   => (Raw_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
+      script_Element   =>
+        (Raw_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
       --  section_Element,
-      --  select_Element,
+      select_Element   => Normal_No_Text_Properties,
       --  slot_Element,
       --  small_Element,
       source_Element   => Void_Element_Properties,
       --  span_Element,
       --  strong_Element,
-      style_Element    => (Raw_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
+      style_Element    =>
+        (Raw_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
       --  sub_Element,
       --  summary_Element,
       --  sup_Element,
-      --  table_Element,
-      --  tbody_Element,
-      --  td_Element,
+      table_Element    => Normal_No_Text_Properties,
+      tbody_Element    =>
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag =>
+           (May_Be_Omitted               => True,
+            Previous_Sibling_End_Omitted =>
+              (tbody_Element | thead_Element | tfoot_Element => False,
+               others                                        => True),
+            First_Child                  =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((tr_Element => True, others => False), others => False)),
+            Is_Empty                     => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((tbody_Element | tfoot_Element => True, others => False),
+                  others => False)),
+            End_Of_Parent  => All_Elements)),
+      td_Element       =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((td_Element | th_Element => True, others => False),
+                  others => False)),
+            End_Of_Parent  => All_Elements)),
       --  template_Element,
-      textarea_Element => (Escapable_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
-      --  tfoot_Element,
-      --  th_Element,
-      --  thead_Element,
+      textarea_Element =>
+        (Kind      => Escapable_Text,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   => (May_Be_Omitted => False)),
+      tfoot_Element    =>
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    => No_Elements),
+            End_Of_Parent  => All_Elements)),
+      th_Element       =>
+        (Kind      => Normal,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((td_Element | th_Element => True, others => False),
+                  others => False)),
+            End_Of_Parent  => All_Elements)),
+      thead_Element    =>
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((tbody_Element | tfoot_Element => True, others => False),
+                  others => False)),
+            End_Of_Parent  => No_Elements)),
       --  time_Element,
-      title_Element    => (Escapable_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
-      --  tr_Element,
+      title_Element    =>
+        (Kind      => Escapable_Text,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   => (May_Be_Omitted => False)),
+      tr_Element       =>
+        (Kind      => Normal,
+         Text      => No,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   =>
+           (May_Be_Omitted => True,
+            Next_Sibling   =>
+              (Whitespace => False,
+               Text       => False,
+               Comment    => False,
+               Element    =>
+                 ((tr_Element => True, others => False), others => False)),
+            End_Of_Parent  => All_Elements)),
       track_Element    => Void_Element_Properties,
       --  u_Element,
       --  ul_Element,
       --  var_Element,
       --  video_Element,
       wbr_Element      => Void_Element_Properties,
-      others           => (Normal, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)));
+      others           =>
+        (Normal, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)));
 
 end VSS.XML.Implementation.HTML_Writer_Data;

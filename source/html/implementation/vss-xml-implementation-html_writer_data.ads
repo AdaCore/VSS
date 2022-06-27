@@ -8,8 +8,6 @@ with VSS.Strings;
 
 package VSS.XML.Implementation.HTML_Writer_Data is
 
-   --  pragma Preelaborate;
-
    --  HTML elements are reordered to group together all elements that appear
    --  in the tag omitting conditions.
 
@@ -199,12 +197,13 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       end case;
    end record;
 
-   --  Elements, used in omitting conditions
+   --  Elements, used in omitting conditions in WhatWG's HTML living
+   --  standard 2022-06-17
    --
-   --   +        preciding
-   --     +      parent
-   --       +    child
-   --         +  following
+   --   ^        preciding
+   --     ^      parent
+   --       ^    child
+   --         ^  following
    --
    --     +      a
    --         +  address
@@ -294,21 +293,26 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       Start_Tag => (May_Be_Omitted => False),
       End_Tag   => (May_Be_Omitted => False));
 
+   Normal_Transparent_Properties : constant Element_Properties :=
+     (Kind      => Normal,
+      Text      => Transparent,
+      Start_Tag => (May_Be_Omitted => False),
+      End_Tag   => (May_Be_Omitted => False));
+
    Properties : constant array (HTML_Element_Kind) of Element_Properties :=
-     (
-      --  a_Element,
+     (a_Element        => Normal_Transparent_Properties,          --  a
       --  abbr_Element,
       --  address_Element,
-      area_Element     => Void_Element_Properties,
+      area_Element     => Void_Element_Properties,                --  area
       --  article_Element,
       --  aside_Element,
-      --  audio_Element,
+      audio_Element    => Normal_Transparent_Properties,          --  audio
       --  b_Element,
-      base_Element     => Void_Element_Properties,
+      base_Element     => Void_Element_Properties,                --  base
       --  bdi_Element,
       --  bdo_Element,
       --  blockquote_Element,
-      body_Element     =>
+      body_Element     =>                                         --  body
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag =>
@@ -332,10 +336,10 @@ package VSS.XML.Implementation.HTML_Writer_Data is
              Comment    => False,
              Element    => All_Elements),
             All_Elements)),
-      br_Element       => Void_Element_Properties,
+      br_Element       => Void_Element_Properties,                --  br
       --  button_Element,
-      --  canvas_Element,
-      caption_Element  =>
+      canvas_Element   => Normal_Transparent_Properties,          --  canvas
+      caption_Element  =>                                         --  caption
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -349,8 +353,8 @@ package VSS.XML.Implementation.HTML_Writer_Data is
             End_Of_Parent  => No_Elements)),
       --  cite_Element,
       --  code_Element,
-      col_Element      => Void_Element_Properties,
-      colgroup_Element =>
+      col_Element      => Void_Element_Properties,                --  col
+      colgroup_Element =>                                         --  colgroup
         (Kind      => Normal,
          Text      => No,
          Start_Tag =>
@@ -374,7 +378,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
             End_Of_Parent  => No_Elements)),
       --  data_Element,
       --  datalist_Element,
-      dd_Element       =>
+      dd_Element       =>                                         --  dd
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -388,13 +392,13 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                  ((dt_Element | dd_Element => True, others => False),
                   False)),
             End_Of_Parent  => All_Elements)),
-      --  del_Element,
+      del_Element      => Normal_Transparent_Properties,          --  del
       --  details_Element,
       --  dfn_Element,
       --  dialog_Element,
       --  div_Element,
-      dl_Element       => Normal_No_Text_Properties,
-      dt_Element       =>
+      dl_Element       => Normal_No_Text_Properties,              --  dl
+      dt_Element       =>                                         --  dt
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -409,7 +413,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                   False)),
             End_Of_Parent  => No_Elements)),
       --  em_Element,
-      embed_Element    => Void_Element_Properties,
+      embed_Element    => Void_Element_Properties,                --  embed
       --  fieldset_Element,
       --  figcaption_Element,
       --  figure_Element,
@@ -421,7 +425,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       --  h4_Element,
       --  h5_Element,
       --  h6_Element,
-      head_Element     =>
+      head_Element     =>                                         --  head
         (Kind      => Normal,
          Text      => No,
          Start_Tag =>
@@ -438,9 +442,9 @@ package VSS.XML.Implementation.HTML_Writer_Data is
              Element    => All_Elements),
             All_Elements)),
       --  header_Element,
-      --  hgroup_Element,
-      hr_Element       => Void_Element_Properties,
-      html_Element     =>
+      hgroup_Element   => Normal_No_Text_Properties,              --  hgroup
+      hr_Element       => Void_Element_Properties,                --  hr
+      html_Element     =>                                         --  html
         (Kind      => Normal,
          Text      => No,
          Start_Tag =>
@@ -458,13 +462,13 @@ package VSS.XML.Implementation.HTML_Writer_Data is
             All_Elements)),
       --  i_Element,
       --  iframe_Element,
-      img_Element      => Void_Element_Properties,
-      input_Element    => Void_Element_Properties,
-      --  ins_Element,
+      img_Element      => Void_Element_Properties,                --  img
+      input_Element    => Void_Element_Properties,                --  input
+      ins_Element      => Normal_Transparent_Properties,          --  ins
       --  kbd_Element,
       --  label_Element,
       --  legend_Element,
-      li_Element       =>
+      li_Element       =>                                         --  li
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -478,18 +482,18 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                  (Other    => False,
                   Specific => (li_Element => True, others => False))),
             End_Of_Parent  => All_Elements)),
-      link_Element     => Void_Element_Properties,
+      link_Element     => Void_Element_Properties,                --  link
       --  main_Element,
-      --  map_Element,
+      map_Element      => Normal_Transparent_Properties,          --  map
       --  mark_Element,
-      --  menu_Element,
-      meta_Element     => Void_Element_Properties,
+      menu_Element     => Normal_No_Text_Properties,              --  menu
+      meta_Element     => Void_Element_Properties,                --  meta
       --  meter_Element,
       --  nav_Element,
       --  noscript_Element,
-      --  object_Element,
-      --  ol_Element,
-      optgroup_Element =>
+      object_Element   => Normal_Transparent_Properties,          --  object
+      ol_Element       => Normal_No_Text_Properties,              --  ol
+      optgroup_Element =>                                         --  optgroup
         (Kind      => Normal,
          Text      => No,
          Start_Tag => (May_Be_Omitted => False),
@@ -503,7 +507,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                  ((optgroup_Element => True, others => False),
                   others => False)),
             End_Of_Parent  => All_Elements)),
-      option_Element   =>
+      option_Element   =>                                         --  option
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -519,7 +523,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                   others => False)),
             End_Of_Parent  => All_Elements)),
       --  output_Element,
-      p_Element        =>
+      p_Element        =>                                         --  p
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -552,7 +556,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       --  pre_Element,
       --  progress_Element,
       --  q_Element,
-      rp_Element       =>
+      rp_Element       =>                                         --  rp
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -566,7 +570,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                  ((rp_Element | rt_Element => True, others => False),
                   False)),
             End_Of_Parent  => All_Elements)),
-      rt_Element       =>
+      rt_Element       =>                                         --  rt
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -580,26 +584,25 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                  ((rp_Element | rt_Element => True, others => False),
                   False)),
             End_Of_Parent  => All_Elements)),
-
       --  ruby_Element,
       --  s_Element,
       --  samp_Element,
-      script_Element   =>
+      script_Element   =>                                         --  script
         (Raw_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
       --  section_Element,
-      select_Element   => Normal_No_Text_Properties,
-      --  slot_Element,
+      select_Element   => Normal_No_Text_Properties,              --  select
+      slot_Element     => Normal_Transparent_Properties,          --  slot
       --  small_Element,
-      source_Element   => Void_Element_Properties,
+      source_Element   => Void_Element_Properties,                --  source
       --  span_Element,
       --  strong_Element,
-      style_Element    =>
+      style_Element    =>                                         --  style
         (Raw_Text, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)),
       --  sub_Element,
       --  summary_Element,
       --  sup_Element,
-      table_Element    => Normal_No_Text_Properties,
-      tbody_Element    =>
+      table_Element    => Normal_No_Text_Properties,              --  table
+      tbody_Element    =>                                         --  tbody
         (Kind      => Normal,
          Text      => No,
          Start_Tag =>
@@ -624,7 +627,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                  ((tbody_Element | tfoot_Element => True, others => False),
                   others => False)),
             End_Of_Parent  => All_Elements)),
-      td_Element       =>
+      td_Element       =>                                         --  td
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -639,12 +642,12 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                   others => False)),
             End_Of_Parent  => All_Elements)),
       --  template_Element,
-      textarea_Element =>
+      textarea_Element =>                                         --  textarea
         (Kind      => Escapable_Text,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
          End_Tag   => (May_Be_Omitted => False)),
-      tfoot_Element    =>
+      tfoot_Element    =>                                         --  tfoot
         (Kind      => Normal,
          Text      => No,
          Start_Tag => (May_Be_Omitted => False),
@@ -656,7 +659,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                Comment    => False,
                Element    => No_Elements),
             End_Of_Parent  => All_Elements)),
-      th_Element       =>
+      th_Element       =>                                         --  th
         (Kind      => Normal,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
@@ -670,7 +673,7 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                  ((td_Element | th_Element => True, others => False),
                   others => False)),
             End_Of_Parent  => All_Elements)),
-      thead_Element    =>
+      thead_Element    =>                                         --  thead
         (Kind      => Normal,
          Text      => No,
          Start_Tag => (May_Be_Omitted => False),
@@ -685,12 +688,12 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                   others => False)),
             End_Of_Parent  => No_Elements)),
       --  time_Element,
-      title_Element    =>
+      title_Element    =>                                         --  title
         (Kind      => Escapable_Text,
          Text      => Yes,
          Start_Tag => (May_Be_Omitted => False),
          End_Tag   => (May_Be_Omitted => False)),
-      tr_Element       =>
+      tr_Element       =>                                         --  tr
         (Kind      => Normal,
          Text      => No,
          Start_Tag => (May_Be_Omitted => False),
@@ -703,12 +706,12 @@ package VSS.XML.Implementation.HTML_Writer_Data is
                Element    =>
                  ((tr_Element => True, others => False), others => False)),
             End_Of_Parent  => All_Elements)),
-      track_Element    => Void_Element_Properties,
+      track_Element    => Void_Element_Properties,                --  track
       --  u_Element,
-      --  ul_Element,
+      ul_Element       => Normal_No_Text_Properties,              --  ul
       --  var_Element,
-      --  video_Element,
-      wbr_Element      => Void_Element_Properties,
+      video_Element    => Normal_Transparent_Properties,          --  video
+      wbr_Element      => Void_Element_Properties,                --  wbr
       others           =>
         (Normal, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)));
 

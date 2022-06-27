@@ -202,9 +202,20 @@ package body VSS.HTML.Writers is
 
    type Event_Kind is (Start_Tag, End_Tag, Comment, CDATA);
 
+   type Event_Data (Kind : Event_Kind) is record
+      case Kind is
+         when Start_Tag =>
+            Element :
+              VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind;
+
+         when others =>
+            null;
+      end case;
+   end record;
+
    procedure Close_Current_Tag
      (Self    : in out HTML5_Writer'Class;
-      Event   : Event_Kind;
+      Event   : Event_Data;
       Success : in out Boolean);
    --  Generate close of the current tag when necessary.
 
@@ -334,9 +345,8 @@ package body VSS.HTML.Writers is
 
    procedure Close_Current_Tag
      (Self    : in out HTML5_Writer'Class;
-      Event   : Event_Kind;
-      Success : in out Boolean)
-   is
+      Event   : Event_Data;
+      Success : in out Boolean) is
    begin
       --  Reject ignorable whitespaces.
 
@@ -364,12 +374,12 @@ package body VSS.HTML.Writers is
 
          begin
             if Self.Text.Is_Empty then
-               case Event is
+               case Event.Kind is
                   when Start_Tag =>
                      Omit :=
                        VSS.XML.Implementation.HTML_Writer_Data.Element
                          (Properties.End_Tag.Next_Sibling,
-                          Self.Current.Last_Child.Element);
+                          Event.Element);
 
                   when End_Tag =>
                      Omit :=
@@ -396,6 +406,8 @@ package body VSS.HTML.Writers is
          end;
       end if;
 
+      --  Check whether start tag of the current element may be omitted.
+
       if Self.Current.State /= Initial then
          if not Self.Current.Start_Closed then
             if Self.Current.Start_Omitted then
@@ -408,12 +420,12 @@ package body VSS.HTML.Writers is
 
                begin
                   if Self.Text.Is_Empty then
-                     case Event is
+                     case Event.Kind is
                         when Start_Tag =>
                            Omit :=
                              VSS.XML.Implementation.HTML_Writer_Data.Element
                                (Properties.Start_Tag.First_Child,
-                                Self.Current.Element);
+                                Event.Element);
 
                         when End_Tag =>
                            Omit :=
@@ -447,19 +459,21 @@ package body VSS.HTML.Writers is
                      Self.Write (Self.Current.Tag, Success);
                      Self.Current.Start_Omitted := False;
 
-                     if Event /= End_Tag then
+                     if Event.Kind /= End_Tag then
                         Self.Write_Close_Of_Start_Tag (Success);
                      end if;
                   end if;
                end;
 
             else
-               if Event /= End_Tag then
+               if Event.Kind /= End_Tag then
                   Self.Write_Close_Of_Start_Tag (Success);
                end if;
             end if;
          end if;
       end if;
+
+      --  Write accumulated text if eny.
 
       if not Self.Text.Is_Empty then
          if not Self.Current.Start_Closed then
@@ -482,7 +496,7 @@ package body VSS.HTML.Writers is
       Text    : VSS.Strings.Virtual_String;
       Success : in out Boolean) is
    begin
-      Self.Close_Current_Tag (Comment, Success);
+      Self.Close_Current_Tag ((Kind => Comment), Success);
 
       if Self.Current.Restrictions.No_Comment then
          raise Program_Error;
@@ -548,7 +562,7 @@ package body VSS.HTML.Writers is
                   (Self.Current.Element);
 
    begin
-      Self.Close_Current_Tag (End_Tag, Success);
+      Self.Close_Current_Tag ((Kind => End_Tag), Success);
 
       if not Self.Current.Start_Closed
         and then Self.Current.Element = Foreign
@@ -795,7 +809,7 @@ package body VSS.HTML.Writers is
      (Self    : in out HTML5_Writer;
       Success : in out Boolean) is
    begin
-      Self.Close_Current_Tag (CDATA, Success);
+      Self.Close_Current_Tag ((Kind => CDATA), Success);
 
       if Self.Current.Restrictions.No_CDATA then
          Self.Warning ("CDATA is not allowed", Success);
@@ -867,7 +881,8 @@ package body VSS.HTML.Writers is
             (Current_Element);
 
    begin
-      Self.Close_Current_Tag (Start_Tag, Success);
+      Self.Close_Current_Tag
+        ((Kind => Start_Tag, Element => Current_Element), Success);
 
       if Self.Current.State = Initial
         and then not Is_HTML_Namespace

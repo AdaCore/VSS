@@ -29,4 +29,4 @@ For now we have:
 
 ## Useful articles
 
-* https://tc39.es/ecma262
+* https://swtch.com/~rsc/regexp/

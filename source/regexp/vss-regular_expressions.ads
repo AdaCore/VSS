@@ -75,6 +75,8 @@ package VSS.Regular_Expressions is
       Subject : VSS.Strings.Virtual_String;
       Options : Match_Options := No_Match_Options)
       return Regular_Expression_Match;
+   --  Perform a regular expression match of the Subject against given regexp
+   --  taking Options (if provided) into account.
 
    function Match
      (Self    : Regular_Expression'Class;
@@ -82,6 +84,10 @@ package VSS.Regular_Expressions is
       From    : VSS.Strings.Cursors.Abstract_Cursor'Class;
       Options : Match_Options := No_Match_Options)
       return Regular_Expression_Match;
+   --  Perform a regular expression match of the Subject starting from given
+   --  position (From) against the regexp. Take Options (if provided) into
+   --  account. The beginning of a line assertion (`^`) matches From position
+   --  even if Subject has character before it.
 
    ------------------------------
    -- Regular_Expression_Match --

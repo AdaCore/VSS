@@ -24,6 +24,7 @@ package VSS.Regular_Expressions.Engines is
    not overriding procedure Match
      (Self    : Engine;
       Subject : VSS.Strings.Virtual_String;
+      From    : VSS.Strings.Cursors.Abstract_Cursor'Class;
       Options : Match_Options := No_Match_Options;
       Result  : out Match_Access) is abstract
      with Pre'Class => Self.Is_Valid;

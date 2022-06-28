@@ -7,10 +7,12 @@
 with Ada.Unchecked_Deallocation;
 with System.Atomic_Counters;
 
+with VSS.Implementation.Referrers;
 with VSS.Regular_Expressions.Engines;
 with VSS.Regular_Expressions.Matches;
 with VSS.Regular_Expressions.Pike_Engines;
-with VSS.Implementation.Referrers;
+with VSS.Strings.Cursors.Internals;
+with VSS.Strings.Cursors.Iterators.Characters;
 
 package body VSS.Regular_Expressions is
    pragma Warnings (Off);
@@ -306,9 +308,15 @@ package body VSS.Regular_Expressions is
       Options : Match_Options := No_Match_Options)
       return Regular_Expression_Match
    is
+      Data : Match_Access;
    begin
-      pragma Compile_Time_Warning (Standard.True, "Match unimplemented");
-      return raise Program_Error with "Unimplemented function Match";
+      if Self.Is_Valid and
+        VSS.Strings.Cursors.Internals.Is_Owner (From, Subject)
+      then
+         Self.Data.Match (Subject, From, Options, Data);
+      end if;
+
+      return (Ada.Finalization.Controlled with Data);
    end Match;
 
    -----------
@@ -319,16 +327,8 @@ package body VSS.Regular_Expressions is
      (Self    : Regular_Expression'Class;
       Subject : VSS.Strings.Virtual_String;
       Options : Match_Options := No_Match_Options)
-      return Regular_Expression_Match
-   is
-      Data : Match_Access;
-   begin
-      if Self.Is_Valid then
-         Self.Data.Match (Subject, Options, Data);
-      end if;
-
-      return (Ada.Finalization.Controlled with Data);
-   end Match;
+      return Regular_Expression_Match is
+        (Self.Match (Subject, Subject.At_First_Character, Options));
 
    -------------
    -- Options --

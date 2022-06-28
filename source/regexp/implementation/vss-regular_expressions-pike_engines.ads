@@ -90,6 +90,7 @@ private
    overriding procedure Match
      (Self    : Engine;
       Subject : VSS.Strings.Virtual_String;
+      From    : VSS.Strings.Cursors.Abstract_Cursor'Class;
       Options : Match_Options := No_Match_Options;
       Result  : out Match_Access);
 

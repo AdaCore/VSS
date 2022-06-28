@@ -9,12 +9,10 @@ pragma Ada_2020;
 pragma Ada_2022;
 pragma Warnings (On);
 
-with Ada.Wide_Wide_Text_IO;
-with VSS.Strings.Conversions;
-
 with VSS.Characters.Latin;
 with VSS.HTML.Namespaces;
 with VSS.Strings.Character_Iterators;
+with VSS.XML.Implementation.Parse_Errors;
 
 package body VSS.HTML.Writers is
 
@@ -156,15 +154,10 @@ package body VSS.HTML.Writers is
    End_Tag_Open               : constant VSS.Strings.Virtual_String := "</";
    End_Tag_Close              : constant VSS.Strings.Virtual_String := ">";
 
-   --  HTML_Tag        : constant VSS.Strings.Virtual_String := "html";
-
    Ampersand_Reference      : constant VSS.Strings.Virtual_String := "&amp;";
    Apostrophe_Reference     : constant VSS.Strings.Virtual_String := "&apos;";
    Less_Than_Sign_Reference : constant VSS.Strings.Virtual_String := "&lt;";
    Quotation_Mark_Reference : constant VSS.Strings.Virtual_String := "&quot;";
-
-   --  type Text_Escaping_Context is
-   --  (Raw_Text, Escapable_Raw_Text, Normal, CDATA);
 
    procedure Write
      (Self    : HTML5_Writer'Class;
@@ -219,17 +212,17 @@ package body VSS.HTML.Writers is
       Success : in out Boolean);
    --  Generate close of the current tag when necessary.
 
-   procedure Warning
+   procedure Report_Warning
      (Self    : in out HTML5_Writer'Class;
       Message : VSS.Strings.Virtual_String;
       Success : in out Boolean);
 
-   procedure Error
+   procedure Report_Error
      (Self    : in out HTML5_Writer'Class;
       Message : VSS.Strings.Virtual_String;
       Success : in out Boolean);
 
-   --  procedure Fatal_Error
+   --  procedure Report_Fatal_Error
    --    (Self    : in out HTML5_Writer'Class;
    --     Message : VSS.Strings.Virtual_String;
    --     Success : in out Boolean);
@@ -329,7 +322,7 @@ package body VSS.HTML.Writers is
             --  Report warning for the first text non-whitespace segment
 
             if not Is_Whitespace and Self.Is_Whitespace then
-               Self.Warning ("Text is not allowed", Success);
+               Self.Report_Warning ("Text is not allowed", Success);
             end if;
 
             Self.Is_Whitespace := @ and Is_Whitespace;
@@ -612,43 +605,6 @@ package body VSS.HTML.Writers is
          End_Omitted => Properties.End_Tag.May_Be_Omitted);
    end End_Element;
 
-   -----------
-   -- Error --
-   -----------
-
-   procedure Error
-     (Self    : in out HTML5_Writer'Class;
-      Message : VSS.Strings.Virtual_String;
-      Success : in out Boolean)
-   is
-      pragma Unreferenced (Self);
-      pragma Unreferenced (Success);
-
-   begin
-      Ada.Wide_Wide_Text_IO.Put_Line
-        (Ada.Wide_Wide_Text_IO.Standard_Error,
-         "error: " & VSS.Strings.Conversions.To_Wide_Wide_String (Message));
-   end Error;
-
-   -----------------
-   -- Fatal_Error --
-   -----------------
-
-   --  procedure Fatal_Error
-   --    (Self    : in out HTML5_Writer'Class;
-   --     Message : VSS.Strings.Virtual_String;
-   --     Success : in out Boolean)
-   --  is
-   --     pragma Unreferenced (Self);
-   --     pragma Unreferenced (Success);
-   --
-   --  begin
-   --     Ada.Wide_Wide_Text_IO.Put_Line
-   --       (Ada.Wide_Wide_Text_IO.Standard_Error,
-   --        "fatal: "
-   --        & VSS.Strings.Conversions.To_Wide_Wide_String (Message));
-   --  end Fatal_Error;
-
    -------------------------------
    -- HTML_Element_Restrictions --
    -------------------------------
@@ -790,6 +746,92 @@ package body VSS.HTML.Writers is
       return True;
    end Is_ASCII_Whitespace;
 
+   ------------------
+   -- Report_Error --
+   ------------------
+
+   procedure Report_Error
+     (Self    : in out HTML5_Writer'Class;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
+   is
+      use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
+
+      Error : constant VSS.XML.Implementation.Parse_Errors.Parse_Error :=
+        (Self.Locator, Message);
+
+   begin
+      if Self.Error /= null then
+         Self.Error.Error (Error, Success);
+      end if;
+   end Report_Error;
+
+   ------------------------
+   -- Report_Fatal_Error --
+   ------------------------
+
+   --  procedure Report_Fatal_Error
+   --    (Self    : in out HTML5_Writer'Class;
+   --     Message : VSS.Strings.Virtual_String;
+   --     Success : in out Boolean)
+   --  is
+   --     use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
+   --
+   --     Error : constant VSS.XML.Implementation.Parse_Errors.Parse_Error :=
+   --       (Self.Locator, Message);
+   --
+   --  begin
+   --     if Self.Error /= null then
+   --        Self.Error.Fatal_Error (Error, Success);
+   --     end if;
+   --  end Report_Fatal_Error;
+
+   --------------------
+   -- Report_Warning --
+   --------------------
+
+   procedure Report_Warning
+     (Self    : in out HTML5_Writer'Class;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
+   is
+      use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
+
+      Error : constant VSS.XML.Implementation.Parse_Errors.Parse_Error :=
+        (Self.Locator, Message);
+
+   begin
+      if Self.Error /= null then
+         Self.Error.Warning (Error, Success);
+      end if;
+   end Report_Warning;
+
+   --------------------------
+   -- Set_Document_Locator --
+   --------------------------
+
+   overriding procedure Set_Document_Locator
+     (Self    : in out HTML5_Writer;
+      Locator : VSS.XML.Locators.SAX_Locator_Access;
+      Success : in out Boolean)
+   is
+      pragma Unreferenced (Success);
+
+   begin
+      Self.Locator := Locator;
+   end Set_Document_Locator;
+
+   -----------------------
+   -- Set_Error_Handler --
+   -----------------------
+
+   procedure Set_Error_Handler
+     (Self : in out HTML5_Writer'Class;
+      To   : VSS.XML.Error_Handlers.SAX_Error_Handler_Access) is
+   begin
+      Self.Error := To;
+   end Set_Error_Handler;
+
    -----------------------
    -- Set_Output_Stream --
    -----------------------
@@ -812,7 +854,7 @@ package body VSS.HTML.Writers is
       Self.Close_Current_Tag ((Kind => CDATA), Success);
 
       if Self.Current.Restrictions.No_CDATA then
-         Self.Warning ("CDATA is not allowed", Success);
+         Self.Report_Warning ("CDATA is not allowed", Success);
 
       else
          Self.CDATA_Mode := True;
@@ -859,8 +901,6 @@ package body VSS.HTML.Writers is
       Attributes     : VSS.XML.Attributes.XML_Attributes'Class;
       Success        : in out Boolean)
    is
-      --  use type VSS.Strings.Virtual_String;
-
       Is_HTML_Namespace   : constant Boolean :=
         URI = VSS.HTML.Namespaces.HTML_Namespace;
       Is_MathML_Namespace : constant Boolean :=
@@ -969,24 +1009,6 @@ package body VSS.HTML.Writers is
          end loop;
       end if;
    end Start_Element;
-
-   -------------
-   -- Warning --
-   -------------
-
-   procedure Warning
-     (Self    : in out HTML5_Writer'Class;
-      Message : VSS.Strings.Virtual_String;
-      Success : in out Boolean)
-   is
-      pragma Unreferenced (Self);
-      pragma Unreferenced (Success);
-
-   begin
-      Ada.Wide_Wide_Text_IO.Put_Line
-        (Ada.Wide_Wide_Text_IO.Standard_Error,
-         "warning: " & VSS.Strings.Conversions.To_Wide_Wide_String (Message));
-   end Warning;
 
    -----------
    -- Write --
@@ -1240,7 +1262,7 @@ package body VSS.HTML.Writers is
                      then
                         if Self.Current.Restrictions.No_Character_Reference
                         then
-                           Self.Error
+                           Self.Report_Error
                              (VSS.Strings.To_Virtual_String
                                 ("LESS-THAN SIGN in the text and character"
                                  & " references are not allowed"),
@@ -1260,7 +1282,7 @@ package body VSS.HTML.Writers is
                            --  XXX Check may be added for ambiguous ampersand
                            --  to avoid false negatives of simplified check
 
-                           Self.Error
+                           Self.Report_Error
                              (VSS.Strings.To_Virtual_String
                                 ("AMPERSAND in the text and character"
                                  & " references are not allowed"),

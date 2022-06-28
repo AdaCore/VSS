@@ -7,13 +7,16 @@
 private with Ada.Containers.Vectors;
 
 with VSS.XML.Content_Handlers;
+with VSS.XML.Error_Handlers;
 with VSS.XML.Lexical_Handlers;
 
 private with VSS.IRIs;
 private with VSS.Strings;
 with VSS.Text_Streams;
 private with VSS.XML.Attributes;
+private with VSS.XML.Implementation.Error_Handlers;
 private with VSS.XML.Implementation.HTML_Writer_Data;
+private with VSS.XML.Locators;
 
 package VSS.HTML.Writers is
 
@@ -26,6 +29,10 @@ package VSS.HTML.Writers is
    procedure Set_Output_Stream
      (Self   : in out HTML5_Writer'Class;
       Stream : VSS.Text_Streams.Output_Text_Stream_Access);
+
+   procedure Set_Error_Handler
+     (Self : in out HTML5_Writer'Class;
+      To   : VSS.XML.Error_Handlers.SAX_Error_Handler_Access);
 
 private
 
@@ -106,6 +113,9 @@ private
    record
       Omit_Whitespaces : Boolean := True;
       Output           : VSS.Text_Streams.Output_Text_Stream_Access;
+      Error            : VSS.XML.Error_Handlers.SAX_Error_Handler_Access :=
+        VSS.XML.Implementation.Error_Handlers.Default'Access;
+      Locator          : VSS.XML.Locators.SAX_Locator_Access;
 
       Text             : VSS.Strings.Virtual_String;
       Is_Whitespace    : Boolean;
@@ -115,10 +125,10 @@ private
       Stack            : State_Vectors.Vector;
    end record;
 
-   --  procedure Set_Document_Locator
-   --    (Self    : in out SAX_Content_Handler;
-   --     Locator : VSS.XML.Locators.SX_Locator_Access;
-   --     Success : in out Boolean) is null;
+   overriding procedure Set_Document_Locator
+     (Self    : in out HTML5_Writer;
+      Locator : VSS.XML.Locators.SAX_Locator_Access;
+      Success : in out Boolean);
 
    overriding procedure Start_Document
      (Self    : in out HTML5_Writer;

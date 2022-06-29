@@ -9,7 +9,72 @@ with VSS.Strings;
 package VSS.XML.Implementation.HTML_Writer_Data is
 
    --  HTML elements are reordered to group together all elements that appear
-   --  in the tag omitting conditions.
+   --  in the tag omitting conditions according to WhatWG's HTML living
+   --  standard 2022-06-17.
+   --
+   --   ^        preciding
+   --     ^      parent
+   --       ^    child
+   --         ^  following
+   --
+   --     +      a
+   --         +  address
+   --         +  article
+   --         +  aside
+   --     +      audio
+   --         +  blockquote
+   --       +    col
+   --   +        colgroup
+   --         +  dd
+   --     +      del
+   --         +  details
+   --         +  div
+   --         +  dl
+   --         +  dt
+   --         +  fieldset
+   --         +  figcaption
+   --         +  figure
+   --         +  footer
+   --         +  form
+   --         +  h1
+   --         +  h2
+   --         +  h3
+   --         +  h4
+   --         +  h5
+   --         +  h6
+   --         +  header
+   --         +  hgroup
+   --         +  hr
+   --     +      ins
+   --         +  li
+   --       +    link
+   --         +  main
+   --     +      map
+   --         +  menu
+   --       +    meta
+   --         +  nav
+   --     +      noscript
+   --         +  ol
+   --         +  option
+   --         +  optgroup
+   --         +  p
+   --         +  pre
+   --         +  rp
+   --         +  rt
+   --       +    script
+   --         +  section
+   --       +    style
+   --         +  table
+   --   +     +  tbody
+   --         +  td
+   --       +    template
+   --   +     +  tfoot
+   --         +  th
+   --   +        thead
+   --       + +  tr
+   --         +  ul
+   --     +      video
+   --     +      anonymous custom element
 
    type HTML_Element_Kind is
      (Anonymous_Custom_Element,
@@ -196,73 +261,6 @@ package VSS.XML.Implementation.HTML_Writer_Data is
             End_Of_Parent : Element_Flags;
       end case;
    end record;
-
-   --  Elements, used in omitting conditions in WhatWG's HTML living
-   --  standard 2022-06-17
-   --
-   --   ^        preciding
-   --     ^      parent
-   --       ^    child
-   --         ^  following
-   --
-   --     +      a
-   --         +  address
-   --         +  article
-   --         +  aside
-   --     +      audio
-   --         +  blockquote
-   --       +    col
-   --   +        colgroup
-   --         +  dd
-   --     +      del
-   --         +  details
-   --         +  div
-   --         +  dl
-   --         +  dt
-   --         +  fieldset
-   --         +  figcaption
-   --         +  figure
-   --         +  footer
-   --         +  form
-   --         +  h1
-   --         +  h2
-   --         +  h3
-   --         +  h4
-   --         +  h5
-   --         +  h6
-   --         +  header
-   --         +  hgroup
-   --         +  hr
-   --     +      ins
-   --         +  li
-   --       +    link
-   --         +  main
-   --     +      map
-   --         +  menu
-   --       +    meta
-   --         +  nav
-   --     +      noscript
-   --         +  ol
-   --         +  option
-   --         +  optgroup
-   --         +  p
-   --         +  pre
-   --         +  rp
-   --         +  rt
-   --       +    script
-   --         +  section
-   --       +    style
-   --         +  table
-   --   +     +  tbody
-   --         +  td
-   --       +    template
-   --   +     +  tfoot
-   --         +  th
-   --   +        thead
-   --       + +  tr
-   --         +  ul
-   --     +      video
-   --     +      anonymous custom element
 
    type Element_Kinds is
      (Void, Template, Raw_Text, Escapable_Text, Normal, Foreign);

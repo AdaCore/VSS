@@ -47,9 +47,11 @@ begin
                Print_Match (Match);
 
                for J in 1 .. Reg_Exp.Capture_Group_Count loop
-                  Ada.Wide_Wide_Text_IO.Put ("   ");
-                  Ada.Wide_Wide_Text_IO.Put (J'Wide_Wide_Image);
-                  Print_Match (Match, J);
+                  if Match.Has_Capture (J) then
+                     Ada.Wide_Wide_Text_IO.Put ("   ");
+                     Ada.Wide_Wide_Text_IO.Put (J'Wide_Wide_Image);
+                     Print_Match (Match, J);
+                  end if;
                end loop;
             end if;
          end;

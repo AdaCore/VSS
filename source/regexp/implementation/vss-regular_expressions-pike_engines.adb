@@ -31,6 +31,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
    overriding procedure Match
      (Self    : Engine;
       Subject : VSS.Strings.Virtual_String;
+      From    : VSS.Strings.Cursors.Abstract_Cursor'Class;
       Options : Match_Options := No_Match_Options;
       Result  : out Match_Access)
    is
@@ -124,7 +125,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          begin
             case Kind is
                when Start_Of_Line =>
-                  return Cursor.Character_Index = 1;
+                  return Cursor.Character_Index = From.First_Character_Index;
                when End_Of_Line =>
                   return not Cursor.Has_Element;
                when Word_Boundary =>
@@ -304,10 +305,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       use type VSS.Strings.Character_Count;
 
-      Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
-        Subject.At_First_Character;
+      Cursor : VSS.Strings.Character_Iterators.Character_Iterator;
 
    begin
+      Cursor.Set_At (From.First_Marker);
       Active.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
       Next.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
 

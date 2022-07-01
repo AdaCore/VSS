@@ -10,9 +10,9 @@ pragma Ada_2022;
 pragma Warnings (On);
 
 with VSS.Characters.Latin;
-with VSS.HTML.Namespaces;
 with VSS.Strings.Character_Iterators;
 with VSS.XML.Implementation.Parse_Errors;
+with VSS.XML.Namespaces;
 
 package body VSS.HTML.Writers is
 
@@ -900,11 +900,11 @@ package body VSS.HTML.Writers is
       Success    : in out Boolean)
    is
       Is_HTML_Namespace   : constant Boolean :=
-        URI = VSS.HTML.Namespaces.HTML_Namespace;
+        URI = VSS.XML.Namespaces.HTML_Namespace;
       Is_MathML_Namespace : constant Boolean :=
-        URI = VSS.HTML.Namespaces.MathML_Namespace;
+        URI = VSS.XML.Namespaces.MathML_Namespace;
       Is_SVG_Namespace    : constant Boolean :=
-        URI = VSS.HTML.Namespaces.SVG_Namespace;
+        URI = VSS.XML.Namespaces.SVG_Namespace;
 
       Current_Element : constant
         VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind :=

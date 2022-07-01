@@ -139,19 +139,17 @@ private
       Success : in out Boolean);
 
    overriding procedure Start_Element
-     (Self           : in out HTML5_Writer;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Attributes     : VSS.XML.Attributes.XML_Attributes'Class;
-      Success        : in out Boolean);
+     (Self       : in out HTML5_Writer;
+      URI        : VSS.IRIs.IRI;
+      Name       : VSS.Strings.Virtual_String;
+      Attributes : VSS.XML.Attributes.XML_Attributes'Class;
+      Success    : in out Boolean);
 
    overriding procedure End_Element
-     (Self           : in out HTML5_Writer;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Success        : in out Boolean);
+     (Self    : in out HTML5_Writer;
+      URI     : VSS.IRIs.IRI;
+      Name    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
 
    overriding procedure Characters
      (Self    : in out HTML5_Writer;

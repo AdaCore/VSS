@@ -11,7 +11,6 @@ with VSS.XML.Implementation.XmlAda_Parse_Errors;
 
 package body VSS.XML.XmlAda_Readers is
 
-   use type VSS.Strings.Virtual_String;
    use type VSS.XML.Content_Handlers.SAX_Content_Handler_Access;
    use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
    use type VSS.XML.Lexical_Handlers.SAX_Lexical_Handler_Access;
@@ -108,29 +107,20 @@ package body VSS.XML.XmlAda_Readers is
    overriding procedure End_Element
      (Self       : in out XmlAda_Dispatcher;
       NS         : Sax.Utils.XML_NS;
-      Local_Name : Sax.Symbols.Symbol)
-   is
-      Prefix : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Conversions.To_Virtual_String
-          (Sax.Symbols.Get (Sax.Utils.Get_Prefix (NS)).all);
-      L_Name : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Conversions.To_Virtual_String
-          (Sax.Symbols.Get (Local_Name).all);
-      Q_Name : constant VSS.Strings.Virtual_String :=
-        (if Prefix.Is_Empty then L_Name else Prefix & ":" & L_Name);
-
+      Local_Name : Sax.Symbols.Symbol) is
    begin
       pragma Assert (Self.Success);
 
       if Self.Content /= null then
          Self.Content.End_Element
-           (URI            =>
+           (URI     =>
               VSS.IRIs.To_IRI
                 (VSS.Strings.Conversions.To_Virtual_String
                      (Sax.Symbols.Get (Sax.Utils.Get_URI (NS)).all)),
-            Local_Name     => L_Name,
-            Qualified_Name => Q_Name,
-            Success        => Self.Success);
+            Name    =>
+              VSS.Strings.Conversions.To_Virtual_String
+                (Sax.Symbols.Get (Local_Name).all),
+            Success => Self.Success);
       end if;
 
       if not Self.Success then
@@ -444,32 +434,23 @@ package body VSS.XML.XmlAda_Readers is
      (Self       : in out XmlAda_Dispatcher;
       NS         : Sax.Utils.XML_NS;
       Local_Name : Sax.Symbols.Symbol;
-      Atts       : Sax.Readers.Sax_Attribute_List)
-   is
-      Prefix : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Conversions.To_Virtual_String
-          (Sax.Symbols.Get (Sax.Utils.Get_Prefix (NS)).all);
-      L_Name : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Conversions.To_Virtual_String
-          (Sax.Symbols.Get (Local_Name).all);
-      Q_Name : constant VSS.Strings.Virtual_String :=
-        (if Prefix.Is_Empty then L_Name else Prefix & ":" & L_Name);
-
+      Atts       : Sax.Readers.Sax_Attribute_List) is
    begin
       pragma Assert (Self.Success);
 
       if Self.Content /= null then
          Self.Content.Start_Element
-           (URI            =>
+           (URI        =>
               VSS.IRIs.To_IRI
                 (VSS.Strings.Conversions.To_Virtual_String
                      (Sax.Symbols.Get (Sax.Utils.Get_URI (NS)).all)),
-            Local_Name     => L_Name,
-            Qualified_Name => Q_Name,
-            Attributes     =>
+            Name       =>
+              VSS.Strings.Conversions.To_Virtual_String
+          (Sax.Symbols.Get (Local_Name).all),
+            Attributes =>
               VSS.XML.Implementation.XmlAda_Attributes.XmlAda_Attributes'
                 (Attributes => Atts),
-            Success        => Self.Success);
+            Success    => Self.Success);
       end if;
 
       if not Self.Success then

@@ -541,11 +541,10 @@ package body VSS.HTML.Writers is
    -----------------
 
    overriding procedure End_Element
-     (Self           : in out HTML5_Writer;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Success        : in out Boolean)
+     (Self    : in out HTML5_Writer;
+      URI     : VSS.IRIs.IRI;
+      Name    : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
    is
       use all type VSS.XML.Implementation.HTML_Writer_Data.Element_Kinds;
 
@@ -590,7 +589,7 @@ package body VSS.HTML.Writers is
 
          if not Properties.End_Tag.May_Be_Omitted then
             Self.Write (End_Tag_Open, Success);
-            Self.Write (Local_Name, Success);
+            Self.Write (Name, Success);
             Self.Write (End_Tag_Close, Success);
          end if;
       end if;
@@ -894,12 +893,11 @@ package body VSS.HTML.Writers is
    -------------------
 
    overriding procedure Start_Element
-     (Self           : in out HTML5_Writer;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Attributes     : VSS.XML.Attributes.XML_Attributes'Class;
-      Success        : in out Boolean)
+     (Self       : in out HTML5_Writer;
+      URI        : VSS.IRIs.IRI;
+      Name       : VSS.Strings.Virtual_String;
+      Attributes : VSS.XML.Attributes.XML_Attributes'Class;
+      Success    : in out Boolean)
    is
       Is_HTML_Namespace   : constant Boolean :=
         URI = VSS.HTML.Namespaces.HTML_Namespace;
@@ -912,8 +910,7 @@ package body VSS.HTML.Writers is
         VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind :=
           (if Is_HTML_Namespace
            then
-              VSS.XML.Implementation.HTML_Writer_Data.To_HTML_Element
-                (Local_Name)
+              VSS.XML.Implementation.HTML_Writer_Data.To_HTML_Element (Name)
            else Foreign);
       Properties      : constant
         VSS.XML.Implementation.HTML_Writer_Data.Element_Properties :=
@@ -954,10 +951,10 @@ package body VSS.HTML.Writers is
       Self.Current :=
         (State         => Element,
          Element       => Current_Element,
-         Tag           => Local_Name,
+         Tag           => Name,
          Restrictions  =>
            (if Is_HTML_Namespace
-            then HTML_Element_Restrictions (Local_Name)
+            then HTML_Element_Restrictions (Name)
             else
               (No_Less_Than | No_Ambiguous_Ampersand => True,
                others                                => False)),
@@ -994,7 +991,7 @@ package body VSS.HTML.Writers is
 
       if not Self.Current.Start_Omitted then
          Self.Write (Start_Tag_Open, Success);
-         Self.Write (Local_Name, Success);
+         Self.Write (Name, Success);
 
          for J in 1 .. Attributes.Get_Length loop
             --  This is simple implementation, no checks or support for
@@ -1002,7 +999,7 @@ package body VSS.HTML.Writers is
             --  elements.
 
             Self.Write_Attribute
-              (Name    => Attributes.Get_Local_Name (J),
+              (Name    => Attributes.Get_Name (J),
                Value   => Attributes.Get_Value (J),
                Syntax  => Self.Current.Syntax,
                Success => Success);

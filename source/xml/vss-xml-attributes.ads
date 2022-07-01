@@ -19,11 +19,7 @@ package VSS.XML.Attributes is
      (Self  : XML_Attributes;
       Index : Positive) return VSS.IRIs.IRI is abstract;
 
-   function Get_Local_Name
-     (Self  : XML_Attributes;
-      Index : Positive) return VSS.Strings.Virtual_String is abstract;
-
-   function Get_Qualified_Name
+   function Get_Name
      (Self  : XML_Attributes;
       Index : Positive) return VSS.Strings.Virtual_String is abstract;
 

@@ -79,6 +79,10 @@ package VSS.String_Vectors is
       Index : Positive);
    --  Delete element at the given index.
 
+   function Delete_First
+     (Self : Virtual_String_Vector'Class) return Virtual_String_Vector;
+   --  Delete first element and return result vector.
+
    procedure Delete_Last (Self : in out Virtual_String_Vector'Class);
    --  Delete the last element.
 

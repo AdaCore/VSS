@@ -130,6 +130,24 @@ package body VSS.String_Vectors is
       end if;
    end Delete;
 
+   ------------------
+   -- Delete_First --
+   ------------------
+
+   function Delete_First
+     (Self : Virtual_String_Vector'Class) return Virtual_String_Vector is
+   begin
+      return Result : Virtual_String_Vector :=
+        (Ada.Finalization.Controlled with Data => Self.Data)
+      do
+         VSS.Implementation.String_Vectors.Reference (Result.Data);
+
+         if Result.Data /= null and then Result.Data.Last /= 0 then
+            VSS.Implementation.String_Vectors.Delete (Result.Data, 1);
+         end if;
+      end return;
+   end Delete_First;
+
    -----------------
    -- Delete_Last --
    -----------------

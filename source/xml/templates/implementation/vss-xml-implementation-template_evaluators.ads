@@ -4,19 +4,13 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
---  with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Vectors;
 
---  private with VSS.IRIs;
---  with VSS.Strings.Hash;
 with VSS.String_Vectors;
---  private with VSS.XML.Attributes;
 with VSS.XML.Content_Handlers;
 with VSS.XML.Implementation.Template_Namespaces;
 with VSS.XML.Implementation.Template_Programs;
 with VSS.XML.Lexical_Handlers;
---  with VSS.XML.Templates.Proxies;
---  private with VSS.XML.Locators;
 
 package VSS.XML.Implementation.Template_Evaluators is
 
@@ -29,7 +23,6 @@ package VSS.XML.Implementation.Template_Evaluators is
       Iterator  :
         VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
       Content   : VSS.String_Vectors.Virtual_String_Vector;
-      --  Filter    : Filter_Kind;
    end record;
 
    package State_Vectors is

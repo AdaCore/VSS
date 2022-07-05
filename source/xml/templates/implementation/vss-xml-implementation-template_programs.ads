@@ -9,7 +9,6 @@ with Ada.Containers.Vectors;
 with VSS.IRIs;
 with VSS.Strings;
 with VSS.String_Vectors;
-with VSS.XML.Attributes.Containers;
 
 package VSS.XML.Implementation.Template_Programs is
 
@@ -22,6 +21,7 @@ package VSS.XML.Implementation.Template_Programs is
    type Instruction_Kind is
      (None,
       Start_Element,
+      Attribute,
       End_Element,
       Text,
       Comment,
@@ -38,7 +38,12 @@ package VSS.XML.Implementation.Template_Programs is
          when Start_Element =>
             URI        : VSS.IRIs.IRI;
             Name       : VSS.Strings.Virtual_String;
-            Attributes : VSS.XML.Attributes.Containers.Attributes;
+
+         when Attribute =>
+            Attribute_URI   : VSS.IRIs.IRI;
+            Attribute_Name  : VSS.Strings.Virtual_String;
+            Attribute_Value : VSS.Strings.Virtual_String;
+            Attribute_Path  : VSS.String_Vectors.Virtual_String_Vector;
 
          when End_Element =>
             Start_Address : Address;

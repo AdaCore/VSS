@@ -15,4 +15,7 @@ package VSS.XML.Namespaces is
    SVG_Namespace    : constant VSS.IRIs.IRI :=
      VSS.IRIs.To_IRI ("http://www.w3.org/2000/svg");
 
+   TAL_Namespace    : constant VSS.IRIs.IRI :=
+     VSS.IRIs.To_IRI ("http://xml.zope.org/namespaces/tal");
+
 end VSS.XML.Namespaces;

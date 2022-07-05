@@ -33,13 +33,14 @@ package body VSS.XML.Implementation.Template_Evaluators is
       use type VSS.XML.Implementation.Template_Programs.Address;
       use all type VSS.XML.Implementation.Template_Programs.Instruction_Kind;
 
+      procedure Do_Start_Element
+        (Current : in out VSS.XML.Implementation.Template_Programs.Address);
+
       procedure Do_Content
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction);
-      --    (Current : VSS.XML.Implementation.Template_Programs.Address);
 
       procedure Do_Repeat
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction);
-        --  (Current : VSS.XML.Implementation.Template_Programs.Address);
 
       procedure Execute
         (Current : in out VSS.XML.Implementation.Template_Programs.Address);
@@ -87,6 +88,100 @@ package body VSS.XML.Implementation.Template_Evaluators is
             VSS.XML.Templates.Proxy_Access (Iterator));
       end Do_Repeat;
 
+      ----------------------
+      -- Do_Start_Element --
+      ----------------------
+
+      procedure Do_Start_Element
+        (Current : in out VSS.XML.Implementation.Template_Programs.Address)
+      is
+         use type
+           VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
+
+         Instruction : VSS.XML.Implementation.Template_Programs.Instruction
+           renames Program (Current);
+         Attributes  : VSS.XML.Attributes.Containers.Attributes;
+
+      begin
+         if Self.Current.Element =
+           VSS.XML.Implementation.Template_Programs.Null_Address
+         then
+            Self.Current.Element := Current;
+         end if;
+
+         if Self.Current.Element = Current
+           and then Self.Current.Iterator /= null
+           and then not Self.Current.Iterator.Next
+         then
+            --  Rewind till end of the element.
+
+            loop
+               Current := @ + 1;
+
+               exit when Current > Program.Last_Index;
+
+               exit when Program (Current).Kind = End_Element
+                 and then Program (Current).Start_Address
+                            = Self.Current.Element;
+            end loop;
+
+            Pop_State;
+
+         else
+            --  Process attributes
+
+            loop
+               Current := @ + 1;
+
+               exit when Current > Program.Last_Index;
+               exit when Program (Current).Kind /= Attribute;
+
+               Attributes.Insert
+                 (Program (Current).Attribute_URI,
+                  Program (Current).Attribute_Name,
+                  Program (Current).Attribute_Value);
+            end loop;
+
+            Current := @ - 1;
+
+            if Self.Content /= null then
+               Self.Content.Start_Element
+                 (Instruction.URI,
+                  Instruction.Name,
+                  Attributes,
+                  Success);
+            end if;
+
+            if Self.Current.Element = Current
+              and then not Self.Current.Content.Is_Empty
+            then
+               if Self.Content /= null then
+                  Self.Content.Characters
+                    (Self.Current.Namespace.Resolve_Content
+                       (Self.Current.Content),
+                     Success);
+               end if;
+
+               --  Rewind till end of the element.
+
+               loop
+                  Current := @ + 1;
+
+                  exit when Current > Program.Last_Index;
+
+                  if Program (Current).Kind = End_Element
+                    and then Program (Current).Start_Address
+                               = Self.Current.Element
+                  then
+                     Current := @ - 1;
+
+                     exit;
+                  end if;
+               end loop;
+            end if;
+         end if;
+      end Do_Start_Element;
+
       -------------
       -- Execute --
       -------------
@@ -99,88 +194,11 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
          Instruction : VSS.XML.Implementation.Template_Programs.Instruction
            renames Program (Current);
-         Attributes  : VSS.XML.Attributes.Containers.Attributes;
 
       begin
          case Instruction.Kind is
             when Start_Element =>
-               if Self.Current.Element =
-                 VSS.XML.Implementation.Template_Programs.Null_Address
-               then
-                  Self.Current.Element := Current;
-               end if;
-
-               if Self.Current.Element = Current
-                 and then Self.Current.Iterator /= null
-                 and then not Self.Current.Iterator.Next
-               then
-                  --  Rewind till end of the element.
-
-                  loop
-                     Current := @ + 1;
-
-                     exit when Current > Program.Last_Index;
-
-                     exit when Program (Current).Kind = End_Element
-                       and then Program (Current).Start_Address
-                       = Self.Current.Element;
-                  end loop;
-
-                  Pop_State;
-
-               else
-                  --  Process attributes
-
-                  loop
-                     Current := @ + 1;
-
-                     exit when Current > Program.Last_Index;
-                     exit when Program (Current).Kind /= Attribute;
-
-                     Attributes.Insert
-                       (Program (Current).Attribute_URI,
-                        Program (Current).Attribute_Name,
-                        Program (Current).Attribute_Value);
-                  end loop;
-
-                  Current := @ - 1;
-
-                  if Self.Content /= null then
-                     Self.Content.Start_Element
-                       (Instruction.URI,
-                        Instruction.Name,
-                        Attributes,
-                        Success);
-                  end if;
-
-                  if Self.Current.Element = Current
-                    and then not Self.Current.Content.Is_Empty
-                  then
-                     if Self.Content /= null then
-                        Self.Content.Characters
-                          (Self.Current.Namespace.Resolve_Content
-                             (Self.Current.Content),
-                           Success);
-                     end if;
-
-                     --  Rewind till end of the element.
-
-                     loop
-                        Current := @ + 1;
-
-                        exit when Current > Program.Last_Index;
-
-                        if Program (Current).Kind = End_Element
-                          and then Program (Current).Start_Address
-                                     = Self.Current.Element
-                        then
-                           Current := @ - 1;
-
-                           exit;
-                        end if;
-                     end loop;
-                  end if;
-               end if;
+               Do_Start_Element (Current);
 
             when Attribute =>
                --  Attribute instructions are processed together with

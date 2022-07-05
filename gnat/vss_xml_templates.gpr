@@ -1,0 +1,29 @@
+--
+--  Copyright (C) 2022, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  VSS: XML/HTML processing subproject, XML templates engine
+
+with "vss_config";
+with "vss_xml";
+
+project VSS_XML_Templates is
+
+   for Languages use ("Ada");
+
+   for Library_Name use "vss-xml-templates";
+   for Library_Kind use VSS_Config.Library_Kind;
+
+   for Object_Dir use VSS_Config.Object_Dir;
+   for Library_Dir use VSS_Config.Library_Dir;
+   for Source_Dirs use
+     ("../source/xml/templates",
+      "../source/xml/templates/implementation");
+
+   package Compiler renames VSS_Config.Compiler;
+
+   package Linker renames VSS_Config.Linker;
+
+end VSS_XML_Templates;

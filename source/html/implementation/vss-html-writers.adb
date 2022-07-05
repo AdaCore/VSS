@@ -234,7 +234,8 @@ package body VSS.HTML.Writers is
    --  Return True when string contains only ASCII whitespace characters.
 
    function HTML_Element_Restrictions
-     (Name : VSS.Strings.Virtual_String) return Restrictions_Record;
+     (Name   : VSS.Strings.Virtual_String;
+      Parent : Restrictions_Record) return Restrictions_Record;
 
    function Best_Attribute_Syntax
      (Item : VSS.Strings.Virtual_String) return Attribute_Syntax;
@@ -609,7 +610,8 @@ package body VSS.HTML.Writers is
    -------------------------------
 
    function HTML_Element_Restrictions
-     (Name : VSS.Strings.Virtual_String) return Restrictions_Record
+     (Name   : VSS.Strings.Virtual_String;
+      Parent : Restrictions_Record) return Restrictions_Record
    is
       use all type VSS.XML.Implementation.HTML_Writer_Data.Element_Kinds;
       use all type VSS.XML.Implementation.HTML_Writer_Data.Text_Children;
@@ -689,7 +691,7 @@ package body VSS.HTML.Writers is
                      Result.No_Text := True;
 
                   when Transparent =>
-                     raise Program_Error;
+                     Result.No_Text := Parent.No_Text;
 
                   when Yes =>
                      null;
@@ -954,7 +956,7 @@ package body VSS.HTML.Writers is
          Tag           => Name,
          Restrictions  =>
            (if Is_HTML_Namespace
-            then HTML_Element_Restrictions (Name)
+            then HTML_Element_Restrictions (Name, Self.Current.Restrictions)
             else
               (No_Less_Than | No_Ambiguous_Ampersand => True,
                others                                => False)),

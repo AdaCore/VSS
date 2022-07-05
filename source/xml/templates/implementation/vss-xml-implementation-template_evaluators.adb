@@ -12,12 +12,7 @@ pragma Warnings (On);
 --  with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 --  with VSS.Strings.Conversions; use VSS.Strings.Conversions;
 
---  private with Ada.Containers.Vectors;
---
---  private with VSS.IRIs;
---  private with VSS.Strings;
---  private with VSS.XML.Attributes;
---  private with VSS.XML.Locators;
+with VSS.XML.Attributes.Containers;
 with VSS.XML.Templates;
 
 package body VSS.XML.Implementation.Template_Evaluators is
@@ -74,88 +69,22 @@ package body VSS.XML.Implementation.Template_Evaluators is
       ---------------
 
       procedure Do_Repeat
-        --  (Current : VSS.XML.Implementation.Template_Programs.Address)
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction)
       is
-         --  Inner    : VSS.XML.Implementation.Template_Programs.Address;
          Iterator :
            VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
 
       begin
-         --  Iterator :=
-         --    new VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
-         --      (Self.Current.Namespace.Resolve_Iterable
-         --         (Program (Current).Path));
          Iterator :=
-         --    new VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
            Self.Current.Namespace.Resolve_Iterable
              (Instruction.Repeat_Path);
-             --  (Program (Current).Repeat_Path);
 
          Push_State;
 
          Self.Current.Iterator := Iterator;
          Self.Current.Namespace.Bind
            (Instruction.Identifier,
-           --  (Program (Current).Identifier,
             VSS.XML.Templates.Proxy_Access (Iterator));
-
-         --  Put_Line
-         --    ('''
-         --  & To_Wide_Wide_String (Program (Current).Identifier) & ''');
-
-         --  while Self.Current.Iterator.Next loop
-         --     Inner := Current + 1;
-         --
-         --     while Inner <= Program.Last_Index loop
-         --        case Program (Inner).Kind is
-         --           when Start_Element =>
-         --              if Self.Content /= null then
-         --                 Self.Content.Start_Element
-         --                   (Program (Inner).URI,
-         --                    Program (Inner).Name,
-         --                    Program (Inner).Attributes,
-         --                    Success);
-         --
-         --                 exit when not Success;
-         --              end if;
-         --
-         --           when End_Element =>
-         --              if Self.Content /= null then
-         --                 Self.Content.End_Element
-         --                   (Program (Program (Inner).Start_Address).URI,
-         --                    Program (Program (Inner).Start_Address).Name,
-         --                    Success);
-         --
-         --                 exit when not Success;
-         --              end if;
-         --
-         --           when Text =>
-         --              if Self.Content /= null then
-         --                 Self.Content.Characters
-         --                   (Program (Inner).Text, Success);
-         --
-         --                 exit when not Success;
-         --              end if;
-         --
-         --           when Repeat =>
-         --              Do_Repeat (Inner);
-         --
-         --           when Done =>
-         --              exit;
-         --
-         --           when others =>
-         --              raise Program_Error with Program (Inner).Kind'Image;
-         --        end case;
-         --
-         --        Inner := @ + 1;
-         --     end loop;
-         --  end loop;
-         --
-         --  Self.Current := Self.Stack.Last_Element;
-         --  Self.Stack.Delete_Last;
-         --
-         --  Current := Inner;
       end Do_Repeat;
 
       -------------
@@ -170,6 +99,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
          Instruction : VSS.XML.Implementation.Template_Programs.Instruction
            renames Program (Current);
+         Attributes  : VSS.XML.Attributes.Containers.Attributes;
 
       begin
          case Instruction.Kind is
@@ -178,8 +108,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
                  VSS.XML.Implementation.Template_Programs.Null_Address
                then
                   Self.Current.Element := Current;
-
-                  --  raise Program_Error;
                end if;
 
                if Self.Current.Element = Current
@@ -201,14 +129,28 @@ package body VSS.XML.Implementation.Template_Evaluators is
                   Pop_State;
 
                else
+                  --  Process attributes
+
+                  loop
+                     Current := @ + 1;
+
+                     exit when Current > Program.Last_Index;
+                     exit when Program (Current).Kind /= Attribute;
+
+                     Attributes.Insert
+                       (Program (Current).Attribute_URI,
+                        Program (Current).Attribute_Name,
+                        Program (Current).Attribute_Value);
+                  end loop;
+
+                  Current := @ - 1;
+
                   if Self.Content /= null then
                      Self.Content.Start_Element
                        (Instruction.URI,
                         Instruction.Name,
-                        Instruction.Attributes,
+                        Attributes,
                         Success);
-
-                     --  exit when not Success;
                   end if;
 
                   if Self.Current.Element = Current
@@ -238,12 +180,13 @@ package body VSS.XML.Implementation.Template_Evaluators is
                         end if;
                      end loop;
                   end if;
-                  --  if Self.Current.Element = Current then
-                  --     if not Self.Current.Content.Is_Empty then
-                  --        Self.Current.Ignore := Ignore_Children;
-                  --     end if;
-                  --  end if;
                end if;
+
+            when Attribute =>
+               --  Attribute instructions are processed together with
+               --  Start_Element instruction.
+
+               raise Program_Error;
 
             when End_Element =>
                if Self.Content /= null then
@@ -266,8 +209,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
                   --  raise Program_Error;
                end if;
 
-               --  Current := @ + 1;
-
             when Text =>
                if Self.Content /= null then
                   Self.Content.Characters (Instruction.Text, Success);
@@ -275,7 +216,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
                   --  exit when not Success;
                end if;
 
-               --  Current := @ + 1;
             when Content =>
                Do_Content (Program (Current));
 
@@ -336,48 +276,10 @@ package body VSS.XML.Implementation.Template_Evaluators is
       Self.Current.Namespace :=
         new VSS.XML.Implementation.Template_Namespaces.Namespace'
               (Enclosing => Binded, others => <>);
+      Self.Current.Element :=
+        VSS.XML.Implementation.Template_Programs.Address'Last;
 
       while Current <= Program.Last_Index loop
-         --  case Program (Current).Kind is
-         --     when Start_Element =>
-         --        if Self.Content /= null then
-         --           Self.Content.Start_Element
-         --             (Program (Current).URI,
-         --              Program (Current).Name,
-         --              Program (Current).Attributes,
-         --              Success);
-         --
-         --           exit when not Success;
-         --        end if;
-         --
-         --     when End_Element =>
-         --        if Self.Content /= null then
-         --           Self.Content.End_Element
-         --             (Program (Program (Current).Start_Address).URI,
-         --              Program (Program (Current).Start_Address).Name,
-         --              Success);
-         --
-         --           exit when not Success;
-         --        end if;
-         --
-         --     when Text =>
-         --        if Self.Content /= null then
-         --        Self.Content.Characters (Program (Current).Text, Success);
-         --
-         --           exit when not Success;
-         --        end if;
-         --
-         --     when Repeat =>
-         --        Do_Repeat (Current);
-         --
-         --     --  when Done =>
-         --     --     null;
-         --
-         --     when others =>
-         --        raise Program_Error with Program (Current).Kind'Image;
-         --  end case;
-         --
-         --  Current := @ + 1;
          Execute (Current);
       end loop;
    end Evaluate;

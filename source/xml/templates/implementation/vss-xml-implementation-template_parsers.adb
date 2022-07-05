@@ -11,7 +11,6 @@ pragma Warnings (On);
 
 with VSS.String_Vectors;
 with VSS.XML.Namespaces;
-with VSS.XML.Attributes.Containers;
 
 package body VSS.XML.Implementation.Template_Parsers is
 
@@ -241,10 +240,30 @@ package body VSS.XML.Implementation.Template_Parsers is
            (VSS.XML.Implementation.Template_Programs.Repeat, Name, Path);
       end Parse_Repeat;
 
-      Filtered        : VSS.XML.Attributes.Containers.Attributes;
-      Instructions    : Natural := 0;
+      Attributes_Program :
+        VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
+      Instructions       : Natural := 0;
+      Start_Address      : VSS.XML.Implementation.Template_Programs.Address;
 
    begin
+      --  Prepare instruction for each of present attribute from non-TAL
+      --  namespace.
+
+      for J in 1 .. Attributes.Get_Length loop
+         if Attributes.Get_URI (J) /= VSS.XML.Namespaces.TAL_Namespace then
+            Attributes_Program.Append
+              (VSS.XML.Implementation.Template_Programs.Instruction'
+                 (Kind            =>
+                      VSS.XML.Implementation.Template_Programs.Attribute,
+                  Attribute_URI   => Attributes.Get_URI (J),
+                  Attribute_Name  => Attributes.Get_Name (J),
+                  Attribute_Value => Attributes.Get_Value (J),
+                  Attribute_Path  => <>));
+         end if;
+      end loop;
+
+      --  Process attributes from TAL namespace.
+
       for J in 1 .. Attributes.Get_Length loop
          if Attributes.Get_URI (J) = VSS.XML.Namespaces.TAL_Namespace then
             if Attributes.Get_Name (J) = content_Attribute then
@@ -258,12 +277,6 @@ package body VSS.XML.Implementation.Template_Parsers is
 
                null;
             end if;
-
-         else
-            Filtered.Insert
-              (Attributes.Get_URI (J),
-               Attributes.Get_Name (J),
-               Attributes.Get_Value (J));
          end if;
       end loop;
 
@@ -283,12 +296,13 @@ package body VSS.XML.Implementation.Template_Parsers is
         (VSS.XML.Implementation.Template_Programs.Instruction'
            (VSS.XML.Implementation.Template_Programs.Start_Element,
             URI,
-            Name,
-            Filtered));
+            Name));
+      Start_Address := Self.Program.Last_Index;
+      Self.Program.Append_Vector (Attributes_Program);
 
       Self.Stack.Append (Self.Current);
       Self.Current :=
-        (Start_Address => Self.Program.Last_Index,
+        (Start_Address => Start_Address,
          Instructions  => Instructions);
    end Start_Element;
 

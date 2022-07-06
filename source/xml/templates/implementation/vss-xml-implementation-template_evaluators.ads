@@ -6,8 +6,11 @@
 
 with Ada.Containers.Vectors;
 
+with VSS.Strings.Texts;
 with VSS.String_Vectors;
 with VSS.XML.Content_Handlers;
+with VSS.XML.Error_Handlers;
+with VSS.XML.Implementation.Error_Handlers;
 with VSS.XML.Implementation.Template_Namespaces;
 with VSS.XML.Implementation.Template_Programs;
 with VSS.XML.Lexical_Handlers;
@@ -23,6 +26,10 @@ package VSS.XML.Implementation.Template_Evaluators is
       Iterator  :
         VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
       Content   : VSS.String_Vectors.Virtual_String_Vector;
+
+      System_Id : VSS.Strings.Virtual_String;
+      Line      : VSS.Strings.Texts.Line_Count;
+      Column    : VSS.Strings.Character_Count;
    end record;
 
    package State_Vectors is
@@ -31,7 +38,8 @@ package VSS.XML.Implementation.Template_Evaluators is
    type Template_Evaluator is tagged limited record
       Content : VSS.XML.Content_Handlers.SAX_Content_Handler_Access;
       Lexical : VSS.XML.Lexical_Handlers.SAX_Lexical_Handler_Access;
-
+      Error   : VSS.XML.Error_Handlers.SAX_Error_Handler_Access :=
+        VSS.XML.Implementation.Error_Handlers.Default'Access;
       Globals : aliased VSS.XML.Implementation.Template_Namespaces.Namespace;
 
       Current : State;

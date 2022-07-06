@@ -195,6 +195,7 @@ package body VSS.XML.Implementation.Template_Parsers is
         VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
       Content_Replace : VSS.XML.Implementation.Template_Programs.Instruction;
       Repeat          : VSS.XML.Implementation.Template_Programs.Instruction;
+      Add_Location       : Boolean := False;
 
       procedure Parse_Attributes (Text : VSS.Strings.Virtual_String);
 
@@ -234,6 +235,8 @@ package body VSS.XML.Implementation.Template_Parsers is
                Attribute_Name  => Name,
                Attribute_Value => <>,
                Attribute_Path  => Path));
+
+         Add_Location := True;
       end Append_Attribute_Expression;
 
       ----------------------
@@ -284,6 +287,8 @@ package body VSS.XML.Implementation.Template_Parsers is
            (Kind         => VSS.XML.Implementation.Template_Programs.Content,
             Is_Text      => Format = "text",
             Content_Path => Path);
+
+         Add_Location := True;
       end Parse_Content;
 
       ------------------
@@ -300,6 +305,8 @@ package body VSS.XML.Implementation.Template_Parsers is
       begin
          Repeat :=
            (VSS.XML.Implementation.Template_Programs.Repeat, Name, Path);
+
+         Add_Location := True;
       end Parse_Repeat;
 
       Instructions  : Natural := 0;
@@ -342,6 +349,18 @@ package body VSS.XML.Implementation.Template_Parsers is
             end if;
          end if;
       end loop;
+
+      --  Add location information when any instructions required evaluation
+      --  will be added for element.
+
+      if Add_Location then
+         Self.Program.Append
+           (VSS.XML.Implementation.Template_Programs.Instruction'
+              (Kind      => VSS.XML.Implementation.Template_Programs.Location,
+               System_Id => Self.Locator.Get_System_Id,
+               Line      => Self.Locator.Get_Line_Number,
+               Column    => Self.Locator.Get_Column_Number));
+      end if;
 
       if Repeat.Kind /= VSS.XML.Implementation.Template_Programs.None then
          Self.Program.Append (Repeat);

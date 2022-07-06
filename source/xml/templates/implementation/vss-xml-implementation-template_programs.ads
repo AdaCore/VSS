@@ -7,7 +7,7 @@
 with Ada.Containers.Vectors;
 
 with VSS.IRIs;
-with VSS.Strings;
+with VSS.Strings.Texts;
 with VSS.String_Vectors;
 
 package VSS.XML.Implementation.Template_Programs is
@@ -26,6 +26,7 @@ package VSS.XML.Implementation.Template_Programs is
       Text,
       Comment,
       Processing_Instruction,
+      Location,                --  Location information for debug purposes.
       Content,
       Repeat,
       Done);
@@ -58,6 +59,11 @@ package VSS.XML.Implementation.Template_Programs is
          when Processing_Instruction =>
             Target : VSS.Strings.Virtual_String;
             Data   : VSS.Strings.Virtual_String;
+
+         when Location =>
+            System_Id : VSS.Strings.Virtual_String;
+            Line      : VSS.Strings.Texts.Line_Count;
+            Column    : VSS.Strings.Character_Count;
 
          when Content =>
             Is_Text      : Boolean;

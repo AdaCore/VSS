@@ -11,12 +11,13 @@ pragma Warnings (On);
 
 with Ada.Unchecked_Deallocation;
 
---  with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
---  with VSS.Strings.Conversions; use VSS.Strings.Conversions;
-
 with VSS.XML.Attributes.Containers;
+with VSS.XML.Implementation.Parse_Errors;
 with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;
+
+--  with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+--  with VSS.Strings.Conversions; use VSS.Strings.Conversions;
 
 package body VSS.XML.Implementation.Template_Evaluators is
 
@@ -75,6 +76,10 @@ package body VSS.XML.Implementation.Template_Evaluators is
       procedure Do_Repeat
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction)
       is
+         use type
+           VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
+         use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
+
          Iterator :
            VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
 
@@ -83,12 +88,30 @@ package body VSS.XML.Implementation.Template_Evaluators is
            Self.Current.Namespace.Resolve_Iterable
              (Instruction.Repeat_Path);
 
-         Push_State;
+         if Iterator = null then
+            if Self.Error /= null then
+               declare
+                  Error : constant
+                    VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
+                      (Public_Id => <>,
+                       System_Id => Self.Current.System_Id,
+                       Line      => Self.Current.Line,
+                       Column    => Self.Current.Column,
+                       Message   => "Unable to resolve path to iterable");
 
-         Self.Current.Iterator := Iterator;
-         Self.Current.Namespace.Bind
-           (Instruction.Identifier,
-            VSS.XML.Templates.Proxies.Proxy_Access (Iterator));
+               begin
+                  Self.Error.Error (Error, Success);
+               end;
+            end if;
+
+         else
+            Push_State;
+
+            Self.Current.Iterator := Iterator;
+            Self.Current.Namespace.Bind
+              (Instruction.Identifier,
+               VSS.XML.Templates.Proxies.Proxy_Access (Iterator));
+         end if;
       end Do_Repeat;
 
       ----------------------
@@ -262,6 +285,13 @@ package body VSS.XML.Implementation.Template_Evaluators is
                   --  exit when not Success;
                end if;
 
+            when Location =>
+               Push_State;
+
+               Self.Current.System_Id := Instruction.System_Id;
+               Self.Current.Line      := Instruction.Line;
+               Self.Current.Column    := Instruction.Column;
+
             when Content =>
                Do_Content (Program (Current));
 
@@ -320,7 +350,10 @@ package body VSS.XML.Implementation.Template_Evaluators is
                         Enclosing => Self.Current.Namespace,
                         others    => <>),
             Iterator  => null,
-            Content   => VSS.String_Vectors.Empty_Virtual_String_Vector);
+            Content   => VSS.String_Vectors.Empty_Virtual_String_Vector,
+            System_Id => <>,
+            Line      => 0,
+            Column    => 0);
       end Push_State;
 
       Current : VSS.XML.Implementation.Template_Programs.Address :=

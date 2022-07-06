@@ -13,7 +13,7 @@ pragma Warnings (On);
 --  with VSS.Strings.Conversions; use VSS.Strings.Conversions;
 
 with VSS.XML.Attributes.Containers;
-with VSS.XML.Templates;
+with VSS.XML.Templates.Values;
 
 package body VSS.XML.Implementation.Template_Evaluators is
 
@@ -98,6 +98,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
          use type
            VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
 
+         Element     :
+           constant VSS.XML.Implementation.Template_Programs.Address :=
+             Current;
          Instruction : VSS.XML.Implementation.Template_Programs.Instruction
            renames Program (Current);
          Attributes  : VSS.XML.Attributes.Containers.Attributes;
@@ -136,10 +139,32 @@ package body VSS.XML.Implementation.Template_Evaluators is
                exit when Current > Program.Last_Index;
                exit when Program (Current).Kind /= Attribute;
 
-               Attributes.Insert
-                 (Program (Current).Attribute_URI,
-                  Program (Current).Attribute_Name,
-                  Program (Current).Attribute_Value);
+               if Program (Current).Attribute_Path.Is_Empty then
+                  Attributes.Insert
+                    (Program (Current).Attribute_URI,
+                     Program (Current).Attribute_Name,
+                     Program (Current).Attribute_Value);
+
+               else
+                  declare
+                     use type VSS.XML.Templates.Values.Value_Kind;
+
+                     V : constant VSS.XML.Templates.Values.Value :=
+                       Self.Current.Namespace.Resolve_Value
+                         (Program (Current).Attribute_Path);
+
+                  begin
+                     if V.Kind = VSS.XML.Templates.Values.String then
+                        Attributes.Insert
+                          (Program (Current).Attribute_URI,
+                           Program (Current).Attribute_Name,
+                           V.String_Value);
+
+                     else
+                        raise Program_Error;
+                     end if;
+                  end;
+               end if;
             end loop;
 
             Current := @ - 1;
@@ -152,7 +177,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
                   Success);
             end if;
 
-            if Self.Current.Element = Current
+            if Self.Current.Element = Element
               and then not Self.Current.Content.Is_Empty
             then
                if Self.Content /= null then

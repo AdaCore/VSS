@@ -14,8 +14,9 @@ with VSS.XML.Namespaces;
 
 package body VSS.XML.Implementation.Template_Parsers is
 
-   repeat_Attribute  : constant VSS.Strings.Virtual_String := "repeat";
-   content_Attribute : constant VSS.Strings.Virtual_String := "content";
+   attributes_Attribute : constant VSS.Strings.Virtual_String := "attributes";
+   repeat_Attribute     : constant VSS.Strings.Virtual_String := "repeat";
+   content_Attribute    : constant VSS.Strings.Virtual_String := "content";
 
    ----------------
    -- Characters --
@@ -190,12 +191,73 @@ package body VSS.XML.Implementation.Template_Parsers is
       use type VSS.Strings.Virtual_String;
       use type VSS.XML.Implementation.Template_Programs.Instruction_Kind;
 
+      Attributes_Program :
+        VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
       Content_Replace : VSS.XML.Implementation.Template_Programs.Instruction;
       Repeat          : VSS.XML.Implementation.Template_Programs.Instruction;
+
+      procedure Parse_Attributes (Text : VSS.Strings.Virtual_String);
 
       procedure Parse_Content (Text : VSS.Strings.Virtual_String);
 
       procedure Parse_Repeat (Text : VSS.Strings.Virtual_String);
+
+      procedure Append_Attribute_Expression
+        (URI  : VSS.IRIs.IRI;
+         Name : VSS.Strings.Virtual_String;
+         Path : VSS.String_Vectors.Virtual_String_Vector);
+
+      ---------------------------------
+      -- Append_Attribute_Expression --
+      ---------------------------------
+
+      procedure Append_Attribute_Expression
+        (URI  : VSS.IRIs.IRI;
+         Name : VSS.Strings.Virtual_String;
+         Path : VSS.String_Vectors.Virtual_String_Vector) is
+      begin
+         for Instruction of Attributes_Program loop
+            if Instruction.Attribute_URI = URI
+              and then Instruction.Attribute_Name = Name
+            then
+               Instruction.Attribute_Path := Path;
+
+               return;
+            end if;
+         end loop;
+
+         Attributes_Program.Append
+           (VSS.XML.Implementation.Template_Programs.Instruction'
+              (Kind            =>
+                 VSS.XML.Implementation.Template_Programs.Attribute,
+               Attribute_URI   => URI,
+               Attribute_Name  => Name,
+               Attribute_Value => <>,
+               Attribute_Path  => Path));
+      end Append_Attribute_Expression;
+
+      ----------------------
+      -- Parse_Attributes --
+      ----------------------
+
+      procedure Parse_Attributes (Text : VSS.Strings.Virtual_String) is
+         Statements : constant VSS.String_Vectors.Virtual_String_Vector :=
+           Text.Split (';');
+
+      begin
+         for Statement of Statements loop
+            declare
+               Parts : constant VSS.String_Vectors.Virtual_String_Vector :=
+                 Statement.Split (' ');
+               Name  : constant VSS.Strings.Virtual_String := Parts (1);
+               Path  : constant VSS.String_Vectors.Virtual_String_Vector :=
+                 Parts (2).Split ('/');
+
+            begin
+               Append_Attribute_Expression (VSS.IRIs.Empty_IRI, Name, Path);
+            end;
+         end loop;
+      end Parse_Attributes;
 
       -------------------
       -- Parse_Content --
@@ -240,10 +302,8 @@ package body VSS.XML.Implementation.Template_Parsers is
            (VSS.XML.Implementation.Template_Programs.Repeat, Name, Path);
       end Parse_Repeat;
 
-      Attributes_Program :
-        VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
-      Instructions       : Natural := 0;
-      Start_Address      : VSS.XML.Implementation.Template_Programs.Address;
+      Instructions  : Natural := 0;
+      Start_Address : VSS.XML.Implementation.Template_Programs.Address;
 
    begin
       --  Prepare instruction for each of present attribute from non-TAL
@@ -266,7 +326,10 @@ package body VSS.XML.Implementation.Template_Parsers is
 
       for J in 1 .. Attributes.Get_Length loop
          if Attributes.Get_URI (J) = VSS.XML.Namespaces.TAL_Namespace then
-            if Attributes.Get_Name (J) = content_Attribute then
+            if Attributes.Get_Name (J) = attributes_Attribute then
+               Parse_Attributes (Attributes.Get_Value (J));
+
+            elsif Attributes.Get_Name (J) = content_Attribute then
                Parse_Content (Attributes.Get_Value (J));
 
             elsif Attributes.Get_Name (J) = repeat_Attribute then

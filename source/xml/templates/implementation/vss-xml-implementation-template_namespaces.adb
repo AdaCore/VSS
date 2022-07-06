@@ -83,15 +83,6 @@ package body VSS.XML.Implementation.Template_Namespaces is
 
    begin
       if Item /= null then
-         --  if Subpath.Is_Empty
-         --    and then Item.all
-         --      in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
-         --  then
-         --     return
-         --       new VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
-         --             (VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
-         --                (Item.all).Iterator);
-
          if Item.all
               in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
          then
@@ -107,7 +98,6 @@ package body VSS.XML.Implementation.Template_Namespaces is
          return Self.Enclosing.Resolve_Content (Path);
       end if;
 
-      --  return null;
       return VSS.Strings.Empty_Virtual_String;
    end Resolve_Content;
 
@@ -129,12 +119,6 @@ package body VSS.XML.Implementation.Template_Namespaces is
          then Name_Item_Maps.Element (Position) else null);
 
    begin
-      --  if Name_Item_Maps.Has_Element (Position) then
-      --        declare
-      --           Item : constant not null VSS.XML.Templates.Proxy_Access :=
-      --             Name_Item_Maps.Element (Position);
-      --
-      --        begin
       if Item /= null then
          if Subpath.Is_Empty
            and then Item.all
@@ -154,37 +138,43 @@ package body VSS.XML.Implementation.Template_Namespaces is
       end if;
 
       return null;
-
-      --  return Result : Iterable_Iterator_Access do
-      --     if Name_Item_Maps.Has_Element (Position) then
-      --        declare
-      --           Item : constant not null VSS.XML.Templates.Proxy_Access :=
-      --             Name_Item_Maps.Element (Position);
-      --
-      --        begin
-      --           if Subpath.Is_Empty then
-      --              if Item.all
-      --                in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
-      --              then
-      --                 Result :=
-      --                   new VSS.XML.Templates.Proxies
-      --                         .Abstract_Iterable_Iterator'Class'
-      --                       (VSS.XML.Templates.Proxies
-      --                        .Abstract_Iterable_Proxy'Class
-      --                          (Item.all).Iterator);
-      --              end if;
-      --
-      --           elsif Item.all in Namespace'Class then
-      --              Result :=
-      --                Namespace'Class (Item.all).Resolve_Iterable (Subpath);
-      --           end if;
-      --        end;
-      --
-      --     elsif Self.Enclosing /= null then
-      --        Result := Self.Enclosing.Resolve_Iterable (Path);
-      --     end if;
-      --  end return;
-      --
    end Resolve_Iterable;
+
+   -------------------
+   -- Resolve_Value --
+   -------------------
+
+   function Resolve_Value
+     (Self : Namespace'Class;
+      Path : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Values.Value
+   is
+      Position : constant Name_Item_Maps.Cursor :=
+        Self.Items.Find (Path (1));
+      Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
+        Path.Delete_First;
+      Item     : constant VSS.XML.Templates.Proxy_Access :=
+        (if Name_Item_Maps.Has_Element (Position)
+         then Name_Item_Maps.Element (Position) else null);
+
+   begin
+      if Item /= null then
+         if Item.all
+              in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+         then
+            return
+              VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+                (Item.all).Value (Subpath);
+
+         elsif Item.all in Namespace'Class then
+            return Namespace'Class (Item.all).Resolve_Value (Subpath);
+         end if;
+
+      elsif Self.Enclosing /= null then
+         return Self.Enclosing.Resolve_Value (Path);
+      end if;
+
+      return (Kind => VSS.XML.Templates.Values.Error);
+   end Resolve_Value;
 
 end VSS.XML.Implementation.Template_Namespaces;

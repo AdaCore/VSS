@@ -4,9 +4,11 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with Ada.Unchecked_Deallocation;
+
 package body VSS.XML.Implementation.Template_Namespaces is
 
-   use type VSS.XML.Templates.Proxy_Access;
+   use type VSS.XML.Templates.Proxies.Proxy_Access;
 
    ----------
    -- Bind --
@@ -15,7 +17,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
    procedure Bind
      (Self : in out Namespace'Class;
       Path : VSS.String_Vectors.Virtual_String_Vector;
-      Item : not null VSS.XML.Templates.Proxy_Access)
+      Item : not null VSS.XML.Templates.Proxies.Proxy_Access)
    is
       Name : constant VSS.Strings.Virtual_String := Path (1);
 
@@ -27,7 +29,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
          declare
             Position : constant Name_Item_Maps.Cursor :=
               Self.Items.Find (Name);
-            Child    : VSS.XML.Templates.Proxy_Access :=
+            Child    : VSS.XML.Templates.Proxies.Proxy_Access :=
               (if Name_Item_Maps.Has_Element (Position)
                then Name_Item_Maps.Element (Position) else null);
 
@@ -59,10 +61,28 @@ package body VSS.XML.Implementation.Template_Namespaces is
    procedure Bind
      (Self : in out Namespace'Class;
       Name : VSS.Strings.Virtual_String;
-      Item : not null VSS.XML.Templates.Proxy_Access) is
+      Item : not null VSS.XML.Templates.Proxies.Proxy_Access) is
    begin
       Self.Items.Insert (Name, Item);
    end Bind;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding procedure Finalize (Self : in out Namespace) is
+      procedure Free is
+        new Ada.Unchecked_Deallocation
+          (VSS.XML.Templates.Proxies.Abstract_Proxy'Class,
+           VSS.XML.Templates.Proxies.Proxy_Access);
+
+   begin
+      for Item of Self.Items loop
+         Free (Item);
+      end loop;
+
+      Self.Items.Clear;
+   end Finalize;
 
    ---------------------
    -- Resolve_Content --
@@ -77,7 +97,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
         Self.Items.Find (Path (1));
       Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
         Path.Delete_First;
-      Item     : constant VSS.XML.Templates.Proxy_Access :=
+      Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
         (if Name_Item_Maps.Has_Element (Position)
          then Name_Item_Maps.Element (Position) else null);
 
@@ -114,7 +134,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
         Self.Items.Find (Path (1));
       Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
         Path.Delete_First;
-      Item     : constant VSS.XML.Templates.Proxy_Access :=
+      Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
         (if Name_Item_Maps.Has_Element (Position)
          then Name_Item_Maps.Element (Position) else null);
 
@@ -153,7 +173,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
         Self.Items.Find (Path (1));
       Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
         Path.Delete_First;
-      Item     : constant VSS.XML.Templates.Proxy_Access :=
+      Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
         (if Name_Item_Maps.Has_Element (Position)
          then Name_Item_Maps.Element (Position) else null);
 

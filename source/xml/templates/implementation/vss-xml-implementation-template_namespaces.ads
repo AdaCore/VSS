@@ -5,6 +5,7 @@
 --
 
 with Ada.Containers.Hashed_Maps;
+with Ada.Finalization;
 
 with VSS.Strings.Hash;
 with VSS.String_Vectors;
@@ -16,20 +17,22 @@ package VSS.XML.Implementation.Template_Namespaces is
    package Name_Item_Maps is
      new Ada.Containers.Hashed_Maps
        (VSS.Strings.Virtual_String,
-        VSS.XML.Templates.Proxy_Access,
+        VSS.XML.Templates.Proxies.Proxy_Access,
         VSS.Strings.Hash,
         VSS.Strings."=",
-        VSS.XML.Templates."=");
+        VSS.XML.Templates.Proxies."=");
 
    type Iterable_Iterator_Access is
      access all VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class;
 
-   type Namespace;  --  is tagged;
+   type Namespace is tagged;
 
-   type Namespace_Access is access all Namespace;  --  'Class;
+   type Namespace_Access is access all Namespace'Class;
 
    type Namespace is
-     limited new VSS.XML.Templates.Proxies.Abstract_Proxy with record
+     limited new Ada.Finalization.Limited_Controlled
+       and VSS.XML.Templates.Proxies.Abstract_Proxy with
+   record
       Enclosing : Namespace_Access;
       Items     : Name_Item_Maps.Map;
    end record;
@@ -55,13 +58,15 @@ package VSS.XML.Implementation.Template_Namespaces is
    procedure Bind
      (Self : in out Namespace'Class;
       Path : VSS.String_Vectors.Virtual_String_Vector;
-      Item : not null VSS.XML.Templates.Proxy_Access)
+      Item : not null VSS.XML.Templates.Proxies.Proxy_Access)
      with Pre => not Path.Is_Empty;
 
    procedure Bind
      (Self : in out Namespace'Class;
       Name : VSS.Strings.Virtual_String;
-      Item : not null VSS.XML.Templates.Proxy_Access)
+      Item : not null VSS.XML.Templates.Proxies.Proxy_Access)
      with Pre => not Name.Is_Empty;
+
+   overriding procedure Finalize (Self : in out Namespace);
 
 end VSS.XML.Implementation.Template_Namespaces;

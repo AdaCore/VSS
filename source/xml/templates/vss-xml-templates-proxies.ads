@@ -5,6 +5,7 @@
 --
 
 with VSS.Strings;
+with VSS.String_Vectors;
 
 with VSS.XML.Templates.Values;
 
@@ -12,7 +13,10 @@ package VSS.XML.Templates.Proxies is
 
    type Abstract_Proxy is limited interface;
 
-   type Abstract_Iterable_Iterator is limited interface;
+   type Proxy_Access is
+     access all VSS.XML.Templates.Proxies.Abstract_Proxy'Class;
+
+   type Abstract_Iterable_Iterator is limited interface and Abstract_Proxy;
 
    function Next
      (Self : in out Abstract_Iterable_Iterator) return Boolean is abstract;

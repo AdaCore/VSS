@@ -9,10 +9,13 @@ pragma Ada_2020;
 pragma Ada_2022;
 pragma Warnings (On);
 
+with Ada.Unchecked_Deallocation;
+
 --  with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 --  with VSS.Strings.Conversions; use VSS.Strings.Conversions;
 
 with VSS.XML.Attributes.Containers;
+with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;
 
 package body VSS.XML.Implementation.Template_Evaluators is
@@ -85,7 +88,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
          Self.Current.Iterator := Iterator;
          Self.Current.Namespace.Bind
            (Instruction.Identifier,
-            VSS.XML.Templates.Proxy_Access (Iterator));
+            VSS.XML.Templates.Proxies.Proxy_Access (Iterator));
       end Do_Repeat;
 
       ----------------------
@@ -281,7 +284,13 @@ package body VSS.XML.Implementation.Template_Evaluators is
       ---------------
 
       procedure Pop_State is
+         procedure Free is
+           new Ada.Unchecked_Deallocation
+             (VSS.XML.Implementation.Template_Namespaces.Namespace'Class,
+              VSS.XML.Implementation.Template_Namespaces.Namespace_Access);
+
       begin
+         Free (Self.Current.Namespace);
          Self.Current := Self.Stack.Last_Element;
          Self.Stack.Delete_Last;
       end Pop_State;
@@ -307,7 +316,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
               VSS.XML.Implementation.Template_Programs.Null_Address,
             Namespace =>
                new VSS.XML.Implementation.Template_Namespaces.Namespace'
-              (Enclosing => Self.Current.Namespace, others => <>),
+                     (Ada.Finalization.Limited_Controlled with
+                        Enclosing => Self.Current.Namespace,
+                        others    => <>),
             Iterator  => null,
             Content   => VSS.String_Vectors.Empty_Virtual_String_Vector);
       end Push_State;
@@ -318,7 +329,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
    begin
       Self.Current.Namespace :=
         new VSS.XML.Implementation.Template_Namespaces.Namespace'
-              (Enclosing => Binded, others => <>);
+              (Ada.Finalization.Limited_Controlled with
+                 Enclosing => Binded,
+                 others    => <>);
       Self.Current.Element :=
         VSS.XML.Implementation.Template_Programs.Address'Last;
 

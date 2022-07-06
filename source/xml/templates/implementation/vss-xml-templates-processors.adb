@@ -4,21 +4,17 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+pragma Warnings (Off);
+pragma Ada_2020;
 pragma Ada_2022;
-
---  with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+pragma Warnings (On);
 
 with VSS.XML.Implementation.Template_Evaluators;
-with VSS.XML.Implementation.Template_Namespaces;
 with VSS.XML.Namespaces;
---  with VSS.Strings.Conversions;
 
-package body VSS.XML.Templates is
+package body VSS.XML.Templates.Processors is
 
    use type VSS.XML.Content_Handlers.SAX_Content_Handler_Access;
-
-   --  X : Namespace_Access :=
-   --    new VSS.XML.Implementation.Template_Namespaces.Namespace;
 
    ----------
    -- Bind --
@@ -27,13 +23,8 @@ package body VSS.XML.Templates is
    procedure Bind
      (Self  : in out XML_Template_Processor'Class;
       Path  : VSS.String_Vectors.Virtual_String_Vector;
-      Proxy : not null Proxy_Access) is
+      Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access) is
    begin
-      if Self.Binded = null then
-         Self.Binded :=
-           new VSS.XML.Implementation.Template_Namespaces.Namespace;
-      end if;
-
       Self.Binded.Bind (Path, Proxy);
    end Bind;
 
@@ -98,9 +89,9 @@ package body VSS.XML.Templates is
                   Evaluator.Content := Self.Content;
 
                   Evaluator.Evaluate
-                    (VSS.XML.Implementation.Template_Namespaces.Namespace_Access
-                       (Self.Binded),
-                     Self.Parser.Program, Success);
+                    (Self.Binded'Unchecked_Access,
+                     Self.Parser.Program,
+                     Success);
                end;
             end if;
          end if;
@@ -110,20 +101,6 @@ package body VSS.XML.Templates is
             Self.Content.End_Element (URI, Name, Success);
          end if;
       end if;
-      --  if Self.Current.Recording then
-      --     Self.Current.Stream.Append
-      --       (Event_Record'(End_Element, URI, Local_Name, Qualified_Name));
-      --
-      --     Self.Current.Depth := @ - 1;
-      --
-      --     if Self.Current.Depth = 0 then
-      --        raise Program_Error;
-      --     end if;
-      --
-      --  elsif Self.Content /= null then
-      --     Self.Content.End_Element
-      --  (URI, Local_Name, Qualified_Name, Success);
-      --  end if;
    end End_Element;
 
    ----------------------------
@@ -203,11 +180,7 @@ package body VSS.XML.Templates is
       Success    : in out Boolean)
    is
       use type VSS.IRIs.IRI;
-      --  use type VSS.Strings.Virtual_String;
 
-      --  Filtered : VSS.XML.Implementation.Attributes.Attributes;
-
-      --  Has_Repeat : Boolean := False;
       Has_TAL : Boolean := False;
 
    begin
@@ -235,55 +208,6 @@ package body VSS.XML.Templates is
             end if;
          end if;
       end if;
-      --  for J in 1 .. Attributes.Get_Length loop
-      --     if Attributes.Get_URI (J) = VSS.HTML.Namespaces.TAL_Namespace then
-      --        if Attributes.Get_Local_Name (J) = Repeat_Attribute then
-      --           Put_Line
-      --             (">>> repeat: '"
-      --              & VSS.Strings.Conversions.To_Wide_Wide_String
-      --                (Attributes.Get_Value (J))
-      --              & ''');
-      --           Has_Repeat := True;
-      --
-      --        else
-      --           raise Program_Error;
-      --           --  Self.Error.Error
-      --        end if;
-      --
-      --     else
-      --        Filtered.Insert
-      --          (Attributes.Get_URI (J),
-      --           Attributes.Get_Local_Name (J),
-      --           Attributes.Get_Qualified_Name (J),
-      --           Attributes.Get_Value (J));
-      --
-      --        Put_Line
-      --          ('''
-      --           & VSS.Strings.Conversions.To_Wide_Wide_String
-      --             (Attributes.Get_URI (J).To_Virtual_String)
-      --           & "' '"
-      --           & VSS.Strings.Conversions.To_Wide_Wide_String
-      --             (Attributes.Get_Local_Name (J))
-      --           & "' '"
-      --           & VSS.Strings.Conversions.To_Wide_Wide_String
-      --             (Attributes.Get_Qualified_Name (J))
-      --           & ''');
-      --     end if;
-      --  end loop;
-      --
-      --  if Has_Repeat then
-      --     Self.Stack.Append (Self.Current);
-      --     Self.Current := (others => <>);
-      --     Self.Current.Recording := True;
-      --
-      --  else
-      --     Self.Current.Depth := @ + 1;
-      --  end if;
-      --
-      --  if not Self.Current.Recording and Self.Content /= null then
-      --     Self.Content.Start_Element
-      --       (URI, Local_Name, Qualified_Name, Filtered, Success);
-      --  end if;
    end Start_Element;
 
-end VSS.XML.Templates;
+end VSS.XML.Templates.Processors;

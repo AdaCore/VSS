@@ -140,14 +140,13 @@ package body VSS.XML.Implementation.Template_Namespaces is
 
    begin
       if Item /= null then
-         if Subpath.Is_Empty
-           and then Item.all
+         if Item.all
              in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
          then
             return
               new VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
                     (VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
-                       (Item.all).Iterator);
+                       (Item.all).Iterator (Subpath));
 
          elsif Item.all in Namespace'Class then
             return Namespace'Class (Item.all).Resolve_Iterable (Subpath);

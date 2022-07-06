@@ -6,6 +6,8 @@
 
 with VSS.Strings;
 
+with VSS.XML.Templates.Values;
+
 package VSS.XML.Templates.Proxies is
 
    type Abstract_Proxy is limited interface;
@@ -33,5 +35,10 @@ package VSS.XML.Templates.Proxies is
    --     return VSS.XML.Events.Sequence;
 
    type Abstract_Value_Proxy is limited interface and Abstract_Proxy;
+
+   function Value
+     (Self : Abstract_Value_Proxy;
+      Path : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Values.Value is abstract;
 
 end VSS.XML.Templates.Proxies;

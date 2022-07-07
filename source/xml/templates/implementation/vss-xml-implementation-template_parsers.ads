@@ -59,9 +59,9 @@ private
       Locator : VSS.XML.Locators.SAX_Locator_Access;
       Success : in out Boolean);
 
-   --  overriding procedure Start_Document
-   --    (Self    : in out Template_Parser;
-   --     Success : in out Boolean);
+   overriding procedure Start_Document
+     (Self    : in out Template_Parser;
+      Success : in out Boolean);
 
    --  procedure End_Document
    --    (Self    : in out SAX_Content_Handler;

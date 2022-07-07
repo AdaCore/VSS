@@ -174,6 +174,25 @@ package body VSS.XML.Implementation.Template_Parsers is
       Self.CDATA := True;
    end Start_CDATA;
 
+   --------------------
+   -- Start_Document --
+   --------------------
+
+   overriding procedure Start_Document
+     (Self    : in out Template_Parser;
+      Success : in out Boolean)
+   is
+      pragma Unreferenced (Success);
+
+   begin
+      --  Reset state of the parser
+
+      Self.Program.Clear;
+      Self.CDATA := False;
+      Self.Current := (0, 0);
+      Self.Stack.Clear;
+   end Start_Document;
+
    -------------------
    -- Start_Element --
    -------------------

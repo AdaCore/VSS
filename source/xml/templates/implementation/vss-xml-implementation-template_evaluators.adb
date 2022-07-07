@@ -13,6 +13,7 @@ with Ada.Unchecked_Deallocation;
 
 with VSS.XML.Attributes.Containers;
 with VSS.XML.Implementation.Parse_Errors;
+with VSS.XML.Implementation.Template_Programs.Debug;
 with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;
 
@@ -20,6 +21,27 @@ with VSS.XML.Templates.Values;
 --  with VSS.Strings.Conversions; use VSS.Strings.Conversions;
 
 package body VSS.XML.Implementation.Template_Evaluators is
+
+   -----------
+   -- Error --
+   -----------
+
+   overriding procedure Error
+     (Self    : in out Template_Evaluator;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
+   is
+      Error :
+        constant VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
+        (Public_Id => <>,
+         System_Id => Self.Current.System_Id,
+         Line      => Self.Current.Line,
+         Column    => Self.Current.Column,
+         Message   => Message);
+
+   begin
+      Self.Error.Error (Error, Success);
+   end Error;
 
    --------------
    -- Evaluate --
@@ -209,7 +231,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
                if Self.Content /= null then
                   Self.Content.Characters
                     (Self.Current.Namespace.Resolve_Content
-                       (Self.Current.Content),
+                       (Self.Current.Content, Self, Success),
                      Success);
                end if;
 
@@ -360,6 +382,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
         Program.First_Index;
 
    begin
+      Template_Programs.Debug.Dump (Program);
       Self.Current.Namespace :=
         new VSS.XML.Implementation.Template_Namespaces.Namespace'
               (Ada.Finalization.Limited_Controlled with

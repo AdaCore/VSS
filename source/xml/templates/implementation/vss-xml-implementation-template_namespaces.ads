@@ -14,6 +14,13 @@ with VSS.XML.Templates.Values;
 
 package VSS.XML.Implementation.Template_Namespaces is
 
+   type Error_Handler is limited interface;
+
+   procedure Error
+     (Self    : in out Error_Handler;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is abstract;
+
    package Name_Item_Maps is
      new Ada.Containers.Hashed_Maps
        (VSS.Strings.Virtual_String,
@@ -44,8 +51,10 @@ package VSS.XML.Implementation.Template_Namespaces is
      with Pre => not Path.Is_Empty;
 
    function Resolve_Content
-     (Self : Namespace'Class;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
+     (Self    : Namespace'Class;
+      Path    : VSS.String_Vectors.Virtual_String_Vector;
+      Error   : in out Error_Handler'Class;
+      Success : in out Boolean)
       return VSS.Strings.Virtual_String
      with Pre => not Path.Is_Empty;
 

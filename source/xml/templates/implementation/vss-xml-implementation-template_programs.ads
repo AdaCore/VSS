@@ -27,6 +27,7 @@ package VSS.XML.Implementation.Template_Programs is
       Comment,
       Processing_Instruction,
       Location,                --  Location information for debug purposes.
+      Condition,
       Content,
       Repeat,
       Done);
@@ -64,6 +65,10 @@ package VSS.XML.Implementation.Template_Programs is
             System_Id : VSS.Strings.Virtual_String;
             Line      : VSS.Strings.Texts.Line_Count;
             Column    : VSS.Strings.Character_Count;
+
+         when Condition =>
+            Negate         : Boolean;
+            Condition_Path : VSS.String_Vectors.Virtual_String_Vector;
 
          when Content =>
             Is_Text      : Boolean;

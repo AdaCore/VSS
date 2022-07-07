@@ -23,6 +23,8 @@ package VSS.XML.Implementation.Template_Evaluators is
    type State is record
       Element   : VSS.XML.Implementation.Template_Programs.Address;
       Namespace : VSS.XML.Implementation.Template_Namespaces.Namespace_Access;
+      Condition : VSS.String_Vectors.Virtual_String_Vector;
+      Negate    : Boolean;
       Iterator  :
         VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
       Content   : VSS.String_Vectors.Virtual_String_Vector;

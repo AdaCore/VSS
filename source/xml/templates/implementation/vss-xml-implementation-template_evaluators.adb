@@ -62,6 +62,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
       procedure Do_Start_Element
         (Current : in out VSS.XML.Implementation.Template_Programs.Address);
 
+      procedure Do_Condition
+        (Instruction : VSS.XML.Implementation.Template_Programs.Instruction);
+
       procedure Do_Content
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction);
 
@@ -73,6 +76,19 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
       procedure Push_State;
       procedure Pop_State;
+
+      ------------------
+      -- Do_Condition --
+      ------------------
+
+      procedure Do_Condition
+        (Instruction : VSS.XML.Implementation.Template_Programs.Instruction) is
+      begin
+         Push_State;
+
+         Self.Current.Condition := Instruction.Condition_Path;
+         Self.Current.Negate    := Instruction.Negate;
+      end Do_Condition;
 
       ----------------
       -- Do_Content --
@@ -146,6 +162,32 @@ package body VSS.XML.Implementation.Template_Evaluators is
          use type
            VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
 
+         procedure Skip_Element (Preserve_End_Element : Boolean);
+
+         ------------------
+         -- Skip_Element --
+         ------------------
+
+         procedure Skip_Element (Preserve_End_Element : Boolean) is
+         begin
+            loop
+               Current := @ + 1;
+
+               exit when Current > Program.Last_Index;
+
+               if Program (Current).Kind = End_Element
+                 and then Program (Current).Start_Address
+                             = Self.Current.Element
+               then
+                  if Preserve_End_Element then
+                     Current := @ - 1;
+                  end if;
+
+                  exit;
+               end if;
+            end loop;
+         end Skip_Element;
+
          Element     :
            constant VSS.XML.Implementation.Template_Programs.Address :=
              Current;
@@ -161,20 +203,35 @@ package body VSS.XML.Implementation.Template_Evaluators is
          end if;
 
          if Self.Current.Element = Current
+           and then not Self.Current.Condition.Is_Empty
+         then
+            declare
+               Value : constant VSS.XML.Templates.Values.Value :=
+                 Self.Current.Namespace.Resolve_Boolean_Value
+                   (Self.Current.Condition);
+
+            begin
+               case Value.Kind is
+                  when VSS.XML.Templates.Values.Boolean =>
+                     if not (Value.Boolean_Value xor Self.Current.Negate) then
+                        Skip_Element (False);
+
+                        return;
+                     end if;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+            end;
+         end if;
+
+         if Self.Current.Element = Current
            and then Self.Current.Iterator /= null
            and then not Self.Current.Iterator.Next
          then
             --  Rewind till end of the element.
 
-            loop
-               Current := @ + 1;
-
-               exit when Current > Program.Last_Index;
-
-               exit when Program (Current).Kind = End_Element
-                 and then Program (Current).Start_Address
-                            = Self.Current.Element;
-            end loop;
+            Skip_Element (False);
 
             Pop_State;
 
@@ -237,20 +294,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
                --  Rewind till end of the element.
 
-               loop
-                  Current := @ + 1;
-
-                  exit when Current > Program.Last_Index;
-
-                  if Program (Current).Kind = End_Element
-                    and then Program (Current).Start_Address
-                               = Self.Current.Element
-                  then
-                     Current := @ - 1;
-
-                     exit;
-                  end if;
-               end loop;
+               Skip_Element (True);
             end if;
          end if;
       end Do_Start_Element;
@@ -314,6 +358,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
                Self.Current.Line      := Instruction.Line;
                Self.Current.Column    := Instruction.Column;
 
+            when Condition =>
+               Do_Condition (Program (Current));
+
             when Content =>
                Do_Content (Program (Current));
 
@@ -371,6 +418,8 @@ package body VSS.XML.Implementation.Template_Evaluators is
                      (Ada.Finalization.Limited_Controlled with
                         Enclosing => Self.Current.Namespace,
                         others    => <>),
+            Condition => VSS.String_Vectors.Empty_Virtual_String_Vector,
+            Negate    => False,
             Iterator  => null,
             Content   => VSS.String_Vectors.Empty_Virtual_String_Vector,
             System_Id => <>,

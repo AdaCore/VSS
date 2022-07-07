@@ -8,15 +8,18 @@ with VSS.Strings;
 
 package VSS.XML.Templates.Values is
 
-   type Value_Kind is (Error, Nothing, Default, String);
+   type Value_Kind is (Error, Nothing, Default, Boolean, String);
 
    type Value (Kind : Value_Kind) is record
       case Kind is
          when Error | Nothing | Default =>
             null;
 
+         when Boolean =>
+            Boolean_Value : Standard.Boolean;
+
          when String =>
-            String_Value : VSS.Strings.Virtual_String;
+            String_Value  : VSS.Strings.Virtual_String;
       end case;
    end record;
 

@@ -10,13 +10,20 @@ pragma Ada_2022;
 pragma Warnings (On);
 
 with VSS.String_Vectors;
+with VSS.XML.Implementation.Parse_Errors;
 with VSS.XML.Namespaces;
 
 package body VSS.XML.Implementation.Template_Parsers is
 
    attributes_Attribute : constant VSS.Strings.Virtual_String := "attributes";
-   repeat_Attribute     : constant VSS.Strings.Virtual_String := "repeat";
+   condition_Attribute  : constant VSS.Strings.Virtual_String := "condition";
    content_Attribute    : constant VSS.Strings.Virtual_String := "content";
+   repeat_Attribute     : constant VSS.Strings.Virtual_String := "repeat";
+
+   procedure Report_Error
+     (Self    : Template_Parser'Class;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
 
    ----------------
    -- Characters --
@@ -145,6 +152,26 @@ package body VSS.XML.Implementation.Template_Parsers is
       return Self.Program;
    end Program;
 
+   ------------------
+   -- Report_Error --
+   ------------------
+
+   procedure Report_Error
+     (Self    : Template_Parser'Class;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
+   is
+      use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
+
+      Error : constant VSS.XML.Implementation.Parse_Errors.Parse_Error :=
+        (Self.Locator, Message);
+
+   begin
+      if Self.Error /= null then
+         Self.Error.Error (Error, Success);
+      end if;
+   end Report_Error;
+
    --------------------------
    -- Set_Document_Locator --
    --------------------------
@@ -204,19 +231,20 @@ package body VSS.XML.Implementation.Template_Parsers is
       Attributes : VSS.XML.Attributes.XML_Attributes'Class;
       Success    : in out Boolean)
    is
-      pragma Unreferenced (Success);
-
       use type VSS.IRIs.IRI;
       use type VSS.Strings.Virtual_String;
       use type VSS.XML.Implementation.Template_Programs.Instruction_Kind;
 
       Attributes_Program :
         VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
+      Condition       : VSS.XML.Implementation.Template_Programs.Instruction;
       Content_Replace : VSS.XML.Implementation.Template_Programs.Instruction;
       Repeat          : VSS.XML.Implementation.Template_Programs.Instruction;
       Add_Location       : Boolean := False;
 
       procedure Parse_Attributes (Text : VSS.Strings.Virtual_String);
+
+      procedure Parse_Condition (Text : VSS.Strings.Virtual_String);
 
       procedure Parse_Content (Text : VSS.Strings.Virtual_String);
 
@@ -280,6 +308,26 @@ package body VSS.XML.Implementation.Template_Parsers is
             end;
          end loop;
       end Parse_Attributes;
+
+      ---------------------
+      -- Parse_Condition --
+      ---------------------
+
+      procedure Parse_Condition (Text : VSS.Strings.Virtual_String) is
+         Parts : constant VSS.String_Vectors.Virtual_String_Vector :=
+           Text.Split (':');
+         Path  : constant VSS.String_Vectors.Virtual_String_Vector :=
+           (if Parts.Length = 1
+            then Parts (1).Split ('/')
+            else Parts (2).Split ('/'));
+
+      begin
+         Condition :=
+           (Kind           =>
+              VSS.XML.Implementation.Template_Programs.Condition,
+            Negate         => Parts (1) = "not",
+            Condition_Path => Path);
+      end Parse_Condition;
 
       -------------------
       -- Parse_Content --
@@ -355,6 +403,9 @@ package body VSS.XML.Implementation.Template_Parsers is
             if Attributes.Get_Name (J) = attributes_Attribute then
                Parse_Attributes (Attributes.Get_Value (J));
 
+            elsif Attributes.Get_Name (J) = condition_Attribute then
+               Parse_Condition (Attributes.Get_Value (J));
+
             elsif Attributes.Get_Name (J) = content_Attribute then
                Parse_Content (Attributes.Get_Value (J));
 
@@ -362,9 +413,7 @@ package body VSS.XML.Implementation.Template_Parsers is
                Parse_Repeat (Attributes.Get_Value (J));
 
             else
-               --  Self.Error.Error ("Unknown TAL attribute.
-
-               null;
+               Self.Report_Error ("Unknown TAL attribute", Success);
             end if;
          end if;
       end loop;
@@ -379,6 +428,11 @@ package body VSS.XML.Implementation.Template_Parsers is
                System_Id => Self.Locator.Get_System_Id,
                Line      => Self.Locator.Get_Line_Number,
                Column    => Self.Locator.Get_Column_Number));
+      end if;
+
+      if Condition.Kind /= VSS.XML.Implementation.Template_Programs.None then
+         Self.Program.Append (Condition);
+         Instructions := @ + 1;
       end if;
 
       if Repeat.Kind /= VSS.XML.Implementation.Template_Programs.None then

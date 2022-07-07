@@ -159,6 +159,100 @@ package body VSS.XML.Implementation.Template_Namespaces is
       end if;
    end Resolve;
 
+   ---------------------------
+   -- Resolve_Boolean_Value --
+   ---------------------------
+
+   function Resolve_Boolean_Value
+     (Self : Namespace'Class;
+      Path : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Values.Value
+   is
+      Binded : VSS.XML.Templates.Proxies.Proxy_Access;
+      Suffix : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      Self.Resolve (Path, Binded, Suffix);
+
+      if Suffix.Is_Empty then
+         if Binded.all
+              in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+         then
+            raise Program_Error;
+
+         else
+            raise Program_Error;
+         end if;
+         --  if Binded.all
+         --    in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+         --  then
+         --     raise Program_Error;
+         --     --  return
+         --     --    new VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
+         --     --      (VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+         --     --         (Binded.all).Iterator);
+         --
+         --  else
+         --     raise Program_Error;
+         --  end if;
+
+      else
+         declare
+            Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+              Resolve (Binded.all, Suffix);
+
+         begin
+            if Proxy
+              in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+            then
+               return
+                 (Kind          => VSS.XML.Templates.Values.Boolean,
+                  Boolean_Value =>
+                    not VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+                          (Proxy).Is_Empty);
+
+         --     elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+         --        Error.Error
+         --          (VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message,
+         --           Success);
+         --
+         --        return null;
+
+            else
+               raise Program_Error;
+            end if;
+         end;
+      end if;
+
+      return (Kind => VSS.XML.Templates.Values.Default);
+      --  Position : constant Name_Item_Maps.Cursor :=
+      --    Self.Items.Find (Path (1));
+      --  Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
+      --    Path.Delete_First;
+      --  Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
+      --    (if Name_Item_Maps.Has_Element (Position)
+      --     then Name_Item_Maps.Element (Position) else null);
+      --
+   --  begin
+   --     if Item /= null then
+   --        if Item.all
+   --             in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+   --        then
+   --           return
+   --             VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+   --               (Item.all).Value (Subpath);
+   --
+   --        elsif Item.all in Namespace'Class then
+   --           return Namespace'Class (Item.all).Resolve_Value (Subpath);
+   --        end if;
+   --
+   --     elsif Self.Enclosing /= null then
+   --        return Self.Enclosing.Resolve_Value (Path);
+   --     end if;
+   --
+   --     return (Kind => VSS.XML.Templates.Values.Error);
+   end Resolve_Boolean_Value;
+
    ---------------------
    -- Resolve_Content --
    ---------------------

@@ -27,6 +27,9 @@ package VSS.XML.Templates.Proxies is
      (Self : in out Abstract_Iterable_Proxy)
       return Abstract_Iterable_Iterator'Class is abstract;
 
+   function Is_Empty
+     (Self : Abstract_Iterable_Proxy) return Boolean is abstract;
+
    type Abstract_Composite_Proxy is limited interface and Abstract_Proxy;
 
    function Component

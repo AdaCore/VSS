@@ -73,6 +73,12 @@ package VSS.XML.Implementation.Template_Namespaces is
       return VSS.XML.Templates.Values.Value
      with Pre => not Path.Is_Empty;
 
+   function Resolve_Boolean_Value
+     (Self : Namespace'Class;
+      Path : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Values.Value
+     with Pre => not Path.Is_Empty;
+
    procedure Bind
      (Self : in out Namespace'Class;
       Path : VSS.String_Vectors.Virtual_String_Vector;

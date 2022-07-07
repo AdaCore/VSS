@@ -108,7 +108,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
       begin
          Iterator :=
            Self.Current.Namespace.Resolve_Iterable
-             (Instruction.Repeat_Path);
+             (Instruction.Repeat_Path, Self, Success);
 
          if Iterator = null then
             if Self.Error /= null then

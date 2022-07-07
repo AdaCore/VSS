@@ -10,6 +10,11 @@ package body VSS.XML.Implementation.Template_Namespaces is
 
    use type VSS.XML.Templates.Proxies.Proxy_Access;
 
+   function Resolve
+     (Proxy : in out VSS.XML.Templates.Proxies.Abstract_Proxy'Class;
+      Path  : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Proxies.Abstract_Proxy'Class;
+
    ----------
    -- Bind --
    ----------
@@ -84,6 +89,76 @@ package body VSS.XML.Implementation.Template_Namespaces is
       Self.Items.Clear;
    end Finalize;
 
+   -------------
+   -- Resolve --
+   -------------
+
+   procedure Resolve
+     (Self      : Namespace'Class;
+      Path      : VSS.String_Vectors.Virtual_String_Vector;
+      Proxy     : out VSS.XML.Templates.Proxies.Proxy_Access;
+      Remaining : out VSS.String_Vectors.Virtual_String_Vector)
+   is
+      Position : constant Name_Item_Maps.Cursor :=
+        Self.Items.Find (Path (1));
+      Suffix   : constant VSS.String_Vectors.Virtual_String_Vector :=
+        Path.Delete_First;
+      Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
+        (if Name_Item_Maps.Has_Element (Position)
+         then Name_Item_Maps.Element (Position) else null);
+
+   begin
+      Proxy := null;
+      Remaining.Clear;
+
+      if Item /= null then
+         if Item.all in Namespace'Class then
+            Namespace'Class (Item.all).Resolve (Suffix, Proxy, Remaining);
+
+         else
+            Proxy     := Item;
+            Remaining := Suffix;
+         end if;
+
+      elsif Self.Enclosing /= null then
+         Self.Enclosing.Resolve (Path, Proxy, Remaining);
+      end if;
+   end Resolve;
+
+   -------------
+   -- Resolve --
+   -------------
+
+   function Resolve
+     (Proxy : in out VSS.XML.Templates.Proxies.Abstract_Proxy'Class;
+      Path  : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Proxies.Abstract_Proxy'Class is
+   begin
+      if Proxy
+        in VSS.XML.Templates.Proxies.Abstract_Composite_Proxy'Class
+      then
+         if Path.Length = 1 then
+            return
+              VSS.XML.Templates.Proxies.Abstract_Composite_Proxy'Class
+                (Proxy).Component (Path (1));
+         else
+            declare
+               Aux : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+                 VSS.XML.Templates.Proxies.Abstract_Composite_Proxy'Class
+                   (Proxy).Component (Path (1));
+
+            begin
+               return Resolve (Aux, Path.Delete_First);
+            end;
+         end if;
+
+      else
+         return
+           VSS.XML.Templates.Proxies.Error_Proxy'
+             (Message => "proxy is not composite");
+      end if;
+   end Resolve;
+
    ---------------------
    -- Resolve_Content --
    ---------------------
@@ -134,37 +209,57 @@ package body VSS.XML.Implementation.Template_Namespaces is
    ----------------------
 
    function Resolve_Iterable
-     (Self : Namespace'Class;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
-      return Iterable_Iterator_Access
+     (Self    : Namespace'Class;
+      Path    : VSS.String_Vectors.Virtual_String_Vector;
+      Error   : in out Error_Handler'Class;
+      Success : in out Boolean) return Iterable_Iterator_Access
    is
-      Position : constant Name_Item_Maps.Cursor :=
-        Self.Items.Find (Path (1));
-      Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
-        Path.Delete_First;
-      Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
-        (if Name_Item_Maps.Has_Element (Position)
-         then Name_Item_Maps.Element (Position) else null);
+      Binded : VSS.XML.Templates.Proxies.Proxy_Access;
+      Suffix : VSS.String_Vectors.Virtual_String_Vector;
 
    begin
-      if Item /= null then
-         if Item.all
-             in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+      Self.Resolve (Path, Binded, Suffix);
+
+      if Suffix.Is_Empty then
+         if Binded.all
+           in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
          then
             return
               new VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
-                    (VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
-                       (Item.all).Iterator (Subpath));
+                (VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+                   (Binded.all).Iterator);
 
-         elsif Item.all in Namespace'Class then
-            return Namespace'Class (Item.all).Resolve_Iterable (Subpath);
+         else
+            raise Program_Error;
          end if;
 
-      elsif Self.Enclosing /= null then
-         return Self.Enclosing.Resolve_Iterable (Path);
-      end if;
+      else
+         declare
+            Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+              Resolve (Binded.all, Suffix);
 
-      return null;
+         begin
+            if Proxy
+              in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+            then
+               return
+                 new
+                 VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
+                   (VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+                      (Proxy).Iterator);
+
+            elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+               Error.Error
+                 (VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message,
+                  Success);
+
+               return null;
+
+            else
+               raise Program_Error;
+            end if;
+         end;
+      end if;
    end Resolve_Iterable;
 
    -------------------

@@ -24,9 +24,15 @@ package VSS.XML.Templates.Proxies is
    type Abstract_Iterable_Proxy is limited interface and Abstract_Proxy;
 
    function Iterator
-     (Self : in out Abstract_Iterable_Proxy;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
+     (Self : in out Abstract_Iterable_Proxy)
       return Abstract_Iterable_Iterator'Class is abstract;
+
+   type Abstract_Composite_Proxy is limited interface and Abstract_Proxy;
+
+   function Component
+     (Self : in out Abstract_Composite_Proxy;
+      Name : VSS.Strings.Virtual_String)
+      return Abstract_Proxy'Class is abstract;
 
    type Abstract_Content_Proxy is limited interface and Abstract_Proxy;
 
@@ -45,5 +51,9 @@ package VSS.XML.Templates.Proxies is
      (Self : Abstract_Value_Proxy;
       Path : VSS.String_Vectors.Virtual_String_Vector)
       return VSS.XML.Templates.Values.Value is abstract;
+
+   type Error_Proxy is limited new Abstract_Proxy with record
+      Message : VSS.Strings.Virtual_String;
+   end record;
 
 end VSS.XML.Templates.Proxies;

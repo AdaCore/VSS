@@ -89,8 +89,10 @@ package body VSS.XML.Implementation.Template_Namespaces is
    ---------------------
 
    function Resolve_Content
-     (Self : Namespace'Class;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
+     (Self    : Namespace'Class;
+      Path    : VSS.String_Vectors.Virtual_String_Vector;
+      Error   : in out Error_Handler'Class;
+      Success : in out Boolean)
       return VSS.Strings.Virtual_String
    is
       Position : constant Name_Item_Maps.Cursor :=
@@ -103,19 +105,25 @@ package body VSS.XML.Implementation.Template_Namespaces is
 
    begin
       if Item /= null then
-         if Item.all
+         if Item.all in Namespace'Class then
+            return
+              Namespace'Class (Item.all).Resolve_Content
+                (Subpath, Error, Success);
+
+         elsif Item.all
               in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
          then
             return
               VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
                 (Item.all).Content (Subpath);
 
-         elsif Item.all in Namespace'Class then
-            return Namespace'Class (Item.all).Resolve_Content (Subpath);
+         else
+            Error.Error
+              ("Content_Proxy interface is not supported", Success);
          end if;
 
       elsif Self.Enclosing /= null then
-         return Self.Enclosing.Resolve_Content (Path);
+         return Self.Enclosing.Resolve_Content (Path, Error, Success);
       end if;
 
       return VSS.Strings.Empty_Virtual_String;

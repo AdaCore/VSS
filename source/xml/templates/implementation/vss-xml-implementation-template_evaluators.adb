@@ -13,12 +13,8 @@ with Ada.Unchecked_Deallocation;
 
 with VSS.XML.Attributes.Containers;
 with VSS.XML.Implementation.Parse_Errors;
-with VSS.XML.Implementation.Template_Programs.Debug;
 with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;
-
---  with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
---  with VSS.Strings.Conversions; use VSS.Strings.Conversions;
 
 package body VSS.XML.Implementation.Template_Evaluators is
 
@@ -415,7 +411,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
         Program.First_Index;
 
    begin
-      Template_Programs.Debug.Dump (Program);
       Self.Current.Namespace :=
         new VSS.XML.Implementation.Template_Namespaces.Namespace'
               (Ada.Finalization.Limited_Controlled with

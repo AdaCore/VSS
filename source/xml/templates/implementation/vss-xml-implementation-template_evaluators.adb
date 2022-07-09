@@ -22,27 +22,6 @@ with VSS.XML.Templates.Values;
 
 package body VSS.XML.Implementation.Template_Evaluators is
 
-   -----------
-   -- Error --
-   -----------
-
-   overriding procedure Error
-     (Self    : in out Template_Evaluator;
-      Message : VSS.Strings.Virtual_String;
-      Success : in out Boolean)
-   is
-      Error :
-        constant VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
-        (Public_Id => <>,
-         System_Id => Self.Current.System_Id,
-         Line      => Self.Current.Line,
-         Column    => Self.Current.Column,
-         Message   => Message);
-
-   begin
-      Self.Error.Error (Error, Success);
-   end Error;
-
    --------------
    -- Evaluate --
    --------------
@@ -265,6 +244,11 @@ package body VSS.XML.Implementation.Template_Evaluators is
                            Program (Current).Attribute_Name,
                            V.String_Value);
 
+                     elsif V.Kind = VSS.XML.Templates.Values.Error then
+                        Self.Report_Error (V.Message, Success);
+
+                        raise Program_Error;
+
                      else
                         raise Program_Error;
                      end if;
@@ -445,47 +429,25 @@ package body VSS.XML.Implementation.Template_Evaluators is
       end loop;
    end Evaluate;
 
-   --  ----------------------
-   --  -- Resolve_Iterable --
-   --  ----------------------
-   --
-   --  overriding function Resolve_Iterable
-   --    (Self : Namespace;
-   --     Path : VSS.String_Vectors.Virtual_String_Vector) return Cursor_Access
-   --  is
-   --     pragma Assert (not Path.Is_Empty);
-   --
-   --     Position : constant Named_Item_Maps.Cursor :=
-   --       Self.Items.Find (Path (1));
-   --     Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
-   --       Path.Delete_First;
-   --
-   --  begin
-   --     return Result : Cursor_Access do
-   --        if Named_Item_Maps.Has_Element (Position) then
-   --           declare
-   --              Item : constant not null Named_Item_Access :=
-   --                Named_Item_Maps.Element (Position);
-   --
-   --           begin
-   --              if Subpath.Is_Empty then
-   --                 if Item.all in Iterable_Item'Class then
-   --                    Result :=
-   --                      new Iterable_Cursor'Class'
-   --                            (Iterable_Item'Class (Item.all).Iterator);
-   --                 end if;
-   --
-   --              elsif Item.all in Abstract_Namespace'Class then
-   --                 Result :=
-   --                   Abstract_Namespace'Class
-   --                     (Item.all).Resolve_Iterable (Subpath);
-   --              end if;
-   --           end;
-   --
-   --        elsif Self.Enclosing /= null then
-   --           Result := Self.Enclosing.Resolve_Iterable (Path);
-   --        end if;
-   --     end return;
-   --  end Resolve_Iterable;
+   ------------------
+   -- Report_Error --
+   ------------------
+
+   overriding procedure Report_Error
+     (Self    : in out Template_Evaluator;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
+   is
+      Error :
+        constant VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
+        (Public_Id => <>,
+         System_Id => Self.Current.System_Id,
+         Line      => Self.Current.Line,
+         Column    => Self.Current.Column,
+         Message   => Message);
+
+   begin
+      Self.Error.Error (Error, Success);
+   end Report_Error;
 
 end VSS.XML.Implementation.Template_Evaluators;

@@ -12,8 +12,11 @@ package VSS.XML.Templates.Values is
 
    type Value (Kind : Value_Kind) is record
       case Kind is
-         when Error | Nothing | Default =>
+         when Nothing | Default =>
             null;
+
+         when Error =>
+            Message : VSS.Strings.Virtual_String;
 
          when Boolean =>
             Boolean_Value : Standard.Boolean;

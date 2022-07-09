@@ -16,7 +16,7 @@ package VSS.XML.Implementation.Template_Namespaces is
 
    type Error_Handler is limited interface;
 
-   procedure Error
+   procedure Report_Error
      (Self    : in out Error_Handler;
       Message : VSS.Strings.Virtual_String;
       Success : in out Boolean) is abstract;

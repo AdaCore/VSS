@@ -136,6 +136,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
             return
               VSS.XML.Templates.Proxies.Abstract_Composite_Proxy'Class
                 (Proxy).Component (Path (1));
+
          else
             declare
                Aux : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
@@ -146,6 +147,12 @@ package body VSS.XML.Implementation.Template_Namespaces is
                return Resolve (Aux, Path.Delete_First);
             end;
          end if;
+
+      elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+         return
+           VSS.XML.Templates.Proxies.Error_Proxy'
+             (Message =>
+                VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message);
 
       else
          return
@@ -259,38 +266,80 @@ package body VSS.XML.Implementation.Template_Namespaces is
       Success : in out Boolean)
       return VSS.Strings.Virtual_String
    is
-      Position : constant Name_Item_Maps.Cursor :=
-        Self.Items.Find (Path (1));
-      Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
-        Path.Delete_First;
-      Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
-        (if Name_Item_Maps.Has_Element (Position)
-         then Name_Item_Maps.Element (Position) else null);
+      Binded : VSS.XML.Templates.Proxies.Proxy_Access;
+      Suffix : VSS.String_Vectors.Virtual_String_Vector;
 
    begin
-      if Item /= null then
-         if Item.all in Namespace'Class then
-            return
-              Namespace'Class (Item.all).Resolve_Content
-                (Subpath, Error, Success);
+      Self.Resolve (Path, Binded, Suffix);
 
-         elsif Item.all
-              in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
-         then
-            return
-              VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
-                (Item.all).Content (Subpath);
+      if Binded.all
+           in VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
+      then
+         if Suffix.Is_Empty then
+            raise Program_Error;
 
          else
-            Error.Report_Error
-              ("Content_Proxy interface is not supported", Success);
+            declare
+               Element : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+                 VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
+                   (Binded.all).Element;
+               Proxy   : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+                 Resolve (Element, Suffix);
+
+            begin
+               if Proxy
+                  in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
+               then
+                  return
+                    VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
+                      (Proxy).Content;
+
+               elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+                  Error.Report_Error
+                    (VSS.XML.Templates.Proxies.Error_Proxy'Class
+                       (Proxy).Message,
+                     Success);
+
+                  return VSS.Strings.Empty_Virtual_String;
+
+               else
+                  raise Program_Error;
+               end if;
+            end;
          end if;
 
-      elsif Self.Enclosing /= null then
-         return Self.Enclosing.Resolve_Content (Path, Error, Success);
-      end if;
+      else
+         if Suffix.Is_Empty then
+            raise Program_Error;
 
-      return VSS.Strings.Empty_Virtual_String;
+         else
+
+            declare
+               Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+                 Resolve (Binded.all, Suffix);
+
+            begin
+               if Proxy
+                  in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
+               then
+                  return
+                    VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
+                      (Proxy).Content;
+
+               elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+                  Error.Report_Error
+                    (VSS.XML.Templates.Proxies.Error_Proxy'Class
+                       (Proxy).Message,
+                     Success);
+
+                  return VSS.Strings.Empty_Virtual_String;
+
+               else
+                  raise Program_Error;
+               end if;
+            end;
+         end if;
+      end if;
    end Resolve_Content;
 
    ----------------------

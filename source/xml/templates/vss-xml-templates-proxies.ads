@@ -21,6 +21,10 @@ package VSS.XML.Templates.Proxies is
    function Next
      (Self : in out Abstract_Iterable_Iterator) return Boolean is abstract;
 
+   function Element
+     (Self : in out Abstract_Iterable_Iterator)
+      return Abstract_Proxy'Class is abstract;
+
    type Abstract_Iterable_Proxy is limited interface and Abstract_Proxy;
 
    function Iterator
@@ -40,8 +44,7 @@ package VSS.XML.Templates.Proxies is
    type Abstract_Content_Proxy is limited interface and Abstract_Proxy;
 
    function Content
-     (Self : Abstract_Content_Proxy;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
+     (Self : Abstract_Content_Proxy)
       return VSS.Strings.Virtual_String is abstract;
 
    --  function Content

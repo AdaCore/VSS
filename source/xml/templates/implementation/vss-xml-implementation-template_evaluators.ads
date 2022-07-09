@@ -58,7 +58,7 @@ package VSS.XML.Implementation.Template_Evaluators is
         VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
       Success : in out Boolean);
 
-   overriding procedure Error
+   overriding procedure Report_Error
      (Self    : in out Template_Evaluator;
       Message : VSS.Strings.Virtual_String;
       Success : in out Boolean);

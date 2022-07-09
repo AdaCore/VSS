@@ -39,11 +39,6 @@ package body VSS.XML.Implementation.Template_Namespaces is
                then Name_Item_Maps.Element (Position) else null);
 
          begin
-            --  if not Name_Item_Maps.Has_Element (Position) then
-            --     Self.Items.Insert (Name, new Namespace);
-            --     Position := Self.Items (Name);
-            --  end if;
-
             if Child = null then
                Child := new Namespace;
                Self.Items.Insert (Name, Child);
@@ -287,7 +282,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
                 (Item.all).Content (Subpath);
 
          else
-            Error.Error
+            Error.Report_Error
               ("Content_Proxy interface is not supported", Success);
          end if;
 
@@ -343,7 +338,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
                       (Proxy).Iterator);
 
             elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
-               Error.Error
+               Error.Report_Error
                  (VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message,
                   Success);
 
@@ -390,7 +385,9 @@ package body VSS.XML.Implementation.Template_Namespaces is
          return Self.Enclosing.Resolve_Value (Path);
       end if;
 
-      return (Kind => VSS.XML.Templates.Values.Error);
+      return
+        (Kind    => VSS.XML.Templates.Values.Error,
+         Message => "unable to resolve path to value");
    end Resolve_Value;
 
 end VSS.XML.Implementation.Template_Namespaces;

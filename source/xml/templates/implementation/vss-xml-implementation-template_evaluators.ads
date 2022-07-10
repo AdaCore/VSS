@@ -28,6 +28,7 @@ package VSS.XML.Implementation.Template_Evaluators is
       Iterator  :
         VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
       Content   : VSS.String_Vectors.Virtual_String_Vector;
+      Omit_Tag  : Boolean;
 
       System_Id : VSS.Strings.Virtual_String;
       Line      : VSS.Strings.Texts.Line_Count;

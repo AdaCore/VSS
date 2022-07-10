@@ -18,6 +18,7 @@ package body VSS.XML.Implementation.Template_Parsers is
    attributes_Attribute : constant VSS.Strings.Virtual_String := "attributes";
    condition_Attribute  : constant VSS.Strings.Virtual_String := "condition";
    content_Attribute    : constant VSS.Strings.Virtual_String := "content";
+   omit_tag_Attribute   : constant VSS.Strings.Virtual_String := "omit-tag";
    repeat_Attribute     : constant VSS.Strings.Virtual_String := "repeat";
 
    procedure Report_Error
@@ -239,14 +240,17 @@ package body VSS.XML.Implementation.Template_Parsers is
         VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
       Condition       : VSS.XML.Implementation.Template_Programs.Instruction;
       Content_Replace : VSS.XML.Implementation.Template_Programs.Instruction;
+      Omit_Tag        : VSS.XML.Implementation.Template_Programs.Instruction;
       Repeat          : VSS.XML.Implementation.Template_Programs.Instruction;
-      Add_Location       : Boolean := False;
+      Add_Location    : Boolean := False;
 
       procedure Parse_Attributes (Text : VSS.Strings.Virtual_String);
 
       procedure Parse_Condition (Text : VSS.Strings.Virtual_String);
 
       procedure Parse_Content (Text : VSS.Strings.Virtual_String);
+
+      procedure Parse_Omit_Tag (Text : VSS.Strings.Virtual_String);
 
       procedure Parse_Repeat (Text : VSS.Strings.Virtual_String);
 
@@ -358,6 +362,17 @@ package body VSS.XML.Implementation.Template_Parsers is
          Add_Location := True;
       end Parse_Content;
 
+      --------------------
+      -- Parse_Omit_Tag --
+      --------------------
+
+      procedure Parse_Omit_Tag (Text : VSS.Strings.Virtual_String) is
+      begin
+         Omit_Tag :=
+           (Kind     => VSS.XML.Implementation.Template_Programs.Omit_Tag,
+            Omit_Tag => Text.Is_Empty);
+      end Parse_Omit_Tag;
+
       ------------------
       -- Parse_Repeat --
       ------------------
@@ -409,6 +424,9 @@ package body VSS.XML.Implementation.Template_Parsers is
             elsif Attributes.Get_Name (J) = content_Attribute then
                Parse_Content (Attributes.Get_Value (J));
 
+            elsif Attributes.Get_Name (J) = omit_tag_Attribute then
+               Parse_Omit_Tag (Attributes.Get_Value (J));
+
             elsif Attributes.Get_Name (J) = repeat_Attribute then
                Parse_Repeat (Attributes.Get_Value (J));
 
@@ -444,6 +462,11 @@ package body VSS.XML.Implementation.Template_Parsers is
         /= VSS.XML.Implementation.Template_Programs.None
       then
          Self.Program.Append (Content_Replace);
+         Instructions := @ + 1;
+      end if;
+
+      if Omit_Tag.Kind /= VSS.XML.Implementation.Template_Programs.None then
+         Self.Program.Append (Omit_Tag);
          Instructions := @ + 1;
       end if;
 

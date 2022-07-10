@@ -43,6 +43,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
       procedure Do_Content
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction);
 
+      procedure Do_Omit_Tag
+        (Instruction : VSS.XML.Implementation.Template_Programs.Instruction);
+
       procedure Do_Repeat
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction);
 
@@ -81,6 +84,18 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
          Self.Current.Content := Instruction.Content_Path;
       end Do_Content;
+
+      -----------------
+      -- Do_Omit_Tag --
+      -----------------
+
+      procedure Do_Omit_Tag
+        (Instruction : VSS.XML.Implementation.Template_Programs.Instruction) is
+      begin
+         Push_State;
+
+         Self.Current.Omit_Tag := Instruction.Omit_Tag;
+      end Do_Omit_Tag;
 
       ---------------
       -- Do_Repeat --
@@ -254,12 +269,16 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
             Current := @ - 1;
 
-            if Self.Content /= null then
-               Self.Content.Start_Element
-                 (Instruction.URI,
-                  Instruction.Name,
-                  Attributes,
-                  Success);
+            if Self.Current.Element /= Current
+              or else not Self.Current.Omit_Tag
+            then
+               if Self.Content /= null then
+                  Self.Content.Start_Element
+                    (Instruction.URI,
+                     Instruction.Name,
+                     Attributes,
+                     Success);
+               end if;
             end if;
 
             if Self.Current.Element = Element
@@ -304,13 +323,17 @@ package body VSS.XML.Implementation.Template_Evaluators is
                raise Program_Error;
 
             when End_Element =>
-               if Self.Content /= null then
-                  Self.Content.End_Element
-                    (Program (Instruction.Start_Address).URI,
-                     Program (Instruction.Start_Address).Name,
-                     Success);
+               if Self.Current.Element /= Instruction.Start_Address
+                 or else not Self.Current.Omit_Tag
+               then
+                  if Self.Content /= null then
+                     Self.Content.End_Element
+                       (Program (Instruction.Start_Address).URI,
+                        Program (Instruction.Start_Address).Name,
+                        Success);
 
-                  --  exit when not Success;
+                     --  exit when not Success;
+                  end if;
                end if;
 
                if Self.Current.Element = Instruction.Start_Address then
@@ -343,6 +366,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
             when Content =>
                Do_Content (Program (Current));
+
+            when Omit_Tag =>
+               Do_Omit_Tag (Program (Current));
 
             when Repeat =>
                Do_Repeat (Program (Current));
@@ -402,6 +428,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
             Negate    => False,
             Iterator  => null,
             Content   => VSS.String_Vectors.Empty_Virtual_String_Vector,
+            Omit_Tag  => False,
             System_Id => <>,
             Line      => 0,
             Column    => 0);

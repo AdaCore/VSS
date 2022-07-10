@@ -29,6 +29,7 @@ package VSS.XML.Implementation.Template_Programs is
       Location,                --  Location information for debug purposes.
       Condition,
       Content,
+      Omit_Tag,
       Repeat,
       Done);
 
@@ -73,6 +74,9 @@ package VSS.XML.Implementation.Template_Programs is
          when Content =>
             Is_Text      : Boolean;
             Content_Path : VSS.String_Vectors.Virtual_String_Vector;
+
+         when Omit_Tag =>
+            Omit_Tag : Boolean;
 
          when Repeat =>
             Identifier  : VSS.Strings.Virtual_String;

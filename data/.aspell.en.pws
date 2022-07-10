@@ -13,7 +13,9 @@ iri
 json
 kd
 lf
+mathml
 multiline
+namespace
 nel
 nonspacing
 nul
@@ -28,6 +30,8 @@ spdx
 substring
 substrings
 subtype
+svg
+tal
 titlecase
 ucs
 ufffd

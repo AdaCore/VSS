@@ -389,7 +389,14 @@ package body VSS.HTML.Writers is
                end case;
 
             else
-               raise Program_Error;
+               if Is_ASCII_Whitespace
+                 (Self.Text.At_First_Character.Element)
+               then
+                  Omit := Properties.End_Tag.Next_Sibling.Whitespace;
+
+               else
+                  Omit := Properties.End_Tag.Next_Sibling.Text;
+               end if;
             end if;
 
             if not Omit then

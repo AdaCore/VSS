@@ -209,6 +209,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
                         return;
                      end if;
 
+                  when VSS.XML.Templates.Values.Error =>
+                     Self.Report_Error (Value.Message, Success);
+
                   when others =>
                      raise Program_Error;
                end case;

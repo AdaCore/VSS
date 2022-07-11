@@ -148,6 +148,20 @@ package body VSS.XML.Implementation.Template_Namespaces is
             end;
          end if;
 
+      elsif Proxy
+        in VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
+      then
+         --  "Dereference" iterator
+
+         declare
+            Element_Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+              VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
+                (Proxy).Element;
+
+         begin
+            return Resolve (Element_Proxy, Path);
+         end;
+
       elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
          return
            VSS.XML.Templates.Proxies.Error_Proxy'
@@ -157,7 +171,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
       else
          return
            VSS.XML.Templates.Proxies.Error_Proxy'
-             (Message => "proxy is not composite");
+             (Message => "proxy is not composite or iterator");
       end if;
    end Resolve;
 

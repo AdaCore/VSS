@@ -206,6 +206,8 @@ package body VSS.XML.Implementation.Template_Evaluators is
                      if not (Value.Boolean_Value xor Self.Current.Negate) then
                         Skip_Element (False);
 
+                        Pop_State;
+
                         return;
                      end if;
 

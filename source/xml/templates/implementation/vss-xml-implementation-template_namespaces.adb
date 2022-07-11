@@ -213,12 +213,12 @@ package body VSS.XML.Implementation.Template_Namespaces is
                     not VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
                           (Proxy).Is_Empty);
 
-         --     elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
-         --        Error.Error
-         --          (VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message,
-         --           Success);
-         --
-         --        return null;
+            elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+               return
+                 (Kind    => VSS.XML.Templates.Values.Error,
+                  Message =>
+                    VSS.XML.Templates.Proxies.Error_Proxy'Class
+                      (Proxy).Message);
 
             else
                raise Program_Error;
@@ -271,6 +271,12 @@ package body VSS.XML.Implementation.Template_Namespaces is
 
    begin
       Self.Resolve (Path, Binded, Suffix);
+
+      if Binded = null then
+         Error.Report_Error ("unknown path", Success);
+
+         return VSS.Strings.Empty_Virtual_String;
+      end if;
 
       if Binded.all
            in VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class

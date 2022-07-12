@@ -32,6 +32,12 @@ package body Platform is
    GNAT_Argv : constant chars_ptr_Pointers.Pointer
      with Import, Convention => C, External_Name => "gnat_argv";
 
+   ----------------------
+   -- Application_File --
+   ----------------------
+
+   function Application_File return VSS.Strings.Virtual_String is separate;
+
    ---------------
    -- Arguments --
    ---------------

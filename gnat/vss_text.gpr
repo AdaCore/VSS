@@ -64,6 +64,15 @@ library project VSS_Text is
             for Implementation ("VSS.Standard_Paths")
               use "vss-standard_paths__posix.adb";
 
+            case VSS_Config.OS_API is
+               when "unix" =>
+                  for Implementation ("VSS.Application.Platform.Application_File")
+                    use "vss-application-platform-application_file__linux.adb";
+               when "osx" =>
+                  for Implementation ("VSS.Application.Platform.Application_File")
+                    use "vss-application-platform-application_file__darwin.adb";
+            end case;
+
          when "Windows_NT" =>
             for Implementation ("VSS.Application.Platform")
               use "vss-application-platform__windows.adb";

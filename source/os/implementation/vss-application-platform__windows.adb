@@ -20,6 +20,15 @@ package body Platform is
      new Interfaces.C.Pointers
            (Natural, VSS.Implementation.Windows.LPWSTR, LPWSTR_Array, null);
 
+   ----------------------
+   -- Application_File --
+   ----------------------
+
+   function Application_File return VSS.Strings.Virtual_String is
+   begin
+      return VSS.Strings.Empty_Virtual_String;
+   end Application_File;
+
    ---------------
    -- Arguments --
    ---------------

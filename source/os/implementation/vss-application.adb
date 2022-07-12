@@ -11,9 +11,19 @@ package body VSS.Application is
       function Arguments return VSS.String_Vectors.Virtual_String_Vector;
       --  Returns arguments provided in command line, except executable name.
 
+      function Application_File return VSS.Strings.Virtual_String;
+      --  Return path to executable file of the application.
+
    end Platform;
 
    package body Platform is separate;
+
+   ----------------------
+   -- Application_File --
+   ----------------------
+
+   function Application_File return VSS.Strings.Virtual_String
+     renames Platform.Application_File;
 
    ---------------
    -- Arguments --

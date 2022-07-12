@@ -23,11 +23,7 @@ package VSS.XML.Implementation.XmlAda_Attributes is
      (Self  : XmlAda_Attributes;
       Index : Positive) return VSS.IRIs.IRI;
 
-   overriding function Get_Local_Name
-     (Self  : XmlAda_Attributes;
-      Index : Positive) return VSS.Strings.Virtual_String;
-
-   overriding function Get_Qualified_Name
+   overriding function Get_Name
      (Self  : XmlAda_Attributes;
       Index : Positive) return VSS.Strings.Virtual_String;
 

@@ -10,9 +10,9 @@ pragma Ada_2022;
 pragma Warnings (On);
 
 with VSS.Characters.Latin;
-with VSS.HTML.Namespaces;
 with VSS.Strings.Character_Iterators;
 with VSS.XML.Implementation.Parse_Errors;
+with VSS.XML.Namespaces;
 
 package body VSS.HTML.Writers is
 
@@ -234,7 +234,8 @@ package body VSS.HTML.Writers is
    --  Return True when string contains only ASCII whitespace characters.
 
    function HTML_Element_Restrictions
-     (Name : VSS.Strings.Virtual_String) return Restrictions_Record;
+     (Name   : VSS.Strings.Virtual_String;
+      Parent : Restrictions_Record) return Restrictions_Record;
 
    function Best_Attribute_Syntax
      (Item : VSS.Strings.Virtual_String) return Attribute_Syntax;
@@ -388,7 +389,14 @@ package body VSS.HTML.Writers is
                end case;
 
             else
-               raise Program_Error;
+               if Is_ASCII_Whitespace
+                 (Self.Text.At_First_Character.Element)
+               then
+                  Omit := Properties.End_Tag.Next_Sibling.Whitespace;
+
+               else
+                  Omit := Properties.End_Tag.Next_Sibling.Text;
+               end if;
             end if;
 
             if not Omit then
@@ -541,11 +549,10 @@ package body VSS.HTML.Writers is
    -----------------
 
    overriding procedure End_Element
-     (Self           : in out HTML5_Writer;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Success        : in out Boolean)
+     (Self    : in out HTML5_Writer;
+      URI     : VSS.IRIs.IRI;
+      Name    : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
    is
       use all type VSS.XML.Implementation.HTML_Writer_Data.Element_Kinds;
 
@@ -590,7 +597,7 @@ package body VSS.HTML.Writers is
 
          if not Properties.End_Tag.May_Be_Omitted then
             Self.Write (End_Tag_Open, Success);
-            Self.Write (Local_Name, Success);
+            Self.Write (Name, Success);
             Self.Write (End_Tag_Close, Success);
          end if;
       end if;
@@ -610,7 +617,8 @@ package body VSS.HTML.Writers is
    -------------------------------
 
    function HTML_Element_Restrictions
-     (Name : VSS.Strings.Virtual_String) return Restrictions_Record
+     (Name   : VSS.Strings.Virtual_String;
+      Parent : Restrictions_Record) return Restrictions_Record
    is
       use all type VSS.XML.Implementation.HTML_Writer_Data.Element_Kinds;
       use all type VSS.XML.Implementation.HTML_Writer_Data.Text_Children;
@@ -690,7 +698,7 @@ package body VSS.HTML.Writers is
                      Result.No_Text := True;
 
                   when Transparent =>
-                     raise Program_Error;
+                     Result.No_Text := Parent.No_Text;
 
                   when Yes =>
                      null;
@@ -894,26 +902,24 @@ package body VSS.HTML.Writers is
    -------------------
 
    overriding procedure Start_Element
-     (Self           : in out HTML5_Writer;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Attributes     : VSS.XML.Attributes.XML_Attributes'Class;
-      Success        : in out Boolean)
+     (Self       : in out HTML5_Writer;
+      URI        : VSS.IRIs.IRI;
+      Name       : VSS.Strings.Virtual_String;
+      Attributes : VSS.XML.Attributes.XML_Attributes'Class;
+      Success    : in out Boolean)
    is
       Is_HTML_Namespace   : constant Boolean :=
-        URI = VSS.HTML.Namespaces.HTML_Namespace;
+        URI = VSS.XML.Namespaces.HTML_Namespace;
       Is_MathML_Namespace : constant Boolean :=
-        URI = VSS.HTML.Namespaces.MathML_Namespace;
+        URI = VSS.XML.Namespaces.MathML_Namespace;
       Is_SVG_Namespace    : constant Boolean :=
-        URI = VSS.HTML.Namespaces.SVG_Namespace;
+        URI = VSS.XML.Namespaces.SVG_Namespace;
 
       Current_Element : constant
         VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind :=
           (if Is_HTML_Namespace
            then
-              VSS.XML.Implementation.HTML_Writer_Data.To_HTML_Element
-                (Local_Name)
+              VSS.XML.Implementation.HTML_Writer_Data.To_HTML_Element (Name)
            else Foreign);
       Properties      : constant
         VSS.XML.Implementation.HTML_Writer_Data.Element_Properties :=
@@ -954,10 +960,10 @@ package body VSS.HTML.Writers is
       Self.Current :=
         (State         => Element,
          Element       => Current_Element,
-         Tag           => Local_Name,
+         Tag           => Name,
          Restrictions  =>
            (if Is_HTML_Namespace
-            then HTML_Element_Restrictions (Local_Name)
+            then HTML_Element_Restrictions (Name, Self.Current.Restrictions)
             else
               (No_Less_Than | No_Ambiguous_Ampersand => True,
                others                                => False)),
@@ -994,7 +1000,7 @@ package body VSS.HTML.Writers is
 
       if not Self.Current.Start_Omitted then
          Self.Write (Start_Tag_Open, Success);
-         Self.Write (Local_Name, Success);
+         Self.Write (Name, Success);
 
          for J in 1 .. Attributes.Get_Length loop
             --  This is simple implementation, no checks or support for
@@ -1002,7 +1008,7 @@ package body VSS.HTML.Writers is
             --  elements.
 
             Self.Write_Attribute
-              (Name    => Attributes.Get_Local_Name (J),
+              (Name    => Attributes.Get_Name (J),
                Value   => Attributes.Get_Value (J),
                Syntax  => Self.Current.Syntax,
                Success => Success);

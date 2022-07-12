@@ -43,19 +43,17 @@ package VSS.XML.Content_Handlers is
       Success : in out Boolean) is null;
 
    procedure Start_Element
-     (Self           : in out SAX_Content_Handler;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Attributes     : VSS.XML.Attributes.XML_Attributes'Class;
-      Success        : in out Boolean) is null;
+     (Self       : in out SAX_Content_Handler;
+      URI        : VSS.IRIs.IRI;
+      Name       : VSS.Strings.Virtual_String;
+      Attributes : VSS.XML.Attributes.XML_Attributes'Class;
+      Success    : in out Boolean) is null;
 
    procedure End_Element
-     (Self           : in out SAX_Content_Handler;
-      URI            : VSS.IRIs.IRI;
-      Local_Name     : VSS.Strings.Virtual_String;
-      Qualified_Name : VSS.Strings.Virtual_String;
-      Success        : in out Boolean) is null;
+     (Self    : in out SAX_Content_Handler;
+      URI     : VSS.IRIs.IRI;
+      Name    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is null;
 
    procedure Characters
      (Self    : in out SAX_Content_Handler;

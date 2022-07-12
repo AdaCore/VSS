@@ -18,6 +18,7 @@ with Ada.Iterator_Interfaces;
 private with Ada.Finalization;
 private with Ada.Streams;
 
+with VSS.Characters;
 private with VSS.Implementation.String_Vectors;
 with VSS.Strings;
 
@@ -79,6 +80,10 @@ package VSS.String_Vectors is
       Index : Positive);
    --  Delete element at the given index.
 
+   function Delete_First
+     (Self : Virtual_String_Vector'Class) return Virtual_String_Vector;
+   --  Delete first element and return result vector.
+
    procedure Delete_Last (Self : in out Virtual_String_Vector'Class);
    --  Delete the last element.
 
@@ -96,6 +101,13 @@ package VSS.String_Vectors is
         VSS.Strings.Case_Sensitive)
       return Boolean;
    --  Return True when vector contains given string.
+
+   function Join
+     (Self      : Virtual_String_Vector'Class;
+      Separator : VSS.Characters.Virtual_Character)
+      return VSS.Strings.Virtual_String;
+   --  Join all strings in the string vector into single string with each
+   --  element separated by the given separator.
 
    function Join_Lines
      (Self           : Virtual_String_Vector'Class;

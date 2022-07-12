@@ -6,7 +6,7 @@
 
 with VSS.IRIs;
 
-package VSS.HTML.Namespaces is
+package VSS.XML.Namespaces is
 
    HTML_Namespace   : constant VSS.IRIs.IRI :=
      VSS.IRIs.To_IRI ("http://www.w3.org/1999/xhtml");
@@ -15,4 +15,7 @@ package VSS.HTML.Namespaces is
    SVG_Namespace    : constant VSS.IRIs.IRI :=
      VSS.IRIs.To_IRI ("http://www.w3.org/2000/svg");
 
-end VSS.HTML.Namespaces;
+   TAL_Namespace    : constant VSS.IRIs.IRI :=
+     VSS.IRIs.To_IRI ("http://xml.zope.org/namespaces/tal");
+
+end VSS.XML.Namespaces;

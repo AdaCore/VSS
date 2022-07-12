@@ -130,6 +130,24 @@ package body VSS.String_Vectors is
       end if;
    end Delete;
 
+   ------------------
+   -- Delete_First --
+   ------------------
+
+   function Delete_First
+     (Self : Virtual_String_Vector'Class) return Virtual_String_Vector is
+   begin
+      return Result : Virtual_String_Vector :=
+        (Ada.Finalization.Controlled with Data => Self.Data)
+      do
+         VSS.Implementation.String_Vectors.Reference (Result.Data);
+
+         if Result.Data /= null and then Result.Data.Last /= 0 then
+            VSS.Implementation.String_Vectors.Delete (Result.Data, 1);
+         end if;
+      end return;
+   end Delete_First;
+
    -----------------
    -- Delete_Last --
    -----------------
@@ -205,6 +223,32 @@ package body VSS.String_Vectors is
    begin
       return (Last => Self.Length);
    end Iterate;
+
+   ----------
+   -- Join --
+   ----------
+
+   function Join
+     (Self      : Virtual_String_Vector'Class;
+      Separator : VSS.Characters.Virtual_Character)
+      return VSS.Strings.Virtual_String
+   is
+      First_Segment : Boolean := True;
+
+   begin
+      return Result : VSS.Strings.Virtual_String do
+         for Item of Self loop
+            if First_Segment then
+               First_Segment := False;
+
+            else
+               Result.Append (Separator);
+            end if;
+
+            Result.Append (Item);
+         end loop;
+      end return;
+   end Join;
 
    ----------------
    -- Join_Lines --

@@ -19,11 +19,11 @@ package body VSS.XML.Implementation.XmlAda_Attributes is
       return Sax.Readers.Get_Length (Self.Attributes);
    end Get_Length;
 
-   --------------------
-   -- Get_Local_Name --
-   --------------------
+   --------------
+   -- Get_Name --
+   --------------
 
-   overriding function Get_Local_Name
+   overriding function Get_Name
      (Self  : XmlAda_Attributes;
       Index : Positive) return VSS.Strings.Virtual_String is
    begin
@@ -36,25 +36,7 @@ package body VSS.XML.Implementation.XmlAda_Attributes is
       else
          return VSS.Strings.Empty_Virtual_String;
       end if;
-   end Get_Local_Name;
-
-   ------------------------
-   -- Get_Qualified_Name --
-   ------------------------
-
-   overriding function Get_Qualified_Name
-     (Self  : XmlAda_Attributes;
-      Index : Positive) return VSS.Strings.Virtual_String is
-   begin
-      if Index <= Sax.Readers.Get_Length (Self.Attributes) then
-         return
-           VSS.Strings.Conversions.To_Virtual_String
-             (Sax.Readers.Get_Qname (Self.Attributes, Index));
-
-      else
-         return VSS.Strings.Empty_Virtual_String;
-      end if;
-   end Get_Qualified_Name;
+   end Get_Name;
 
    -------------
    -- Get_URI --

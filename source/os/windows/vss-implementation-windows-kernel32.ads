@@ -41,6 +41,12 @@ package VSS.Implementation.Windows.Kernel32 is
       cchBuffer     : DWORD) return DWORD
       with Import, Convention => Stdcall, Link_Name => "GetLongPathNameW";
 
+   function GetModuleFileName
+     (hModule    : HANDLE;
+      lpFilename : LPWSTR;
+      nSize      : DWORD) return DWORD
+     with Import, Convention => StdCall, Link_Name => "GetModuleFileNameW";
+
    procedure LocalFree (hMem : LPWSTR_Pointer)
      with Import, Convention => StdCall, Link_Name => "LocalFree";
 

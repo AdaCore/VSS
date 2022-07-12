@@ -25,8 +25,44 @@ package body Platform is
    ----------------------
 
    function Application_File return VSS.Strings.Virtual_String is
+
+      use type VSS.Implementation.Windows.DWORD;
+
+      Size : VSS.Implementation.Windows.DWORD := 512;
+
    begin
-      return VSS.Strings.Empty_Virtual_String;
+      return Result : VSS.Strings.Virtual_String do
+         loop
+            declare
+               Buffer :
+                 Interfaces.C.char16_array (1 .. Interfaces.C.size_t (Size));
+               Status : VSS.Implementation.Windows.DWORD;
+
+            begin
+               Status :=
+                 VSS.Implementation.Windows.Kernel32.GetModuleFileName
+                   (0, Buffer (Buffer'First)'Unchecked_Access, Size);
+
+               if Status = 0 then
+                  return;
+               end if;
+
+               if Status < Size
+                 or else VSS.Implementation.Windows.Kernel32.GetLastError
+                   /= VSS.Implementation.Windows.ERROR_INSUFFICIENT_BUFFER
+               then
+                  Result :=
+                    VSS.Implementation.Windows.String_Utilities
+                      .From_Native_String
+                         (Buffer (Buffer'First)'Unchecked_Access);
+
+                  return;
+               end if;
+
+               Size := Size * 2;
+            end;
+         end loop;
+      end return;
    end Application_File;
 
    ---------------

@@ -24,6 +24,9 @@ jobs:
         with:
           toolchain: gnat_native^11 gprbuild^21
           toolchain_dir: ./cached_gnat
+      - name: Export OS=osx on macOS
+        if: runner.os == 'macOS'
+        run: echo "OS=osx" >> $GITHUB_ENV
       - name: Get UCD.zip
         run: |
           curl -C - -o UCD-14.0.0.zip https://www.unicode.org/Public/14.0.0/ucd/UCD.zip

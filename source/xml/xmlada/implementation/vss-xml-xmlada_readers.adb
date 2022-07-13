@@ -314,12 +314,7 @@ package body VSS.XML.XmlAda_Readers is
       Self.Locator.Locator := Loc;
 
       if Self.Content /= null then
-         Self.Content.Set_Document_Locator
-           (Self.Locator'Unchecked_Access, Self.Success);
-      end if;
-
-      if not Self.Success then
-         raise Sax.Readers.XML_Fatal_Error;
+         Self.Content.Set_Document_Locator (Self.Locator'Unchecked_Access);
       end if;
    end Set_Document_Locator;
 

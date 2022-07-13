@@ -820,11 +820,7 @@ package body VSS.HTML.Writers is
 
    overriding procedure Set_Document_Locator
      (Self    : in out HTML5_Writer;
-      Locator : VSS.XML.Locators.SAX_Locator_Access;
-      Success : in out Boolean)
-   is
-      pragma Unreferenced (Success);
-
+      Locator : VSS.XML.Locators.SAX_Locator_Access) is
    begin
       Self.Locator := Locator;
    end Set_Document_Locator;

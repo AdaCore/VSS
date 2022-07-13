@@ -182,11 +182,7 @@ package body VSS.XML.Implementation.Template_Parsers is
 
    overriding procedure Set_Document_Locator
      (Self    : in out Template_Parser;
-      Locator : VSS.XML.Locators.SAX_Locator_Access;
-      Success : in out Boolean)
-   is
-      pragma Unreferenced (Success);
-
+      Locator : VSS.XML.Locators.SAX_Locator_Access) is
    begin
       Self.Locator := Locator;
    end Set_Document_Locator;

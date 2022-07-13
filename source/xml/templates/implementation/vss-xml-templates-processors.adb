@@ -135,11 +135,10 @@ package body VSS.XML.Templates.Processors is
 
    overriding procedure Set_Document_Locator
      (Self    : in out XML_Template_Processor;
-      Locator : VSS.XML.Locators.SAX_Locator_Access;
-      Success : in out Boolean) is
+      Locator : VSS.XML.Locators.SAX_Locator_Access) is
    begin
       Self.Locator := Locator;
-      Self.Parser.Set_Document_Locator (Locator, Success);
+      Self.Parser.Set_Document_Locator (Locator);
    end Set_Document_Locator;
 
    -----------------------

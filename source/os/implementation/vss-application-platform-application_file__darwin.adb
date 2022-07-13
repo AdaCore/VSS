@@ -6,7 +6,7 @@
 
 --  XXX It is dummy stub only. _NSGetExecutablePath must be used here.
 
-separate (VSS.Application)
+separate (VSS.Application.Platform)
 function Application_File return VSS.Strings.Virtual_String is
    Args : constant chars_ptr_Array :=
      chars_ptr_Pointers.Value

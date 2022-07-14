@@ -6,6 +6,15 @@
 
 package body VSS.XML.Attributes.Containers is
 
+   -----------
+   -- Clear --
+   -----------
+
+   procedure Clear (Self : in out Attributes'Class) is
+   begin
+      Self.Container.Clear;
+   end Clear;
+
    ----------------
    -- Get_Length --
    ----------------

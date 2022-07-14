@@ -7,7 +7,7 @@
 package VSS.XML.Templates.Proxies.Strings is
 
    type Virtual_String_Proxy is
-     limited new VSS.XML.Templates.Proxies.Abstract_Content_Proxy
+     limited new VSS.XML.Templates.Proxies.Abstract_Text_Content_Proxy
        and VSS.XML.Templates.Proxies.Abstract_Value_Proxy with
    record
       Text : VSS.Strings.Virtual_String;

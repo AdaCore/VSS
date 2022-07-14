@@ -21,18 +21,20 @@ package VSS.XML.Implementation.Template_Evaluators is
      (None, Ignore_Children);
 
    type State is record
-      Element   : VSS.XML.Implementation.Template_Programs.Address;
-      Namespace : VSS.XML.Implementation.Template_Namespaces.Namespace_Access;
-      Condition : VSS.String_Vectors.Virtual_String_Vector;
-      Negate    : Boolean;
-      Iterator  :
+      Element      : VSS.XML.Implementation.Template_Programs.Address;
+      Namespace    :
+        VSS.XML.Implementation.Template_Namespaces.Namespace_Access;
+      Condition    : VSS.String_Vectors.Virtual_String_Vector;
+      Negate       : Boolean;
+      Iterator     :
         VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
-      Content   : VSS.String_Vectors.Virtual_String_Vector;
-      Omit_Tag  : Boolean;
+      Content      : VSS.String_Vectors.Virtual_String_Vector;
+      Text_Content : Boolean;
+      Omit_Tag     : Boolean;
 
-      System_Id : VSS.Strings.Virtual_String;
-      Line      : VSS.Strings.Texts.Line_Count;
-      Column    : VSS.Strings.Character_Count;
+      System_Id    : VSS.Strings.Virtual_String;
+      Line         : VSS.Strings.Texts.Line_Count;
+      Column       : VSS.Strings.Character_Count;
    end record;
 
    package State_Vectors is

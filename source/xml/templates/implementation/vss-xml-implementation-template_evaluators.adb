@@ -11,7 +11,10 @@ pragma Warnings (On);
 
 with Ada.Unchecked_Deallocation;
 
+with VSS.IRIs;
 with VSS.XML.Attributes.Containers;
+with VSS.XML.Events;
+with VSS.XML.Event_Vectors;
 with VSS.XML.Implementation.Parse_Errors;
 with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;
@@ -82,7 +85,8 @@ package body VSS.XML.Implementation.Template_Evaluators is
          --     raise Program_Error;
          --  end if;
 
-         Self.Current.Content := Instruction.Content_Path;
+         Self.Current.Content      := Instruction.Content_Path;
+         Self.Current.Text_Content := Instruction.Is_Text;
       end Do_Content;
 
       -----------------
@@ -290,10 +294,108 @@ package body VSS.XML.Implementation.Template_Evaluators is
               and then not Self.Current.Content.Is_Empty
             then
                if Self.Content /= null then
-                  Self.Content.Characters
-                    (Self.Current.Namespace.Resolve_Content
-                       (Self.Current.Content, Self, Success),
-                     Success);
+                  if Self.Current.Text_Content then
+                     Self.Content.Characters
+                       (Self.Current.Namespace.Resolve_Text_Content
+                          (Self.Current.Content, Self, Success),
+                        Success);
+
+                  else
+                     declare
+                        use type VSS.XML.Lexical_Handlers
+                                   .SAX_Lexical_Handler_Access;
+
+                        procedure Flush_Start_Element;
+
+                        Content    : constant VSS.XML.Event_Vectors.Vector :=
+                          Self.Current.Namespace.Resolve_Structure_Content
+                            (Self.Current.Content, Self, Success);
+                        URI        : VSS.IRIs.IRI;
+                        Name       : VSS.Strings.Virtual_String;
+                        Attributes : VSS.XML.Attributes.Containers.Attributes;
+
+                        -------------------------
+                        -- Flush_Start_Element --
+                        -------------------------
+
+                        procedure Flush_Start_Element is
+                        begin
+                           if not Name.Is_Empty then
+                              Self.Content.Start_Element
+                                (URI, Name, Attributes, Success);
+
+                              --  URI.Clear;
+                              Name.Clear;
+                              Attributes.Clear;
+                           end if;
+                        end Flush_Start_Element;
+
+                     begin
+                        for Item of Content loop
+                           case Item.Kind is
+                              when VSS.XML.Events.None =>
+                                 raise Program_Error;
+
+                              when VSS.XML.Events.Start_Element =>
+                                 Flush_Start_Element;
+
+                                 URI  := Item.URI;
+                                 Name := Item.Name;
+
+                              when VSS.XML.Events.Attribute =>
+                                 Attributes.Insert
+                                   (Item.URI, Item.Name, Item.Value);
+
+                              when VSS.XML.Events.End_Element =>
+                                 Flush_Start_Element;
+
+                                 if Self.Content /= null then
+                                    Self.Content.End_Element
+                                      (Item.URI, Item.Name, Success);
+                                 end if;
+
+                              when VSS.XML.Events.Comment =>
+                                 Flush_Start_Element;
+
+                                 if Self.Lexical /= null then
+                                    Self.Lexical.Comment (Item.Text, Success);
+                                 end if;
+
+                              when VSS.XML.Events.Processing_Instruction =>
+                                 Flush_Start_Element;
+
+                                 if Self.Content /= null then
+                                    Self.Content.Processing_Instruction
+                                      (Item.Target, Item.Data, Success);
+                                 end if;
+
+                              when VSS.XML.Events.Text =>
+                                 Flush_Start_Element;
+
+                                 if Self.Content /= null then
+                                    Self.Content.Characters
+                                      (Item.Text, Success);
+                                 end if;
+
+                              when VSS.XML.Events.CDATA =>
+                                 Flush_Start_Element;
+
+                                 if Self.Lexical /= null then
+                                    Self.Lexical.Start_CDATA (Success);
+                                 end if;
+
+                                 if Self.Content /= null then
+                                    Self.Content.Characters
+                                      (Item.Text, Success);
+                                 end if;
+
+                                 if Self.Lexical /= null then
+                                    Self.Lexical.End_CDATA (Success);
+                                 end if;
+                           end case;
+                        end loop;
+                     end;
+                  end if;
                end if;
 
                --  Rewind till end of the element.
@@ -422,21 +524,22 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
          Self.Stack.Append (Self.Current);
          Self.Current :=
-           (Element   =>
+           (Element      =>
               VSS.XML.Implementation.Template_Programs.Null_Address,
-            Namespace =>
+            Namespace    =>
                new VSS.XML.Implementation.Template_Namespaces.Namespace'
                      (Ada.Finalization.Limited_Controlled with
                         Enclosing => Self.Current.Namespace,
                         others    => <>),
-            Condition => VSS.String_Vectors.Empty_Virtual_String_Vector,
-            Negate    => False,
-            Iterator  => null,
-            Content   => VSS.String_Vectors.Empty_Virtual_String_Vector,
-            Omit_Tag  => False,
-            System_Id => <>,
-            Line      => 0,
-            Column    => 0);
+            Condition    => VSS.String_Vectors.Empty_Virtual_String_Vector,
+            Negate       => False,
+            Iterator     => null,
+            Content      => VSS.String_Vectors.Empty_Virtual_String_Vector,
+            Text_Content => True,
+            Omit_Tag     => False,
+            System_Id    => <>,
+            Line         => 0,
+            Column       => 0);
       end Push_State;
 
       Current : VSS.XML.Implementation.Template_Programs.Address :=

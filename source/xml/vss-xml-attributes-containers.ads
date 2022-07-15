@@ -16,6 +16,8 @@ package VSS.XML.Attributes.Containers is
    type Attributes is
      new VSS.XML.Attributes.XML_Attributes with private;
 
+   procedure Clear (Self : in out Attributes'Class);
+
    procedure Insert
      (Self  : in out Attributes'Class;
       URI   : VSS.IRIs.IRI;

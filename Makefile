@@ -33,6 +33,7 @@ all:
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
 
 generate:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr
@@ -134,6 +135,7 @@ install:
 	gprinstall $(GPRINSTALL_FLAGS)/regexp -f -p -P gnat/vss_regexp.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/xml -f -p -P gnat/vss_xml.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/xml_templates -f -p -P gnat/vss_xml_templates.gpr
+	gprinstall $(GPRINSTALL_FLAGS)/xml_xmlada -f -p -P gnat/vss_xml_xmlada.gpr
 
 misc: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr

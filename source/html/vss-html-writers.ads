@@ -88,19 +88,22 @@ private
             null;
 
          when Element =>
-            Element       :
+            Element              :
               VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind;
-            Tag           : VSS.Strings.Virtual_String;
+            Tag                  : VSS.Strings.Virtual_String;
 
-            Syntax        : Attribute_Syntax;
+            Syntax               : Attribute_Syntax;
             --  Syntax used for the last attribute of the element.
 
-            Start_Omitted : Boolean;
+            Start_Omitted        : Boolean;
             --  Start tag is omitted.
 
-            Start_Closed  : Boolean;
+            Start_Closed         : Boolean;
             --  Whether start tag has been closed. It is set to True when
             --  final decision to omit the start tag is given.
+
+            Preserve_Whitespaces : Boolean;
+            --  Whether whitespaces of the element must be preserved or not.
       end case;
    end record;
 
@@ -111,18 +114,29 @@ private
      limited new VSS.XML.Content_Handlers.SAX_Content_Handler
        and VSS.XML.Lexical_Handlers.SAX_Lexical_Handler with
    record
-      Omit_Whitespaces : Boolean := True;
-      Output           : VSS.Text_Streams.Output_Text_Stream_Access;
-      Error            : VSS.XML.Error_Handlers.SAX_Error_Handler_Access :=
+      Omit_Whitespaces     : Boolean := True;
+      --  Whether whitespaces may be omitted at the begin and end of the
+      --  text segment, as well as be squeezed inside the text segment.
+      --  This transformation done only when it is allowed:
+      --   - HTML element is not one of the known text-only elements
+      --     (raw text or escapable text)
+      --   - xml:space=preserve is not specified for element or its ancestors
+      --   - preserve of whitespaces is not activated by default
+      Preserve_Whitespaces : Boolean := False;
+      --  Whether whitespace must be preserved for all elements of the
+      --  document. Note, this value is used for xml:space=default.
+
+      Output               : VSS.Text_Streams.Output_Text_Stream_Access;
+      Error                : VSS.XML.Error_Handlers.SAX_Error_Handler_Access :=
         VSS.XML.Implementation.Error_Handlers.Default'Access;
-      Locator          : VSS.XML.Locators.SAX_Locator_Access;
+      Locator              : VSS.XML.Locators.SAX_Locator_Access;
 
-      Text             : VSS.Strings.Virtual_String;
-      Is_Whitespace    : Boolean;
+      Text                 : VSS.Strings.Virtual_String;
+      Is_Whitespace        : Boolean;
 
-      CDATA_Mode       : Boolean;
-      Current          : State_Record;
-      Stack            : State_Vectors.Vector;
+      CDATA_Mode           : Boolean;
+      Current              : State_Record;
+      Stack                : State_Vectors.Vector;
    end record;
 
    overriding procedure Set_Document_Locator

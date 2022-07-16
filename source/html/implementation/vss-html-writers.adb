@@ -345,12 +345,51 @@ package body VSS.HTML.Writers is
       --  Reject ignorable whitespaces.
 
       if not Self.Text.Is_Empty
-        and Self.Omit_Whitespaces
-        and Self.Is_Whitespace
-        and Self.Current.Restrictions.No_Text
+        and then Self.Omit_Whitespaces
       then
-         Self.Text.Clear;
-         Self.Is_Whitespace := True;
+         if Self.Is_Whitespace
+           and Self.Current.Restrictions.No_Text
+         then
+            Self.Text.Clear;
+            Self.Is_Whitespace := True;
+
+         elsif not Self.Current.Preserve_Whitespaces then
+            declare
+               Aux      : constant VSS.Strings.Virtual_String := Self.Text;
+               Iterator : VSS.Strings.Character_Iterators.Character_Iterator :=
+                 Aux.Before_First_Character;
+               Omitted  : Boolean := False;
+
+            begin
+               Self.Text.Clear;
+               --  Self.Text.Set_Capacity (Aux.Character_Length);
+               --  ??? Virtual_String.Set_Capacity is not implemented,
+               --  however, setting of it may improve performance on long
+               --  strings.
+
+               while Iterator.Forward loop
+                  declare
+                     C : constant VSS.Characters.Virtual_Character :=
+                       Iterator.Element;
+
+                  begin
+                     if Is_ASCII_Whitespace (C) then
+                        if not Self.Text.Is_Empty then
+                           Omitted := True;
+                        end if;
+
+                     else
+                        if Omitted then
+                           Self.Text.Append (VSS.Characters.Latin.Space);
+                           Omitted := False;
+                        end if;
+
+                        Self.Text.Append (C);
+                     end if;
+                  end;
+               end loop;
+            end;
+         end if;
       end if;
 
       --  Check whether end tag of the last processed element may be
@@ -876,12 +915,12 @@ package body VSS.HTML.Writers is
    begin
       Self.Stack.Clear;
       Self.Current :=
-        (State          => Initial,
-         Restrictions   =>
+        (State                => Initial,
+         Restrictions         =>
            (No_Ambiguous_Ampersand | No_Less_Than => True,
             No_Text | No_CDATA                    => True,
             others                                => False),
-         Last_Child     => (Kind => None));
+         Last_Child           => (Kind => None));
       Self.CDATA_Mode := False;
       Self.Text.Clear;
       Self.Is_Whitespace := True;
@@ -904,6 +943,8 @@ package body VSS.HTML.Writers is
       Attributes : VSS.XML.Attributes.XML_Attributes'Class;
       Success    : in out Boolean)
    is
+      use type VSS.Strings.Virtual_String;
+
       Is_HTML_Namespace   : constant Boolean :=
         URI = VSS.XML.Namespaces.HTML_Namespace;
       Is_MathML_Namespace : constant Boolean :=
@@ -921,6 +962,8 @@ package body VSS.HTML.Writers is
         VSS.XML.Implementation.HTML_Writer_Data.Element_Properties :=
           VSS.XML.Implementation.HTML_Writer_Data.Properties
             (Current_Element);
+      Has_Attributes  : Boolean := False;
+      Has_XML_Space   : Boolean := False;
 
    begin
       Self.Close_Current_Tag
@@ -954,23 +997,57 @@ package body VSS.HTML.Writers is
 
       Self.Stack.Append (Self.Current);
       Self.Current :=
-        (State         => Element,
-         Element       => Current_Element,
-         Tag           => Name,
-         Restrictions  =>
+        (State                => Element,
+         Element              => Current_Element,
+         Tag                  => Name,
+         Restrictions         =>
            (if Is_HTML_Namespace
             then HTML_Element_Restrictions (Name, Self.Current.Restrictions)
             else
               (No_Less_Than | No_Ambiguous_Ampersand => True,
                others                                => False)),
-         Syntax        => None,
-         Start_Omitted => False,
-         Start_Closed  => False,
-         Last_Child    => (others => <>));
+         Syntax               => None,
+         Preserve_Whitespaces =>
+           Properties.Kind
+             in VSS.XML.Implementation.HTML_Writer_Data.Raw_Text
+                  | VSS.XML.Implementation.HTML_Writer_Data.Escapable_Text
+             or else
+               (if Self.Stack.Last_Element.State = Initial
+                  then Self.Preserve_Whitespaces
+                  else Self.Stack.Last_Element.Preserve_Whitespaces),
+         Start_Omitted        => False,
+         Start_Closed         => False,
+         Last_Child           => (others => <>));
+
+      --  Check list of attributes for xml:space attribute and apply it if
+      --  present.
+
+      for J in 1 .. Attributes.Get_Length loop
+         if Attributes.Get_URI (J) = XML.Namespaces.XML_Namespace
+           and then Attributes.Get_Name (J) = "space"
+         then
+            Has_XML_Space := True;
+
+            if Current_Element = Foreign then
+               Has_Attributes := True;
+            end if;
+
+            if Attributes.Get_Value (J) = "default" then
+               Self.Current.Preserve_Whitespaces :=
+                 Self.Preserve_Whitespaces;
+
+            elsif Attributes.Get_Value (J) = "preserve" then
+               Self.Current.Preserve_Whitespaces := True;
+            end if;
+
+         else
+            Has_Attributes := True;
+         end if;
+      end loop;
 
       --  Chech whether start tag of the current element may be omitted.
 
-      if Attributes.Get_Length = 0
+      if not Has_Attributes
         and then Properties.Start_Tag.May_Be_Omitted
       then
          Self.Current.Start_Omitted := True;
@@ -998,17 +1075,36 @@ package body VSS.HTML.Writers is
          Self.Write (Start_Tag_Open, Success);
          Self.Write (Name, Success);
 
-         for J in 1 .. Attributes.Get_Length loop
-            --  This is simple implementation, no checks or support for
-            --  namespaces, especially for allowed namespaces in foreign
-            --  elements.
+         if Has_Attributes then
+            for J in 1 .. Attributes.Get_Length loop
+               --  This is simple implementation, no checks or support for
+               --  namespaces, especially for allowed namespaces in foreign
+               --  elements.
 
-            Self.Write_Attribute
-              (Name    => Attributes.Get_Name (J),
-               Value   => Attributes.Get_Value (J),
-               Syntax  => Self.Current.Syntax,
-               Success => Success);
-         end loop;
+               if not Has_XML_Space
+                 or else (Attributes.Get_URI (J)
+                            /= XML.Namespaces.XML_Namespace
+                          or else Attributes.Get_Name (J) /= "space")
+               then
+                  Self.Write_Attribute
+                    (Name    => Attributes.Get_Name (J),
+                     Value   => Attributes.Get_Value (J),
+                     Syntax  => Self.Current.Syntax,
+                     Success => Success);
+
+               else
+                  --  Processing of xml:space attribute.
+
+                  if Self.Current.Element = Foreign then
+                     Self.Write_Attribute
+                       (Name    => "xml:space",
+                        Value   => Attributes.Get_Value (J),
+                        Syntax  => Self.Current.Syntax,
+                        Success => Success);
+                  end if;
+               end if;
+            end loop;
+         end if;
       end if;
    end Start_Element;
 

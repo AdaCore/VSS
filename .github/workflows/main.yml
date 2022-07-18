@@ -24,6 +24,12 @@ jobs:
         with:
           toolchain: gnat_native^11 gprbuild^21
           toolchain_dir: ./cached_gnat
+      - name: Get XmlAda with alire
+        shell: bash
+        run: |
+          export PATH=`ls -d $PWD/cached_gnat/*/bin |tr '\n' ':'`$PATH
+          alr get xmlada --build
+          echo "XMLADA_CRATE_ROOT=`pwd`/`alr get xmlada --dirname`" >> $GITHUB_ENV
       - name: Export OS=osx on macOS
         if: runner.os == 'macOS'
         run: echo "OS=osx" >> $GITHUB_ENV
@@ -41,6 +47,9 @@ jobs:
         shell: bash
         run: |
           export PATH=`ls -d $PWD/cached_gnat/*/bin |tr '\n' ':'`$PATH
+          export GPR_PROJECT_PATH=$XMLADA_CRATE_ROOT/input_sources:$GPR_PROJECT_PATH
+          export GPR_PROJECT_PATH=$XMLADA_CRATE_ROOT/sax:$GPR_PROJECT_PATH
+          export GPR_PROJECT_PATH=$XMLADA_CRATE_ROOT/unicode:$GPR_PROJECT_PATH
           make -C vss all check coverage BUILD_MODE=${{ matrix.build_mode }}
           make -C vss install check_install PREFIX=/tmp BUILD_MODE=${{ matrix.build_mode }}
           make -C vss misc BUILD_MODE=${{ matrix.build_mode }}

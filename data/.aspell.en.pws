@@ -7,6 +7,7 @@ crlf
 dont
 dtd
 encodings
+escapable
 grapheme
 ignorable
 iri
@@ -42,3 +43,4 @@ utf
 vss
 whitespace
 whitespaces
+xmlns

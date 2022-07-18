@@ -71,6 +71,8 @@ library project VSS_Text is
                when "osx" =>
                   for Implementation ("VSS.Application.Platform.Application_File")
                     use "vss-application-platform-application_file__darwin.adb";
+               when "Windows_NT" =>
+                  null;
             end case;
 
          when "Windows_NT" =>

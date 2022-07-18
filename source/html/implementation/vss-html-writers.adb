@@ -239,28 +239,36 @@ package body VSS.HTML.Writers is
       Parent : Restrictions_Record) return Restrictions_Record;
 
    function Best_Attribute_Syntax
-     (Item : VSS.Strings.Virtual_String) return Attribute_Syntax;
-   --  Computes most appropriate syntax for the given attribute's value.
+     (Name  : VSS.Strings.Virtual_String;
+      Value : VSS.Strings.Virtual_String) return Attribute_Syntax;
+   --  Computes most appropriate syntax for the given attribute's value. If
+   --  Name is not an empty string it is checked for the name of the know
+   --  boolean attributes, and empty syntax is used for them.
 
    ---------------------------
    -- Best_Attribute_Syntax --
    ---------------------------
 
    function Best_Attribute_Syntax
-     (Item : VSS.Strings.Virtual_String) return Attribute_Syntax
+     (Name  : VSS.Strings.Virtual_String;
+      Value : VSS.Strings.Virtual_String) return Attribute_Syntax
    is
       Single  : Natural := 0;
       Double  : Natural := 0;
       Special : Natural := 0;
 
    begin
-      if Item.Is_Empty then
+      if Value.Is_Empty
+        or else (not Name.Is_Empty
+                   and then VSS.XML.Implementation.HTML_Writer_Data
+                              .Is_Boolean_Attribute (Name))
+      then
          return Empty;
       end if;
 
       declare
          Iterator : VSS.Strings.Character_Iterators.Character_Iterator :=
-           Item.Before_First_Character;
+           Value.Before_First_Character;
 
       begin
          while Iterator.Forward loop
@@ -1288,7 +1296,12 @@ package body VSS.HTML.Writers is
 
    begin
       if Self.Output /= null then
-         Syntax := Best_Attribute_Syntax (Value);
+         Syntax :=
+           Best_Attribute_Syntax
+             ((if Self.Current.Element = Foreign
+                 then VSS.Strings.Empty_Virtual_String
+                 else Name),
+              Value);
 
          Self.Write (VSS.Characters.Latin.Space, Success);
          Self.Write (Name, Success);

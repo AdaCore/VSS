@@ -6,6 +6,8 @@
 
 package body VSS.XML.Implementation.HTML_Writer_Data is
 
+   use type VSS.Strings.Virtual_String;
+
    a_Prefix : constant VSS.Strings.Virtual_String := "a";
    b_Prefix : constant VSS.Strings.Virtual_String := "b";
    c_Prefix : constant VSS.Strings.Virtual_String := "c";
@@ -137,6 +139,36 @@ package body VSS.XML.Implementation.HTML_Writer_Data is
    video_Tag      : constant VSS.Strings.Virtual_String := "video";
    wbr_Tag        : constant VSS.Strings.Virtual_String := "wbr";
 
+   allowfullscreen_Attribute :
+     constant VSS.Strings.Virtual_String := "allowfullscreen";
+   async_Attribute      : constant VSS.Strings.Virtual_String := "async";
+   autofocus_Attribute  : constant VSS.Strings.Virtual_String := "autofocus";
+   autoplay_Attribute   : constant VSS.Strings.Virtual_String := "autoplay";
+   checked_Attribute    : constant VSS.Strings.Virtual_String := "checked";
+   controls_Attribute   : constant VSS.Strings.Virtual_String := "controls";
+   default_Attribute    : constant VSS.Strings.Virtual_String := "default";
+   defer_Attribute      : constant VSS.Strings.Virtual_String := "defer";
+   disabled_Attribute   : constant VSS.Strings.Virtual_String := "disabled";
+   formnovalidate_Attribute :
+     constant VSS.Strings.Virtual_String := "formnovalidate";
+   hidden_Attribute     : constant VSS.Strings.Virtual_String := "hidden";
+   inert_Attribute      : constant VSS.Strings.Virtual_String := "inert";
+   ismap_Attribute      : constant VSS.Strings.Virtual_String := "ismap";
+   itemscope_Attribute  : constant VSS.Strings.Virtual_String := "itemscope";
+   loop_Attribute       : constant VSS.Strings.Virtual_String := "loop";
+   multiple_Attribute   : constant VSS.Strings.Virtual_String := "multiple";
+   muted_Attribute      : constant VSS.Strings.Virtual_String := "muted";
+   nomodule_Attribute   : constant VSS.Strings.Virtual_String := "nomodule";
+   novalidate_Attribute : constant VSS.Strings.Virtual_String := "novalidate";
+   open_Attribute       : constant VSS.Strings.Virtual_String := "open";
+   playsinline_Attribute :
+     constant VSS.Strings.Virtual_String := "playsinline";
+   readonly_Attribute   : constant VSS.Strings.Virtual_String := "readonly";
+   required_Attribute   : constant VSS.Strings.Virtual_String := "required";
+   reversed_Attribute   : constant VSS.Strings.Virtual_String := "reversed";
+   selected_Attribute   : constant VSS.Strings.Virtual_String := "selected";
+   truespeed_Attribute  : constant VSS.Strings.Virtual_String := "truespeed";
+
    -------------
    -- Element --
    -------------
@@ -148,15 +180,71 @@ package body VSS.XML.Implementation.HTML_Writer_Data is
       return Value (Self.Element, Element);
    end Element;
 
+   --------------------------
+   -- Is_Boolean_Attribute --
+   --------------------------
+
+   function Is_Boolean_Attribute
+     (Name : VSS.Strings.Virtual_String) return Boolean is
+   begin
+      if Name.Starts_With (a_Prefix) then
+         return
+           Name in allowfullscreen_Attribute | async_Attribute
+                     | autofocus_Attribute | autoplay_Attribute;
+
+      elsif Name.Starts_With (c_Prefix) then
+         return Name in checked_Attribute | controls_Attribute;
+
+      elsif Name.Starts_With (d_Prefix) then
+         return
+           Name in default_Attribute | defer_Attribute | disabled_Attribute;
+
+      elsif Name.Starts_With (f_Prefix) then
+         return Name = formnovalidate_Attribute;
+
+      elsif Name.Starts_With (h_Prefix) then
+         return Name = hidden_Attribute;
+
+      elsif Name.Starts_With (i_Prefix) then
+         return
+           Name in inert_Attribute | ismap_Attribute | itemscope_Attribute;
+
+      elsif Name.Starts_With (l_Prefix) then
+         return Name = loop_Attribute;
+
+      elsif Name.Starts_With (m_Prefix) then
+         return Name in multiple_Attribute | muted_Attribute;
+
+      elsif Name.Starts_With (n_Prefix) then
+         return Name in nomodule_Attribute | novalidate_Attribute;
+
+      elsif Name.Starts_With (o_Prefix) then
+         return Name = open_Attribute;
+
+      elsif Name.Starts_With (p_Prefix) then
+         return Name = playsinline_Attribute;
+
+      elsif Name.Starts_With (r_Prefix) then
+         return
+           Name in readonly_Attribute | required_Attribute
+                     | reversed_Attribute;
+
+      elsif Name.Starts_With (s_Prefix) then
+         return Name = selected_Attribute;
+
+      elsif Name.Starts_With (t_Prefix) then
+         return Name = truespeed_Attribute;
+      end if;
+
+      return False;
+   end Is_Boolean_Attribute;
+
    ---------------------
    -- To_HTML_Element --
    ---------------------
 
    function To_HTML_Element
-     (Name : VSS.Strings.Virtual_String) return HTML_Element_Kind
-   is
-      use type VSS.Strings.Virtual_String;
-
+     (Name : VSS.Strings.Virtual_String) return HTML_Element_Kind is
    begin
       if Name.Starts_With (a_Prefix) then
          if Name = a_Tag then

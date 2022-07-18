@@ -81,6 +81,10 @@ package VSS.XML.Implementation.HTML_Writer_Data is
    --     +      video
    --     +      anonymous custom element
 
+   function Is_Boolean_Attribute
+     (Name : VSS.Strings.Virtual_String) return Boolean;
+   --  Return True when attribute is know HTML boolean attribute.
+
    type HTML_Element_Kind is
      (Anonymous_Custom_Element,
 

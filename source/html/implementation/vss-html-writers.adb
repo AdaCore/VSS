@@ -11,6 +11,7 @@ pragma Warnings (On);
 
 with VSS.Characters.Latin;
 with VSS.Strings.Character_Iterators;
+with VSS.Strings.Line_Iterators;
 with VSS.XML.Implementation.Parse_Errors;
 with VSS.XML.Namespaces;
 
@@ -513,11 +514,32 @@ package body VSS.HTML.Writers is
          end if;
       end if;
 
-      --  Write accumulated text if eny.
+      --  Write accumulated text if any.
 
       if not Self.Text.Is_Empty then
          if not Self.Current.Start_Closed then
             Self.Write_Close_Of_Start_Tag (Success);
+         end if;
+
+         if Self.Current.Element in pre_Element | textarea_Element
+           and then Self.Current.Last_Child.Kind = None
+         then
+            declare
+               use type VSS.Strings.Character_Count;
+
+               Iterator : constant VSS.Strings.Line_Iterators.Line_Iterator :=
+                 Self.Text.At_First_Line
+                   (VSS.XML.Implementation.HTML_Writer_Data
+                      .HTML_New_Line_Function);
+
+            begin
+               if Iterator.Character_Length = 0 then
+                  --  First line of the text is empty, thus additional empty
+                  --  line should be added in HTML serialization format.
+
+                  Self.Write (VSS.Characters.Latin.Line_Feed, Success);
+               end if;
+            end;
          end if;
 
          Self.Write_Escaped_Text (Self.Text, Success);

@@ -8,6 +8,11 @@ with VSS.Strings;
 
 package VSS.XML.Implementation.HTML_Writer_Data is
 
+   HTML_New_Line_Function : constant VSS.Strings.Line_Terminator_Set :=
+     (VSS.Strings.CR | VSS.Strings.LF | VSS.Strings.CRLF => True,
+      others                                             => False);
+   --  Line terminators allowed by the HTML specification.
+
    --  HTML elements are reordered to group together all elements that appear
    --  in the tag omitting conditions according to WhatWG's HTML living
    --  standard 2022-06-17.

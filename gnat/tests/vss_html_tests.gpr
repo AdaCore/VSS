@@ -1,0 +1,28 @@
+--
+--  Copyright (C) 2022, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  VSS: HTML processing subproject tests
+
+with "../vss_config";
+with "../vss_xml_xmlada";
+with "vss_test_common";
+
+project VSS_HTML_Tests is
+
+   for Languages use ("Ada");
+   for Object_Dir use VSS_Config.Tests_Object_Dir;
+   for Source_Dirs use ("../../testsuite/html");
+   for Main use ("test_html_writer.adb");
+
+   package Compiler is
+      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Wb");
+   end Binder;
+
+end VSS_HTML_Tests;

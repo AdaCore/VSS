@@ -47,8 +47,9 @@ build_tests:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_json_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_stream_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_regexp_tests.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_html_tests.gpr
 
-check: build_tests check_text check_json check_regexp
+check: build_tests check_text check_json check_regexp check_html
 
 check_text:
 	.objs/tests/test_characters data/ucd
@@ -99,6 +100,13 @@ check_json:
 check_regexp: re_tests
 	.objs/tests/test_regexp
 	.objs/tests/test_regexp_re_tests $(OK_RE_TESTS) < re_tests
+
+check_html:
+	rm -f .objs/tests/.fails
+	for f in testsuite/html/test_data/*.xhtml; do \
+	  echo -n "$$f: "; if .objs/tests/test_html_writer $$f | diff -u -- $${f%xhtml}html - ; then echo "PASS"; else echo "FAIL"; touch .objs/tests/.fails; fi ; \
+	done
+	test ! -e .objs/tests/.fails
 
 check_install:
 	echo 'with "vss_text.gpr";'             >  example.gpr

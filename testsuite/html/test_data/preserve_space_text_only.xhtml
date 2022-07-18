@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      Test of preserve of whitespaces for some text-only elements
+    </title>
+    <script>
+      //  for 'script' tag there is no needs to escape &lt; character.
+      function f(x, y) {
+        return x &lt; y;
+      }
+    </script>
+    <style>
+      html {
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea>
+      Whitespaces inside textarea  are  preserved.
+    </textarea>
+  </body>
+</html>

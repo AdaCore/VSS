@@ -1,2 +1,2 @@
 <!DOCTYPE html>
-<title>Hello</title><body class=main><p class='para primary'>Welcome to this example.<p title="I'm a tooltip">This is a paragraph.<p title='John "ShotGun" Nelson'><p title="John 'ShotGun' Nelson">
+<title>Check use of appropriate attribute syntax, and format of self closing tag of foreign element</title><body class=main><p class='para primary'>Welcome to this example.<p title="I'm a tooltip">This is a paragraph.<p title='John "ShotGun" Nelson'><p title="John 'ShotGun' Nelson"></p><math><malignmark edge=right /></math>

@@ -385,9 +385,6 @@ package body VSS.XML.Implementation.HTML_Writer_Data is
          elsif Name = h4_Tag then
             return h4_Element;
 
-         elsif Name = h4_Tag then
-            return h4_Element;
-
          elsif Name = h5_Tag then
             return h5_Element;
 

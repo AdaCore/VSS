@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Test processing of CDATA in HTML and foreign modes</title>
+  <script><![CDATA[
+    function f(x, y, z)
+    {
+      return x < y && y > z;
+    }
+    ]]></script>
+  </head>
+  <body>
+    <p>Welcome to this example.</p>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+    <mtext><![CDATA[ Theorem 1: x < y, y > z ]]></mtext>
+    </math>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<title>Test processing of CDATA in HTML and foreign modes</title><script>
+    function f(x, y, z)
+    {
+      return x < y && y > z;
+    }
+    </script><p>Welcome to this example.</p><math><mtext><![CDATA[ Theorem 1: x < y, y > z ]]></mtext></math>
+cdata_script_foreign.xhtml:10:8: <warning> CDATA is not allowed

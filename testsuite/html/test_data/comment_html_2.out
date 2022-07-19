@@ -1,0 +1,3 @@
+<!DOCTYPE html>
+<html>
+<!--  Comment immidiately after start tag of the 'html' element  --><!--  Note, it is recommended to add new line after each comment inside 'html' before 'head', not implemented  --><title>Test of the 'html' start tag omitting</title><p>Welcome to this example.

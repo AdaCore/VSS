@@ -1,0 +1,2 @@
+<!DOCTYPE html>
+<title>Hello</title><script defer async src=myscript.js></script><p>Welcome to this example.</p><button disabled>Push me</button><input type=checkbox checked>

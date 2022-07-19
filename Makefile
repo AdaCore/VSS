@@ -104,7 +104,7 @@ check_regexp: re_tests
 check_html:
 	rm -f .objs/tests/.fails
 	for f in testsuite/html/test_data/*.xhtml; do \
-	  echo -n "$$f: "; if .objs/tests/test_html_writer $$f | diff -u -- $${f%xhtml}html - ; then echo "PASS"; else echo "FAIL"; touch .objs/tests/.fails; fi ; \
+	  echo -n "$$f: "; if .objs/tests/test_html_writer $$f 1>.objs/out 2>.objs/err; (cat .objs/out; sed 's/.*[\/\\]\(.*:\)/\1/' .objs/err) | diff --strip-trailing-cr -u -- $${f%xhtml}out - ; then echo "PASS"; else echo "FAIL"; touch .objs/tests/.fails; fi ; \
 	done
 	test ! -e .objs/tests/.fails
 

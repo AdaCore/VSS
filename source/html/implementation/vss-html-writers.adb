@@ -598,7 +598,10 @@ package body VSS.HTML.Writers is
       Success : in out Boolean) is
    begin
       Self.CDATA_Mode := False;
-      Self.Write (CDATA_Close, Success);
+
+      if not Self.Current.Restrictions.No_CDATA then
+         Self.Write (CDATA_Close, Success);
+      end if;
    end End_CDATA;
 
    ------------------
@@ -925,12 +928,12 @@ package body VSS.HTML.Writers is
       Success : in out Boolean) is
    begin
       Self.Close_Current_Tag ((Kind => CDATA), Success);
+      Self.CDATA_Mode := True;
 
       if Self.Current.Restrictions.No_CDATA then
          Self.Report_Warning ("CDATA is not allowed", Success);
 
       else
-         Self.CDATA_Mode := True;
          Self.Write (CDATA_Open, Success);
       end if;
    end Start_CDATA;

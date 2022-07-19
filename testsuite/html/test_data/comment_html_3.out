@@ -1,0 +1,2 @@
+<!DOCTYPE html>
+<title>Test of the 'html' end tag omitting</title><p>Welcome to this example.</body><!--  Comment immidiately before end tag of the 'html' element  -->

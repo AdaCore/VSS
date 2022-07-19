@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<title>Test control of preserve of whitespaces by xml:space attribute</title><p>
+<title>Test control of preserve of whitespaces by xml:space attribute, and serialization of the attribute for foreign elements</title><p>
       Welcome to this example.
       Whitespaces are <span> preserved </span> due to use of xml:space='preserve'.
       <br>
       <span>However, this can be reverted to default when necessary.</span>
-    
+    </p><math xml:space=preserve>
+      <mrow>
+        <malignmark/>
+        <mtext xml:space=default>This is text</mtext>
+      </mrow>
+    </math>

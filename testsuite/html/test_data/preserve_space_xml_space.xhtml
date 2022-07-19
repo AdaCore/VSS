@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title>Test control of preserve of whitespaces by xml:space attribute</title>
+    <title>Test control of preserve of whitespaces by xml:space attribute, and serialization of the attribute for foreign elements</title>
   </head>
   <body>
     <p xml:space='preserve'>
@@ -12,5 +12,11 @@
         However, this can be reverted to default when necessary.
       </span>
     </p>
+    <math xmlns="http://www.w3.org/1998/Math/MathML" xml:space='preserve'>
+      <mrow>
+        <malignmark/>
+        <mtext xml:space='default'> This  is  text </mtext>
+      </mrow>
+    </math>
   </body>
 </html>

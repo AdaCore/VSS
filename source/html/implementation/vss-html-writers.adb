@@ -727,17 +727,6 @@ package body VSS.HTML.Writers is
                Result.No_Element             := True;
                Result.No_Comment             := True;
 
-               case Element is
-                  when script_Element =>
-                     Result.No_End_Script := True;
-
-                  when style_Element =>
-                     Result.No_End_Style := True;
-
-                  when others =>
-                     raise Program_Error;
-               end case;
-
             when Escapable_Text =>
                pragma Assert (Properties.Text = Yes);
                --  Escapable text element contains text.
@@ -745,17 +734,6 @@ package body VSS.HTML.Writers is
                Result.No_Less_Than := False;
                Result.No_Element   := True;
                Result.No_Comment   := True;
-
-               case Element is
-                  when textarea_Element =>
-                     Result.No_End_Text_Area := True;
-
-                  when title_Element =>
-                     Result.No_End_Title := True;
-
-                  when others =>
-                     raise Program_Error;
-               end case;
 
             when Normal =>
                Result.No_Less_Than           := True;
@@ -774,6 +752,23 @@ package body VSS.HTML.Writers is
 
             when Foreign =>
                Result.No_CDATA := False;
+         end case;
+
+         case Element is
+            when script_Element =>
+               Result.No_End_Script := True;
+
+            when style_Element =>
+               Result.No_End_Style := True;
+
+            when textarea_Element =>
+               Result.No_End_Text_Area := True;
+
+            when title_Element =>
+               Result.No_End_Title := True;
+
+            when others =>
+               null;
          end case;
       end return;
    end HTML_Element_Restrictions;

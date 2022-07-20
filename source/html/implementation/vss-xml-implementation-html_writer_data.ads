@@ -719,6 +719,11 @@ package VSS.XML.Implementation.HTML_Writer_Data is
       --  var_Element,
       video_Element    => Normal_Transparent_Properties,          --  video
       wbr_Element      => Void_Element_Properties,                --  wbr
+      Foreign          =>
+        (Kind      => Foreign,
+         Text      => Yes,
+         Start_Tag => (May_Be_Omitted => False),
+         End_Tag   => (May_Be_Omitted => False)),
       others           =>
         (Normal, Yes, (May_Be_Omitted => False), (May_Be_Omitted => False)));
 

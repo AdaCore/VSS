@@ -235,8 +235,10 @@ package body VSS.HTML.Writers is
    --  Return True when string contains only ASCII whitespace characters.
 
    function HTML_Element_Restrictions
-     (Name   : VSS.Strings.Virtual_String;
-      Parent : Restrictions_Record) return Restrictions_Record;
+     (Element    : VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind;
+      Properties : VSS.XML.Implementation.HTML_Writer_Data.Element_Properties;
+      Parent     : Restrictions_Record) return Restrictions_Record;
+   --  Compute restrictions of the element.
 
    function Best_Attribute_Syntax
      (Name  : VSS.Strings.Virtual_String;
@@ -689,18 +691,12 @@ package body VSS.HTML.Writers is
    -------------------------------
 
    function HTML_Element_Restrictions
-     (Name   : VSS.Strings.Virtual_String;
-      Parent : Restrictions_Record) return Restrictions_Record
+     (Element    : VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind;
+      Properties : VSS.XML.Implementation.HTML_Writer_Data.Element_Properties;
+      Parent     : Restrictions_Record) return Restrictions_Record
    is
       use all type VSS.XML.Implementation.HTML_Writer_Data.Element_Kinds;
       use all type VSS.XML.Implementation.HTML_Writer_Data.Text_Children;
-
-      Element    : constant
-        VSS.XML.Implementation.HTML_Writer_Data.HTML_Element_Kind :=
-          VSS.XML.Implementation.HTML_Writer_Data.To_HTML_Element (Name);
-      Properties : constant
-        VSS.XML.Implementation.HTML_Writer_Data.Element_Properties :=
-          VSS.XML.Implementation.HTML_Writer_Data.Properties (Element);
 
    begin
       return Result : Restrictions_Record := (others => False) do
@@ -777,7 +773,7 @@ package body VSS.HTML.Writers is
                end case;
 
             when Foreign =>
-               raise Program_Error;
+               Result.No_CDATA := False;
          end case;
       end return;
    end HTML_Element_Restrictions;
@@ -1034,11 +1030,8 @@ package body VSS.HTML.Writers is
          Element              => Current_Element,
          Tag                  => Name,
          Restrictions         =>
-           (if Is_HTML_Namespace
-            then HTML_Element_Restrictions (Name, Self.Current.Restrictions)
-            else
-              (No_Less_Than | No_Ambiguous_Ampersand => True,
-               others                                => False)),
+           HTML_Element_Restrictions
+             (Current_Element, Properties, Self.Current.Restrictions),
          Syntax               => None,
          Preserve_Whitespaces =>
            Properties.Kind

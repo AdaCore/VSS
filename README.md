@@ -53,7 +53,7 @@ For use JSON streaming API:
 
 ## Documentation
 
-* [API Reference](https://adacore.github.io/VSS/gnatdoc/)
+* [API Reference](https://adacore.github.io/VSS/)
 
 ## Maintainers
 

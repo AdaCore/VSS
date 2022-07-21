@@ -1,3 +1,3 @@
 # VSS Documentation
 
-* [API Reference](https://adacore.github.io/VSS/gnatdoc/)
+* [API Reference](html/index.html)

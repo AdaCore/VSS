@@ -13,11 +13,13 @@ aggregate project VSS_Documentation is
       "gnat/vss_json.gpr",
       "gnat/vss_regexp.gpr",
       "gnat/vss_xml.gpr",
-      "gnat/vss_xml_xmlada.gpr",
+--      "gnat/vss_xml_xmlada.gpr",
+--  XmlAda integration is excluded due to dependency from the XmlAda, which is
+--  hard to handle at GHA.
       "gnat/vss_xml_templates.gpr");
 
    package Documentation is
-      for Output_Dir (others) use "docs";
+      for Output_Dir (others) use ".docs";
       for Resources_Dir (others) use "gnatdoc";
       for Exclude_Project_Files use
         ("gnat/vss_config.gpr",

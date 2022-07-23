@@ -1,0 +1,29 @@
+--
+--  Copyright (C) 2020-2022, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  Aggregate project mostly for documentation generation
+
+aggregate project VSS_Documentation is
+
+   for Project_Files use
+     ("gnat/vss_text.gpr",
+      "gnat/vss_json.gpr",
+      "gnat/vss_regexp.gpr",
+      "gnat/vss_xml.gpr",
+--      "gnat/vss_xml_xmlada.gpr",
+--  XmlAda integration is excluded due to dependency from the XmlAda, which is
+--  hard to handle at GHA.
+      "gnat/vss_xml_templates.gpr");
+
+   package Documentation is
+      for Output_Dir (others) use ".docs";
+      for Resources_Dir (others) use "gnatdoc";
+      for Excluded_Project_Files use
+        ("gnat/vss_config.gpr",
+         "gnat/vss_gnat.gpr");
+   end Documentation;
+
+end VSS_Documentation;

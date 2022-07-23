@@ -50,8 +50,8 @@ jobs:
           git config user.name  `git log -1 --pretty=format:'%an'`
           git checkout gh-pages
           git reset --hard HEAD^
-          cp -fr .objs/index.html .objs/gnatdoc/ .
-          git add index.html gnatdoc
+          cp -fr .docs/* .
+          git add index.html html
           if git commit -m "" --allow-empty-message; then
             git push -f
           fi

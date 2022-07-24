@@ -14,12 +14,18 @@ package VSS.Implementation.Windows is
 
    type HANDLE is new System.Win32.HANDLE;
 
+   type HWND is new HANDLE;
+
    type BOOL is new System.Win32.BOOL;
 
    FALSE : constant := System.Win32.FALSE;
 
+   type BYTE is new System.Win32.BYTE;
+   type UINT is new Interfaces.C.unsigned;
+   type WORD is new System.Win32.WORD;
    type DWORD is new System.Win32.DWORD;
 
+   type LPBYTE is access all BYTE;
    type LPCWSTR is access constant Interfaces.C.char16_t;
    type LPWSTR is access all Interfaces.C.char16_t;
 

@@ -148,6 +148,17 @@ package body VSS.String_Vectors is
       end return;
    end Delete_First;
 
+   ------------------
+   -- Delete_First --
+   ------------------
+
+   procedure Delete_First (Self : in out Virtual_String_Vector'Class) is
+   begin
+      if Self.Data /= null and then Self.Data.Last /= 0 then
+         VSS.Implementation.String_Vectors.Delete (Self.Data, 1);
+      end if;
+   end Delete_First;
+
    -----------------
    -- Delete_Last --
    -----------------

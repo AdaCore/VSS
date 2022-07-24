@@ -84,6 +84,9 @@ package VSS.String_Vectors is
      (Self : Virtual_String_Vector'Class) return Virtual_String_Vector;
    --  Delete first element and return result vector.
 
+   procedure Delete_First (Self : in out Virtual_String_Vector'Class);
+   --  Delete first element from the vector.
+
    procedure Delete_Last (Self : in out Virtual_String_Vector'Class);
    --  Delete the last element.
 

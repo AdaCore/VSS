@@ -57,6 +57,8 @@ library project VSS_Text is
          when "unix" | "osx" =>
             for Implementation ("VSS.Application.Platform")
               use "vss-application-platform__posix.adb";
+            for Implementation ("VSS.Command_Line.Platform")
+              use "vss-command_line-platform__posix.adb";
             for Implementation ("VSS.Environments.Platform")
               use "vss-environments-platform__posix.adb";
             for Implementation ("VSS.Implementation.Environment_Utilities")
@@ -78,6 +80,8 @@ library project VSS_Text is
          when "Windows_NT" =>
             for Implementation ("VSS.Application.Platform")
               use "vss-application-platform__windows.adb";
+            for Implementation ("VSS.Command_Line.Platform")
+              use "vss-command_line-platform__windows.adb";
             for Implementation ("VSS.Environments.Platform")
               use "vss-environments-platform__windows.adb";
             for Implementation ("VSS.Implementation.Environment_Utilities")

@@ -67,7 +67,13 @@ package VSS.Command_Line is
      return VSS.String_Vectors.Virtual_String_Vector;
    --  Return list of positional arguments.
 
-   procedure Report_Error (Message : VSS.Strings.Virtual_String);
-   --  Report error and exit.
+   procedure Report_Error (Message : VSS.Strings.Virtual_String)
+     with No_Return;
+   --  Report error and terminate application.
+
+private
+
+   function Unique_Name
+     (Self : Named_Option'Class) return VSS.Strings.Virtual_String;
 
 end VSS.Command_Line;

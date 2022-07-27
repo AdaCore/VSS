@@ -101,7 +101,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       From        : VSS.Unicode.UTF8_Code_Unit_Index;
       Size        : VSS.Unicode.UTF8_Code_Unit_Count;
-      Length      : VSS.Implementation.Strings.Character_Count);
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Terminator  : Boolean := False);
    --  Append given slice of the data to the target. Convert target
    --  from in-place to heap based implementation when necessary.
 
@@ -111,7 +112,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       From        : VSS.Unicode.UTF8_Code_Unit_Index;
       Size        : VSS.Unicode.UTF8_Code_Unit_Count;
-      Length      : VSS.Implementation.Strings.Character_Count);
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Terminator  : Boolean := False);
    --  Append given slice of the data to the target. Convert target
    --  from in-place to heap based implementation when necessary.
 
@@ -3984,13 +3986,13 @@ package body VSS.Implementation.UTF8_String_Handlers is
            (Target_Data);
 
          Unchecked_Append
-           (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length);
+           (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length, True);
 
       elsif Size > In_Place_Storage_Capacity then
          Self.Initialize (Target_Data);
 
          Unchecked_Append
-           (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length);
+           (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length, True);
 
       else
          VSS.Implementation.String_Handlers.Abstract_String_Handler
@@ -4031,7 +4033,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Self.Initialize (Target_Data);
 
       Unchecked_Append
-        (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length);
+        (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length, True);
    end Slice;
 
    -----------------
@@ -4283,7 +4285,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       From        : VSS.Unicode.UTF8_Code_Unit_Index;
       Size        : VSS.Unicode.UTF8_Code_Unit_Count;
-      Length      : VSS.Implementation.Strings.Character_Count) is
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Terminator  : Boolean := False) is
    begin
       if Target_Data.In_Place then
          declare
@@ -4296,6 +4299,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
                  Storage (From .. From + Size - 1);
                Target.Size   := Target.Size + Size;
                Target.Length := Target.Length + Length;
+
+               if Terminator then
+                  Target.Storage (Target.Size) := 16#00#;
+               end if;
 
                Target_Size   := Target.Size;
 
@@ -4325,6 +4332,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Target.Size   := Target.Size + Size;
          Target.Length := Target.Length + Length;
 
+         if Terminator then
+            Target.Storage (Target.Size) := 16#00#;
+         end if;
+
          Target_Size   := Target.Size;
       end;
    end Unchecked_Append;
@@ -4338,12 +4349,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       From        : VSS.Unicode.UTF8_Code_Unit_Index;
       Size        : VSS.Unicode.UTF8_Code_Unit_Count;
-      Length      : VSS.Implementation.Strings.Character_Count)
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Terminator  : Boolean := False)
    is
       Target_Size : VSS.Unicode.UTF8_Code_Unit_Count;
 
    begin
-      Unchecked_Append (Target_Data, Target_Size, Storage, From, Size, Length);
+      Unchecked_Append
+        (Target_Data, Target_Size, Storage, From, Size, Length, Terminator);
    end Unchecked_Append;
 
    ------------------------

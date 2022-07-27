@@ -17,6 +17,7 @@ project VSS_OS_Tests is
    for Source_Dirs use ("../../testsuite/os");
    for Main use
      ("test_application_arguments.adb",
+      "test_command_line_parser.adb",
       "test_standard_paths.adb");
 
    package Compiler is

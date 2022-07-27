@@ -5,6 +5,7 @@
 --
 
 with VSS.Strings.Character_Iterators;
+with VSS.String_Vectors;
 
 with Test_Support;
 
@@ -13,6 +14,12 @@ procedure Test_String is
    procedure Test_Prepend;
    procedure Test_Replace;
    procedure Test_Tail;
+
+   procedure Test_V705_011;
+   --  Test that Slice implementation fills null terminator at the end of the
+   --  internal string data.
+   --
+   --  This test requires valgrind.
 
    ------------------
    -- Test_Prepend --
@@ -164,8 +171,33 @@ procedure Test_String is
       Test_Support.Assert (S.Tail_After (S.At_Last_Character).Is_Empty);
    end Test_Tail;
 
+   -------------------
+   -- Test_V705_011 --
+   -------------------
+
+   procedure Test_V705_011 is
+      V1 : constant VSS.Strings.Virtual_String := "First string";
+      V2 : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.To_Virtual_String
+          (" Second string in the list. It is long enough to can't be placed"
+           & "inside the string object without memory allocation");
+      J  : constant VSS.Strings.Character_Iterators.Character_Iterator :=
+        V2.At_First_Character;
+      V  : VSS.String_Vectors.Virtual_String_Vector;
+      R  : VSS.Strings.Virtual_String with Unreferenced;
+      --  This value is only necessary to build result object, thus to allow
+      --  valgrind to detect use of uninitialized value.
+
+   begin
+      V.Append (V1);
+      V.Append (V2.Tail_After (J));
+      R := V.Join_Lines (VSS.Strings.LF);
+   end Test_V705_011;
+
 begin
    Test_Prepend;
    Test_Replace;
    Test_Tail;
+
+   Test_V705_011;
 end Test_String;

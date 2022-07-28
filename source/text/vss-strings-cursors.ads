@@ -34,13 +34,19 @@ package VSS.Strings.Cursors is
 
    function First_Character_Index
      (Self : Abstract_Cursor)
-      return VSS.Strings.Character_Index is abstract;
-   --  Return index of the first character of the logical element.
+      return VSS.Strings.Character_Index'Base is abstract;
+   --  Return index of the first character of the logical element. This index
+   --  is zero when cursor is invalid or points before the first character of
+   --  the string data; or large than length of the string when cursor points
+   --  after last characters of the string data.
 
    function Last_Character_Index
      (Self : Abstract_Cursor)
-      return VSS.Strings.Character_Index is abstract;
-   --  Return index of the last character of the logical element.
+      return VSS.Strings.Character_Index'Base is abstract;
+   --  Return index of the last character of the logical element. Returned
+   --  value when cursor points to the empty logical element or to the logical
+   --  element before or after the string data depends from the particular
+   --  implementation.
 
    function First_UTF8_Offset
      (Self : Abstract_Cursor)
@@ -76,7 +82,7 @@ package VSS.Strings.Cursors is
 
    function Character_Index
      (Self : Abstract_Character_Cursor'Class)
-      return VSS.Strings.Character_Index;
+      return VSS.Strings.Character_Index'Base;
    --  Returns index of the character.
 
    -----------------------------
@@ -118,11 +124,11 @@ private
 
    overriding function First_Character_Index
      (Self : Character_Cursor_Base)
-      return VSS.Strings.Character_Index;
+      return VSS.Strings.Character_Index'Base;
 
    overriding function Last_Character_Index
      (Self : Character_Cursor_Base)
-      return VSS.Strings.Character_Index renames First_Character_Index;
+      return VSS.Strings.Character_Index'Base renames First_Character_Index;
 
    overriding function First_UTF8_Offset
      (Self : Character_Cursor_Base) return VSS.Unicode.UTF8_Code_Unit_Index;
@@ -163,11 +169,11 @@ private
 
    overriding function First_Character_Index
      (Self : Character_Cursor_Limited_Base)
-      return VSS.Strings.Character_Index;
+      return VSS.Strings.Character_Index'Base;
 
    overriding function Last_Character_Index
      (Self : Character_Cursor_Limited_Base)
-      return VSS.Strings.Character_Index renames First_Character_Index;
+      return VSS.Strings.Character_Index'Base renames First_Character_Index;
 
    overriding function First_UTF8_Offset
      (Self : Character_Cursor_Limited_Base)
@@ -211,11 +217,10 @@ private
 
    overriding function First_Character_Index
      (Self : Segment_Cursor_Base)
-      return VSS.Strings.Character_Index;
+      return VSS.Strings.Character_Index'Base;
 
    overriding function Last_Character_Index
-     (Self : Segment_Cursor_Base)
-      return VSS.Strings.Character_Index;
+     (Self : Segment_Cursor_Base) return VSS.Strings.Character_Index'Base;
 
    overriding function First_UTF8_Offset
      (Self : Segment_Cursor_Base)
@@ -263,11 +268,11 @@ private
 
    overriding function First_Character_Index
      (Self : Segment_Cursor_Limited_Base)
-      return VSS.Strings.Character_Index;
+      return VSS.Strings.Character_Index'Base;
 
    overriding function Last_Character_Index
      (Self : Segment_Cursor_Limited_Base)
-      return VSS.Strings.Character_Index;
+      return VSS.Strings.Character_Index'Base;
 
    overriding function First_UTF8_Offset
      (Self : Segment_Cursor_Limited_Base)

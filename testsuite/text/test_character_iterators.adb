@@ -103,6 +103,12 @@ procedure Test_Character_Iterators is
    procedure Test_Backward;
    procedure Test_Backward_After_Last;
 
+   procedure Test_V627_026_Empty_Segments;
+   --  Test that last character index is equal to first character index when
+   --  iterator is not initialized or point before the first character or
+   --  after last character of the string data, and there is no exception
+   --  raised.
+
    procedure Test_Common_Backward
      (J : in out VSS.Strings.Character_Iterators.Character_Iterator);
 
@@ -526,9 +532,58 @@ procedure Test_Character_Iterators is
       Test_Common_Forward (J);
    end Test_Forward_From_Before_First;
 
+   ----------------------------------
+   -- Test_V627_026_Empty_Segments --
+   ----------------------------------
+
+   procedure Test_V627_026_Empty_Segments is
+      S : constant VSS.Strings.Virtual_String := "ABC";
+      A : constant VSS.Strings.Character_Count := S.Character_Length + 1;
+
+   begin
+      declare
+         JB : constant VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.Before_First_Character;
+         JA : constant VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.After_Last_Character;
+         JE : VSS.Strings.Character_Iterators.Character_Iterator;
+         JF : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_First_Character;
+         JL : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_Last_Character;
+
+      begin
+         Test_Support.Assert (JB.Character_Index = 0);
+         Test_Support.Assert (JB.First_Character_Index = 0);
+         Test_Support.Assert
+           (JB.First_Character_Index = JB.Last_Character_Index);
+
+         Test_Support.Assert (JA.Character_Index = A);
+         Test_Support.Assert (JA.First_Character_Index = A);
+         Test_Support.Assert
+           (JA.First_Character_Index = JA.Last_Character_Index);
+
+         Test_Support.Assert
+           (JE.First_Character_Index = JE.Last_Character_Index);
+
+         Test_Support.Assert (not JF.Backward);
+         Test_Support.Assert (JF.Character_Index = 0);
+         Test_Support.Assert (JF.First_Character_Index = 0);
+         Test_Support.Assert
+           (JF.First_Character_Index = JF.Last_Character_Index);
+
+         Test_Support.Assert (not JL.Forward);
+         Test_Support.Assert (JL.Character_Index = A);
+         Test_Support.Assert (JL.First_Character_Index = A);
+         Test_Support.Assert
+           (JL.First_Character_Index = JL.Last_Character_Index);
+      end;
+   end Test_V627_026_Empty_Segments;
+
 begin
    Test_Forward;
    Test_Forward_From_Before_First;
    Test_Backward;
    Test_Backward_After_Last;
+   Test_V627_026_Empty_Segments;
 end Test_Character_Iterators;

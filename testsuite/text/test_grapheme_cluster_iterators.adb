@@ -21,6 +21,11 @@ procedure Test_Grapheme_Cluster_Iterators is
    procedure Run_UCD_Tests is
      new Generic_UCD_Break_Test_Runner (Run_Test_Case);
 
+   procedure Test_V627_026_Empty_Segments;
+   --  Test index of first and last characters in the segment when iterator is
+   --  not initialized or points before the first character or after the last
+   --  character of the string data.
+
    -------------------
    -- Run_Test_Case --
    -------------------
@@ -70,6 +75,39 @@ procedure Test_Grapheme_Cluster_Iterators is
       Test_Support.Assert (not JB.Has_Element);
    end Run_Test_Case;
 
+   ----------------------------------
+   -- Test_V627_026_Empty_Segments --
+   ----------------------------------
+
+   procedure Test_V627_026_Empty_Segments is
+
+      use type VSS.Strings.Character_Count;
+
+      S : constant VSS.Strings.Virtual_String := "ABC";
+      A : constant VSS.Strings.Character_Count := S.Character_Length + 1;
+
+      JE : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator;
+      JF : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
+        S.At_First_Grapheme_Cluster;
+      JL : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
+        S.At_Last_Grapheme_Cluster;
+
+   begin
+      Test_Support.Assert (JE.First_Character_Index = 0);
+      Test_Support.Assert
+        (JE.First_Character_Index = JE.Last_Character_Index);
+
+      Test_Support.Assert (not JF.Backward);
+      Test_Support.Assert (JF.First_Character_Index = 0);
+      Test_Support.Assert
+        (JF.First_Character_Index = JF.Last_Character_Index);
+
+      Test_Support.Assert (not JL.Forward);
+      Test_Support.Assert (JL.First_Character_Index = A);
+      Test_Support.Assert
+        (JL.First_Character_Index > JL.Last_Character_Index);
+   end Test_V627_026_Empty_Segments;
+
 begin
    --  Process test cases provided with UCD.
 
@@ -81,4 +119,6 @@ begin
    Run_Test_Case
      (VSS.Strings.Empty_Virtual_String,
       VSS.String_Vectors.Empty_Virtual_String_Vector);
+
+   Test_V627_026_Empty_Segments;
 end Test_Grapheme_Cluster_Iterators;

@@ -18,7 +18,7 @@ package body VSS.Strings.Cursors is
 
    function Character_Index
      (Self : Abstract_Character_Cursor'Class)
-      return VSS.Strings.Character_Index is
+      return VSS.Strings.Character_Index'Base is
    begin
       return Self.First_Character_Index;
    end Character_Index;
@@ -67,9 +67,9 @@ package body VSS.Strings.Cursors is
 
    overriding function First_Character_Index
      (Self : Character_Cursor_Base)
-      return VSS.Strings.Character_Index is
+      return VSS.Strings.Character_Index'Base is
    begin
-      return VSS.Strings.Character_Index (Self.Position.Index);
+      return VSS.Strings.Character_Index'Base (Self.Position.Index);
    end First_Character_Index;
 
    ---------------------------
@@ -78,9 +78,9 @@ package body VSS.Strings.Cursors is
 
    overriding function First_Character_Index
      (Self : Character_Cursor_Limited_Base)
-      return VSS.Strings.Character_Index is
+      return VSS.Strings.Character_Index'Base is
    begin
-      return VSS.Strings.Character_Index (Self.Position.Index);
+      return VSS.Strings.Character_Index'Base (Self.Position.Index);
    end First_Character_Index;
 
    ---------------------------
@@ -88,9 +88,9 @@ package body VSS.Strings.Cursors is
    ---------------------------
 
    overriding function First_Character_Index
-     (Self : Segment_Cursor_Base) return VSS.Strings.Character_Index is
+     (Self : Segment_Cursor_Base) return VSS.Strings.Character_Index'Base is
    begin
-      return VSS.Strings.Character_Index (Self.First_Position.Index);
+      return VSS.Strings.Character_Index'Base (Self.First_Position.Index);
    end First_Character_Index;
 
    ---------------------------
@@ -98,9 +98,10 @@ package body VSS.Strings.Cursors is
    ---------------------------
 
    overriding function First_Character_Index
-     (Self : Segment_Cursor_Limited_Base) return VSS.Strings.Character_Index is
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Strings.Character_Index'Base is
    begin
-      return VSS.Strings.Character_Index (Self.First_Position.Index);
+      return VSS.Strings.Character_Index'Base (Self.First_Position.Index);
    end First_Character_Index;
 
    ------------------
@@ -395,9 +396,9 @@ package body VSS.Strings.Cursors is
    --------------------------
 
    overriding function Last_Character_Index
-     (Self : Segment_Cursor_Base) return VSS.Strings.Character_Index is
+     (Self : Segment_Cursor_Base) return VSS.Strings.Character_Index'Base is
    begin
-      return VSS.Strings.Character_Index (Self.Last_Position.Index);
+      return VSS.Strings.Character_Index'Base (Self.Last_Position.Index);
    end Last_Character_Index;
 
    --------------------------
@@ -405,9 +406,10 @@ package body VSS.Strings.Cursors is
    --------------------------
 
    overriding function Last_Character_Index
-     (Self : Segment_Cursor_Limited_Base) return VSS.Strings.Character_Index is
+     (Self : Segment_Cursor_Limited_Base)
+      return VSS.Strings.Character_Index'Base is
    begin
-      return VSS.Strings.Character_Index (Self.Last_Position.Index);
+      return VSS.Strings.Character_Index'Base (Self.Last_Position.Index);
    end Last_Character_Index;
 
    -----------------

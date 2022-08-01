@@ -128,7 +128,7 @@ re_tests:
 	curl -o $@ https://raw.githubusercontent.com/Perl/perl5/blead/t/re/re_tests
 
 coverage:
-	find .objs/ -name *.o | xargs -s 512 gcov
+	find .objs/ -name *.o | xargs -s 512 gcov || true
 
 docs:
 	make -C docs

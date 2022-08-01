@@ -17,12 +17,12 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ./cached_gnat
-          key: ${{ runner.os }}-alire_v1
-          restore-keys: ${{ runner.os }}-alire_v1
+          key: ${{ runner.os }}-alire_v2
+          restore-keys: ${{ runner.os }}-alire_v2
       - name: Get GNAT toolchain with alire
         uses: alire-project/setup-alire@v1
         with:
-          toolchain: gnat_native^11 gprbuild^21
+          toolchain: gnat_native^12 gprbuild^22
           toolchain_dir: ./cached_gnat
       - name: Get XmlAda with alire
         shell: bash

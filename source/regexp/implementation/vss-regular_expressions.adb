@@ -13,6 +13,8 @@ with VSS.Regular_Expressions.Matches;
 with VSS.Regular_Expressions.Pike_Engines;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
+pragma Unreferenced (VSS.Strings.Cursors.Iterators.Characters);
+--  GNAT 20220812 doesn't recognize use of this package
 
 package body VSS.Regular_Expressions is
    pragma Warnings (Off);

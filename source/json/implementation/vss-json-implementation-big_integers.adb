@@ -328,19 +328,19 @@ package body VSS.JSON.Implementation.Big_Integers is
    is
       Large_Step       : constant := 135;
       Large_Power_Of_5 : constant Limb_Array (0 .. 4) :=
-        (1414648277510068013, 9180637584431281687, 4539964771860779200,
-         10482974169319127550, 198276706040285095);
+        [1414648277510068013, 9180637584431281687, 4539964771860779200,
+         10482974169319127550, 198276706040285095];
 
       Small_Step       : constant := 27;
       Small_Power_Of_5 : constant Limb_Type := 7450580596923828125;
 
       Tail_Power_Of_5  : constant Limb_Array (0 .. Small_Step) :=
-        (1, 5, 25, 125, 625, 3125, 15625, 78125, 390625,
+        [1, 5, 25, 125, 625, 3125, 15625, 78125, 390625,
          1953125, 9765625, 48828125, 244140625, 1220703125,
          6103515625, 30517578125, 152587890625, 762939453125,
          3814697265625, 19073486328125, 95367431640625, 476837158203125,
          2384185791015625, 11920928955078125, 59604644775390625,
-         298023223876953125, 1490116119384765625, 7450580596923828125);
+         298023223876953125, 1490116119384765625, 7450580596923828125];
 
       E                : Interfaces.Integer_32 := Exponent;
 
@@ -420,7 +420,7 @@ package body VSS.JSON.Implementation.Big_Integers is
       Fill   : Limb_Type) is
    begin
       if Length > Self.Last + 1 then
-         Self.Data (Self.Last + 1 .. Length - 1) := (others => Fill);
+         Self.Data (Self.Last + 1 .. Length - 1) := [others => Fill];
          Self.Last := Length - 1;
 
       else
@@ -559,7 +559,7 @@ package body VSS.JSON.Implementation.Big_Integers is
          Self.Data (Self.Data'First + Amount .. Self.Last + Amount) :=
            Self.Data (Self.Data'First .. Self.Last);
          Self.Data (Self.Data'First .. Self.Data'First + Amount - 1) :=
-           (others => 0);
+           [others => 0];
          Self.Last := @ + Amount;
       end if;
    end Shift_Left_Limbs;

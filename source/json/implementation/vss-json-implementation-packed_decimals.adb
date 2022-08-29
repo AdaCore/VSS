@@ -4,11 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-pragma Warnings (Off, "unrecognized pragma");
-pragma Ada_2020;
 pragma Ada_2022;
-pragma Warnings (On, "unrecognized pragma");
-pragma Warnings (Off, "array aggregate using ()");
 
 package body VSS.JSON.Implementation.Packed_Decimals is
 

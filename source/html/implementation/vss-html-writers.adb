@@ -4,10 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-pragma Warnings (Off);
-pragma Ada_2020;
 pragma Ada_2022;
-pragma Warnings (On);
 
 with VSS.Characters.Latin;
 with VSS.Strings.Character_Iterators;

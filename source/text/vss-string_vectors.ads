@@ -6,10 +6,7 @@
 
 --  Vector of strings and operations on it.
 
-pragma Warnings (Off);
-pragma Ada_2020;
 pragma Ada_2022;
-pragma Warnings (On);
 --  GNAT: different versions of compiler use different pragmas to enable
 --  Ada 2022 features.
 

@@ -4,11 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-pragma Warnings (Off, "unrecognized pragma");
-pragma Ada_2020;
-pragma Extensions_Allowed (On);
 pragma Ada_2022;
-pragma Warnings (On, "unrecognized pragma");
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Wide_Wide_Text_IO;

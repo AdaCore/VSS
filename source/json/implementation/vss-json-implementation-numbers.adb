@@ -4,10 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-pragma Warnings (Off, "unrecognized pragma");
-pragma Ada_2020;
 pragma Ada_2022;
-pragma Warnings (On, "unrecognized pragma");
 
 with VSS.JSON.Implementation.Big_Integers;
 with VSS.JSON.Implementation.Numbers.Clinger;

@@ -28,7 +28,7 @@ Warning: This is experimental work in progress, everything is subject to
 change. It may be or may be not part of GNATCOLL or standard Ada library
 in the future.
 
-Note: Some Ada 2020 features are used in source code. This requires compiler
+Note: Some Ada 2022 features are used in source code. This requires compiler
 that supports them.
 
 ## Install

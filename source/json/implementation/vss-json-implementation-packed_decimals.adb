@@ -28,7 +28,7 @@ package body VSS.JSON.Implementation.Packed_Decimals is
 
    Power_Of_10 : constant
      array (Interfaces.Unsigned_32 range 1 .. 16) of Interfaces.Unsigned_64 :=
-     (10,
+     [10,
       100,
       1000,
       10000,
@@ -43,7 +43,7 @@ package body VSS.JSON.Implementation.Packed_Decimals is
       10000000000000,
       100000000000000,
       1000000000000000,
-      10000000000000000);
+      10000000000000000];
 
    procedure Append
      (U64    : in out Unsigned_64_Array;

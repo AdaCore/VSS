@@ -495,6 +495,37 @@ package body VSS.Strings is
         VSS.Strings.Hash_Type (VSS.Implementation.FNV_Hash.Value (Generator));
    end Hash;
 
+   -----------------
+   -- Head_Before --
+   -----------------
+
+   function Head_Before
+     (Self   : Virtual_String'Class;
+      Before : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String
+   is
+      Handler        :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
+      First_Position : VSS.Implementation.Strings.Cursor;
+      Last_Position  : VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Before).all;
+      Success        : Boolean with Unreferenced;
+
+   begin
+      return Result : Virtual_String do
+         if VSS.Strings.Cursors.Internals.Is_Owner (Before, Self) then
+            if Handler.Backward (Self.Data, Last_Position) then
+               Handler.Before_First_Character (Self.Data, First_Position);
+               Success := Handler.Forward (Self.Data, First_Position);
+               Handler.Slice
+                 (Self.Data, First_Position, Last_Position, Result.Data);
+            end if;
+         end if;
+      end return;
+   end Head_Before;
+
    ------------
    -- Insert --
    ------------
@@ -935,9 +966,9 @@ package body VSS.Strings is
       end return;
    end Tail_After;
 
-   ----------
-   -- Tail --
-   ----------
+   ---------------
+   -- Tail_From --
+   ---------------
 
    function Tail_From
      (Self : Virtual_String'Class;

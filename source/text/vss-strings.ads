@@ -332,14 +332,11 @@ package VSS.Strings is
    --  Returns slice of the string. Return "null" string when one of cursors
    --  doesn't belong to given string or invalid cursors.
 
-   function Starts_With
-     (Self             : Virtual_String'Class;
-      Prefix           : Virtual_String'Class;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean;
-   --  Return True when Self starts with Prefix. Case_Sensitivity defines
-   --  whether search is case sensitive or not, and select algorithm for the
-   --  last.
+   function Head_Before
+     (Self   : Virtual_String'Class;
+      Before : VSS.Strings.Cursors.Abstract_Cursor'Class)
+      return Virtual_String;
+   --  Return head of the string before given position.
 
    function Tail_From
      (Self : Virtual_String'Class;
@@ -351,6 +348,15 @@ package VSS.Strings is
       After : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String;
    --  Return tail of the string starting from the first character after given
    --  position.
+
+   function Starts_With
+     (Self             : Virtual_String'Class;
+      Prefix           : Virtual_String'Class;
+      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      return Boolean;
+   --  Return True when Self starts with Prefix. Case_Sensitivity defines
+   --  whether search is case sensitive or not, and select algorithm for the
+   --  last.
 
    function Ends_With
      (Self             : Virtual_String'Class;

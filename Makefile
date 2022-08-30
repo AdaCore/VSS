@@ -85,6 +85,7 @@ else
 	.objs/tests/test_application_arguments hello привет გამარჯობა 👋
 endif
 	VSS_ENV1="A$(VSS_PS)B$(VSS_PS)C" .objs/tests/test_environment
+	.objs/tests/test_command_line_parser
 
 check_json:
 	.objs/tests/test_json_content_handler

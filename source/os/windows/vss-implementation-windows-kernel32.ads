@@ -10,11 +10,40 @@ package VSS.Implementation.Windows.Kernel32 is
 
    pragma Linker_Options ("-lkernel32");
 
+   type STARTUPINFO is record
+      cb              : DWORD;
+      lpReserved      : LPWSTR;
+      lpDesktop       : LPWSTR;
+      lpTitle         : LPWSTR;
+      dwX             : DWORD;
+      dwY             : DWORD;
+      dwXSize         : DWORD;
+      dwYSize         : DWORD;
+      dwXCountChars   : DWORD;
+      dwYCountChars   : DWORD;
+      dwFillAttribute : DWORD;
+      dwFlags         : DWORD;
+      wShowWindow     : WORD;
+      cbReserved2     : WORD;
+      lpReserved2     : LPBYTE;
+      hStdInput       : HANDLE;
+      hStdOutput      : HANDLE;
+      hStdError       : HANDLE;
+   end record
+     with Convention => C;
+
+   type LPSTARTUPINFO is access all STARTUPINFO with Convention => C;
+
+   STARTF_USESTDHANDLES : constant DWORD := 16#0000_0100#;
+
    function CloseHandle (hObject : HANDLE) return BOOL
      with Import, Convention => Stdcall, Link_Name => "CloseHandle";
 
    function GetCommandLine return LPWSTR
      with Import, Convention => Stdcall, Link_Name => "GetCommandLineW";
+
+   function GetConsoleWindow return HWND
+     with Import, Convention => Stdcall, Link_Name => "GetConsoleWindow";
 
    function GetCurrentProcess return HANDLE
      with Import, Convention => Stdcall, Link_Name => "GetCurrentProcess";
@@ -29,6 +58,10 @@ package VSS.Implementation.Windows.Kernel32 is
      with Import,
           Convention => Stdcall,
           Link_Name  => "GetEnvironmentVariableW";
+
+   procedure GetStartupInfo
+     (lpStartupInfo : Kernel32.LPSTARTUPINFO)
+     with Import, Convention => StdCall, Link_Name => "GetStartupInfoW";
 
    function GetTempPath
      (nBufferLength : DWORD;

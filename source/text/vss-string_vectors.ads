@@ -6,10 +6,7 @@
 
 --  Vector of strings and operations on it.
 
-pragma Warnings (Off);
-pragma Ada_2020;
 pragma Ada_2022;
-pragma Warnings (On);
 --  GNAT: different versions of compiler use different pragmas to enable
 --  Ada 2022 features.
 
@@ -83,6 +80,9 @@ package VSS.String_Vectors is
    function Delete_First
      (Self : Virtual_String_Vector'Class) return Virtual_String_Vector;
    --  Delete first element and return result vector.
+
+   procedure Delete_First (Self : in out Virtual_String_Vector'Class);
+   --  Delete first element from the vector.
 
    procedure Delete_Last (Self : in out Virtual_String_Vector'Class);
    --  Delete the last element.

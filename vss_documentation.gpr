@@ -22,8 +22,8 @@ aggregate project VSS_Documentation is
       for Output_Dir (others) use ".docs";
       for Resources_Dir (others) use "gnatdoc";
       for Excluded_Project_Files use
-        ("gnat/vss_config.gpr",
-         "gnat/vss_gnat.gpr");
+        ("vss_config.gpr",
+         "vss_gnat.gpr");
    end Documentation;
 
 end VSS_Documentation;

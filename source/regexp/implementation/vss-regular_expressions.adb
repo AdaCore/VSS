@@ -101,7 +101,7 @@ package body VSS.Regular_Expressions is
       Index : Natural := 0)
       return VSS.Strings.Virtual_String is
    begin
-      if Self.Is_Valid then
+      if Self.Is_Valid and then Index + 1 in Self.Data.Markers'Range then
          return
            Self.Data.Get_Owner.Slice
              (From => Self.First_Marker (Index),

@@ -103,6 +103,10 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       procedure Character_Class_Escape
         (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean);
 
+      procedure Character_Escape
+        (Value : out VSS.Characters.Virtual_Character; Ok : in out Boolean)
+          with Pre => Ok;
+
       Next_Group : Positive := 1;  --  Group counter
 
       --  Implementations
@@ -157,13 +161,34 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end Alternative;
 
       procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean) is
-         Set : Name_Sets.General_Category_Set;
+         Set       : Name_Sets.General_Category_Set;
+         Character : VSS.Characters.Virtual_Character;
       begin
-         Character_Class_Escape (Set, Ok);
+         if not Cursor.Has_Element then
+            if Error.Is_Empty then
+               Error := "Unexpected end of string in escape.";
+            end if;
 
-         if Ok then
-            Value := (Has_Node => False, Category => Set);
+            Ok := False;
+            return;
          end if;
+
+         case Cursor.Element is
+            when 'p' | 'P' =>
+               Character_Class_Escape (Set, Ok);
+
+               if Ok then
+                  Value := (Has_Node => False, Category => Set);
+               end if;
+
+            when others =>
+               Character_Escape (Character, Ok);
+
+               if Ok then
+                  Value := From_Node (Create_Character (Character));
+               end if;
+
+         end case;
       end Atom_Escape;
 
       procedure Atom_Or_Assertion
@@ -299,6 +324,22 @@ package body VSS.Regular_Expressions.ECMA_Parser is
             Value := not Value;
          end if;
       end Character_Class_Escape;
+
+      procedure Character_Escape
+        (Value : out VSS.Characters.Virtual_Character; Ok : in out Boolean) is
+      begin
+         case Cursor.Element is
+            when '^' | '$' | '\' | '.' | '*' | '+' | '?' |
+               '(' | ')' | '[' | ']' | '{' | '}' | '|'
+               =>
+
+               Value := Cursor.Element;
+               Expect (Cursor.Element, Ok);
+            when others =>
+               Ok := False;
+               Error := "Unsupported escape sequence.";
+         end case;
+      end Character_Escape;
 
       procedure Class_Atom
         (Value : out Character_Or_Set;

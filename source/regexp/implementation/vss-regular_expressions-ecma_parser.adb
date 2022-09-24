@@ -334,11 +334,50 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                =>
 
                Value := Cursor.Element;
+
+            when 'f' =>
+               Value := VSS.Characters.Virtual_Character'Val (16#0C#);
+
+            when 'n' =>
+               Value := VSS.Characters.Virtual_Character'Val (16#0A#);
+
+            when 'r' =>
+               Value := VSS.Characters.Virtual_Character'Val (16#0D#);
+
+            when 't' =>
+               Value := VSS.Characters.Virtual_Character'Val (16#09#);
+
+            when 'v' =>
+               Value := VSS.Characters.Virtual_Character'Val (16#0B#);
+
+            when 'c' =>
                Expect (Cursor.Element, Ok);
+
+               if not Cursor.Has_Element then
+                  Ok := False;
+                  Error := "Incomplete \c escape sequence.";
+                  return;
+
+               elsif Cursor.Element in 'A' .. 'Z' | 'a' .. 'z' then
+                  Value := VSS.Characters.Virtual_Character'Val
+                    (VSS.Characters.Virtual_Character'Pos (Cursor.Element)
+                     mod 32);
+
+               else
+                  Ok := False;
+                  Error := "Unexpected character in \c escape sequence.";
+                  return;
+
+               end if;
+
             when others =>
                Ok := False;
                Error := "Unsupported escape sequence.";
+               return;
+
          end case;
+
+         Expect (Cursor.Element, Ok);
       end Character_Escape;
 
       procedure Class_Atom

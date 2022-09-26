@@ -26,6 +26,7 @@ For now we have:
 |  **\B**                   | Not a word boundary assertion             |
 |  *x*                      | Character literal *x*, not in `^$.*+?]{}` |
 |  **\\** *x*               | Character literal *x* in `^$.*+?]{}`      |
+|  **\\n** **\\r** **\\t**  | New line, tabulation and other controls   |
 
 ## Useful articles
 

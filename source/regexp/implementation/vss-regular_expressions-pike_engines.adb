@@ -461,6 +461,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  Generate <s:split[fallback:unlinked]>
       --           <left[next:s]>
 
+      function Create_Plus (Left : Node) return Node;
+      --  Generate <l:left[next:s]>
+      --           <s:split[next:l,fallback:unlinked]>
+
       function Create_Group (Left : Node; Group : Positive) return Node;
       --  Generate <save[2*group+1,next:1]>
       --           <left[next:s]>
@@ -611,6 +615,28 @@ package body VSS.Regular_Expressions.Pike_Engines is
             end loop;
          end return;
       end Create_Negated_Class;
+
+      -----------------
+      -- Create_Plus --
+      -----------------
+
+      function Create_Plus (Left : Node) return Node is
+         Code : constant Instruction :=
+           (Kind      => Split,
+            Next      => -Left.Program.Last_Index,
+            Fallback  => To_Be_Patched);
+      begin
+         return Result : Node :=
+           (Program     => Left.Program & Code,
+            Ends        => Address_Vectors.To_Vector
+                             (Left.Program.Last_Index + 1, Length => 1))
+         do
+            --  Patch left ends to connect them to the Split
+            for J of Left.Ends loop
+               Patch (Result.Program (J), Left.Program.Last_Index + 1 - J);
+            end loop;
+         end return;
+      end Create_Plus;
 
       ---------------------
       -- Create_Sequence --

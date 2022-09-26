@@ -581,13 +581,17 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
          if Ok and then
            Cursor.Has_Element and then
-           Cursor.Element in '*' | '?'
+           Cursor.Element in '*' | '+' | '?'
          then
             if Is_Atom then
                case Cursor.Element is
                   when '*' =>
                      Expect (Cursor.Element, Ok);
                      Value := From_Node (Create_Star (To_Node (Value)));
+
+                  when '+' =>
+                     Expect (Cursor.Element, Ok);
+                     Value := From_Node (Create_Plus (To_Node (Value)));
 
                   when '?' =>
                      Expect (Cursor.Element, Ok);

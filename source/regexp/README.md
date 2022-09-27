@@ -11,6 +11,8 @@ For now we have:
 | *x* *y*                   | Match the *x* then *y*                    |
 | *x* **\|** *y*            | Match either the *x* or *y*               |
 | *x* **\***                | Match the *x* zero or more times          |
+| *x* **+**                 | Match the *x* one or more times           |
+| *x* **?**                 | Match the *x* zero or one times           |
 | **(:?** *x* **)**         | Non-capturing group                       |
 | **(** *x* **)**           | Capturing group                           |
 | **\p{** *N* **}**         | Char of the general category *N*          |

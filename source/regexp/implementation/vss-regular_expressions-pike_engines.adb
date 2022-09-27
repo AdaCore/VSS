@@ -164,6 +164,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
                        (Cursor);
                begin
                   Updated (Code.Tag) := Pos.all;
+                  --  Reset nested subgroup tags if any:
+                  Updated (Code.Tag + 1 .. Code.Last) := (others => <>);
                   Append_State (Cursor, Prev, Next, Updated);
                end;
             when Assertion =>
@@ -461,7 +463,14 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  Generate <s:split[fallback:unlinked]>
       --           <left[next:s]>
 
-      function Create_Group (Left : Node; Group : Positive) return Node;
+      function Create_Plus (Left : Node) return Node;
+      --  Generate <l:left[next:s]>
+      --           <s:split[next:l,fallback:unlinked]>
+
+      function Create_Group
+        (Left : Node;
+         From : Positive;
+         To   : Natural) return Node;
       --  Generate <save[2*group+1,next:1]>
       --           <left[next:s]>
       --           <s:save[2*group+2,next:unlinked]>
@@ -564,15 +573,21 @@ package body VSS.Regular_Expressions.Pike_Engines is
       -- Create_Group --
       ------------------
 
-      function Create_Group (Left : Node; Group : Positive) return Node is
+      function Create_Group
+        (Left  : Node;
+         From  : Positive;
+         To    : Natural) return Node
+      is
          Open : constant Instruction :=
            (Kind => Save,
-            Tag  => Tag_Number (2 * Group + 1),
+            Tag  => Tag_Number (2 * From + 1),
+            Last => Tag_Number (2 * To + 2),  --  Groups in range From .. To
             Next => 1);
 
          Close : constant Instruction :=
            (Kind => Save,
-            Tag  => Tag_Number (2 * Group + 2),
+            Tag  => Tag_Number (2 * From + 2),
+            Last => Tag_Number (2 * From + 1),  --  An empty range
             Next => To_Be_Patched);
       begin
          return Result : Node :=
@@ -611,6 +626,28 @@ package body VSS.Regular_Expressions.Pike_Engines is
             end loop;
          end return;
       end Create_Negated_Class;
+
+      -----------------
+      -- Create_Plus --
+      -----------------
+
+      function Create_Plus (Left : Node) return Node is
+         Code : constant Instruction :=
+           (Kind      => Split,
+            Next      => -Left.Program.Last_Index,
+            Fallback  => To_Be_Patched);
+      begin
+         return Result : Node :=
+           (Program     => Left.Program & Code,
+            Ends        => Address_Vectors.To_Vector
+                             (Left.Program.Last_Index + 1, Length => 1))
+         do
+            --  Patch left ends to connect them to the Split
+            for J of Left.Ends loop
+               Patch (Result.Program (J), Left.Program.Last_Index + 1 - J);
+            end loop;
+         end return;
+      end Create_Plus;
 
       ---------------------
       -- Create_Sequence --
@@ -697,14 +734,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  <match>
 
       Save_1 : constant Instruction :=
-        (Kind => Save,
-         Next => 1,
-         Tag  => 1);
+        (Kind => Save, Next => 1, Tag  => 1, Last => 0);
 
       Save_2 : constant Instruction :=
-        (Kind => Save,
-         Next => 1,
-         Tag  => 2);
+        (Kind => Save, Next => 1, Tag  => 2, Last => 0);
 
       Final : constant Instruction := (Kind => Match, Next => 0);
 

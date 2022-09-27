@@ -222,8 +222,10 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                   begin
                      Next_Group := Next_Group + 1;
                      Disjunction (Value, Ok);
-                     Value :=
-                       From_Node (Create_Group (To_Node (Value), Group));
+                     Value := From_Node
+                       (Create_Group
+                         (To_Node (Value), Group, Next_Group - 1));
+
                      Expect (')', Ok);
                   end;
                end if;
@@ -579,10 +581,28 @@ package body VSS.Regular_Expressions.ECMA_Parser is
             Atom_Or_Assertion (Value, Is_Atom, Ok);
          end if;
 
-         if Ok and then Cursor.Has_Element and then Cursor.Element = '*' then
+         if Ok and then
+           Cursor.Has_Element and then
+           Cursor.Element in '*' | '+' | '?'
+         then
             if Is_Atom then
-               Expect (Cursor.Element, Ok);
-               Value := From_Node (Create_Star (To_Node (Value)));
+               case Cursor.Element is
+                  when '*' =>
+                     Expect (Cursor.Element, Ok);
+                     Value := From_Node (Create_Star (To_Node (Value)));
+
+                  when '+' =>
+                     Expect (Cursor.Element, Ok);
+                     Value := From_Node (Create_Plus (To_Node (Value)));
+
+                  when '?' =>
+                     Expect (Cursor.Element, Ok);
+                     Value := From_Node
+                       (Create_Alternative (To_Node (Value), Create_Empty));
+
+                  when others =>
+                     null;
+               end case;
             else
                Ok := False;
                Error := "The assertion is not quantifiable";

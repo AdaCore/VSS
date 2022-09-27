@@ -30,11 +30,12 @@ private generic
    with function Create_Sequence (Left, Right : Node) return Node is <>;
    with function Create_Alternative (Left, Right : Node) return Node is <>;
    with function Create_Star (Left : Node) return Node is <>;
+   with function Create_Plus (Left : Node) return Node is <>;
 
    with function Create_Negated_Class (Left : Node) return Node is <>;
 
    with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
+     (Left : Node; From : Positive; To : Natural) return Node is <>;
 
    with function Create_Empty return Node is <>;
 

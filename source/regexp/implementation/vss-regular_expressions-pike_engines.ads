@@ -62,7 +62,14 @@ private
          when Assertion =>
             Assertion : Simple_Assertion_Kind;
          when Save =>
-            Tag : Tag_Number;
+            Tag  : Tag_Number;
+            Last : Tag_Number;
+            --  Save current position into given Tag, where Tag is a cell index
+            --  Clear any cells with index from Tag + 1 to Last to make nested
+            --  subgroups work. E.g. `(a(b)?)+` matching with `aba` results
+            --  $0="aba", $1 = "a", $2="".
+            --  So, when the engine starts the enclosing group it should reset
+            --  the nested subgroup.
          when No_Operation | Match =>
             null;
       end case;

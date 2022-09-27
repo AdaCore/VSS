@@ -35,7 +35,7 @@ private generic
    with function Create_Negated_Class (Left : Node) return Node is <>;
 
    with function Create_Group
-     (Left : Node; Group : Positive) return Node is <>;
+     (Left : Node; From : Positive; To : Natural) return Node is <>;
 
    with function Create_Empty return Node is <>;
 

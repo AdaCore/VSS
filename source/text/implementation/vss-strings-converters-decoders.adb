@@ -7,6 +7,7 @@
 with Ada.Unchecked_Deallocation;
 
 with VSS.Stream_Element_Vectors.Internals;
+with VSS.Strings.Converters.Decoders.ISO88591;
 with VSS.Strings.Converters.Decoders.UTF8;
 
 package body VSS.Strings.Converters.Decoders is
@@ -41,7 +42,17 @@ package body VSS.Strings.Converters.Decoders is
       ("utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
       ("unicode11utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
       ("unicode20utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
-      ("xunicode20utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access)
+      ("xunicode20utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
+
+      --  ISO-8859-1
+      ("isoir100", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access),
+      ("iso88591", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access),
+      ("latin1", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access),
+      ("l1", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access),
+      ("ibm819", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access),
+      ("cp819", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access),
+      ("csisolatin1", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access),
+      ("iso885911987", VSS.Strings.Converters.Decoders.ISO88591.Factory'Access)
      );
 
    ------------

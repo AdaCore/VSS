@@ -172,6 +172,15 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       end if;
    end Error_Message;
 
+   -------------
+   -- Factory --
+   -------------
+
+   function Factory return VSS.Strings.Converters.Decoders.Decoder_Access is
+   begin
+      return new UTF8_Decoder;
+   end Factory;
+
    ---------------
    -- Has_Error --
    ---------------
@@ -189,7 +198,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
      (Self  : in out UTF8_Decoder;
       Flags : Converter_Flags) is
    begin
-      Self.Flags  := Flags;
+      Self.Flags := Flags;
       Self.Reset_State;
    end Initialize;
 

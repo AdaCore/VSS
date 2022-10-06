@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2022, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -10,7 +10,10 @@
 
 private package VSS.Strings.Converters.Decoders.UTF8 is
 
-   type UTF8_Decoder is new Abstract_Decoder with private;
+   --  type UTF8_Decoder is new Abstract_Decoder with private;
+
+   function Factory return VSS.Strings.Converters.Decoders.Decoder_Access;
+   --  Create UTF8_Decoder and return it
 
 private
 

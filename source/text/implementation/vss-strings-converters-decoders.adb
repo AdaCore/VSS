@@ -14,6 +14,35 @@ package body VSS.Strings.Converters.Decoders is
    procedure Free is
      new Ada.Unchecked_Deallocation (Abstract_Decoder'Class, Decoder_Access);
 
+   type Decoder_Factory is access function return Decoder_Access;
+   --  Factory function to create decoder.
+
+   type Registry_Record is record
+      Encoding_Name : VSS.Strings.Virtual_String;
+      Factory       : Decoder_Factory;
+   end record;
+
+   --  This registry contains encoding names and aliases defined by
+   --  IANA character sets database
+   --
+   --  https://www.iana.org/assignments/character-sets/character-sets.xhtml
+   --
+   --  and Encodings specification
+   --
+   --  https://encoding.spec.whatwg.org/
+   --
+   --  All names are transformed by the algorithm used by the To_Encoding_Name
+   --  function, thus binary compare is enough to check the encoding name.
+
+   Registry : constant array (Positive range <>) of Registry_Record :=
+     --  UTF-8
+     (("csutf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
+      ("utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
+      ("unicode11utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
+      ("unicode20utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access),
+      ("xunicode20utf8", VSS.Strings.Converters.Decoders.UTF8.Factory'Access)
+     );
+
    ------------
    -- Decode --
    ------------
@@ -101,14 +130,22 @@ package body VSS.Strings.Converters.Decoders is
    procedure Initialize
      (Self     : in out Virtual_String_Decoder'Class;
       Encoding : VSS.Strings.Virtual_String;
-      Flags    : Converter_Flags := Default_Converter_Flags) is
+      Flags    : Converter_Flags := Default_Converter_Flags)
+   is
+      Encoding_Name : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.Converters.To_Encoding_Name (Encoding);
+
    begin
       Free (Self.Decoder);
 
-      if VSS.Strings.Converters.To_Encoding_Name (Encoding) = "utf8" then
-         Self.Decoder := new VSS.Strings.Converters.Decoders.UTF8.UTF8_Decoder;
-         Self.Decoder.Initialize (Flags);
-      end if;
+      for Item of Registry loop
+         if Encoding_Name = Item.Encoding_Name then
+            Self.Decoder := Item.Factory.all;
+            Self.Decoder.Initialize (Flags);
+
+            exit;
+         end if;
+      end loop;
    end Initialize;
 
    --------------

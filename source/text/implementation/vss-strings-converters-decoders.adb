@@ -14,7 +14,8 @@ package body VSS.Strings.Converters.Decoders is
    procedure Free is
      new Ada.Unchecked_Deallocation (Abstract_Decoder'Class, Decoder_Access);
 
-   type Decoder_Factory is access function return Decoder_Access;
+   type Decoder_Factory is
+     access function (Flags : Converter_Flags) return Decoder_Access;
    --  Factory function to create decoder.
 
    type Registry_Record is record
@@ -140,8 +141,7 @@ package body VSS.Strings.Converters.Decoders is
 
       for Item of Registry loop
          if Encoding_Name = Item.Encoding_Name then
-            Self.Decoder := Item.Factory.all;
-            Self.Decoder.Initialize (Flags);
+            Self.Decoder := Item.Factory (Flags);
 
             exit;
          end if;

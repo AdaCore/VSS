@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2022, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -105,7 +105,7 @@ package body VSS.Strings.Converters.Decoders is
    begin
       Free (Self.Decoder);
 
-      if Encoding = "utf-8" then
+      if VSS.Strings.Converters.To_Encoding_Name (Encoding) = "utf8" then
          Self.Decoder := new VSS.Strings.Converters.Decoders.UTF8.UTF8_Decoder;
          Self.Decoder.Initialize (Flags);
       end if;

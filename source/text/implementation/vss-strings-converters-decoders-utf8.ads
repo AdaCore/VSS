@@ -10,9 +10,9 @@
 
 private package VSS.Strings.Converters.Decoders.UTF8 is
 
-   --  type UTF8_Decoder is new Abstract_Decoder with private;
-
-   function Factory return VSS.Strings.Converters.Decoders.Decoder_Access;
+   function Factory
+     (Flags : Converter_Flags)
+      return VSS.Strings.Converters.Decoders.Decoder_Access;
    --  Create UTF8_Decoder and return it
 
 private
@@ -27,10 +27,6 @@ private
       Error    : Boolean;
       Skip_BOM : Boolean;
    end record;
-
-   overriding procedure Initialize
-     (Self  : in out UTF8_Decoder;
-      Flags : Converter_Flags);
 
    overriding procedure Decode
      (Self   : in out UTF8_Decoder;

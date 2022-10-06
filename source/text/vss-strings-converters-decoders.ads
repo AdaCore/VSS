@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2022, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -59,10 +59,6 @@ private
    type Abstract_Decoder is abstract tagged limited null record;
 
    type Decoder_Access is access all Abstract_Decoder'Class;
-
-   not overriding procedure Initialize
-     (Self  : in out Abstract_Decoder;
-      Flags : Converter_Flags) is abstract;
 
    not overriding procedure Decode
      (Self   : in out Abstract_Decoder;

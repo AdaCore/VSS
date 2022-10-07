@@ -10,6 +10,7 @@ with VSS.Stream_Element_Vectors.Internals;
 with VSS.Strings.Converters.Decoders.ISO88591;
 with VSS.Strings.Converters.Decoders.ISO88592;
 with VSS.Strings.Converters.Decoders.ISO88595;
+with VSS.Strings.Converters.Decoders.ISO88596;
 with VSS.Strings.Converters.Decoders.UTF8;
 
 package body VSS.Strings.Converters.Decoders is
@@ -69,7 +70,20 @@ package body VSS.Strings.Converters.Decoders is
       ("iso88595",           ISO88595.Factory'Access),
       ("cyrillic",           ISO88595.Factory'Access),
       ("csisolatincyrillic", ISO88595.Factory'Access),
-      ("iso885951988",       ISO88595.Factory'Access)
+      ("iso885951988",       ISO88595.Factory'Access),
+
+      --  ISO-8859-6
+      ("isoir127",           ISO88596.Factory'Access),
+      ("iso88596",           ISO88596.Factory'Access),
+      ("ecma114",            ISO88596.Factory'Access),
+      ("asmo708",            ISO88596.Factory'Access),
+      ("arabic",             ISO88596.Factory'Access),
+      ("csisolatinarabic",   ISO88596.Factory'Access),
+      ("csiso88596e",        ISO88596.Factory'Access),
+      ("csiso88596i",        ISO88596.Factory'Access),
+      ("iso88596e",          ISO88596.Factory'Access),
+      ("iso88596i",          ISO88596.Factory'Access),
+      ("iso885961987",       ISO88596.Factory'Access)
      );
 
    ------------

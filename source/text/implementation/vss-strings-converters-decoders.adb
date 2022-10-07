@@ -11,6 +11,7 @@ with VSS.Strings.Converters.Decoders.ISO88591;
 with VSS.Strings.Converters.Decoders.ISO88592;
 with VSS.Strings.Converters.Decoders.ISO88595;
 with VSS.Strings.Converters.Decoders.ISO88596;
+with VSS.Strings.Converters.Decoders.ISO88597;
 with VSS.Strings.Converters.Decoders.UTF8;
 
 package body VSS.Strings.Converters.Decoders is
@@ -83,7 +84,18 @@ package body VSS.Strings.Converters.Decoders is
       ("csiso88596i",        ISO88596.Factory'Access),
       ("iso88596e",          ISO88596.Factory'Access),
       ("iso88596i",          ISO88596.Factory'Access),
-      ("iso885961987",       ISO88596.Factory'Access)
+      ("iso885961987",       ISO88596.Factory'Access),
+
+      --  ISO-8859-7
+      ("isoir126",           ISO88597.Factory'Access),
+      ("iso88597",           ISO88597.Factory'Access),
+      ("elot928",            ISO88597.Factory'Access),
+      ("ecma118",            ISO88597.Factory'Access),
+      ("greek",              ISO88597.Factory'Access),
+      ("greek8",             ISO88597.Factory'Access),
+      ("csisolatingreek",    ISO88597.Factory'Access),
+      ("iso885971987",       ISO88597.Factory'Access),
+      ("suneugreek",         ISO88597.Factory'Access)
      );
 
    ------------

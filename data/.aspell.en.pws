@@ -1,8 +1,10 @@
 personal_ws-1.1 en 30
+abnf
 adacore
 bom
 caseless
 cdata
+charset
 crlf
 dont
 dtd
@@ -40,6 +42,7 @@ unhandled
 unreferenced
 uri
 utf
+uts
 vss
 whitespace
 whitespaces

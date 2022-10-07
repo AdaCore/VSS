@@ -172,6 +172,28 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       end if;
    end Error_Message;
 
+   -------------
+   -- Factory --
+   -------------
+
+   function Factory
+     (Flags : Converter_Flags)
+      return VSS.Strings.Converters.Decoders.Decoder_Access is
+   begin
+      return Result : constant
+        VSS.Strings.Converters.Decoders.Decoder_Access :=
+          new UTF8_Decoder
+      do
+         declare
+            Self : UTF8_Decoder renames UTF8_Decoder (Result.all);
+
+         begin
+            Self.Flags := Flags;
+            Self.Reset_State;
+         end;
+      end return;
+   end Factory;
+
    ---------------
    -- Has_Error --
    ---------------
@@ -180,18 +202,6 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
    begin
       return Self.Error;
    end Has_Error;
-
-   ----------------
-   -- Initialize --
-   ----------------
-
-   overriding procedure Initialize
-     (Self  : in out UTF8_Decoder;
-      Flags : Converter_Flags) is
-   begin
-      Self.Flags  := Flags;
-      Self.Reset_State;
-   end Initialize;
 
    -----------------
    -- Reset_State --

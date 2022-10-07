@@ -25,6 +25,9 @@ procedure Test_Stream_Element_Vector is
    procedure Test_Conversions;
    --  Test conversions from/to standard String/Unbounded_String;
 
+   procedure Test_Emptyness;
+   --  Test Is_Empty and Length consistency.
+
    --------------------------------------
    -- Test_Assignment_And_Modification --
    --------------------------------------
@@ -130,8 +133,26 @@ procedure Test_Stream_Element_Vector is
       Test_Support.Assert (Count = 0);
    end Test_Element_Iterator;
 
+   --------------------
+   -- Test_Emptyness --
+   --------------------
+
+   procedure Test_Emptyness is
+      V : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+
+   begin
+      Test_Support.Assert (V.Is_Empty);
+      Test_Support.Assert (V.Length = 0);
+
+      V.Append (Character'Pos ('0'));
+
+      Test_Support.Assert (not V.Is_Empty);
+      Test_Support.Assert (V.Length = 1);
+   end Test_Emptyness;
+
 begin
    Test_Assignment_And_Modification;
    Test_Element_Iterator;
    Test_Conversions;
+   Test_Emptyness;
 end Test_Stream_Element_Vector;

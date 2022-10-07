@@ -86,6 +86,14 @@ else
 endif
 	VSS_ENV1="A$(VSS_PS)B$(VSS_PS)C" .objs/tests/test_environment
 	.objs/tests/test_command_line_parser
+	.objs/tests/test_string_decoder iso-8859-1 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88591-utf8.txt
+	.objs/tests/test_string_decoder iso-8859-2 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88592-utf8.txt
+	.objs/tests/test_string_decoder iso-8859-5 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88595-utf8.txt
+	.objs/tests/test_string_decoder iso-8859-6 true testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88596-utf8.txt
+	.objs/tests/test_string_decoder iso-8859-7 true testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88597-utf8.txt
+	.objs/tests/test_string_decoder iso-8859-8 true testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88598-utf8.txt
+	.objs/tests/test_string_decoder iso-8859-9 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88599-utf8.txt
+	.objs/tests/test_string_decoder iso-8859-15 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso885915-utf8.txt
 
 check_json:
 	.objs/tests/test_json_content_handler

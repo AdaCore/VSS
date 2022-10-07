@@ -14,6 +14,7 @@ with VSS.Strings.Converters.Decoders.ISO88596;
 with VSS.Strings.Converters.Decoders.ISO88597;
 with VSS.Strings.Converters.Decoders.ISO88598;
 with VSS.Strings.Converters.Decoders.ISO88599;
+with VSS.Strings.Converters.Decoders.ISO885915;
 with VSS.Strings.Converters.Decoders.UTF8;
 
 package body VSS.Strings.Converters.Decoders is
@@ -115,7 +116,14 @@ package body VSS.Strings.Converters.Decoders is
       ("latin5",             ISO88599.Factory'Access),
       ("l5",                 ISO88599.Factory'Access),
       ("csisolatin5",        ISO88599.Factory'Access),
-      ("iso885991989",       ISO88599.Factory'Access)
+      ("iso885991989",       ISO88599.Factory'Access),
+
+      --  ISO-8859-15
+      ("iso885915",          ISO885915.Factory'Access),
+      ("latin9",             ISO885915.Factory'Access),
+      ("csiso885915",        ISO885915.Factory'Access),
+      ("csisolatin9",        ISO885915.Factory'Access),
+      ("l9",                 ISO885915.Factory'Access)
      );
 
    ------------

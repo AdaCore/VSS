@@ -24,6 +24,9 @@ package VSS.Stream_Element_Vectors is
       Capacity : Ada.Streams.Stream_Element_Count);
    --  Request to pre-allocate memory to store given number of stream elements.
 
+   function Is_Empty (Self : Stream_Element_Vector'Class) return Boolean;
+   --  Return True when stream element vector doesn't contain any elements.
+
    function Length
      (Self : Stream_Element_Vector'Class)
       return Ada.Streams.Stream_Element_Count;

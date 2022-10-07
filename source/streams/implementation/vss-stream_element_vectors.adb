@@ -168,6 +168,15 @@ package body VSS.Stream_Element_Vectors is
       return (Index => (if Self.Last > 0 then 1 else 0));
    end First;
 
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (Self : Stream_Element_Vector'Class) return Boolean is
+   begin
+      return Self.Data = null or else Self.Data.Length = 0;
+   end Is_Empty;
+
    -------------
    -- Iterate --
    -------------

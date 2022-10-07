@@ -9,6 +9,7 @@ with Ada.Unchecked_Deallocation;
 with VSS.Stream_Element_Vectors.Internals;
 with VSS.Strings.Converters.Decoders.ISO88591;
 with VSS.Strings.Converters.Decoders.ISO88592;
+with VSS.Strings.Converters.Decoders.ISO88595;
 with VSS.Strings.Converters.Decoders.UTF8;
 
 package body VSS.Strings.Converters.Decoders is
@@ -39,29 +40,36 @@ package body VSS.Strings.Converters.Decoders is
 
    Registry : constant array (Positive range <>) of Registry_Record :=
      --  UTF-8
-     (("csutf8",         UTF8.Factory'Access),
-      ("utf8",           UTF8.Factory'Access),
-      ("unicode11utf8",  UTF8.Factory'Access),
-      ("unicode20utf8",  UTF8.Factory'Access),
-      ("xunicode20utf8", UTF8.Factory'Access),
+     (("csutf8",             UTF8.Factory'Access),
+      ("utf8",               UTF8.Factory'Access),
+      ("unicode11utf8",      UTF8.Factory'Access),
+      ("unicode20utf8",      UTF8.Factory'Access),
+      ("xunicode20utf8",     UTF8.Factory'Access),
 
       --  ISO-8859-1
-      ("isoir100",       ISO88591.Factory'Access),
-      ("iso88591",       ISO88591.Factory'Access),
-      ("latin1",         ISO88591.Factory'Access),
-      ("l1",             ISO88591.Factory'Access),
-      ("ibm819",         ISO88591.Factory'Access),
-      ("cp819",          ISO88591.Factory'Access),
-      ("csisolatin1",    ISO88591.Factory'Access),
-      ("iso885911987",   ISO88591.Factory'Access),
+      ("isoir100",           ISO88591.Factory'Access),
+      ("iso88591",           ISO88591.Factory'Access),
+      ("latin1",             ISO88591.Factory'Access),
+      ("l1",                 ISO88591.Factory'Access),
+      ("ibm819",             ISO88591.Factory'Access),
+      ("cp819",              ISO88591.Factory'Access),
+      ("csisolatin1",        ISO88591.Factory'Access),
+      ("iso885911987",       ISO88591.Factory'Access),
 
       --  ISO-8859-2
-      ("isoir101",       ISO88592.Factory'Access),
-      ("iso88592",       ISO88592.Factory'Access),
-      ("latin2",         ISO88592.Factory'Access),
-      ("l2",             ISO88592.Factory'Access),
-      ("csisolatin2",    ISO88592.Factory'Access),
-      ("iso885921987",   ISO88592.Factory'Access)
+      ("isoir101",           ISO88592.Factory'Access),
+      ("iso88592",           ISO88592.Factory'Access),
+      ("latin2",             ISO88592.Factory'Access),
+      ("l2",                 ISO88592.Factory'Access),
+      ("csisolatin2",        ISO88592.Factory'Access),
+      ("iso885921987",       ISO88592.Factory'Access),
+
+      --  ISO-8859-5
+      ("isoir144",           ISO88595.Factory'Access),
+      ("iso88595",           ISO88595.Factory'Access),
+      ("cyrillic",           ISO88595.Factory'Access),
+      ("csisolatincyrillic", ISO88595.Factory'Access),
+      ("iso885951988",       ISO88595.Factory'Access)
      );
 
    ------------

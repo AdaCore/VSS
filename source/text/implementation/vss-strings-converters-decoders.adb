@@ -153,13 +153,10 @@ package body VSS.Strings.Converters.Decoders is
 
       return Result : VSS.Strings.Virtual_String do
          if Self.Decoder /= null then
-            if Storage /= null then
-               Self.Decoder.Decode
-                 (Storage (1 .. Length), End_Of_Data, Result.Data);
-
-            else
-               Self.Decoder.Decode (Empty_Data, End_Of_Data, Result.Data);
-            end if;
+            Self.Decoder.Decode
+              ((if Storage /= null then Storage (1 .. Length) else Empty_Data),
+               End_Of_Data,
+               Result.Data);
          end if;
       end return;
    end Decode;

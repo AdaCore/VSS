@@ -86,6 +86,25 @@ procedure Test_Converters is
      (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#,
       16#8C#, 16#88#);
    E6 : constant VSS.Strings.Virtual_String := "AБक𐌈";
+   --  Single character from of each number of bytes of encoded sequence.
+
+   D7_2  : constant Ada.Streams.Stream_Element_Array :=
+     (16#41#, 16#D0#);
+   E7_2  : constant VSS.Strings.Virtual_String := "A�";
+   D7_31 : constant Ada.Streams.Stream_Element_Array :=
+     (16#41#, 16#D0#, 16#91#, 16#E0#);
+   D7_32 : constant Ada.Streams.Stream_Element_Array :=
+     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#);
+   E7_3  : constant VSS.Strings.Virtual_String := "AБ�";
+   D7_41 : constant Ada.Streams.Stream_Element_Array :=
+     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#);
+   D7_42 : constant Ada.Streams.Stream_Element_Array :=
+     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#);
+   D7_43 : constant Ada.Streams.Stream_Element_Array :=
+     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#,
+      16#8C#);
+   E7_4  : constant VSS.Strings.Virtual_String := "AБक�";
+   --  Incomplete multibyte seqence at the end of the encoded data.
 
    procedure Run_Decoder_Test
      (Encoded   : Ada.Streams.Stream_Element_Array;
@@ -481,4 +500,14 @@ begin
    end;
 
    Run_Encoder_Test (D6, E6);
+
+   --  Check reporting of the error at the end of the incomplete mutlubyte
+   --  sequence at the end of the data.
+
+   Run_Decoder_Test (D7_2, E7_2, True);
+   Run_Decoder_Test (D7_31, E7_3, True);
+   Run_Decoder_Test (D7_32, E7_3, True);
+   Run_Decoder_Test (D7_41, E7_4, True);
+   Run_Decoder_Test (D7_42, E7_4, True);
+   Run_Decoder_Test (D7_43, E7_4, True);
 end Test_Converters;

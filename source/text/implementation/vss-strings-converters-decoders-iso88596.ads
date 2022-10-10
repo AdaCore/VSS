@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
---  ISO-8859-5 decoder.
+--  ISO-8859-6 decoder.
 
 private package VSS.Strings.Converters.Decoders.ISO88596 is
 

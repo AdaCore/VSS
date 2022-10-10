@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO88596 is
 
@@ -28,53 +28,46 @@ package body VSS.Strings.Converters.Decoders.ISO88596 is
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if (Self.Error and Self.Flags (Stop_On_Error))
-        or else Source'Last < Source'First
-      then
-         --  Error was encountered in "stop on error" mode or source data is
-         --  empty: return "null" string.
+      if Self.Error and Self.Flags (Stop_On_Error) then
+         --  Error was encountered in "stop on error" mode, return immediately.
 
-         Target := VSS.Implementation.Strings.Null_String_Data;
-
-      else
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Target);
-
-         loop
-            exit when Index > Source'Last;
-
-            Byte := Source (Index);
-
-            case Byte is
-               when 16#00# .. 16#A0# | 16#A4# | 16#AD# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, VSS.Unicode.Code_Point (Byte), Offset);
-
-               when 16#AC# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#060C#, Offset);
-
-               when 16#A1# .. 16#A3# | 16#A5# .. 16#AB# | 16#AE# .. 16#BA#
-                  | 16#BC# .. 16#BE# | 16#C0# | 16#DB# .. 16#DF#
-                  | 16#F3# .. 16#FF#
-               =>
-                  Self.Error := True;
-
-                  exit when Self.Flags (Stop_On_Error);
-
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Replacement_Character, Offset);
-
-               when others =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target,
-                     VSS.Unicode.Code_Point (Byte) - 16#B0# + 16#0610#,
-                     Offset);
-            end case;
-
-            Index := Index + 1;
-         end loop;
+         return;
       end if;
+
+      loop
+         exit when Index > Source'Last;
+
+         Byte := Source (Index);
+
+         case Byte is
+            when 16#00# .. 16#A0# | 16#A4# | 16#AD# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+
+            when 16#AC# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#060C#, Offset);
+
+            when 16#A1# .. 16#A3# | 16#A5# .. 16#AB# | 16#AE# .. 16#BA#
+               | 16#BC# .. 16#BE# | 16#C0# | 16#DB# .. 16#DF#
+               | 16#F3# .. 16#FF#
+            =>
+               Self.Error := True;
+
+               exit when Self.Flags (Stop_On_Error);
+
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, Replacement_Character, Offset);
+
+            when others =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target,
+                  VSS.Unicode.Code_Point (Byte) - 16#B0# + 16#0610#,
+                  Offset);
+         end case;
+
+         Index := Index + 1;
+      end loop;
    end Decode;
 
    -------------------

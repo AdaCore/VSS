@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Converters.Decoders.UTF8 is
 
@@ -34,132 +34,127 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
-         --  Error was encountered in "stop on error" mode: return "null"
-         --  string.
+         --  Error was encountered in "stop on error" mode: return immediately.
 
-         Target := VSS.Implementation.Strings.Null_String_Data;
+         return;
+      end if;
 
-      else
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Target);
-
-         loop
-            if Index > Source'Last then
-               if Needed /= 0 and (Self.Flags (Stateless) or End_Of_Data) then
-                  Needed := 0;
-
-                  Self.Error := True;
-
-                  if not Self.Flags (Stop_On_Error) then
-                     VSS.Implementation.Strings.Handler (Target).Append
-                       (Target, Replacement_Character, Offset);
-                  end if;
-               end if;
-
-               exit;
-            end if;
-
-            Byte := Source (Index);
-
-            if Needed = 0 then
-               case Byte is
-                  when 16#00# .. 16#7F# =>
-                     VSS.Implementation.Strings.Handler (Target).Append
-                       (Target,
-                        VSS.Unicode.Code_Point (Byte and 16#7F#),
-                        Offset);
-
-                  when 16#C2# .. 16#DF# =>
-                     Code := VSS.Unicode.Code_Point (Byte and 16#1F#);
-                     Needed := 1;
-
-                  when 16#E0# .. 16#EF# =>
-                     Code := VSS.Unicode.Code_Point (Byte and 16#0F#);
-                     Needed := 2;
-
-                     if Byte = 16#E0# then
-                        Lower := 16#A0#;
-
-                     elsif Byte = 16#ED# then
-                        Upper := 16#9F#;
-                     end if;
-
-                  when 16#F0# .. 16#F4# =>
-                     Code := VSS.Unicode.Code_Point (Byte and 16#07#);
-                     Needed := 3;
-
-                     if Byte = 16#F0# then
-                        Lower := 16#90#;
-
-                     elsif Byte = 16#F4# then
-                        Upper := 16#8F#;
-                     end if;
-
-                  when others =>
-                     Self.Error := True;
-
-                     if Self.Flags (Stop_On_Error) then
-                        exit;
-
-                     else
-                        VSS.Implementation.Strings.Handler (Target).Append
-                          (Target, Replacement_Character, Offset);
-                     end if;
-               end case;
-
-            elsif Byte in Lower .. Upper then
-               Lower := 16#80#;
-               Upper := 16#BF#;
-               Code  :=
-                 Code * 16#40# or VSS.Unicode.Code_Point (Byte and 16#3F#);
-
-               Seen := Seen + 1;
-
-               if Seen = Needed then
-                  if Self.Skip_BOM then
-                     Self.Skip_BOM := False;
-
-                     if Code = 16#FEFF# then
-                        goto Skip;
-                     end if;
-                  end if;
-
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Code, Offset);
-
-                  <<Skip>>
-
-                  Needed := 0;
-                  Seen   := 0;
-               end if;
-
-            else
-               Index  := Index - 1;
-               Lower  := 16#80#;
-               Upper  := 16#BF#;
+      loop
+         if Index > Source'Last then
+            if Needed /= 0 and (Self.Flags (Stateless) or End_Of_Data) then
                Needed := 0;
-               Seen   := 0;
 
                Self.Error := True;
 
-               if Self.Flags (Stop_On_Error) then
-                  exit;
-
-               else
+               if not Self.Flags (Stop_On_Error) then
                   VSS.Implementation.Strings.Handler (Target).Append
                     (Target, Replacement_Character, Offset);
                end if;
             end if;
 
-            Index := Index + 1;
-         end loop;
+            exit;
+         end if;
 
-         Self.Code   := Code;
-         Self.Needed := Needed;
-         Self.Seen   := Seen;
-         Self.Upper  := Upper;
-         Self.Lower  := Lower;
-      end if;
+         Byte := Source (Index);
+
+         if Needed = 0 then
+            case Byte is
+               when 16#00# .. 16#7F# =>
+                  VSS.Implementation.Strings.Handler (Target).Append
+                    (Target,
+                     VSS.Unicode.Code_Point (Byte and 16#7F#),
+                     Offset);
+
+               when 16#C2# .. 16#DF# =>
+                  Code := VSS.Unicode.Code_Point (Byte and 16#1F#);
+                  Needed := 1;
+
+               when 16#E0# .. 16#EF# =>
+                  Code := VSS.Unicode.Code_Point (Byte and 16#0F#);
+                  Needed := 2;
+
+                  if Byte = 16#E0# then
+                     Lower := 16#A0#;
+
+                  elsif Byte = 16#ED# then
+                     Upper := 16#9F#;
+                  end if;
+
+               when 16#F0# .. 16#F4# =>
+                  Code := VSS.Unicode.Code_Point (Byte and 16#07#);
+                  Needed := 3;
+
+                  if Byte = 16#F0# then
+                     Lower := 16#90#;
+
+                  elsif Byte = 16#F4# then
+                     Upper := 16#8F#;
+                  end if;
+
+               when others =>
+                  Self.Error := True;
+
+                  if Self.Flags (Stop_On_Error) then
+                     exit;
+
+                  else
+                     VSS.Implementation.Strings.Handler (Target).Append
+                       (Target, Replacement_Character, Offset);
+                  end if;
+            end case;
+
+         elsif Byte in Lower .. Upper then
+            Lower := 16#80#;
+            Upper := 16#BF#;
+            Code  :=
+              Code * 16#40# or VSS.Unicode.Code_Point (Byte and 16#3F#);
+
+            Seen := Seen + 1;
+
+            if Seen = Needed then
+               if Self.Skip_BOM then
+                  Self.Skip_BOM := False;
+
+                  if Code = 16#FEFF# then
+                     goto Skip;
+                  end if;
+               end if;
+
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, Code, Offset);
+
+               <<Skip>>
+
+               Needed := 0;
+               Seen   := 0;
+            end if;
+
+         else
+            Index  := Index - 1;
+            Lower  := 16#80#;
+            Upper  := 16#BF#;
+            Needed := 0;
+            Seen   := 0;
+
+            Self.Error := True;
+
+            if Self.Flags (Stop_On_Error) then
+               exit;
+
+            else
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, Replacement_Character, Offset);
+            end if;
+         end if;
+
+         Index := Index + 1;
+      end loop;
+
+      Self.Code   := Code;
+      Self.Needed := Needed;
+      Self.Seen   := Seen;
+      Self.Upper  := Upper;
+      Self.Lower  := Lower;
    end Decode;
 
    -------------------

@@ -126,16 +126,22 @@ package body VSS.Strings.Converters.Decoders is
       ("l9",                 ISO885915.Factory'Access)
      );
 
+   Empty_Data : constant Ada.Streams.Stream_Element_Array (1 .. 0) :=
+     (others => <>);
+
    ------------
    -- Decode --
    ------------
 
    function Decode
-     (Self : in out Virtual_String_Decoder'Class;
-      Data : VSS.Stream_Element_Vectors.Stream_Element_Vector)
+     (Self        : in out Virtual_String_Decoder'Class;
+      Data_Chunk  : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+      End_Of_Data : Boolean := True)
       return VSS.Strings.Virtual_String
    is
       use type Ada.Streams.Stream_Element_Offset;
+      use type
+        VSS.Stream_Element_Vectors.Internals.Stream_Element_Array_Access;
 
       Length  : Ada.Streams.Stream_Element_Count;
       Storage :
@@ -143,11 +149,17 @@ package body VSS.Strings.Converters.Decoders is
 
    begin
       VSS.Stream_Element_Vectors.Internals.Data_Constant_Access
-        (Data, Length, Storage);
+        (Data_Chunk, Length, Storage);
 
       return Result : VSS.Strings.Virtual_String do
-         if Length /= 0 and Self.Decoder /= null then
-            Self.Decoder.Decode (Storage (1 .. Length), Result.Data);
+         if Self.Decoder /= null then
+            if Storage /= null then
+               Self.Decoder.Decode
+                 (Storage (1 .. Length), End_Of_Data, Result.Data);
+
+            else
+               Self.Decoder.Decode (Empty_Data, End_Of_Data, Result.Data);
+            end if;
          end if;
       end return;
    end Decode;
@@ -157,13 +169,14 @@ package body VSS.Strings.Converters.Decoders is
    ------------
 
    function Decode
-     (Self : in out Virtual_String_Decoder'Class;
-      Data : Ada.Streams.Stream_Element_Array)
+     (Self        : in out Virtual_String_Decoder'Class;
+      Data_Chunk  : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean := True)
       return VSS.Strings.Virtual_String is
    begin
       return Result : VSS.Strings.Virtual_String do
-         if Data'Length /= 0 and Self.Decoder /= null then
-            Self.Decoder.Decode (Data, Result.Data);
+         if Self.Decoder /= null then
+            Self.Decoder.Decode (Data_Chunk, End_Of_Data, Result.Data);
          end if;
       end return;
    end Decode;

@@ -175,6 +175,7 @@ procedure Test_Converters is
       --  Stream_Element_Array and incremental mode
 
       declare
+         use type Ada.Streams.Stream_Element_Offset;
          use type VSS.Strings.Virtual_String;
 
          Decoder : VSS.Strings.Converters.Decoders.Virtual_String_Decoder;
@@ -183,23 +184,18 @@ procedure Test_Converters is
       begin
          Decoder.Initialize ("utf-8");
 
-         if not Decoder.Is_Valid then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Decoder.Is_Valid);
 
          for J in Encoded'Range loop
             Result.Append
               (Decoder.Decode
-                 (Ada.Streams.Stream_Element_Array'((1 => Encoded (J)))));
+                 (Ada.Streams.Stream_Element_Array'((1 => Encoded (J))),
+                  J = Encoded'Last));
          end loop;
 
-         if Result /= Decoded then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Result = Decoded);
 
-         if Decoder.Has_Error /= Has_Error then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Decoder.Has_Error = Has_Error);
 
          if Decoder.Error_Message.Is_Empty and Has_Error then
             raise Program_Error;
@@ -209,6 +205,7 @@ procedure Test_Converters is
       --  Stream_Element_Vector and incremental mode
 
       declare
+         use type Ada.Streams.Stream_Element_Offset;
          use type VSS.Strings.Virtual_String;
 
          Decoder : VSS.Strings.Converters.Decoders.Virtual_String_Decoder;
@@ -217,24 +214,19 @@ procedure Test_Converters is
       begin
          Decoder.Initialize ("utf-8");
 
-         if not Decoder.Is_Valid then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Decoder.Is_Valid);
 
          for J in Encoded'Range loop
             Result.Append
               (Decoder.Decode
                  (VSS.Stream_Element_Vectors.Conversions
-                    .To_Stream_Element_Vector ((1 => Encoded (J)))));
+                    .To_Stream_Element_Vector ((1 => Encoded (J))),
+                  J = Encoded'Last));
          end loop;
 
-         if Result /= Decoded then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Result = Decoded);
 
-         if Decoder.Has_Error /= Has_Error then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Decoder.Has_Error = Has_Error);
 
          if Decoder.Error_Message.Is_Empty and Has_Error then
             raise Program_Error;
@@ -392,24 +384,24 @@ begin
    end;
 
    declare
+      use type Ada.Streams.Stream_Element_Offset;
+
       D : VSS.Strings.Converters.Decoders.Virtual_String_Decoder;
       S : VSS.Strings.Virtual_String;
 
    begin
       D.Initialize ("utf-8", (Process_BOM => True, others => False));
 
-      if not D.Is_Valid then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (D.Is_Valid);
 
       for J in D1'Range loop
          S.Append
-           (D.Decode (Ada.Streams.Stream_Element_Array'((1 => D1 (J)))));
+           (D.Decode
+              (Ada.Streams.Stream_Element_Array'((1 => D1 (J))),
+               J = D1'Last));
       end loop;
 
-      if not S.Is_Empty then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (S.Is_Empty);
    end;
 
    Run_Decoder_Test (D2, E2, True);

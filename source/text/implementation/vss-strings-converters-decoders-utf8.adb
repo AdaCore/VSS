@@ -13,9 +13,10 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
    ------------
 
    overriding procedure Decode
-     (Self   : in out UTF8_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data)
+     (Self        : in out UTF8_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data)
    is
       use type Ada.Streams.Stream_Element;
       use type Ada.Streams.Stream_Element_Offset;
@@ -32,11 +33,9 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if (Self.Error and Self.Flags (Stop_On_Error))
-        or else Source'Last < Source'First
-      then
-         --  Error was encountered in "stop on error" mode or source data is
-         --  empty: return "null" string.
+      if Self.Error and Self.Flags (Stop_On_Error) then
+         --  Error was encountered in "stop on error" mode: return "null"
+         --  string.
 
          Target := VSS.Implementation.Strings.Null_String_Data;
 
@@ -45,7 +44,20 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
            (Target);
 
          loop
-            exit when Index > Source'Last;
+            if Index > Source'Last then
+               if Needed /= 0 and (Self.Flags (Stateless) or End_Of_Data) then
+                  Needed := 0;
+
+                  Self.Error := True;
+
+                  if not Self.Flags (Stop_On_Error) then
+                     VSS.Implementation.Strings.Handler (Target).Append
+                       (Target, Replacement_Character, Offset);
+                  end if;
+               end if;
+
+               exit;
+            end if;
 
             Byte := Source (Index);
 
@@ -142,18 +154,11 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
             Index := Index + 1;
          end loop;
 
-         if Self.Flags (Stateless) then
-            if Needed /= 0 then
-               Self.Error := True;
-            end if;
-
-         else
-            Self.Code   := Code;
-            Self.Needed := Needed;
-            Self.Seen   := Seen;
-            Self.Upper  := Upper;
-            Self.Lower  := Lower;
-         end if;
+         Self.Code   := Code;
+         Self.Needed := Needed;
+         Self.Seen   := Seen;
+         Self.Upper  := Upper;
+         Self.Lower  := Lower;
       end if;
    end Decode;
 

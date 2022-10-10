@@ -29,9 +29,10 @@ private
    end record;
 
    overriding procedure Decode
-     (Self   : in out UTF8_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data);
+     (Self        : in out UTF8_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data);
 
    overriding function Has_Error (Self : UTF8_Decoder) return Boolean;
 

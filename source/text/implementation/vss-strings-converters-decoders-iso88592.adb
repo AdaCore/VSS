@@ -113,11 +113,13 @@ package body VSS.Strings.Converters.Decoders.ISO88592 is
    ------------
 
    overriding procedure Decode
-     (Self   : in out ISO88592_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data)
+     (Self        : in out ISO88592_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data)
    is
       pragma Unreferenced (Self);
+      pragma Unreferenced (End_Of_Data);
 
       use type Ada.Streams.Stream_Element_Offset;
 

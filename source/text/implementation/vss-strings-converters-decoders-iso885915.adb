@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO885915 is
 
@@ -28,61 +28,51 @@ package body VSS.Strings.Converters.Decoders.ISO885915 is
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if Source'Last < Source'First then
-         --  Source data is empty: return "null" string.
+      loop
+         exit when Index > Source'Last;
 
-         Target := VSS.Implementation.Strings.Null_String_Data;
+         Byte := Source (Index);
 
-      else
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Target);
+         case Byte is
+            when 16#A4# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#20AC#, Offset);
 
-         loop
-            exit when Index > Source'Last;
+            when 16#A6# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#0160#, Offset);
 
-            Byte := Source (Index);
+            when 16#A8# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#0161#, Offset);
 
-            case Byte is
-               when 16#A4# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#20AC#, Offset);
+            when 16#B4# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#017D#, Offset);
 
-               when 16#A6# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#0160#, Offset);
+            when 16#B8# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#017E#, Offset);
 
-               when 16#A8# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#0161#, Offset);
+            when 16#BC# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#0152#, Offset);
 
-               when 16#B4# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#017D#, Offset);
+            when 16#BD# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#0153#, Offset);
 
-               when 16#B8# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#017E#, Offset);
+            when 16#BE# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#0178#, Offset);
 
-               when 16#BC# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#0152#, Offset);
+            when others =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+         end case;
 
-               when 16#BD# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#0153#, Offset);
-
-               when 16#BE# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#0178#, Offset);
-
-               when others =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, VSS.Unicode.Code_Point (Byte), Offset);
-            end case;
-
-            Index := Index + 1;
-         end loop;
-      end if;
+         Index := Index + 1;
+      end loop;
    end Decode;
 
    -------------

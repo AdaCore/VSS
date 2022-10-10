@@ -68,6 +68,7 @@ private
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
       Target      : out VSS.Implementation.Strings.String_Data) is abstract;
+   --  Decode Source chunk of the data and append result to Target.
 
    not overriding function Has_Error
      (Self : Abstract_Decoder) return Boolean is abstract;

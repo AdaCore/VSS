@@ -7,6 +7,7 @@
 with Ada.Unchecked_Deallocation;
 
 with VSS.Stream_Element_Vectors.Internals;
+with VSS.Strings.Converters.Decoders.GB18030;
 with VSS.Strings.Converters.Decoders.ISO88591;
 with VSS.Strings.Converters.Decoders.ISO88592;
 with VSS.Strings.Converters.Decoders.ISO88595;
@@ -123,7 +124,23 @@ package body VSS.Strings.Converters.Decoders is
       ("latin9",             ISO885915.Factory'Access),
       ("csiso885915",        ISO885915.Factory'Access),
       ("csisolatin9",        ISO885915.Factory'Access),
-      ("l9",                 ISO885915.Factory'Access)
+      ("l9",                 ISO885915.Factory'Access),
+
+      --  GB18030
+      ("csgb2312",           GB18030.Factory'Access),
+      ("cp936",              GB18030.Factory'Access),
+      ("ms936",              GB18030.Factory'Access),
+      ("windows936",         GB18030.Factory'Access),
+      ("csgbk",              GB18030.Factory'Access),
+      ("csgb18030",          GB18030.Factory'Access),
+      ("chinese",            GB18030.Factory'Access),
+      ("csiso58gb231280",    GB18030.Factory'Access),
+      ("gb2312",             GB18030.Factory'Access),
+      ("gb231280",           GB18030.Factory'Access),
+      ("gbk",                GB18030.Factory'Access),
+      ("isoir58",            GB18030.Factory'Access),
+      ("xgbk",               GB18030.Factory'Access),
+      ("gb18030",            GB18030.Factory'Access)
      );
 
    Empty_Data : constant Ada.Streams.Stream_Element_Array (1 .. 0) :=

@@ -10,6 +10,7 @@ with VSS.Stream_Element_Vectors.Conversions;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Converters.Decoders;
 with VSS.Strings.Converters.Encoders;
+with VSS.Strings.Conversions;
 
 with Test_Support;
 
@@ -107,10 +108,13 @@ procedure Test_Converters is
    --  Incomplete multibyte seqence at the end of the encoded data.
 
    procedure Run_Decoder_Test
-     (Encoded   : Ada.Streams.Stream_Element_Array;
+     (Encoding  : VSS.Strings.Virtual_String;
+      Encoded   : Ada.Streams.Stream_Element_Array;
       Decoded   : VSS.Strings.Virtual_String;
-      Has_Error : Boolean);
-   --  Run decoder for UTF-8 encoding in two modes: block and incremental,
+      Has_Error : Boolean;
+      Comment   : VSS.Strings.Virtual_String :=
+        VSS.Strings.Empty_Virtual_String);
+   --  Run decoder for given encoding in two modes: block and incremental,
    --  and check result.
 
    procedure Run_Encoder_Test
@@ -119,14 +123,24 @@ procedure Test_Converters is
    --  Run encoder for UTF-8 encoding in two modes: block and incremental,
    --  and check result.
 
+   procedure Test_GB18030_Decoder;
+   --  Run tests of the GB-18030 decoder. It tests GBK, GB2312 encodings too.
+
    ----------------------
    -- Run_Decoder_Test --
    ----------------------
 
    procedure Run_Decoder_Test
-     (Encoded   : Ada.Streams.Stream_Element_Array;
+     (Encoding  : VSS.Strings.Virtual_String;
+      Encoded   : Ada.Streams.Stream_Element_Array;
       Decoded   : VSS.Strings.Virtual_String;
-      Has_Error : Boolean) is
+      Has_Error : Boolean;
+      Comment   : VSS.Strings.Virtual_String :=
+        VSS.Strings.Empty_Virtual_String)
+   is
+      Message : constant String :=
+        VSS.Strings.Conversions.To_UTF_8_String (Comment);
+
    begin
       --  Stream_Element_Array and block mode
 
@@ -137,25 +151,16 @@ procedure Test_Converters is
          Result  : VSS.Strings.Virtual_String;
 
       begin
-         Decoder.Initialize ("utf-8");
+         Decoder.Initialize (Encoding);
 
-         if not Decoder.Is_Valid then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Decoder.Is_Valid, Message);
 
          Result := Decoder.Decode (Encoded);
 
-         if Result /= Decoded then
-            raise Program_Error;
-         end if;
-
-         if Decoder.Has_Error /= Has_Error then
-            raise Program_Error;
-         end if;
-
-         if Decoder.Error_Message.Is_Empty and Has_Error then
-            raise Program_Error;
-         end if;
+         Test_Support.Assert (Result = Decoded, Message);
+         Test_Support.Assert (Decoder.Has_Error = Has_Error, Message);
+         Test_Support.Assert
+           (Decoder.Error_Message.Is_Empty xor Has_Error, Message);
       end;
 
       --  Stream_Element_Vector and block mode
@@ -167,7 +172,7 @@ procedure Test_Converters is
          Result  : VSS.Strings.Virtual_String;
 
       begin
-         Decoder.Initialize ("utf-8");
+         Decoder.Initialize (Encoding);
 
          if not Decoder.Is_Valid then
             raise Program_Error;
@@ -201,7 +206,7 @@ procedure Test_Converters is
          Result  : VSS.Strings.Virtual_String;
 
       begin
-         Decoder.Initialize ("utf-8");
+         Decoder.Initialize (Encoding);
 
          Test_Support.Assert (Decoder.Is_Valid);
 
@@ -231,7 +236,7 @@ procedure Test_Converters is
          Result  : VSS.Strings.Virtual_String;
 
       begin
-         Decoder.Initialize ("utf-8");
+         Decoder.Initialize (Encoding);
 
          Test_Support.Assert (Decoder.Is_Valid);
 
@@ -348,6 +353,12 @@ procedure Test_Converters is
       end;
    end Run_Encoder_Test;
 
+   --------------------------
+   -- Test_GB18030_Decoder --
+   --------------------------
+
+   procedure Test_GB18030_Decoder is separate;
+
 begin
    --  Check invalid state of the decoder after object declaration without
    --  initialization.
@@ -423,11 +434,11 @@ begin
       Test_Support.Assert (S.Is_Empty);
    end;
 
-   Run_Decoder_Test (D2, E2, True);
-   Run_Decoder_Test (D3, E3, True);
-   Run_Decoder_Test (D4, E4, True);
-   Run_Decoder_Test (D5, E5, True);
-   Run_Decoder_Test (D6, E6, False);
+   Run_Decoder_Test ("utf-8", D2, E2, True);
+   Run_Decoder_Test ("utf-8", D3, E3, True);
+   Run_Decoder_Test ("utf-8", D4, E4, True);
+   Run_Decoder_Test ("utf-8", D5, E5, True);
+   Run_Decoder_Test ("utf-8", D6, E6, False);
 
    --  Check processing of the BOM and empty string
 
@@ -504,10 +515,14 @@ begin
    --  Check reporting of the error at the end of the incomplete mutlubyte
    --  sequence at the end of the data.
 
-   Run_Decoder_Test (D7_2, E7_2, True);
-   Run_Decoder_Test (D7_31, E7_3, True);
-   Run_Decoder_Test (D7_32, E7_3, True);
-   Run_Decoder_Test (D7_41, E7_4, True);
-   Run_Decoder_Test (D7_42, E7_4, True);
-   Run_Decoder_Test (D7_43, E7_4, True);
+   Run_Decoder_Test ("utf-8", D7_2, E7_2, True);
+   Run_Decoder_Test ("utf-8", D7_31, E7_3, True);
+   Run_Decoder_Test ("utf-8", D7_32, E7_3, True);
+   Run_Decoder_Test ("utf-8", D7_41, E7_4, True);
+   Run_Decoder_Test ("utf-8", D7_42, E7_4, True);
+   Run_Decoder_Test ("utf-8", D7_43, E7_4, True);
+
+   --  Test other decoders.
+
+   Test_GB18030_Decoder;
 end Test_Converters;

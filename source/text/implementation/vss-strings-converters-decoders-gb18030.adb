@@ -13,9 +13,6 @@ with VSS.Strings.Converters.Decoders.GB18030.Ranges;
 
 package body VSS.Strings.Converters.Decoders.GB18030 is
 
-   subtype ASCII_Byte_Range is
-     Ada.Streams.Stream_Element range 16#00# .. 16#7F#;
-
    function Index_GB18030_Ranges_Code_Point
      (First  : Ada.Streams.Stream_Element;
       Second : Ada.Streams.Stream_Element;

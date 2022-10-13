@@ -59,6 +59,9 @@ private
 
    Replacement_Character : constant VSS.Unicode.Code_Point := 16#FFFD#;
 
+   subtype ASCII_Byte_Range is
+     Ada.Streams.Stream_Element range 16#00# .. 16#7F#;
+
    type Abstract_Decoder is abstract tagged limited null record;
 
    type Decoder_Access is access all Abstract_Decoder'Class;

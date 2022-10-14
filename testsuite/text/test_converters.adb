@@ -126,6 +126,9 @@ procedure Test_Converters is
    procedure Test_GB18030_Decoder;
    --  Run tests of the GB-18030 decoder. It tests GBK, GB2312 encodings too.
 
+   procedure Test_EUCJP_Decoder;
+   --  Run tests of the EUC-JP decoder.
+
    ----------------------
    -- Run_Decoder_Test --
    ----------------------
@@ -353,6 +356,12 @@ procedure Test_Converters is
       end;
    end Run_Encoder_Test;
 
+   ------------------------
+   -- Test_EUCJP_Decoder --
+   ------------------------
+
+   procedure Test_EUCJP_Decoder is separate;
+
    --------------------------
    -- Test_GB18030_Decoder --
    --------------------------
@@ -525,4 +534,5 @@ begin
    --  Test other decoders.
 
    Test_GB18030_Decoder;
+   Test_EUCJP_Decoder;
 end Test_Converters;

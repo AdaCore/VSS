@@ -107,8 +107,23 @@ package body VSS.Strings.Converters.Decoders.ShiftJIS is
             end;
 
          elsif Byte in ASCII_Byte_Range | 16#80# then
-            VSS.Implementation.Strings.Handler (Target).Append
-              (Target, VSS.Unicode.Code_Point (Byte), Offset);
+            --  Encoding Standard (Jul 2022) maps 0x5C and 0x7E bytes to
+            --  Unicode code point with same value. However, WPT assumes
+            --  mapping of 0x5C to U+00A5 and 0x7E to U+203E.
+
+            case Byte is
+               when 16#5C# =>
+                  VSS.Implementation.Strings.Handler (Target).Append
+                    (Target, 16#A5#, Offset);
+
+               when 16#7E# =>
+                  VSS.Implementation.Strings.Handler (Target).Append
+                    (Target, 16#203E#, Offset);
+
+               when others =>
+                  VSS.Implementation.Strings.Handler (Target).Append
+                    (Target, VSS.Unicode.Code_Point (Byte), Offset);
+            end case;
 
          elsif Byte in 16#A1# .. 16#DF# then
             VSS.Implementation.Strings.Handler (Target).Append

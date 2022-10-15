@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO88591 is
 
@@ -13,11 +13,13 @@ package body VSS.Strings.Converters.Decoders.ISO88591 is
    ------------
 
    overriding procedure Decode
-     (Self   : in out ISO88591_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data)
+     (Self        : in out ISO88591_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data)
    is
       pragma Unreferenced (Self);
+      pragma Unreferenced (End_Of_Data);
 
       use type Ada.Streams.Stream_Element_Offset;
 
@@ -26,26 +28,16 @@ package body VSS.Strings.Converters.Decoders.ISO88591 is
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if Source'Last < Source'First then
-         --  Source data is empty: return "null" string.
+      loop
+         exit when Index > Source'Last;
 
-         Target := VSS.Implementation.Strings.Null_String_Data;
+         Byte := Source (Index);
 
-      else
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Target);
+         VSS.Implementation.Strings.Handler (Target).Append
+           (Target, VSS.Unicode.Code_Point (Byte), Offset);
 
-         loop
-            exit when Index > Source'Last;
-
-            Byte := Source (Index);
-
-            VSS.Implementation.Strings.Handler (Target).Append
-              (Target, VSS.Unicode.Code_Point (Byte), Offset);
-
-            Index := Index + 1;
-         end loop;
-      end if;
+         Index := Index + 1;
+      end loop;
    end Decode;
 
    -------------

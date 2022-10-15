@@ -94,6 +94,9 @@ endif
 	.objs/tests/test_string_decoder iso-8859-8 true testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88598-utf8.txt
 	.objs/tests/test_string_decoder iso-8859-9 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88599-utf8.txt
 	.objs/tests/test_string_decoder iso-8859-15 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso885915-utf8.txt
+	.objs/tests/test_string_decoder koi8-r false testsuite/text/converters/all_bytes.bin testsuite/text/converters/koi8r-utf8.txt
+	.objs/tests/test_string_decoder EUC-JP false testsuite/text/converters/eucjp_chars.eucjp testsuite/text/converters/eucjp_chars-utf8.txt
+	.objs/tests/test_string_decoder shift-jis false testsuite/text/converters/sjis_chars.sjis testsuite/text/converters/sjis_chars-utf8.txt
 
 check_json:
 	.objs/tests/test_json_content_handler

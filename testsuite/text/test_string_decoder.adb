@@ -109,6 +109,8 @@ procedure Test_String_Decoder is
       Encoded   : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Decoded   : VSS.Strings.Virtual_String)
    is
+      use type Ada.Streams.Stream_Element_Offset;
+
       Decoder : VSS.Strings.Converters.Decoders.Virtual_String_Decoder;
       Result  : VSS.Strings.Virtual_String;
 
@@ -117,11 +119,12 @@ procedure Test_String_Decoder is
 
       Test_Support.Assert (Decoder.Is_Valid);
 
-      for Byte of Encoded loop
+      for J in 1 .. Encoded.Length loop
          Result.Append
            (Decoder.Decode
               (VSS.Stream_Element_Vectors.Conversions
-                 .To_Stream_Element_Vector ((1 => Byte))));
+                 .To_Stream_Element_Vector ((1 => Encoded (J))),
+               J = Encoded.Length));
       end loop;
 
       Test_Support.Assert (Result = Decoded);

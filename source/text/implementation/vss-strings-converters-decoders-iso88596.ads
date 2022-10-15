@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
---  ISO-8859-5 decoder.
+--  ISO-8859-6 decoder.
 
 private package VSS.Strings.Converters.Decoders.ISO88596 is
 
@@ -21,9 +21,10 @@ private
    end record;
 
    overriding procedure Decode
-     (Self   : in out ISO88596_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data);
+     (Self        : in out ISO88596_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data);
 
    overriding function Has_Error (Self : ISO88596_Decoder) return Boolean;
 

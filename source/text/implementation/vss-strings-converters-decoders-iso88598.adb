@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO88598 is
 
@@ -13,10 +13,13 @@ package body VSS.Strings.Converters.Decoders.ISO88598 is
    ------------
 
    overriding procedure Decode
-     (Self   : in out ISO88598_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data)
+     (Self        : in out ISO88598_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data)
    is
+      pragma Unreferenced (End_Of_Data);
+
       use type Ada.Streams.Stream_Element_Offset;
       use type VSS.Unicode.Code_Point;
 
@@ -25,68 +28,61 @@ package body VSS.Strings.Converters.Decoders.ISO88598 is
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if (Self.Error and Self.Flags (Stop_On_Error))
-        or else Source'Last < Source'First
-      then
-         --  Error was encountered in "stop on error" mode or source data is
-         --  empty: return "null" string.
+      if Self.Error and Self.Flags (Stop_On_Error) then
+         --  Error was encountered in "stop on error" mode, return immidiately.
 
-         Target := VSS.Implementation.Strings.Null_String_Data;
-
-      else
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Target);
-
-         loop
-            exit when Index > Source'Last;
-
-            Byte := Source (Index);
-
-            case Byte is
-               when 16#00# .. 16#A0# | 16#A2# .. 16#A9#
-                  | 16#AB# .. 16#B9# | 16#BB# .. 16#BE#
-               =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, VSS.Unicode.Code_Point (Byte), Offset);
-
-               when 16#AA# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#00D7#, Offset);
-
-               when 16#BA# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#00F7#, Offset);
-
-               when 16#DF# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#2017#, Offset);
-
-               when 16#FD# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#200E#, Offset);
-
-               when 16#FE# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#200F#, Offset);
-
-               when 16#A1# | 16#BF# .. 16#DE# | 16#FB# | 16#FC# | 16#FF# =>
-                  Self.Error := True;
-
-                  exit when Self.Flags (Stop_On_Error);
-
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Replacement_Character, Offset);
-
-               when others =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target,
-                     VSS.Unicode.Code_Point (Byte) - 16#E0# + 16#05D0#,
-                     Offset);
-            end case;
-
-            Index := Index + 1;
-         end loop;
+         return;
       end if;
+
+      loop
+         exit when Index > Source'Last;
+
+         Byte := Source (Index);
+
+         case Byte is
+            when 16#00# .. 16#A0# | 16#A2# .. 16#A9#
+               | 16#AB# .. 16#B9# | 16#BB# .. 16#BE#
+            =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+
+            when 16#AA# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#00D7#, Offset);
+
+            when 16#BA# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#00F7#, Offset);
+
+            when 16#DF# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#2017#, Offset);
+
+            when 16#FD# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#200E#, Offset);
+
+            when 16#FE# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#200F#, Offset);
+
+            when 16#A1# | 16#BF# .. 16#DE# | 16#FB# | 16#FC# | 16#FF# =>
+               Self.Error := True;
+
+               exit when Self.Flags (Stop_On_Error);
+
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, Replacement_Character, Offset);
+
+            when others =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target,
+                  VSS.Unicode.Code_Point (Byte) - 16#E0# + 16#05D0#,
+                  Offset);
+         end case;
+
+         Index := Index + 1;
+      end loop;
    end Decode;
 
    -------------------

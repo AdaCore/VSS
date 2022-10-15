@@ -35,18 +35,21 @@ package VSS.Strings.Converters.Decoders is
    --  Return error message for latest detected error.
 
    function Decode
-     (Self : in out Virtual_String_Decoder'Class;
-      Data : VSS.Stream_Element_Vectors.Stream_Element_Vector)
+     (Self        : in out Virtual_String_Decoder'Class;
+      Data_Chunk  : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+      End_Of_Data : Boolean := True)
       return VSS.Strings.Virtual_String;
    function Decode
-     (Self : in out Virtual_String_Decoder'Class;
-      Data : Ada.Streams.Stream_Element_Array)
+     (Self        : in out Virtual_String_Decoder'Class;
+      Data_Chunk  : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean := True)
       return VSS.Strings.Virtual_String;
    --  Decode Data and return result. When Stateless flag was set to False,
-   --  it returns only fully decoded portion of the data, and save incomplete
-   --  data to be decoded with next call of Decode. When Stateless flag was
-   --  set to True, incomplete data is not allowed, it will be returned as
-   --  decoding error.
+   --  and End_Of_Data parameter is False, it returns only fully decoded
+   --  portion of the data, and save incomplete data to be decoded with next
+   --  call of Decode. When Stateless flag was set to True, or End_Of_Data is
+   --  True, incomplete data is not allowed, it will be returned as decoding
+   --  error.
 
    procedure Reset_State (Self : in out Virtual_String_Decoder'Class);
    --  Reset state of the decoder to initial (after call of Initialize).
@@ -56,14 +59,19 @@ private
 
    Replacement_Character : constant VSS.Unicode.Code_Point := 16#FFFD#;
 
+   subtype ASCII_Byte_Range is
+     Ada.Streams.Stream_Element range 16#00# .. 16#7F#;
+
    type Abstract_Decoder is abstract tagged limited null record;
 
    type Decoder_Access is access all Abstract_Decoder'Class;
 
    not overriding procedure Decode
-     (Self   : in out Abstract_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data) is abstract;
+     (Self        : in out Abstract_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data) is abstract;
+   --  Decode Source chunk of the data and append result to Target.
 
    not overriding function Has_Error
      (Self : Abstract_Decoder) return Boolean is abstract;

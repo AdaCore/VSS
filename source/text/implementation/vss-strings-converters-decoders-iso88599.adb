@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO88599 is
 
@@ -13,11 +13,13 @@ package body VSS.Strings.Converters.Decoders.ISO88599 is
    ------------
 
    overriding procedure Decode
-     (Self   : in out ISO88599_Decoder;
-      Source : Ada.Streams.Stream_Element_Array;
-      Target : out VSS.Implementation.Strings.String_Data)
+     (Self        : in out ISO88599_Decoder;
+      Source      : Ada.Streams.Stream_Element_Array;
+      End_Of_Data : Boolean;
+      Target      : out VSS.Implementation.Strings.String_Data)
    is
       pragma Unreferenced (Self);
+      pragma Unreferenced (End_Of_Data);
 
       use type Ada.Streams.Stream_Element_Offset;
 
@@ -26,53 +28,43 @@ package body VSS.Strings.Converters.Decoders.ISO88599 is
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      if Source'Last < Source'First then
-         --  Source data is empty: return "null" string.
+      loop
+         exit when Index > Source'Last;
 
-         Target := VSS.Implementation.Strings.Null_String_Data;
+         Byte := Source (Index);
 
-      else
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Target);
+         case Byte is
+            when 16#D0# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#011E#, Offset);
 
-         loop
-            exit when Index > Source'Last;
+            when 16#DD# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#0130#, Offset);
 
-            Byte := Source (Index);
+            when 16#DE# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#015E#, Offset);
 
-            case Byte is
-               when 16#D0# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#011E#, Offset);
+            when 16#F0# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#011F#, Offset);
 
-               when 16#DD# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#0130#, Offset);
+            when 16#FD# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#0131#, Offset);
 
-               when 16#DE# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#015E#, Offset);
+            when 16#FE# =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, 16#015F#, Offset);
 
-               when 16#F0# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#011F#, Offset);
+            when others =>
+               VSS.Implementation.Strings.Handler (Target).Append
+                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+         end case;
 
-               when 16#FD# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#0131#, Offset);
-
-               when 16#FE# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#015F#, Offset);
-
-               when others =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, VSS.Unicode.Code_Point (Byte), Offset);
-            end case;
-
-            Index := Index + 1;
-         end loop;
-      end if;
+         Index := Index + 1;
+      end loop;
    end Decode;
 
    -------------

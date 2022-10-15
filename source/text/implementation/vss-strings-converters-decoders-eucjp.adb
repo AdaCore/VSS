@@ -8,8 +8,8 @@ with Interfaces;
 
 with VSS.Implementation.String_Handlers;
 
-with VSS.Strings.Converters.Decoders.EUCJP.JIS0208;
 with VSS.Strings.Converters.Decoders.EUCJP.JIS0212;
+with VSS.Strings.Converters.Decoders.Index_JIS0208;
 
 package body VSS.Strings.Converters.Decoders.EUCJP is
 
@@ -90,7 +90,7 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                         Code := EUCJP.JIS0212.Table (Pointer);
 
                      else
-                        Code := EUCJP.JIS0208.Table (Pointer);
+                        Code := Index_JIS0208.Table (Pointer);
                      end if;
                   end;
                end if;

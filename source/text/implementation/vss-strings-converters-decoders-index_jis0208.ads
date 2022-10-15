@@ -17,7 +17,7 @@ pragma Style_Checks ("M131");
 
 with Interfaces;
 
-private package VSS.Strings.Converters.Decoders.EUCJP.JIS0208 is
+private package VSS.Strings.Converters.Decoders.Index_JIS0208 is
 
    Table : constant
      array (Interfaces.Unsigned_32 range 0 ..  11_103)
@@ -7749,4 +7749,4 @@ private package VSS.Strings.Converters.Decoders.EUCJP.JIS0208 is
 
       others => 0);
 
-end VSS.Strings.Converters.Decoders.EUCJP.JIS0208;
+end VSS.Strings.Converters.Decoders.Index_JIS0208;

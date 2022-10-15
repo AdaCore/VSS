@@ -17,6 +17,7 @@ with VSS.Strings.Converters.Decoders.ISO88597;
 with VSS.Strings.Converters.Decoders.ISO88598;
 with VSS.Strings.Converters.Decoders.ISO88599;
 with VSS.Strings.Converters.Decoders.ISO885915;
+with VSS.Strings.Converters.Decoders.KOI8R;
 with VSS.Strings.Converters.Decoders.ShiftJIS;
 with VSS.Strings.Converters.Decoders.UTF8;
 
@@ -156,7 +157,13 @@ package body VSS.Strings.Converters.Decoders is
       ("shiftjis",            ShiftJIS.Factory'Access),
       ("sjis",                ShiftJIS.Factory'Access),
       ("windows31j",          ShiftJIS.Factory'Access),
-      ("xsjis",               ShiftJIS.Factory'Access)
+      ("xsjis",               ShiftJIS.Factory'Access),
+
+      --  KOI8-R
+      ("koi8r",               KOI8R.Factory'Access),
+      ("cskoi8r",             KOI8R.Factory'Access),
+      ("koi",                 KOI8R.Factory'Access),
+      ("koi8",                KOI8R.Factory'Access)
      );
 
    Empty_Data : constant Ada.Streams.Stream_Element_Array (1 .. 0) :=

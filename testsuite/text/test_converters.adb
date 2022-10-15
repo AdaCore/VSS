@@ -129,6 +129,9 @@ procedure Test_Converters is
    procedure Test_EUCJP_Decoder;
    --  Run tests of the EUC-JP decoder.
 
+   procedure Test_ShiftJIS_Decoder;
+   --  Run tests of the Shift-JIS decoder.
+
    ----------------------
    -- Run_Decoder_Test --
    ----------------------
@@ -368,6 +371,12 @@ procedure Test_Converters is
 
    procedure Test_GB18030_Decoder is separate;
 
+   ---------------------------
+   -- Test_ShiftJIS_Decoder --
+   ---------------------------
+
+   procedure Test_ShiftJIS_Decoder is separate;
+
 begin
    --  Check invalid state of the decoder after object declaration without
    --  initialization.
@@ -535,4 +544,5 @@ begin
 
    Test_GB18030_Decoder;
    Test_EUCJP_Decoder;
+   Test_ShiftJIS_Decoder;
 end Test_Converters;

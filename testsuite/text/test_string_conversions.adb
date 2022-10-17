@@ -114,6 +114,39 @@ procedure Test_String_Conversions is
               = Ada.Strings.Wide_Wide_Unbounded.To_Unbounded_Wide_Wide_String
                   (UTF_32_Encoded));
       end;
+
+      --  Test Set_* family of subprograms, which fills exact string
+
+      declare
+         S  : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String (UTF_32_Encoded);
+         BS : String (1 .. UTF_8_Encoded'Length);
+         BW : Wide_Wide_String (1 .. UTF_32_Encoded'Length);
+
+      begin
+         VSS.Strings.Conversions.Set_UTF_8_String (S, BS);
+         Test_Support.Assert (BS = UTF_8_Encoded);
+
+         VSS.Strings.Conversions.Set_Wide_Wide_String (S, BW);
+         Test_Support.Assert (BW = UTF_32_Encoded);
+      end;
+
+      --  Test Set_* family of subprograms, which fills string buffer
+
+      declare
+         S  : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String (UTF_32_Encoded);
+         BS : String (1 .. UTF_8_Encoded'Length + 10);
+         BW : Wide_Wide_String (1 .. UTF_32_Encoded'Length + 10);
+         L  : Natural;
+
+      begin
+         VSS.Strings.Conversions.Set_UTF_8_String (S, L, BS);
+         Test_Support.Assert (BS (BS'First .. L) = UTF_8_Encoded);
+
+         VSS.Strings.Conversions.Set_Wide_Wide_String (S, L, BW);
+         Test_Support.Assert (BW (BW'First .. L) = UTF_32_Encoded);
+      end;
    end Do_Test;
 
 begin

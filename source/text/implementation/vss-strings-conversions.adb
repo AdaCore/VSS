@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2022, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -14,23 +14,128 @@ pragma Warnings (On, ".* is an internal GNAT unit");
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UTF8_Encoding;
+with VSS.Unicode;
 
 package body VSS.Strings.Conversions is
 
-   procedure Set_Wide_Wide_String
-     (Item   : Virtual_String'Class;
-      String : out Wide_Wide_String);
-   --  Set given string to content of virtual string. Length of the string
-   --  must be equal to the length in characters of the virtual string;
-   --  otherwise Constraint_Error is raised.
+   ----------------------
+   -- Set_UTF_8_String --
+   ----------------------
 
-   -------------------------
+   procedure Set_UTF_8_String
+     (Item : Virtual_String'Class;
+      Into : out Ada.Strings.UTF_Encoding.UTF_8_String)
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      U_Buffer :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
+      S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
+      Length   : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Last     : Natural := Into'First - 1;
+
+   begin
+      Handler.After_Last_Character (Item.Data, Position);
+
+      if Into'Length /= Handler.First_UTF8_Offset (Item.Data, Position) then
+         raise Constraint_Error;
+      end if;
+
+      Handler.Before_First_Character (Item.Data, Position);
+
+      while Handler.Forward (Item.Data, Position) loop
+         VSS.Implementation.UTF8_Encoding.Encode
+           (Handler.Element (Item.Data, Position),
+            Length,
+            U_Buffer (1),
+            U_Buffer (2),
+            U_Buffer (3),
+            U_Buffer (4));
+
+         Into (Last + 1 .. Last + Natural (Length)) :=
+           S_Buffer (1 .. Natural (Length));
+
+         Last := Last + Natural (Length);
+      end loop;
+
+      pragma Assert (Last = Into'Last);
+   end Set_UTF_8_String;
+
+   ----------------------
+   -- Set_UTF_8_String --
+   ----------------------
+
+   procedure Set_UTF_8_String
+     (Item : Virtual_String'Class;
+      Last : out Natural;
+      Into : out Ada.Strings.UTF_Encoding.UTF_8_String) is
+   begin
+      Set_UTF_8_String (Item, Into'First, Last, Into);
+   end Set_UTF_8_String;
+
+   ----------------------
+   -- Set_UTF_8_String --
+   ----------------------
+
+   procedure Set_UTF_8_String
+     (Item : Virtual_String'Class;
+      From : Positive;
+      Last : out Natural;
+      Into : out Ada.Strings.UTF_Encoding.UTF_8_String)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      U_Buffer :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
+      S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
+      Length   : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+
+   begin
+      Last := From - 1;
+
+      if Item.Is_Empty then
+         return;
+      end if;
+
+      Handler.After_Last_Character (Item.Data, Position);
+
+      if Natural (Handler.First_UTF8_Offset (Item.Data, Position))
+           > Into'Last - From + 1
+      then
+         raise Constraint_Error;
+      end if;
+
+      Handler.Before_First_Character (Item.Data, Position);
+
+      while Handler.Forward (Item.Data, Position) loop
+         VSS.Implementation.UTF8_Encoding.Encode
+           (Handler.Element (Item.Data, Position),
+            Length,
+            U_Buffer (1),
+            U_Buffer (2),
+            U_Buffer (3),
+            U_Buffer (4));
+
+         Into (Last + 1 .. Last + Natural (Length)) :=
+           S_Buffer (1 .. Natural (Length));
+
+         Last := Last + Natural (Length);
+      end loop;
+   end Set_UTF_8_String;
+
+   --------------------------
    -- Set_Wide_Wide_String --
-   -------------------------
+   --------------------------
 
    procedure Set_Wide_Wide_String
-     (Item   : Virtual_String'Class;
-      String : out Wide_Wide_String)
+     (Item : Virtual_String'Class;
+      Into : out Wide_Wide_String)
    is
       Handler  :
         constant not null VSS.Implementation.Strings.String_Handler_Access :=
@@ -38,7 +143,7 @@ package body VSS.Strings.Conversions is
       Position : VSS.Implementation.Strings.Cursor;
 
    begin
-      if Item.Character_Length /= String'Length then
+      if Item.Character_Length /= Into'Length then
          raise Constraint_Error;
       end if;
 
@@ -49,7 +154,55 @@ package body VSS.Strings.Conversions is
       Handler.Before_First_Character (Item.Data, Position);
 
       while Handler.Forward (Item.Data, Position) loop
-         String (String'First + Integer (Position.Index) - 1) :=
+         Into (Into'First + Integer (Position.Index) - 1) :=
+           Wide_Wide_Character'Val
+             (Handler.Element (Item.Data, Position));
+      end loop;
+   end Set_Wide_Wide_String;
+
+   --------------------------
+   -- Set_Wide_Wide_String --
+   --------------------------
+
+   procedure Set_Wide_Wide_String
+     (Item : Virtual_String'Class;
+      Last : out Natural;
+      Into : out Wide_Wide_String) is
+   begin
+      Set_Wide_Wide_String (Item, Into'First, Last, Into);
+   end Set_Wide_Wide_String;
+
+   --------------------------
+   -- Set_Wide_Wide_String --
+   --------------------------
+
+   procedure Set_Wide_Wide_String
+     (Item : Virtual_String'Class;
+      From : Positive;
+      Last : out Natural;
+      Into : out Wide_Wide_String)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Last := From - 1;
+
+      if Item.Is_Empty then
+         return;
+      end if;
+
+      if Natural (Item.Character_Length) > Into'Last - From + 1 then
+         raise Constraint_Error;
+      end if;
+
+      Handler.Before_First_Character (Item.Data, Position);
+
+      while Handler.Forward (Item.Data, Position) loop
+         Last := Last + 1;
+         Into (Last) :=
            Wide_Wide_Character'Val
              (Handler.Element (Item.Data, Position));
       end loop;

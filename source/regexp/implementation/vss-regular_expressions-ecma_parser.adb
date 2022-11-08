@@ -98,7 +98,8 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
       procedure Class_Escape
         (Value : out Character_Or_Set;
-         Ok    : in out Boolean);
+         Ok    : in out Boolean)
+          with Pre => Ok;
 
       procedure Character_Class_Escape
         (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean);
@@ -397,15 +398,28 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
       procedure Class_Escape
         (Value : out Character_Or_Set;
-         Ok    : in out Boolean)
-      is
-         Set : Name_Sets.General_Category_Set;
+         Ok    : in out Boolean) is
       begin
-         Character_Class_Escape (Set, Ok);
-
-         if Ok then
-            Value := (Is_Character => False, Category => Set);
+         if not Cursor.Has_Element then
+            Ok := False;
+            Error := "Unexpected end of string";
+            return;
          end if;
+
+         case Cursor.Element is
+            when 'p' | 'P' =>
+               Value := (Is_Character => False, Category => <>);
+               Character_Class_Escape (Value.Category, Ok);
+
+            when '-' =>
+               Expect ('-', Ok);
+               Value := (Is_Character => True, Character => '-');
+
+            when others =>
+               Value := (Is_Character => True, Character => <>);
+               Character_Escape (Value.Character, Ok);
+         end case;
+
       end Class_Escape;
 
       procedure Class_Ranges

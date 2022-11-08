@@ -10,6 +10,7 @@ with Ada.Wide_Wide_Text_IO;
 
 with VSS.Application;
 with VSS.Characters;
+with VSS.Characters.Latin;
 with VSS.Regular_Expressions;
 with VSS.Strings;
 with VSS.Strings.Cursors.Markers;
@@ -50,7 +51,7 @@ procedure Test_RegExp_RE_Tests is
 
    function Expand_Sample (Value : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String;
-   --  Interprete `\x{AA}`
+   --  Interprete `\n`, `\x{AA}`
 
    Tab : constant VSS.Characters.Virtual_Character :=
      VSS.Characters.Virtual_Character
@@ -96,6 +97,8 @@ procedure Test_RegExp_RE_Tests is
                   end if;
                end if;
             end;
+         elsif List (J).Starts_With ("n") then
+            Result.Append (VSS.Characters.Latin.Line_Feed);
          else
             Result.Append ('\');
             Result.Append (List (J));

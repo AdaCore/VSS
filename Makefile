@@ -16,7 +16,7 @@ GPRINSTALL_FLAGS = --prefix=$(PREFIX) --exec-subdir=$(INSTALL_EXEC_DIR)\
  --lib-subdir=$(INSTALL_ALI_DIR) --project-subdir=$(INSTALL_PROJECT_DIR)\
  --link-lib-subdir=$(INSTALL_LIBRARY_DIR) --sources-subdir=$(INSTALL_INCLUDE_DIR)
 
-OK_RE_TESTS := 501 # Number of re_tests to be passed
+OK_RE_TESTS := 504 # Number of re_tests to be passed
 
 ifeq ($(OS),Windows_NT)
 	VSS_PS=;

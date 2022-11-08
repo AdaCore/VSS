@@ -22,13 +22,14 @@ For now we have:
 | **[** *x* **-** *y* **]** | Character in range *x..y*                 |
 | **[\p{** *N* **}]**       | Char of the general category *N*          |
 | **[\P{** *N* **}]**       | Char not of the general category *N*      |
-|  **^**                    | Start of line assertion                   |
-|  **$**                    | End of line assertion                     |
-|  **\b**                   | Word boundary assertion                   |
-|  **\B**                   | Not a word boundary assertion             |
-|  *x*                      | Character literal *x*, not in `^$.*+?]{}` |
-|  **\\** *x*               | Character literal *x* in `^$.*+?]{}`      |
-|  **\\n** **\\r** **\\t**  | New line, tabulation and other controls   |
+| **^**                     | Start of line assertion                   |
+| **$**                     | End of line assertion                     |
+| **\b**                    | Word boundary assertion                   |
+| **\B**                    | Not a word boundary assertion             |
+| *x*                       | Character literal *x*, not in `^$.*+?]{}` |
+| **\\** *x*                | Character literal *x* in `^$.*+?]{}`      |
+| **\\n** **\\r** **\\t**   | New line, tabulation and other controls   |
+| **[\\n\\r]**              | The same in a character class             |
 
 ## Useful articles
 

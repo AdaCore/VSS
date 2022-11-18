@@ -41,6 +41,90 @@ procedure Test_Command_Line_Parser is
    procedure Test_Name_Value_Mixed;
    --  Test of "-X" "name1=value1" "-Xname2=value2"
 
+   procedure Test_Long_Binary;
+   --  Test that "--subprojects" raise error
+
+   procedure Test_Short_Binary;
+   --  Test that "-S" raise error
+
+   procedure Test_Long_Binary_With_Equal_Sign_Error;
+   --  Test that "--subprojects=" raise error
+
+   procedure Test_Long_Binary_With_Value_Error;
+   --  Test that "--subprojects=project.gpr" raise error
+
+   procedure Test_Short_Binary_With_Equal_Sign_Error;
+   --  Test that "--S=" raise error
+
+   procedure Test_Short_Binary_With_Value_Error;
+   --  Test that "--S=project.gpr" raise error
+
+   ----------------------
+   -- Test_Long_Binary --
+   ----------------------
+
+   procedure Test_Long_Binary is
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option    : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => "S",
+         Long_Name   => "subprojects",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option);
+
+      Arguments.Append ("--subprojects");
+
+      Test_Support.Assert (Parser.Parse (Arguments));
+      Test_Support.Assert (Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (Parser.Is_Specified (Option));
+   end Test_Long_Binary;
+
+   --------------------------------------------
+   -- Test_Long_Binary_With_Equal_Sign_Error --
+   --------------------------------------------
+
+   procedure Test_Long_Binary_With_Equal_Sign_Error is
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option    : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => "S",
+         Long_Name   => "subprojects",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option);
+
+      Arguments.Append ("--subprojects=");
+
+      Test_Support.Assert (not Parser.Parse (Arguments));
+      Test_Support.Assert (not Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (not Parser.Is_Specified (Option));
+   end Test_Long_Binary_With_Equal_Sign_Error;
+
+   ---------------------------------------
+   -- Test_Long_Binary_With_Value_Error --
+   ---------------------------------------
+
+   procedure Test_Long_Binary_With_Value_Error is
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option    : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => "S",
+         Long_Name   => "subprojects",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option);
+
+      Arguments.Append ("--subprojects=project.gpr");
+
+      Test_Support.Assert (not Parser.Parse (Arguments));
+      Test_Support.Assert (not Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (not Parser.Is_Specified (Option));
+   end Test_Long_Binary_With_Value_Error;
+
    ---------------------
    -- Test_Long_Equal --
    ---------------------
@@ -176,6 +260,72 @@ procedure Test_Command_Line_Parser is
       Test_Support.Assert (Parser.Values (Option) (1).Value = "value");
    end Test_Name_Value_No_Separator;
 
+   -----------------------
+   -- Test_Short_Binary --
+   -----------------------
+
+   procedure Test_Short_Binary is
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option    : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => "S",
+         Long_Name   => "subprojects",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option);
+
+      Arguments.Append ("-S");
+
+      Test_Support.Assert (Parser.Parse (Arguments));
+      Test_Support.Assert (Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (Parser.Is_Specified (Option));
+   end Test_Short_Binary;
+
+   ---------------------------------------------
+   -- Test_Short_Binary_With_Equal_Sign_Error --
+   ---------------------------------------------
+
+   procedure Test_Short_Binary_With_Equal_Sign_Error is
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option    : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => "S",
+         Long_Name   => "subprojects",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option);
+
+      Arguments.Append ("-S=");
+
+      Test_Support.Assert (not Parser.Parse (Arguments));
+      Test_Support.Assert (not Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (not Parser.Is_Specified (Option));
+   end Test_Short_Binary_With_Equal_Sign_Error;
+
+   ----------------------------------------
+   -- Test_Short_Binary_With_Value_Error --
+   ----------------------------------------
+
+   procedure Test_Short_Binary_With_Value_Error is
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option    : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => "S",
+         Long_Name   => "subprojects",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option);
+
+      Arguments.Append ("-S=project.gpr");
+
+      Test_Support.Assert (not Parser.Parse (Arguments));
+      Test_Support.Assert (not Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (not Parser.Is_Specified (Option));
+   end Test_Short_Binary_With_Value_Error;
+
    ----------------------
    -- Test_Short_Equal --
    ----------------------
@@ -258,4 +408,11 @@ begin
    Test_Name_Value_No_Separator;
    Test_Name_Value_Next;
    Test_Name_Value_Mixed;
+
+   Test_Long_Binary;
+   Test_Short_Binary;
+   Test_Long_Binary_With_Equal_Sign_Error;
+   Test_Long_Binary_With_Value_Error;
+   Test_Short_Binary_With_Equal_Sign_Error;
+   Test_Short_Binary_With_Value_Error;
 end Test_Command_Line_Parser;

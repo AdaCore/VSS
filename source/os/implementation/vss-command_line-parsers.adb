@@ -156,8 +156,10 @@ package body VSS.Command_Line.Parsers is
                  Self.Defined_Named_Options (Name);
 
             begin
-               if Option in Binary_Option then
-                  raise Program_Error;
+               if Option in Binary_Option'Class then
+                  --  Value of the binary option is empty always.
+
+                  pragma Assert (Value.Is_Empty);
 
                elsif Option in Value_Option'Class then
                   --  Named option with value, may value be empty?
@@ -209,6 +211,26 @@ package body VSS.Command_Line.Parsers is
          end loop;
 
          if Iterator.Has_Element then
+            if Self.Defined_Named_Options.Contains
+              (Argument.Head_Before (Iterator))
+            then
+               --  Binary option doesn't support '--name=value' format.
+
+               declare
+                  Option : constant Named_Option'Class :=
+                    Self.Defined_Named_Options
+                      (Argument.Head_Before (Iterator));
+
+               begin
+                  if Option in Binary_Option'Class then
+                     Self.Error_Message := "binary option can't have value";
+                     Success            := False;
+
+                     return;
+                  end if;
+               end;
+            end if;
+
             Append_Named_Argument
               (Argument.Head_Before (Iterator),
                Argument.Tail_After (Iterator));
@@ -255,6 +277,24 @@ package body VSS.Command_Line.Parsers is
                  and then Argument.At_First_Character.Element
                    = VSS.Characters.Latin.Equals_Sign
                then
+                  if Self.Defined_Named_Options.Contains (Name) then
+                     --  Binary option doesn't support '--N=value' format.
+
+                     declare
+                        Option : constant Named_Option'Class :=
+                          Self.Defined_Named_Options (Name);
+
+                     begin
+                        if Option in Binary_Option'Class then
+                           Self.Error_Message :=
+                             "binary option can't have value";
+                           Success            := False;
+
+                           return;
+                        end if;
+                     end;
+                  end if;
+
                   Append_Named_Argument
                     (Name, Argument.Tail_After (Argument.At_First_Character));
                   Argument.Clear;
@@ -266,7 +306,8 @@ package body VSS.Command_Line.Parsers is
 
                   begin
                      if Option in Binary_Option'Class then
-                        raise Program_Error;
+                        Append_Named_Argument
+                          (Name, VSS.Strings.Empty_Virtual_String);
 
                      else
                         if Argument.Is_Empty then

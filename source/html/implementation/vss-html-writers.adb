@@ -535,8 +535,9 @@ package body VSS.HTML.Writers is
                use type VSS.Strings.Character_Count;
 
                Iterator : constant VSS.Strings.Line_Iterators.Line_Iterator :=
-                 Self.Text.At_First_Line
-                   (VSS.XML.Implementation.HTML_Writer_Data
+                 VSS.Strings.Line_Iterators.At_First
+                   (Self.Text,
+                    VSS.XML.Implementation.HTML_Writer_Data
                       .HTML_New_Line_Function);
 
             begin

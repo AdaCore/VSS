@@ -183,7 +183,8 @@ procedure Test_Line_Iterators is
       use type VSS.Strings.Virtual_String;
 
       J : VSS.Strings.Line_Iterators.Line_Iterator :=
-        Source_String.At_First_Line (Terminators, Keep_Terminator);
+        VSS.Strings.Line_Iterators.At_First
+          (Source_String, Terminators, Keep_Terminator);
       C : Natural := 1;
 
    begin
@@ -290,7 +291,8 @@ procedure Test_Line_Iterators is
    begin
       declare
          JL : VSS.Strings.Line_Iterators.Line_Iterator :=
-           Source_String.At_First_Line (Terminators, Keep_Terminator);
+           VSS.Strings.Line_Iterators.At_First
+             (Source_String, Terminators, Keep_Terminator);
 
       begin
          for K in 2 .. Restart_Line loop
@@ -312,7 +314,8 @@ procedure Test_Line_Iterators is
 
       declare
          J : VSS.Strings.Line_Iterators.Line_Iterator :=
-           Source_String.At_Line (M, Terminators, Keep_Terminator);
+           VSS.Strings.Line_Iterators.At_Position
+             (Source_String, M, Terminators, Keep_Terminator);
          C : Positive := Restart_Line;
 
       begin
@@ -368,7 +371,7 @@ procedure Test_Line_Iterators is
    procedure Test_U902_007 is
       Text : constant VSS.Strings.Virtual_String := "f";
       J    : constant VSS.Strings.Line_Iterators.Line_Iterator :=
-        Text.At_First_Line (Keep_Terminator => True);
+        VSS.Strings.Line_Iterators.At_First (Text, Keep_Terminator => True);
       LT   : VSS.Strings.Virtual_String;
 
    begin

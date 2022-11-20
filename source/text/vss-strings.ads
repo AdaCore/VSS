@@ -14,7 +14,6 @@ private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
-limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Cursors.Iterators.Words;
 limited with VSS.Strings.Texts;
 
@@ -143,27 +142,6 @@ package VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
    --  Return iterator pointing to the word of the string at the given
    --  position.
-
-   function At_First_Line
-     (Self            : Virtual_String'Class;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
-   --  Return iterator pointing to the first logical line of the string.
-
-   function At_Line
-     (Self            : Virtual_String'Class;
-      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
-   --  Return iterator pointing to the line at given position.
-
-   --  function At_Last_Line
-   --    (Self            : Virtual_String'Class;
-   --     Terminators     : Line_Terminator_Set := New_Line_Function;
-   --     Keep_Terminator : Boolean := False)
-   --     return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
 
    overriding function "="
      (Left  : Virtual_String;

@@ -36,6 +36,32 @@ package VSS.Strings.Cursors.Iterators is
      (Self : Abstract_Segment_Iterator) return Boolean is abstract;
    --  Return True when iterator points to the text element
 
+   --  ??? Move functions below to Abstract_Iterator interface?
+
+   --  function Before_First
+   --    (Item : VSS.Strings.Virtual_String'Class)
+   --     return Abstract_Segment_Iterator is abstract;
+   --  --  Create iterator pointing before the first segment of the given
+   --  --  string.
+   --
+   --  function At_First
+   --    (Item : VSS.Strings.Virtual_String'Class)
+   --     return Abstract_Segment_Iterator is abstract;
+   --  --  Create iterator pointing to the first segment of the given string.
+   --
+   --  --  function At_Position
+   --  --    (Item     : VSS.Strings.Virtual_String'Class;
+   --
+   --  function At_Last
+   --    (Item : VSS.Strings.Virtual_String'Class)
+   --     return Abstract_Segment_Iterator is abstract;
+   --  --  Create iterator pointing to the last segment of the given string.
+   --
+   --  function After_Last
+   --    (Item : VSS.Strings.Virtual_String'Class)
+   --     return Abstract_Segment_Iterator is abstract;
+   --  --  Create iterator pointing after the last segment of the given string.
+   --
 private
 
    type Abstract_Character_Iterator is

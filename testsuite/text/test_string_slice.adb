@@ -102,9 +102,9 @@ begin
       JC2 : constant VSS.Strings.Character_Iterators.Character_Iterator :=
         S2.At_First_Character;
       JL1 : constant VSS.Strings.Line_Iterators.Line_Iterator           :=
-        S1.At_First_Line;
+        VSS.Strings.Line_Iterators.At_First (S1);
       JL2 : constant VSS.Strings.Line_Iterators.Line_Iterator           :=
-        S2.At_First_Line;
+        VSS.Strings.Line_Iterators.At_First (S2);
 
       R   : VSS.Strings.Virtual_String;
 

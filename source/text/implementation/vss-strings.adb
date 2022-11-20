@@ -10,7 +10,6 @@ with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
 with VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals;
-with VSS.Strings.Cursors.Iterators.Lines.Internals;
 with VSS.Strings.Cursors.Iterators.Words.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
@@ -234,21 +233,6 @@ package body VSS.Strings is
    end At_First_Grapheme_Cluster;
 
    -------------------
-   -- At_First_Line --
-   -------------------
-
-   function At_First_Line
-     (Self            : Virtual_String'Class;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
-   begin
-      return
-        VSS.Strings.Cursors.Iterators.Lines.Internals.First_Line
-          (Self, Terminators, Keep_Terminator);
-   end At_First_Line;
-
-   -------------------
    -- At_First_Word --
    -------------------
 
@@ -318,27 +302,6 @@ package body VSS.Strings is
    begin
       return VSS.Strings.Cursors.Iterators.Words.Internals.Last_Word (Self);
    end At_Last_Word;
-
-   -------------
-   -- At_Line --
-   -------------
-
-   function At_Line
-     (Self            : Virtual_String'Class;
-      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
-   is
-      Start : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
-   begin
-      return
-        VSS.Strings.Cursors.Iterators.Lines.Internals.Line
-          (Self, Start, Terminators, Keep_Terminator);
-   end At_Line;
 
    -------------
    -- At_Word --

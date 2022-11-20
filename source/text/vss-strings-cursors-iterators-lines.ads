@@ -63,6 +63,37 @@ package VSS.Strings.Cursors.Iterators.Lines is
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Return offset of the last UTF-16 code unit of the logical element.
 
+   --  function Before_First
+   --    (Item : VSS.Strings.Virtual_String'Class)
+   --     return Abstract_Segment_Iterator is abstract;
+   --  --  Create iterator pointing before the first line of the given
+   --  --  string.
+
+   function At_First
+     (Item            : VSS.Strings.Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False) return Line_Iterator;
+   --  Create iterator pointing to the first line of the given string.
+
+   function At_Position
+     (Item            : Virtual_String'Class;
+      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False) return Line_Iterator;
+   --  Return iterator pointing to the line at given position.
+
+   --  function At_Last
+   --    (Item            : VSS.Strings.Virtual_String'Class;
+   --     Terminators     : Line_Terminator_Set := New_Line_Function;
+   --     Keep_Terminator : Boolean := False)
+   --     return Abstract_Segment_Iterator is abstract;
+   --  --  Create iterator pointing to the last line of the given string.
+   --
+   --  function After_Last
+   --    (Item : VSS.Strings.Virtual_String'Class)
+   --     return Abstract_Segment_Iterator is abstract;
+   --  --  Create iterator pointing after the last line of the given string.
+
 private
 
    type Line_Iterator is new Abstract_Segment_Iterator with record
@@ -95,5 +126,17 @@ private
       Keep_Terminator : Boolean             := False);
    --  Initialize iterator and lookup for line boundaries at the given
    --  position.
+
+   --  overriding function Before_First
+   --    (Item : VSS.Strings.Virtual_String'Class) return Line_Iterator;
+   --
+   --  overriding function At_First
+   --    (Item : VSS.Strings.Virtual_String'Class) return Line_Iterator;
+   --
+   --  overriding function At_Last
+   --    (Item : VSS.Strings.Virtual_String'Class) return Line_Iterator;
+   --
+   --  overriding function After_Last
+   --    (Item : VSS.Strings.Virtual_String'Class) return Line_Iterator;
 
 end VSS.Strings.Cursors.Iterators.Lines;

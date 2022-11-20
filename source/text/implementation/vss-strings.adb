@@ -10,7 +10,6 @@ with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
 with VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals;
-with VSS.Strings.Cursors.Iterators.Words.Internals;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
@@ -232,17 +231,6 @@ package body VSS.Strings is
           .First_Grapheme_Cluster (Self);
    end At_First_Grapheme_Cluster;
 
-   -------------------
-   -- At_First_Word --
-   -------------------
-
-   function At_First_Word
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
-   begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.First_Word (Self);
-   end At_First_Word;
-
    -------------------------
    -- At_Grapheme_Cluster --
    -------------------------
@@ -291,34 +279,6 @@ package body VSS.Strings is
         VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals
           .Last_Grapheme_Cluster (Self);
    end At_Last_Grapheme_Cluster;
-
-   ------------------
-   -- At_Last_Word --
-   ------------------
-
-   function At_Last_Word
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
-   begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.Last_Word (Self);
-   end At_Last_Word;
-
-   -------------
-   -- At_Word --
-   -------------
-
-   function At_Word
-     (Self     : Virtual_String'Class;
-      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator
-   is
-      Start : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
-   begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.Word (Self, Start);
-   end At_Word;
 
    ----------------------------
    -- Before_First_Character --

@@ -31,7 +31,8 @@ procedure Test_Word_Iterators is
    is
       use type VSS.Strings.Virtual_String;
 
-      JF : VSS.Strings.Word_Iterators.Word_Iterator := String.At_First_Word;
+      JF : VSS.Strings.Word_Iterators.Word_Iterator :=
+        VSS.Strings.Word_Iterators.At_First (String);
       --  JB : VSS.Strings.Word_Iterators.Word_Iterator := String.Last_Word;
       S  : Positive := 1;
 

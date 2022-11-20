@@ -13,6 +13,19 @@ package VSS.Strings.Cursors.Iterators.Words is
    function Backward (Self : in out Word_Iterator) return Boolean;
    --  Move iterator to previous word.
 
+   function At_First (Item : Virtual_String'Class) return Word_Iterator;
+   --  Return iterator pointing to the first word of the string.
+
+   function At_Last (Item : Virtual_String'Class) return Word_Iterator;
+   --  Return iterator pointing to the last word of the string.
+
+   function At_Position
+     (Item     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return Word_Iterator;
+   --  Return iterator pointing to the word of the string at the given
+   --  position.
+
 private
 
    type Word_Iterator is new Abstract_Segment_Iterator with record

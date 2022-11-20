@@ -14,7 +14,6 @@ private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
-limited with VSS.Strings.Cursors.Iterators.Words;
 limited with VSS.Strings.Texts;
 
 package VSS.Strings is
@@ -125,23 +124,6 @@ package VSS.Strings is
                .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the grapheme cluster of the string at the
    --  given position.
-
-   function At_First_Word
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
-   --  Return iterator pointing to the first word of the string.
-
-   function At_Last_Word
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
-   --  Return iterator pointing to the last word of the string.
-
-   function At_Word
-     (Self     : Virtual_String'Class;
-      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator;
-   --  Return iterator pointing to the word of the string at the given
-   --  position.
 
    overriding function "="
      (Left  : Virtual_String;

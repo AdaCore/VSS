@@ -13,7 +13,6 @@ private with VSS.Implementation.Referrers;
 private with VSS.Implementation.Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
-limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 limited with VSS.Strings.Texts;
 
 package VSS.Strings is
@@ -104,26 +103,6 @@ package VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing after the last character of the string.
-
-   function At_First_Grapheme_Cluster
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
-               .Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the first grapheme cluster of the string.
-
-   function At_Last_Grapheme_Cluster
-     (Self : Virtual_String'Class)
-      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
-               .Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the last grapheme cluster of the string.
-
-   function At_Grapheme_Cluster
-     (Self     : Virtual_String'Class;
-      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
-               .Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the grapheme cluster of the string at the
-   --  given position.
 
    overriding function "="
      (Left  : Virtual_String;

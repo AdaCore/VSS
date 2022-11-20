@@ -268,7 +268,9 @@ package body VSS.Command_Line.Parsers is
          while not Argument.Is_Empty loop
             declare
                Name : constant VSS.Strings.Virtual_String :=
-                 Argument.Slice (Argument.At_First_Grapheme_Cluster);
+                 Argument.Slice
+                   (VSS.Strings.Grapheme_Cluster_Iterators.At_First
+                      (Argument));
 
             begin
                Remove_Prefix (Argument, Name);

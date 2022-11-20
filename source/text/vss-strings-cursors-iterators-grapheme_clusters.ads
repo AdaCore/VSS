@@ -14,6 +14,21 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Backward (Self : in out Grapheme_Cluster_Iterator) return Boolean;
    --  Move iterator to previous grapheme cluster.
 
+   function At_First
+     (Item : Virtual_String'Class) return Grapheme_Cluster_Iterator;
+   --  Return iterator pointing to the first grapheme cluster of the string.
+
+   function At_Last
+     (Item : Virtual_String'Class) return Grapheme_Cluster_Iterator;
+   --  Return iterator pointing to the last grapheme cluster of the string.
+
+   function At_Position
+     (Item     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return Grapheme_Cluster_Iterator;
+   --  Return iterator pointing to the grapheme cluster of the string at the
+   --  given position.
+
 private
 
    type Grapheme_Cluster_Iterator is new Abstract_Segment_Iterator with record

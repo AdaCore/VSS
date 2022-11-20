@@ -37,9 +37,9 @@ procedure Test_Grapheme_Cluster_Iterators is
       use type VSS.Strings.Virtual_String;
 
       JF : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        String.At_First_Grapheme_Cluster;
+        VSS.Strings.Grapheme_Cluster_Iterators.At_First (String);
       JB : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        String.At_Last_Grapheme_Cluster;
+        VSS.Strings.Grapheme_Cluster_Iterators.At_Last (String);
       S  : Positive := 1;
 
    begin
@@ -88,9 +88,9 @@ procedure Test_Grapheme_Cluster_Iterators is
 
       JE : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator;
       JF : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        S.At_First_Grapheme_Cluster;
+        VSS.Strings.Grapheme_Cluster_Iterators.At_First (S);
       JL : VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator :=
-        S.At_Last_Grapheme_Cluster;
+        VSS.Strings.Grapheme_Cluster_Iterators.At_Last (S);
 
    begin
       Test_Support.Assert (JE.First_Character_Index = 0);

@@ -7,6 +7,7 @@
 with VSS.Implementation.String_Handlers;
 with VSS.Implementation.UCD_Core;
 
+with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Markers;
 pragma Unreferenced (VSS.Strings.Cursors.Markers);
 --  XXX GNAT 20210710: crash without clause above.
@@ -258,6 +259,63 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
       return Properties.WB in WB_HL;
    end Apply_WB7c;
+
+   --------------
+   -- At_First --
+   --------------
+
+   function At_First (Item : Virtual_String'Class) return Word_Iterator is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
+   begin
+      return Result : Word_Iterator do
+         Handler.Before_First_Character (Item.Data, Position);
+         Dummy := Handler.Forward (Item.Data, Position);
+         Result.Initialize (Item, Position);
+      end return;
+   end At_First;
+
+   -------------
+   -- At_Last --
+   -------------
+
+   function At_Last (Item : Virtual_String'Class) return Word_Iterator is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
+   begin
+      return Result : Word_Iterator do
+         Handler.After_Last_Character (Item.Data, Position);
+         Dummy := Handler.Backward (Item.Data, Position);
+         Result.Initialize (Item, Position);
+      end return;
+   end At_Last;
+
+   -----------------
+   -- At_Position --
+   -----------------
+
+   function At_Position
+     (Item     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator
+   is
+      Start : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Position).all;
+
+   begin
+      return Result : Word_Iterator do
+         Result.Initialize (Item, Start);
+      end return;
+   end At_Position;
 
    --------------
    -- Backward --

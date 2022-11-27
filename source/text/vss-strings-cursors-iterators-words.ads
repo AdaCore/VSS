@@ -4,6 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+--  Iterator to iterate over word boundaries. Pointing element is not
+--  necessary a word, it may point to the sequence of word separators too.
+
 package VSS.Strings.Cursors.Iterators.Words is
 
    pragma Preelaborate;
@@ -12,6 +15,25 @@ package VSS.Strings.Cursors.Iterators.Words is
 
    function Backward (Self : in out Word_Iterator) return Boolean;
    --  Move iterator to previous word.
+
+   --  function Before_First (Item : Virtual_String'Class) return Word_Iterator;
+   --  Return iterator pointing before the first word of the string.
+
+   function At_First (Item : Virtual_String'Class) return Word_Iterator;
+   --  Return iterator pointing to the first word of the string.
+
+   function At_Position
+     (Item     : Virtual_String'Class;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+      return Word_Iterator;
+   --  Return iterator pointing to the word of the string at the given
+   --  position.
+
+   function At_Last (Item : Virtual_String'Class) return Word_Iterator;
+   --  Return iterator pointing to the last word of the string.
+
+   --  function After_Last (Item : Virtual_String'Class) return Word_Iterator;
+   --  Return iterator pointing after the last word of the string.
 
 private
 

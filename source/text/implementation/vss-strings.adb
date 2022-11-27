@@ -11,7 +11,7 @@ with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
 with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 with VSS.Strings.Cursors.Iterators.Lines;
-with VSS.Strings.Cursors.Iterators.Words.Internals;
+with VSS.Strings.Cursors.Iterators.Words;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
@@ -254,7 +254,7 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.First_Word (Self);
+      return VSS.Strings.Cursors.Iterators.Words.At_First (Self);
    end At_First_Word;
 
    -------------------------
@@ -307,7 +307,7 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.Last_Word (Self);
+      return VSS.Strings.Cursors.Iterators.Words.At_Last (Self);
    end At_Last_Word;
 
    -------------
@@ -333,14 +333,9 @@ package body VSS.Strings is
    function At_Word
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator
-   is
-      Start : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.Word (Self, Start);
+      return VSS.Strings.Cursors.Iterators.Words.At_Position (Self, Position);
    end At_Word;
 
    ----------------------------

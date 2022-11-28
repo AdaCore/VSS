@@ -9,9 +9,9 @@ with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
-with VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals;
-with VSS.Strings.Cursors.Iterators.Lines.Internals;
-with VSS.Strings.Cursors.Iterators.Words.Internals;
+with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
+with VSS.Strings.Cursors.Iterators.Lines;
+with VSS.Strings.Cursors.Iterators.Words;
 with VSS.String_Vectors.Internals;
 with VSS.Strings.Texts;
 
@@ -228,9 +228,7 @@ package body VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals
-          .First_Grapheme_Cluster (Self);
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters.At_First (Self);
    end At_First_Grapheme_Cluster;
 
    -------------------
@@ -244,7 +242,7 @@ package body VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
    begin
       return
-        VSS.Strings.Cursors.Iterators.Lines.Internals.First_Line
+        VSS.Strings.Cursors.Iterators.Lines.At_First
           (Self, Terminators, Keep_Terminator);
    end At_First_Line;
 
@@ -256,7 +254,7 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.First_Word (Self);
+      return VSS.Strings.Cursors.Iterators.Words.At_First (Self);
    end At_First_Word;
 
    -------------------------
@@ -267,16 +265,11 @@ package body VSS.Strings is
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
-               .Grapheme_Cluster_Iterator
-   is
-      Start : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
+               .Grapheme_Cluster_Iterator is
    begin
       return
-        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals
-          .Grapheme_Cluster (Self, Start);
+        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.At_Position
+          (Self, Position);
    end At_Grapheme_Cluster;
 
    -----------------------
@@ -303,9 +296,7 @@ package body VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.Internals
-          .Last_Grapheme_Cluster (Self);
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters.At_Last (Self);
    end At_Last_Grapheme_Cluster;
 
    ------------------
@@ -316,7 +307,7 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.Last_Word (Self);
+      return VSS.Strings.Cursors.Iterators.Words.At_Last (Self);
    end At_Last_Word;
 
    -------------
@@ -328,16 +319,11 @@ package body VSS.Strings is
       Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean := False)
-      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator
-   is
-      Start : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
    begin
       return
-        VSS.Strings.Cursors.Iterators.Lines.Internals.Line
-          (Self, Start, Terminators, Keep_Terminator);
+        VSS.Strings.Cursors.Iterators.Lines.At_Position
+          (Self, Position, Terminators, Keep_Terminator);
    end At_Line;
 
    -------------
@@ -347,14 +333,9 @@ package body VSS.Strings is
    function At_Word
      (Self     : Virtual_String'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator
-   is
-      Start : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.Internals.Word (Self, Start);
+      return VSS.Strings.Cursors.Iterators.Words.At_Position (Self, Position);
    end At_Word;
 
    ----------------------------

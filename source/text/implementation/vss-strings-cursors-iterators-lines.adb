@@ -8,6 +8,7 @@ pragma Ada_2022;
 
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Handlers;
+with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Markers.Internals;
 with VSS.Strings.Internals;
 
@@ -38,6 +39,51 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Position : VSS.Implementation.Strings.Cursor);
    --  Lookup for previous line. Position points to the first character of
    --  the line of the current line.
+
+   --------------
+   -- At_First --
+   --------------
+
+   function At_First
+     (Item            : VSS.Strings.Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False) return Line_Iterator
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
+   begin
+      return Result : Line_Iterator do
+         Handler.Before_First_Character (Item.Data, Position);
+         Dummy := Handler.Forward (Item.Data, Position);
+         Result.Initialize (Item, Position, Terminators, Keep_Terminator);
+      end return;
+   end At_First;
+
+   -----------------
+   -- At_Position --
+   -----------------
+
+   function At_Position
+     (Item            : Virtual_String'Class;
+      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False) return Line_Iterator
+   is
+      Inside : constant VSS.Implementation.Strings.Cursor :=
+        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
+          (Position).all;
+
+   begin
+      return Result : Line_Iterator do
+         if not VSS.Implementation.Strings.Is_Invalid (Inside) then
+            Result.Initialize (Item, Inside, Terminators, Keep_Terminator);
+         end if;
+      end return;
+   end At_Position;
 
    ------------------------
    -- Element_Terminator --

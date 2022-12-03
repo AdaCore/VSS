@@ -440,6 +440,18 @@ package body VSS.Command_Line.Parsers is
 
    function Values
      (Self   : Command_Line_Parser'Class;
+      Option : Value_Option'Class)
+      return VSS.String_Vectors.Virtual_String_Vector is
+   begin
+      return Self.Known_Named_Options_Values (Option.Unique_Name);
+   end Values;
+
+   ------------
+   -- Values --
+   ------------
+
+   function Values
+     (Self   : Command_Line_Parser'Class;
       Option : Name_Value_Option'Class) return Name_Value_Vectors.Vector
    is
       use type VSS.Characters.Virtual_Character;

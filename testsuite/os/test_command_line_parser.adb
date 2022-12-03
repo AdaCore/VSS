@@ -32,6 +32,9 @@ procedure Test_Command_Line_Parser is
    procedure Test_Long_Next;
    --  Test of "--project" "project.gpr"
 
+   procedure Test_Multiple_Values_Mixed;
+   --  Test of "-o" "a" "-ob" "-o=c" "--output=d" "--output" "e"
+
    procedure Test_Name_Value_No_Separator;
    --  Test of "-Xname=value"
 
@@ -173,6 +176,41 @@ procedure Test_Command_Line_Parser is
       Test_Support.Assert (Parser.Is_Specified (Option));
       Test_Support.Assert (Parser.Value (Option) = "project.gpr");
    end Test_Long_Next;
+
+   --------------------------------
+   -- Test_Multiple_Values_Mixed --
+   --------------------------------
+
+   procedure Test_Multiple_Values_Mixed is
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option    : constant VSS.Command_Line.Value_Option :=
+        (Short_Name  => "o",
+         Long_Name   => "output",
+         Value_Name  => "value",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option);
+
+      Arguments.Append ("-o");
+      Arguments.Append ("a");
+      Arguments.Append ("-ob");
+      Arguments.Append ("-o=c");
+      Arguments.Append ("--output=d");
+      Arguments.Append ("--output");
+      Arguments.Append ("e");
+
+      Test_Support.Assert (Parser.Parse (Arguments));
+      Test_Support.Assert (Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (Parser.Is_Specified (Option));
+      Test_Support.Assert (Parser.Values (Option).Length = 5);
+      Test_Support.Assert (Parser.Values (Option) (1) = "a");
+      Test_Support.Assert (Parser.Values (Option) (2) = "b");
+      Test_Support.Assert (Parser.Values (Option) (3) = "c");
+      Test_Support.Assert (Parser.Values (Option) (4) = "d");
+      Test_Support.Assert (Parser.Values (Option) (5) = "e");
+   end Test_Multiple_Values_Mixed;
 
    ---------------------------
    -- Test_Name_Value_Mixed --
@@ -405,6 +443,7 @@ begin
    Test_Short_Next;
    Test_Long_Equal;
    Test_Long_Next;
+   Test_Multiple_Values_Mixed;
    Test_Name_Value_No_Separator;
    Test_Name_Value_Next;
    Test_Name_Value_Mixed;

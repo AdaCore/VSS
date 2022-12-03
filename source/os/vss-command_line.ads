@@ -59,6 +59,11 @@ package VSS.Command_Line is
    --  Return value of the given option.
 
    function Values
+     (Option : Value_Option'Class)
+      return VSS.String_Vectors.Virtual_String_Vector;
+   --  Return all values of the given option specified in the command line.
+
+   function Values
      (Option : Name_Value_Option'Class) return Name_Value_Vectors.Vector;
    --  Return all name=value pairs of the given option specified in the
    --  command line.

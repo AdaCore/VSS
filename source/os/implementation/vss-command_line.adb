@@ -136,6 +136,17 @@ package body VSS.Command_Line is
    ------------
 
    function Values
+     (Option : Value_Option'Class)
+      return VSS.String_Vectors.Virtual_String_Vector is
+   begin
+      return Parser.Values (Option);
+   end Values;
+
+   ------------
+   -- Values --
+   ------------
+
+   function Values
      (Option : Name_Value_Option'Class) return Name_Value_Vectors.Vector is
    begin
       return Parser.Values (Option);

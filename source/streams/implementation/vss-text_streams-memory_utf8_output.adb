@@ -11,6 +11,26 @@ with VSS.Unicode;
 
 package body VSS.Text_Streams.Memory_UTF8_Output is
 
+   -------------------
+   -- Error_Message --
+   -------------------
+
+   overriding function Error_Message
+     (Self : Memory_UTF8_Output_Stream) return VSS.Strings.Virtual_String is
+   begin
+      return VSS.Strings.Empty_Virtual_String;
+   end Error_Message;
+
+   ---------------
+   -- Has_Error --
+   ---------------
+
+   overriding function Has_Error
+     (Self : Memory_UTF8_Output_Stream) return Boolean is
+   begin
+      return False;
+   end Has_Error;
+
    ---------
    -- Put --
    ---------

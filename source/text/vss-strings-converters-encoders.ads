@@ -61,6 +61,10 @@ package VSS.Strings.Converters.Encoders is
    --  set to True, incomplete data is not allowed, it will be returned as
    --  encoding error.
 
+   procedure Reset_State (Self : in out Virtual_String_Encoder'Class);
+   --  Reset state of the encoder to initial (after call of Initialize).
+   --  All accumulated incomplete data will be lost.
+
 private
 
    Zero_Width_No_Break_Space_Character :

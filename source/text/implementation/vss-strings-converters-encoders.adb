@@ -181,4 +181,15 @@ package body VSS.Strings.Converters.Encoders is
       Self.BOM_Written := not Self.Flags (Process_BOM);
    end Reset_State;
 
+   -----------------
+   -- Reset_State --
+   -----------------
+
+   procedure Reset_State (Self : in out Virtual_String_Encoder'Class) is
+   begin
+      if Self.Encoder /= null then
+         Self.Encoder.Reset_State;
+      end if;
+   end Reset_State;
+
 end VSS.Strings.Converters.Encoders;

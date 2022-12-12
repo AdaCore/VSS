@@ -44,4 +44,12 @@ package VSS.Text_Streams is
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean) is abstract;
 
+   function Has_Error (Self : Output_Text_Stream) return Boolean is abstract;
+   --  Return True when any error is detected.
+
+   function Error_Message
+     (Self : Output_Text_Stream) return VSS.Strings.Virtual_String
+         is abstract;
+   --  Return error message when Has_Error returns True, or 'null' string.
+
 end VSS.Text_Streams;

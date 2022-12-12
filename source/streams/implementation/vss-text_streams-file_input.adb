@@ -45,6 +45,15 @@ package body VSS.Text_Streams.File_Input is
       return Self.Error;
    end Error_Message;
 
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding procedure Finalize (Self : in out File_Input_Text_Stream) is
+   begin
+      Self.Close;
+   end Finalize;
+
    ---------
    -- Get --
    ---------

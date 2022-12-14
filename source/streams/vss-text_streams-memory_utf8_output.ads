@@ -13,9 +13,17 @@ package VSS.Text_Streams.Memory_UTF8_Output is
       Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
    end record;
 
+private
+
    overriding procedure Put
      (Self    : in out Memory_UTF8_Output_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean);
+
+   overriding function Has_Error
+     (Self : Memory_UTF8_Output_Stream) return Boolean;
+
+   overriding function Error_Message
+     (Self : Memory_UTF8_Output_Stream) return VSS.Strings.Virtual_String;
 
 end VSS.Text_Streams.Memory_UTF8_Output;

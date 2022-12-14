@@ -48,6 +48,8 @@ private
       Error   : VSS.Strings.Virtual_String;
    end record;
 
+   overriding procedure Finalize (Self : in out File_Input_Text_Stream);
+
    overriding procedure Get
      (Self    : in out File_Input_Text_Stream;
       Item    : out VSS.Characters.Virtual_Character;

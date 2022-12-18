@@ -209,6 +209,29 @@ package body VSS.XML.Implementation.Template_Namespaces is
 
          begin
             if Proxy
+              in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+            then
+               declare
+                  Value : VSS.XML.Templates.Values.Value :=
+                    VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+                      (Proxy).Value;
+
+               begin
+                  case Value.Kind is
+                     when VSS.XML.Templates.Values.Boolean =>
+                        return Value;
+
+                     when VSS.XML.Templates.Values.String =>
+                        return
+                          (Kind          => VSS.XML.Templates.Values.Boolean,
+                           Boolean_Value => not Value.String_Value.Is_Empty);
+
+                     when others =>
+                        raise Program_Error;
+                  end case;
+               end;
+
+            elsif Proxy
               in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
             then
                return

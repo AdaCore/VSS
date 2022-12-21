@@ -575,11 +575,13 @@ package body VSS.XML.Implementation.Template_Namespaces is
             --        in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
             --     then
             --        raise Program_Error;
-      --  --              return
-      --  --                VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
-      --  --                  (Proxy).Content;
+      --  --          return
+      --  --          VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
+      --  --             (Proxy).Content;
       --
-      --           elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+      --           elsif Proxy
+      --              in VSS.XML.Templates.Proxies.Error_Proxy'Class
+      --           then
       --              return
       --                (Kind    => VSS.XML.Templates.Values.Error,
       --                 Message =>

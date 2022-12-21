@@ -1,0 +1,23 @@
+stages:
+  - build_and_test
+
+#########
+# BUILD #
+#########
+
+build_and_test:
+  services:
+     - image:sandbox
+     - cpu:8
+     - mem:16
+  stage: build_and_test
+  script:
+    - . ~/.aws_container_credentials
+    - export PATH=/it/e3/bin:$PATH
+
+    # Tell the anod sandbox to use our repository
+    - cd /it/wave
+    - anod vcs --add-repo vss $CI_PROJECT_DIR
+
+    # Build the ALS as a test
+    - anod build als

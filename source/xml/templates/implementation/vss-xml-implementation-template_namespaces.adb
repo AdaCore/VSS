@@ -588,33 +588,29 @@ package body VSS.XML.Implementation.Template_Namespaces is
             raise Program_Error;
 
          else
-            raise Program_Error;
-            --  declare
-            --     Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-            --       Resolve (Binded.all, Suffix);
-            --
-            --  begin
-            --     if Proxy
-            --        in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
-            --     then
-            --        raise Program_Error;
-      --  --          return
-      --  --          VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
-      --  --             (Proxy).Content;
-      --
-      --           elsif Proxy
-      --              in VSS.XML.Templates.Proxies.Error_Proxy'Class
-      --           then
-      --              return
-      --                (Kind    => VSS.XML.Templates.Values.Error,
-      --                 Message =>
-      --                   VSS.XML.Templates.Proxies.Error_Proxy'Class
-      --                     (Proxy).Message);
-      --
-      --           else
-      --              raise Program_Error;
-      --           end if;
-      --        end;
+            declare
+               Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+                 Resolve (Binded.all, Suffix);
+
+            begin
+               if Proxy
+                  in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+               then
+                  return
+                    VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+                      (Proxy).Value;
+
+               elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+                  return
+                    (Kind    => VSS.XML.Templates.Values.Error,
+                     Message =>
+                       VSS.XML.Templates.Proxies.Error_Proxy'Class
+                         (Proxy).Message);
+
+               else
+                  raise Program_Error;
+               end if;
+            end;
          end if;
       end if;
       --  Position : constant Name_Item_Maps.Cursor :=

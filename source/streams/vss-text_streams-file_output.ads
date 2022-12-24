@@ -49,7 +49,7 @@ private
 
    overriding procedure Finalize (Self : in out File_Output_Text_Stream);
 
-   procedure Put
+   overriding procedure Put
      (Self    : in out File_Output_Text_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean);

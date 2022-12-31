@@ -20,6 +20,6 @@ package VSS.XML.Namespaces is
      VSS.IRIs.To_IRI ("http://www.w3.org/2000/xmlns/");
 
    TAL_Namespace    : constant VSS.IRIs.IRI :=
-     VSS.IRIs.To_IRI ("http://xml.zope.org/namespaces/tal");
+     VSS.IRIs.To_IRI ("http://xml.adacore.com/namespaces/tal");
 
 end VSS.XML.Namespaces;

@@ -83,7 +83,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
          --  end if;
 
          Self.Current.Content      := Instruction.Content_Path;
-         Self.Current.Text_Content := Instruction.Is_Text;
       end Do_Content;
 
       -----------------
@@ -549,7 +548,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
             Negate       => False,
             Iterator     => null,
             Content      => VSS.String_Vectors.Empty_Virtual_String_Vector,
-            Text_Content => True,
             Omit_Tag     => False,
             System_Id    => <>,
             Line         => 0,

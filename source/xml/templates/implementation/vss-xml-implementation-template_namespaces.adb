@@ -6,8 +6,6 @@
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.XML.Events;
-
 package body VSS.XML.Implementation.Template_Namespaces is
 
    use type VSS.XML.Templates.Proxies.Proxy_Access;
@@ -212,7 +210,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
               in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
             then
                declare
-                  Value : VSS.XML.Templates.Values.Value :=
+                  Value : constant VSS.XML.Templates.Values.Value :=
                     VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
                       (Proxy).Value;
 

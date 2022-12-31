@@ -6,7 +6,6 @@
 
 with VSS.Strings;
 
-with VSS.XML.Event_Vectors;
 with VSS.XML.Templates.Values;
 
 package VSS.XML.Templates.Proxies is

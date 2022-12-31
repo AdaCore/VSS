@@ -11,7 +11,6 @@ with Ada.Unchecked_Deallocation;
 with VSS.IRIs;
 with VSS.XML.Attributes.Containers;
 with VSS.XML.Events;
-with VSS.XML.Event_Vectors;
 with VSS.XML.Implementation.Parse_Errors;
 with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;

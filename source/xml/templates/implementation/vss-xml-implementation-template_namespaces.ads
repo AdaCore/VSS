@@ -9,7 +9,6 @@ with Ada.Finalization;
 
 with VSS.Strings.Hash;
 with VSS.String_Vectors;
-with VSS.XML.Event_Vectors;
 with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;
 

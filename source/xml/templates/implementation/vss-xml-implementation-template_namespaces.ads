@@ -60,21 +60,6 @@ package VSS.XML.Implementation.Template_Namespaces is
       Success : in out Boolean) return Iterable_Iterator_Access
      with Pre => not Path.Is_Empty;
 
-   function Resolve_Text_Content
-     (Self    : Namespace'Class;
-      Path    : VSS.String_Vectors.Virtual_String_Vector;
-      Error   : in out Error_Handler'Class;
-      Success : in out Boolean)
-      return VSS.Strings.Virtual_String
-     with Pre => not Path.Is_Empty;
-
-   function Resolve_Structure_Content
-     (Self    : Namespace'Class;
-      Path    : VSS.String_Vectors.Virtual_String_Vector;
-      Error   : in out Error_Handler'Class;
-      Success : in out Boolean) return VSS.XML.Event_Vectors.Vector
-     with Pre => not Path.Is_Empty;
-
    function Resolve_Value
      (Self : Namespace'Class;
       Path : VSS.String_Vectors.Virtual_String_Vector)

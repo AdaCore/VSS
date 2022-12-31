@@ -291,108 +291,125 @@ package body VSS.XML.Implementation.Template_Evaluators is
               and then not Self.Current.Content.Is_Empty
             then
                if Self.Content /= null then
-                  if Self.Current.Text_Content then
-                     Self.Content.Characters
-                       (Self.Current.Namespace.Resolve_Text_Content
-                          (Self.Current.Content, Self, Success),
-                        Success);
+                  declare
+                     V : constant VSS.XML.Templates.Values.Value :=
+                       Self.Current.Namespace.Resolve_Value
+                         (Self.Current.Content);
 
-                  else
-                     declare
-                        use type VSS.XML.Lexical_Handlers
-                                   .SAX_Lexical_Handler_Access;
+                  begin
+                     case V.Kind is
+                        when VSS.XML.Templates.Values.Error =>
+                           null;
 
-                        procedure Flush_Start_Element;
+                        when VSS.XML.Templates.Values.Default =>
+                           raise Program_Error;
 
-                        Content    : constant VSS.XML.Event_Vectors.Vector :=
-                          Self.Current.Namespace.Resolve_Structure_Content
-                            (Self.Current.Content, Self, Success);
-                        URI        : VSS.IRIs.IRI;
-                        Name       : VSS.Strings.Virtual_String;
-                        Attributes : VSS.XML.Attributes.Containers.Attributes;
+                        when VSS.XML.Templates.Values.Nothing =>
+                           raise Program_Error;
 
-                        -------------------------
-                        -- Flush_Start_Element --
-                        -------------------------
+                        when VSS.XML.Templates.Values.Boolean =>
+                           raise Program_Error;
 
-                        procedure Flush_Start_Element is
-                        begin
-                           if not Name.Is_Empty then
-                              Self.Content.Start_Element
-                                (URI, Name, Attributes, Success);
+                        when VSS.XML.Templates.Values.String =>
+                           Self.Content.Characters (V.String_Value, Success);
 
-                              --  URI.Clear;
-                              Name.Clear;
-                              Attributes.Clear;
-                           end if;
-                        end Flush_Start_Element;
+                        when VSS.XML.Templates.Values.Content =>
+                           declare
+                              use type VSS.XML.Lexical_Handlers
+                                         .SAX_Lexical_Handler_Access;
 
-                     begin
-                        for Item of Content loop
-                           case Item.Kind is
-                              when VSS.XML.Events.None =>
-                                 raise Program_Error;
+                              procedure Flush_Start_Element;
 
-                              when VSS.XML.Events.Start_Element =>
-                                 Flush_Start_Element;
+                              URI        : VSS.IRIs.IRI;
+                              Name       : VSS.Strings.Virtual_String;
+                              Attributes :
+                                VSS.XML.Attributes.Containers.Attributes;
 
-                                 URI  := Item.URI;
-                                 Name := Item.Name;
+                              -------------------------
+                              -- Flush_Start_Element --
+                              -------------------------
 
-                              when VSS.XML.Events.Attribute =>
-                                 Attributes.Insert
-                                   (Item.URI, Item.Name, Item.Value);
+                              procedure Flush_Start_Element is
+                              begin
+                                 if not Name.Is_Empty then
+                                    Self.Content.Start_Element
+                                      (URI, Name, Attributes, Success);
 
-                              when VSS.XML.Events.End_Element =>
-                                 Flush_Start_Element;
-
-                                 if Self.Content /= null then
-                                    Self.Content.End_Element
-                                      (Item.URI, Item.Name, Success);
+                                    --  URI.Clear;
+                                    Name.Clear;
+                                    Attributes.Clear;
                                  end if;
+                              end Flush_Start_Element;
 
-                              when VSS.XML.Events.Comment =>
-                                 Flush_Start_Element;
+                           begin
+                              for Item of V.Content_Value loop
+                                 case Item.Kind is
+                                    when VSS.XML.Events.None =>
+                                       raise Program_Error;
 
-                                 if Self.Lexical /= null then
-                                    Self.Lexical.Comment (Item.Text, Success);
-                                 end if;
+                                    when VSS.XML.Events.Start_Element =>
+                                       Flush_Start_Element;
 
-                              when VSS.XML.Events.Processing_Instruction =>
-                                 Flush_Start_Element;
+                                       URI  := Item.URI;
+                                       Name := Item.Name;
 
-                                 if Self.Content /= null then
-                                    Self.Content.Processing_Instruction
-                                      (Item.Target, Item.Data, Success);
-                                 end if;
+                                    when VSS.XML.Events.Attribute =>
+                                       Attributes.Insert
+                                         (Item.URI, Item.Name, Item.Value);
 
-                              when VSS.XML.Events.Text =>
-                                 Flush_Start_Element;
+                                    when VSS.XML.Events.End_Element =>
+                                       Flush_Start_Element;
 
-                                 if Self.Content /= null then
-                                    Self.Content.Characters
-                                      (Item.Text, Success);
-                                 end if;
+                                       if Self.Content /= null then
+                                          Self.Content.End_Element
+                                            (Item.URI, Item.Name, Success);
+                                       end if;
 
-                              when VSS.XML.Events.CDATA =>
-                                 Flush_Start_Element;
+                                    when VSS.XML.Events.Comment =>
+                                       Flush_Start_Element;
 
-                                 if Self.Lexical /= null then
-                                    Self.Lexical.Start_CDATA (Success);
-                                 end if;
+                                       if Self.Lexical /= null then
+                                          Self.Lexical.Comment
+                                            (Item.Text, Success);
+                                       end if;
 
-                                 if Self.Content /= null then
-                                    Self.Content.Characters
-                                      (Item.Text, Success);
-                                 end if;
+                                    when
+                                      VSS.XML.Events.Processing_Instruction =>
+                                       Flush_Start_Element;
 
-                                 if Self.Lexical /= null then
-                                    Self.Lexical.End_CDATA (Success);
-                                 end if;
-                           end case;
-                        end loop;
-                     end;
-                  end if;
+                                       if Self.Content /= null then
+                                          Self.Content.Processing_Instruction
+                                            (Item.Target, Item.Data, Success);
+                                       end if;
+
+                                    when VSS.XML.Events.Text =>
+                                       Flush_Start_Element;
+
+                                       if Self.Content /= null then
+                                          Self.Content.Characters
+                                            (Item.Text, Success);
+                                       end if;
+
+                                    when VSS.XML.Events.CDATA =>
+                                       Flush_Start_Element;
+
+                                       if Self.Lexical /= null then
+                                          Self.Lexical.Start_CDATA (Success);
+                                       end if;
+
+                                       if Self.Content /= null then
+                                          Self.Content.Characters
+                                            (Item.Text, Success);
+                                       end if;
+
+                                       if Self.Lexical /= null then
+                                          Self.Lexical.End_CDATA (Success);
+                                       end if;
+                                 end case;
+                              end loop;
+                           end;
+                     end case;
+                  end;
                end if;
 
                --  Rewind till end of the element.

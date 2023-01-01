@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -105,7 +105,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
       is
          use type
            VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
-         use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
 
          Iterator :
            VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
@@ -116,20 +115,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
              (Instruction.Repeat_Path, Self, Success);
 
          if Iterator = null then
-            if Self.Error /= null then
-               declare
-                  Error : constant
-                    VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
-                      (Public_Id => <>,
-                       System_Id => Self.Current.System_Id,
-                       Line      => Self.Current.Line,
-                       Column    => Self.Current.Column,
-                       Message   => "Unable to resolve path to iterable");
-
-               begin
-                  Self.Error.Error (Error, Success);
-               end;
-            end if;
+            Self.Report_Error ("Unable to resolve path to iterable", Success);
 
          else
             Push_State;
@@ -297,7 +283,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
                   begin
                      case V.Kind is
                         when VSS.XML.Templates.Values.Error =>
-                           null;
+                           Self.Report_Error (V.Message, Success);
 
                         when VSS.XML.Templates.Values.Default =>
                            raise Program_Error;
@@ -579,16 +565,23 @@ package body VSS.XML.Implementation.Template_Evaluators is
       Message : VSS.Strings.Virtual_String;
       Success : in out Boolean)
    is
-      Error :
-        constant VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
-        (Public_Id => <>,
-         System_Id => Self.Current.System_Id,
-         Line      => Self.Current.Line,
-         Column    => Self.Current.Column,
-         Message   => Message);
+      use type VSS.XML.Error_Handlers.SAX_Error_Handler_Access;
 
    begin
-      Self.Error.Error (Error, Success);
+      if Self.Error /= null then
+         declare
+            Error : constant
+              VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
+                (Public_Id => <>,
+                 System_Id => Self.Current.System_Id,
+                 Line      => Self.Current.Line,
+                 Column    => Self.Current.Column,
+                 Message   => Message);
+
+         begin
+            Self.Error.Error (Error, Success);
+         end;
+      end if;
    end Report_Error;
 
 end VSS.XML.Implementation.Template_Evaluators;

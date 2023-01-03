@@ -72,7 +72,6 @@ package VSS.XML.Implementation.Template_Programs is
             Condition_Path : VSS.String_Vectors.Virtual_String_Vector;
 
          when Content =>
-            Is_Text      : Boolean;
             Content_Path : VSS.String_Vectors.Virtual_String_Vector;
 
          when Omit_Tag =>

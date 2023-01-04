@@ -18,9 +18,6 @@ package body VSS.XML.Implementation.Template_Parsers is
    omit_tag_Attribute   : constant VSS.Strings.Virtual_String := "omit-tag";
    repeat_Attribute     : constant VSS.Strings.Virtual_String := "repeat";
 
-   text_Keyword      : constant VSS.Strings.Virtual_String := "text";
-   structure_Keyword : constant VSS.Strings.Virtual_String := "structure";
-
    procedure Report_Error
      (Self    : Template_Parser'Class;
       Message : VSS.Strings.Virtual_String;
@@ -334,25 +331,12 @@ package body VSS.XML.Implementation.Template_Parsers is
       -------------------
 
       procedure Parse_Content (Text : VSS.Strings.Virtual_String) is
-         Parts      : constant VSS.String_Vectors.Virtual_String_Vector :=
-           Text.Split (' ');
-         Format     : constant VSS.Strings.Virtual_String :=
-           (if Parts.Length = 1 then text_Keyword else Parts (1));
-         Expression : constant VSS.Strings.Virtual_String :=
-           (if Parts.Length = 1 then Parts (1) else Parts (2));
-         Path       : constant VSS.String_Vectors.Virtual_String_Vector :=
-           Expression.Split ('/');
+         Path : constant VSS.String_Vectors.Virtual_String_Vector :=
+           Text.Split ('/');
 
       begin
-         if Format /= text_Keyword and Format /= structure_Keyword then
-            --  Self.Error.Error ("Unknown format of content");
-
-            return;
-         end if;
-
          Content_Replace :=
            (Kind         => VSS.XML.Implementation.Template_Programs.Content,
-            Is_Text      => Format = text_Keyword,
             Content_Path => Path);
 
          Add_Location := True;

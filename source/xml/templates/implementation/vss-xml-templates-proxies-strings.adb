@@ -6,16 +6,6 @@
 
 package body VSS.XML.Templates.Proxies.Strings is
 
-   -------------
-   -- Content --
-   -------------
-
-   overriding function Content
-     (Self : Virtual_String_Proxy) return VSS.Strings.Virtual_String is
-   begin
-      return Self.Text;
-   end Content;
-
    -----------
    -- Value --
    -----------

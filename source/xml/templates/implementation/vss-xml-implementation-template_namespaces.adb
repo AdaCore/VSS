@@ -6,8 +6,6 @@
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.XML.Events;
-
 package body VSS.XML.Implementation.Template_Namespaces is
 
    use type VSS.XML.Templates.Proxies.Proxy_Access;
@@ -212,7 +210,7 @@ package body VSS.XML.Implementation.Template_Namespaces is
               in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
             then
                declare
-                  Value : VSS.XML.Templates.Values.Value :=
+                  Value : constant VSS.XML.Templates.Values.Value :=
                     VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
                       (Proxy).Value;
 
@@ -340,193 +338,6 @@ package body VSS.XML.Implementation.Template_Namespaces is
       end if;
    end Resolve_Iterable;
 
-   -------------------------------
-   -- Resolve_Structure_Content --
-   -------------------------------
-
-   function Resolve_Structure_Content
-     (Self    : Namespace'Class;
-      Path    : VSS.String_Vectors.Virtual_String_Vector;
-      Error   : in out Error_Handler'Class;
-      Success : in out Boolean) return VSS.XML.Event_Vectors.Vector
-   is
-      function Content
-        (Proxy : in out VSS.XML.Templates.Proxies.Abstract_Proxy'Class)
-         return VSS.XML.Event_Vectors.Vector;
-
-      -------------
-      -- Content --
-      -------------
-
-      function Content
-        (Proxy : in out VSS.XML.Templates.Proxies.Abstract_Proxy'Class)
-         return VSS.XML.Event_Vectors.Vector is
-      begin
-         if Proxy
-           in VSS.XML.Templates.Proxies.Abstract_Structure_Content_Proxy'Class
-         then
-            return
-              VSS.XML.Templates.Proxies.Abstract_Structure_Content_Proxy'Class
-                (Proxy).Content;
-
-         elsif Proxy
-           in VSS.XML.Templates.Proxies.Abstract_Text_Content_Proxy'Class
-         then
-            return Result : VSS.XML.Event_Vectors.Vector do
-               Result.Append
-                 ((VSS.XML.Events.Text,
-                  VSS.XML.Templates.Proxies.Abstract_Text_Content_Proxy'Class
-                    (Proxy).Content));
-            end return;
-
-         elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
-            Error.Report_Error
-              (VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message,
-               Success);
-
-            return VSS.XML.Event_Vectors.Empty_Vector;
-
-         else
-            raise Program_Error;
-         end if;
-      end Content;
-
-      Binded : VSS.XML.Templates.Proxies.Proxy_Access;
-      Suffix : VSS.String_Vectors.Virtual_String_Vector;
-
-   begin
-      Self.Resolve (Path, Binded, Suffix);
-
-      if Binded = null then
-         Error.Report_Error ("unknown path", Success);
-
-         return VSS.XML.Event_Vectors.Empty_Vector;
-      end if;
-
-      if Binded.all
-           in VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
-      then
-         if Suffix.Is_Empty then
-            raise Program_Error;
-
-         else
-            declare
-               Element : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-                 VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
-                   (Binded.all).Element;
-               Proxy   : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-                 Resolve (Element, Suffix);
-
-            begin
-               return Content (Proxy);
-            end;
-         end if;
-
-      else
-         if Suffix.Is_Empty then
-            raise Program_Error;
-
-         else
-            declare
-               Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-                 Resolve (Binded.all, Suffix);
-
-            begin
-               return Content (Proxy);
-            end;
-         end if;
-      end if;
-   end Resolve_Structure_Content;
-
-   --------------------------
-   -- Resolve_Text_Content --
-   --------------------------
-
-   function Resolve_Text_Content
-     (Self    : Namespace'Class;
-      Path    : VSS.String_Vectors.Virtual_String_Vector;
-      Error   : in out Error_Handler'Class;
-      Success : in out Boolean)
-      return VSS.Strings.Virtual_String
-   is
-      function Content
-        (Proxy : in out VSS.XML.Templates.Proxies.Abstract_Proxy'Class)
-         return VSS.Strings.Virtual_String;
-
-      -------------
-      -- Content --
-      -------------
-
-      function Content
-        (Proxy : in out VSS.XML.Templates.Proxies.Abstract_Proxy'Class)
-         return VSS.Strings.Virtual_String is
-      begin
-         if Proxy
-           in VSS.XML.Templates.Proxies.Abstract_Text_Content_Proxy'Class
-         then
-            return
-              VSS.XML.Templates.Proxies.Abstract_Text_Content_Proxy'Class
-                (Proxy).Content;
-
-         elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
-            Error.Report_Error
-              (VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message,
-               Success);
-
-            return VSS.Strings.Empty_Virtual_String;
-
-         else
-            raise Program_Error;
-         end if;
-      end Content;
-
-      Binded : VSS.XML.Templates.Proxies.Proxy_Access;
-      Suffix : VSS.String_Vectors.Virtual_String_Vector;
-
-   begin
-      Self.Resolve (Path, Binded, Suffix);
-
-      if Binded = null then
-         Error.Report_Error ("unknown path", Success);
-
-         return VSS.Strings.Empty_Virtual_String;
-      end if;
-
-      if Binded.all
-           in VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
-      then
-         if Suffix.Is_Empty then
-            raise Program_Error;
-
-         else
-            declare
-               Element : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-                 VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
-                   (Binded.all).Element;
-               Proxy   : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-                 Resolve (Element, Suffix);
-
-            begin
-               return Content (Proxy);
-            end;
-         end if;
-
-      else
-         if Suffix.Is_Empty then
-            raise Program_Error;
-
-         else
-            declare
-               Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-                 Resolve (Binded.all, Suffix);
-
-            begin
-               return Content (Proxy);
-            end;
-         end if;
-      end if;
-   end Resolve_Text_Content;
-
    -------------------
    -- Resolve_Value --
    -------------------
@@ -588,63 +399,31 @@ package body VSS.XML.Implementation.Template_Namespaces is
             raise Program_Error;
 
          else
-            raise Program_Error;
-            --  declare
-            --     Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
-            --       Resolve (Binded.all, Suffix);
-            --
-            --  begin
-            --     if Proxy
-            --        in VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
-            --     then
-            --        raise Program_Error;
-      --  --          return
-      --  --          VSS.XML.Templates.Proxies.Abstract_Content_Proxy'Class
-      --  --             (Proxy).Content;
-      --
-      --           elsif Proxy
-      --              in VSS.XML.Templates.Proxies.Error_Proxy'Class
-      --           then
-      --              return
-      --                (Kind    => VSS.XML.Templates.Values.Error,
-      --                 Message =>
-      --                   VSS.XML.Templates.Proxies.Error_Proxy'Class
-      --                     (Proxy).Message);
-      --
-      --           else
-      --              raise Program_Error;
-      --           end if;
-      --        end;
+            declare
+               Proxy : VSS.XML.Templates.Proxies.Abstract_Proxy'Class :=
+                 Resolve (Binded.all, Suffix);
+
+            begin
+               if Proxy
+                  in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+               then
+                  return
+                    VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+                      (Proxy).Value;
+
+               elsif Proxy in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+                  return
+                    (Kind    => VSS.XML.Templates.Values.Error,
+                     Message =>
+                       VSS.XML.Templates.Proxies.Error_Proxy'Class
+                         (Proxy).Message);
+
+               else
+                  raise Program_Error;
+               end if;
+            end;
          end if;
       end if;
-      --  Position : constant Name_Item_Maps.Cursor :=
-      --    Self.Items.Find (Path (1));
-      --  Subpath  : constant VSS.String_Vectors.Virtual_String_Vector :=
-      --    Path.Delete_First;
-      --  Item     : constant VSS.XML.Templates.Proxies.Proxy_Access :=
-      --    (if Name_Item_Maps.Has_Element (Position)
-      --     then Name_Item_Maps.Element (Position) else null);
-      --
-   --  begin
-   --     if Item /= null then
-   --        if Item.all
-   --             in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
-   --        then
-   --           return
-   --             VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
-   --               (Item.all).Value (Subpath);
-   --
-   --        elsif Item.all in Namespace'Class then
-   --           return Namespace'Class (Item.all).Resolve_Value (Subpath);
-   --        end if;
-   --
-   --     elsif Self.Enclosing /= null then
-   --        return Self.Enclosing.Resolve_Value (Path);
-   --     end if;
-   --
-   --     return
-   --       (Kind    => VSS.XML.Templates.Values.Error,
-   --        Message => "unable to resolve path to value");
    end Resolve_Value;
 
 end VSS.XML.Implementation.Template_Namespaces;

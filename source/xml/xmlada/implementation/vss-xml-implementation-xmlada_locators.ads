@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 with Sax.Locators;
 
-with VSS.Strings.Texts;
+with VSS.Strings;
 with VSS.XML.Locators;
 
 package VSS.XML.Implementation.XmlAda_Locators is
@@ -20,8 +20,7 @@ package VSS.XML.Implementation.XmlAda_Locators is
      (Self : XmlAda_Locator) return VSS.Strings.Character_Index'Base;
 
    overriding function Get_Line_Number
-     (Self : XmlAda_Locator)
-      return VSS.Strings.Texts.Line_Index'Base;
+     (Self : XmlAda_Locator) return VSS.Strings.Line_Index'Base;
 
    overriding function Get_Public_Id
      (Self : XmlAda_Locator) return VSS.Strings.Virtual_String;

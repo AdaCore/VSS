@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -27,10 +27,10 @@ package body VSS.XML.Implementation.XmlAda_Parse_Errors is
    ---------------------
 
    overriding function Get_Line_Number
-     (Self : Parse_Error) return VSS.Strings.Texts.Line_Index'Base is
+     (Self : Parse_Error) return VSS.Strings.Line_Index'Base is
    begin
       return
-        VSS.Strings.Texts.Line_Index'Base
+        VSS.Strings.Line_Index'Base
           (Sax.Exceptions.Get_Location (Self.Error.all).Line);
    end Get_Line_Number;
 

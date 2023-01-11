@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -27,11 +27,10 @@ package body VSS.XML.Implementation.XmlAda_Locators is
    ---------------------
 
    overriding function Get_Line_Number
-     (Self : XmlAda_Locator)
-      return VSS.Strings.Texts.Line_Index'Base is
+     (Self : XmlAda_Locator) return VSS.Strings.Line_Index'Base is
    begin
       return
-        VSS.Strings.Texts.Line_Index'Base
+        VSS.Strings.Line_Index'Base
           (Sax.Locators.Get_Line_Number (Self.Locator));
    end Get_Line_Number;
 

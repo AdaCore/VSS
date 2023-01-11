@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -8,7 +8,6 @@ with Ada.Wide_Wide_Text_IO;
 with Ada.Strings.Wide_Wide_Fixed;
 
 with VSS.Strings.Conversions;
-with VSS.Strings.Texts;
 
 package body VSS.XML.Implementation.Error_Handlers is
 
@@ -56,7 +55,7 @@ package body VSS.XML.Implementation.Error_Handlers is
    is
       Line_Image   : constant Wide_Wide_String :=
         Ada.Strings.Wide_Wide_Fixed.Trim
-          (VSS.Strings.Texts.Line_Index'Base'Wide_Wide_Image
+          (VSS.Strings.Line_Index'Base'Wide_Wide_Image
              (Error.Get_Line_Number),
            Ada.Strings.Both);
       Column_Image : constant Wide_Wide_String :=

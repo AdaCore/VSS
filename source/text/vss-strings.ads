@@ -16,7 +16,6 @@ limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Cursors.Iterators.Words;
-limited with VSS.Strings.Texts;
 
 package VSS.Strings is
 
@@ -82,9 +81,6 @@ package VSS.Strings is
    function Character_Length
      (Self : Virtual_String'Class) return Character_Count;
    --  Return number of characters.
-
-   function To_Magic_Text
-     (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text;
 
    function Before_First_Character
      (Self : Virtual_String'Class)

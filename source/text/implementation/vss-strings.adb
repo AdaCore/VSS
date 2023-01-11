@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -13,7 +13,6 @@ with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 with VSS.Strings.Cursors.Iterators.Lines;
 with VSS.Strings.Cursors.Iterators.Words;
 with VSS.String_Vectors.Internals;
-with VSS.Strings.Texts;
 
 package body VSS.Strings is
 
@@ -991,20 +990,6 @@ package body VSS.Strings is
             Result.Data);
       end return;
    end To_Lowercase;
-
-   -------------------
-   -- To_Magic_Text --
-   -------------------
-
-   function To_Magic_Text
-     (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text is
-   begin
-      return
-        (VSS.Implementation.Referrers.Magic_String_Base with Data => <>);
-                --  Data => (if Self.Data = null
-                --           then null
-                --           else Self.Data.To_Text),
-   end To_Magic_Text;
 
    -------------------
    -- To_Normalized --

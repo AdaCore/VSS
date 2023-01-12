@@ -120,7 +120,7 @@ private
    --     Name    : VSS.Strings.Virtual_String;
    --     Success : in out Boolean) is null;
 
-   procedure Comment
+   overriding procedure Comment
      (Self    : in out XML_Template_Processor;
       Text    : VSS.Strings.Virtual_String;
       Success : in out Boolean);

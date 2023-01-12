@@ -48,7 +48,7 @@ package body VSS.XML.Templates.Processors is
    -- Comment --
    -------------
 
-   procedure Comment
+   overriding procedure Comment
      (Self    : in out XML_Template_Processor;
       Text    : VSS.Strings.Virtual_String;
       Success : in out Boolean)
@@ -61,7 +61,7 @@ package body VSS.XML.Templates.Processors is
 
       else
          if Self.Lexical /= null then
-            Self.Lexical.Comment (Text, SUccess);
+            Self.Lexical.Comment (Text, Success);
          end if;
       end if;
    end Comment;

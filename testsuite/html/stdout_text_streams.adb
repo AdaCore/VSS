@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -21,7 +21,8 @@ package body Stdout_Text_Streams is
 
    exception
       when others =>
-         Success := False;
+         Self.Message := "exception raised by IO";
+         Success      := False;
    end Put;
 
 end Stdout_Text_Streams;

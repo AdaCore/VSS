@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -7,7 +7,7 @@
 with Ada.Containers.Vectors;
 
 with VSS.IRIs;
-with VSS.Strings.Texts;
+with VSS.Strings;
 with VSS.String_Vectors;
 
 package VSS.XML.Implementation.Template_Programs is
@@ -64,7 +64,7 @@ package VSS.XML.Implementation.Template_Programs is
 
          when Location =>
             System_Id : VSS.Strings.Virtual_String;
-            Line      : VSS.Strings.Texts.Line_Count;
+            Line      : VSS.Strings.Line_Count;
             Column    : VSS.Strings.Character_Count;
 
          when Condition =>

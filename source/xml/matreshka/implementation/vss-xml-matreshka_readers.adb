@@ -1,11 +1,11 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 with VSS.IRIs;
-with VSS.Strings.Texts;
+with VSS.Strings;
 with VSS.XML.Implementation.Matreshka_Attributes;
 with VSS.XML.Implementation.Parse_Errors;
 
@@ -149,7 +149,7 @@ package body VSS.XML.Matreshka_Readers is
         constant VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
           (Public_Id => To_Virtual_String (Occurrence.Public_Id),
            System_Id => To_Virtual_String (Occurrence.System_Id),
-           Line      => VSS.Strings.Texts.Line_Count (Occurrence.Line),
+           Line      => VSS.Strings.Line_Count (Occurrence.Line),
            Column    => VSS.Strings.Character_Count (Occurrence.Column),
            Message   => To_Virtual_String (Occurrence.Message));
 
@@ -183,7 +183,7 @@ package body VSS.XML.Matreshka_Readers is
         constant VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
           (Public_Id => To_Virtual_String (Occurrence.Public_Id),
            System_Id => To_Virtual_String (Occurrence.System_Id),
-           Line      => VSS.Strings.Texts.Line_Count (Occurrence.Line),
+           Line      => VSS.Strings.Line_Count (Occurrence.Line),
            Column    => VSS.Strings.Character_Count (Occurrence.Column),
            Message   => To_Virtual_String (Occurrence.Message));
       Success : Boolean := True;
@@ -442,7 +442,7 @@ package body VSS.XML.Matreshka_Readers is
         constant VSS.XML.Implementation.Parse_Errors.Parse_Error_Location :=
           (Public_Id => To_Virtual_String (Occurrence.Public_Id),
            System_Id => To_Virtual_String (Occurrence.System_Id),
-           Line      => VSS.Strings.Texts.Line_Count (Occurrence.Line),
+           Line      => VSS.Strings.Line_Count (Occurrence.Line),
            Column    => VSS.Strings.Character_Count (Occurrence.Column),
            Message   => To_Virtual_String (Occurrence.Message));
 

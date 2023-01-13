@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -13,14 +13,15 @@ with VSS.XML.Error_Handlers;
 private with VSS.XML.Implementation.Error_Handlers;
 private with VSS.XML.Implementation.Template_Namespaces;
 private with VSS.XML.Implementation.Template_Parsers;
---  with VSS.XML.Lexical_Handlers;
+with VSS.XML.Lexical_Handlers;
 private with VSS.XML.Locators;
 with VSS.XML.Templates.Proxies;
 
 package VSS.XML.Templates.Processors is
 
    type XML_Template_Processor is
-     limited new VSS.XML.Content_Handlers.SAX_Content_Handler with private;
+     limited new VSS.XML.Content_Handlers.SAX_Content_Handler
+       and VSS.XML.Lexical_Handlers.SAX_Lexical_Handler with private;
 
    procedure Set_Content_Handler
      (Self    : in out XML_Template_Processor;
@@ -47,10 +48,12 @@ package VSS.XML.Templates.Processors is
 private
 
    type XML_Template_Processor is
-     limited new VSS.XML.Content_Handlers.SAX_Content_Handler with
+     limited new VSS.XML.Content_Handlers.SAX_Content_Handler
+       and VSS.XML.Lexical_Handlers.SAX_Lexical_Handler with
    record
       Locator : VSS.XML.Locators.SAX_Locator_Access;
       Content : VSS.XML.Content_Handlers.SAX_Content_Handler_Access;
+      Lexical : VSS.XML.Lexical_Handlers.SAX_Lexical_Handler_Access;
       Error   : VSS.XML.Error_Handlers.SAX_Error_Handler_Access :=
         VSS.XML.Implementation.Error_Handlers.Default'Access;
 
@@ -114,6 +117,40 @@ private
 
    --  procedure Skipped_Entity
    --    (Self    : in out SAX_Content_Handler;
+   --     Name    : VSS.Strings.Virtual_String;
+   --     Success : in out Boolean) is null;
+
+   overriding procedure Comment
+     (Self    : in out XML_Template_Processor;
+      Text    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   --  procedure Start_DTD
+   --    (Self      : in out SAX_Lexical_Handler;
+   --     Name      : VSS.Strings.Virtual_String;
+   --     Public_Id : VSS.Strings.Virtual_String;
+   --     System_Id : VSS.Strings.Virtual_String;
+   --     Success   : in out Boolean) is null;
+   --
+   --  procedure End_DTD
+   --    (Self    : in out SAX_Lexical_Handler;
+   --     Success : in out Boolean) is null;
+   --
+   --  procedure Start_CDATA
+   --    (Self    : in out SAX_Lexical_Handler;
+   --     Success : in out Boolean) is null;
+   --
+   --  procedure End_CDATA
+   --    (Self    : in out SAX_Lexical_Handler;
+   --     Success : in out Boolean) is null;
+   --
+   --  procedure Start_Entity
+   --    (Self    : in out SAX_Lexical_Handler;
+   --     Name    : VSS.Strings.Virtual_String;
+   --     Success : in out Boolean) is null;
+   --
+   --  procedure End_Entity
+   --    (Self    : in out SAX_Lexical_Handler;
    --     Name    : VSS.Strings.Virtual_String;
    --     Success : in out Boolean) is null;
 

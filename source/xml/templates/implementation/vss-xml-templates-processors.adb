@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -43,6 +43,28 @@ package body VSS.XML.Templates.Processors is
          end if;
       end if;
    end Characters;
+
+   -------------
+   -- Comment --
+   -------------
+
+   overriding procedure Comment
+     (Self    : in out XML_Template_Processor;
+      Text    : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
+   is
+      use type VSS.XML.Lexical_Handlers.SAX_Lexical_Handler_Access;
+
+   begin
+      if Self.Depth /= 0 then
+         Self.Parser.Comment (Text, Success);
+
+      else
+         if Self.Lexical /= null then
+            Self.Lexical.Comment (Text, Success);
+         end if;
+      end if;
+   end Comment;
 
    ------------------
    -- End_Document --

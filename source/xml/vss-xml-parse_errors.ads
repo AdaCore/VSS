@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Strings.Texts;
+with VSS.Strings;
 
 package VSS.XML.Parse_Errors is
 
@@ -25,8 +25,7 @@ package VSS.XML.Parse_Errors is
      (Self : SAX_Parse_Error) return VSS.Strings.Virtual_String is abstract;
 
    function Get_Line_Number
-     (Self : SAX_Parse_Error)
-      return VSS.Strings.Texts.Line_Index'Base is abstract;
+     (Self : SAX_Parse_Error) return VSS.Strings.Line_Index'Base is abstract;
 
    function Get_Column_Number
      (Self : SAX_Parse_Error)

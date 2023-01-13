@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 with Ada.Containers.Vectors;
 
-with VSS.Strings.Texts;
+with VSS.Strings;
 with VSS.String_Vectors;
 with VSS.XML.Content_Handlers;
 with VSS.XML.Error_Handlers;
@@ -32,7 +32,7 @@ package VSS.XML.Implementation.Template_Evaluators is
       Omit_Tag  : Boolean;
 
       System_Id : VSS.Strings.Virtual_String;
-      Line      : VSS.Strings.Texts.Line_Count;
+      Line      : VSS.Strings.Line_Count;
       Column    : VSS.Strings.Character_Count;
    end record;
 

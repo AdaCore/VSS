@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -54,7 +54,7 @@ package Tests_Text_Streams is
    -------------------------------
 
    type Memory_UTF8_Output_Stream is
-   limited new VSS.Text_Streams.Output_Text_Stream with record
+     limited new VSS.Text_Streams.Output_Text_Stream with record
       Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Limit  : VSS.Strings.Character_Count := VSS.Strings.Character_Count'Last;
       Count  : VSS.Strings.Character_Count := 0;
@@ -74,12 +74,19 @@ package Tests_Text_Streams is
    --  successfully. After reaching of this limit all subsequential Put
    --  operations will fail.
 
+   overriding function Has_Error
+     (Self : Memory_UTF8_Output_Stream) return Boolean is (False);
+
+   overriding function Error_Message
+     (Self : Memory_UTF8_Output_Stream) return VSS.Strings.Virtual_String
+         is (VSS.Strings.Empty_Virtual_String);
+
    --------------------------
    -- String_Output_Stream --
    --------------------------
 
    type String_Output_Stream is
-   limited new VSS.Text_Streams.Output_Text_Stream with record
+     limited new VSS.Text_Streams.Output_Text_Stream with record
       Buffer : VSS.Strings.Virtual_String;
       Limit  : VSS.Strings.Character_Count := VSS.Strings.Character_Count'Last;
       --  Limiting amount of accumulated characters, Put operation returns
@@ -97,5 +104,12 @@ package Tests_Text_Streams is
    --  Set limiting number of character that can be consumed by the text stream
    --  successfully. After reaching of this limit all subsequential Put
    --  operations will fail.
+
+   overriding function Has_Error
+     (Self : String_Output_Stream) return Boolean is (False);
+
+   overriding function Error_Message
+     (Self : String_Output_Stream) return VSS.Strings.Virtual_String
+         is (VSS.Strings.Empty_Virtual_String);
 
 end Tests_Text_Streams;

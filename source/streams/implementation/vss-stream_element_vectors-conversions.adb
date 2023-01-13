@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2022, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -9,6 +9,27 @@ with Ada.Strings.Unbounded.Aux;
 pragma Warnings (On, "is an internal GNAT unit");
 
 package body VSS.Stream_Element_Vectors.Conversions is
+
+   -----------------------------
+   -- To_Stream_Element_Array --
+   -----------------------------
+
+   function To_Stream_Element_Array
+     (Item : Stream_Element_Vector'Class)
+      return Ada.Streams.Stream_Element_Array
+   is
+      use type Ada.Streams.Stream_Element_Offset;
+
+   begin
+      if Item.Data = null
+        or else Item.Data.Length = 0
+      then
+         return (0 .. -1 => <>);
+
+      else
+         return Item.Data.Storage (1 .. Item.Data.Length);
+      end if;
+   end To_Stream_Element_Array;
 
    ------------------------------
    -- To_Stream_Element_Vector --

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -16,7 +16,6 @@ limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Cursors.Iterators.Words;
-limited with VSS.Strings.Texts;
 
 package VSS.Strings is
 
@@ -29,6 +28,12 @@ package VSS.Strings is
    type Grapheme_Cluster_Count is range 0 .. 2 ** 30 - 1;
    subtype Grapheme_Cluster_Index is Grapheme_Cluster_Count
      range 1 .. Grapheme_Cluster_Count'Last;
+
+   type Line_Count is new Natural;
+   subtype Line_Index is Line_Count range 1 .. Line_Count'Last;
+
+   type Column_Count is new Grapheme_Cluster_Count;
+   subtype Column_Index is Column_Count range 1 .. Column_Count'Last;
 
    type Hash_Type is mod 2**64;
 
@@ -76,9 +81,6 @@ package VSS.Strings is
    function Character_Length
      (Self : Virtual_String'Class) return Character_Count;
    --  Return number of characters.
-
-   function To_Magic_Text
-     (Self : Virtual_String) return VSS.Strings.Texts.Magic_Text;
 
    function Before_First_Character
      (Self : Virtual_String'Class)

@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with VSS.Strings.Texts;
+with VSS.Strings;
 
 package VSS.XML.Locators is
 
@@ -18,8 +18,7 @@ package VSS.XML.Locators is
      (Self : SAX_Locator) return VSS.Strings.Character_Index'Base is abstract;
 
    function Get_Line_Number
-     (Self : SAX_Locator)
-      return VSS.Strings.Texts.Line_Index'Base is abstract;
+     (Self : SAX_Locator) return VSS.Strings.Line_Index'Base is abstract;
 
    function Get_Public_Id
      (Self : SAX_Locator) return VSS.Strings.Virtual_String is abstract;

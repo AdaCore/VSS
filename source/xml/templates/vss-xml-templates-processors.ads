@@ -5,7 +5,7 @@
 --
 
 private with VSS.IRIs;
-private with VSS.Strings;
+with VSS.Strings;
 with VSS.String_Vectors;
 private with VSS.XML.Attributes;
 with VSS.XML.Content_Handlers;
@@ -37,6 +37,15 @@ package VSS.XML.Templates.Processors is
       Handler : VSS.XML.Error_Handlers.SAX_Error_Handler_Access);
 
    procedure Bind
+     (Self    : in out XML_Template_Processor'Class;
+      Segment : VSS.Strings.Virtual_String;
+      Proxy   : not null VSS.XML.Templates.Proxies.Proxy_Access)
+     with Pre => not Segment.Is_Empty;
+   --  Bind given proxy to given segment of the root namespace. Ownership of
+   --  the proxy object is moved to template processor, thus application must
+   --  not use it anymore. Proxy will be released by the templates processor.
+
+   procedure Bind
      (Self  : in out XML_Template_Processor'Class;
       Path  : VSS.String_Vectors.Virtual_String_Vector;
       Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access)
@@ -44,6 +53,10 @@ package VSS.XML.Templates.Processors is
    --  Bind given proxy to given path. Ownership of the proxy object is moved
    --  to template processor, thus application must not use it anymore.
    --  Proxy will be released by the templates processor.
+   --
+   --  Use of the subprogram is discouraged. It is recommended to define
+   --  custom composite proxy and bind it to the segment of the root
+   --  namespace.
 
 private
 

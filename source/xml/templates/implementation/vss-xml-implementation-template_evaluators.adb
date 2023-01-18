@@ -65,6 +65,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
          Self.Current.Condition := Instruction.Condition_Path;
          Self.Current.Negate    := Instruction.Negate;
+         Self.Current.Exists    := Instruction.Exists;
       end Do_Condition;
 
       ----------------
@@ -181,27 +182,40 @@ package body VSS.XML.Implementation.Template_Evaluators is
            and then not Self.Current.Condition.Is_Empty
          then
             declare
+               use type VSS.XML.Templates.Values.Value_Kind;
+
                Value : constant VSS.XML.Templates.Values.Value :=
                  Self.Current.Namespace.Resolve_Boolean_Value
                    (Self.Current.Condition);
+               Skip  : Boolean := False;
 
             begin
-               case Value.Kind is
-                  when VSS.XML.Templates.Values.Boolean =>
-                     if not (Value.Boolean_Value xor Self.Current.Negate) then
-                        Skip_Element (False);
+               if Self.Current.Exists then
+                  Skip :=
+                    not (Value.Kind /= VSS.XML.Templates.Values.Error
+                           xor Self.Current.Negate);
 
-                        Pop_State;
+               else
+                  case Value.Kind is
+                     when VSS.XML.Templates.Values.Boolean =>
+                        Skip :=
+                          not (Value.Boolean_Value xor Self.Current.Negate);
 
-                        return;
-                     end if;
+                     when VSS.XML.Templates.Values.Error =>
+                        Self.Report_Error (Value.Message, Success);
 
-                  when VSS.XML.Templates.Values.Error =>
-                     Self.Report_Error (Value.Message, Success);
+                     when others =>
+                        raise Program_Error;
+                  end case;
+               end if;
 
-                  when others =>
-                     raise Program_Error;
-               end case;
+               if Skip then
+                  Skip_Element (False);
+
+                  Pop_State;
+
+                  return;
+               end if;
             end;
          end if;
 
@@ -531,6 +545,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
                         others    => <>),
             Condition    => VSS.String_Vectors.Empty_Virtual_String_Vector,
             Negate       => False,
+            Exists       => False,
             Iterator     => null,
             Content      => VSS.String_Vectors.Empty_Virtual_String_Vector,
             Omit_Tag     => False,

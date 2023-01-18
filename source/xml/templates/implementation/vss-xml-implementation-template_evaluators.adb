@@ -35,6 +35,11 @@ package body VSS.XML.Implementation.Template_Evaluators is
       return not null VSS.XML.Templates.Proxies.Proxy_Access;
    --  Helper subprogram to resolve path expression and evaluate it.
 
+   procedure Report_Error
+     (Self    : in out Template_Evaluator'Class;
+      Message : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
    --------------
    -- Evaluate --
    --------------
@@ -742,8 +747,8 @@ package body VSS.XML.Implementation.Template_Evaluators is
    -- Report_Error --
    ------------------
 
-   overriding procedure Report_Error
-     (Self    : in out Template_Evaluator;
+   procedure Report_Error
+     (Self    : in out Template_Evaluator'Class;
       Message : VSS.Strings.Virtual_String;
       Success : in out Boolean)
    is

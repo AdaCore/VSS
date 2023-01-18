@@ -26,6 +26,7 @@ package VSS.XML.Implementation.Template_Evaluators is
         VSS.XML.Implementation.Template_Namespaces.Namespace_Access;
       Condition : VSS.String_Vectors.Virtual_String_Vector;
       Negate    : Boolean;
+      Exists    : Boolean;
       Iterator  :
         VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
       Content   : VSS.String_Vectors.Virtual_String_Vector;

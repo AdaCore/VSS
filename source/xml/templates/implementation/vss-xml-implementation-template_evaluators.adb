@@ -12,10 +12,11 @@ with VSS.IRIs;
 with VSS.XML.Attributes.Containers;
 with VSS.XML.Events;
 with VSS.XML.Implementation.Parse_Errors;
-with VSS.XML.Templates.Proxies;
 with VSS.XML.Templates.Values;
 
 package body VSS.XML.Implementation.Template_Evaluators is
+
+   use type VSS.XML.Templates.Proxies.Proxy_Access;
 
    function Evaluate_Condition
      (Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access)
@@ -26,6 +27,12 @@ package body VSS.XML.Implementation.Template_Evaluators is
      (Namespace : VSS.XML.Implementation.Template_Namespaces.Namespace'Class;
       Path      : VSS.String_Vectors.Virtual_String_Vector)
       return VSS.XML.Templates.Values.Value;
+   --  Helper subprogram to resolve path expression and evaluate it.
+
+   function Evaluate_Iterable
+     (Namespace : VSS.XML.Implementation.Template_Namespaces.Namespace'Class;
+      Path      : VSS.String_Vectors.Virtual_String_Vector)
+      return not null VSS.XML.Templates.Proxies.Proxy_Access;
    --  Helper subprogram to resolve path expression and evaluate it.
 
    --------------
@@ -115,27 +122,30 @@ package body VSS.XML.Implementation.Template_Evaluators is
       procedure Do_Repeat
         (Instruction : VSS.XML.Implementation.Template_Programs.Instruction)
       is
-         use type
-           VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
-
-         Iterator :
-           VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
+         Proxy : VSS.XML.Templates.Proxies.Proxy_Access;
 
       begin
-         Iterator :=
-           Self.Current.Namespace.Resolve_Iterable
-             (Instruction.Repeat_Path, Self, Success);
+         Proxy :=
+           Evaluate_Iterable
+             (Self.Current.Namespace.all, Instruction.Repeat_Path);
 
-         if Iterator = null then
-            Self.Report_Error ("Unable to resolve path to iterable", Success);
-
-         else
+         if Proxy.all
+              in VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class
+         then
             Push_State;
 
-            Self.Current.Iterator := Iterator;
-            Self.Current.Namespace.Bind
-              (Instruction.Identifier,
-               VSS.XML.Templates.Proxies.Proxy_Access (Iterator));
+            Self.Current.Iterator := Iterable_Iterator_Access (Proxy);
+            Self.Current.Namespace.Bind (Instruction.Identifier, Proxy);
+
+         elsif Proxy.all
+              in VSS.XML.Templates.Proxies.Error_Proxy'Class
+         then
+            Self.Report_Error
+              (VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy.all).Message,
+               Success);
+
+         else
+            raise Program_Error;
          end if;
       end Do_Repeat;
 
@@ -146,9 +156,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
       procedure Do_Start_Element
         (Current : in out VSS.XML.Implementation.Template_Programs.Address)
       is
-         use type
-           VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
-
          procedure Skip_Element (Preserve_End_Element : Boolean);
 
          ------------------
@@ -193,8 +200,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
            and then not Self.Current.Condition.Is_Empty
          then
             declare
-               use type VSS.XML.Templates.Proxies.Proxy_Access;
-
                procedure Free is
                  new Ada.Unchecked_Deallocation
                    (VSS.XML.Templates.Proxies.Abstract_Proxy'Class,
@@ -450,9 +455,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
       procedure Execute
         (Current : in out VSS.XML.Implementation.Template_Programs.Address)
       is
-         use type
-           VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
-
          Instruction : VSS.XML.Implementation.Template_Programs.Instruction
            renames Program (Current);
 
@@ -641,6 +643,43 @@ package body VSS.XML.Implementation.Template_Evaluators is
       end if;
    end Evaluate_Condition;
 
+   -----------------------
+   -- Evaluate_Iterable --
+   -----------------------
+
+   function Evaluate_Iterable
+     (Namespace : VSS.XML.Implementation.Template_Namespaces.Namespace'Class;
+      Path      : VSS.String_Vectors.Virtual_String_Vector)
+      return not null VSS.XML.Templates.Proxies.Proxy_Access
+   is
+      Proxy : VSS.XML.Templates.Proxies.Proxy_Access;
+      Owned : Boolean;
+
+   begin
+      Namespace.Resolve (Path, Proxy, Owned);
+
+      if Proxy = null then
+         return
+           new VSS.XML.Templates.Proxies.Error_Proxy'
+                 (Message => "unable to resolve path");
+      end if;
+
+      if Proxy.all
+           in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+      then
+         return
+           new VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class'
+                 (VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+                    (Proxy.all).Iterator);
+
+      elsif Proxy.all in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+         return Proxy;
+
+      else
+         raise Program_Error;
+      end if;
+   end Evaluate_Iterable;
+
    --------------------
    -- Evaluate_Value --
    --------------------
@@ -650,8 +689,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
       Path      : VSS.String_Vectors.Virtual_String_Vector)
       return VSS.XML.Templates.Values.Value
    is
-      use type VSS.XML.Templates.Proxies.Proxy_Access;
-
       procedure Free is
         new Ada.Unchecked_Deallocation
           (VSS.XML.Templates.Proxies.Abstract_Proxy'Class,

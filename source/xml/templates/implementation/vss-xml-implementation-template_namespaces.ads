@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -48,7 +48,8 @@ package VSS.XML.Implementation.Template_Namespaces is
      (Self      : Namespace'Class;
       Path      : VSS.String_Vectors.Virtual_String_Vector;
       Proxy     : out VSS.XML.Templates.Proxies.Proxy_Access;
-      Remaining : out VSS.String_Vectors.Virtual_String_Vector);
+      Remaining : out VSS.String_Vectors.Virtual_String_Vector)
+     with Pre => not Path.Is_Empty;
    --  Attempt to resolve proxy till it's binding point. Returned proxy is
    --  managed by the namespace.
 
@@ -65,11 +66,19 @@ package VSS.XML.Implementation.Template_Namespaces is
       return VSS.XML.Templates.Values.Value
      with Pre => not Path.Is_Empty;
 
-   function Resolve_Boolean_Value
-     (Self : Namespace'Class;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
-      return VSS.XML.Templates.Values.Value
-     with Pre => not Path.Is_Empty;
+   procedure Resolve
+     (Self  : Namespace'Class;
+      Path  : VSS.String_Vectors.Virtual_String_Vector;
+      Proxy : out VSS.XML.Templates.Proxies.Proxy_Access;
+      Owned : out Boolean);
+   --  Resolve given path to the proxy.
+   --
+   --  @param Self   Root namespace
+   --  @param Path   Path to resolve
+   --  @param Proxy  Proxy found at given path, if any; null overwise
+   --  @param Owned
+   --    Whether proxy is owned by the namespace. Returned proxy must be
+   --    deallocated by the caller when proxy is not owned by the namespace.
 
    procedure Bind
      (Self : in out Namespace'Class;

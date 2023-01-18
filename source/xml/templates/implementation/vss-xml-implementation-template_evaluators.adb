@@ -182,31 +182,75 @@ package body VSS.XML.Implementation.Template_Evaluators is
            and then not Self.Current.Condition.Is_Empty
          then
             declare
-               use type VSS.XML.Templates.Values.Value_Kind;
+               use type VSS.XML.Templates.Proxies.Proxy_Access;
 
-               Value : constant VSS.XML.Templates.Values.Value :=
-                 Self.Current.Namespace.Resolve_Boolean_Value
-                   (Self.Current.Condition);
+               procedure Free is
+                 new Ada.Unchecked_Deallocation
+                   (VSS.XML.Templates.Proxies.Abstract_Proxy'Class,
+                    VSS.XML.Templates.Proxies.Proxy_Access);
+
+               Proxy : VSS.XML.Templates.Proxies.Proxy_Access;
+               Owned : Boolean;
                Skip  : Boolean := False;
 
             begin
+               Self.Current.Namespace.Resolve
+                 (Self.Current.Condition, Proxy, Owned);
+
                if Self.Current.Exists then
                   Skip :=
-                    not (Value.Kind /= VSS.XML.Templates.Values.Error
-                           xor Self.Current.Negate);
+                    not (Proxy /= null
+                         and then Proxy.all
+                           not in VSS.XML.Templates.Proxies.Error_Proxy'Class);
 
                else
-                  case Value.Kind is
-                     when VSS.XML.Templates.Values.Boolean =>
-                        Skip :=
-                          not (Value.Boolean_Value xor Self.Current.Negate);
+                  if Proxy.all
+                    in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+                  then
+                     declare
+                        Value : constant VSS.XML.Templates.Values.Value :=
+                          VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+                            (Proxy.all).Value;
 
-                     when VSS.XML.Templates.Values.Error =>
-                        Self.Report_Error (Value.Message, Success);
+                     begin
+                        case Value.Kind is
+                           when VSS.XML.Templates.Values.Boolean =>
+                              Skip := not Value.Boolean_Value;
 
-                     when others =>
-                        raise Program_Error;
-                  end case;
+                           when VSS.XML.Templates.Values.String =>
+                              Skip := Value.String_Value.Is_Empty;
+
+                           when others =>
+                              raise Program_Error;
+                        end case;
+                     end;
+
+                  elsif Proxy.all
+                    in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+                  then
+                     Skip :=
+                       VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+                         (Proxy.all).Is_Empty;
+
+                  elsif Proxy.all
+                    in VSS.XML.Templates.Proxies.Error_Proxy'Class
+                  then
+                     Skip := True;
+
+                     Self.Report_Error
+                       (VSS.XML.Templates.Proxies.Error_Proxy'Class
+                          (Proxy.all).Message,
+                        Success);
+
+                  else
+                     raise Program_Error;
+                  end if;
+               end if;
+
+               Skip := Skip xor Self.Current.Negate;
+
+               if not Owned then
+                  Free (Proxy);
                end if;
 
                if Skip then

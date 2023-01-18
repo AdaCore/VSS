@@ -28,9 +28,6 @@ package VSS.XML.Implementation.Template_Namespaces is
         VSS.Strings."=",
         VSS.XML.Templates.Proxies."=");
 
-   type Iterable_Iterator_Access is
-     access all VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class;
-
    type Namespace is tagged;
 
    type Namespace_Access is access all Namespace'Class;
@@ -42,13 +39,6 @@ package VSS.XML.Implementation.Template_Namespaces is
       Enclosing : Namespace_Access;
       Items     : Name_Item_Maps.Map;
    end record;
-
-   function Resolve_Iterable
-     (Self    : Namespace'Class;
-      Path    : VSS.String_Vectors.Virtual_String_Vector;
-      Error   : in out Error_Handler'Class;
-      Success : in out Boolean) return Iterable_Iterator_Access
-     with Pre => not Path.Is_Empty;
 
    procedure Resolve
      (Self  : Namespace'Class;

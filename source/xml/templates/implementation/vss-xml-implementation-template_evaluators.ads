@@ -14,11 +14,15 @@ with VSS.XML.Implementation.Error_Handlers;
 with VSS.XML.Implementation.Template_Namespaces;
 with VSS.XML.Implementation.Template_Programs;
 with VSS.XML.Lexical_Handlers;
+with VSS.XML.Templates.Proxies;
 
 package VSS.XML.Implementation.Template_Evaluators is
 
    type Filter_Kind is
      (None, Ignore_Children);
+
+   type Iterable_Iterator_Access is
+     access all VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class;
 
    type State is record
       Element   : VSS.XML.Implementation.Template_Programs.Address;
@@ -27,8 +31,7 @@ package VSS.XML.Implementation.Template_Evaluators is
       Condition : VSS.String_Vectors.Virtual_String_Vector;
       Negate    : Boolean;
       Exists    : Boolean;
-      Iterator  :
-        VSS.XML.Implementation.Template_Namespaces.Iterable_Iterator_Access;
+      Iterator  : Iterable_Iterator_Access;
       Content   : VSS.String_Vectors.Virtual_String_Vector;
       Omit_Tag  : Boolean;
 

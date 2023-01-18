@@ -43,9 +43,7 @@ package VSS.XML.Implementation.Template_Evaluators is
    package State_Vectors is
      new Ada.Containers.Vectors (Positive, State);
 
-   type Template_Evaluator is
-     limited new VSS.XML.Implementation.Template_Namespaces.Error_Handler with
-   record
+   type Template_Evaluator is tagged limited record
       Content : VSS.XML.Content_Handlers.SAX_Content_Handler_Access;
       Lexical : VSS.XML.Lexical_Handlers.SAX_Lexical_Handler_Access;
       Error   : VSS.XML.Error_Handlers.SAX_Error_Handler_Access :=
@@ -62,11 +60,6 @@ package VSS.XML.Implementation.Template_Evaluators is
         not null VSS.XML.Implementation.Template_Namespaces.Namespace_Access;
       Program :
         VSS.XML.Implementation.Template_Programs.Instruction_Vectors.Vector;
-      Success : in out Boolean);
-
-   overriding procedure Report_Error
-     (Self    : in out Template_Evaluator;
-      Message : VSS.Strings.Virtual_String;
       Success : in out Boolean);
 
 end VSS.XML.Implementation.Template_Evaluators;

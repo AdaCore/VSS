@@ -190,6 +190,12 @@ package body VSS.XML.Implementation.Template_Namespaces is
    begin
       Self.Resolve (Path, Binded, Suffix);
 
+      if Binded = null then
+         return
+           (Kind    => VSS.XML.Templates.Values.Error,
+            Message => "unable to resolve path to value");
+      end if;
+
       if Suffix.Is_Empty then
          if Binded.all
               in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class

@@ -10,7 +10,6 @@ with Ada.Finalization;
 with VSS.Strings.Hash;
 with VSS.String_Vectors;
 with VSS.XML.Templates.Proxies;
-with VSS.XML.Templates.Values;
 
 package VSS.XML.Implementation.Template_Namespaces is
 
@@ -58,12 +57,6 @@ package VSS.XML.Implementation.Template_Namespaces is
       Path    : VSS.String_Vectors.Virtual_String_Vector;
       Error   : in out Error_Handler'Class;
       Success : in out Boolean) return Iterable_Iterator_Access
-     with Pre => not Path.Is_Empty;
-
-   function Resolve_Value
-     (Self : Namespace'Class;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
-      return VSS.XML.Templates.Values.Value
      with Pre => not Path.Is_Empty;
 
    procedure Resolve

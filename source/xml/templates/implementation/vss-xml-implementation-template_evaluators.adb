@@ -20,7 +20,13 @@ package body VSS.XML.Implementation.Template_Evaluators is
    function Evaluate_Condition
      (Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access)
       return Boolean;
-   --  Helper to evaluate expression used by 'condition' attribute.
+   --  Helper subprogram to evaluate expression used by 'condition' attribute.
+
+   function Evaluate_Value
+     (Namespace : VSS.XML.Implementation.Template_Namespaces.Namespace'Class;
+      Path      : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Values.Value;
+   --  Helper subprogram to resolve path expression and evaluate it.
 
    --------------
    -- Evaluate --
@@ -267,8 +273,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
                      use type VSS.XML.Templates.Values.Value_Kind;
 
                      V : constant VSS.XML.Templates.Values.Value :=
-                       Self.Current.Namespace.Resolve_Value
-                         (Program (Current).Attribute_Path);
+                       Evaluate_Value
+                         (Self.Current.Namespace.all,
+                          Program (Current).Attribute_Path);
 
                   begin
                      if V.Kind = VSS.XML.Templates.Values.String then
@@ -309,8 +316,9 @@ package body VSS.XML.Implementation.Template_Evaluators is
                if Self.Content /= null then
                   declare
                      V : constant VSS.XML.Templates.Values.Value :=
-                       Self.Current.Namespace.Resolve_Value
-                         (Self.Current.Content);
+                       Evaluate_Value
+                         (Self.Current.Namespace.all,
+                          Self.Current.Content);
 
                   begin
                      case V.Kind is
@@ -632,6 +640,66 @@ package body VSS.XML.Implementation.Template_Evaluators is
          raise Program_Error;
       end if;
    end Evaluate_Condition;
+
+   --------------------
+   -- Evaluate_Value --
+   --------------------
+
+   function Evaluate_Value
+     (Namespace : VSS.XML.Implementation.Template_Namespaces.Namespace'Class;
+      Path      : VSS.String_Vectors.Virtual_String_Vector)
+      return VSS.XML.Templates.Values.Value
+   is
+      use type VSS.XML.Templates.Proxies.Proxy_Access;
+
+      procedure Free is
+        new Ada.Unchecked_Deallocation
+          (VSS.XML.Templates.Proxies.Abstract_Proxy'Class,
+           VSS.XML.Templates.Proxies.Proxy_Access);
+
+      Proxy : VSS.XML.Templates.Proxies.Proxy_Access;
+      Owned : Boolean;
+
+   begin
+      Namespace.Resolve (Path, Proxy, Owned);
+
+      if Proxy = null then
+         return
+           (Kind    => VSS.XML.Templates.Values.Error,
+            Message => "unable to resolve path");
+      end if;
+
+      if Proxy.all in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class then
+         return Result : constant VSS.XML.Templates.Values.Value :=
+           VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+             (Proxy.all).Value
+         do
+            if not Owned then
+               Free (Proxy);
+            end if;
+         end return;
+
+      elsif Proxy.all in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+         return Result : constant VSS.XML.Templates.Values.Value :=
+           (Kind    => VSS.XML.Templates.Values.Error,
+            Message =>
+              VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy.all).Message)
+         do
+            if not Owned then
+               Free (Proxy);
+            end if;
+         end return;
+
+      else
+         if not Owned then
+            Free (Proxy);
+         end if;
+
+         return
+           (Kind    => VSS.XML.Templates.Values.Error,
+            Message => "unable to evaluate value");
+      end if;
+   end Evaluate_Value;
 
    ------------------
    -- Report_Error --

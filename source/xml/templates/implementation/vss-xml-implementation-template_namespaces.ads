@@ -43,15 +43,6 @@ package VSS.XML.Implementation.Template_Namespaces is
       Items     : Name_Item_Maps.Map;
    end record;
 
-   procedure Resolve
-     (Self      : Namespace'Class;
-      Path      : VSS.String_Vectors.Virtual_String_Vector;
-      Proxy     : out VSS.XML.Templates.Proxies.Proxy_Access;
-      Remaining : out VSS.String_Vectors.Virtual_String_Vector)
-     with Pre => not Path.Is_Empty;
-   --  Attempt to resolve proxy till it's binding point. Returned proxy is
-   --  managed by the namespace.
-
    function Resolve_Iterable
      (Self    : Namespace'Class;
       Path    : VSS.String_Vectors.Virtual_String_Vector;

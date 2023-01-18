@@ -15,6 +15,15 @@ package body VSS.XML.Implementation.Template_Namespaces is
       Path  : VSS.String_Vectors.Virtual_String_Vector)
       return VSS.XML.Templates.Proxies.Abstract_Proxy'Class;
 
+   procedure Resolve
+     (Self      : Namespace'Class;
+      Path      : VSS.String_Vectors.Virtual_String_Vector;
+      Proxy     : out VSS.XML.Templates.Proxies.Proxy_Access;
+      Remaining : out VSS.String_Vectors.Virtual_String_Vector)
+     with Pre => not Path.Is_Empty;
+   --  Attempt to resolve proxy till it's binding point. Returned proxy is
+   --  managed by the namespace.
+
    ----------
    -- Bind --
    ----------

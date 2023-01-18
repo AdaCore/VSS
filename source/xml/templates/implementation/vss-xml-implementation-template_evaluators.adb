@@ -17,6 +17,11 @@ with VSS.XML.Templates.Values;
 
 package body VSS.XML.Implementation.Template_Evaluators is
 
+   function Evaluate_Condition
+     (Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access)
+      return Boolean;
+   --  Helper to evaluate expression used by 'condition' attribute.
+
    --------------
    -- Evaluate --
    --------------
@@ -204,46 +209,15 @@ package body VSS.XML.Implementation.Template_Evaluators is
                            not in VSS.XML.Templates.Proxies.Error_Proxy'Class);
 
                else
+                  Skip := not Evaluate_Condition (Proxy);
+
                   if Proxy.all
-                    in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
-                  then
-                     declare
-                        Value : constant VSS.XML.Templates.Values.Value :=
-                          VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
-                            (Proxy.all).Value;
-
-                     begin
-                        case Value.Kind is
-                           when VSS.XML.Templates.Values.Boolean =>
-                              Skip := not Value.Boolean_Value;
-
-                           when VSS.XML.Templates.Values.String =>
-                              Skip := Value.String_Value.Is_Empty;
-
-                           when others =>
-                              raise Program_Error;
-                        end case;
-                     end;
-
-                  elsif Proxy.all
-                    in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
-                  then
-                     Skip :=
-                       VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
-                         (Proxy.all).Is_Empty;
-
-                  elsif Proxy.all
                     in VSS.XML.Templates.Proxies.Error_Proxy'Class
                   then
-                     Skip := True;
-
                      Self.Report_Error
                        (VSS.XML.Templates.Proxies.Error_Proxy'Class
                           (Proxy.all).Message,
                         Success);
-
-                  else
-                     raise Program_Error;
                   end if;
                end if;
 
@@ -614,6 +588,50 @@ package body VSS.XML.Implementation.Template_Evaluators is
          Execute (Current);
       end loop;
    end Evaluate;
+
+   ------------------------
+   -- Evaluate_Condition --
+   ------------------------
+
+   function Evaluate_Condition
+     (Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access)
+      return Boolean is
+   begin
+      if Proxy.all
+           in VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+      then
+         declare
+            Value : constant VSS.XML.Templates.Values.Value :=
+              VSS.XML.Templates.Proxies.Abstract_Value_Proxy'Class
+                (Proxy.all).Value;
+
+         begin
+            case Value.Kind is
+               when VSS.XML.Templates.Values.Boolean =>
+                  return Value.Boolean_Value;
+
+               when VSS.XML.Templates.Values.String =>
+                  return not Value.String_Value.Is_Empty;
+
+               when others =>
+                  raise Program_Error;
+            end case;
+         end;
+
+      elsif Proxy.all
+              in VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+      then
+         return
+           not VSS.XML.Templates.Proxies.Abstract_Iterable_Proxy'Class
+                 (Proxy.all).Is_Empty;
+
+      elsif Proxy.all in VSS.XML.Templates.Proxies.Error_Proxy'Class then
+         return False;
+
+      else
+         raise Program_Error;
+      end if;
+   end Evaluate_Condition;
 
    ------------------
    -- Report_Error --

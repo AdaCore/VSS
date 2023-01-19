@@ -218,7 +218,11 @@ package body VSS.XML.Implementation.Template_Evaluators is
                Self.Current.Namespace.Resolve
                  (Self.Current.Condition, Proxy, Owned);
 
-               if Self.Current.Exists then
+               if Proxy = null then
+                  Self.Report_Error ("unable to resolve path", Success);
+                  Skip := True;
+
+               elsif Self.Current.Exists then
                   Skip :=
                     not (Proxy /= null
                          and then Proxy.all

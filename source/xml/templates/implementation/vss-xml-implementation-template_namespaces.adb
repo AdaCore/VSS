@@ -144,12 +144,8 @@ package body VSS.XML.Implementation.Template_Namespaces is
                        (Proxy.all).Element);
 
          elsif Proxy.all in VSS.XML.Templates.Proxies.Error_Proxy'Class then
-            raise Program_Error;
-      --     return
-      --       VSS.XML.Templates.Proxies.Error_Proxy'
-      --         (Message =>
-      --          VSS.XML.Templates.Proxies.Error_Proxy'Class (Proxy).Message);
-      --
+            return;
+
          else
             raise Program_Error;
       --     return

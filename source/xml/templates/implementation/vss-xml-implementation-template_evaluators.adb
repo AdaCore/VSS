@@ -301,8 +301,6 @@ package body VSS.XML.Implementation.Template_Evaluators is
                      elsif V.Kind = VSS.XML.Templates.Values.Error then
                         Self.Report_Error (V.Message, Success);
 
-                        raise Program_Error;
-
                      else
                         raise Program_Error;
                      end if;

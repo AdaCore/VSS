@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -43,6 +43,8 @@ package VSS.Characters.Latin is
 
    Hyphen_Minus           : constant Virtual_Character :=
      Virtual_Character'Val (16#002D#);
+   Full_Stop              : constant Virtual_Character :=
+     Virtual_Character'Val (16#002E#);
 
    Digit_Zero             : constant Virtual_Character :=
      Virtual_Character'Val (16#0030#);

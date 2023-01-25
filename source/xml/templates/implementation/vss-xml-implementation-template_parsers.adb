@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -311,18 +311,43 @@ package body VSS.XML.Implementation.Template_Parsers is
       ---------------------
 
       procedure Parse_Condition (Text : VSS.Strings.Virtual_String) is
-         Parts : constant VSS.String_Vectors.Virtual_String_Vector :=
+         Parts  : constant VSS.String_Vectors.Virtual_String_Vector :=
            Text.Split (':');
-         Path  : constant VSS.String_Vectors.Virtual_String_Vector :=
-           (if Parts.Length = 1
-            then Parts (1).Split ('/')
-            else Parts (2).Split ('/'));
+         Path   : constant VSS.String_Vectors.Virtual_String_Vector :=
+           Parts.Last_Element.Split ('/');
+         Negate : Boolean := False;
+         Exists : Boolean := False;
 
       begin
+         if Parts.Length = 2 then
+            if Parts (1) = "not" then
+               Negate := True;
+
+            elsif Parts (1) = "exists" then
+               Exists := True;
+
+            else
+               Self.Report_Error ("Unknown operator", Success);
+            end if;
+
+         elsif Parts.Length = 3 then
+            if Parts (1) = "not" and Parts (2) = "exists" then
+               Negate := True;
+               Exists := True;
+
+            else
+               Self.Report_Error ("Unknown operator", Success);
+            end if;
+
+         elsif Parts.Length > 3 then
+            Self.Report_Error ("Unsupported expression", Success);
+         end if;
+
          Condition :=
            (Kind           =>
               VSS.XML.Implementation.Template_Programs.Condition,
-            Negate         => Parts (1) = "not",
+            Negate         => Negate,
+            Exists         => Exists,
             Condition_Path => Path);
       end Parse_Condition;
 

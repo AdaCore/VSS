@@ -47,6 +47,8 @@ package VSS.Characters.Latin is
 
    Hyphen_Minus           : constant Virtual_Character :=
      Virtual_Character'Val (16#002D#);
+   Full_Stop              : constant Virtual_Character :=
+     Virtual_Character'Val (16#002E#);
 
    Digit_Zero             : constant Virtual_Character :=
      Virtual_Character'Val (16#0030#);

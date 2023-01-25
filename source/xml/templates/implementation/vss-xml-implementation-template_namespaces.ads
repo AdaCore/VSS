@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -10,16 +10,8 @@ with Ada.Finalization;
 with VSS.Strings.Hash;
 with VSS.String_Vectors;
 with VSS.XML.Templates.Proxies;
-with VSS.XML.Templates.Values;
 
 package VSS.XML.Implementation.Template_Namespaces is
-
-   type Error_Handler is limited interface;
-
-   procedure Report_Error
-     (Self    : in out Error_Handler;
-      Message : VSS.Strings.Virtual_String;
-      Success : in out Boolean) is abstract;
 
    package Name_Item_Maps is
      new Ada.Containers.Hashed_Maps
@@ -28,9 +20,6 @@ package VSS.XML.Implementation.Template_Namespaces is
         VSS.Strings.Hash,
         VSS.Strings."=",
         VSS.XML.Templates.Proxies."=");
-
-   type Iterable_Iterator_Access is
-     access all VSS.XML.Templates.Proxies.Abstract_Iterable_Iterator'Class;
 
    type Namespace is tagged;
 
@@ -45,31 +34,18 @@ package VSS.XML.Implementation.Template_Namespaces is
    end record;
 
    procedure Resolve
-     (Self      : Namespace'Class;
-      Path      : VSS.String_Vectors.Virtual_String_Vector;
-      Proxy     : out VSS.XML.Templates.Proxies.Proxy_Access;
-      Remaining : out VSS.String_Vectors.Virtual_String_Vector);
-   --  Attempt to resolve proxy till it's binding point. Returned proxy is
-   --  managed by the namespace.
-
-   function Resolve_Iterable
-     (Self    : Namespace'Class;
-      Path    : VSS.String_Vectors.Virtual_String_Vector;
-      Error   : in out Error_Handler'Class;
-      Success : in out Boolean) return Iterable_Iterator_Access
-     with Pre => not Path.Is_Empty;
-
-   function Resolve_Value
-     (Self : Namespace'Class;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
-      return VSS.XML.Templates.Values.Value
-     with Pre => not Path.Is_Empty;
-
-   function Resolve_Boolean_Value
-     (Self : Namespace'Class;
-      Path : VSS.String_Vectors.Virtual_String_Vector)
-      return VSS.XML.Templates.Values.Value
-     with Pre => not Path.Is_Empty;
+     (Self  : Namespace'Class;
+      Path  : VSS.String_Vectors.Virtual_String_Vector;
+      Proxy : out VSS.XML.Templates.Proxies.Proxy_Access;
+      Owned : out Boolean);
+   --  Resolve given path to the proxy.
+   --
+   --  @param Self   Root namespace
+   --  @param Path   Path to resolve
+   --  @param Proxy  Proxy found at given path, if any; null overwise
+   --  @param Owned
+   --    Whether proxy is owned by the namespace. Returned proxy must be
+   --    deallocated by the caller when proxy is not owned by the namespace.
 
    procedure Bind
      (Self : in out Namespace'Class;

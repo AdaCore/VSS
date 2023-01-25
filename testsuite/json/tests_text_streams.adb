@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -150,6 +150,28 @@ package body Tests_Text_Streams is
       return Self.Current > Self.Buffer.Length;
    end Is_End_Of_Stream;
 
+   --------------
+   -- New_Line --
+   --------------
+
+   overriding procedure New_Line
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Success : in out Boolean) is
+   begin
+      raise Program_Error;
+   end New_Line;
+
+   --------------
+   -- New_Line --
+   --------------
+
+   overriding procedure New_Line
+     (Self    : in out String_Output_Stream;
+      Success : in out Boolean) is
+   begin
+      raise Program_Error;
+   end New_Line;
+
    ---------
    -- Put --
    ---------
@@ -202,6 +224,18 @@ package body Tests_Text_Streams is
    ---------
 
    overriding procedure Put
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is
+   begin
+      raise Program_Error;
+   end Put;
+
+   ---------
+   -- Put --
+   ---------
+
+   overriding procedure Put
      (Self    : in out String_Output_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean)
@@ -218,6 +252,42 @@ package body Tests_Text_Streams is
          Self.Buffer.Append (Item);
       end if;
    end Put;
+
+   ---------
+   -- Put --
+   ---------
+
+   overriding procedure Put
+     (Self    : in out String_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is
+   begin
+      raise Program_Error;
+   end Put;
+
+   --------------
+   -- Put_Line --
+   --------------
+
+   overriding procedure Put_Line
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is
+   begin
+      raise Program_Error;
+   end Put_Line;
+
+   --------------
+   -- Put_Line --
+   --------------
+
+   overriding procedure Put_Line
+     (Self    : in out String_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is
+   begin
+      raise Program_Error;
+   end Put_Line;
 
    ---------------------
    -- Set_Incremental --

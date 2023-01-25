@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -61,6 +61,14 @@ procedure Test_Command_Line_Parser is
 
    procedure Test_Short_Binary_With_Value_Error;
    --  Test that "--S=project.gpr" raise error
+
+   procedure Test_Positional_Long_List;
+   --  Test processing of the positional arguments: list of arguments is
+   --  longer than number of defined positional arguments.
+
+   procedure Test_Positional_Unspecified;
+   --  Test processing of the positional arguments: some of defined positional
+   --  argument is not specified in the command line.
 
    ----------------------
    -- Test_Long_Binary --
@@ -298,6 +306,70 @@ procedure Test_Command_Line_Parser is
       Test_Support.Assert (Parser.Values (Option) (1).Value = "value");
    end Test_Name_Value_No_Separator;
 
+   -------------------------------
+   -- Test_Positional_Long_List --
+   -------------------------------
+
+   procedure Test_Positional_Long_List is
+      use type VSS.String_Vectors.Virtual_String_Vector;
+
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option_A  : constant VSS.Command_Line.Positional_Option :=
+        (Name        => "file.a",
+         Description => "");
+      Option_B  : constant VSS.Command_Line.Positional_Option :=
+        (Name        => "file.b",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option_A);
+      Parser.Add_Option (Option_B);
+
+      Arguments.Append ("file1");
+      Arguments.Append ("file2");
+      Arguments.Append ("file3");
+
+      Test_Support.Assert (Parser.Parse (Arguments));
+      Test_Support.Assert (Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (Parser.Positional_Arguments = Arguments);
+      Test_Support.Assert (Parser.Is_Specified (Option_A));
+      Test_Support.Assert (Parser.Value (Option_A) = "file1");
+      Test_Support.Assert (Parser.Is_Specified (Option_B));
+      Test_Support.Assert (Parser.Value (Option_B) = "file2");
+   end Test_Positional_Long_List;
+
+   ---------------------------------
+   -- Test_Positional_Unspecified --
+   ---------------------------------
+
+   procedure Test_Positional_Unspecified is
+      use type VSS.String_Vectors.Virtual_String_Vector;
+
+      Arguments : VSS.String_Vectors.Virtual_String_Vector;
+      Option_A  : constant VSS.Command_Line.Positional_Option :=
+        (Name        => "file.a",
+         Description => "");
+      Option_B  : constant VSS.Command_Line.Positional_Option :=
+        (Name        => "file.b",
+         Description => "");
+      Parser    : VSS.Command_Line.Parsers.Command_Line_Parser;
+
+   begin
+      Parser.Add_Option (Option_A);
+      Parser.Add_Option (Option_B);
+
+      Arguments.Append ("file1");
+
+      Test_Support.Assert (Parser.Parse (Arguments));
+      Test_Support.Assert (Parser.Error_Message.Is_Empty);
+      Test_Support.Assert (Parser.Positional_Arguments = Arguments);
+      Test_Support.Assert (Parser.Is_Specified (Option_A));
+      Test_Support.Assert (Parser.Value (Option_A) = "file1");
+      Test_Support.Assert (not Parser.Is_Specified (Option_B));
+      Test_Support.Assert (Parser.Value (Option_B).Is_Empty);
+   end Test_Positional_Unspecified;
+
    -----------------------
    -- Test_Short_Binary --
    -----------------------
@@ -454,4 +526,7 @@ begin
    Test_Long_Binary_With_Value_Error;
    Test_Short_Binary_With_Equal_Sign_Error;
    Test_Short_Binary_With_Value_Error;
+
+   Test_Positional_Long_List;
+   Test_Positional_Unspecified;
 end Test_Command_Line_Parser;

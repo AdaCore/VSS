@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -85,7 +85,10 @@ package body VSS.Command_Line.Parsers is
              (Named_Option'Class (Option).Unique_Name);
 
       else
-         raise Program_Error;
+         return
+           Self.Defined_Positional_Options.Find_Index
+             (Positional_Option'Class (Option))
+                <= Self.Positional_Options_Values.Length;
       end if;
    end Is_Specified;
 

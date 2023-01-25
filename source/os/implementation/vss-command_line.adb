@@ -4,14 +4,11 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with Ada.Wide_Wide_Text_IO;
-
 with GNAT.OS_Lib;
 
 with VSS.Application;
-with VSS.Strings.Conversions;
-
 with VSS.Command_Line.Parsers;
+with VSS.Text_Streams.Standadrs;
 
 package body VSS.Command_Line is
 
@@ -54,15 +51,12 @@ package body VSS.Command_Line is
    ------------------
 
    procedure Output_Error (Message : VSS.Strings.Virtual_String) is
-   begin
-      --  ??? VSS doesn't provide IO implementation for standard streams, so
-      --  use Ada.Wide_Wide_Text_IO as fallback, while it is known that it may
-      --  creates an issues like crash on Windows when nor standard error nor
-      --  console is not available, or incorrect encodings on POSIX systems.
+      Error   : VSS.Text_Streams.Output_Text_Stream'Class :=
+        VSS.Text_Streams.Standadrs.Standard_Error;
+      Success : Boolean := True;
 
-      Ada.Wide_Wide_Text_IO.Put_Line
-        (Ada.Wide_Wide_Text_IO.Standard_Error,
-         VSS.Strings.Conversions.To_Wide_Wide_String (Message));
+   begin
+      Error.Put_Line (Message, Success);
    end Output_Error;
 
    --------------

@@ -422,6 +422,19 @@ package body VSS.Command_Line.Parsers is
 
    function Value
      (Self   : Command_Line_Parser'Class;
+      Option : Positional_Option'Class) return VSS.Strings.Virtual_String is
+   begin
+      return
+        Self.Positional_Options_Values
+          (Self.Defined_Positional_Options.Find_Index (Option));
+   end Value;
+
+   -----------
+   -- Value --
+   -----------
+
+   function Value
+     (Self   : Command_Line_Parser'Class;
       Option : Value_Option'Class) return VSS.Strings.Virtual_String is
    begin
       if Self.Known_Named_Options_Values.Contains (Option.Unique_Name) then

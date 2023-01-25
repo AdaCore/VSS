@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -120,6 +120,16 @@ package body VSS.Command_Line is
          return Self.Short_Name;
       end if;
    end Unique_Name;
+
+   -----------
+   -- Value --
+   -----------
+
+   function Value
+     (Option : Positional_Option'Class) return VSS.Strings.Virtual_String is
+   begin
+      return Parser.Value (Option);
+   end Value;
 
    -----------
    -- Value --

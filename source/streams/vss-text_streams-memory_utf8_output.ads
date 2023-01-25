@@ -1,8 +1,12 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
+
+--  Simple implementation of the text stream to store output in the memory as
+--  seqeunce of stream elements in UTF-8 text encoding and using LF as line
+--  separator.
 
 with VSS.Stream_Element_Vectors;
 
@@ -18,6 +22,20 @@ private
    overriding procedure Put
      (Self    : in out Memory_UTF8_Output_Stream;
       Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
+
+   overriding procedure Put
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure Put_Line
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure New_Line
+     (Self    : in out Memory_UTF8_Output_Stream;
       Success : in out Boolean);
 
    overriding function Has_Error

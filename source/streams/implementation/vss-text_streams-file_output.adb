@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -7,12 +7,14 @@
 with Ada.Streams;
 with Interfaces.C;
 
+with VSS.Implementation.Line_Terminator;
 with VSS.Stream_Element_Vectors.Internals;
 with VSS.Strings.Conversions;
 
 package body VSS.Text_Streams.File_Output is
 
    use type Interfaces.C_Streams.FILEs;
+   use type Interfaces.C_Streams.size_t;
 
    C_W_Mode : constant Interfaces.C.char_array := Interfaces.C.To_C ("w");
 
@@ -115,6 +117,19 @@ package body VSS.Text_Streams.File_Output is
       return not Self.Error.Is_Empty;
    end Has_Error;
 
+   --------------
+   -- New_Line --
+   --------------
+
+   overriding procedure New_Line
+     (Self    : in out File_Output_Text_Stream;
+      Success : in out Boolean) is
+   begin
+      Self.Put
+        (VSS.Implementation.Line_Terminator.Sequence (Self.Terminator),
+         Success);
+   end New_Line;
+
    ---------
    -- Put --
    ---------
@@ -124,8 +139,6 @@ package body VSS.Text_Streams.File_Output is
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean)
    is
-      use type Interfaces.C_Streams.size_t;
-
       Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
       Length : Ada.Streams.Stream_Element_Count;
       Data   :
@@ -133,15 +146,15 @@ package body VSS.Text_Streams.File_Output is
       Size   : Interfaces.C_Streams.size_t;
 
    begin
-      if Self.Stream = Interfaces.C_Streams.NULL_Stream then
-         Self.Error := "File is not open";
-         Success    := False;
+      if not Success or not Self.Error.Is_Empty then
+         Success := False;
 
          return;
       end if;
 
-      if not Self.Error.Is_Empty then
-         Success := False;
+      if Self.Stream = Interfaces.C_Streams.NULL_Stream then
+         Self.Error := "File is not open";
+         Success    := False;
 
          return;
       end if;
@@ -165,6 +178,68 @@ package body VSS.Text_Streams.File_Output is
          end if;
       end if;
    end Put;
+
+   ---------
+   -- Put --
+   ---------
+
+   overriding procedure Put
+     (Self    : in out File_Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean)
+   is
+      Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+      Length : Ada.Streams.Stream_Element_Count;
+      Data   :
+        VSS.Stream_Element_Vectors.Internals.Stream_Element_Array_Access;
+      Size   : Interfaces.C_Streams.size_t;
+
+   begin
+      if not Success or not Self.Error.Is_Empty then
+         Success := False;
+
+         return;
+      end if;
+
+      if Self.Stream = Interfaces.C_Streams.NULL_Stream then
+         Self.Error := "File is not open";
+         Success    := False;
+
+         return;
+      end if;
+
+      Self.Encoder.Encode (Item, Buffer);
+
+      if not Buffer.Is_Empty then
+         VSS.Stream_Element_Vectors.Internals.Data_Constant_Access
+           (Buffer, Length, Data);
+
+         Size :=
+           Interfaces.C_Streams.fwrite
+             (Data (Data'First)'Address,
+              1,
+              Interfaces.C_Streams.size_t (Length),
+              Self.Stream);
+
+         if Size /= Interfaces.C_Streams.size_t (Length) then
+            Self.Error := "File IO error";
+            Success    := False;
+         end if;
+      end if;
+   end Put;
+
+   --------------
+   -- Put_Line --
+   --------------
+
+   overriding procedure Put_Line
+     (Self    : in out File_Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is
+   begin
+      Self.Put (Item, Success);
+      Self.New_Line (Success);
+   end Put_Line;
 
    ------------------
    -- Set_Encoding --
@@ -192,4 +267,5 @@ package body VSS.Text_Streams.File_Output is
          end if;
       end if;
    end Set_Encoding;
+
 end VSS.Text_Streams.File_Output;

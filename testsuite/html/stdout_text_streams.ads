@@ -25,6 +25,20 @@ private
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean);
 
+   overriding procedure Put
+     (Self    : in out Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure Put_Line
+     (Self    : in out Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure New_Line
+     (Self    : in out Output_Text_Stream;
+      Success : in out Boolean);
+
    overriding function Has_Error
      (Self : Output_Text_Stream) return Boolean is (not Self.Message.Is_Empty);
 

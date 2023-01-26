@@ -1,8 +1,10 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
+
+--  Abstract API of the streams interpreted as sequence of characters.
 
 with VSS.Characters;
 with VSS.Strings;
@@ -43,6 +45,45 @@ package VSS.Text_Streams is
      (Self    : in out Output_Text_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean) is abstract;
+   --  Output character to stream with conversion to the stream's text
+   --  encoding.
+   --
+   --  @param Self     Text stream itself
+   --  @param Item     Character to output
+   --  @param Success
+   --    Subprogram do nothing when True, and set it to True on failure.
+
+   procedure Put
+     (Self    : in out Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is abstract;
+   --  Output string to stream with conversion to the stream's text encoding.
+   --
+   --  @param Self     Text stream itself
+   --  @param Item     String to output
+   --  @param Success
+   --    Subprogram do nothing when True, and set it to True on failure.
+
+   procedure Put_Line
+     (Self    : in out Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is abstract;
+   --  Output string to stream with conversion to the stream's text encoding
+   --  and output line terminator sequence.
+   --
+   --  @param Self     Text stream itself
+   --  @param Item     String to output
+   --  @param Success
+   --    Subprogram do nothing when True, and set it to True on failure.
+
+   procedure New_Line
+     (Self    : in out Output_Text_Stream;
+      Success : in out Boolean) is abstract;
+   --  Output line terminator sequence to the text stream.
+   --
+   --  @param Self     Text stream itself
+   --  @param Success
+   --    Subprogram do nothing when True, and set it to True on failure.
 
    function Has_Error (Self : Output_Text_Stream) return Boolean is abstract;
    --  Return True when any error is detected.

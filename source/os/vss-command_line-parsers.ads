@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -38,6 +38,11 @@ package VSS.Command_Line.Parsers is
      (Self   : Command_Line_Parser'Class;
       Option : Abstract_Option'Class) return Boolean;
    --  Return True when given option has been specified the command line.
+
+   function Value
+     (Self   : Command_Line_Parser'Class;
+      Option : Positional_Option'Class) return VSS.Strings.Virtual_String;
+   --  Return value of the given option.
 
    function Value
      (Self   : Command_Line_Parser'Class;

@@ -67,6 +67,20 @@ package Tests_Text_Streams is
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean);
 
+   overriding procedure Put
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure Put_Line
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure New_Line
+     (Self    : in out Memory_UTF8_Output_Stream;
+      Success : in out Boolean);
+
    procedure Set_Limit
      (Self : in out Memory_UTF8_Output_Stream'Class;
       To   : VSS.Strings.Character_Count);
@@ -96,6 +110,20 @@ package Tests_Text_Streams is
    overriding procedure Put
      (Self    : in out String_Output_Stream;
       Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
+
+   overriding procedure Put
+     (Self    : in out String_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure Put_Line
+     (Self    : in out String_Output_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
+
+   overriding procedure New_Line
+     (Self    : in out String_Output_Stream;
       Success : in out Boolean);
 
    procedure Set_Limit

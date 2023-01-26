@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -53,6 +53,10 @@ package VSS.Command_Line is
 
    function Is_Specified (Option : Abstract_Option'Class) return Boolean;
    --  Return True when given option has been specified the command line.
+
+   function Value
+     (Option : Positional_Option'Class) return VSS.Strings.Virtual_String;
+   --  Return value of the given option.
 
    function Value
      (Option : Value_Option'Class) return VSS.Strings.Virtual_String;

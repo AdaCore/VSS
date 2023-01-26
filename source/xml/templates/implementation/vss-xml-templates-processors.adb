@@ -18,6 +18,18 @@ package body VSS.XML.Templates.Processors is
    ----------
 
    procedure Bind
+     (Self    : in out XML_Template_Processor'Class;
+      Segment : VSS.Strings.Virtual_String;
+      Proxy   : not null VSS.XML.Templates.Proxies.Proxy_Access) is
+   begin
+      Self.Binded.Bind (Segment, Proxy);
+   end Bind;
+
+   ----------
+   -- Bind --
+   ----------
+
+   procedure Bind
      (Self  : in out XML_Template_Processor'Class;
       Path  : VSS.String_Vectors.Virtual_String_Vector;
       Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access) is

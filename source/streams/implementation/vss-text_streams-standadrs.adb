@@ -1,118 +1,74 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+--  Standard input/output streams as text streams.
+
 with Ada.Streams;
-with Interfaces.C;
+with Interfaces.C_Streams;
 
 with VSS.Implementation.Line_Terminator;
 with VSS.Stream_Element_Vectors.Internals;
-with VSS.Strings.Conversions;
+with VSS.Strings.Converters.Encoders;
 
-package body VSS.Text_Streams.File_Output is
+package body VSS.Text_Streams.Standadrs is
 
    use type Interfaces.C_Streams.FILEs;
    use type Interfaces.C_Streams.size_t;
 
-   C_W_Mode : constant Interfaces.C.char_array := Interfaces.C.To_C ("w");
+   type Standard_Output_Text_Stream is
+     limited new VSS.Text_Streams.Output_Text_Stream with
+   record
+      Encoder    : VSS.Strings.Converters.Encoders.Virtual_String_Encoder;
+      Terminator : VSS.Strings.Line_Terminator := VSS.Strings.LF;
+      Stream     : Interfaces.C_Streams.FILEs :=
+        Interfaces.C_Streams.NULL_Stream;
+      Error      : VSS.Strings.Virtual_String;
+   end record;
 
-   -----------
-   -- Close --
-   -----------
+   overriding procedure Put
+     (Self    : in out Standard_Output_Text_Stream;
+      Item    : VSS.Characters.Virtual_Character;
+      Success : in out Boolean);
 
-   procedure Close (Self : in out File_Output_Text_Stream'Class) is
-      Dummy : Interfaces.C_Streams.int;
+   overriding procedure Put
+     (Self    : in out Standard_Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
 
-   begin
-      if Self.Stream /= Interfaces.C_Streams.NULL_Stream then
-         Dummy := Interfaces.C_Streams.fclose (Self.Stream);
-      end if;
+   overriding procedure Put_Line
+     (Self    : in out Standard_Output_Text_Stream;
+      Item    : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
 
-      Self.Stream := Interfaces.C_Streams.NULL_Stream;
-      Self.Encoder.Reset_State;
-      Self.Error.Clear;
-   end Close;
+   overriding procedure New_Line
+     (Self    : in out Standard_Output_Text_Stream;
+      Success : in out Boolean);
 
-   ------------
-   -- Create --
-   ------------
+   overriding function Has_Error
+     (Self : Standard_Output_Text_Stream) return Boolean;
 
-   procedure Create
-     (Self : in out File_Output_Text_Stream'Class;
-      Name : VSS.Strings.Virtual_String'Class)
-   is
-      C_Name : constant Interfaces.C.char_array :=
-        Interfaces.C.To_C (VSS.Strings.Conversions.To_UTF_8_String (Name));
-
-   begin
-      if Self.Stream /= Interfaces.C_Streams.NULL_Stream then
-         Self.Close;
-      end if;
-
-      Self.Error.Clear;
-
-      Self.Stream :=
-        Interfaces.C_Streams.fopen
-          (C_Name (C_Name'First)'Address,
-           C_W_Mode (C_W_Mode'First)'Address);
-
-      if Self.Stream = Interfaces.C_Streams.NULL_Stream then
-         Self.Error := "Unable to create file";
-
-      elsif not Self.Encoder.Is_Valid then
-         Self.Encoder.Initialize ("utf-8");
-      end if;
-   end Create;
-
-   ------------
-   -- Create --
-   ------------
-
-   procedure Create
-     (Self     : in out File_Output_Text_Stream'Class;
-      Name     : VSS.Strings.Virtual_String'Class;
-      Encoding : VSS.Strings.Virtual_String) is
-   begin
-      if Self.Stream /= Interfaces.C_Streams.NULL_Stream then
-         Self.Close;
-      end if;
-
-      Self.Error.Clear;
-
-      Self.Set_Encoding (Encoding);
-
-      if Self.Error.Is_Empty then
-         Self.Create (Name);
-      end if;
-   end Create;
+   overriding function Error_Message
+     (Self : Standard_Output_Text_Stream) return VSS.Strings.Virtual_String;
 
    -------------------
    -- Error_Message --
    -------------------
 
    overriding function Error_Message
-     (Self : File_Output_Text_Stream) return VSS.Strings.Virtual_String is
+     (Self : Standard_Output_Text_Stream) return VSS.Strings.Virtual_String is
    begin
       return Self.Error;
    end Error_Message;
-
-   --------------
-   -- Finalize --
-   --------------
-
-   overriding procedure Finalize (Self : in out File_Output_Text_Stream) is
-   begin
-      Self.Close;
-   end Finalize;
 
    ---------------
    -- Has_Error --
    ---------------
 
    overriding function Has_Error
-     (Self : File_Output_Text_Stream) return Boolean is
+     (Self : Standard_Output_Text_Stream) return Boolean is
    begin
       return not Self.Error.Is_Empty;
    end Has_Error;
@@ -122,7 +78,7 @@ package body VSS.Text_Streams.File_Output is
    --------------
 
    overriding procedure New_Line
-     (Self    : in out File_Output_Text_Stream;
+     (Self    : in out Standard_Output_Text_Stream;
       Success : in out Boolean) is
    begin
       Self.Put
@@ -135,7 +91,7 @@ package body VSS.Text_Streams.File_Output is
    ---------
 
    overriding procedure Put
-     (Self    : in out File_Output_Text_Stream;
+     (Self    : in out Standard_Output_Text_Stream;
       Item    : VSS.Characters.Virtual_Character;
       Success : in out Boolean)
    is
@@ -184,7 +140,7 @@ package body VSS.Text_Streams.File_Output is
    ---------
 
    overriding procedure Put
-     (Self    : in out File_Output_Text_Stream;
+     (Self    : in out Standard_Output_Text_Stream;
       Item    : VSS.Strings.Virtual_String;
       Success : in out Boolean)
    is
@@ -233,39 +189,47 @@ package body VSS.Text_Streams.File_Output is
    --------------
 
    overriding procedure Put_Line
-     (Self    : in out File_Output_Text_Stream;
+     (Self    : in out Standard_Output_Text_Stream;
       Item    : VSS.Strings.Virtual_String;
       Success : in out Boolean) is
    begin
       Self.Put (Item, Success);
       Self.New_Line (Success);
    end Put_Line;
+   --------------------
+   -- Standard_Error --
+   --------------------
 
-   ------------------
-   -- Set_Encoding --
-   ------------------
-
-   procedure Set_Encoding
-     (Self     : in out File_Output_Text_Stream'Class;
-      Encoding : VSS.Strings.Virtual_String)
-   is
-      use all type VSS.Strings.Converters.Converter_Flag;
-
+   function Standard_Error return VSS.Text_Streams.Output_Text_Stream'Class is
    begin
-      if Self.Stream = Interfaces.C_Streams.NULL_Stream then
-         Self.Encoder.Initialize
-           (Encoding,
-            (Stateless     => False,
-             Stop_On_Error => False,
-             Process_BOM   => False));
+      return Result : Standard_Output_Text_Stream :=
+        (Encoder     => <>,
+         Terminator  => VSS.Strings.LF,
+         Stream      => Interfaces.C_Streams.stderr,
+         Error       => <>)
+      do
+         Result.Encoder.Initialize ("utf-8");
+         --  XXX Encoding must be detected from application's locale.
+         --  XXX Line terminator must be detected by platform.
+      end return;
+   end Standard_Error;
 
-         if not Self.Encoder.Is_Valid then
-            Self.Error := "Unsupported encoding";
+   ---------------------
+   -- Standard_Output --
+   ---------------------
 
-         else
-            Self.Error.Clear;
-         end if;
-      end if;
-   end Set_Encoding;
+   function Standard_Output return VSS.Text_Streams.Output_Text_Stream'Class is
+   begin
+      return Result : Standard_Output_Text_Stream :=
+        (Encoder     => <>,
+         Terminator  => VSS.Strings.LF,
+         Stream      => Interfaces.C_Streams.stdout,
+         Error       => <>)
+      do
+         Result.Encoder.Initialize ("utf-8");
+         --  XXX Encoding must be detected from application's locale.
+         --  XXX Line terminator must be detected by platform.
+      end return;
+   end Standard_Output;
 
-end VSS.Text_Streams.File_Output;
+end VSS.Text_Streams.Standadrs;

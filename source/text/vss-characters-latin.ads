@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -12,13 +12,17 @@ package VSS.Characters.Latin is
 
    Nul       : constant Virtual_Character := Virtual_Character'Val (16#0000#);
 
-   Backspace : constant Virtual_Character := Virtual_Character'Val (16#0008#);
+   Backspace            : constant Virtual_Character :=
+     Virtual_Character'Val (16#0008#);
    Character_Tabulation : constant Virtual_Character :=
      Virtual_Character'Val (16#0009#);
-   Line_Feed : constant Virtual_Character := Virtual_Character'Val (16#000A#);
-
-   Form_Feed : constant Virtual_Character := Virtual_Character'Val (16#000C#);
-   Carriage_Return : constant Virtual_Character :=
+   Line_Feed            : constant Virtual_Character :=
+     Virtual_Character'Val (16#000A#);
+   Line_Tabulation      : constant Virtual_Character :=
+     Virtual_Character'Val (16#000B#);
+   Form_Feed            : constant Virtual_Character :=
+     Virtual_Character'Val (16#000C#);
+   Carriage_Return      : constant Virtual_Character :=
      Virtual_Character'Val (16#000D#);
 
    Space     : constant Virtual_Character := Virtual_Character'Val (16#0020#);
@@ -43,6 +47,8 @@ package VSS.Characters.Latin is
 
    Hyphen_Minus           : constant Virtual_Character :=
      Virtual_Character'Val (16#002D#);
+   Full_Stop              : constant Virtual_Character :=
+     Virtual_Character'Val (16#002E#);
 
    Digit_Zero             : constant Virtual_Character :=
      Virtual_Character'Val (16#0030#);
@@ -81,5 +87,8 @@ package VSS.Characters.Latin is
      Virtual_Character'Val (16#007D#);
    Tilde                  : constant Virtual_Character :=
      Virtual_Character'Val (16#007E#);
+
+   Next_Line              : constant Virtual_Character :=
+     Virtual_Character'Val (16#0085#);
 
 end VSS.Characters.Latin;

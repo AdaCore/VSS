@@ -69,6 +69,7 @@ package VSS.XML.Implementation.Template_Programs is
 
          when Condition =>
             Negate         : Boolean;
+            Exists         : Boolean;
             Condition_Path : VSS.String_Vectors.Virtual_String_Vector;
 
          when Content =>

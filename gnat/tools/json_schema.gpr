@@ -1,24 +1,24 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
-with "vss_config";
+with "vss_common";
 with "vss_json";
 with "vss_text";
 
 project JSON_Schema is
 
    for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tools_Object_Dir;
+   for Object_Dir use VSS_Common.Tools_Object_Dir;
    for Source_Dirs use
      ("../../tools/json_schema");
    for Main use ("json_schema-driver.adb");
 
-   package Compiler renames VSS_Config.Compiler;
+   package Compiler renames VSS_Common.Compiler;
 
-   package Linker renames VSS_Config.Linker;
+   package Linker renames VSS_Common.Linker;
 
    package Builder is
       for Executable ("json_schema-driver.adb") use "gen_json";

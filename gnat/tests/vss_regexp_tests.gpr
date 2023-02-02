@@ -1,26 +1,26 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 --  VSS: RegExp processing subproject tests
 
-with "../vss_config";
+with "../vss_common";
 with "../vss_regexp";
 with "vss_test_common";
 
 project VSS_RegExp_Tests is
 
    for Languages use ("Ada");
-   for Object_Dir use VSS_Config.Tests_Object_Dir;
+   for Object_Dir use VSS_Common.Tests_Object_Dir;
    for Source_Dirs use ("../../testsuite/regexp");
    for Main use
      ("test_regexp.adb",
       "test_regexp_re_tests.adb");
 
    package Compiler is
-      for Switches ("Ada") use VSS_Config.Ada_Switches & ("-gnatW8");
+      for Switches ("Ada") use VSS_Common.Ada_Switches & ("-gnatW8");
    end Compiler;
 
    package Binder is

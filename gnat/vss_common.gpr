@@ -6,6 +6,8 @@
 
 --  Configuration project for all subprojects of the VSS.
 
+with "../config/vss_config.gpr";
+
 abstract project VSS_Common is
 
    type OS_API_Kind is ("unix", "osx", "Windows_NT");
@@ -80,7 +82,7 @@ abstract project VSS_Common is
    --  possible and never hardcode any switches to simplify future support.
 
    package Compiler is
-      for Switches ("Ada") use Ada_Switches & Ada_Coverage_Switches;
+      for Switches ("Ada") use VSS_Config.Ada_Compiler_Switches & Ada_Switches & Ada_Coverage_Switches;
    end Compiler;
 
    package Linker is

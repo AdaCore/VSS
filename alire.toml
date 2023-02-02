@@ -10,3 +10,7 @@ licenses = "Apache-2.0"
 website = "https://github.com/AdaCore/VSS"
 
 project-files = ["gnat/vss_text.gpr", "gnat/vss_json.gpr"]
+
+[configuration]
+generate_ada = false
+generate_c = false

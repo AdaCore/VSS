@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 --  VSS: Text processing subproject
 
-with "vss_config";
+with "vss_common";
 with "vss_gnat";
 
 library project VSS_Text is
@@ -14,22 +14,22 @@ library project VSS_Text is
    for Languages use ("Ada");
 
    for Library_Name use "vss";
-   for Library_Kind use VSS_Config.Library_Kind;
+   for Library_Kind use VSS_Common.Library_Kind;
 
-   for Object_Dir use VSS_Config.Object_Dir;
-   for Library_Dir use VSS_Config.Library_Dir;
+   for Object_Dir use VSS_Common.Object_Dir;
+   for Library_Dir use VSS_Common.Library_Dir;
 
    OS_Source_Dirs := ();
    OS_Library_Options := ();
 
-   case VSS_Config.OS_API is
+   case VSS_Common.OS_API is
       when "unix" | "osx" =>
          null;
 
       when "Windows_NT" =>
          OS_Source_Dirs := ("../source/os/windows");
 
-         case VSS_Config.Library_Kind is
+         case VSS_Common.Library_Kind is
             when "relocatable" =>
                OS_Library_Options := ("-luserenv");
             when others=>
@@ -48,12 +48,12 @@ library project VSS_Text is
       "../source/text/implementation",
       "../source/text/ucd") & OS_Source_Dirs;
 
-   package Compiler renames VSS_Config.Compiler;
+   package Compiler renames VSS_Common.Compiler;
 
-   package Linker renames VSS_Config.Linker;
+   package Linker renames VSS_Common.Linker;
 
    package Naming is
-      case VSS_Config.OS_API is
+      case VSS_Common.OS_API is
          when "unix" | "osx" =>
             for Implementation ("VSS.Application.Platform")
               use "vss-application-platform__posix.adb";
@@ -66,7 +66,7 @@ library project VSS_Text is
             for Implementation ("VSS.Standard_Paths")
               use "vss-standard_paths__posix.adb";
 
-            case VSS_Config.OS_API is
+            case VSS_Common.OS_API is
                when "unix" =>
                   for Implementation ("VSS.Application.Platform.Application_File")
                     use "vss-application-platform-application_file__linux.adb";

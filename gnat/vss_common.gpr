@@ -1,0 +1,108 @@
+--
+--  Copyright (C) 2020-2023, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  Configuration project for all subprojects of the VSS.
+
+with "../config/vss_config.gpr";
+
+abstract project VSS_Common is
+
+   type OS_API_Kind is ("unix", "osx", "Windows_NT");
+   OS_API : OS_API_Kind :=
+     external ("VSS_OS", external ("OS", "unix"));
+
+   type VSS_Library_Kind is ("relocatable", "static", "static-pic");
+   Library_Kind : VSS_Library_Kind :=
+     external ("VSS_LIBRARY_TYPE", external ("LIBRARY_TYPE", "static"));
+
+   type VSS_Coverage_Mode is ("none", "gcov");
+   Coverage_Mode : VSS_Coverage_Mode :=
+     external ("VSS_COVERAGE_MODE", external ("COVERAGE_MODE", "none"));
+
+   type VSS_CI_Mode is ("none", "on");
+   CI_Mode : VSS_CI_Mode :=
+     external ("VSS_CI_MODE", external ("CI_MODE", "none"));
+
+   Superproject := external ("SUPERPROJECT", "");
+
+   Ada_Switches := ();
+   Ada_Coverage_Switches := ();
+   Linker_Options := ();
+
+   Library_Dir      := "../.libs/" & Superproject & "/" & Library_Kind;
+   Object_Dir       := "../.objs/" & Superproject & "/" & Library_Kind;
+   Tests_Object_Dir := "../../.objs/" & Superproject & "/tests";
+   Tools_Object_Dir := "../../.objs/" & Superproject & "/tools";
+
+   --  Build Profile
+
+   VSS_Ada_Compiler_Switches := ();
+   case VSS_Config.Build_Profile is
+      when "release" =>
+         VSS_Ada_Compiler_Switches := ("-g");
+
+      when "validation" =>
+         VSS_Ada_Compiler_Switches := ();
+
+      when "development" =>
+         VSS_Ada_Compiler_Switches :=
+           (
+             "-O0",
+             "-fstack-check",  --  Enable stack overflow checks
+             "-gnata",         --  Enable assertions and contracts
+             "-gnato",         --  Enable numeric overflow checking
+             "-gnatyg",        --  check standard GNAT style rules
+             "-gnatyo"         --  check subprogram bodies in alphabetical order
+           );
+   end case;
+
+   --  Coverage Mode
+
+   Coverage_Ada_Compiler_Switches := ();
+   Coverage_Linker_Options := ();
+   case Coverage_Mode is
+      when "none" =>
+         null;
+
+      when "gcov" =>
+         --  Enable coverage code instrumentation.
+         Coverage_Ada_Compiler_Switches := ("--coverage");
+         Coverage_Linker_Options := ("--coverage");
+   end case;
+
+   --  CI Mode
+
+   CI_Ada_Compiler_Switches := ();
+   case CI_Mode is
+      when "none" =>
+         null;
+
+      when "on" =>
+         CI_Ada_Compiler_Switches := ("-gnatwe");
+   end case;
+
+   --  Common set of switches
+
+   Ada_Compiler_Switches :=
+     VSS_Config.Ada_Compiler_Switches
+       & VSS_Ada_Compiler_Switches
+       & Coverage_Ada_Compiler_Switches
+       & CI_Ada_Compiler_Switches;
+   Linker_Options := Coverage_Linker_Options;
+
+   --  All packages below are expected to be used when there is no subproject
+   --  specific switches are necessary. Please keep this packages as simple as
+   --  possible and never hardcode any switches to simplify future support.
+
+   package Compiler is
+      for Switches ("Ada") use Ada_Compiler_Switches;
+   end Compiler;
+
+   package Linker is
+      for Linker_Options use Coverage_Linker_Options;
+   end Linker;
+
+end VSS_Common;

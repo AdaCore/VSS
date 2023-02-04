@@ -1,10 +1,11 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 with VSS.Regular_Expressions;
+pragma Warnings (Off, "is not referenced");
 with VSS.Strings.Character_Iterators;
 
 separate (Test_Regexp)

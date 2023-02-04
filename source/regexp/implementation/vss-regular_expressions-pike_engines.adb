@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -342,7 +342,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       if Found and then
         (not Options (Anchored_Match) or else
-         VSS.Strings.Character_Count (Final_Tags (Self.Last_Tag).Index) =
+         VSS.Strings.Character_Count (Final_Tags (2).Index) =
             Subject.After_Last_Character.Character_Index)
       then
          Result := new VSS.Regular_Expressions.Matches.Match

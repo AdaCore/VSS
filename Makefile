@@ -1,7 +1,6 @@
-# Build mode (dev or prod)
-BUILD_MODE=dev
 
 GPRBUILD_FLAGS = -p -j0
+
 PREFIX                 ?= /usr
 GPRDIR                 ?= $(PREFIX)/share/gpr
 LIBDIR                 ?= $(PREFIX)/lib
@@ -27,13 +26,13 @@ endif
 .PHONY: docs
 
 all:
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_json.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr -XVSS_BUILD_MODE=$(BUILD_MODE) -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_json.gpr -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr -cargs $(ADAFLAGS)
 
 generate:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr

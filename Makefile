@@ -40,7 +40,7 @@ endif
 
 all: build-libs-relocatable
 
-all-build-libs: build-libs-relocatable build-libs-static build-libs-static-pic
+build-all-libs: build-libs-relocatable build-libs-static build-libs-static-pic
 
 build-libs-%:
 	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr

@@ -1,4 +1,14 @@
 
+# Common scenario variables of the GPR files:
+#
+# VSS_BUILD_PROFILE | BUILD_PROFILE = release | validation | development
+#
+# VSS_COVERAGE_MODE | COVERAGE_MODE = none | gcov
+#
+# VSS_CI_MODE | CI_MODE = none | on
+#
+# ADAFLAGS = ...
+
 GPRBUILD_FLAGS = -p -j0
 
 PREFIX                 ?= /usr
@@ -26,13 +36,13 @@ endif
 .PHONY: docs
 
 all:
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_json.gpr -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr -cargs $(ADAFLAGS)
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr -cargs $(ADAFLAGS)
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_json.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr
 
 generate:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr

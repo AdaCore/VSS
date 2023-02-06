@@ -38,6 +38,8 @@ endif
 
 .PHONY: docs
 
+.NOTPARALLEL:
+
 all: build-libs-relocatable
 
 build-all-libs: build-libs-relocatable build-libs-static build-libs-static-pic

@@ -16,14 +16,17 @@ GPRDIR                 ?= $(PREFIX)/share/gpr
 LIBDIR                 ?= $(PREFIX)/lib
 BINDIR                 ?= $(PREFIX)/bin
 INSTALL_PROJECT_DIR    ?= $(DESTDIR)$(GPRDIR)
-INSTALL_INCLUDE_DIR    ?= $(DESTDIR)$(PREFIX)/include/vss
+INSTALL_INCLUDE_DIR    ?= $(DESTDIR)$(PREFIX)/include/vss/$*
 INSTALL_EXEC_DIR       ?= $(DESTDIR)$(BINDIR)
 INSTALL_LIBRARY_DIR    ?= $(DESTDIR)$(LIBDIR)
-INSTALL_ALI_DIR        ?= $(INSTALL_LIBRARY_DIR)/vss
+INSTALL_ALI_DIR        ?= $(INSTALL_LIBRARY_DIR)/vss/$*
 
-GPRINSTALL_FLAGS = --prefix=$(PREFIX) --exec-subdir=$(INSTALL_EXEC_DIR)\
- --lib-subdir=$(INSTALL_ALI_DIR) --project-subdir=$(INSTALL_PROJECT_DIR)\
- --link-lib-subdir=$(INSTALL_LIBRARY_DIR) --sources-subdir=$(INSTALL_INCLUDE_DIR)
+GPRINSTALL_FLAGS = \
+    -XVSS_LIBRARY_TYPE=$* \
+    --build-name=$* --build-var=LIBRARY_TYPE --build-var=VSS_LIBRARY_TYPE \
+    --prefix=$(PREFIX) --exec-subdir=$(INSTALL_EXEC_DIR) \
+    --lib-subdir=$(INSTALL_ALI_DIR) --project-subdir=$(INSTALL_PROJECT_DIR) \
+    --link-lib-subdir=$(INSTALL_LIBRARY_DIR) --sources-subdir=$(INSTALL_INCLUDE_DIR)
 
 OK_RE_TESTS := 504 # Number of re_tests to be passed
 
@@ -35,14 +38,18 @@ endif
 
 .PHONY: docs
 
-all:
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_json.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr
+all: build-libs-relocatable
+
+all-build-libs: build-libs-relocatable build-libs-static build-libs-static-pic
+
+build-libs-%:
+	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_text.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_json.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_xml.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr
 
 generate:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr
@@ -51,12 +58,12 @@ generate:
 	gnatchop .objs/ucd.ada source/text/ucd
 
 build_tests:
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_text_tests.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_os_tests.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_json_tests.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_stream_tests.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_regexp_tests.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_html_tests.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_text_tests.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_os_tests.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_json_tests.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_stream_tests.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_regexp_tests.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_html_tests.gpr
 
 check: build_tests check_text check_json check_regexp check_html
 
@@ -157,7 +164,11 @@ docs:
 clean:
 	rm -rf .objs .libs re_tests
 
-install:
+install: install-libs-relocatable
+
+install-all-libs: install-libs-relocatable install-libs-static install-libs-static-pic
+
+install-libs-%:
 	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/text -f -p -P gnat/vss_text.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/json -f -p -P gnat/vss_json.gpr

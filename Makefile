@@ -49,7 +49,7 @@ build-libs-%:
 	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr
 	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_xml.gpr
 	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr
-	gprbuild -XVSS_LIBRARY_TYPE=$* $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=$* -XXMLADA_BUILD=$* $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr
 
 generate:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr
@@ -63,7 +63,7 @@ build_tests:
 	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_json_tests.gpr
 	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_stream_tests.gpr
 	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_regexp_tests.gpr
-	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_html_tests.gpr
+	gprbuild -XVSS_LIBRARY_TYPE=static -XXMLADA_BUILD=static $(GPRBUILD_FLAGS) gnat/tests/vss_html_tests.gpr
 
 check: build_tests check_text check_json check_regexp check_html
 
@@ -175,7 +175,7 @@ install-libs-%:
 	gprinstall $(GPRINSTALL_FLAGS)/regexp -f -p -P gnat/vss_regexp.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/xml -f -p -P gnat/vss_xml.gpr
 	gprinstall $(GPRINSTALL_FLAGS)/xml_templates -f -p -P gnat/vss_xml_templates.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/xml_xmlada -f -p -P gnat/vss_xml_xmlada.gpr
+	gprinstall -XXMLADA_BUILD=$* $(GPRINSTALL_FLAGS)/xml_xmlada -f -p -P gnat/vss_xml_xmlada.gpr
 
 misc: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr

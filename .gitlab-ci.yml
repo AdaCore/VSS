@@ -43,12 +43,17 @@ build_and_test:
         ENABLE_GCOV=y gcovr --print-summary --cobertura gcov.xml )
       make clean
 
+    # Run spell checker
+    - make spellcheck_json
+
   coverage: /^\s*lines:\s*\d+.\d+\%/
   artifacts:
     reports:
       coverage_report:
         coverage_format: cobertura
         path: gcov.xml
+      codequality:
+        - spellcheck.json
 
 build_als:
   services:

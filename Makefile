@@ -195,3 +195,12 @@ spellcheck:
 	   echo "\n\nFIX SPELLING or append exceptions to data/.aspell.en.pws !!!" ; \
 	   exit 1 ; \
 	fi
+
+spellcheck_json:
+	for J in source/*/*.ads; do \
+	  sed -e 's/#[^#]*#//g' -e "s/'\([A-Z]\)/ \1/g" $$J |   \
+	  aspell list --lang=en --home-dir=./data/ --ignore-case > /tmp/spell.txt; \
+	  if [ -s /tmp/spell.txt ] ; then \
+	    sort -u -f /tmp/spell.txt | jq -R --arg file "$$J" '{description: "Wrong spelling: \(.)", fingerprint: ., severity: "major", location: {path: $$file, lines: {begin: 1} }}' ; \
+	  fi  \
+	done | jq -s 'reduce inputs as $$in (.; . + $$in)' > spellcheck.json

@@ -26,16 +26,14 @@ abstract project VSS_Common is
    CI_Mode : VSS_CI_Mode :=
      external ("VSS_CI_MODE", external ("CI_MODE", "none"));
 
-   Superproject := external ("SUPERPROJECT", "");
-
    Ada_Switches := ();
    Ada_Coverage_Switches := ();
    Linker_Options := ();
 
-   Library_Dir      := "../.libs/" & Superproject & "/" & Library_Kind;
-   Object_Dir       := "../.objs/" & Superproject & "/" & Library_Kind;
-   Tests_Object_Dir := "../../.objs/" & Superproject & "/tests";
-   Tools_Object_Dir := "../../.objs/" & Superproject & "/tools";
+   Library_Dir      := "../.libs/" & "/" & Library_Kind;
+   Object_Dir       := "../.objs/" & "/" & Library_Kind;
+   Tests_Object_Dir := "../../.objs/" & "/tests";
+   Tools_Object_Dir := "../../.objs/" & "/tools";
 
    --  Build Profile
 

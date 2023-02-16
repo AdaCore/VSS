@@ -10,16 +10,16 @@ jobs:
     name: Docs
     steps:
       - name: Get VSS
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ./cached_gnat
           key: ${{ runner.os }}-alire_v1
           restore-keys: ${{ runner.os }}-alire_v1
       - name: Get GNAT toolchain with alire
-        uses: alire-project/setup-alire@v1
+        uses: alire-project/setup-alire@v2
         with:
           toolchain: gnat_native^11 gprbuild^21
           toolchain_dir: ./cached_gnat

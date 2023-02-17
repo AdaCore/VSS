@@ -54,7 +54,7 @@ jobs:
           make -C vss install-libs-static check_install PREFIX=/tmp BUILD_MODE=${{ matrix.build_mode }}
           make -C vss misc BUILD_MODE=${{ matrix.build_mode }}
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         if: ${{ matrix.build_mode == 'coverage' }}
         with:
           working-directory: vss

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -85,12 +85,24 @@ package body VSS.Text_Streams.File_Input is
                 (Data (Data'First)'Address, 0, 1, Data'Length, Self.Stream);
 
             if Size /= 0 then
+               --  Some data has been read, decode it.
+
                Self.Buffer :=
                  Self.Decoder.Decode
                    (Data
                       (Data'First
                          .. Data'First
-                              + Ada.Streams.Stream_Element_Offset (Size) - 1));
+                              + Ada.Streams.Stream_Element_Offset (Size) - 1),
+                    False);
+
+            elsif Interfaces.C_Streams.feof (Self.Stream) /= 0 then
+               --  End of file has been reached, let decoder know that no more
+               --  data available. Decoder will return REPLACEMENT CHARACTER
+               --  if some data has beed accumulated but can't be decoded.
+
+               Self.Buffer :=
+                 Self.Decoder.Decode
+                   (Data (Data'First .. Data'First - 1), True);
 
             elsif Interfaces.C_Streams.ferror (Self.Stream) /= 0 then
                Self.Error := "File IO error";

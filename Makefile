@@ -78,6 +78,7 @@ check_text:
 	.objs/tests/test_line_iterators
 	.objs/tests/test_stream_element_vector
 	.objs/tests/test_text_streams
+	.objs/tests/test_file_text_streams testsuite/stream/test_file_text_stream/vss.197.in.txt /tmp/vss.197.out.txt && diff -u /tmp/vss.197.out.txt testsuite/stream/test_file_text_stream/vss.197.out.txt
 	.objs/tests/test_string_append
 	.objs/tests/test_string_casing
 	.objs/tests/test_string_compare

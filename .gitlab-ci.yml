@@ -16,13 +16,22 @@ build_and_test:
     . ~/.aws_container_credentials
     export PATH=/it/e3/bin:$PATH
 
-    # Build the VSS and tests
-    anod install --sandbox-dir /it/wave gnat
-    eval $(anod printenv --sandbox-dir /it/wave gnat)
+    # Install GNAT (with gcov) and gcovr
+    anod install --sandbox-dir /it/wave gnatall
+    python3 -m pip install gcovr
+
+    # Fetch tests' data into `./data/`
+    PACKAGE=vss-tests-data.tar.bz2
+    VSS_URL=https://gitlab.adacore-it.com/api/v4/projects/129
     curl -L --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-     https://gitlab.adacore-it.com/api/v4/projects/129/packages/generic/vss-tests-data.tar.bz2/0.0.0/vss-tests-data.tar.bz2 |\
-     tar xjvf - -C ./data
-    make build-libs-static check clean
+     $VSS_URL/packages/generic/$PACKAGE/0.0.0/$PACKAGE |\
+     tar xjf - -C ./data
+
+    # Build VSS and run tests
+    ( eval $(anod printenv --sandbox-dir /it/wave gnatall) ;\
+      make COVERAGE_MODE=gcov build-libs-static check ;\
+      ENABLE_GCOV=y gcovr --print-summary --cobertura gcov.xml )
+    make clean
 
     # Tell the anod sandbox to use our repository
     cd /it/wave
@@ -30,3 +39,10 @@ build_and_test:
 
     # Build the ALS as a test
     anod build als
+
+  coverage: /^\s*lines:\s*\d+.\d+\%/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: gcov.xml

@@ -78,6 +78,7 @@ check_text:
 	.objs/tests/test_line_iterators
 	.objs/tests/test_stream_element_vector
 	.objs/tests/test_text_streams
+	.objs/tests/test_file_text_streams testsuite/stream/test_file_text_stream/vss.197.in.txt /tmp/vss.197.out.txt && diff -u /tmp/vss.197.out.txt testsuite/stream/test_file_text_stream/vss.197.out.txt
 	.objs/tests/test_string_append
 	.objs/tests/test_string_casing
 	.objs/tests/test_string_compare
@@ -127,9 +128,9 @@ check_json:
 	test ! -e .objs/tests/.fails
 	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected
 
-check_regexp: re_tests
+check_regexp:
 	.objs/tests/test_regexp
-	.objs/tests/test_regexp_re_tests $(OK_RE_TESTS) < re_tests
+	.objs/tests/test_regexp_re_tests $(OK_RE_TESTS) < data/re_tests
 
 check_html:
 	rm -f .objs/tests/.fails
@@ -154,9 +155,6 @@ check_install:
 	gprclean -aP $(INSTALL_PROJECT_DIR) -P example.gpr
 	rm -f example.*
 
-re_tests:
-	curl -o $@ https://raw.githubusercontent.com/Perl/perl5/blead/t/re/re_tests
-
 coverage:
 	find .objs/ -name *.o | xargs -s 512 gcov || true
 
@@ -164,7 +162,7 @@ docs:
 	make -C docs
 
 clean:
-	rm -rf .objs .libs re_tests
+	rm -rf .objs .libs
 
 install: install-libs-relocatable
 

@@ -11,13 +11,22 @@ build_and_test:
      - cpu:8
      - mem:16
   stage: build_and_test
-  script:
-    - . ~/.aws_container_credentials
-    - export PATH=/it/e3/bin:$PATH
+  script: |
+    set -x
+    . ~/.aws_container_credentials
+    export PATH=/it/e3/bin:$PATH
+
+    # Build the VSS and tests
+    anod install --sandbox-dir /it/wave gnat
+    eval $(anod printenv --sandbox-dir /it/wave gnat)
+    curl -L --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+     https://gitlab.adacore-it.com/api/v4/projects/129/packages/generic/vss-tests-data.tar.bz2/0.0.0/vss-tests-data.tar.bz2 |\
+     tar xjvf - -C ./data
+    make build-libs-static check clean
 
     # Tell the anod sandbox to use our repository
-    - cd /it/wave
-    - anod vcs --add-repo vss $CI_PROJECT_DIR
+    cd /it/wave
+    anod vcs --add-repo vss $CI_PROJECT_DIR
 
     # Build the ALS as a test
-    - anod build als
+    anod build als

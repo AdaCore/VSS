@@ -38,6 +38,9 @@ jobs:
           curl -C - -o UCD-14.0.0.zip https://www.unicode.org/Public/14.0.0/ucd/UCD.zip
           mkdir vss/data/ucd
           unzip UCD-14.0.0.zip -d vss/data/ucd
+      - name: Get regexp tests
+        run: |
+          curl -C - -o vss/data/re_tests https://raw.githubusercontent.com/Perl/perl5/blead/t/re/re_tests
       - name: Get parse-number-fxx-test-data repository
         uses: actions/checkout@v3
         with:

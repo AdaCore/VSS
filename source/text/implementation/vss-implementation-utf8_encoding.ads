@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -64,5 +64,18 @@ package VSS.Implementation.UTF8_Encoding is
       Unit_3  : VSS.Unicode.UTF8_Code_Unit;
       Unit_4  : VSS.Unicode.UTF8_Code_Unit) with Inline_Always;
    --  Store encoded character.
+
+   procedure Unchecked_Decode_Forward
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point);
+   --  Decode UTF8 encoded character started at given offset and change offset
+   --  to point to the beginning of the next character.
+
+   function Unchecked_Decode
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : VSS.Unicode.UTF8_Code_Unit_Index)
+      return VSS.Unicode.Code_Point;
+   --  Decode UTF8 encoded character started at given offset
 
 end VSS.Implementation.UTF8_Encoding;

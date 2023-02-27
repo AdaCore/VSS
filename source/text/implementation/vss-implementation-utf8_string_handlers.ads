@@ -389,4 +389,14 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Content of the data will be copied, and old storage block will be
    --  unreferenced (and deallocated if it is no longer used).
 
+   procedure Unchecked_Append
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Terminator  : Boolean := False);
+   --  Append given slice of the data to the target. Convert target
+   --  from in-place to heap based implementation when necessary.
+
 end VSS.Implementation.UTF8_String_Handlers;

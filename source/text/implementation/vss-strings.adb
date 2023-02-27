@@ -245,9 +245,9 @@ package body VSS.Strings is
       Keep_Terminator : Boolean := False)
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Lines.At_First
-          (Self, Terminators, Keep_Terminator);
+      return Result : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
+         Result.Set_At_First (Self, Terminators, Keep_Terminator);
+      end return;
    end At_First_Line;
 
    -------------------
@@ -335,9 +335,11 @@ package body VSS.Strings is
       Keep_Terminator : Boolean := False)
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Lines.At_Position
-          (Self, Position, Terminators, Keep_Terminator);
+      return Result : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
+         if VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
+            Result.Set_At (Position, Terminators, Keep_Terminator);
+         end if;
+      end return;
    end At_Line;
 
    -------------

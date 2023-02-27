@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -8,11 +8,12 @@ pragma Ada_2022;
 
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Handlers;
-with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Markers.Internals;
 with VSS.Strings.Internals;
 
 package body VSS.Strings.Cursors.Iterators.Lines is
+
+   use type VSS.Implementation.Referrers.Magic_String_Access;
 
    function Terminator_First
      (Self : Line_Iterator'Class) return VSS.Implementation.Strings.Cursor;
@@ -23,10 +24,10 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    --  Return cursor of last character of the line terminator sequence.
 
    procedure Lookup_Line_Boundaries
-     (Self          : in out Line_Iterator'Class;
-      Position      : VSS.Implementation.Strings.Cursor);
-      --  Terminator    : out VSS.Implementation.Strings.Cursor;
-      --  Last_Position : out VSS.Implementation.Strings.Cursor);
+     (Self            : in out Line_Iterator'Class;
+      Position        : VSS.Implementation.Strings.Cursor;
+      Terminators     : Line_Terminator_Set;
+      Keep_Terminator : Boolean);
 
    procedure Lookup_Next_Line
      (Self     : in out Line_Iterator'Class;
@@ -40,51 +41,6 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    --  Lookup for previous line. Position points to the first character of
    --  the line of the current line.
 
-   --------------
-   -- At_First --
-   --------------
-
-   function At_First
-     (Item            : VSS.Strings.Virtual_String'Class;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean := False) return Line_Iterator
-   is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
-      Dummy    : Boolean;
-
-   begin
-      return Result : Line_Iterator do
-         Handler.Before_First_Character (Item.Data, Position);
-         Dummy := Handler.Forward (Item.Data, Position);
-         Result.Initialize (Item, Position, Terminators, Keep_Terminator);
-      end return;
-   end At_First;
-
-   -----------------
-   -- At_Position --
-   -----------------
-
-   function At_Position
-     (Item            : Virtual_String'Class;
-      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean             := False) return Line_Iterator
-   is
-      Inside : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
-   begin
-      return Result : Line_Iterator do
-         if not VSS.Implementation.Strings.Is_Invalid (Inside) then
-            Result.Initialize (Item, Inside, Terminators, Keep_Terminator);
-         end if;
-      end return;
-   end At_Position;
-
    ------------------------
    -- Element_Terminator --
    ------------------------
@@ -92,8 +48,6 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    function Element_Terminator
      (Self : Line_Iterator'Class) return VSS.Strings.Virtual_String
    is
-      use type VSS.Implementation.Referrers.Magic_String_Access;
-
       First      : constant VSS.Implementation.Strings.Cursor :=
         Self.Terminator_First;
       Last       : constant VSS.Implementation.Strings.Cursor :=
@@ -170,24 +124,6 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    end Has_Line_Terminator;
 
    ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize
-     (Self            : in out Line_Iterator'Class;
-      String          : Virtual_String'Class;
-      Position        : VSS.Implementation.Strings.Cursor;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean             := False) is
-   begin
-      Self.Connect (String'Unrestricted_Access);
-      Self.Terminators     := Terminators;
-      Self.Keep_Terminator := Keep_Terminator;
-
-      Lookup_Line_Boundaries (Self, Position);
-   end Initialize;
-
-   ----------------
    -- Invalidate --
    ----------------
 
@@ -203,8 +139,10 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    ----------------------------
 
    procedure Lookup_Line_Boundaries
-     (Self          : in out Line_Iterator'Class;
-      Position      : VSS.Implementation.Strings.Cursor)
+     (Self            : in out Line_Iterator'Class;
+      Position        : VSS.Implementation.Strings.Cursor;
+      Terminators     : Line_Terminator_Set;
+      Keep_Terminator : Boolean)
    is
       use type VSS.Implementation.Strings.Character_Count;
 
@@ -217,6 +155,9 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Dummy   : Boolean;
 
    begin
+      Self.Terminators     := Terminators;
+      Self.Keep_Terminator := Keep_Terminator;
+
       if Current_Position.Index /= 1 then
          --  Going backward till previous line terminator has been found.
 
@@ -338,6 +279,68 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Self.Terminator_Position := Last_Position;
       end if;
    end Lookup_Previous_Line;
+
+   ------------
+   -- Set_At --
+   ------------
+
+   procedure Set_At
+     (Self            : in out Line_Iterator;
+      Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False)
+   is
+      Cursor_Owner    : VSS.Implementation.Referrers.Magic_String_Access;
+      Cursor_Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Get_Owner_And_Position (Position, Cursor_Owner, Cursor_Position);
+
+      if Self.Owner /= Cursor_Owner then
+         if Self.Owner /= null then
+            Self.Disconnect;
+         end if;
+
+         if Cursor_Owner /= null then
+            Self.Connect (Cursor_Owner);
+         end if;
+      end if;
+
+      if Self.Owner /= null then
+         Self.Lookup_Line_Boundaries
+           (Cursor_Position, Terminators, Keep_Terminator);
+
+      else
+         Self.Invalidate;
+      end if;
+   end Set_At;
+
+   ------------------
+   -- Set_At_First --
+   ------------------
+
+   procedure Set_At_First
+     (Self            : in out Line_Iterator;
+      On              : VSS.Strings.Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean             := False)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.Before_First_Character (On.Data, Position);
+      Dummy := Handler.Forward (On.Data, Position);
+      Self.Lookup_Line_Boundaries (Position, Terminators, Keep_Terminator);
+   end Set_At_First;
 
    ---------------------
    -- String_Modified --

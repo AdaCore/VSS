@@ -1,12 +1,11 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 with VSS.Implementation.String_Handlers;
 with VSS.Implementation.UCD_Core;
-with VSS.Strings.Cursors.Internals;
 
 with VSS.Strings.Cursors.Markers;
 pragma Unreferenced (VSS.Strings.Cursors.Markers);
@@ -14,6 +13,7 @@ pragma Unreferenced (VSS.Strings.Cursors.Markers);
 
 package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
+   use type VSS.Implementation.Referrers.Magic_String_Access;
    use type VSS.Implementation.Strings.Character_Offset;
    use all type VSS.Implementation.UCD_Core.GCB_Values;
 
@@ -101,67 +101,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          end if;
       end loop;
    end Apply_RI;
-
-   --------------
-   -- At_First --
-   --------------
-
-   function At_First
-     (Item : Virtual_String'Class) return Grapheme_Cluster_Iterator
-   is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
-      Dummy    : Boolean;
-
-   begin
-      return Result : Grapheme_Cluster_Iterator do
-         Handler.Before_First_Character (Item.Data, Position);
-         Dummy := Handler.Forward (Item.Data, Position);
-         Result.Initialize (Item, Position);
-      end return;
-   end At_First;
-
-   -------------
-   -- At_Last --
-   -------------
-
-   function At_Last
-     (Item : Virtual_String'Class) return Grapheme_Cluster_Iterator
-   is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
-      Dummy    : Boolean;
-
-   begin
-      return Result : Grapheme_Cluster_Iterator do
-         Handler.After_Last_Character (Item.Data, Position);
-         Dummy := Handler.Backward (Item.Data, Position);
-         Result.Initialize (Item, Position);
-      end return;
-   end At_Last;
-
-   -----------------
-   -- At_Position --
-   -----------------
-
-   function At_Position
-     (Item     : Virtual_String'Class;
-      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return Grapheme_Cluster_Iterator
-   is
-      Inside : constant VSS.Implementation.Strings.Cursor :=
-        VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-          (Position).all;
-
-   begin
-      return Result : Grapheme_Cluster_Iterator do
-         Result.Initialize (Item, Inside);
-      end return;
-   end At_Position;
 
    --------------
    -- Backward --
@@ -481,19 +420,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    end Has_Element;
 
    ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize
-     (Self            : in out Grapheme_Cluster_Iterator'Class;
-      String          : Virtual_String'Class;
-      Position        : VSS.Implementation.Strings.Cursor) is
-   begin
-      Self.Connect (String'Unrestricted_Access);
-      Self.Lookup_Grapheme_Cluster_Boundaries (Position);
-   end Initialize;
-
-   ----------------
    -- Invalidate --
    ----------------
 
@@ -549,6 +475,88 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          raise Program_Error;
       end if;
    end Lookup_Grapheme_Cluster_Boundaries;
+
+   ------------
+   -- Set_At --
+   ------------
+
+   procedure Set_At
+     (Self     : in out Grapheme_Cluster_Iterator;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   is
+      Cursor_Owner    : VSS.Implementation.Referrers.Magic_String_Access;
+      Cursor_Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Get_Owner_And_Position (Position, Cursor_Owner, Cursor_Position);
+
+      if Self.Owner /= Cursor_Owner then
+         if Self.Owner /= null then
+            Self.Disconnect;
+         end if;
+
+         if Cursor_Owner /= null then
+            Self.Connect (Cursor_Owner);
+         end if;
+      end if;
+
+      if Self.Owner /= null then
+         Self.Lookup_Grapheme_Cluster_Boundaries (Cursor_Position);
+
+      else
+         Self.Invalidate;
+      end if;
+   end Set_At;
+
+   ------------------
+   -- Set_At_First --
+   ------------------
+
+   procedure Set_At_First
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.Before_First_Character (On.Data, Position);
+      Dummy := Handler.Forward (On.Data, Position);
+      Self.Lookup_Grapheme_Cluster_Boundaries (Position);
+   end Set_At_First;
+
+   -----------------
+   -- Set_At_Last --
+   -----------------
+
+   procedure Set_At_Last
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
+   begin
+      if Self.Owner /= On'Unrestricted_Access then
+         Self.Disconnect;
+         Self.Connect (On'Unrestricted_Access);
+      end if;
+
+      Handler.After_Last_Character (On.Data, Position);
+      Dummy := Handler.Backward (On.Data, Position);
+      Self.Lookup_Grapheme_Cluster_Boundaries (Position);
+   end Set_At_Last;
 
    ---------------------
    -- String_Modified --

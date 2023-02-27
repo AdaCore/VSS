@@ -227,7 +227,12 @@ package body VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters.At_First (Self);
+      return Result :
+               VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+                 .Grapheme_Cluster_Iterator
+      do
+         Result.Set_At_First (Self);
+      end return;
    end At_First_Grapheme_Cluster;
 
    -------------------
@@ -266,9 +271,14 @@ package body VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
-      return
-        VSS.Strings.Cursors.Iterators.Grapheme_Clusters.At_Position
-          (Self, Position);
+      return Result :
+               VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+                 .Grapheme_Cluster_Iterator
+      do
+         if VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
+            Result.Set_At (Position);
+         end if;
+      end return;
    end At_Grapheme_Cluster;
 
    -----------------------
@@ -295,7 +305,12 @@ package body VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
                .Grapheme_Cluster_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters.At_Last (Self);
+      return Result :
+               VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+                 .Grapheme_Cluster_Iterator
+      do
+         Result.Set_At_Last (Self);
+      end return;
    end At_Last_Grapheme_Cluster;
 
    ------------------

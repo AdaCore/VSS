@@ -258,7 +258,9 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.At_First (Self);
+      return Result : VSS.Strings.Cursors.Iterators.Words.Word_Iterator do
+         Result.Set_At_First (Self);
+      end return;
    end At_First_Word;
 
    -------------------------
@@ -321,7 +323,9 @@ package body VSS.Strings is
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.At_Last (Self);
+      return Result : VSS.Strings.Cursors.Iterators.Words.Word_Iterator do
+         Result.Set_At_Last (Self);
+      end return;
    end At_Last_Word;
 
    -------------
@@ -351,7 +355,11 @@ package body VSS.Strings is
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
       return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
    begin
-      return VSS.Strings.Cursors.Iterators.Words.At_Position (Self, Position);
+      return Result : VSS.Strings.Cursors.Iterators.Words.Word_Iterator do
+         if VSS.Strings.Cursors.Internals.Is_Owner (Position, Self) then
+            Result.Set_At (Position);
+         end if;
+      end return;
    end At_Word;
 
    ----------------------------

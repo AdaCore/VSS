@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -300,6 +300,40 @@ package body VSS.Strings.Cursors is
         First_UTF8_Offset
           (VSS.Strings.Magic_String_Access (Self.Owner), Self.First_Position);
    end First_UTF8_Offset;
+
+   ----------------------------
+   -- Get_Owner_And_Position --
+   ----------------------------
+
+   procedure Get_Owner_And_Position
+     (Cursor   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Owner    : out VSS.Implementation.Referrers.Magic_String_Access;
+      Position : out VSS.Implementation.Strings.Cursor) is
+   begin
+      if Cursor in Character_Cursor_Limited_Base'Class then
+         declare
+            C : Character_Cursor_Limited_Base'Class
+              renames Character_Cursor_Limited_Base'Class (Cursor);
+
+         begin
+            Owner    := C.Owner;
+            Position := C.Position;
+         end;
+
+      elsif Cursor in Character_Cursor_Base'Class then
+         declare
+            C : Character_Cursor_Base'Class
+              renames Character_Cursor_Base'Class (Cursor);
+
+         begin
+            Owner    := C.Owner;
+            Position := C.Position;
+         end;
+
+      else
+         raise Program_Error;
+      end if;
+   end Get_Owner_And_Position;
 
    ----------------
    -- Invalidate --

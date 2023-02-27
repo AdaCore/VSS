@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -324,5 +324,11 @@ private
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Common code to obtain offset of the last UTF16 code unit for given
    --  position.
+
+   procedure Get_Owner_And_Position
+     (Cursor   : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+      Owner    : out VSS.Implementation.Referrers.Magic_String_Access;
+      Position : out VSS.Implementation.Strings.Cursor);
+   --  Returns owner string and cursor position of the given character cursor.
 
 end VSS.Strings.Cursors;

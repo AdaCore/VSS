@@ -63,3 +63,22 @@ build_als:
 
       # Build the ALS as a test
       anod build als
+
+build_gs:
+  services:
+     - image:sandbox
+     - cpu:8
+     - mem:16
+  stage: build_dependent
+  when: manual
+  script:
+    - !reference [.basic-setup]
+
+    - |
+      cd /it/wave
+
+      # Tell the anod sandbox to use our repository
+      anod vcs --add-repo vss $CI_PROJECT_DIR
+
+      # Build the ALS as a test
+      anod build gps

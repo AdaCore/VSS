@@ -630,15 +630,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    begin
       Get_Owner_And_Position (Position, Cursor_Owner, Cursor_Position);
 
-      if Self.Owner /= Cursor_Owner then
-         if Self.Owner /= null then
-            Self.Disconnect;
-         end if;
-
-         if Cursor_Owner /= null then
-            Self.Connect (Cursor_Owner);
-         end if;
-      end if;
+      Self.Reconnect (Cursor_Owner);
 
       if Self.Owner /= null then
          Self.Lookup_Word_Boundaries (Cursor_Position);
@@ -663,10 +655,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Dummy    : Boolean;
 
    begin
-      if Self.Owner /= On'Unrestricted_Access then
-         Self.Disconnect;
-         Self.Connect (On'Unrestricted_Access);
-      end if;
+      Self.Reconnect (On'Unrestricted_Access);
 
       Handler.Before_First_Character (On.Data, Position);
       Dummy := Handler.Forward (On.Data, Position);
@@ -688,10 +677,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Dummy    : Boolean;
 
    begin
-      if Self.Owner /= On'Unrestricted_Access then
-         Self.Disconnect;
-         Self.Connect (On'Unrestricted_Access);
-      end if;
+      Self.Reconnect (On'Unrestricted_Access);
 
       Handler.After_Last_Character (On.Data, Position);
       Dummy := Handler.Backward (On.Data, Position);

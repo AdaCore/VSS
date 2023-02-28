@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -88,7 +88,15 @@ package VSS.Implementation.Referrers is
    procedure Disconnect (Self  : in out Referal_Limited_Base'Class);
    --  Disconnect referel from string object
 
+   procedure Reconnect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : Magic_String_Access);
+   --  Reconnect referel to another string object. New owner may be null, in
+   --  such case referel is disconnected from the old string object only.
+
    procedure Invalidate (Self : in out Referal_Limited_Base) is abstract;
+   --  Invalidate state of the object. It should not call Disconnect, but
+   --  reset state to invalid.
 
    procedure String_Modified
      (Self     : in out Referal_Limited_Base;

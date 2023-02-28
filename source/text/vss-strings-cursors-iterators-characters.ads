@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -19,34 +19,33 @@ package VSS.Strings.Cursors.Iterators.Characters is
      (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
    --  Return character pointed by iterator.
 
-   procedure Set_At_First
-     (Self : in out Character_Iterator;
-      On   : VSS.Strings.Virtual_String'Class);
-   --  Initialize iterator to point to the first text element of the given
-   --  string.
-
    procedure Set_Before_First
      (Self : in out Character_Iterator;
       On   : VSS.Strings.Virtual_String'Class);
-   --  Initialize iterator to point before the first text element of the given
+   --  Initialize iterator to point before the first character of the given
    --  string.
 
-   procedure Set_At_Last
+   procedure Set_At_First
      (Self : in out Character_Iterator;
       On   : VSS.Strings.Virtual_String'Class);
-   --  Initialize iterator to point to the last text element of the given
-   --  string.
-
-   procedure Set_After_Last
-     (Self : in out Character_Iterator;
-      On   : VSS.Strings.Virtual_String'Class);
-   --  Initialize iterator to point after the last text element of the given
+   --  Initialize iterator to point to the first character of the given
    --  string.
 
    procedure Set_At
      (Self     : in out Character_Iterator;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class);
-   --  Initialize iterator to point at the text element at given position.
+   --  Initialize iterator to point at the character at given position.
+
+   procedure Set_At_Last
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Initialize iterator to point to the last character of the given string.
+
+   procedure Set_After_Last
+     (Self : in out Character_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Initialize iterator to point after the last character of the given
+   --  string.
 
 private
 

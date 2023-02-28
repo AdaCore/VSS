@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -272,5 +272,22 @@ package body VSS.Implementation.Referrers is
 
       Ada.Exceptions.Reraise_Occurrence (Occurrence);
    end Notify_String_Modified;
+
+   ---------------
+   -- Reconnect --
+   ---------------
+
+   procedure Reconnect
+     (Self  : in out Referal_Limited_Base'Class;
+      Owner : Magic_String_Access) is
+   begin
+      if Self.Owner /= Owner then
+         Self.Disconnect;
+
+         if Owner /= null then
+            Self.Connect (Owner);
+         end if;
+      end if;
+   end Reconnect;
 
 end VSS.Implementation.Referrers;

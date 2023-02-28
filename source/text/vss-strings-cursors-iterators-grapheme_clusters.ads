@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -20,20 +20,20 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    --  Create iterator pointing before the first grapheme cluster of the given
    --  string.
 
-   function At_First
-     (Item : Virtual_String'Class) return Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the first grapheme cluster of the string.
+   procedure Set_At_First
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Set iterator to point to the first grapheme cluster of the string.
 
-   function At_Position
-     (Item     : Virtual_String'Class;
-      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
-      return Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the grapheme cluster of the string at the
-   --  given position.
+   procedure Set_At
+     (Self     : in out Grapheme_Cluster_Iterator;
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class);
+   --  Set iterator to point to the grapheme cluster at the given position.
 
-   function At_Last
-     (Item : Virtual_String'Class) return Grapheme_Cluster_Iterator;
-   --  Return iterator pointing to the last grapheme cluster of the string.
+   procedure Set_At_Last
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Set iterator to point to the last grapheme cluster of the string.
 
    --  function After_Last
    --    (Item : VSS.Strings.Virtual_String'Class)
@@ -60,12 +60,5 @@ private
 
    overriding function Has_Element
      (Self : Grapheme_Cluster_Iterator) return Boolean;
-
-   procedure Initialize
-     (Self            : in out Grapheme_Cluster_Iterator'Class;
-      String          : Virtual_String'Class;
-      Position        : VSS.Implementation.Strings.Cursor);
-   --  Initialize iterator and lookup for grapheme boundaries around the given
-   --  position.
 
 end VSS.Strings.Cursors.Iterators.Grapheme_Clusters;

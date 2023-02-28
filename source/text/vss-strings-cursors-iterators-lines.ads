@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -68,18 +68,20 @@ package VSS.Strings.Cursors.Iterators.Lines is
    --  Create iterator pointing before the first line of the given
    --  string.
 
-   function At_First
-     (Item            : VSS.Strings.Virtual_String'Class;
+   procedure Set_At_First
+     (Self            : in out Line_Iterator;
+      On              : VSS.Strings.Virtual_String'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean             := False) return Line_Iterator;
-   --  Create iterator pointing to the first line of the given string.
+      Keep_Terminator : Boolean             := False);
+   --  Initialize iterator to point to the first line of the given
+   --  string.
 
-   function At_Position
-     (Item            : Virtual_String'Class;
+   procedure Set_At
+     (Self            : in out Line_Iterator;
       Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
       Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean             := False) return Line_Iterator;
-   --  Return iterator pointing to the line at given position.
+      Keep_Terminator : Boolean             := False);
+   --  Initialize iterator to point at the line at the given position.
 
    --  function At_Last
    --    (Item            : VSS.Strings.Virtual_String'Class;
@@ -114,14 +116,5 @@ private
    overriding function Forward (Self : in out Line_Iterator) return Boolean;
 
    overriding function Has_Element (Self : Line_Iterator) return Boolean;
-
-   procedure Initialize
-     (Self            : in out Line_Iterator'Class;
-      String          : Virtual_String'Class;
-      Position        : VSS.Implementation.Strings.Cursor;
-      Terminators     : Line_Terminator_Set := New_Line_Function;
-      Keep_Terminator : Boolean             := False);
-   --  Initialize iterator and lookup for line boundaries at the given
-   --  position.
 
 end VSS.Strings.Cursors.Iterators.Lines;

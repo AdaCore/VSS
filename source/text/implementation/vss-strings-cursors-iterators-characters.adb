@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -105,10 +105,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
           VSS.Implementation.Strings.Handler (On.Data);
 
    begin
-      if Self.Owner /= On'Unrestricted_Access then
-         Self.Disconnect;
-         Self.Connect (On'Unrestricted_Access);
-      end if;
+      Self.Reconnect (On'Unrestricted_Access);
 
       Handler.After_Last_Character (On.Data, Self.Position);
    end Set_After_Last;
@@ -119,49 +116,16 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    procedure Set_At
      (Self     : in out Character_Iterator;
-      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class) is
+      Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+   is
+      Cursor_Owner    : VSS.Implementation.Referrers.Magic_String_Access;
+      Cursor_Position : VSS.Implementation.Strings.Cursor;
+
    begin
-      if Position in Character_Cursor_Limited_Base'Class then
-         declare
-            P : Character_Cursor_Limited_Base'Class
-              renames Character_Cursor_Limited_Base'Class (Position);
+      Get_Owner_And_Position (Position, Cursor_Owner, Cursor_Position);
 
-         begin
-            if Self.Owner /= P.Owner then
-               if Self.Owner /= null then
-                  Self.Disconnect;
-               end if;
-
-               if P.Owner /= null then
-                  Self.Connect (P.Owner);
-               end if;
-            end if;
-
-            Self.Position := P.Position;
-         end;
-
-      elsif Position in Character_Cursor_Base'Class then
-         declare
-            P : Character_Cursor_Base'Class
-              renames Character_Cursor_Base'Class (Position);
-
-         begin
-            if Self.Owner /= P.Owner then
-               if Self.Owner /= null then
-                  Self.Disconnect;
-               end if;
-
-               if P.Owner /= null then
-                  Self.Connect (P.Owner);
-               end if;
-            end if;
-
-            Self.Position := P.Position;
-         end;
-
-      else
-         raise Program_Error;
-      end if;
+      Self.Reconnect (Cursor_Owner);
+      Self.Position := Cursor_Position;
    end Set_At;
 
    ------------------
@@ -178,10 +142,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Dummy   : Boolean;
 
    begin
-      if Self.Owner /= On'Unrestricted_Access then
-         Self.Disconnect;
-         Self.Connect (On'Unrestricted_Access);
-      end if;
+      Self.Reconnect (On'Unrestricted_Access);
 
       Handler.Before_First_Character (On.Data, Self.Position);
       Dummy := Handler.Forward (On.Data, Self.Position);
@@ -201,10 +162,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Dummy   : Boolean;
 
    begin
-      if Self.Owner /= On'Unrestricted_Access then
-         Self.Disconnect;
-         Self.Connect (On'Unrestricted_Access);
-      end if;
+      Self.Reconnect (On'Unrestricted_Access);
 
       Handler.After_Last_Character (On.Data, Self.Position);
       Dummy := Handler.Backward (On.Data, Self.Position);
@@ -223,10 +181,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
           VSS.Implementation.Strings.Handler (On.Data);
 
    begin
-      if Self.Owner /= On'Unrestricted_Access then
-         Self.Disconnect;
-         Self.Connect (On'Unrestricted_Access);
-      end if;
+      Self.Reconnect (On'Unrestricted_Access);
 
       Handler.Before_First_Character (On.Data, Self.Position);
    end Set_Before_First;

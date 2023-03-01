@@ -11,9 +11,7 @@ with Ada.Unchecked_Deallocation;
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.UCD_Casing_UTF8;
-with VSS.Implementation.UCD_Normalization_UTF8;
 with VSS.Implementation.UTF8_Casing;
-with VSS.Implementation.UTF8_Normalization;
 
 package body VSS.Implementation.UTF8_String_Handlers is
 
@@ -1609,116 +1607,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Reallocate (Data, Capacity, Size);
       end if;
    end Mutate;
-
-   ---------------
-   -- Normalize --
-   ---------------
-
-   overriding procedure Normalize
-     (Self   : UTF8_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data)
-   is
-      Source : UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Data.Pointer'Address;
-
-   begin
-      if Source = null or else Source.Length = 0 then
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Result);
-
-      else
-         Self.Initialize (Result);
-
-         case Form is
-            when VSS.Strings.Normalization_Form_D =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_C =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KD =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KC =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-         end case;
-      end if;
-   end Normalize;
-
-   ---------------
-   -- Normalize --
-   ---------------
-
-   overriding procedure Normalize
-     (Self   : UTF8_In_Place_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data)
-   is
-      Source : UTF8_In_Place_Data
-        with Import, Convention => Ada, Address => Data'Address;
-
-   begin
-      if Source.Length = 0 then
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Result);
-
-      else
-         Self.Initialize (Result);
-
-         case Form is
-            when VSS.Strings.Normalization_Form_D =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_C =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KD =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KC =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-         end case;
-      end if;
-   end Normalize;
 
    ----------------
    -- Reallocate --

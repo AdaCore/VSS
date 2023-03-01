@@ -9,11 +9,18 @@
 with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Normalization_UTF8;
 with VSS.Implementation.UTF8_Encoding;
+with VSS.Strings;
 with VSS.Unicode;
 
 package VSS.Implementation.UTF8_Normalization is
 
    pragma Preelaborate;
+
+   procedure Normalize
+     (Data   : VSS.Implementation.Strings.String_Data;
+      Form   : VSS.Strings.Normalization_Form;
+      Result : out VSS.Implementation.Strings.String_Data);
+   --  Do normalization of the string to the given normalization form.
 
    procedure Decompose
      (Source_Storage     :

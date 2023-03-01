@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -258,12 +258,6 @@ package VSS.Implementation.Null_String_Handlers is
       Data    : VSS.Implementation.Strings.String_Data;
       Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
-
-   overriding procedure Normalize
-     (Self   : Null_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data);
 
    Global_Null_String_Handler : aliased Null_String_Handler;
 

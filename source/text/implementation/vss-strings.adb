@@ -7,6 +7,7 @@
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
+with VSS.Implementation.UTF8_Normalization;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
 with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
@@ -890,24 +891,24 @@ package body VSS.Strings is
                Prefix_CF_NFC    : VSS.Implementation.Strings.String_Data;
 
             begin
-               Self_Handler.Normalize
+               VSS.Implementation.UTF8_Normalization.Normalize
                  (Self.Data, VSS.Strings.Normalization_Form_D, Self_NFD);
                VSS.Implementation.Strings.Handler (Self_NFD).Convert_Case
                  (Self_NFD,
                   VSS.Implementation.String_Handlers.NFKC_Casefold,
                   Self_CF_Mapped);
-               VSS.Implementation.Strings.Handler (Self_CF_Mapped).Normalize
+               VSS.Implementation.UTF8_Normalization.Normalize
                  (Self_CF_Mapped,
                   VSS.Strings.Normalization_Form_C,
                   Self_CF_NFC);
 
-               Prefix_Handler.Normalize
+               VSS.Implementation.UTF8_Normalization.Normalize
                  (Prefix.Data, VSS.Strings.Normalization_Form_D, Prefix_NFD);
                VSS.Implementation.Strings.Handler (Prefix_NFD).Convert_Case
                  (Prefix_NFD,
                   VSS.Implementation.String_Handlers.NFKC_Casefold,
                   Prefix_CF_Mapped);
-               VSS.Implementation.Strings.Handler (Prefix_CF_Mapped).Normalize
+               VSS.Implementation.UTF8_Normalization.Normalize
                  (Prefix_CF_Mapped,
                   VSS.Strings.Normalization_Form_C,
                   Prefix_CF_NFC);
@@ -1025,7 +1026,7 @@ package body VSS.Strings is
       Form : Normalization_Form) return Virtual_String is
    begin
       return Result : Virtual_String do
-         VSS.Implementation.Strings.Handler (Self.Data).Normalize
+         VSS.Implementation.UTF8_Normalization.Normalize
            (Self.Data, Form, Result.Data);
       end return;
    end To_Normalized;

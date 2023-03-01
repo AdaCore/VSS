@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -324,12 +324,5 @@ package VSS.Implementation.String_Handlers is
       Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data) is abstract;
    --  Do case conversion of the string.
-
-   not overriding procedure Normalize
-     (Self   : Abstract_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data) is abstract;
-   --  Do normalization of the string to given normalization form.
 
 end VSS.Implementation.String_Handlers;

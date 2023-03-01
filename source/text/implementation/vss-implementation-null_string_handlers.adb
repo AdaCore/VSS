@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -277,21 +277,6 @@ package body VSS.Implementation.Null_String_Handlers is
      (Self : Null_String_Handler;
       Data : VSS.Implementation.Strings.String_Data)
       return VSS.Implementation.Strings.Character_Count is (0);
-
-   ---------------
-   -- Normalize --
-   ---------------
-
-   overriding procedure Normalize
-     (Self   : Null_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data) is
-   begin
-      --  String is empty, nothing to do.
-
-      Self.Initialize (Result);
-   end Normalize;
 
    ---------------
    -- Reference --

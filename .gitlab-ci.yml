@@ -82,3 +82,35 @@ build_gs:
 
       # Build the ALS as a test
       anod build gps
+
+build_lsif:
+  services:
+     - image:sandbox
+     - cpu:8
+     - mem:16
+  stage: build_dependent
+  script:
+    - !reference [.basic-setup]
+
+    - |
+      export GPR_PROJECT_PATH=`pwd`/gnat:$GPR_PROJECT_PATH
+      mkdir subprojects
+      git clone $GIT_CLONE_BASE/eng/ide/gnatdoc subprojects/gnatdoc
+      export GPR_PROJECT_PATH=`pwd`/subprojects/gnatdoc/gnat:$GPR_PROJECT_PATH
+      git clone $GIT_CLONE_BASE/godunko/lsif-ada subprojects/lsif-ada
+      export GPR_PROJECT_PATH=`pwd`/subprojects/lsif-ada/gnat:$GPR_PROJECT_PATH
+
+      anod install --sandbox-dir /it/wave stable-gnatall
+      anod install --sandbox-dir /it/wave stable-langkit_support
+      anod install --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare
+      anod install --sandbox-dir /it/wave stable-libadalang
+      ( eval $(anod printenv --sandbox-dir /it/wave stable-gnatall) ;\
+        eval $(anod printenv --sandbox-dir /it/wave stable-langkit_support) ;\
+        eval $(anod printenv --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare) ;\
+        eval $(anod printenv --sandbox-dir /it/wave stable-libadalang) ;\
+        make -C subprojects/lsif-ada; \
+        ./subprojects/lsif-ada/.objs/lsif-ada > dump.lsif)
+
+  artifacts:
+    reports:
+      lsif: dump.lsif

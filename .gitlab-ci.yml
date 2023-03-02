@@ -93,6 +93,7 @@ build_lsif:
      - cpu:8
      - mem:16
   stage: build_dependent
+  allow_failure: true
   script:
     - !reference [.basic-setup]
 

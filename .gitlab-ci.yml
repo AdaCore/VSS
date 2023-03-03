@@ -56,6 +56,7 @@ build_als:
      - cpu:8
      - mem:16
   stage: build_dependent
+  when: manual
   script:
     - !reference [.basic-setup]
 

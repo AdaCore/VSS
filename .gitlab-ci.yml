@@ -1,5 +1,16 @@
+variables:
+   # The common part of the URL for cloning from within a CI
+   GIT_CLONE_BASE: https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}  
+
+.basic-setup:
+  - |
+    set -x
+    export PATH=/it/e3/bin:$PATH
+  - . ~/.aws_container_credentials
+
 stages:
   - build_and_test
+  - build_dependent
 
 #########
 # BUILD #
@@ -11,34 +22,26 @@ build_and_test:
      - cpu:8
      - mem:16
   stage: build_and_test
-  script: |
-    set -x
-    . ~/.aws_container_credentials
-    export PATH=/it/e3/bin:$PATH
+  script:
+    - !reference [.basic-setup]
 
-    # Install GNAT (with gcov) and gcovr
-    anod install --sandbox-dir /it/wave gnatall
-    python3 -m pip install gcovr
+    - |
+      # Install GNAT (with gcov) and gcovr
+      anod install --sandbox-dir /it/wave gnatall
+      python3 -m pip install gcovr
 
-    # Fetch tests' data into `./data/`
-    PACKAGE=vss-tests-data.tar.bz2
-    VSS_URL=https://gitlab.adacore-it.com/api/v4/projects/129
-    curl -L --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-     $VSS_URL/packages/generic/$PACKAGE/0.0.0/$PACKAGE |\
-     tar xjf - -C ./data
+      # Fetch tests' data into `./data/`
+      PACKAGE=vss-tests-data.tar.bz2
+      VSS_URL=https://gitlab.adacore-it.com/api/v4/projects/129
+      curl -L --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        $VSS_URL/packages/generic/$PACKAGE/0.0.0/$PACKAGE |\
+        tar xjf - -C ./data
 
-    # Build VSS and run tests
-    ( eval $(anod printenv --sandbox-dir /it/wave gnatall) ;\
-      make COVERAGE_MODE=gcov build-libs-static check ;\
-      ENABLE_GCOV=y gcovr --print-summary --cobertura gcov.xml )
-    make clean
-
-    # Tell the anod sandbox to use our repository
-    cd /it/wave
-    anod vcs --add-repo vss $CI_PROJECT_DIR
-
-    # Build the ALS as a test
-    anod build als
+      # Build VSS and run tests
+      ( eval $(anod printenv --sandbox-dir /it/wave gnatall) ;\
+        make COVERAGE_MODE=gcov build-libs-static check ;\
+        ENABLE_GCOV=y gcovr --print-summary --cobertura gcov.xml )
+      make clean
 
   coverage: /^\s*lines:\s*\d+.\d+\%/
   artifacts:
@@ -46,3 +49,74 @@ build_and_test:
       coverage_report:
         coverage_format: cobertura
         path: gcov.xml
+
+build_als:
+  services:
+     - image:sandbox
+     - cpu:8
+     - mem:16
+  stage: build_dependent
+  when: manual
+  script:
+    - !reference [.basic-setup]
+
+    - |
+      cd /it/wave
+
+      # Tell the anod sandbox to use our repository
+      anod vcs --add-repo vss $CI_PROJECT_DIR
+
+      # Build the ALS as a test
+      anod build als
+
+build_gs:
+  services:
+     - image:gtk-deps
+     - cpu:8
+     - mem:16
+  stage: build_dependent
+  when: manual
+  script:
+    - !reference [.basic-setup]
+
+    - |
+      cd /it/wave
+
+      # Tell the anod sandbox to use our repository
+      anod vcs --add-repo vss $CI_PROJECT_DIR
+
+      # Build the ALS as a test
+      anod build gps
+
+build_lsif:
+  services:
+     - image:sandbox
+     - cpu:8
+     - mem:16
+  stage: build_dependent
+  allow_failure: true
+  script:
+    - !reference [.basic-setup]
+
+    - |
+      export GPR_PROJECT_PATH=`pwd`/gnat:$GPR_PROJECT_PATH
+      mkdir subprojects
+      git clone $GIT_CLONE_BASE/eng/ide/gnatdoc subprojects/gnatdoc
+      export GPR_PROJECT_PATH=`pwd`/subprojects/gnatdoc/gnat:$GPR_PROJECT_PATH
+      git clone $GIT_CLONE_BASE/eng/ide/lsif-ada subprojects/lsif-ada
+      export GPR_PROJECT_PATH=`pwd`/subprojects/lsif-ada/gnat:$GPR_PROJECT_PATH
+
+      anod install --sandbox-dir /it/wave stable-gnatall
+      anod install --sandbox-dir /it/wave stable-langkit_support
+      anod install --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare
+      anod install --sandbox-dir /it/wave stable-libadalang
+      ( eval $(anod printenv --sandbox-dir /it/wave stable-gnatall) ;\
+        eval $(anod printenv --sandbox-dir /it/wave stable-langkit_support) ;\
+        eval $(anod printenv --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare) ;\
+        eval $(anod printenv --sandbox-dir /it/wave stable-libadalang) ;\
+        make -C subprojects/lsif-ada; \
+        ./subprojects/lsif-ada/.objs/lsif-ada gnat/vss_text.gpr > dump.lsif)
+
+  artifacts:
+    reports:
+      lsif: dump.lsif

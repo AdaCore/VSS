@@ -103,7 +103,7 @@ build_lsif:
       mkdir subprojects
       git clone $GIT_CLONE_BASE/eng/ide/gnatdoc subprojects/gnatdoc
       export GPR_PROJECT_PATH=`pwd`/subprojects/gnatdoc/gnat:$GPR_PROJECT_PATH
-      git clone $GIT_CLONE_BASE/godunko/lsif-ada subprojects/lsif-ada
+      git clone $GIT_CLONE_BASE/eng/ide/lsif-ada subprojects/lsif-ada
       export GPR_PROJECT_PATH=`pwd`/subprojects/lsif-ada/gnat:$GPR_PROJECT_PATH
 
       anod install --sandbox-dir /it/wave stable-gnatall

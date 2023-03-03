@@ -115,7 +115,7 @@ build_lsif:
         eval $(anod printenv --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare) ;\
         eval $(anod printenv --sandbox-dir /it/wave stable-libadalang) ;\
         make -C subprojects/lsif-ada; \
-        ./subprojects/lsif-ada/.objs/lsif-ada gnat/vss_text.gpr > dump.lsif)
+        ./subprojects/lsif-ada/bin/lsif-ada gnat/vss_text.gpr > dump.lsif)
 
   artifacts:
     reports:

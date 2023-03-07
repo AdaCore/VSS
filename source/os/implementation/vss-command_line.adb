@@ -8,7 +8,7 @@ with GNAT.OS_Lib;
 
 with VSS.Application;
 with VSS.Command_Line.Parsers;
-with VSS.Text_Streams.Standadrs;
+with VSS.Text_Streams.Standards;
 
 package body VSS.Command_Line is
 
@@ -52,7 +52,7 @@ package body VSS.Command_Line is
 
    procedure Output_Error (Message : VSS.Strings.Virtual_String) is
       Error   : VSS.Text_Streams.Output_Text_Stream'Class :=
-        VSS.Text_Streams.Standadrs.Standard_Error;
+        VSS.Text_Streams.Standards.Standard_Error;
       Success : Boolean := True;
 
    begin

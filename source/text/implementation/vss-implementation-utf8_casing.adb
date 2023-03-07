@@ -4,10 +4,242 @@
 --  SPDX-License-Identifier: Apache-2.0
 --
 
+with VSS.Implementation.Null_String_Handlers;
 with VSS.Implementation.UCD_Casing;
 with VSS.Implementation.UTF8_String_Handlers;
 
 package body VSS.Implementation.UTF8_Casing is
+
+   procedure Convert_Case
+     (Self    : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data);
+
+   procedure Convert_Case
+     (Self    :
+        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data);
+
+   ------------------
+   -- Convert_Case --
+   ------------------
+
+   procedure Convert_Case
+     (Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data)
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Data);
+
+   begin
+      if Handler.all
+           in VSS.Implementation.Null_String_Handlers.Null_String_Handler
+      then
+         --  String is empty, nothing to do.
+
+         Handler.Initialize (Result);
+
+      elsif Handler.all
+              in VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
+      then
+         Convert_Case
+           (VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
+              (Handler.all),
+            Data,
+            Mapping,
+            Result);
+
+      elsif Handler.all
+              in VSS.Implementation.UTF8_String_Handlers
+                   .UTF8_In_Place_String_Handler
+      then
+         Convert_Case
+           (VSS.Implementation.UTF8_String_Handlers
+              .UTF8_In_Place_String_Handler (Handler.all),
+            Data,
+            Mapping,
+            Result);
+
+      else
+         raise Program_Error;
+      end if;
+   end Convert_Case;
+
+   ------------------
+   -- Convert_Case --
+   ------------------
+
+   procedure Convert_Case
+     (Self    : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data)
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Source : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+
+   begin
+      Self.Initialize (Result);
+
+      if Self.Is_Empty (Data) then
+         --  Nothing to do for an empty string.
+
+         return;
+      end if;
+
+      declare
+         Target :
+           VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
+             with Import, Convention => Ada, Address => Result.Pointer'Address;
+
+      begin
+         Target :=
+           VSS.Implementation.UTF8_String_Handlers.Allocate
+             (VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
+              Source.Size);
+      end;
+
+      case Mapping is
+         when VSS.Implementation.String_Handlers.Simple_Lowercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Titlecase =>
+            raise Program_Error;
+
+            --  Convert_Case_Simple
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
+            --     Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Uppercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.NFKC_Casefold =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.NFKC_Casefold_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Lowercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
+               True,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Titlecase =>
+            raise Program_Error;
+
+            --  Convert_Case_Full
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+            --     False,
+            --     Result);
+
+         when VSS.Implementation.String_Handlers.Uppercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
+               False,
+               Result);
+      end case;
+   end Convert_Case;
+
+   ------------------
+   -- Convert_Case --
+   ------------------
+
+   procedure Convert_Case
+     (Self    :
+        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
+      Data    : VSS.Implementation.Strings.String_Data;
+      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
+      Result  : out VSS.Implementation.Strings.String_Data)
+   is
+      Source : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+
+   begin
+      Self.Initialize (Result);
+
+      case Mapping is
+         when VSS.Implementation.String_Handlers.Simple_Lowercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Titlecase =>
+            raise Program_Error;
+
+            --  Convert_Case_Simple
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Simple_Titlecase_Index,
+            --     Result);
+
+         when VSS.Implementation.String_Handlers.Simple_Uppercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.NFKC_Casefold =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.NFKC_Casefold_Index,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Lowercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
+               True,
+               Result);
+
+         when VSS.Implementation.String_Handlers.Titlecase =>
+            raise Program_Error;
+
+            --  Convert_Case_Full
+            --    (Source.Storage,
+            --     Source.Size,
+            --     VSS.Implementation.UCD_Casing_UTF8.Full_Titlecase_Index,
+            --     False,
+            --     Result);
+
+         when VSS.Implementation.String_Handlers.Uppercase =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Full
+              (Source.Storage,
+               Source.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
+               False,
+               Result);
+      end case;
+   end Convert_Case;
 
    -----------------------
    -- Convert_Case_Full --

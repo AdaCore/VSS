@@ -25,15 +25,6 @@ package VSS.Implementation.String_Handlers is
 
    use type VSS.Implementation.Strings.Character_Count;
 
-   type Case_Mapping is
-     (Simple_Lowercase,
-      Simple_Titlecase,
-      Simple_Uppercase,
-      NFKC_Casefold,
-      Lowercase,
-      Titlecase,
-      Uppercase);
-
    -----------------------------
    -- Abstract_String_Handler --
    -----------------------------
@@ -310,12 +301,5 @@ package VSS.Implementation.String_Handlers is
    --  Splits string into lines using given set of allowed new line
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
-
-   not overriding procedure Get_Case_Mapping
-     (Self    : Abstract_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data) is abstract;
-   --  Fill given case mapping for the given character into Target.
 
 end VSS.Implementation.String_Handlers;

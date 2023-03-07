@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -7,6 +7,7 @@
 with VSS.Implementation.String_Handlers;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Core;
+with VSS.Implementation.UTF8_Casing;
 with VSS.Locales;
 with VSS.Strings.Internals;
 with VSS.Unicode;
@@ -144,10 +145,9 @@ package body VSS.Characters is
       Data : VSS.Implementation.Strings.String_Data;
 
    begin
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping
+      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
-         VSS.Implementation.String_Handlers.Lowercase,
+         VSS.Implementation.UTF8_Casing.Lowercase,
          Data);
 
       return Result : constant VSS.Strings.Virtual_String :=
@@ -169,10 +169,9 @@ package body VSS.Characters is
       Success  : Boolean with Unreferenced;
 
    begin
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping
+      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
-         VSS.Implementation.String_Handlers.Simple_Lowercase,
+         VSS.Implementation.UTF8_Casing.Simple_Lowercase,
          Data);
 
       VSS.Implementation.Strings.Handler
@@ -198,10 +197,9 @@ package body VSS.Characters is
       Success  : Boolean with Unreferenced;
 
    begin
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping
+      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
-         VSS.Implementation.String_Handlers.Simple_Titlecase,
+         VSS.Implementation.UTF8_Casing.Simple_Titlecase,
          Data);
 
       VSS.Implementation.Strings.Handler
@@ -227,10 +225,9 @@ package body VSS.Characters is
       Success  : Boolean with Unreferenced;
 
    begin
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping
+      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
-         VSS.Implementation.String_Handlers.Simple_Uppercase,
+         VSS.Implementation.UTF8_Casing.Simple_Uppercase,
          Data);
 
       VSS.Implementation.Strings.Handler
@@ -267,10 +264,9 @@ package body VSS.Characters is
       Data : VSS.Implementation.Strings.String_Data;
 
    begin
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping
+      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
-         VSS.Implementation.String_Handlers.Titlecase,
+         VSS.Implementation.UTF8_Casing.Titlecase,
          Data);
 
       return Result : constant VSS.Strings.Virtual_String :=
@@ -315,10 +311,9 @@ package body VSS.Characters is
       Data : VSS.Implementation.Strings.String_Data;
 
    begin
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping
+      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
-         VSS.Implementation.String_Handlers.Uppercase,
+         VSS.Implementation.UTF8_Casing.Uppercase,
          Data);
 
       return Result : constant VSS.Strings.Virtual_String :=

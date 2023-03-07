@@ -247,12 +247,6 @@ package VSS.Implementation.Null_String_Handlers is
         VSS.Implementation.String_Vectors.String_Vector_Data_Access)
       with Pre => not Data.In_Place and then Data.Handler = null;
 
-   overriding procedure Get_Case_Mapping
-     (Self    : Null_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data);
-
    Global_Null_String_Handler : aliased Null_String_Handler;
 
 end VSS.Implementation.Null_String_Handlers;

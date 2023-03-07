@@ -896,7 +896,7 @@ package body VSS.Strings is
                  (Self.Data, VSS.Strings.Normalization_Form_D, Self_NFD);
                VSS.Implementation.UTF8_Casing.Convert_Case
                  (Self_NFD,
-                  VSS.Implementation.String_Handlers.NFKC_Casefold,
+                  VSS.Implementation.UTF8_Casing.NFKC_Casefold,
                   Self_CF_Mapped);
                VSS.Implementation.UTF8_Normalization.Normalize
                  (Self_CF_Mapped,
@@ -907,7 +907,7 @@ package body VSS.Strings is
                  (Prefix.Data, VSS.Strings.Normalization_Form_D, Prefix_NFD);
                VSS.Implementation.UTF8_Casing.Convert_Case
                  (Prefix_NFD,
-                  VSS.Implementation.String_Handlers.NFKC_Casefold,
+                  VSS.Implementation.UTF8_Casing.NFKC_Casefold,
                   Prefix_CF_Mapped);
                VSS.Implementation.UTF8_Normalization.Normalize
                  (Prefix_CF_Mapped,
@@ -1013,7 +1013,7 @@ package body VSS.Strings is
       return Result : Virtual_String do
          VSS.Implementation.UTF8_Casing.Convert_Case
            (Self.Data,
-            VSS.Implementation.String_Handlers.Lowercase,
+            VSS.Implementation.UTF8_Casing.Lowercase,
             Result.Data);
       end return;
    end To_Lowercase;
@@ -1042,7 +1042,7 @@ package body VSS.Strings is
       return Result : Virtual_String do
          VSS.Implementation.UTF8_Casing.Convert_Case
            (Self.Data,
-            VSS.Implementation.String_Handlers.Simple_Lowercase,
+            VSS.Implementation.UTF8_Casing.Simple_Lowercase,
             Result.Data);
       end return;
    end To_Simple_Lowercase;
@@ -1072,7 +1072,7 @@ package body VSS.Strings is
       return Result : Virtual_String do
          VSS.Implementation.UTF8_Casing.Convert_Case
            (Self.Data,
-            VSS.Implementation.String_Handlers.Simple_Uppercase,
+            VSS.Implementation.UTF8_Casing.Simple_Uppercase,
             Result.Data);
       end return;
    end To_Simple_Uppercase;
@@ -1101,7 +1101,7 @@ package body VSS.Strings is
       return Result : Virtual_String do
          VSS.Implementation.UTF8_Casing.Convert_Case
            (Self.Data,
-            VSS.Implementation.String_Handlers.Uppercase,
+            VSS.Implementation.UTF8_Casing.Uppercase,
             Result.Data);
       end return;
    end To_Uppercase;

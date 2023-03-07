@@ -179,22 +179,6 @@ package body VSS.Implementation.Null_String_Handlers is
       Success := False;
    end From_Wide_Wide_String;
 
-   ----------------------
-   -- Get_Case_Mapping --
-   ----------------------
-
-   overriding procedure Get_Case_Mapping
-     (Self    : Null_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data) is
-   begin
-      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-        (Data);
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping (Code, Mapping, Data);
-   end Get_Case_Mapping;
-
    -------------------
    -- Has_Character --
    -------------------

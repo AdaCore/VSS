@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -49,15 +49,16 @@ private
      (VSS.Characters.General_Category) of Boolean
        with Pack;
 
-   type General_Category_Set is new Boolean_Array
-     with Default_Component_Value => False;
+   type General_Category_Set is record
+      Data : Boolean_Array := [others => False];
+   end record;
 
    function Empty return General_Category_Set is
-     (General_Category_Set (Boolean_Array'[others => False]));
+     (Data => [others => False]);
 
    function Contains
      (Self  : General_Category_Set;
       Value : VSS.Characters.General_Category) return Boolean is
-        (Self (Value));
+        (Self.Data (Value));
 
 end VSS.Regular_Expressions.Name_Sets;

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -246,24 +246,6 @@ package VSS.Implementation.Null_String_Handlers is
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access)
       with Pre => not Data.In_Place and then Data.Handler = null;
-
-   overriding procedure Get_Case_Mapping
-     (Self    : Null_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data);
-
-   overriding procedure Convert_Case
-     (Self    : Null_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data);
-
-   overriding procedure Normalize
-     (Self   : Null_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data);
 
    Global_Null_String_Handler : aliased Null_String_Handler;
 

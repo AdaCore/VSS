@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -278,6 +278,138 @@ package body VSS.Implementation.UTF8_Encoding is
                 (Code and 2#0_0000_0000_0000_0011_1111#);
       end case;
    end Encode;
+
+   ----------------------
+   -- Unchecked_Decode --
+   ----------------------
+
+   function Unchecked_Decode
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : VSS.Unicode.UTF8_Code_Unit_Index)
+      return VSS.Unicode.Code_Point
+   is
+      use type VSS.Unicode.Code_Point;
+      use type VSS.Unicode.UTF8_Code_Unit;
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      U1 : VSS.Unicode.Code_Point := VSS.Unicode.Code_Point (Storage (Offset));
+      U2 : VSS.Unicode.Code_Point;
+      U3 : VSS.Unicode.Code_Point;
+      U4 : VSS.Unicode.Code_Point;
+
+   begin
+      case U1 is
+         when 16#00# .. 16#7F# =>
+            --  1x code units sequence
+
+            return U1;
+
+         when 16#C2# .. 16#DF# =>
+            --  2x code units sequence
+
+            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
+            U2 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 1) and 2#0011_1111#);
+
+            return U1 or U2;
+
+         when 16#E0# .. 16#EF# =>
+            --  3x code units sequence
+
+            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#0100_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 2) and 2#0011_1111#);
+
+            return U1 or U2 or U3;
+
+         when 16#F0# .. 16#F4# =>
+            --  4x code units sequence
+
+            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#010_000_0000_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point
+                (Storage (Offset + 2) and 2#0011_1111#) * 2#0100_0000#;
+            U4 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 3) and 2#0011_1111#);
+
+            return U1 or U2 or U3 or U4;
+
+         when others =>
+            raise Program_Error;
+      end case;
+   end Unchecked_Decode;
+
+   ------------------------------
+   -- Unchecked_Decode_Forward --
+   ------------------------------
+
+   procedure Unchecked_Decode_Forward
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point)
+   is
+      use type VSS.Unicode.Code_Point;
+      use type VSS.Unicode.UTF8_Code_Unit;
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      U1 : VSS.Unicode.Code_Point := VSS.Unicode.Code_Point (Storage (Offset));
+      U2 : VSS.Unicode.Code_Point;
+      U3 : VSS.Unicode.Code_Point;
+      U4 : VSS.Unicode.Code_Point;
+
+   begin
+      case U1 is
+         when 16#00# .. 16#7F# =>
+            --  1x code units sequence
+
+            Code   := U1;
+            Offset := Offset + 1;
+
+         when 16#C2# .. 16#DF# =>
+            --  2x code units sequence
+
+            U1 := (U1 and 2#0001_1111#) * 2#0100_0000#;
+            U2 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 1) and 2#0011_1111#);
+
+            Code   := U1 or U2;
+            Offset := Offset + 2;
+
+         when 16#E0# .. 16#EF# =>
+            --  3x code units sequence
+
+            U1 := (U1 and 2#0000_1111#) * 2#01_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#0100_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 2) and 2#0011_1111#);
+
+            Code   := U1 or U2 or U3;
+            Offset := Offset + 3;
+
+         when 16#F0# .. 16#F4# =>
+            --  4x code units sequence
+
+            U1 := (U1 and 2#0000_0111#) * 2#0100_0000_0000_0000_0000#;
+            U2 := VSS.Unicode.Code_Point
+              (Storage (Offset + 1) and 2#0011_1111#) * 2#010_000_0000_0000#;
+            U3 :=
+              VSS.Unicode.Code_Point
+                (Storage (Offset + 2) and 2#0011_1111#) * 2#0100_0000#;
+            U4 :=
+              VSS.Unicode.Code_Point (Storage (Offset + 3) and 2#0011_1111#);
+
+            Code   := U1 or U2 or U3 or U4;
+            Offset := Offset + 4;
+
+         when others =>
+            raise Program_Error;
+      end case;
+   end Unchecked_Decode_Forward;
 
    ---------------------
    -- Unchecked_Store --

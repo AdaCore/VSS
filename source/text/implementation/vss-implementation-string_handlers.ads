@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -24,15 +24,6 @@ package VSS.Implementation.String_Handlers is
    pragma Preelaborate;
 
    use type VSS.Implementation.Strings.Character_Count;
-
-   type Case_Mapping is
-     (Simple_Lowercase,
-      Simple_Titlecase,
-      Simple_Uppercase,
-      NFKC_Casefold,
-      Lowercase,
-      Titlecase,
-      Uppercase);
 
    -----------------------------
    -- Abstract_String_Handler --
@@ -310,26 +301,5 @@ package VSS.Implementation.String_Handlers is
    --  Splits string into lines using given set of allowed new line
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
-
-   not overriding procedure Get_Case_Mapping
-     (Self    : Abstract_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data) is abstract;
-   --  Fill given case mapping for the given character into Target.
-
-   not overriding procedure Convert_Case
-     (Self    : Abstract_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data) is abstract;
-   --  Do case conversion of the string.
-
-   not overriding procedure Normalize
-     (Self   : Abstract_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data) is abstract;
-   --  Do normalization of the string to given normalization form.
 
 end VSS.Implementation.String_Handlers;

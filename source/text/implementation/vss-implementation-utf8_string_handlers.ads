@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -167,25 +167,6 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
-   overriding procedure Get_Case_Mapping
-     (Self    : UTF8_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data);
-   --  Fill given case mapping for the given character into Target.
-
-   overriding procedure Convert_Case
-     (Self    : UTF8_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data);
-
-   overriding procedure Normalize
-     (Self   : UTF8_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data);
-
    In_Place_Storage_Capacity : constant := 17;
    --  Number of code units can be stored in place
 
@@ -340,25 +321,45 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
-   overriding procedure Get_Case_Mapping
-     (Self    : UTF8_In_Place_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data);
-
-   overriding procedure Convert_Case
-     (Self    : UTF8_In_Place_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data);
-
-   overriding procedure Normalize
-     (Self   : UTF8_In_Place_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data);
-
    Global_UTF8_String_Handler   : aliased
      VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
+
+   --  Subprograms to help code refactoring, some of the will be moved to
+   --  generic UTF8 fastpath string API, and some moved to the body after
+   --  that.
+
+   procedure Copy_To_Heap
+     (Data     : in out VSS.Implementation.Strings.String_Data;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+     with Pre => Data.In_Place,
+          Post => not Data.In_Place;
+   --  Turn "in place" string data into a heap allocated one.
+   --  Use expected Capacity and Size to allocate a storage block, then copy
+   --  string content to the allocated block.
+
+   function Allocate
+     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+      return UTF8_String_Data_Access;
+   --  Allocate storage block to store at least given amount of the data.
+
+   procedure Reallocate
+     (Data     : in out UTF8_String_Data_Access;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+   --  Reallocates storage block to store at least given amount of the data.
+   --  Content of the data will be copied, and old storage block will be
+   --  unreferenced (and deallocated if it is no longer used).
+
+   procedure Unchecked_Append
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Terminator  : Boolean := False);
+   --  Append given slice of the data to the target. Convert target
+   --  from in-place to heap based implementation when necessary.
 
 end VSS.Implementation.UTF8_String_Handlers;

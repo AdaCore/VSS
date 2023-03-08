@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -90,21 +90,6 @@ package body VSS.Implementation.Null_String_Handlers is
       Position := Before_First_Character_Cursor;
    end Before_First_Character;
 
-   ------------------
-   -- Convert_Case --
-   ------------------
-
-   overriding procedure Convert_Case
-     (Self    : Null_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data) is
-   begin
-      --  String is empty, nothing to do.
-
-      Self.Initialize (Result);
-   end Convert_Case;
-
    ------------
    -- Delete --
    ------------
@@ -194,22 +179,6 @@ package body VSS.Implementation.Null_String_Handlers is
       Success := False;
    end From_Wide_Wide_String;
 
-   ----------------------
-   -- Get_Case_Mapping --
-   ----------------------
-
-   overriding procedure Get_Case_Mapping
-     (Self    : Null_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.String_Handlers.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data) is
-   begin
-      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-        (Data);
-      VSS.Implementation.Strings.Handler
-        (Data).Get_Case_Mapping (Code, Mapping, Data);
-   end Get_Case_Mapping;
-
    -------------------
    -- Has_Character --
    -------------------
@@ -277,21 +246,6 @@ package body VSS.Implementation.Null_String_Handlers is
      (Self : Null_String_Handler;
       Data : VSS.Implementation.Strings.String_Data)
       return VSS.Implementation.Strings.Character_Count is (0);
-
-   ---------------
-   -- Normalize --
-   ---------------
-
-   overriding procedure Normalize
-     (Self   : Null_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data) is
-   begin
-      --  String is empty, nothing to do.
-
-      Self.Initialize (Result);
-   end Normalize;
 
    ---------------
    -- Reference --

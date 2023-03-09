@@ -6,7 +6,7 @@
 
 --  Standard input/output streams as text streams.
 
-package VSS.Text_Streams.Standadrs is
+package VSS.Text_Streams.Standards is
 
    function Standard_Output return VSS.Text_Streams.Output_Text_Stream'Class;
    --  Return text stream to output to standard output stream.
@@ -14,4 +14,4 @@ package VSS.Text_Streams.Standadrs is
    function Standard_Error return VSS.Text_Streams.Output_Text_Stream'Class;
    --  Return text stream to output to standard error stream.
 
-end VSS.Text_Streams.Standadrs;
+end VSS.Text_Streams.Standards;

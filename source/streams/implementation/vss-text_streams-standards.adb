@@ -13,7 +13,7 @@ with VSS.Implementation.Line_Terminator;
 with VSS.Stream_Element_Vectors.Internals;
 with VSS.Strings.Converters.Encoders;
 
-package body VSS.Text_Streams.Standadrs is
+package body VSS.Text_Streams.Standards is
 
    use type Interfaces.C_Streams.FILEs;
    use type Interfaces.C_Streams.size_t;
@@ -232,4 +232,4 @@ package body VSS.Text_Streams.Standadrs is
       end return;
    end Standard_Output;
 
-end VSS.Text_Streams.Standadrs;
+end VSS.Text_Streams.Standards;

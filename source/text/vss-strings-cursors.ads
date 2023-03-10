@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2020-2023, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 limited with VSS.Strings.Cursors.Markers;

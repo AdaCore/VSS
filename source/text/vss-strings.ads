@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2020-2023, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  API to process string data as sequences of Unicode Code Points.

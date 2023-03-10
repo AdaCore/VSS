@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2021, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 package body Gen_UCD.Compressed_UTF_8_Data is

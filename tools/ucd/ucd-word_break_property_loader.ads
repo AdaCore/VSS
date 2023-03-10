@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2021, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 package UCD.Word_Break_Property_Loader is

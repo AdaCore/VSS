@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2022, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Low level binding to Windows API (USER32.DLL).

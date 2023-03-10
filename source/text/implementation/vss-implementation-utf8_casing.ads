@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2023, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Case conversion of UTF-8 encoded text data

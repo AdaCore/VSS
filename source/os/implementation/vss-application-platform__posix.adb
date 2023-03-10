@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2022, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  This is GNAT specific package, it use symbols declared in argv.c file

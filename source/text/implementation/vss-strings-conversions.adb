@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2020-2022, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 pragma Warnings (Off, ".* is an internal GNAT unit");

@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2021, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 package UCD.Derived_Core_Properties_Loader is

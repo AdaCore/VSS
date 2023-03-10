@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2022-2023, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Implementation of the output text stream to output text to the files.

@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2020-2023, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Abstract_String_Handler is abstract set of operations on string data.

@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2021-2022, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  UTF-8 decoder. Implementation is conformant with W3C/Unicode requirements

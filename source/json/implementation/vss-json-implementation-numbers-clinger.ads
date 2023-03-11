@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2022, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Fast conversion when value of decimal significand and decimal exponent

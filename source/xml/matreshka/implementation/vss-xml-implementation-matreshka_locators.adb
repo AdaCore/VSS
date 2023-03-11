@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2022-2023, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 package body VSS.XML.Implementation.Matreshka_Locators is

@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2020-2023, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Simple implementation of the text stream to store output in the memory as

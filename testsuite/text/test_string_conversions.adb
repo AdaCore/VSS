@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2020-2022, AdaCore
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with Ada.Strings.Unbounded;

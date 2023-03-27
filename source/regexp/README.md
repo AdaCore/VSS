@@ -26,6 +26,12 @@ For now we have:
 | **$**                     | End of line assertion                     |
 | **\b**                    | Word boundary assertion                   |
 | **\B**                    | Not a word boundary assertion             |
+| **\d**                    | A digit (like `[0-9]`)                    |
+| **\D**                    | Not a digit (like `[^0-9]`)               |
+| **\s**                    | A whitespace (like `[\p{z}\r\n\t\f\v]`)   |
+| **\S**                    | Not a whitespace                          |
+| **\w**                    | A word character (like `[A-Za-z0-9_]`)    |
+| **\W**                    | Not a word char (like `[^A-Za-z0-9_]`)    |
 | *x*                       | Character literal *x*, not in `^$.*+?]{}` |
 | **\\** *x*                | Character literal *x* in `^$.*+?]{}`      |
 | **\\n** **\\r** **\\t**   | New line, tabulation and other controls   |

@@ -5,7 +5,7 @@
 --
 
 --  Simple implementation of the text stream to store output in the memory as
---  seqeunce of stream elements in UTF-8 text encoding and using LF as line
+--  sequence of stream elements in UTF-8 text encoding and using LF as line
 --  separator.
 
 with VSS.Stream_Element_Vectors;

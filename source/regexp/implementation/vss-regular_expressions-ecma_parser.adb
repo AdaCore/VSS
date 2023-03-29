@@ -1,8 +1,10 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
+
+with VSS.Characters.Latin;
 
 package body VSS.Regular_Expressions.ECMA_Parser is
 
@@ -56,7 +58,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
             when True =>
                Character : VSS.Characters.Virtual_Character;
             when False =>
-               Category  : Name_Sets.General_Category_Set;
+               Category  : Node_Or_Class;
          end case;
       end record;
 
@@ -102,7 +104,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
           with Pre => Ok;
 
       procedure Character_Class_Escape
-        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean);
+        (Value : out Node_Or_Class; Ok : in out Boolean);
 
       procedure Character_Escape
         (Value : out VSS.Characters.Virtual_Character; Ok : in out Boolean)
@@ -162,7 +164,6 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end Alternative;
 
       procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean) is
-         Set       : Name_Sets.General_Category_Set;
          Character : VSS.Characters.Virtual_Character;
       begin
          if not Cursor.Has_Element then
@@ -175,12 +176,8 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
 
          case Cursor.Element is
-            when 'p' | 'P' =>
-               Character_Class_Escape (Set, Ok);
-
-               if Ok then
-                  Value := (Has_Node => False, Category => Set);
-               end if;
+            when 'p' | 'P' | 'd' | 'D' | 's' | 'S' | 'w' | 'W' =>
+               Character_Class_Escape (Value, Ok);
 
             when others =>
                Character_Escape (Character, Ok);
@@ -293,10 +290,11 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       end Character_Class;
 
       procedure Character_Class_Escape
-        (Value : out Name_Sets.General_Category_Set; Ok : in out Boolean)
+        (Value : out Node_Or_Class; Ok : in out Boolean)
       is
          use type Name_Sets.General_Category_Set;
 
+         Item   : Node;
          Negate : Boolean;
       begin
          if not Ok then
@@ -308,6 +306,58 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
 
          case Cursor.Element is
+            when 'w' | 'W' =>  --  word characters
+               Item := Create_Character_Range ('a', 'z');
+
+               Item := Create_Alternative
+                 (Item, Create_Character_Range ('A', 'Z'));
+
+               Item := Create_Alternative
+                 (Item, Create_Character_Range ('0', '9'));
+
+               Item := Create_Alternative (Item, Create_Character ('_'));
+
+               if Cursor.Element = 'W' then
+                  Item := Create_Negated_Class (Item);
+               end if;
+
+               Value := From_Node (Item);
+               Expect (Cursor.Element, Ok);
+               return;
+
+            when 's' | 'S' =>  --  Whitespace
+               --  \r\n\t\f\v
+               Item := Create_Character_Range
+                 (VSS.Characters.Latin.Character_Tabulation,
+                  VSS.Characters.Latin.Carriage_Return);
+
+               --  Append zwnbsp
+               Item := Create_Alternative
+                 (Item, Create_Character
+                    (VSS.Characters.Virtual_Character'Val (16#FEFF#)));
+
+               --  Append any "z" (Space, Line and Paragraph Separator)
+               Value := From_Node (Item);
+               Name_Sets.To_General_Category_Set ("z", Value.Category, Ok);
+
+               if Cursor.Element = 'S' then
+                  Item := To_Node (Value);
+                  Item := Create_Negated_Class (Item);
+                  Value := From_Node (Item);
+               end if;
+
+               Expect (Cursor.Element, Ok);
+               return;
+            when 'd' | 'D' =>
+               Item := Create_Character_Range ('0', '9');
+
+               if Cursor.Element = 'D' then
+                  Item := Create_Negated_Class (Item);
+               end if;
+
+               Value := From_Node (Item);
+               Expect (Cursor.Element, Ok);
+               return;
             when 'p' =>
                Negate := False;
             when 'P' =>
@@ -320,11 +370,11 @@ package body VSS.Regular_Expressions.ECMA_Parser is
 
          Expect (Cursor.Element, Ok);
          Expect ('{', Ok);
-         Lone_Unicode_Property_Name_Or_Value (Value, Ok);
+         Lone_Unicode_Property_Name_Or_Value (Value.Category, Ok);
          Expect ('}', Ok);
 
          if Ok and Negate then
-            Value := not Value;
+            Value.Category := not Value.Category;
          end if;
       end Character_Class_Escape;
 
@@ -407,7 +457,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
 
          case Cursor.Element is
-            when 'p' | 'P' =>
+            when 'p' | 'P' | 'd' | 'D' | 's' | 'S' | 'w' | 'W' =>
                Value := (Is_Character => False, Category => <>);
                Character_Class_Escape (Value.Category, Ok);
 
@@ -451,7 +501,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
             if Item.Is_Character then
                Right := Create_Character (Item.Character);
             else
-               Right := Create_General_Category_Set (Item.Category);
+               Right := To_Node (Item.Category);
             end if;
 
             Append_Node (Right, First);

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -74,7 +74,7 @@ package body VSS.Regular_Expressions is
      (Self : Regular_Expression'Class) return Natural
    is
    begin
-      return Self.Data.Capture_Group_Count;
+      return (if Self.Is_Valid then Self.Data.Capture_Group_Count else 0);
    end Capture_Group_Count;
 
    -------------------------
@@ -215,7 +215,9 @@ package body VSS.Regular_Expressions is
      (Self  : Regular_Expression_Match'Class;
       Index : Positive) return Boolean is
    begin
-      return Self.Marker (Index).Is_Valid;
+      return Self.Is_Valid
+        and then Index + 1 in Self.Data.Markers'Range
+        and then Self.Marker (Index).Is_Valid;
    end Has_Capture;
 
    ---------------

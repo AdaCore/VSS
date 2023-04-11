@@ -241,8 +241,9 @@ package body JSON_Schema.Writers.Outputs is
       use type VSS.Strings.Virtual_String;
 
       procedure On_Property
-        (Property : JSON_Schema.Property;
-         Required : Boolean);
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean);
       --  Generate component output code for given property
 
       procedure On_Anonymous_Schema (Property : JSON_Schema.Property);
@@ -262,11 +263,12 @@ package body JSON_Schema.Writers.Outputs is
       -----------------
 
       procedure On_Property
-        (Property : JSON_Schema.Property;
-         Required : Boolean) is
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean) is
       begin
          Write_Record_Component
-           (Enclosing_Type, Map, Property, Required, Holders);
+           (Enclosing, Map, Property, Required, Holders);
       end On_Property;
 
       Schema : Schema_Access renames Property.Schema;
@@ -288,7 +290,7 @@ package body JSON_Schema.Writers.Outputs is
       if not Schema.All_Of.Is_Empty then
          Put ("Handler.Start_Object;");
          New_Line;
-         Writers.Each_Property (Map, Schema, On_Property'Access);
+         Writers.Each_Property (Map, "", Schema, On_Property'Access);
          Put ("Handler.End_Object;");
          New_Line;
       elsif not Schema.Properties.Is_Empty then
@@ -330,8 +332,9 @@ package body JSON_Schema.Writers.Outputs is
       use type VSS.Strings.Virtual_String;
 
       procedure On_Property
-        (Property : JSON_Schema.Property;
-         Required : Boolean);
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean);
       --  Generate component output code for given property
 
       procedure On_Anonymous_Schema (Property : JSON_Schema.Property);
@@ -359,10 +362,11 @@ package body JSON_Schema.Writers.Outputs is
       -----------------
 
       procedure On_Property
-        (Property : JSON_Schema.Property;
-         Required : Boolean) is
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean) is
       begin
-         Write_Record_Component (Name, Map, Property, Required, Holders);
+         Write_Record_Component (Enclosing, Map, Property, Required, Holders);
       end On_Property;
    begin
       if not Schema.Enum.Is_Empty then
@@ -390,7 +394,7 @@ package body JSON_Schema.Writers.Outputs is
       if not Schema.All_Of.Is_Empty then
          Put ("Handler.Start_Object;");
          New_Line;
-         Writers.Each_Property (Map, Schema, On_Property'Access);
+         Writers.Each_Property (Map, Name, Schema, On_Property'Access);
          Put ("Handler.End_Object;");
          New_Line;
       elsif not Schema.Any_Of.Is_Empty then

@@ -408,8 +408,9 @@ package body JSON_Schema.Writers.Types is
       use type VSS.Strings.Virtual_String;
 
       procedure On_Property
-        (Property : JSON_Schema.Property;
-         Required : Boolean);
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean);
       --  Generate component declaration for given property
 
       procedure On_Anonymous_Schema (Property : JSON_Schema.Property);
@@ -436,11 +437,12 @@ package body JSON_Schema.Writers.Types is
       -----------------
 
       procedure On_Property
-        (Property : JSON_Schema.Property;
-         Required : Boolean) is
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean) is
       begin
          Write_Record_Component
-           (Name, Map, Root_Package, Property, Required, False);
+           (Enclosing, Map, Root_Package, Property, Required, False);
       end On_Property;
 
       Schema : constant Schema_Access := Map (Name);
@@ -485,7 +487,7 @@ package body JSON_Schema.Writers.Types is
       Put ("record");
       New_Line;
 
-      Writers.Each_Property (Map, Schema, On_Property'Access);
+      Writers.Each_Property (Map, Name, Schema, On_Property'Access);
 
       Put ("end record;");
       New_Line;

@@ -188,21 +188,29 @@ package body JSON_Schema.Writers is
 
    procedure Each_Property
      (Map    : JSON_Schema.Readers.Schema_Map;
+      Name   : Schema_Name;
       Schema : Schema_Access;
       Action : access procedure
-        (Property : JSON_Schema.Property;
-         Required : Boolean))
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean))
    is
       use type VSS.Strings.Virtual_String;
 
-      function Equal_Name (Left, Right : JSON_Schema.Property) return Boolean
-        is (Left.Name = Right.Name);
+      type Property_Info is record
+         Schema   : Schema_Name;
+         Property : JSON_Schema.Property;
+      end record;
+
+      function Equal_Name (Left, Right : Property_Info)
+        return Boolean is (Left.Property.Name = Right.Property.Name);
 
       package Property_Lists is new Ada.Containers.Doubly_Linked_Lists
-        (Property, Equal_Name);
+        (Property_Info, Equal_Name);
 
       procedure Prepend
         (List     : in out Property_Lists.List;
+         Schema   : Schema_Name;
          Property : JSON_Schema.Property);
       --  If property in the list, then move it at the beginning, otherwise
       --  prepend it to the list.
@@ -213,20 +221,21 @@ package body JSON_Schema.Writers is
 
       procedure Prepend
         (List     : in out Property_Lists.List;
+         Schema   : Schema_Name;
          Property : JSON_Schema.Property)
       is
-         Cursor : Property_Lists.Cursor := List.Find (Property);
+         Cursor : Property_Lists.Cursor := List.Find (("", Property));
       begin
          if Property_Lists.Has_Element (Cursor) then
             declare
-               Value : constant JSON_Schema.Property :=
+               Value : constant Property_Info :=
                  Property_Lists.Element (Cursor);
             begin
                List.Delete (Cursor);
                List.Prepend (Value);
             end;
          else
-            List.Prepend (Property);
+            List.Prepend ((Schema, Property));
          end if;
       end Prepend;
 
@@ -239,10 +248,12 @@ package body JSON_Schema.Writers is
       --  Set of required properties
 
       Next : Schema_Access := Schema;
+
+      Enclosing : Schema_Name := Name;  --  Name of Next
    begin
       loop
          for Property of reverse Next.Properties loop
-            Prepend (List, Property);
+            Prepend (List, Enclosing, Property);
 
             if Next.Required.Contains (Property.Name) then
                Required.Include (Property.Name);
@@ -251,7 +262,7 @@ package body JSON_Schema.Writers is
 
          for Item of Next.All_Of loop
             for Property of reverse Item.Properties loop
-               Prepend (List, Property);
+               Prepend (List, Enclosing, Property);
 
                if Item.Required.Contains (Property.Name) then
                   Required.Include (Property.Name);
@@ -262,12 +273,16 @@ package body JSON_Schema.Writers is
          if Next.All_Of.Is_Empty then
             exit;
          else
-            Next := Map (Next.All_Of.First_Element.Ref);
+            Enclosing := Next.All_Of.First_Element.Ref;
+            Next := Map (Enclosing);
          end if;
       end loop;
 
-      for Property of List loop
-         Action (Property, Required.Contains (Property.Name));
+      for Item of List loop
+         Action
+           (Item.Schema,
+            Item.Property,
+            Required.Contains (Item.Property.Name));
       end loop;
    end Each_Property;
 

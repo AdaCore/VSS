@@ -50,12 +50,15 @@ package JSON_Schema.Writers is
 
    procedure Each_Property
      (Map    : JSON_Schema.Readers.Schema_Map;
+      Name   : Schema_Name;
       Schema : Schema_Access;
       Action : access procedure
-        (Property : JSON_Schema.Property;
-         Required : Boolean));
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean));
    --  For given Schema traverse allOf items, collect all properties and call
-   --  the Action procedure for each such property.
+   --  the Action procedure for each such property. Name is the Schema name.
+   --  Enclosing is the name of schema for the Property.
 
    procedure Each_Anonymous_Schema
      (Map    : JSON_Schema.Readers.Schema_Map;

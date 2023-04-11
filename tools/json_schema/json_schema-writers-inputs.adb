@@ -440,13 +440,15 @@ package body JSON_Schema.Writers.Inputs is
       Schema    : Schema_Access)
    is
       procedure Find_Any_Property
-        (Property : JSON_Schema.Property;
-         Ignore   : Boolean);
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Ignore    : Boolean);
       --  Check if any property exist
 
       procedure Write_Quoted_Property_Name
-        (Property : JSON_Schema.Property;
-         Ignore   : Boolean);
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Ignore    : Boolean);
 
       First : Boolean := True;
 
@@ -455,10 +457,11 @@ package body JSON_Schema.Writers.Inputs is
       -----------------------
 
       procedure Find_Any_Property
-        (Property : JSON_Schema.Property;
-         Ignore   : Boolean)
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Ignore    : Boolean)
       is
-         pragma Unreferenced (Property);
+         pragma Unreferenced (Enclosing, Property);
       begin
          First := False;
       end Find_Any_Property;
@@ -468,8 +471,11 @@ package body JSON_Schema.Writers.Inputs is
       --------------------------------
 
       procedure Write_Quoted_Property_Name
-        (Property : JSON_Schema.Property;
-         Ignore   : Boolean) is
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Ignore    : Boolean)
+      is
+         pragma Unreferenced (Enclosing);
       begin
          if First then
             First := False;
@@ -483,7 +489,7 @@ package body JSON_Schema.Writers.Inputs is
       end Write_Quoted_Property_Name;
 
    begin
-      Writers.Each_Property (Map, Schema, Find_Any_Property'Access);
+      Writers.Each_Property (Map, "", Schema, Find_Any_Property'Access);
 
       if First then
          --  We didn't find any nested properties for some reason.
@@ -498,7 +504,7 @@ package body JSON_Schema.Writers.Inputs is
       Put ("_Minimal_Perfect_Hash is new Minimal_Perfect_Hash ([");
 
       Writers.Each_Property
-        (Map, Schema, Write_Quoted_Property_Name'Access);
+        (Map, "", Schema, Write_Quoted_Property_Name'Access);
       Put ("]);");
       New_Line;
       New_Line;
@@ -635,8 +641,9 @@ package body JSON_Schema.Writers.Inputs is
       use type VSS.Strings.Virtual_String;
 
       procedure Write_When_Clause
-        (Property : JSON_Schema.Property;
-         Required : Boolean);
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean);
 
       Index : Positive := 1;
 
@@ -648,8 +655,9 @@ package body JSON_Schema.Writers.Inputs is
       -----------------------
 
       procedure Write_When_Clause
-        (Property : JSON_Schema.Property;
-         Required : Boolean) is
+        (Enclosing : Schema_Name;
+         Property  : JSON_Schema.Property;
+         Required  : Boolean) is
       begin
          Put ("   when");
          Put (Index);
@@ -657,7 +665,7 @@ package body JSON_Schema.Writers.Inputs is
          Put (Property.Name);
          New_Line;
 
-         Write_Record_Component (Name, Map, Property, Required, Holders);
+         Write_Record_Component (Enclosing, Map, Property, Required, Holders);
 
          Index := Index + 1;
       end Write_When_Clause;
@@ -679,7 +687,7 @@ package body JSON_Schema.Writers.Inputs is
       New_Line;
       Put ("case Index is"); New_Line;
 
-      Writers.Each_Property (Map, Schema, Write_When_Clause'Access);
+      Writers.Each_Property (Map, Name, Schema, Write_When_Clause'Access);
 
       Put ("when others =>"); New_Line;
       Put ("Reader.Skip_Current_Value;"); New_Line;

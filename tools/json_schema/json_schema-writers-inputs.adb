@@ -17,7 +17,6 @@ package body JSON_Schema.Writers.Inputs is
      (Map          : JSON_Schema.Readers.Schema_Map;
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : VSS.Strings.Virtual_String;
-      Schema       : Schema_Access;
       Kind         : Declaration_Kind;
       Holders      : VSS.String_Vectors.Virtual_String_Vector);
 
@@ -37,7 +36,6 @@ package body JSON_Schema.Writers.Inputs is
    procedure Write_Union_Reader
      (Map          : JSON_Schema.Readers.Schema_Map;
       Name         : VSS.Strings.Virtual_String;
-      Schema       : Schema_Access;
       Enum_Package : VSS.Strings.Virtual_String);
 
    procedure Write_Input_Specification
@@ -106,6 +104,7 @@ package body JSON_Schema.Writers.Inputs is
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean) is
+         pragma Unreferenced (Name, Property, Schema, Optional);
       begin
          Union_Types_Count := Union_Types_Count + 1;
       end Count_Union_Types;
@@ -269,7 +268,6 @@ package body JSON_Schema.Writers.Inputs is
          Write_Named_Type
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
-            JSON_Schema.Readers.Schema_Maps.Element (Cursor),
             Specification,
             Holders);
       end loop;
@@ -358,7 +356,6 @@ package body JSON_Schema.Writers.Inputs is
          Write_Named_Type
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
-            JSON_Schema.Readers.Schema_Maps.Element (Cursor),
             Implemenetation,
             Holders);
       end loop;
@@ -537,12 +534,12 @@ package body JSON_Schema.Writers.Inputs is
      (Map          : JSON_Schema.Readers.Schema_Map;
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : VSS.Strings.Virtual_String;
-      Schema       : Schema_Access;
       Kind         : Declaration_Kind;
       Holders      : VSS.String_Vectors.Virtual_String_Vector)
    is
       use type VSS.Strings.Virtual_String;
 
+      Schema    : constant Schema_Access := Map (Name);
       Type_Name : constant VSS.Strings.Virtual_String :=
         Ref_To_Type_Name (Name);
 
@@ -563,14 +560,9 @@ package body JSON_Schema.Writers.Inputs is
       -------------------------------
 
       procedure Hash_For_Anonymous_Schema (Property : JSON_Schema.Property) is
-         use type VSS.Strings.Virtual_String;
       begin
          Write_Hash (Map, Type_Name & "_" & Property.Name, Property.Schema);
       end Hash_For_Anonymous_Schema;
-
-      Enum_Prefix : constant VSS.Strings.Virtual_String :=
-        (if Enum_Package.Is_Empty then VSS.Strings.Empty_Virtual_String
-         else Enum_Package & ".");
 
    begin
       if not Schema.Enum.Is_Empty then
@@ -616,7 +608,7 @@ package body JSON_Schema.Writers.Inputs is
       if not Schema.All_Of.Is_Empty or not Schema.Properties.Is_Empty then
          Write_Object_Reader (Map, Name, "", Schema, Holders);
       elsif not Schema.Any_Of.Is_Empty then
-         Write_Union_Reader (Map, Name, Schema, Enum_Package);
+         Write_Union_Reader (Map, Name, Enum_Package);
       else
          Put ("Input_Any_Value (Reader, Value, Success);");
          New_Line;
@@ -910,10 +902,11 @@ package body JSON_Schema.Writers.Inputs is
    procedure Write_Union_Reader
      (Map          : JSON_Schema.Readers.Schema_Map;
       Name         : VSS.Strings.Virtual_String;
-      Schema       : Schema_Access;
       Enum_Package : VSS.Strings.Virtual_String)
    is
       use type VSS.Strings.Virtual_String;
+
+      Schema    : constant Schema_Access := Map (Name);
 
       Type_Name : constant VSS.Strings.Virtual_String :=
         Ref_To_Type_Name (Name);

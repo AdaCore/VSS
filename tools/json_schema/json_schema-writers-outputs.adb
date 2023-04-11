@@ -10,7 +10,6 @@ package body JSON_Schema.Writers.Outputs is
      (Map          : JSON_Schema.Readers.Schema_Map;
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : VSS.Strings.Virtual_String;
-      Schema       : Schema_Access;
       Kind         : Declaration_Kind;
       Holders      : VSS.String_Vectors.Virtual_String_Vector);
 
@@ -163,7 +162,6 @@ package body JSON_Schema.Writers.Outputs is
          Write_Named_Type
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
-            JSON_Schema.Readers.Schema_Maps.Element (Cursor),
             Specification, Holders);
       end loop;
 
@@ -221,7 +219,6 @@ package body JSON_Schema.Writers.Outputs is
          Write_Named_Type
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
-            JSON_Schema.Readers.Schema_Maps.Element (Cursor),
             Implemenetation, Holders);
       end loop;
 
@@ -327,7 +324,6 @@ package body JSON_Schema.Writers.Outputs is
      (Map          : JSON_Schema.Readers.Schema_Map;
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : VSS.Strings.Virtual_String;
-      Schema       : Schema_Access;
       Kind         : Declaration_Kind;
       Holders      : VSS.String_Vectors.Virtual_String_Vector)
    is
@@ -341,6 +337,7 @@ package body JSON_Schema.Writers.Outputs is
       procedure On_Anonymous_Schema (Property : JSON_Schema.Property);
       --  Generate anonymous type for given property
 
+      Schema    : constant Schema_Access := Map (Name);
       Type_Name : constant VSS.Strings.Virtual_String :=
         Ref_To_Type_Name (Name);
 

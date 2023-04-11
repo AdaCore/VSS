@@ -75,14 +75,14 @@ package body JSON_Schema.Writers is
      (Map      : JSON_Schema.Readers.Schema_Map;
       Optional : String_Sets.Set;
       Action   : access procedure
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean))
    is
 
       procedure Traverse_Nested_Schemas
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean);
@@ -95,7 +95,7 @@ package body JSON_Schema.Writers is
       -----------------------------
 
       procedure Traverse_Nested_Schemas
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean) is
@@ -128,7 +128,7 @@ package body JSON_Schema.Writers is
    begin
       for Cursor in Map.Iterate loop
          declare
-            Name : constant VSS.Strings.Virtual_String :=
+            Name : constant Schema_Name :=
               JSON_Schema.Readers.Schema_Maps.Key (Cursor);
 
             Schema : constant Schema_Access :=
@@ -153,8 +153,7 @@ package body JSON_Schema.Writers is
    procedure Each_Holder_Type
      (Map      : JSON_Schema.Readers.Schema_Map;
       Holders  : VSS.String_Vectors.Virtual_String_Vector;
-      Action   : access procedure
-        (Name : VSS.Strings.Virtual_String))
+      Action   : access procedure (Name : Schema_Name))
    is
       Done : String_Sets.Set;
    begin
@@ -170,8 +169,7 @@ package body JSON_Schema.Writers is
             for Property of Schema.Properties loop
                if Property.Name = Pair (2) then
                   declare
-                     Name : constant VSS.Strings.Virtual_String :=
-                       Property.Schema.Ref;
+                     Name : constant Schema_Name := Property.Schema.Ref;
                   begin
                      if not Done.Contains (Name) then
                         Action (Name);
@@ -281,14 +279,14 @@ package body JSON_Schema.Writers is
      (Map      : JSON_Schema.Readers.Schema_Map;
       Optional : String_Sets.Set;
       Action   : access procedure
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean))
    is
 
       procedure Traverse_Nested_Schemas
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean);
@@ -301,7 +299,7 @@ package body JSON_Schema.Writers is
       -----------------------------
 
       procedure Traverse_Nested_Schemas
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean) is
@@ -328,7 +326,7 @@ package body JSON_Schema.Writers is
    begin
       for Cursor in Map.Iterate loop
          declare
-            Name : constant VSS.Strings.Virtual_String :=
+            Name : constant Schema_Name :=
               JSON_Schema.Readers.Schema_Maps.Key (Cursor);
 
             Schema : constant Schema_Access :=
@@ -535,7 +533,7 @@ package body JSON_Schema.Writers is
    ---------------------
 
    function Is_Holder_Field
-     (Name     : VSS.Strings.Virtual_String;
+     (Name     : Schema_Name;
       Property : VSS.Strings.Virtual_String;
       Holders  : VSS.String_Vectors.Virtual_String_Vector) return Boolean
    is
@@ -580,7 +578,7 @@ package body JSON_Schema.Writers is
    -- Ref_To_Type_Name --
    ----------------------
 
-   function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
+   function Ref_To_Type_Name (Subschema : Schema_Name)
      return VSS.Strings.Virtual_String
    is
       List : constant VSS.String_Vectors.Virtual_String_Vector :=

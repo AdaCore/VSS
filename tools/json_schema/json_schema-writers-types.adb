@@ -20,7 +20,7 @@ package body JSON_Schema.Writers.Types is
    --  already. Include names of generated type in Done set.
 
    procedure Write_Named_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -32,7 +32,7 @@ package body JSON_Schema.Writers.Types is
    --  described above.
 
    procedure Write_Anonymous_Type
-     (Enclosing_Type : VSS.Strings.Virtual_String;
+     (Enclosing_Type : Schema_Name;
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
@@ -45,7 +45,7 @@ package body JSON_Schema.Writers.Types is
    --  schema. Currently only single level of nesting is implemented.
 
    procedure Write_Record_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -55,7 +55,7 @@ package body JSON_Schema.Writers.Types is
    --  The same for "type: object" schema
 
    procedure Write_Record_Component
-     (Name         : VSS.Strings.Virtual_String;
+     (Name         : Schema_Name;
       Map          : JSON_Schema.Readers.Schema_Map;
       Root_Package : VSS.Strings.Virtual_String;
       Property     : JSON_Schema.Property;
@@ -65,7 +65,7 @@ package body JSON_Schema.Writers.Types is
    --  the schema containing the property.
 
    procedure Write_Derived_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -75,7 +75,7 @@ package body JSON_Schema.Writers.Types is
    --  The same for "allOf:[]" schema
 
    procedure Write_Union_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -123,10 +123,6 @@ package body JSON_Schema.Writers.Types is
       Holders : VSS.String_Vectors.Virtual_String_Vector);
    --  Write holder private (full) types
 
-   function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
-     return VSS.Strings.Virtual_String;
-   --  Convert $ref to a type name
-
    procedure Find_Optional_Types
      (Schema : Schema_Access;
       Result : in out String_Sets.Set);
@@ -146,7 +142,7 @@ package body JSON_Schema.Writers.Types is
    --  Write Description as an Ada comment (handle LF if any).
    --  Use Indent spaces before comment markers.
 
-   procedure Write_Optional_Type (Name : VSS.Strings.Virtual_String);
+   procedure Write_Optional_Type (Name : Schema_Name);
    --  Write an Optional_<Name> type for given type Name
 
    procedure Write_Any_Object (Name : VSS.Strings.Virtual_String);
@@ -207,7 +203,7 @@ package body JSON_Schema.Writers.Types is
    is
       use type Definitions.Simple_Types;
 
-      Ref : VSS.Strings.Virtual_String;
+      Ref : Schema_Name;
    begin
       if Schema.Kind.Last_Index = 1
         and then Schema.Kind (1) = Definitions.An_Array
@@ -266,19 +262,6 @@ package body JSON_Schema.Writers.Types is
       end loop;
    end Find_Optional_Types;
 
-   ---------------
-   -- Type_Name --
-   ---------------
-
-   function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
-     return VSS.Strings.Virtual_String
-   is
-      List : constant VSS.String_Vectors.Virtual_String_Vector :=
-        Subschema.Split ('/');
-   begin
-      return List.Element (List.Length);
-   end Ref_To_Type_Name;
-
    -----------
    -- Write --
    -----------
@@ -316,7 +299,7 @@ package body JSON_Schema.Writers.Types is
    --------------------------
 
    procedure Write_Anonymous_Type
-     (Enclosing_Type : VSS.Strings.Virtual_String;
+     (Enclosing_Type : Schema_Name;
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
@@ -414,7 +397,7 @@ package body JSON_Schema.Writers.Types is
    ------------------------
 
    procedure Write_Derived_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -600,7 +583,7 @@ package body JSON_Schema.Writers.Types is
    ----------------------
 
    procedure Write_Named_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -675,7 +658,7 @@ package body JSON_Schema.Writers.Types is
    -- Write_Optional_Type --
    -------------------------
 
-   procedure Write_Optional_Type (Name : VSS.Strings.Virtual_String) is
+   procedure Write_Optional_Type (Name : Schema_Name) is
       Type_Name : constant VSS.Strings.Virtual_String :=
         Ref_To_Type_Name (Name);
    begin
@@ -710,8 +693,10 @@ package body JSON_Schema.Writers.Types is
 
             Item : constant VSS.Strings.Virtual_String :=
               Readers.Schema_Maps.Key (Cursor);
+
             Schema : constant Schema_Access :=
               Readers.Schema_Maps.Element (Cursor);
+
             Element_Type : constant VSS.Strings.Virtual_String :=
               (if Schema /= null
                  and then Is_Enum (Schema)
@@ -769,9 +754,9 @@ package body JSON_Schema.Writers.Types is
      (Map     : JSON_Schema.Readers.Schema_Map;
       Holders : VSS.String_Vectors.Virtual_String_Vector)
    is
-      procedure Each (Name : VSS.Strings.Virtual_String);
+      procedure Each (Name : Schema_Name);
 
-      procedure Each (Name : VSS.Strings.Virtual_String) is
+      procedure Each (Name : Schema_Name) is
          Type_Name : constant VSS.Strings.Virtual_String :=
            Ref_To_Type_Name (Name);
       begin
@@ -795,9 +780,9 @@ package body JSON_Schema.Writers.Types is
      (Map     : JSON_Schema.Readers.Schema_Map;
       Holders : VSS.String_Vectors.Virtual_String_Vector)
    is
-      procedure Each (Name : VSS.Strings.Virtual_String);
+      procedure Each (Name : Schema_Name);
 
-      procedure Each (Name : VSS.Strings.Virtual_String) is
+      procedure Each (Name : Schema_Name) is
          Type_Name : constant VSS.Strings.Virtual_String :=
            Ref_To_Type_Name (Name);
       begin
@@ -844,7 +829,7 @@ package body JSON_Schema.Writers.Types is
    ----------------------------
 
    procedure Write_Record_Component
-     (Name         : VSS.Strings.Virtual_String;
+     (Name         : Schema_Name;
       Map          : JSON_Schema.Readers.Schema_Map;
       Root_Package : VSS.Strings.Virtual_String;
       Property     : JSON_Schema.Property;
@@ -888,7 +873,7 @@ package body JSON_Schema.Writers.Types is
    -----------------------
 
    procedure Write_Record_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -1027,14 +1012,14 @@ package body JSON_Schema.Writers.Types is
 
       declare
          procedure On_Enumeration_Type
-           (Name     : VSS.Strings.Virtual_String;
+           (Name     : Schema_Name;
             Property : VSS.Strings.Virtual_String;
             Schema   : Schema_Access;
             Optional : Boolean);
          --  Generate enumeration type for Schema
 
          procedure On_Enumeration_Type
-           (Name     : VSS.Strings.Virtual_String;
+           (Name     : Schema_Name;
             Property : VSS.Strings.Virtual_String;
             Schema   : Schema_Access;
             Optional : Boolean)
@@ -1065,19 +1050,20 @@ package body JSON_Schema.Writers.Types is
 
       declare
          procedure On_Union_Type
-           (Name     : VSS.Strings.Virtual_String;
+           (Name     : Schema_Name;
             Property : VSS.Strings.Virtual_String;
             Schema   : Schema_Access;
             Optional : Boolean);
          --  Generate enumeration type for anyOf Schema
 
          procedure On_Union_Type
-           (Name     : VSS.Strings.Virtual_String;
+           (Name     : Schema_Name;
             Property : VSS.Strings.Virtual_String;
             Schema   : Schema_Access;
             Optional : Boolean)
          is
             pragma Unreferenced (Optional);
+
             Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
          begin
             if not Property.Is_Empty then
@@ -1138,7 +1124,7 @@ package body JSON_Schema.Writers.Types is
    ----------------------
 
    procedure Write_Union_Type
-     (Name           : VSS.Strings.Virtual_String;
+     (Name           : Schema_Name;
       Map            : JSON_Schema.Readers.Schema_Map;
       Root_Package   : VSS.Strings.Virtual_String;
       Enum_Package   : VSS.Strings.Virtual_String;
@@ -1285,8 +1271,10 @@ package body JSON_Schema.Writers.Types is
          declare
             Item : constant VSS.Strings.Virtual_String :=
               Readers.Schema_Maps.Key (Cursor);
+
             Schema : constant Schema_Access :=
               Readers.Schema_Maps.Element (Cursor);
+
             Element_Type : constant VSS.Strings.Virtual_String :=
               (if Schema /= null and then Is_Enum (Schema)
                then "Enum." & Item else Item);

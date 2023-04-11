@@ -10,6 +10,9 @@ with JSON_Schema.Readers;
 
 package JSON_Schema.Writers is
 
+   subtype Schema_Name is VSS.Strings.Virtual_String;
+   --  Name of the schema. It looks like "#/definitions/Response"
+
    package String_Sets is new Ada.Containers.Hashed_Sets
      (VSS.Strings.Virtual_String,
       VSS.Strings.Hash,
@@ -32,7 +35,7 @@ package JSON_Schema.Writers is
      (Map      : JSON_Schema.Readers.Schema_Map;
       Optional : String_Sets.Set;
       Action   : access procedure
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean));
@@ -64,7 +67,7 @@ package JSON_Schema.Writers is
      (Map      : JSON_Schema.Readers.Schema_Map;
       Optional : String_Sets.Set;
       Action   : access procedure
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean));
@@ -80,11 +83,10 @@ package JSON_Schema.Writers is
    procedure Each_Holder_Type
      (Map      : JSON_Schema.Readers.Schema_Map;
       Holders  : VSS.String_Vectors.Virtual_String_Vector;
-      Action   : access procedure
-        (Name : VSS.Strings.Virtual_String));
+      Action   : access procedure (Name : Schema_Name));
    --  Execute Action on each schema used in Holders
 
-   function Ref_To_Type_Name (Subschema : VSS.Strings.Virtual_String)
+   function Ref_To_Type_Name (Subschema : Schema_Name)
      return VSS.Strings.Virtual_String;
    --  Convert $ref to a type name
 
@@ -116,9 +118,10 @@ package JSON_Schema.Writers is
    --  anyOf schema
 
    function Is_Holder_Field
-     (Name     : VSS.Strings.Virtual_String;
+     (Name     : Schema_Name;
       Property : VSS.Strings.Virtual_String;
       Holders  : VSS.String_Vectors.Virtual_String_Vector) return Boolean;
-   --  Check if given Property in Schema should be presented as a holder type
+   --  Check if given Property in the schema with Name should be presented as a
+   --  holder type
 
 end JSON_Schema.Writers;

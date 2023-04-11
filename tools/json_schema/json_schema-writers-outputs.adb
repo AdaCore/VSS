@@ -9,12 +9,12 @@ package body JSON_Schema.Writers.Outputs is
    procedure Write_Named_Type
      (Map          : JSON_Schema.Readers.Schema_Map;
       Enum_Package : VSS.Strings.Virtual_String;
-      Name         : VSS.Strings.Virtual_String;
+      Name         : Schema_Name;
       Kind         : Declaration_Kind;
       Holders      : VSS.String_Vectors.Virtual_String_Vector);
 
    procedure Write_Anonymous_Type
-     (Enclosing_Type : VSS.Strings.Virtual_String;
+     (Enclosing_Type : Schema_Name;
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Holders        : VSS.String_Vectors.Virtual_String_Vector);
@@ -24,7 +24,7 @@ package body JSON_Schema.Writers.Outputs is
       Prefix    : VSS.Strings.Virtual_String);
 
    procedure Write_Record_Component
-     (Name     : VSS.Strings.Virtual_String;
+     (Name     : Schema_Name;
       Map      : JSON_Schema.Readers.Schema_Map;
       Property : JSON_Schema.Property;
       Required : Boolean;
@@ -51,14 +51,14 @@ package body JSON_Schema.Writers.Outputs is
       use type VSS.Strings.Virtual_String;
 
       procedure Write_Enum_Specification
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean);
       --  Generate Output procedure specification for an enumeration schema
 
       procedure Write_Enum_Body
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean);
@@ -73,7 +73,7 @@ package body JSON_Schema.Writers.Outputs is
       ---------------------
 
       procedure Write_Enum_Body
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean)
@@ -122,7 +122,7 @@ package body JSON_Schema.Writers.Outputs is
       -------------------------
 
       procedure Write_Enum_Specification
-        (Name     : VSS.Strings.Virtual_String;
+        (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
          Optional : Boolean)
@@ -233,7 +233,7 @@ package body JSON_Schema.Writers.Outputs is
    --------------------------
 
    procedure Write_Anonymous_Type
-     (Enclosing_Type : VSS.Strings.Virtual_String;
+     (Enclosing_Type : Schema_Name;
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Holders        : VSS.String_Vectors.Virtual_String_Vector)
@@ -323,7 +323,7 @@ package body JSON_Schema.Writers.Outputs is
    procedure Write_Named_Type
      (Map          : JSON_Schema.Readers.Schema_Map;
       Enum_Package : VSS.Strings.Virtual_String;
-      Name         : VSS.Strings.Virtual_String;
+      Name         : Schema_Name;
       Kind         : Declaration_Kind;
       Holders      : VSS.String_Vectors.Virtual_String_Vector)
    is
@@ -474,7 +474,7 @@ package body JSON_Schema.Writers.Outputs is
    ----------------------------
 
    procedure Write_Record_Component
-     (Name     : VSS.Strings.Virtual_String;
+     (Name     : Schema_Name;
       Map      : JSON_Schema.Readers.Schema_Map;
       Property : JSON_Schema.Property;
       Required : Boolean;

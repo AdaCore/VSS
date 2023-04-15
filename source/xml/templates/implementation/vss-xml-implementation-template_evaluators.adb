@@ -276,36 +276,56 @@ package body VSS.XML.Implementation.Template_Evaluators is
                exit when Current > Program.Last_Index;
                exit when Program (Current).Kind /= Attribute;
 
-               if Program (Current).Attribute_Path.Is_Empty then
-                  Attributes.Insert
-                    (Program (Current).Attribute_URI,
-                     Program (Current).Attribute_Name,
-                     Program (Current).Attribute_Value);
+               declare
+                  Expression :
+                    constant VSS.String_Vectors.Virtual_String_Vector :=
+                      Program (Current).Attribute_Path;
+                  URI        : constant VSS.IRIs.IRI :=
+                    Program (Current).Attribute_URI;
+                  Name       : constant VSS.Strings.Virtual_String :=
+                    Program (Current).Attribute_Name;
+                  Value      : VSS.Strings.Virtual_String :=
+                    Program (Current).Attribute_Value;
+                  Append     : Boolean := True;
 
-               else
-                  declare
-                     use type VSS.XML.Templates.Values.Value_Kind;
+               begin
+                  if not Expression.Is_Empty then
+                     declare
+                        V : constant VSS.XML.Templates.Values.Value :=
+                          Evaluate_Value
+                            (Self.Current.Namespace.all, Expression);
 
-                     V : constant VSS.XML.Templates.Values.Value :=
-                       Evaluate_Value
-                         (Self.Current.Namespace.all,
-                          Program (Current).Attribute_Path);
+                     begin
+                        case V.Kind is
+                           when VSS.XML.Templates.Values.Nothing =>
+                              --  Exclude attribute.
 
-                  begin
-                     if V.Kind = VSS.XML.Templates.Values.String then
-                        Attributes.Insert
-                          (Program (Current).Attribute_URI,
-                           Program (Current).Attribute_Name,
-                           V.String_Value);
+                              Append := False;
 
-                     elsif V.Kind = VSS.XML.Templates.Values.Error then
-                        Self.Report_Error (V.Message, Success);
+                           when VSS.XML.Templates.Values.Default =>
+                              --  Use default values for the attribute.
 
-                     else
-                        raise Program_Error;
-                     end if;
-                  end;
-               end if;
+                              null;
+
+                           when VSS.XML.Templates.Values.String =>
+                              --  Use computed value for the attribute.
+
+                              Value := V.String_Value;
+
+                           when VSS.XML.Templates.Values.Error =>
+                              Self.Report_Error (V.Message, Success);
+                              Append := False;
+
+                           when others =>
+                              raise Program_Error;
+                        end case;
+                     end;
+                  end if;
+
+                  if Append then
+                     Attributes.Insert (URI, Name, Value);
+                  end if;
+               end;
             end loop;
 
             Current := @ - 1;

@@ -26,34 +26,11 @@ package VSS.Strings.Formatters is
      (Self   : Abstract_Formatter;
       Format : Format_Information)
       return VSS.Strings.Virtual_String is abstract;
+   --  Format value using given format specification.
 
-   --  type Float_Formatter (Value : Long_Float) is
-   --    new Abstract_Formatter with private;
-
-   --  type Float_Formatter is new Abstract_Formatter with private;
-   --
-   --  function Image (Value : Long_Float) return Float_Formatter;
-   --
-   --  function Format
-   --    (Template    : VSS.Strings.Virtual_String;
-   --     Parameter_1 : Abstract_Formatter'Class)
-   --     return VSS.Strings.Virtual_String;
-
-private
-
-   --  type Float_Formatter (Value : Long_Float) is
-   --    new Abstract_Formatter with null record;
-
-   --  type Float_Formatter is new Abstract_Formatter with record
-   --     Value : Long_Float;
-   --  end record;
-   --
-   --  overriding function Format
-   --    (Self   : Float_Formatter;
-   --     Format : Format_Information) return VSS.Strings.Virtual_String;
-   --
-   --  type Virtual_String_Template is tagged record
-   --     null;
-   --  end record;
+   not overriding function Name
+     (Self : Abstract_Formatter)
+      return VSS.Strings.Virtual_String is abstract;
+   --  Name of the parameter.
 
 end VSS.Strings.Formatters;

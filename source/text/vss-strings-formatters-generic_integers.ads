@@ -40,12 +40,20 @@ package VSS.Strings.Formatters.Generic_Integers is
 
    function Image (Item : Integer_Type) return Formatter;
 
+   function Image
+     (Name : VSS.Strings.Virtual_String;
+      Item : Integer_Type) return Formatter;
+
 private
 
    type Formatter is
      new VSS.Strings.Formatters.Abstract_Formatter with record
+      Name  : VSS.Strings.Virtual_String;
       Value : Integer_Type;
    end record;
+
+   overriding function Name
+     (Self : Formatter) return VSS.Strings.Virtual_String;
 
    overriding function Format
      (Self   : Formatter;

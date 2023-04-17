@@ -24,7 +24,28 @@ package body VSS.Strings.Formatters.Strings is
 
    function Image (Item : VSS.Strings.Virtual_String) return Formatter is
    begin
-      return (Value => Item);
+      return (Name => <>, Value => Item);
    end Image;
+
+   -----------
+   -- Image --
+   -----------
+
+   function Image
+     (Name : VSS.Strings.Virtual_String;
+      Item : VSS.Strings.Virtual_String) return Formatter is
+   begin
+      return (Name => Name, Value => Item);
+   end Image;
+
+   ----------
+   -- Name --
+   ----------
+
+   overriding function Name
+     (Self : Formatter) return VSS.Strings.Virtual_String is
+   begin
+      return Self.Name;
+   end Name;
 
 end VSS.Strings.Formatters.Strings;

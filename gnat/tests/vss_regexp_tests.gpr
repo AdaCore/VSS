@@ -19,9 +19,7 @@ project VSS_RegExp_Tests is
      ("test_regexp.adb",
       "test_regexp_re_tests.adb");
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Common.Ada_Switches & ("-gnatW8");
-   end Compiler;
+   package Compiler renames VSS_Test_Common.Compiler;
 
    package Binder is
       for Switches ("Ada") use ("-W8");

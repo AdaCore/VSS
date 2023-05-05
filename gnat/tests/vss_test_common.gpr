@@ -14,8 +14,10 @@ project VSS_Test_Common is
    for Object_Dir use VSS_Common.Tests_Object_Dir;
    for Source_Dirs use ("../../testsuite/common");
 
+   Ada_Compiler_Switches := VSS_Common.Ada_Compiler_Switches & ("-gnatW8");
+
    package Compiler is
-      for Switches ("Ada") use VSS_Common.Ada_Switches & ("-gnatW8");
+      for Switches ("Ada") use Ada_Compiler_Switches;
    end Compiler;
 
 end VSS_Test_Common;

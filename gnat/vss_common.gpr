@@ -26,7 +26,6 @@ abstract project VSS_Common is
    CI_Mode : VSS_CI_Mode :=
      external ("VSS_CI_MODE", external ("CI_MODE", "none"));
 
-   Ada_Switches := ();
    Ada_Coverage_Switches := ();
    Linker_Options := ();
 

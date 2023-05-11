@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -167,9 +167,9 @@ package body UCD.Characters is
       Database :=
         new Character_Array'
           (others =>
-             (Boolean     => (others => False),
-              Enumeration => (others => 0),
-              String      => (others => null)));
+             (Boolean     => [others => False],
+              Enumeration => [others => 0],
+              String      => [others => null]));
 
       --  Initialize special cases.
 

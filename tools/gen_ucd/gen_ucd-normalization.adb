@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -181,9 +181,9 @@ package body Gen_UCD.Normalization is
 
       type Boolean_Array is array (UCD.Code_Point) of Boolean with Pack;
 
-      Is_Primary_Composite : Boolean_Array := (others => False);
-      Is_First_Code        : Boolean_Array := (others => False);
-      Is_Last_Code         : Boolean_Array := (others => False);
+      Is_Primary_Composite : Boolean_Array := [others => False];
+      Is_First_Code        : Boolean_Array := [others => False];
+      Is_Last_Code         : Boolean_Array := [others => False];
       --  Code point is first or last code point of decomposition mapping of
       --  primary composite character.
 
@@ -532,7 +532,7 @@ package body Gen_UCD.Normalization is
         array (Unsigned_6, Unsigned_9) of UCD.Code_Point;
 
       Raw_Composition_Mapping : Composition_Mapping :=
-        (others => (others => 0));
+        [others => [others => 0]];
 
       Max_Length  : Natural := 0;
       Max_UTF_8   : Natural := 0;

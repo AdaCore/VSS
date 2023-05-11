@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-pragma Ada_2022;
-
 package body Gen_UCD.Generic_Compressed_Stage_Table is
 
    type Compressed_Array is array (Gen_UCD.Unsigned_32 range <>) of Data_Type;

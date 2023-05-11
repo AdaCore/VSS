@@ -1,10 +1,8 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
-
-pragma Ada_2022;
 
 with Ada.Unchecked_Conversion;
 

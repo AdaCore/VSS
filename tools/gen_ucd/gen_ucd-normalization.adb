@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-pragma Ada_2022;
-
 with Ada.Containers;
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Ada.Strings;                       use Ada.Strings;

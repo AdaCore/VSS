@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -79,7 +79,7 @@ package body VSS.XML.Attributes.Containers is
          end if;
       end loop;
 
-      Self.Container.Append ((URI, Name, Value));
+      Self.Container.Append (Attribute'(URI, Name, Value));
    end Insert;
 
 end VSS.XML.Attributes.Containers;

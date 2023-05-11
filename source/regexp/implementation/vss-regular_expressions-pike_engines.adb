@@ -150,7 +150,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
          case Code.Kind is
             when Character | Class | Category | Negate_Class | Match =>
-               Match.Next.Append ((PC, New_Tags));
+               Match.Next.Append (Thread_State'(PC, New_Tags));
             when Split =>
                Append_State (Cursor, Prev, Next, New_Tags);
                Append_State (Cursor, Prev, PC + Code.Fallback, New_Tags);

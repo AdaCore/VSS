@@ -35,7 +35,8 @@ abstract project VSS_Common is
    Tools_Object_Dir := "../../.objs/" & "/tools";
 
    Common_Ada_Compiler_Switches :=
-     ("-gnatW8");  --  Wide character encoding method UTF-8
+     ("-gnat2022",  --  Ada 2022 mode
+      "-gnatW8");   --  Wide character encoding method UTF-8
 
    --  Build Profile
 

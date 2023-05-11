@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -13,7 +13,7 @@ package body VSS.Strings.Converters.Decoders.KOI8R is
    Mapping : constant
      array (Ada.Streams.Stream_Element range 16#80# .. 16#FF#)
        of VSS.Unicode.Code_Point :=
-       (16#80# => 16#2500#,   --  BOX DRAWINGS LIGHT HORIZONTAL
+       [16#80# => 16#2500#,   --  BOX DRAWINGS LIGHT HORIZONTAL
         16#81# => 16#2502#,   --  BOX DRAWINGS LIGHT VERTICAL
         16#82# => 16#250C#,   --  BOX DRAWINGS LIGHT DOWN AND RIGHT
         16#83# => 16#2510#,   --  BOX DRAWINGS LIGHT DOWN AND LEFT
@@ -140,7 +140,7 @@ package body VSS.Strings.Converters.Decoders.KOI8R is
         16#FC# => 16#042D#,   --  CYRILLIC CAPITAL LETTER E
         16#FD# => 16#0429#,   --  CYRILLIC CAPITAL LETTER SHCHA
         16#FE# => 16#0427#,   --  CYRILLIC CAPITAL LETTER CHE
-        16#FF# => 16#042A#);  --  CYRILLIC CAPITAL LETTER HARD SIGN
+        16#FF# => 16#042A#];  --  CYRILLIC CAPITAL LETTER HARD SIGN
 
    ------------
    -- Decode --

@@ -94,7 +94,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  If a match has been found, corresponding tag values
 
       Step  : Natural := 1;
-      Steps : array (1 .. Self.Program.Last_Index) of Natural := (others => 0);
+      Steps : array (1 .. Self.Program.Last_Index) of Natural := [others => 0];
       --  A filter to protect the Next from duplicated states
 
       ------------------
@@ -165,7 +165,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
                begin
                   Updated (Code.Tag) := Pos.all;
                   --  Reset nested subgroup tags if any:
-                  Updated (Code.Tag + 1 .. Code.Last) := (others => <>);
+                  Updated (Code.Tag + 1 .. Code.Last) := [others => <>];
                   Append_State (Cursor, Prev, Next, Updated);
                end;
             when Assertion =>

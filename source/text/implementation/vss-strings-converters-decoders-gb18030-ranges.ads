@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -25,7 +25,7 @@ private package VSS.Strings.Converters.Decoders.GB18030.Ranges is
    end record;
 
    Table : constant array (Positive range <>) of Table_Record :=
-     ((0,      16#0080#),
+     [(0,      16#0080#),
       (36,     16#00A5#),
       (38,     16#00A9#),
       (45,     16#00B2#),
@@ -231,6 +231,6 @@ private package VSS.Strings.Converters.Decoders.GB18030.Ranges is
       (39116,  16#FE6C#),
       (39265,  16#FF5F#),
       (39394,  16#FFE6#),
-      (189000, 16#10000#));
+      (189000, 16#10000#)];
 
 end VSS.Strings.Converters.Decoders.GB18030.Ranges;

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -29,14 +29,14 @@ package body VSS.Implementation.String_Vectors is
 
    Line_Terminator_To_Code_Point : constant
      array (VSS.Strings.Line_Terminator) of VSS.Unicode.Code_Point :=
-       (VSS.Strings.CR   => Carriage_Return,
+       [VSS.Strings.CR   => Carriage_Return,
         VSS.Strings.LF   => Line_Feed,
         VSS.Strings.CRLF => Carriage_Return,
         VSS.Strings.NEL  => Next_Line,
         VSS.Strings.VT   => Line_Tabulation,
         VSS.Strings.FF   => Form_Feed,
         VSS.Strings.LS   => Line_Separator,
-        VSS.Strings.PS   => Paragraph_Separator);
+        VSS.Strings.PS   => Paragraph_Separator];
    --  Mapping from Line_Terminator to code point of first character of the
    --  line terminator sequence. Only CRLF case requires longer sequence and
    --  it is processed separately.

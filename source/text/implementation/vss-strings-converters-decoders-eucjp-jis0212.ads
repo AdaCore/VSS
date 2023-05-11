@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -22,7 +22,7 @@ private package VSS.Strings.Converters.Decoders.EUCJP.JIS0212 is
    Table : constant
      array (Interfaces.Unsigned_32 range 108 .. 7_210)
        of VSS.Unicode.Code_Point :=
-     (108    => 16#02D8#,  --  ˘ (BREVE)
+     [108    => 16#02D8#,  --  ˘ (BREVE)
       109    => 16#02C7#,  --  ˇ (CARON)
       110    => 16#00B8#,  --  ¸ (CEDILLA)
       111    => 16#02D9#,  --  ˙ (DOT ABOVE)
@@ -6090,6 +6090,6 @@ private package VSS.Strings.Converters.Decoders.EUCJP.JIS0212 is
       7209   => 16#9FA3#,  --  龣 (<CJK Ideograph>)
       7210   => 16#9FA5#,  --  龥 (<CJK Ideograph>)
 
-      others => 0);
+      others => 0];
 
 end VSS.Strings.Converters.Decoders.EUCJP.JIS0212;

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -49,7 +49,7 @@ package body VSS.Strings.Converters.Decoders is
 
    Registry : constant array (Positive range <>) of Registry_Record :=
      --  UTF-8
-     (("csutf8",              UTF8.Factory'Access),
+     [("csutf8",              UTF8.Factory'Access),
       ("utf8",                UTF8.Factory'Access),
       ("unicode11utf8",       UTF8.Factory'Access),
       ("unicode20utf8",       UTF8.Factory'Access),
@@ -164,10 +164,10 @@ package body VSS.Strings.Converters.Decoders is
       ("cskoi8r",             KOI8R.Factory'Access),
       ("koi",                 KOI8R.Factory'Access),
       ("koi8",                KOI8R.Factory'Access)
-     );
+     ];
 
    Empty_Data : constant Ada.Streams.Stream_Element_Array (1 .. 0) :=
-     (others => <>);
+     [others => <>];
 
    ------------
    -- Decode --

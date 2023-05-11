@@ -34,6 +34,9 @@ abstract project VSS_Common is
    Tests_Object_Dir := "../../.objs/" & "/tests";
    Tools_Object_Dir := "../../.objs/" & "/tools";
 
+   Common_Ada_Compiler_Switches :=
+     ("-gnatW8");  --  Wide character encoding method UTF-8
+
    --  Build Profile
 
    VSS_Ada_Compiler_Switches := ();
@@ -85,6 +88,7 @@ abstract project VSS_Common is
 
    Ada_Compiler_Switches :=
      VSS_Config.Ada_Compiler_Switches
+       & Common_Ada_Compiler_Switches
        & VSS_Ada_Compiler_Switches
        & Coverage_Ada_Compiler_Switches
        & CI_Ada_Compiler_Switches;

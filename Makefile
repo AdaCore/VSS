@@ -57,7 +57,7 @@ generate:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr
 	.objs/tools/gen_ucd data/ucd .objs/ucd.ada
 	rm -f source/text/ucd/*.ad[sb]
-	gnatchop .objs/ucd.ada source/text/ucd
+	gnatchop -gnat2022 .objs/ucd.ada source/text/ucd
 
 build_tests:
 	gprbuild -XVSS_LIBRARY_TYPE=static $(GPRBUILD_FLAGS) gnat/tests/vss_text_tests.gpr

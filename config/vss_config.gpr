@@ -52,6 +52,7 @@ abstract project Vss_Config is
            ,"-gnatyt" -- Check token spacing
            ,"-gnatyu" -- Check unnecessary blank lines
            ,"-gnatyx" -- Check extra parentheses
+           ,"-gnat2022" -- Ada 2022 Mode
           );
    Validation_Ada_Compiler_Switches :=
           (
@@ -89,6 +90,7 @@ abstract project Vss_Config is
            ,"-gnatyt" -- Check token spacing
            ,"-gnatyu" -- Check unnecessary blank lines
            ,"-gnatyx" -- Check extra parentheses
+           ,"-gnat2022" -- Ada 2022 Mode
           );
    Release_Ada_Compiler_Switches :=
           (
@@ -96,6 +98,7 @@ abstract project Vss_Config is
            ,"-gnatn" -- Enable inlining
            ,"-ffunction-sections" -- Separate ELF section for each function
            ,"-fdata-sections" -- Separate ELF section for each variable
+           ,"-gnat2022" -- Ada 2022 Mode
           );
 
    type Build_Profile_Kind is ("release", "validation", "development");

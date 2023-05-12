@@ -18,7 +18,7 @@ package body VSS.Characters is
 
    GC_To_General_Ccategory : constant
      array (VSS.Implementation.UCD_Core.GC_Values) of General_Category :=
-     (VSS.Implementation.UCD_Core.GC_Cc => Control,
+     [VSS.Implementation.UCD_Core.GC_Cc => Control,
       VSS.Implementation.UCD_Core.GC_Cf => Format,
       VSS.Implementation.UCD_Core.GC_Cn => Unassigned,
       VSS.Implementation.UCD_Core.GC_Co => Private_Use,
@@ -47,7 +47,7 @@ package body VSS.Characters is
       VSS.Implementation.UCD_Core.GC_So => Other_Symbol,
       VSS.Implementation.UCD_Core.GC_Zl => Line_Separator,
       VSS.Implementation.UCD_Core.GC_Zp => Paragraph_Separator,
-      VSS.Implementation.UCD_Core.GC_Zs => Space_Separator);
+      VSS.Implementation.UCD_Core.GC_Zs => Space_Separator];
 
    function Extract_Core_Data
      (Character : Virtual_Character)

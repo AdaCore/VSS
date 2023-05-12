@@ -60,7 +60,7 @@ package VSS.Strings is
      with Pack, Default_Component_Value => False;
 
    New_Line_Function : constant Line_Terminator_Set :=
-     (CR | LF | CRLF | NEL => True, others => False);
+     [CR | LF | CRLF | NEL => True, others => False];
 
    type Virtual_String is tagged private
      with String_Literal => To_Virtual_String;

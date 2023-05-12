@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -27,14 +27,14 @@ package VSS.Regular_Expressions is
 
    type Pattern_Options is array (Pattern_Option) of Boolean;
 
-   No_Pattern_Options : constant Pattern_Options := (others => False);
+   No_Pattern_Options : constant Pattern_Options := [others => False];
 
    type Match_Option is
      (Anchored_Match);  --  Match whole string
 
    type Match_Options is array (Match_Option) of Boolean;
 
-   No_Match_Options : constant Match_Options := (others => False);
+   No_Match_Options : constant Match_Options := [others => False];
 
    type Regular_Expression_Match is tagged private;
 

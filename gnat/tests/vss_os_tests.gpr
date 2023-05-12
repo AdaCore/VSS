@@ -20,9 +20,7 @@ project VSS_OS_Tests is
       "test_command_line_parser.adb",
       "test_standard_paths.adb");
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Common.Ada_Switches & ("-gnatW8");
-   end Compiler;
+   package Compiler renames VSS_Test_Common.Compiler;
 
    package Binder is
       for Switches ("Ada") use ("-Wb");

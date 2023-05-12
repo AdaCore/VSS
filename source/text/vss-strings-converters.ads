@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -28,7 +28,7 @@ package VSS.Strings.Converters is
    type Converter_Flags is array (Converter_Flag) of Boolean
      with Pack;
 
-   Default_Converter_Flags : constant Converter_Flags := (others => False);
+   Default_Converter_Flags : constant Converter_Flags := [others => False];
 
 private
 

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -24,7 +24,7 @@ package body VSS.Stream_Element_Vectors.Conversions is
       if Item.Data = null
         or else Item.Data.Length = 0
       then
-         return (0 .. -1 => <>);
+         return [0 .. -1 => <>];
 
       else
          return Item.Data.Storage (1 .. Item.Data.Length);

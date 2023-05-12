@@ -26,7 +26,6 @@ abstract project VSS_Common is
    CI_Mode : VSS_CI_Mode :=
      external ("VSS_CI_MODE", external ("CI_MODE", "none"));
 
-   Ada_Switches := ();
    Ada_Coverage_Switches := ();
    Linker_Options := ();
 
@@ -34,6 +33,9 @@ abstract project VSS_Common is
    Object_Dir       := "../.objs/" & "/" & Library_Kind;
    Tests_Object_Dir := "../../.objs/" & "/tests";
    Tools_Object_Dir := "../../.objs/" & "/tools";
+
+   Common_Ada_Compiler_Switches :=
+     ("-gnatW8");   --  Wide character encoding method UTF-8
 
    --  Build Profile
 
@@ -86,6 +88,7 @@ abstract project VSS_Common is
 
    Ada_Compiler_Switches :=
      VSS_Config.Ada_Compiler_Switches
+       & Common_Ada_Compiler_Switches
        & VSS_Ada_Compiler_Switches
        & Coverage_Ada_Compiler_Switches
        & CI_Ada_Compiler_Switches;

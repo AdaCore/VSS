@@ -17,9 +17,7 @@ project VSS_HTML_Tests is
    for Source_Dirs use ("../../testsuite/html");
    for Main use ("test_html_writer.adb");
 
-   package Compiler is
-      for Switches ("Ada") use VSS_Common.Ada_Switches & ("-gnatW8");
-   end Compiler;
+   package Compiler renames VSS_Test_Common.Compiler;
 
    package Binder is
       for Switches ("Ada") use ("-Wb");

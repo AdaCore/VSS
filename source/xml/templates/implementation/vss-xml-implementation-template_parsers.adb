@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-pragma Ada_2022;
-
 with VSS.String_Vectors;
 with VSS.XML.Implementation.Parse_Errors;
 with VSS.XML.Namespaces;

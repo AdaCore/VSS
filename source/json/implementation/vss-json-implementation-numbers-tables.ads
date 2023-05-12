@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -14,7 +14,7 @@ private package VSS.JSON.Implementation.Numbers.Tables is
 
    Exact_Powers_Of_10 : constant
      array (Interfaces.Integer_32 range 0 .. 22) of Interfaces.IEEE_Float_64 :=
-     (1.0,                      --  10^0
+     [1.0,                      --  10^0
       10.0,
       100.0,
       1000.0,
@@ -36,7 +36,7 @@ private package VSS.JSON.Implementation.Numbers.Tables is
       10000000000000000000.0,
       100000000000000000000.0,  --  10^20
       1000000000000000000000.0,
-      10000000000000000000000.0);
+      10000000000000000000000.0];
 
    --   When mapping numbers from decimal to binary,
    --   we go from w * 10^q to m * 2^p but we have
@@ -67,7 +67,7 @@ private package VSS.JSON.Implementation.Numbers.Tables is
    Powers_Of_Five : constant
      array (Interfaces.Integer_32 range -342 .. 308)
        of Powers_Of_Five_Record :=
-       ((16#eef453d6923bd65a#, 16#113faa2906a13b3f#),
+       [(16#eef453d6923bd65a#, 16#113faa2906a13b3f#),
         (16#9558b4661b6565f8#, 16#4ac7ca59a424c507#),
         (16#baaee17fa23ebf76#, 16#5d79bcf00d2df649#),
         (16#e95a99df8ace6f53#, 16#f4d82c2c107973dc#),
@@ -717,6 +717,6 @@ private package VSS.JSON.Implementation.Numbers.Tables is
         (16#91d28b7416cdd27e#, 16#4cdc331d57fa5441#),
         (16#b6472e511c81471d#, 16#e0133fe4adf8e952#),
         (16#e3d8f9e563a198e5#, 16#58180fddd97723a6#),
-        (16#8e679c2f5e44ff8f#, 16#570f09eaa7ea7648#));
+        (16#8e679c2f5e44ff8f#, 16#570f09eaa7ea7648#)];
 
 end VSS.JSON.Implementation.Numbers.Tables;

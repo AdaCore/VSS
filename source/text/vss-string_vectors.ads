@@ -1,14 +1,10 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Vector of strings and operations on it.
-
-pragma Ada_2022;
---  GNAT: different versions of compiler use different pragmas to enable
---  Ada 2022 features.
 
 with Ada.Iterator_Interfaces;
 

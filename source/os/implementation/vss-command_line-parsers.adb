@@ -497,8 +497,9 @@ package body VSS.Command_Line.Parsers is
                end loop;
 
                Result.Append
-                 ((Image.Head_Before (Iterator),
-                   Image.Tail_After (Iterator)));
+                 (Name_Value'
+                  (Name  => Image.Head_Before (Iterator),
+                   Value => Image.Tail_After (Iterator)));
             end;
          end loop;
       end Parse;

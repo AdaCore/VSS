@@ -14,7 +14,7 @@ package VSS.Implementation.Line_Terminator is
 
    Sequence : constant
      array (VSS.Strings.Line_Terminator) of VSS.Strings.Virtual_String
-     := (VSS.Strings.CR =>
+     := [VSS.Strings.CR =>
            VSS.Strings.To_Virtual_String
              (Wide_Wide_String'
                   (1 => Wide_Wide_Character
@@ -51,6 +51,6 @@ package VSS.Implementation.Line_Terminator is
            VSS.Strings.To_Virtual_String
              (Wide_Wide_String'
                   (1 => Wide_Wide_Character
-                          (VSS.Characters.Punctuations.Paragraph_Separator))));
+                          (VSS.Characters.Punctuations.Paragraph_Separator)))];
 
 end VSS.Implementation.Line_Terminator;

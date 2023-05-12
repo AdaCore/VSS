@@ -14,3 +14,6 @@ project-files = ["gnat/vss_text.gpr", "gnat/vss_json.gpr"]
 [configuration]
 generate_ada = false
 generate_c = false
+
+[build-switches]
+"*".ada_version = "Ada2022"

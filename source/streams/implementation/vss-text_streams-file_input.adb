@@ -229,9 +229,9 @@ package body VSS.Text_Streams.File_Input is
       if Self.Stream = Interfaces.C_Streams.NULL_Stream then
          Self.Decoder.Initialize
            (Encoding,
-            (Stateless     => False,
+            [Stateless     => False,
              Stop_On_Error => False,
-             Process_BOM   => False));
+             Process_BOM   => False]);
 
          if not Self.Decoder.Is_Valid then
             Self.Error := "Unsupported encoding";

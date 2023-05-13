@@ -4,7 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-pragma Ada_2022;
 with VSS.Regular_Expressions.Category_Maps;
 
 package body VSS.Regular_Expressions.Name_Sets is

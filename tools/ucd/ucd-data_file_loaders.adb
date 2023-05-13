@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -295,7 +295,7 @@ package body UCD.Data_File_Loaders is
       Has_Separator : Boolean;
 
    begin
-      Self.Fields := (others => (1, 0));
+      Self.Fields := [others => (1, 0)];
 
       loop
          Self.Line_Last := 0;

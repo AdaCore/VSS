@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -26,7 +26,7 @@ private package VSS.Strings.Converters.Decoders.GB18030.Indices is
    Table : constant
      array (Interfaces.Unsigned_32 range 0 .. 23939)
        of Interfaces.Unsigned_16 :=
-         (0     => 16#4E02#,   --  丂 (<CJK Ideograph>)
+         [0     => 16#4E02#,   --  丂 (<CJK Ideograph>)
           1     => 16#4E04#,   --  丄 (<CJK Ideograph>)
           2     => 16#4E05#,   --  丅 (<CJK Ideograph>)
           3     => 16#4E06#,   --  丆 (<CJK Ideograph>)
@@ -23965,6 +23965,6 @@ private package VSS.Strings.Converters.Decoders.GB18030.Indices is
           23936 => 16#E4C2#,   --   (<Private Use>)
           23937 => 16#E4C3#,   --   (<Private Use>)
           23938 => 16#E4C4#,   --   (<Private Use>)
-          23939 => 16#E4C5#);  --   (<Private Use>)
+          23939 => 16#E4C5#];  --   (<Private Use>)
 
 end VSS.Strings.Converters.Decoders.GB18030.Indices;

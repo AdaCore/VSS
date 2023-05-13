@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,7 +11,7 @@ package body VSS.Strings.Converters.Decoders.ISO88592 is
    Mapping : constant
      array (Ada.Streams.Stream_Element range 16#A0# .. 16#FF#)
        of VSS.Unicode.Code_Point :=
-         (16#A0# => 16#00A0#,  --  NO-BREAK SPACE
+         [16#A0# => 16#00A0#,  --  NO-BREAK SPACE
           16#A1# => 16#0104#,  --  LATIN CAPITAL LETTER A WITH OGONEK
           16#A2# => 16#02D8#,  --  BREVE
           16#A3# => 16#0141#,  --  LATIN CAPITAL LETTER L WITH STROKE
@@ -106,7 +106,7 @@ package body VSS.Strings.Converters.Decoders.ISO88592 is
           16#FC# => 16#00FC#,  --  LATIN SMALL LETTER U WITH DIAERESIS
           16#FD# => 16#00FD#,  --  LATIN SMALL LETTER Y WITH ACUTE
           16#FE# => 16#0163#,  --  LATIN SMALL LETTER T WITH CEDILLA
-          16#FF# => 16#02D9#); --  DOT ABOVE
+          16#FF# => 16#02D9#]; --  DOT ABOVE
 
    ------------
    -- Decode --

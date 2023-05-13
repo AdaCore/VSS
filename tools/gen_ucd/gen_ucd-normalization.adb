@@ -1,10 +1,8 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
-
-pragma Ada_2022;
 
 with Ada.Containers;
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
@@ -183,9 +181,9 @@ package body Gen_UCD.Normalization is
 
       type Boolean_Array is array (UCD.Code_Point) of Boolean with Pack;
 
-      Is_Primary_Composite : Boolean_Array := (others => False);
-      Is_First_Code        : Boolean_Array := (others => False);
-      Is_Last_Code         : Boolean_Array := (others => False);
+      Is_Primary_Composite : Boolean_Array := [others => False];
+      Is_First_Code        : Boolean_Array := [others => False];
+      Is_Last_Code         : Boolean_Array := [others => False];
       --  Code point is first or last code point of decomposition mapping of
       --  primary composite character.
 
@@ -534,7 +532,7 @@ package body Gen_UCD.Normalization is
         array (Unsigned_6, Unsigned_9) of UCD.Code_Point;
 
       Raw_Composition_Mapping : Composition_Mapping :=
-        (others => (others => 0));
+        [others => [others => 0]];
 
       Max_Length  : Natural := 0;
       Max_UTF_8   : Natural := 0;
@@ -977,7 +975,7 @@ package body Gen_UCD.Normalization is
             Put (Image, Database.Mapping_Index_Element (Decomposition, J));
 
             if J = 0 then
-               Put (File, "       (");
+               Put (File, "       [");
 
             elsif J mod 10 = 0 then
                Put_Line (File, ",");
@@ -990,7 +988,7 @@ package body Gen_UCD.Normalization is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
       end Generate_Index_Table;
 
@@ -1148,7 +1146,7 @@ package body Gen_UCD.Normalization is
             Put (Image, Database.Mapping_Data_Element (J), 16);
 
             if J = 0 then
-               Put (File, "         (");
+               Put (File, "         [");
 
             elsif J mod 3 = 0 then
                Put_Line (File, ",");
@@ -1161,7 +1159,7 @@ package body Gen_UCD.Normalization is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
 
          Put_Line (File, "   Mapping_Data_Table :");
@@ -1198,7 +1196,7 @@ package body Gen_UCD.Normalization is
             Put (Image, Integer (Database.UTF_8_Data_Element (J)), 16);
 
             if J = 0 then
-               Put (File, "         (");
+               Put (File, "         [");
 
             elsif J mod 8 = 0 then
                Put_Line (File, ",");
@@ -1211,7 +1209,7 @@ package body Gen_UCD.Normalization is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
       end;
 
@@ -1249,7 +1247,7 @@ package body Gen_UCD.Normalization is
          "     constant array (Last_Mapping_Code_Offset,"
          & " First_Mapping_Code_Offset)");
       Put_Line (File, "       of VSS.Unicode.Code_Point :=");
-      Put (File, "        (");
+      Put (File, "        [");
 
       for L in 0 .. Database.Composition_Last_Index_Last loop
          if L /= 0 then
@@ -1258,7 +1256,7 @@ package body Gen_UCD.Normalization is
             Put (File, "         ");
          end if;
 
-         Put (File, "(");
+         Put (File, "[");
 
          for F in 0 .. Database.Composition_First_Index_Last loop
             declare
@@ -1286,10 +1284,10 @@ package body Gen_UCD.Normalization is
             end;
          end loop;
 
-         Put (File, ")");
+         Put (File, "]");
       end loop;
 
-      Put_Line (File, ");");
+      Put_Line (File, "];");
       New_Line (File);
 
       Put_Line (File, "end VSS.Implementation.UCD_Normalization_Common;");

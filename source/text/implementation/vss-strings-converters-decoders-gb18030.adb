@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -109,7 +109,7 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                when others =>
                   declare
                      Buffer : constant Ada.Streams.Stream_Element_Array :=
-                       (Second, Third, Byte);
+                       [Second, Third, Byte];
 
                   begin
                      First  := 0;
@@ -146,7 +146,7 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                when others =>
                   declare
                      Buffer : constant Ada.Streams.Stream_Element_Array :=
-                       (Second, Byte);
+                       [Second, Byte];
 
                   begin
                      First  := 0;

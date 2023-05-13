@@ -18,9 +18,7 @@ project VSS_Stream_Tests is
       "test_stream_element_vector.adb",
       "test_text_streams.adb");
 
-   package Compiler is
-      for Switches ("Ada") use ("-g", "-O2", "-gnatW8");
-   end Compiler;
+   package Compiler renames VSS_Test_Common.Compiler;
 
    package Binder is
       for Switches ("Ada") use ("-Wb");

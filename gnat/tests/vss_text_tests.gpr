@@ -43,8 +43,8 @@ project VSS_Text_Tests is
                  "test_word_iterators");
 
    package Compiler is
-      for Switches ("Ada") use VSS_Common.Ada_Switches & ("-gnatW8");
-      for Switches ("hello_world_data.adb") use ("-g", "-O2");
+      for Switches ("Ada") use VSS_Test_Common.Ada_Compiler_Switches;
+      for Switches ("hello_world_data.adb") use ("-g", "-O2", "-gnat2022");
    end Compiler;
 
    package Binder is

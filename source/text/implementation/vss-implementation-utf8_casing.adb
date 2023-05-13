@@ -312,7 +312,7 @@ package body VSS.Implementation.UTF8_Casing is
                      --  Replace by 03C2
 
                      VSS.Implementation.UTF8_String_Handlers.Unchecked_Append
-                       (Result_Data, (16#CF#, 16#82#), 0, 2, 1);
+                       (Result_Data, [16#CF#, 16#82#], 0, 2, 1);
                      Skip := True;
                   end if;
                end;

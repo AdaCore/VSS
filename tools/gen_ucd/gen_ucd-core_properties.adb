@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -602,7 +602,7 @@ package body Gen_UCD.Core_Properties is
          for J in 0 .. Database.Index_Last loop
             if First then
                First := False;
-               Put (File, "     (");
+               Put (File, "     [");
 
             elsif J mod 8 = 0 then
                Put_Line (File, ",");
@@ -616,7 +616,7 @@ package body Gen_UCD.Core_Properties is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
       end;
 
@@ -634,7 +634,7 @@ package body Gen_UCD.Core_Properties is
             Put (Image, Integer (Database.Data_Table_Element (J)), 16);
 
             if J = 0 then
-               Put (File, "     (");
+               Put (File, "     [");
 
             elsif J mod 6 = 0 then
                Put_Line (File, ",");
@@ -647,7 +647,7 @@ package body Gen_UCD.Core_Properties is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
 
          Put_Line

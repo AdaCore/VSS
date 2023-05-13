@@ -1,10 +1,8 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
-
-pragma Ada_2022;
 
 with Ada.Integer_Wide_Wide_Text_IO;     use Ada.Integer_Wide_Wide_Text_IO;
 with Ada.Strings;                       use Ada.Strings;
@@ -706,7 +704,7 @@ package body Gen_UCD.Casing is
             Put (Image, Database.Mapping_Index_Element (Mapping, J));
 
             if J = 0 then
-               Put (File, "       (");
+               Put (File, "       [");
 
             elsif J mod 10 = 0 then
                Put_Line (File, ",");
@@ -719,7 +717,7 @@ package body Gen_UCD.Casing is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
       end Generate_Index_Table;
 
@@ -914,7 +912,7 @@ package body Gen_UCD.Casing is
             Put (Image, Database.Mapping_Data_Element (J), 16);
 
             if J = 0 then
-               Put (File, "         (");
+               Put (File, "         [");
 
             elsif J mod 4 = 0 then
                Put_Line (File, ",");
@@ -927,7 +925,7 @@ package body Gen_UCD.Casing is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
 
          Put_Line (File, "   Simplified_Mapping_Data_Table :");
@@ -976,7 +974,7 @@ package body Gen_UCD.Casing is
             Put (Image, Integer (Database.UTF_8_Data_Element (J)), 16);
 
             if J = 0 then
-               Put (File, "         (");
+               Put (File, "         [");
 
             elsif J mod 8 = 0 then
                Put_Line (File, ",");
@@ -989,7 +987,7 @@ package body Gen_UCD.Casing is
             Put (File, Trim (Image, Both));
          end loop;
 
-         Put_Line (File, ");");
+         Put_Line (File, "];");
          New_Line (File);
       end;
 

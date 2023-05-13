@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -22,7 +22,7 @@ private package VSS.Strings.Converters.Decoders.Index_JIS0208 is
    Table : constant
      array (Interfaces.Unsigned_32 range 0 ..  11_103)
        of VSS.Unicode.Code_Point :=
-     (0      => 16#3000#,  --  　 (IDEOGRAPHIC SPACE)
+     [0      => 16#3000#,  --  　 (IDEOGRAPHIC SPACE)
       1      => 16#3001#,  --  、 (IDEOGRAPHIC COMMA)
       2      => 16#3002#,  --  。 (IDEOGRAPHIC FULL STOP)
       3      => 16#FF0C#,  --  ， (FULLWIDTH COMMA)
@@ -7747,6 +7747,6 @@ private package VSS.Strings.Converters.Decoders.Index_JIS0208 is
       11102  => 16#9E19#,  --  鸙 (<CJK Ideograph>)
       11103  => 16#9ED1#,  --  黑 (<CJK Ideograph>)
 
-      others => 0);
+      others => 0];
 
 end VSS.Strings.Converters.Decoders.Index_JIS0208;

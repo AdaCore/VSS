@@ -52,10 +52,10 @@ package VSS.Strings.Cursors.Iterators.Characters is
    function Forward
      (Self    : in out Character_Iterator;
       Element : out VSS.Characters.Virtual_Character'Base) return Boolean;
-   --  Move iterator one character forward, return True when new poisition
-   --  pointing to some character inside string data. Element is set to value
-   --  of the new pointing character, or to invalid character if new position
-   --  is outside of the string data.
+   --  Moves the iterator one character forward, returning True if the new
+   --  position points to any character within the string data. The element is
+   --  set to the value of the new pointing character, or to an invalid
+   --  character if the new position is outside of the string data.
 
 private
 

@@ -72,6 +72,32 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       return False;
    end Forward;
 
+   -------------
+   -- Forward --
+   -------------
+
+   function Forward
+     (Self    : in out Character_Iterator;
+      Element : out VSS.Characters.Virtual_Character'Base) return Boolean
+   is
+      Data   : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Code   : VSS.Unicode.Code_Point'Base :=
+        VSS.Implementation.String_Handlers.No_Character;
+      Result : Boolean := False;
+
+   begin
+      if Self.Owner /= null then
+         Result :=
+           VSS.Implementation.Strings.Handler
+             (Data).Forward_Element (Data, Self.Position, Code);
+      end if;
+
+      Element := VSS.Characters.Virtual_Character'Base'Val (Code);
+
+      return Result;
+   end Forward;
+
    -----------------
    -- Has_Element --
    -----------------

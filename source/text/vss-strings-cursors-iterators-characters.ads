@@ -47,6 +47,14 @@ package VSS.Strings.Cursors.Iterators.Characters is
    --  Initialize iterator to point after the last character of the given
    --  string.
 
+   function Forward
+     (Self    : in out Character_Iterator;
+      Element : out VSS.Characters.Virtual_Character'Base) return Boolean;
+   --  Move iterator one character forward, return True when new poisition
+   --  pointing to some character inside string data. Element is set to value
+   --  of the new pointing character, or to invalid character if new position
+   --  is outside of the string data.
+
 private
 
    type Character_Iterator is new Abstract_Character_Iterator with null record;

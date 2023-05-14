@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -205,6 +205,29 @@ package body VSS.Implementation.String_Handlers is
 
       return Aux.UTF8_Offset;
    end First_UTF8_Offset;
+
+   ---------------------
+   -- Forward_Element --
+   ---------------------
+
+   not overriding function Forward_Element
+     (Self     : Abstract_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor;
+      Element  : out VSS.Unicode.Code_Point'Base) return Boolean is
+   begin
+      if Abstract_String_Handler'Class (Self).Forward (Data, Position) then
+         Element :=
+           Abstract_String_Handler'Class (Self).Element (Data, Position);
+
+         return True;
+
+      else
+         Element := No_Character;
+
+         return False;
+      end if;
+   end Forward_Element;
 
    ----------
    -- Hash --

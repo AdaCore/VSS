@@ -80,7 +80,7 @@ package VSS.Implementation.String_Handlers is
      (Self     : Abstract_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point is abstract;
+      return VSS.Unicode.Code_Point'Base is abstract;
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
 

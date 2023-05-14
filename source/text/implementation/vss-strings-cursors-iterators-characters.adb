@@ -36,7 +36,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    function Element
      (Self : Character_Iterator'Class)
-      return VSS.Characters.Virtual_Character
+      return VSS.Characters.Virtual_Character'Base
    is
       Data : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
@@ -44,12 +44,14 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    begin
       if Self.Owner /= null then
          return
-           VSS.Characters.Virtual_Character'Val
+           VSS.Characters.Virtual_Character'Base'Val
              (VSS.Implementation.Strings.Handler
                 (Data).Element (Data, Self.Position));
       end if;
 
-      return VSS.Characters.Virtual_Character'Val (16#00_0000#);
+      return
+        VSS.Characters.Virtual_Character'Base'Val
+          (VSS.Implementation.String_Handlers.No_Character);
    end Element;
 
    -------------

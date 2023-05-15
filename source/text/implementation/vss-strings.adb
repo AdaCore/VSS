@@ -619,11 +619,14 @@ package body VSS.Strings is
    begin
       VSS.Implementation.Strings.Handler (Self.Data).Insert
         (Self.Data,
-         (1, 0, 0),
+         (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
          VSS.Characters.Virtual_Character'Pos (Item),
          Offset);
 
-      Self.Notify_String_Modified ((1, 0, 0), (0, 0, 0), Offset);
+      Self.Notify_String_Modified
+        ((Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
+         (Index_Offset => 0, UTF8_Offset => 0, UTF16_Offset => 0),
+         Offset);
    end Prepend;
 
    -------------
@@ -638,9 +641,15 @@ package body VSS.Strings is
 
    begin
       VSS.Implementation.Strings.Handler (Self.Data).Insert
-        (Self.Data, (1, 0, 0), Item.Data, Offset);
+        (Self.Data,
+         (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
+         Item.Data,
+         Offset);
 
-      Self.Notify_String_Modified ((1, 0, 0), (0, 0, 0), Offset);
+      Self.Notify_String_Modified
+        ((Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
+         (Index_Offset => 0, UTF8_Offset => 0, UTF16_Offset => 0),
+         Offset);
    end Prepend;
 
    ----------

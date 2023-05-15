@@ -631,7 +631,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
      (Self     : UTF8_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point
+      return VSS.Unicode.Code_Point'Base
    is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -641,7 +641,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
         or else Position.Index < 1
         or else Position.Index > Source.Length
       then
-         return 16#00_0000#;
+         return VSS.Implementation.String_Handlers.No_Character;
       end if;
 
       return
@@ -657,19 +657,17 @@ package body VSS.Implementation.UTF8_String_Handlers is
      (Self     : UTF8_In_Place_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point
+      return VSS.Unicode.Code_Point'Base
    is
       Source : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
 
    begin
-      --  raise Program_Error;
-
       if Position.Index < 1
         or else Position.Index
                   > VSS.Implementation.Strings.Character_Count (Source.Length)
       then
-         return 16#00_0000#;
+         return VSS.Implementation.String_Handlers.No_Character;
       end if;
 
       return
@@ -726,6 +724,72 @@ package body VSS.Implementation.UTF8_String_Handlers is
         Position.Index
           <= VSS.Implementation.Strings.Character_Count (Source.Length);
    end Forward;
+
+   ---------------------
+   -- Forward_Element --
+   ---------------------
+
+   overriding function Forward_Element
+     (Self     : UTF8_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor;
+      Element  : out VSS.Unicode.Code_Point'Base) return Boolean
+   is
+      Source : UTF8_String_Data_Access
+        with Import, Convention => Ada, Address => Data.Pointer'Address;
+      Code   : VSS.Unicode.Code_Point'Base :=
+        VSS.Implementation.String_Handlers.No_Character;
+      Result : Boolean := False;
+
+   begin
+      if Source /= null and then Position.Index <= Source.Length then
+         Unchecked_Forward (Source.Storage, Position);
+
+         if Position.Index <= Source.Length then
+            Code :=
+              VSS.Implementation.UTF8_Encoding.Unchecked_Decode
+                (Source.Storage, Position.UTF8_Offset);
+            Result := True;
+         end if;
+      end if;
+
+      Element := Code;
+
+      return Result;
+   end Forward_Element;
+
+   overriding function Forward_Element
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor;
+      Element  : out VSS.Unicode.Code_Point'Base) return Boolean
+   is
+      Source : constant UTF8_In_Place_Data
+        with Import, Convention => Ada, Address => Data'Address;
+      Code   : VSS.Unicode.Code_Point'Base :=
+        VSS.Implementation.String_Handlers.No_Character;
+      Result : Boolean := False;
+
+   begin
+      if Position.Index
+           <= VSS.Implementation.Strings.Character_Count (Source.Length)
+      then
+         Unchecked_Forward (Source.Storage, Position);
+
+         if Position.Index
+           <= VSS.Implementation.Strings.Character_Count (Source.Length)
+         then
+            Code :=
+              VSS.Implementation.UTF8_Encoding.Unchecked_Decode
+                (Source.Storage, Position.UTF8_Offset);
+            Result := True;
+         end if;
+      end if;
+
+      Element := Code;
+
+      return Result;
+   end Forward_Element;
 
    -----------------------
    -- From_UTF_8_String --

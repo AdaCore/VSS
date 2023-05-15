@@ -16,8 +16,10 @@ package VSS.Strings.Cursors.Iterators.Characters is
    type Character_Iterator is new Abstract_Character_Iterator with private;
 
    function Element
-     (Self : Character_Iterator'Class) return VSS.Characters.Virtual_Character;
-   --  Return character pointed by iterator.
+     (Self : Character_Iterator'Class)
+      return VSS.Characters.Virtual_Character'Base;
+   --  Return character pointed by iterator. Return invalid value when iterator
+   --  points outside of the text data.
 
    procedure Set_Before_First
      (Self : in out Character_Iterator;
@@ -46,6 +48,14 @@ package VSS.Strings.Cursors.Iterators.Characters is
       On   : VSS.Strings.Virtual_String'Class);
    --  Initialize iterator to point after the last character of the given
    --  string.
+
+   function Forward
+     (Self    : in out Character_Iterator;
+      Element : out VSS.Characters.Virtual_Character'Base) return Boolean;
+   --  Moves the iterator one character forward, returning True if the new
+   --  position points to any character within the string data. The element is
+   --  set to the value of the new pointing character, or to an invalid
+   --  character if the new position is outside of the string data.
 
 private
 

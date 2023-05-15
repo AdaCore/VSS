@@ -158,7 +158,9 @@ procedure Test_Characters is
         UCD.Properties.Resolve (Cased_Property, "N");
 
    begin
-      for Character in VSS.Characters.Virtual_Character'Range loop
+      for Character in VSS.Characters.Virtual_Character'First_Valid
+                         .. VSS.Characters.Virtual_Character'Last_Valid
+      loop
          --  General Category
 
          Test_Support.Assert
@@ -168,7 +170,9 @@ procedure Test_Characters is
 
          --  Lowercase
 
-         if VSS.Characters.Get_Lowercase (Character) then
+         if VSS.Characters.Is_Valid_Virtual_Character (Character)
+           and then VSS.Characters.Get_Lowercase (Character)
+         then
             Test_Support.Assert
               (UCD.Characters.Get
                  (VSS.Characters.Virtual_Character'Pos (Character),
@@ -183,7 +187,9 @@ procedure Test_Characters is
 
          --  Uppercase
 
-         if VSS.Characters.Get_Uppercase (Character) then
+         if VSS.Characters.Is_Valid_Virtual_Character (Character)
+           and then VSS.Characters.Get_Uppercase (Character)
+         then
             Test_Support.Assert
               (UCD.Characters.Get
                  (VSS.Characters.Virtual_Character'Pos (Character),
@@ -198,7 +204,9 @@ procedure Test_Characters is
 
          --  Cased
 
-         if VSS.Characters.Get_Cased (Character) then
+         if VSS.Characters.Is_Valid_Virtual_Character (Character)
+           and then VSS.Characters.Get_Cased (Character)
+         then
             Test_Support.Assert
               (UCD.Characters.Get
                  (VSS.Characters.Virtual_Character'Pos (Character),

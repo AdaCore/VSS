@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -71,7 +71,7 @@ procedure Test_Characters is
       GC_Mapping  : constant
         array (VSS.Characters.General_Category)
           of UCD.Properties.Property_Value_Access :=
-          (VSS.Characters.Uppercase_Letter =>
+          [VSS.Characters.Uppercase_Letter =>
              UCD.Properties.Resolve (GC_Property, "Lu"),
            VSS.Characters.Lowercase_Letter =>
              UCD.Properties.Resolve (GC_Property, "Ll"),
@@ -136,7 +136,7 @@ procedure Test_Characters is
            VSS.Characters.Private_Use =>
              UCD.Properties.Resolve (GC_Property, "Co"),
            VSS.Characters.Unassigned =>
-             UCD.Properties.Resolve (GC_Property, "Cn"));
+             UCD.Properties.Resolve (GC_Property, "Cn")];
 
       Lowercase_Property : constant UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("Lowercase");

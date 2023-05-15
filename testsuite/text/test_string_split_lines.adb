@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -119,7 +119,7 @@ begin
          raise Program_Error;
       end if;
 
-      if Result (2) /= VSS.Strings.To_Virtual_String ((1 => LF)) then
+      if Result (2) /= VSS.Strings.To_Virtual_String ([1 => LF]) then
          raise Program_Error;
       end if;
 
@@ -130,7 +130,7 @@ begin
          raise Program_Error;
       end if;
 
-      if Result (4) /= VSS.Strings.To_Virtual_String ((1 => CR)) then
+      if Result (4) /= VSS.Strings.To_Virtual_String ([1 => CR]) then
          raise Program_Error;
       end if;
 
@@ -151,7 +151,7 @@ begin
          raise Program_Error;
       end if;
 
-      if Result (8) /= VSS.Strings.To_Virtual_String ((1 => NEL)) then
+      if Result (8) /= VSS.Strings.To_Virtual_String ([1 => NEL]) then
          raise Program_Error;
       end if;
 
@@ -169,7 +169,7 @@ begin
       use type VSS.Strings.Virtual_String;
 
       Result : constant VSS.String_Vectors.Virtual_String_Vector :=
-        Source.Split_Lines ((others => True));
+        Source.Split_Lines ([others => True]);
 
    begin
       if Result.Length /= 17 then
@@ -315,7 +315,7 @@ begin
 
       Result : constant VSS.String_Vectors.Virtual_String_Vector :=
         CRLFCR.Split_Lines
-          ((VSS.Strings.CR | VSS.Strings.LF => True, others => False));
+          ([VSS.Strings.CR | VSS.Strings.LF => True, others => False]);
 
    begin
       if Result.Length /= 6 then

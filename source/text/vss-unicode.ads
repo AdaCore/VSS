@@ -39,4 +39,19 @@ package VSS.Unicode is
      UTF32_Code_Unit_Offset range 0 .. UTF32_Code_Unit_Offset'Last;
    subtype UTF32_Code_Unit_Index is UTF32_Code_Unit_Count;
 
+   subtype Code_Point_Character is Wide_Wide_Character
+     range Wide_Wide_Character'Val (16#00_0000#)
+             .. Wide_Wide_Character'Val (16#10_FFFF#);
+   --  Limits possible values to the range of the Unicode Code Points: any code
+   --  with value in range 16#00_0000# .. 16#10_FFFF#.
+
+   subtype Scalar_Value_Character is Code_Point_Character
+     with Static_Predicate =>
+       Scalar_Value_Character
+         not in Code_Point_Character'Val (16#D800#)
+                  .. Code_Point_Character'Val (16#DF00#);
+   --  Limits possible values to the range of the Unicode Scalar Values: any
+   --  Unicode code points outside of the surrogate range (16#00_D800# ..
+   --  16#DFFF#).
+
 end VSS.Unicode;

@@ -9,6 +9,58 @@ variables:
     export PATH=/it/e3/bin:$PATH
   - . ~/.aws_container_credentials
 
+.detect-branches:
+  #  Detects source and target branches.
+  #    ADACORE_CI_SOURCE_BRANCH is set to source branch (merge request, pull)
+  #    ADACORE_CI_TARGET_BRANCH is set to target branch of merge request, or 'master'/'edge' for pull
+  #    ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX is set to '-edge' when target repository is 'edge'
+  #    ADACORE_CI_ANOD_EDGE_QUALIFIER is set to '--qualifier=edge' when target repository is 'edge'
+  #    ADACORE_CI_SUBPROJECTS_ROOT is set to '/tmp' and may be overritten by script
+  - |
+      if [[ -n "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" ]]; then
+        ADACORE_CI_TARGET_BRANCH="$CI_MERGE_REQUEST_TARGET_BRANCH_NAME";
+      elif [[ "x$CI_COMMIT_BRANCH" == "xedge" ]]; then
+        ADACORE_CI_TARGET_BRANCH="edge";
+      else
+        ADACORE_CI_TARGET_BRANCH="master";
+      fi;
+      if [[ -n "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" ]]; then
+        ADACORE_CI_SOURCE_BRANCH="$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME";
+      else
+        ADACORE_CI_SOURCE_BRANCH="$CI_COMMIT_BRANCH";
+      fi;
+      if [[ "$ADACORE_CI_TARGET_BRANCH" == "edge" ]]; then
+        ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX="-edge";
+        ADACORE_CI_ANOD_EDGE_QUALIFIER="--qualifier=edge"
+      else
+        ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX="";
+        ADACORE_CI_ANOD_EDGE_QUALIFIER=""
+      fi
+      ADACORE_CI_SUBPROJECTS_ROOT=/tmp
+      echo "Source branch: $ADACORE_CI_SOURCE_BRANCH"
+      echo "Target branch: $ADACORE_CI_TARGET_BRANCH"
+      echo "Name suffix:   $ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX"
+      echo "Qualifier:     $ADACORE_CI_ANOD_EDGE_QUALIFIER"
+      echo "Subprojects:   $ADACORE_CI_SUBPROJECTS_ROOT"
+
+.checkout:
+  #  Variables:
+  #    ADACODE_CI_SUBPROJECTS_ROOT  - root directory to checkout repositories.
+  #    ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH - path component of the repository's URL.
+  #    ADACORE_CI_SUBPROJECT_NAME - name of the directory for subproject.
+  - |
+    AUX_PWD=`pwd`
+    cd $ADACORE_CI_SUBPROJECTS_ROOT
+    git clone $GIT_CLONE_BASE/$ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH $ADACORE_CI_SUBPROJECT_NAME
+    cd $ADACORE_CI_SUBPROJECT_NAME
+    if `git show-ref $ADACORE_CI_SOURCE_BRANCH > /dev/null`; then
+      git checkout $ADACORE_CI_SOURCE_BRANCH;
+    elif `git show-ref $ADACORE_CI_TARGET_BRANCH > /dev/null`; then
+      git checkout $ADACORE_CI_TARGET_BRANCH;
+    fi
+    anod vcs --sandbox-dir /it/wave --add-repo $ADACORE_CI_SUBPROJECT_NAME $ADACORE_CI_SUBPROJECTS_ROOT/$ADACORE_CI_SUBPROJECT_NAME
+    cd $AUX_PWD
+
 stages:
   - build_and_test
   - build_dependent
@@ -29,6 +81,7 @@ build_and_test:
     - if: $CI_COMMIT_BRANCH == 'edge' && $CI_COMMIT_TITLE =~ /Merge branch.*/
   script:
     - !reference [.basic-setup]
+    - !reference [.detect-branches]
 
     - |
       # Install GNAT (with gcov) and gcovr
@@ -71,15 +124,31 @@ build_als:
       when: manual
   script:
     - !reference [.basic-setup]
+    - !reference [.detect-branches]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/markdown
+      ADACORE_CI_SUBPROJECT_NAME=markdown
+    - !reference [.checkout]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
+      ADACORE_CI_SUBPROJECT_NAME=gnatdoc$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX
+    - !reference [.checkout]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/ada_language_server
+      ADACORE_CI_SUBPROJECT_NAME=ada_language_server$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX
+    - !reference [.checkout]
 
     - |
       cd /it/wave
 
       # Tell the anod sandbox to use our repository
-      anod vcs --add-repo vss $CI_PROJECT_DIR
+      anod vcs --add-repo vss$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX $CI_PROJECT_DIR
 
       # Build the ALS as a test
-      anod build als
+      anod build als $ADACORE_CI_ANOD_EDGE_QUALIFIER
 
 build_gs:
   services:
@@ -92,6 +161,27 @@ build_gs:
       when: manual
   script:
     - !reference [.basic-setup]
+    - !reference [.detect-branches]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/markdown
+      ADACORE_CI_SUBPROJECT_NAME=markdown
+    - !reference [.checkout]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
+      ADACORE_CI_SUBPROJECT_NAME=gnatdoc$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX
+    - !reference [.checkout]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/ada_language_server
+      ADACORE_CI_SUBPROJECT_NAME=ada_language_server$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX
+    - !reference [.checkout]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatstudio
+      ADACORE_CI_SUBPROJECT_NAME=gnatstudio$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX
+    - !reference [.checkout]
 
     - |
       cd /it/wave
@@ -100,7 +190,7 @@ build_gs:
       anod vcs --add-repo vss $CI_PROJECT_DIR
 
       # Build the ALS as a test
-      anod build gps
+      anod build gps $ADACORE_CI_ANOD_EDGE_QUALIFIER
 
 build_lsif:
   services:
@@ -115,15 +205,25 @@ build_lsif:
     - if: $CI_COMMIT_TAG
   script:
     - !reference [.basic-setup]
+    - !reference [.detect-branches]
 
     - |
       export GPR_PROJECT_PATH=`pwd`/gnat:$GPR_PROJECT_PATH
       mkdir subprojects
-      git clone $GIT_CLONE_BASE/eng/ide/gnatdoc subprojects/gnatdoc
-      export GPR_PROJECT_PATH=`pwd`/subprojects/gnatdoc/gnat:$GPR_PROJECT_PATH
-      git clone $GIT_CLONE_BASE/eng/ide/lsif-ada subprojects/lsif-ada
-      export GPR_PROJECT_PATH=`pwd`/subprojects/lsif-ada/gnat:$GPR_PROJECT_PATH
+      ADACORE_CI_SUBPROJECTS_ROOT=`pwd`/subprojects
 
+      export GPR_PROJECT_PATH=`pwd`/subprojects/gnatdoc/gnat:$GPR_PROJECT_PATH
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
+      ADACORE_CI_SUBPROJECT_NAME=gnatdoc
+    - !reference [.checkout]
+
+    - |
+      export GPR_PROJECT_PATH=`pwd`/subprojects/lsif-ada/gnat:$GPR_PROJECT_PATH
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/lsif-ada
+      ADACORE_CI_SUBPROJECT_NAME=lsif-ada
+    - !reference [.checkout]
+
+    - |
       anod install --sandbox-dir /it/wave stable-gnatall
       anod install --sandbox-dir /it/wave stable-langkit_support
       anod install --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare

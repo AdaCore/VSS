@@ -4,6 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+with Ada.Containers.Vectors;
+with Ada.Unchecked_Deallocation;
+
 with VSS.Regular_Expressions.ECMA_Parser;
 with VSS.Strings.Character_Iterators;
 with VSS.Implementation.Strings;
@@ -12,8 +15,20 @@ with VSS.Regular_Expressions.Matches;
 with VSS.Strings.Cursors.Markers.Internals;
 with VSS.Strings.Internals;
 with VSS.Implementation.String_Handlers;
+with VSS.Unicode;
 
 package body VSS.Regular_Expressions.Pike_Engines is
+
+   pragma Suppress (Container_Checks);
+
+   package Instruction_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Instruction_Address,
+      Element_Type => Instruction);
+
+   package Address_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Positive,
+      Element_Type => Instruction_Address);
+   --  List of instruction addresses
 
    -------------------------
    -- Capture_Group_Count --
@@ -37,20 +52,55 @@ package body VSS.Regular_Expressions.Pike_Engines is
    is
       use type VSS.Characters.Virtual_Character;
 
+      type Uninitialized_Cursor is record
+         Index        : VSS.Implementation.Strings.Character_Count;
+         UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Offset;
+         UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Offset;
+      end record;
+      --  This is the same record as VSS.Implementation.Strings.Cursor, but
+      --  without initialization. It helps when we preallocate thread states
+      --  because it could contain a lot of cursors.
+
       type Tag_Array is array (1 .. Self.Last_Tag) of
-        VSS.Implementation.Strings.Cursor;
+        Uninitialized_Cursor;
       --  First two items represent whole match boundaries, while others
       --  represent groups boundaries.
       --  Odd items represent left boundaries, even items - right.
       --  Even items point to next character after the bound.
 
-      Unset_Tags : constant Tag_Array := (1 .. Self.Last_Tag => <>);
+      Invalid_Cursor : constant VSS.Implementation.Strings.Cursor :=
+        (others => <>);
+      --  Cursor pointing nowhere.
+
+      Invalid : constant Uninitialized_Cursor :=
+        (Index        => Invalid_Cursor.Index,
+         UTF8_Offset  => Invalid_Cursor.UTF8_Offset,
+         UTF16_Offset => Invalid_Cursor.UTF16_Offset);
+      --  The Invalid_Cursor value converted to Uninitialized_Cursor type
+
+      Unset_Tags : constant Tag_Array := [1 .. Self.Last_Tag => Invalid];
       --  All unset tags have invalid values by default
 
       type Thread_State is record
          PC   : Instruction_Address;
          Tags : Tag_Array;
       end record;
+      --  State of one execution thread has next instruction address and known
+      --  tags (regexp subgroup boundaries).
+
+      type Thread_State_Array is array (Positive range <>) of Thread_State;
+
+      type Thread_State_List is record
+         List : Thread_State_Array (1 .. Self.Max_Threads);
+         Last : Natural := 0;  --  Last assigned item in the List
+      end record;
+
+      type Thread_State_List_Index is range 0 .. 1;
+      --  We keep only two state lists, current and next
+      type Thread_State_List_Pair is
+        array (Thread_State_List_Index) of Thread_State_List;
+      --  Active threads (for the current position) and threads to run in the
+      --  next position.
 
       procedure Step_Backward
         (Text : VSS.Strings.Virtual_String'Class;
@@ -58,13 +108,12 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  Shift Cursor one character backward in string Text
 
       procedure Append_State
-        (Cursor   : VSS.Strings.Character_Iterators.Character_Iterator;
-         Prev     : VSS.Characters.Virtual_Character;
-         PC       : Instruction_Address;
-         New_Tags : Tag_Array);
-      --  This procedure finds all states reachable from the given PC by
+        (Prev     : VSS.Characters.Virtual_Character;
+         New_Tags : Tag_Array;
+         From     : Instruction_Address);
+      --  This procedure finds all states reachable from the given PC (From) by
       --  non-character instructions and appends new thread states to the
-      --  Next global variable. Cursor points to a next unprocessed character
+      --  next state list. Cursor points to a next unprocessed character
       --  if any. Prev is a previous character if Cursor isn't the first
       --  character of the subject.
 
@@ -78,34 +127,51 @@ package body VSS.Regular_Expressions.Pike_Engines is
         (Cursor : in out VSS.Strings.Character_Iterators.Character_Iterator);
       --  Iterate over all characters of the Subject using Cursor
 
-      package State_Vectors is new Ada.Containers.Vectors
-        (Positive, Thread_State);
+      procedure Append_One_State (Value : Thread_State);
+      --  Append one Thread_State to next state list.
 
-      --  Active and Next contains only Match instructions or instructions
-      --  accepting a character.
+      States     : Thread_State_List_Pair;
+      Current    : Thread_State_List_Index := 0;
+      --  Index of the current state list in States
+      function Previous return Thread_State_List_Index is (1 - Current);
+      --  Index of the previous/next state list in States
 
-      Active     : State_Vectors.Vector;
-      --  Active threads in the current position
-      Next       : State_Vectors.Vector;
-      --  Threads to run in the next position
       Found      : Boolean := False;
       --  Some match has been found
       Final_Tags : Tag_Array;
       --  If a match has been found, corresponding tag values
 
+      Program : Instruction_Array renames Self.Program.all;
+
       Step  : Natural := 1;
-      Steps : array (1 .. Self.Program.Last_Index) of Natural := [others => 0];
+      Steps : array (Program'Range) of Natural := [others => 0];
       --  A filter to protect the Next from duplicated states
+
+      Cursor : VSS.Strings.Character_Iterators.Character_Iterator;
+
+      Pos : constant not null
+        VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
+          VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (Cursor);
+
+      ----------------------
+      -- Append_One_State --
+      ----------------------
+
+      procedure Append_One_State (Value : Thread_State) is
+         Next : Thread_State_List renames States (Previous);
+      begin
+         Next.Last := @ + 1;
+         Next.List (Next.Last) := Value;
+      end Append_One_State;
 
       ------------------
       -- Append_State --
       ------------------
 
       procedure Append_State
-        (Cursor   : VSS.Strings.Character_Iterators.Character_Iterator;
-         Prev     : VSS.Characters.Virtual_Character;
-         PC       : Instruction_Address;
-         New_Tags : Tag_Array)
+        (Prev     : VSS.Characters.Virtual_Character;
+         New_Tags : Tag_Array;
+         From     : Instruction_Address)
       is
          function Is_Valid_Assertion (Kind : Simple_Assertion_Kind)
            return Boolean;
@@ -125,7 +191,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
          begin
             case Kind is
                when Start_Of_Line =>
-                  return Cursor.Character_Index = From.First_Character_Index;
+                  return Cursor.Character_Index
+                           = Match.From.First_Character_Index;
                when End_Of_Line =>
                   return not Cursor.Has_Element;
                when Word_Boundary =>
@@ -138,43 +205,50 @@ package body VSS.Regular_Expressions.Pike_Engines is
             end case;
          end Is_Valid_Assertion;
 
-         Code : constant Instruction := Self.Program (PC);
-         Next : constant Instruction_Address := PC + Code.Next;
+         PC   : Instruction_Address := From;
+         Code : Instruction;
 
       begin
-         if Steps (PC) = Step then
-            return;  --  Skip already processed PC
-         end if;
+         while Steps (PC) /= Step loop --  Skip already processed PC
 
-         Steps (PC) := Step;
+            Steps (PC) := Step;
+            Code := Self.Program (PC);
 
-         case Code.Kind is
-            when Character | Class | Category | Negate_Class | Match =>
-               Match.Next.Append (Thread_State'(PC, New_Tags));
-            when Split =>
-               Append_State (Cursor, Prev, Next, New_Tags);
-               Append_State (Cursor, Prev, PC + Code.Fallback, New_Tags);
-            when Save =>
-               declare
-                  Updated : Tag_Array := New_Tags;
+            case Code.Kind is
+               when Character | Class | Category | Negate_Class | Match =>
+                  Append_One_State (Thread_State'(PC, New_Tags));
+                  exit;
 
-                  Pos : constant not null
-                    VSS.Strings.Cursors.Internals.Cursor_Constant_Access :=
-                     VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
-                       (Cursor);
-               begin
-                  Updated (Code.Tag) := Pos.all;
-                  --  Reset nested subgroup tags if any:
-                  Updated (Code.Tag + 1 .. Code.Last) := [others => <>];
-                  Append_State (Cursor, Prev, Next, Updated);
-               end;
-            when Assertion =>
-               if Is_Valid_Assertion (Code.Assertion) then
-                  Append_State (Cursor, Prev, Next, New_Tags);
-               end if;
-            when No_Operation =>
-               Append_State (Cursor, Prev, Next, New_Tags);
-         end case;
+               when Split =>
+                  Append_State (Prev, New_Tags, PC + Code.Next);
+                  PC := PC + Code.Fallback;
+
+               when Save =>
+                  declare
+                     Updated : Tag_Array := New_Tags;
+
+                  begin
+                     Updated (Code.Tag) :=
+                       (Index        => Pos.Index,
+                        UTF8_Offset  => Pos.UTF8_Offset,
+                        UTF16_Offset => Pos.UTF16_Offset);
+
+                     --  Reset nested subgroup tags if any:
+                     Updated (Code.Tag + 1 .. Code.Last) :=
+                       [others => Invalid];
+
+                     Append_State (Prev, Updated, PC + Code.Next);
+                     exit;
+                  end;
+
+               when Assertion =>
+                  exit when not Is_Valid_Assertion (Code.Assertion);
+                  PC := PC + Code.Next;
+
+               when No_Operation =>
+                  PC := PC + Code.Next;
+            end case;
+         end loop;
       end Append_State;
 
       ------------------------
@@ -223,11 +297,13 @@ package body VSS.Regular_Expressions.Pike_Engines is
                --  Shift Cursor, so it points to the next character after Char
                Again : constant Boolean := Cursor.Forward;
             begin
-               Active.Move (Source => Next);  --  Assign Next to Active
+               --  Swap state lists
+               States (Current).Last := 0;
+               Current := Previous;
                Step := Step + 1;
 
                --  Run each active thread
-               for X of Active loop
+               for X of States (Current).List (1 .. States (Current).Last) loop
                   declare
                      Code : constant Instruction := Self.Program (X.PC);
                      Next : constant Instruction_Address := X.PC + Code.Next;
@@ -235,12 +311,12 @@ package body VSS.Regular_Expressions.Pike_Engines is
                      case Code.Kind is
                         when Character =>
                            if Code.Character = Char then
-                              Append_State (Cursor, Char, Next, X.Tags);
+                              Append_State (Char, X.Tags, Next);
                            end if;
 
                         when Class =>
                            if Char in Code.From .. Code.To then
-                              Append_State (Cursor, Char, Next, X.Tags);
+                              Append_State (Char, X.Tags, Next);
                            end if;
 
                         when Category =>
@@ -248,12 +324,12 @@ package body VSS.Regular_Expressions.Pike_Engines is
                                (Code.Category,
                                 VSS.Characters.Get_General_Category (Char))
                            then
-                              Append_State (Cursor, Char, Next, X.Tags);
+                              Append_State (Char, X.Tags, Next);
                            end if;
 
                         when Negate_Class =>
                            if not Character_In_Class (X.PC + 1, Char) then
-                              Append_State (Cursor, Char, Next, X.Tags);
+                              Append_State (Char, X.Tags, Next);
                            end if;
 
                         when Match =>
@@ -267,12 +343,13 @@ package body VSS.Regular_Expressions.Pike_Engines is
                   end;
                end loop;
 
-               exit when not Again or (Next.Is_Empty and Found);
+               exit when not Again
+                 or (States (Previous).Last = 0 and Found);
 
                if not Found and not Options (Anchored_Match) then
                   --  Start new thread from the current character if we haven't
                   --  found any match yet nor we are in anchored match.
-                  Append_State (Cursor, Char, 1, Unset_Tags);
+                  Append_State (Char, Unset_Tags, 1);
                end if;
             end;
          end loop;
@@ -307,24 +384,20 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       use type VSS.Strings.Character_Count;
 
-      Cursor : VSS.Strings.Character_Iterators.Character_Iterator;
-
    begin
       Cursor.Set_At (From.First_Marker);
-      Active.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
-      Next.Reserve_Capacity (Ada.Containers.Count_Type (Self.Max_Threads));
 
       --  Start a new thread at the beginning of the sample
-      Append_State (Cursor, ' ', 1, Unset_Tags);
+      Append_State (' ', Unset_Tags, 1);
 
       if Cursor.Has_Element then
          Loop_Over_Characters (Cursor);
       end if;
 
-      Active.Move (Source => Next);
+      Current := Previous;
 
       --  Find a reached final state
-      for X of Active loop
+      for X of States (Current).List (1 .. States (Current).Last) loop
          declare
             Code : constant Instruction := Self.Program (X.PC);
          begin
@@ -356,11 +429,15 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
             for J in Result.Markers'Range loop
                declare
-                  From : VSS.Implementation.Strings.Cursor renames
-                    Final_Tags (Index);
+                  From : constant VSS.Implementation.Strings.Cursor :=
+                    (Index        => Final_Tags (Index).Index,
+                     UTF8_Offset  => Final_Tags (Index).UTF8_Offset,
+                     UTF16_Offset => Final_Tags (Index).UTF16_Offset);
 
-                  To   : VSS.Implementation.Strings.Cursor renames
-                    Final_Tags (Index + 1);
+                  To   : VSS.Implementation.Strings.Cursor :=
+                    (Index        => Final_Tags (Index + 1).Index,
+                     UTF8_Offset  => Final_Tags (Index + 1).UTF8_Offset,
+                     UTF16_Offset => Final_Tags (Index + 1).UTF16_Offset);
                begin
                   Step_Backward (Result.Get_Owner.all, To);
 
@@ -385,8 +462,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
    ----------------
 
    overriding procedure On_Destroy (Self : in out Engine) is
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Instruction_Array, Instruction_Array_Access);
    begin
-      null;
+      Free (Self.Program);
    end On_Destroy;
 
    -----------
@@ -400,11 +479,6 @@ package body VSS.Regular_Expressions.Pike_Engines is
       Fit     : out Boolean)
    is
       use type Instruction_Vectors.Vector;
-
-      package Address_Vectors is new Ada.Containers.Vectors
-        (Index_Type   => Positive,
-         Element_Type => Instruction_Address);
-      --  List of instruction addresses
 
       --  For each AST subtree we generate a piece of program.
       --  Some instructions in the piece are left unlinked.
@@ -741,7 +815,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       Final : constant Instruction := (Kind => Match, Next => 0);
 
-      Max_Threads : Natural := 1;  --  threads required to execute
+      Max_Threads : Natural := 1;  --  One for Match instruction
       Error       : VSS.Strings.Virtual_String;
       Root        : Node;
       Cursor      : VSS.Strings.Character_Iterators.Character_Iterator :=
@@ -755,15 +829,29 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Error  => Error,
          Result => Root);
 
-      for Code of Root.Program loop
-         if Code.Kind in Character | Class then
-            Max_Threads := Max_Threads + 1;
-         end if;
+      Self.Program := new Instruction_Array (1 .. Root.Program.Last_Index + 3);
+      Self.Program (1) := Save_1;
+
+      for J in 1 .. Root.Program.Last_Index loop
+         declare
+            Code : constant Instruction := Root.Program.Element (J);
+         begin
+            Self.Program (J + 1) := Code;
+
+            for Code of Root.Program loop
+               if Code.Kind in Character .. Negate_Class then
+                  --  Increment for each character instruction
+                  Max_Threads := Max_Threads + 1;
+               end if;
+            end loop;
+         end;
       end loop;
 
       Self.Initialize (Options, Error, Pattern);
       Self.Max_Threads := Max_Threads;
-      Self.Program := Save_1 & Root.Program & Save_2 & Final;
+
+      Self.Program (Self.Program'Last - 1) := Save_2;
+      Self.Program (Self.Program'Last) :=  Final;
 
       --  Patch ends to connect them to Save_2
       for J of Root.Ends loop

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -44,8 +44,8 @@ procedure Test_GB18030_Decoder is
       Comment    : VSS.Strings.Virtual_String)
    is
       Encoded     : constant Ada.Streams.Stream_Element_Array (1 .. 1) :=
-        (1 => Byte);
-      Code_Points : constant Code_Point_Array (1 .. 1) := (1 => Code_Point);
+        [1 => Byte];
+      Code_Points : constant Code_Point_Array (1 .. 1) := [1 => Code_Point];
 
    begin
       Test (Encoded, Code_Points, Has_Error, Comment);
@@ -61,7 +61,7 @@ procedure Test_GB18030_Decoder is
       Has_Error  : Boolean;
       Comment    : VSS.Strings.Virtual_String)
    is
-      Code_Points : constant Code_Point_Array (1 .. 1) := (1 => Code_Point);
+      Code_Points : constant Code_Point_Array (1 .. 1) := [1 => Code_Point];
 
    begin
       Test (Encoded, Code_Points, Has_Error, Comment);
@@ -93,7 +93,7 @@ procedure Test_GB18030_Decoder is
    end record;
 
    Ranges : constant array (Natural range <>) of Range_Record :=
-     ((0,      16#0080#),
+     [(0,      16#0080#),
       (36,     16#00A5#),
       (38,     16#00A9#),
       (45,     16#00B2#),
@@ -299,7 +299,7 @@ procedure Test_GB18030_Decoder is
       (39116,  16#FE6C#),
       (39265,  16#FF5F#),
       (39394,  16#FFE6#),
-      (189000, 16#1_0000#));
+      (189000, 16#1_0000#)];
 
 begin
    --  Tests based on Web Platform Tests, see
@@ -311,62 +311,62 @@ begin
    Test (16#FF#, 16#FFFD#, True, "initial byte out of accepted ranges");
    Test (16#81#, 16#FFFD#, True, "end of queue, gb18030 first not 0");
    Test
-     ((16#81#, 16#28#),
-      (16#FFFD#, VSS.Characters.Virtual_Character'Pos ('(')),
+     ([16#81#, 16#28#],
+      [16#FFFD#, VSS.Characters.Virtual_Character'Pos ('(')],
       True,
       "two bytes 0x81 0x28");
-   Test ((16#81#, 16#40#), 16#4E02#, False, "two bytes 0x81 0x40");
-   Test ((16#81#, 16#7E#), 16#4E8A#, False, "two bytes 0x81 0x7e");
-   Test ((16#81#, 16#7F#), (16#FFFD#, 16#007F#), True, "two bytes 0x81 0x7f");
-   Test ((16#81#, 16#80#), 16#4E90#, False, "two bytes 0x81 0x80");
-   Test ((16#81#, 16#FE#), 16#4FA2#, False, "two bytes 0x81 0xFE");
-   Test ((16#81#, 16#FF#), 16#FFFD#, True, "two bytes 0x81 0xFF");
-   Test ((16#FE#, 16#40#), 16#FA0C#, False, "two bytes 0xFE 0x40");
-   Test ((16#FE#, 16#FE#), 16#E4C5#, False, "two bytes 0xFE 0xFE");
-   Test ((16#FE#, 16#FF#), 16#FFFD#, True, "two bytes 0xFE 0xFF");
-   Test ((16#81#, 16#30#), 16#FFFD#, True, "two bytes 0x81 0x30");
+   Test ([16#81#, 16#40#], 16#4E02#, False, "two bytes 0x81 0x40");
+   Test ([16#81#, 16#7E#], 16#4E8A#, False, "two bytes 0x81 0x7e");
+   Test ([16#81#, 16#7F#], [16#FFFD#, 16#007F#], True, "two bytes 0x81 0x7f");
+   Test ([16#81#, 16#80#], 16#4E90#, False, "two bytes 0x81 0x80");
+   Test ([16#81#, 16#FE#], 16#4FA2#, False, "two bytes 0x81 0xFE");
+   Test ([16#81#, 16#FF#], 16#FFFD#, True, "two bytes 0x81 0xFF");
+   Test ([16#FE#, 16#40#], 16#FA0C#, False, "two bytes 0xFE 0x40");
+   Test ([16#FE#, 16#FE#], 16#E4C5#, False, "two bytes 0xFE 0xFE");
+   Test ([16#FE#, 16#FF#], 16#FFFD#, True, "two bytes 0xFE 0xFF");
+   Test ([16#81#, 16#30#], 16#FFFD#, True, "two bytes 0x81 0x30");
    Test
-     ((16#81#, 16#30#, 16#FE#), 16#FFFD#, True, "three bytes 0x81 0x30 0xFE");
+     ([16#81#, 16#30#, 16#FE#], 16#FFFD#, True, "three bytes 0x81 0x30 0xFE");
    Test
-     ((16#81#, 16#30#, 16#FF#),
-      (16#FFFD#, VSS.Characters.Virtual_Character'Pos ('0'), 16#FFFD#),
+     ([16#81#, 16#30#, 16#FF#],
+      [16#FFFD#, VSS.Characters.Virtual_Character'Pos ('0'), 16#FFFD#],
       True,
       "three bytes 0x81 0x30 0xFF");
    Test
-     ((16#81#, 16#30#, 16#FE#, 16#29#),
-      (16#FFFD#,
+     ([16#81#, 16#30#, 16#FE#, 16#29#],
+      [16#FFFD#,
        VSS.Characters.Virtual_Character'Pos ('0'),
        16#FFFD#,
-       VSS.Characters.Virtual_Character'Pos (')')),
+       VSS.Characters.Virtual_Character'Pos (')')],
       True,
       "four bytes 0x81 0x30 0xFE 0x29");
    Test
-     ((16#FE#, 16#39#, 16#FE#, 16#39#),
+     ([16#FE#, 16#39#, 16#FE#, 16#39#],
       16#FFFD#,
       True,
       "four bytes 0xFE 0x39 0xFE 0x39");
    Test
-     ((16#81#, 16#35#, 16#F4#, 16#36#),
+     ([16#81#, 16#35#, 16#F4#, 16#36#],
       16#1E3E#,
       False,
       "pointer 7458");
-   Test ((16#81#, 16#35#, 16#F4#, 16#37#), 16#E7C7#, False, "pointer 7457");
-   Test ((16#81#, 16#35#, 16#F4#, 16#38#), 16#1E40#, False, "pointer 7459");
-   Test ((16#84#, 16#31#, 16#A4#, 16#39#), 16#FFFF#, False, "pointer 39419");
-   Test ((16#84#, 16#31#, 16#A5#, 16#30#), 16#FFFD#, True, "pointer 39420");
-   Test ((16#8F#, 16#39#, 16#FE#, 16#39#), 16#FFFD#, True, "pointer 189999");
+   Test ([16#81#, 16#35#, 16#F4#, 16#37#], 16#E7C7#, False, "pointer 7457");
+   Test ([16#81#, 16#35#, 16#F4#, 16#38#], 16#1E40#, False, "pointer 7459");
+   Test ([16#84#, 16#31#, 16#A4#, 16#39#], 16#FFFF#, False, "pointer 39419");
+   Test ([16#84#, 16#31#, 16#A5#, 16#30#], 16#FFFD#, True, "pointer 39420");
+   Test ([16#8F#, 16#39#, 16#FE#, 16#39#], 16#FFFD#, True, "pointer 189999");
    Test
-     ((16#90#, 16#30#, 16#81#, 16#30#), 16#1_0000#, False, "pointer 189000");
+     ([16#90#, 16#30#, 16#81#, 16#30#], 16#1_0000#, False, "pointer 189000");
    Test
-     ((16#E3#, 16#32#, 16#9A#, 16#35#), 16#10_FFFF#, False, "pointer 1237575");
-   Test ((16#E3#, 16#32#, 16#9A#, 16#36#), 16#FFFD#, True, "pointer 1237576");
+     ([16#E3#, 16#32#, 16#9A#, 16#35#], 16#10_FFFF#, False, "pointer 1237575");
+   Test ([16#E3#, 16#32#, 16#9A#, 16#36#], 16#FFFD#, True, "pointer 1237576");
    Test
-     ((16#83#, 16#36#, 16#C8#, 16#30#),
+     ([16#83#, 16#36#, 16#C8#, 16#30#],
       16#E7C8#,
       False,
       "legacy ICU special case 1");
-   Test ((16#A1#, 16#AD#), 16#2026#, False, "legacy ICU special case 2");
-   Test ((16#A1#, 16#AB#), 16#FF5E#, False, "legacy ICU special case 3");
+   Test ([16#A1#, 16#AD#], 16#2026#, False, "legacy ICU special case 2");
+   Test ([16#A1#, 16#AB#], 16#FF5E#, False, "legacy ICU special case 3");
 
    for J in Ranges'Range loop
       declare
@@ -374,10 +374,10 @@ begin
 
          Pointer : constant Interfaces.Unsigned_32 := Ranges (J).Pointer;
          Encoded : constant Ada.Streams.Stream_Element_Array (1 .. 4) :=
-           (Ada.Streams.Stream_Element (Pointer / 12600 + 16#81#),
+           [Ada.Streams.Stream_Element (Pointer / 12600 + 16#81#),
             Ada.Streams.Stream_Element ((Pointer mod 12600) / 1260 + 16#30#),
             Ada.Streams.Stream_Element ((Pointer mod 1260) / 10 + 16#81#),
-            Ada.Streams.Stream_Element (Pointer mod 10 + 16#30#));
+            Ada.Streams.Stream_Element (Pointer mod 10 + 16#30#)];
 
       begin
          Test

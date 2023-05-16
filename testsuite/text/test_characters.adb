@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -71,7 +71,7 @@ procedure Test_Characters is
       GC_Mapping  : constant
         array (VSS.Characters.General_Category)
           of UCD.Properties.Property_Value_Access :=
-          (VSS.Characters.Uppercase_Letter =>
+          [VSS.Characters.Uppercase_Letter =>
              UCD.Properties.Resolve (GC_Property, "Lu"),
            VSS.Characters.Lowercase_Letter =>
              UCD.Properties.Resolve (GC_Property, "Ll"),
@@ -136,7 +136,7 @@ procedure Test_Characters is
            VSS.Characters.Private_Use =>
              UCD.Properties.Resolve (GC_Property, "Co"),
            VSS.Characters.Unassigned =>
-             UCD.Properties.Resolve (GC_Property, "Cn"));
+             UCD.Properties.Resolve (GC_Property, "Cn")];
 
       Lowercase_Property : constant UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("Lowercase");
@@ -158,7 +158,9 @@ procedure Test_Characters is
         UCD.Properties.Resolve (Cased_Property, "N");
 
    begin
-      for Character in VSS.Characters.Virtual_Character'Range loop
+      for Character in VSS.Characters.Virtual_Character'First_Valid
+                         .. VSS.Characters.Virtual_Character'Last_Valid
+      loop
          --  General Category
 
          Test_Support.Assert
@@ -168,7 +170,9 @@ procedure Test_Characters is
 
          --  Lowercase
 
-         if VSS.Characters.Get_Lowercase (Character) then
+         if VSS.Characters.Is_Valid_Virtual_Character (Character)
+           and then VSS.Characters.Get_Lowercase (Character)
+         then
             Test_Support.Assert
               (UCD.Characters.Get
                  (VSS.Characters.Virtual_Character'Pos (Character),
@@ -183,7 +187,9 @@ procedure Test_Characters is
 
          --  Uppercase
 
-         if VSS.Characters.Get_Uppercase (Character) then
+         if VSS.Characters.Is_Valid_Virtual_Character (Character)
+           and then VSS.Characters.Get_Uppercase (Character)
+         then
             Test_Support.Assert
               (UCD.Characters.Get
                  (VSS.Characters.Virtual_Character'Pos (Character),
@@ -198,7 +204,9 @@ procedure Test_Characters is
 
          --  Cased
 
-         if VSS.Characters.Get_Cased (Character) then
+         if VSS.Characters.Is_Valid_Virtual_Character (Character)
+           and then VSS.Characters.Get_Cased (Character)
+         then
             Test_Support.Assert
               (UCD.Characters.Get
                  (VSS.Characters.Virtual_Character'Pos (Character),

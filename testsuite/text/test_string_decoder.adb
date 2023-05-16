@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -123,7 +123,7 @@ procedure Test_String_Decoder is
          Result.Append
            (Decoder.Decode
               (VSS.Stream_Element_Vectors.Conversions
-                 .To_Stream_Element_Vector ((1 => Encoded (J))),
+                 .To_Stream_Element_Vector ([1 => Encoded (J)]),
                J = Encoded.Length));
       end loop;
 

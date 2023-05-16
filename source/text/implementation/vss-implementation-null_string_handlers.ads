@@ -69,7 +69,7 @@ package VSS.Implementation.Null_String_Handlers is
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point
+      return VSS.Unicode.Code_Point'Base
       with Pre => not Data.In_Place and then Data.Handler = null;
 
    overriding function Has_Character

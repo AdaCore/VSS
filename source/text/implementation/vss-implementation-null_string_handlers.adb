@@ -13,9 +13,11 @@ package body VSS.Implementation.Null_String_Handlers is
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
    Before_First_Character_Cursor : constant
-     VSS.Implementation.Strings.Cursor := (0, -1, -1);
+     VSS.Implementation.Strings.Cursor :=
+       (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
    After_Last_Character_Cursor   : constant
-     VSS.Implementation.Strings.Cursor := (1, 0, 0);
+     VSS.Implementation.Strings.Cursor :=
+       (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
    --  These are only two possible positions of the cursor for null string.
 
    --------------------------
@@ -108,7 +110,8 @@ package body VSS.Implementation.Null_String_Handlers is
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point is (0);
+      return VSS.Unicode.Code_Point'Base is
+        (VSS.Implementation.String_Handlers.No_Character);
 
    ---------------
    -- Ends_With --

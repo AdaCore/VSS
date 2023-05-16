@@ -70,7 +70,7 @@ package VSS.Implementation.UTF8_String_Handlers is
      (Self     : UTF8_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point;
+      return VSS.Unicode.Code_Point'Base;
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
 
@@ -96,6 +96,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
+
+   overriding function Forward_Element
+     (Self     : UTF8_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor;
+      Element  : out VSS.Unicode.Code_Point'Base) return Boolean;
 
    overriding function Backward
      (Self     : UTF8_String_Handler;
@@ -224,7 +230,7 @@ package VSS.Implementation.UTF8_String_Handlers is
      (Self     : UTF8_In_Place_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point;
+      return VSS.Unicode.Code_Point'Base;
    --  Return character at given position or NUL if Position is not pointing
    --  to any character.
 
@@ -250,6 +256,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
    --  Move cursor one character forward. Return True on success.
+
+   overriding function Forward_Element
+     (Self     : UTF8_In_Place_String_Handler;
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor;
+      Element  : out VSS.Unicode.Code_Point'Base) return Boolean;
 
    overriding function Backward
      (Self     : UTF8_In_Place_String_Handler;

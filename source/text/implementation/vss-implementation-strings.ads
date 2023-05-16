@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -30,11 +30,11 @@ package VSS.Implementation.Strings is
    ------------
 
    type Cursor is record
-      Index        : Character_Count                    := 0;
       UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Offset  :=
         VSS.Unicode.UTF8_Code_Unit_Offset'Last;
       UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Offset :=
         VSS.Unicode.UTF16_Code_Unit_Offset'Last;
+      Index        : Character_Count                    := 0;
    end record;
    --  Position of the character in the string. There are few special values,
    --  see table below.
@@ -51,6 +51,9 @@ package VSS.Implementation.Strings is
    --   - invalid position                0           'Last         'Last
    --   - before first character          0             -1            -1
    --   - after last character        Length + 1     0 | Size      0 | Size
+   --
+   --  UTF8_Offset and UTF16_Offset components are put into the beginning to
+   --  allow compiler to optimize operations on them with SIMD instructions.
 
    function Is_Invalid (Self : Cursor) return Boolean;
    --  Return True when cursor has special invalid value.
@@ -60,12 +63,14 @@ package VSS.Implementation.Strings is
    -------------------
 
    type Cursor_Offset is record
-      Index_Offset : Character_Offset                   := 0;
       UTF8_Offset  : VSS.Unicode.UTF8_Code_Unit_Offset  := 0;
       UTF16_Offset : VSS.Unicode.UTF16_Code_Unit_Offset := 0;
+      Index_Offset : Character_Offset                   := 0;
    end record;
    --  Offset between positions of two Cursors. Also used as size of the
    --  segment.
+   --
+   --  Order of components is same with order of components of Cursor type.
 
    procedure Fixup_Insert
      (Self  : in out Cursor;

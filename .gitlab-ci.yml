@@ -113,6 +113,38 @@ build_and_test:
       codequality:
         - spellcheck.json
 
+build_gnatdoc:
+  services:
+     - image:sandbox
+     - cpu:8
+     - mem:16
+  stage: build_dependent
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+  script:
+    - !reference [.basic-setup]
+    - !reference [.detect-branches]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/markdown
+      ADACORE_CI_SUBPROJECT_NAME=markdown
+    - !reference [.checkout]
+
+    - |
+      ADACORE_CI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
+      ADACORE_CI_SUBPROJECT_NAME=gnatdoc$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX
+    - !reference [.checkout]
+
+    - |
+      cd /it/wave
+
+      # Tell the anod sandbox to use our repository
+      anod vcs --add-repo vss$ADACORE_CI_SUBPROJECT_REPOSITORY_NAME_EDGE_SUFFIX $CI_PROJECT_DIR
+
+      # Build the ALS as a test
+      anod build gnatdoc4 $ADACORE_CI_ANOD_EDGE_QUALIFIER
+
 build_als:
   services:
      - image:sandbox

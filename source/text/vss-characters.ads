@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -8,15 +8,14 @@
 
 limited with VSS.Locales;
 limited with VSS.Strings;
+with VSS.Unicode;
 
 package VSS.Characters is
 
    pragma Preelaborate;
    pragma Remote_Types;
 
-   type Virtual_Character is new Wide_Wide_Character
-     range Wide_Wide_Character'Val (16#00_0000#)
-       .. Wide_Wide_Character'Val (16#10_FFFF#);
+   type Virtual_Character is new VSS.Unicode.Scalar_Value_Character;
 
    type General_Category is
      (Uppercase_Letter,
@@ -80,8 +79,13 @@ package VSS.Characters is
    subtype Other is
      General_Category range Control .. Unassigned;
 
+   function Is_Valid_Virtual_Character
+     (Self : Virtual_Character'Base) return Boolean;
+   --  Returns True when given character is inside the range of the allowed
+   --  characters and outside of the range of the
+
    function Get_General_Category
-     (Self : Virtual_Character) return General_Category;
+     (Self : Virtual_Character'Base) return General_Category;
    --  Return General_Category property for given character.
 
    function Get_Lowercase (Self : Virtual_Character) return Boolean;

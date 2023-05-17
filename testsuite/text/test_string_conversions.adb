@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -207,7 +207,7 @@ begin
       S1 : constant Wide_Wide_String := "AБक𐌈";
       S2 : constant Wide_Wide_String := "AБक𐌈𐌈कБA";
       E1 : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
-        (1  => Character'Val (16#41#),
+        [1  => Character'Val (16#41#),
          2  => Character'Val (16#D0#),
          3  => Character'Val (16#91#),
          4  => Character'Val (16#E0#),
@@ -216,9 +216,9 @@ begin
          7  => Character'Val (16#F0#),
          8  => Character'Val (16#90#),
          9  => Character'Val (16#8C#),
-         10 => Character'Val (16#88#));
+         10 => Character'Val (16#88#)];
       E2 : constant Ada.Strings.UTF_Encoding.UTF_8_String :=
-        (1  => Character'Val (16#41#),
+        [1  => Character'Val (16#41#),
          2  => Character'Val (16#D0#),
          3  => Character'Val (16#91#),
          4  => Character'Val (16#E0#),
@@ -237,7 +237,7 @@ begin
          17 => Character'Val (16#95#),
          18 => Character'Val (16#D0#),
          19 => Character'Val (16#91#),
-         20 => Character'Val (16#41#));
+         20 => Character'Val (16#41#)];
 
    begin
       Do_Test (S1, E1);

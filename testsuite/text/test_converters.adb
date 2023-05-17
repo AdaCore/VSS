@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -20,15 +20,15 @@ procedure Test_Converters is
    use all type VSS.Strings.Converters.Converter_Flag;
 
    D1 : constant Ada.Streams.Stream_Element_Array :=
-     (16#EF#, 16#BB#, 16#BF#);
+     [16#EF#, 16#BB#, 16#BF#];
    --  BOM only
 
    D2 : constant Ada.Streams.Stream_Element_Array :=
-     (16#C0#, 16#AF#, 16#E0#, 16#80#,  16#BF#, 16#F0#, 16#81#, 16#82#,
-      16#41#);
+     [16#C0#, 16#AF#, 16#E0#, 16#80#,  16#BF#, 16#F0#, 16#81#, 16#82#,
+      16#41#];
    E2 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String
-       ((Wide_Wide_Character'Val (16#FFFD#),
+       ([Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
@@ -36,15 +36,15 @@ procedure Test_Converters is
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
-         Wide_Wide_Character'Val (16#0041#)));
+         Wide_Wide_Character'Val (16#0041#)]);
    --  Unicode 13.0, Table 3-8.
 
    D3 : constant Ada.Streams.Stream_Element_Array :=
-     (16#ED#, 16#A0#, 16#80#, 16#ED#,  16#BF#, 16#BF#, 16#ED#, 16#AF#,
-      16#41#);
+     [16#ED#, 16#A0#, 16#80#, 16#ED#,  16#BF#, 16#BF#, 16#ED#, 16#AF#,
+      16#41#];
    E3 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String
-       ((Wide_Wide_Character'Val (16#FFFD#),
+       ([Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
@@ -52,15 +52,15 @@ procedure Test_Converters is
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
-         Wide_Wide_Character'Val (16#0041#)));
+         Wide_Wide_Character'Val (16#0041#)]);
    --  Unicode 13.0, Table 3-9.
 
    D4 : constant Ada.Streams.Stream_Element_Array :=
-     (16#F4#, 16#91#, 16#92#, 16#93#,  16#FF#, 16#41#, 16#80#, 16#BF#,
-      16#42#);
+     [16#F4#, 16#91#, 16#92#, 16#93#,  16#FF#, 16#41#, 16#80#, 16#BF#,
+      16#42#];
    E4 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String
-       ((Wide_Wide_Character'Val (16#FFFD#),
+       ([Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
@@ -68,42 +68,42 @@ procedure Test_Converters is
          Wide_Wide_Character'Val (16#0041#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
-         Wide_Wide_Character'Val (16#0042#)));
+         Wide_Wide_Character'Val (16#0042#)]);
    --  Unicode 13.0, Table 3-10.
 
    D5 : constant Ada.Streams.Stream_Element_Array :=
-     (16#E1#, 16#80#, 16#E2#, 16#F0#,  16#91#, 16#92#, 16#F1#, 16#BF#,
-      16#41#);
+     [16#E1#, 16#80#, 16#E2#, 16#F0#,  16#91#, 16#92#, 16#F1#, 16#BF#,
+      16#41#];
    E5 : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String
-       ((Wide_Wide_Character'Val (16#FFFD#),
+       ([Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
          Wide_Wide_Character'Val (16#FFFD#),
-         Wide_Wide_Character'Val (16#0041#)));
+         Wide_Wide_Character'Val (16#0041#)]);
    --  Unicode 13.0, Table 3-11.
 
    D6 : constant Ada.Streams.Stream_Element_Array :=
-     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#,
-      16#8C#, 16#88#);
+     [16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#,
+      16#8C#, 16#88#];
    E6 : constant VSS.Strings.Virtual_String := "AБक𐌈";
    --  Single character from of each number of bytes of encoded sequence.
 
    D7_2  : constant Ada.Streams.Stream_Element_Array :=
-     (16#41#, 16#D0#);
+     [16#41#, 16#D0#];
    E7_2  : constant VSS.Strings.Virtual_String := "A�";
    D7_31 : constant Ada.Streams.Stream_Element_Array :=
-     (16#41#, 16#D0#, 16#91#, 16#E0#);
+     [16#41#, 16#D0#, 16#91#, 16#E0#];
    D7_32 : constant Ada.Streams.Stream_Element_Array :=
-     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#);
+     [16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#];
    E7_3  : constant VSS.Strings.Virtual_String := "AБ�";
    D7_41 : constant Ada.Streams.Stream_Element_Array :=
-     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#);
+     [16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#];
    D7_42 : constant Ada.Streams.Stream_Element_Array :=
-     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#);
+     [16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#];
    D7_43 : constant Ada.Streams.Stream_Element_Array :=
-     (16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#,
-      16#8C#);
+     [16#41#, 16#D0#, 16#91#, 16#E0#,  16#A4#, 16#95#, 16#F0#, 16#90#,
+      16#8C#];
    E7_4  : constant VSS.Strings.Virtual_String := "AБक�";
    --  Incomplete multibyte seqence at the end of the encoded data.
 
@@ -250,7 +250,7 @@ procedure Test_Converters is
             Result.Append
               (Decoder.Decode
                  (VSS.Stream_Element_Vectors.Conversions
-                    .To_Stream_Element_Vector ((1 => Encoded (J))),
+                    .To_Stream_Element_Vector ([1 => Encoded (J)]),
                   J = Encoded'Last));
          end loop;
 
@@ -418,7 +418,7 @@ begin
       S : VSS.Strings.Virtual_String;
 
    begin
-      D.Initialize ("utf-8", (Process_BOM => True, others => False));
+      D.Initialize ("utf-8", [Process_BOM => True, others => False]);
 
       if not D.Is_Valid then
          raise Program_Error;
@@ -438,7 +438,7 @@ begin
       S : VSS.Strings.Virtual_String;
 
    begin
-      D.Initialize ("utf-8", (Process_BOM => True, others => False));
+      D.Initialize ("utf-8", [Process_BOM => True, others => False]);
 
       Test_Support.Assert (D.Is_Valid);
 
@@ -469,7 +469,7 @@ begin
       Result         : VSS.Stream_Element_Vectors.Stream_Element_Vector;
 
    begin
-      Encoder.Initialize ("utf-8", (Process_BOM => True, others => False));
+      Encoder.Initialize ("utf-8", [Process_BOM => True, others => False]);
 
       Test_Support.Assert (Encoder.Is_Valid);
 
@@ -493,7 +493,7 @@ begin
       Result         : VSS.Stream_Element_Vectors.Stream_Element_Vector;
 
    begin
-      Encoder.Initialize ("utf-8", (Process_BOM => True, others => False));
+      Encoder.Initialize ("utf-8", [Process_BOM => True, others => False]);
 
       Test_Support.Assert (Encoder.Is_Valid);
 
@@ -517,7 +517,7 @@ begin
       Result         : VSS.Stream_Element_Vectors.Stream_Element_Vector;
 
    begin
-      Encoder.Initialize ("utf-8", (Process_BOM => True, others => False));
+      Encoder.Initialize ("utf-8", [Process_BOM => True, others => False]);
 
       Test_Support.Assert (Encoder.Is_Valid);
 

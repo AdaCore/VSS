@@ -7,7 +7,6 @@
 --
 --  This regexp engine use Pike's VM to check regular expressions.
 
-with Ada.Containers.Vectors;
 with VSS.Characters;
 with VSS.Regular_Expressions.Engines;
 with VSS.Regular_Expressions.Name_Sets;
@@ -75,14 +74,16 @@ private
       end case;
    end record;
 
-   package Instruction_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Instruction_Address,
-      Element_Type => Instruction);
+   type Instruction_Array is
+     array (Instruction_Address range <>) of Instruction;
 
-   type Engine is new VSS.Regular_Expressions.Engines.Engine with record
+   type Instruction_Array_Access is access Instruction_Array;
+
+   type Engine is new VSS.Regular_Expressions.Engines.Engine with
+   record
       Last_Tag    : Tag_Number;  --  Max tag used in the Program
-      Max_Threads : Positive;  --  Maximum number of threads
-      Program     : Instruction_Vectors.Vector;
+      Max_Threads : Positive;    --  Threads required to execute
+      Program     : Instruction_Array_Access;
       --  The program executes starting from program address = 1
    end record;
 

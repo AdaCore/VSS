@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -23,21 +23,21 @@ procedure Test_Line_Iterators is
    PS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2029#);
 
    LF_String   : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => LF));
+     VSS.Strings.To_Virtual_String ([1 => LF]);
    VT_String   : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => VT));
+     VSS.Strings.To_Virtual_String ([1 => VT]);
    FF_String   : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => FF));
+     VSS.Strings.To_Virtual_String ([1 => FF]);
    CR_String   : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => CR));
+     VSS.Strings.To_Virtual_String ([1 => CR]);
    CRLF_String : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => CR, 2 => LF));
+     VSS.Strings.To_Virtual_String ([1 => CR, 2 => LF]);
    NEL_String  : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => NEL));
+     VSS.Strings.To_Virtual_String ([1 => NEL]);
    LS_String   : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => LS));
+     VSS.Strings.To_Virtual_String ([1 => LS]);
    PS_String   : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ((1 => PS));
+     VSS.Strings.To_Virtual_String ([1 => PS]);
 
    type Expected_Record is record
       Line_First_Character       : VSS.Strings.Character_Count;
@@ -63,7 +63,7 @@ procedure Test_Line_Iterators is
         & "z");
 
    Expected_1_1 : constant Expected_Array :=
-     (1 => (1, 1, 2, 2, True, LF_String),
+     [1 => (1, 1, 2, 2, True, LF_String),
       2 => (3, 2, 3, 3, True, LF_String),
       3 => (4, 10, 11, 11, True, CR_String),
       4 => (12, 11, 12, 12, True, CR_String),
@@ -71,10 +71,10 @@ procedure Test_Line_Iterators is
       6 => (45, 44, 45, 46, True, CRLF_String),
       7 => (47, 47, 48, 48, True, NEL_String),
       8 => (49, 48, 49, 49, True, NEL_String),
-      9 => (50, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String));
+      9 => (50, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String)];
 
    Expected_1_2 : constant Expected_Array :=
-     (1 => (1, 2, 2, 2, True, LF_String),
+     [1 => (1, 2, 2, 2, True, LF_String),
       2 => (3, 3, 3, 3, True, LF_String),
       3 => (4, 11, 11, 11, True, CR_String),
       4 => (12, 12, 12, 12, True, CR_String),
@@ -82,10 +82,10 @@ procedure Test_Line_Iterators is
       6 => (45, 46, 45, 46, True, CRLF_String),
       7 => (47, 48, 48, 48, True, NEL_String),
       8 => (49, 49, 49, 49, True, NEL_String),
-      9 => (50, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String));
+      9 => (50, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String)];
 
    Expected_1_3 : constant Expected_Array :=
-     (1 => (1, 1, 2, 2, True, LF_String),
+     [1 => (1, 1, 2, 2, True, LF_String),
       2 => (3, 2, 3, 3, True, LF_String),
       3 => (4, 4, 5, 5, True, VT_String),
       4 => (6, 5, 6, 6, True, VT_String),
@@ -101,10 +101,10 @@ procedure Test_Line_Iterators is
       14 => (52, 51, 52, 52, True, LS_String),
       15 => (53, 53, 54, 54, True, PS_String),
       16 => (55, 54, 55, 55, True, PS_String),
-      17 => (56, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String));
+      17 => (56, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String)];
 
    Expected_1_4 : constant Expected_Array :=
-     (1 => (1, 2, 2, 2, True, LF_String),
+     [1 => (1, 2, 2, 2, True, LF_String),
       2 => (3, 3, 3, 3, True, LF_String),
       3 => (4, 5, 5, 5, True, VT_String),
       4 => (6, 6, 6, 6, True, VT_String),
@@ -120,7 +120,7 @@ procedure Test_Line_Iterators is
       14 => (52, 52, 52, 52, True, LS_String),
       15 => (53, 54, 54, 54, True, PS_String),
       16 => (55, 55, 55, 55, True, PS_String),
-      17 => (56, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String));
+      17 => (56, 56, 57, 56, False, VSS.Strings.Empty_Virtual_String)];
 
    CRLFCR : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String
@@ -128,30 +128,30 @@ procedure Test_Line_Iterators is
         & "b" & CR & LF & CR);
 
    Expected_2_1 : constant Expected_Array :=
-     (1 => (1, 1, 2, 3, True, CRLF_String),
+     [1 => (1, 1, 2, 3, True, CRLF_String),
       2 => (4, 3, 4, 4, True, CR_String),
       3 => (5, 5, 6, 7, True, CRLF_String),
-      4 => (8, 7, 8, 8, True, CR_String));
+      4 => (8, 7, 8, 8, True, CR_String)];
 
    Expected_2_2 : constant Expected_Array :=
-     (1 => (1, 1, 2, 2, True, CR_String),
+     [1 => (1, 1, 2, 2, True, CR_String),
       2 => (3, 2, 3, 3, True, LF_String),
       3 => (4, 3, 4, 4, True, CR_String),
       4 => (5, 5, 6, 6, True, CR_String),
       5 => (7, 6, 7, 7, True, LF_String),
-      6 => (8, 7, 8, 8, True, CR_String));
+      6 => (8, 7, 8, 8, True, CR_String)];
 
    Expected_2_3 : constant Expected_Array :=
-     (1 => (1, 1, 2, 3, True, CRLF_String),
+     [1 => (1, 1, 2, 3, True, CRLF_String),
       2 => (4, 5, 6, 7, True, CRLF_String),
-      3 => (8, 8, 9, 8, False, VSS.Strings.Empty_Virtual_String));
+      3 => (8, 8, 9, 8, False, VSS.Strings.Empty_Virtual_String)];
 
    Pack : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("package Pack is" & LF);
    --  Text of single line with line terminator.
 
    Expected_3 : constant Expected_Array :=
-     (1 => (1, 16, 16, 16, True, LF_String));
+     [1 => (1, 16, 16, 16, True, LF_String)];
 
    procedure Test_Forward
      (Source_String   : VSS.Strings.Virtual_String;
@@ -384,26 +384,26 @@ procedure Test_Line_Iterators is
 begin
    Test_Forward (Source_1, Expected_1_1, VSS.Strings.New_Line_Function, False);
    Test_Forward (Source_1, Expected_1_2, VSS.Strings.New_Line_Function, True);
-   Test_Forward (Source_1, Expected_1_3, (others => True), False);
-   Test_Forward (Source_1, Expected_1_4, (others => True), True);
+   Test_Forward (Source_1, Expected_1_3, [others => True], False);
+   Test_Forward (Source_1, Expected_1_4, [others => True], True);
 
    Test_Forward (CRLFCR, Expected_2_1, VSS.Strings.New_Line_Function, False);
    Test_Forward
      (CRLFCR,
       Expected_2_2,
-      (VSS.Strings.CR | VSS.Strings.LF => True, others => False),
+      [VSS.Strings.CR | VSS.Strings.LF => True, others => False],
       False);
    Test_Forward
      (CRLFCR,
       Expected_2_3,
-      (VSS.Strings.CRLF => True, others => False),
+      [VSS.Strings.CRLF => True, others => False],
       False);
 
    Test_Forward
      (Pack,
       Expected_3,
-      (VSS.Strings.CR | VSS.Strings.LF | VSS.Strings.CRLF => True,
-       others => False),
+      [VSS.Strings.CR | VSS.Strings.LF | VSS.Strings.CRLF => True,
+       others => False],
       True);
 
    for J in 2 .. Expected_1_2'Last loop
@@ -413,7 +413,7 @@ begin
 
    for J in 2 .. Expected_1_4'Last loop
       Test_Forward_Restart
-        (Source_1, Expected_1_4, (others => True), True, J);
+        (Source_1, Expected_1_4, [others => True], True, J);
    end loop;
 
    Test_U902_007;

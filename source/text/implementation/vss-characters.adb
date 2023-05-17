@@ -10,7 +10,6 @@ with VSS.Implementation.UCD_Core;
 with VSS.Implementation.UTF8_Casing;
 with VSS.Locales;
 with VSS.Strings.Internals;
-with VSS.Unicode;
 
 package body VSS.Characters is
 
@@ -50,7 +49,7 @@ package body VSS.Characters is
       VSS.Implementation.UCD_Core.GC_Zs => Space_Separator];
 
    function Extract_Core_Data
-     (Character : Virtual_Character)
+     (Code : VSS.Unicode.Code_Point)
       return VSS.Implementation.UCD_Core.Core_Data_Record;
    --  Return core data record for the given character.
 
@@ -59,7 +58,7 @@ package body VSS.Characters is
    -----------------------
 
    function Extract_Core_Data
-     (Character : Virtual_Character)
+     (Code : VSS.Unicode.Code_Point)
       return VSS.Implementation.UCD_Core.Core_Data_Record
    is
       use type VSS.Implementation.UCD_Core.Core_Offset;
@@ -67,11 +66,11 @@ package body VSS.Characters is
 
       Block : constant VSS.Implementation.UCD_Core.Core_Index :=
         VSS.Implementation.UCD_Core.Core_Index
-          (VSS.Unicode.Code_Point (Virtual_Character'Pos (Character))
+          (Code
            / VSS.Unicode.Code_Point (VSS.Implementation.UCD_Core.Block_Size));
       Offset : constant VSS.Implementation.UCD_Core.Core_Offset :=
-        Virtual_Character'Pos (Character)
-          mod VSS.Implementation.UCD_Core.Block_Size;
+        VSS.Implementation.UCD_Core.Core_Offset
+          (Code mod VSS.Implementation.UCD_Core.Block_Size);
 
    begin
       return
@@ -85,7 +84,7 @@ package body VSS.Characters is
 
    function Get_Cased (Self : Virtual_Character) return Boolean is
       Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
-        Extract_Core_Data (Self);
+        Extract_Core_Data (Virtual_Character'Pos (Self));
 
    begin
       return
@@ -101,13 +100,21 @@ package body VSS.Characters is
    --------------------------
 
    function Get_General_Category
-     (Self : Virtual_Character) return General_Category
-   is
-      Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
-        Extract_Core_Data (Self);
-
+     (Self : Virtual_Character'Base) return General_Category is
    begin
-      return GC_To_General_Ccategory (Data.GC);
+      if Wide_Wide_Character (Self)
+           not in VSS.Unicode.Code_Point_Character
+      then
+         return Unassigned;
+      end if;
+
+      declare
+         Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
+           Extract_Core_Data (Virtual_Character'Pos (Self));
+
+      begin
+         return GC_To_General_Ccategory (Data.GC);
+      end;
    end Get_General_Category;
 
    -------------------
@@ -116,7 +123,7 @@ package body VSS.Characters is
 
    function Get_Lowercase (Self : Virtual_Character) return Boolean is
       Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
-        Extract_Core_Data (Self);
+        Extract_Core_Data (Virtual_Character'Pos (Self));
 
    begin
       return Data.GC = VSS.Implementation.UCD_Core.GC_Ll or Data.OLower;
@@ -282,7 +289,7 @@ package body VSS.Characters is
 
    function Get_Uppercase (Self : Virtual_Character) return Boolean is
       Data : constant VSS.Implementation.UCD_Core.Core_Data_Record :=
-        Extract_Core_Data (Self);
+        Extract_Core_Data (Virtual_Character'Pos (Self));
 
    begin
       return Data.GC = VSS.Implementation.UCD_Core.GC_Lu or Data.OUpper;
@@ -353,5 +360,15 @@ package body VSS.Characters is
         Get_General_Category (Self)
           in Letter | Mark | Number | Punctuation | Symbol | Space_Separator;
    end Is_Graphic;
+
+   --------------------------------
+   -- Is_Valid_Virtual_Character --
+   --------------------------------
+
+   function Is_Valid_Virtual_Character
+     (Self : Virtual_Character'Base) return Boolean is
+   begin
+      return Wide_Wide_Character (Self) in VSS.Unicode.Scalar_Value_Character;
+   end Is_Valid_Virtual_Character;
 
 end VSS.Characters;

@@ -1,10 +1,9 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Characters;
 with VSS.Strings;
 
 procedure Test_String_Buffer is

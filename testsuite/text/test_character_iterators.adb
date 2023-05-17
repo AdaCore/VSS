@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -31,51 +31,51 @@ procedure Test_Character_Iterators is
    --  "ASCII Кириллица ⊗∬ 𝛻𝜕 "
    S : constant VSS.Strings.Virtual_String :=
      VSS.Strings.Conversions.To_Virtual_String
-       ((Character'Val (16#41#),
-        Character'Val (16#53#),
-        Character'Val (16#43#),
-        Character'Val (16#49#),
-        Character'Val (16#49#),
-        Character'Val (16#20#),
-        Character'Val (16#D0#),
-        Character'Val (16#9A#),
-        Character'Val (16#D0#),
-        Character'Val (16#B8#),
-        Character'Val (16#D1#),
-        Character'Val (16#80#),
-        Character'Val (16#D0#),
-        Character'Val (16#B8#),
-        Character'Val (16#D0#),
-        Character'Val (16#BB#),
-        Character'Val (16#D0#),
-        Character'Val (16#BB#),
-        Character'Val (16#D0#),
-        Character'Val (16#B8#),
-        Character'Val (16#D1#),
-        Character'Val (16#86#),
-        Character'Val (16#D0#),
-        Character'Val (16#B0#),
-        Character'Val (16#20#),
-        Character'Val (16#E2#),
-        Character'Val (16#8A#),
-        Character'Val (16#97#),
-        Character'Val (16#E2#),
-        Character'Val (16#88#),
-        Character'Val (16#AC#),
-        Character'Val (16#20#),
-        Character'Val (16#F0#),
-        Character'Val (16#9D#),
-        Character'Val (16#9B#),
-        Character'Val (16#BB#),
-        Character'Val (16#F0#),
-        Character'Val (16#9D#),
-        Character'Val (16#9C#),
-        Character'Val (16#95#),
-        Character'Val (16#20#)));
+       ([Character'Val (16#41#),
+         Character'Val (16#53#),
+         Character'Val (16#43#),
+         Character'Val (16#49#),
+         Character'Val (16#49#),
+         Character'Val (16#20#),
+         Character'Val (16#D0#),
+         Character'Val (16#9A#),
+         Character'Val (16#D0#),
+         Character'Val (16#B8#),
+         Character'Val (16#D1#),
+         Character'Val (16#80#),
+         Character'Val (16#D0#),
+         Character'Val (16#B8#),
+         Character'Val (16#D0#),
+         Character'Val (16#BB#),
+         Character'Val (16#D0#),
+         Character'Val (16#BB#),
+         Character'Val (16#D0#),
+         Character'Val (16#B8#),
+         Character'Val (16#D1#),
+         Character'Val (16#86#),
+         Character'Val (16#D0#),
+         Character'Val (16#B0#),
+         Character'Val (16#20#),
+         Character'Val (16#E2#),
+         Character'Val (16#8A#),
+         Character'Val (16#97#),
+         Character'Val (16#E2#),
+         Character'Val (16#88#),
+         Character'Val (16#AC#),
+         Character'Val (16#20#),
+         Character'Val (16#F0#),
+         Character'Val (16#9D#),
+         Character'Val (16#9B#),
+         Character'Val (16#BB#),
+         Character'Val (16#F0#),
+         Character'Val (16#9D#),
+         Character'Val (16#9C#),
+         Character'Val (16#95#),
+         Character'Val (16#20#)]);
 
    D : constant array (VSS.Strings.Character_Index range <>) of Position_Data
      :=
-    (('A', 0, 0, 0, 0),       --  'A' 1
+    [('A', 0, 0, 0, 0),       --  'A' 1
      ('S', 1, 1, 1, 1),       --  'S' 2
      ('C', 2, 2, 2, 2),       --  'C' 3
      ('I', 3, 3, 3, 3),       --  'I' 4
@@ -96,7 +96,7 @@ procedure Test_Character_Iterators is
      (' ', 31, 31, 18, 18),   --  ' ' 19
      ('𝛻', 32, 35, 19, 20),   --  '𝛻' 17
      ('𝜕', 36, 39, 21, 22),   --  '𝜕' 18
-     (' ', 40, 40, 23, 23));  --  ' ' 19
+     (' ', 40, 40, 23, 23)];  --  ' ' 19
 
    procedure Test_Forward;
    procedure Test_Forward_From_Before_First;

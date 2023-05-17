@@ -273,66 +273,37 @@ build_lsif:
     reports:
       lsif: dump.lsif
 
-run_als_ci:
+.run_ci_common: &run_ci_common
   stage: build_dependent
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
+  trigger:
+    strategy: depend
+  inherit:
+    variables: false
+  variables:
+    ACI_UPSTREAM_PROJECT_PATH: $CI_PROJECT_PATH
+    ACI_UPSTREAM_REF_NAME: $CI_COMMIT_REF_NAME
+    ACI_UPSTREAM_SOURCE_BRANCH: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    ACI_UPSTREAM_TARGET_BRANCH: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+
+run_als_ci:
+  <<: *run_ci_common
   trigger:
     project: eng/ide/ada_language_server
-    strategy: depend
-  inherit:
-    variables: false
-  variables:
-    ACI_UPSTREAM_PROJECT_PATH: $CI_PROJECT_PATH
-    ACI_UPSTREAM_REF_NAME: $CI_COMMIT_REF_NAME
-    ACI_UPSTREAM_SOURCE_BRANCH: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    ACI_UPSTREAM_TARGET_BRANCH: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
 
 run_gnatdoc_ci:
-  stage: build_dependent
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
+  <<: *run_ci_common
   trigger:
     project: eng/ide/gnatdoc
-    strategy: depend
-  inherit:
-    variables: false
-  variables:
-    ACI_UPSTREAM_PROJECT_PATH: $CI_PROJECT_PATH
-    ACI_UPSTREAM_REF_NAME: $CI_COMMIT_REF_NAME
-    ACI_UPSTREAM_SOURCE_BRANCH: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    ACI_UPSTREAM_TARGET_BRANCH: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
 
 run_gs_ci:
-  stage: build_dependent
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
+  <<: *run_ci_common
   trigger:
     project: eng/ide/gnatstudio
-    strategy: depend
-  inherit:
-    variables: false
-  variables:
-    ACI_UPSTREAM_PROJECT_PATH: $CI_PROJECT_PATH
-    ACI_UPSTREAM_REF_NAME: $CI_COMMIT_REF_NAME
-    ACI_UPSTREAM_SOURCE_BRANCH: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    ACI_UPSTREAM_TARGET_BRANCH: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
 
 run_lsif_ci:
-  stage: build_dependent
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
+  <<: *run_ci_common
   trigger:
     project: eng/ide/lsif-ada
-    strategy: depend
-  inherit:
-    variables: false
-  variables:
-    ACI_UPSTREAM_PROJECT_PATH: $CI_PROJECT_PATH
-    ACI_UPSTREAM_REF_NAME: $CI_COMMIT_REF_NAME
-    ACI_UPSTREAM_SOURCE_BRANCH: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-    ACI_UPSTREAM_TARGET_BRANCH: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME

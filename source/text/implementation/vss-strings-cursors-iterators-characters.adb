@@ -66,9 +66,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       if Self.Owner /= null then
-         return
-           VSS.Implementation.Strings.Handler
-             (Data).Forward (Data, Self.Position);
+         return Self.Handler.Forward (Data, Self.Position);
       end if;
 
       return False;
@@ -90,9 +88,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       if Self.Owner /= null then
-         Result :=
-           VSS.Implementation.Strings.Handler
-             (Data).Forward_Element (Data, Self.Position, Code);
+         Result := Self.Handler.Forward_Element (Data, Self.Position, Code);
       end if;
 
       Element := VSS.Characters.Virtual_Character'Base'Val (Code);
@@ -112,9 +108,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       if Self.Owner /= null then
-         return
-           VSS.Implementation.Strings.Handler
-             (Data).Has_Character (Data, Self.Position);
+         return Self.Handler.Has_Character (Data, Self.Position);
       end if;
 
       return False;
@@ -126,16 +120,11 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    procedure Set_After_Last
      (Self : in out Character_Iterator;
-      On   : VSS.Strings.Virtual_String'Class)
-   is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
-
+      On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
-
-      Handler.After_Last_Character (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler.After_Last_Character (On.Data, Self.Position);
    end Set_After_Last;
 
    ------------
@@ -153,6 +142,9 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Get_Owner_And_Position (Position, Cursor_Owner, Cursor_Position);
 
       Self.Reconnect (Cursor_Owner);
+      Self.Handler  :=
+        VSS.Implementation.Strings.Handler
+          (Virtual_String (Cursor_Owner.all).Data);
       Self.Position := Cursor_Position;
    end Set_At;
 
@@ -164,16 +156,13 @@ package body VSS.Strings.Cursors.Iterators.Characters is
      (Self : in out Character_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
-      Dummy   : Boolean;
+      Dummy : Boolean;
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
-
-      Handler.Before_First_Character (On.Data, Self.Position);
-      Dummy := Handler.Forward (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler.Before_First_Character (On.Data, Self.Position);
+      Dummy := Self.Handler.Forward (On.Data, Self.Position);
    end Set_At_First;
 
    -----------------
@@ -184,16 +173,13 @@ package body VSS.Strings.Cursors.Iterators.Characters is
      (Self : in out Character_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
-      Dummy   : Boolean;
+      Dummy : Boolean;
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
-
-      Handler.After_Last_Character (On.Data, Self.Position);
-      Dummy := Handler.Backward (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler.After_Last_Character (On.Data, Self.Position);
+      Dummy := Self.Handler.Backward (On.Data, Self.Position);
    end Set_At_Last;
 
    ----------------------
@@ -202,16 +188,11 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    procedure Set_Before_First
      (Self : in out Character_Iterator;
-      On   : VSS.Strings.Virtual_String'Class)
-   is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
-
+      On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
-
-      Handler.Before_First_Character (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler.Before_First_Character (On.Data, Self.Position);
    end Set_Before_First;
 
    ---------------------
@@ -229,6 +210,9 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       then
          VSS.Implementation.Strings.Fixup_Insert
            (Self.Position, Start, Inserted);
+         Self.Handler :=
+           VSS.Implementation.Strings.Handler
+             (Virtual_String (Self.Owner.all).Data);
 
       else
          Self.Invalidate;

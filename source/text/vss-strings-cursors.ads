@@ -150,6 +150,9 @@ private
      abstract new VSS.Implementation.Referrers.Referal_Limited_Base
        and VSS.Strings.Cursors.Abstract_Character_Cursor with
    record
+      Handler  : VSS.Implementation.Strings.String_Handler_Access;
+      --  Cached value of the string data handler. Derived type is responsible
+      --  to manage its consistency.
       Position : aliased VSS.Implementation.Strings.Cursor;
    end record;
 

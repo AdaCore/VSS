@@ -351,6 +351,7 @@ package body VSS.Strings.Cursors is
    overriding procedure Invalidate
      (Self : in out Character_Cursor_Limited_Base) is
    begin
+      Self.Handler  := null;
       Self.Position := (others => <>);
    end Invalidate;
 

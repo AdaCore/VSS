@@ -21,6 +21,10 @@ package VSS.Implementation.Strings is
    type Grapheme_Count is range 0 .. 2 ** 30 - 1;
    subtype Grapheme_Index is Grapheme_Count range 1 .. Grapheme_Count'Last;
 
+   No_Character : constant VSS.Unicode.Code_Point'Base :=
+     Wide_Wide_Character'Pos (Wide_Wide_Character'Last);
+   --  Special value to return when there is no character at given position.
+
    type String_Handler_Access is
      access all
        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;

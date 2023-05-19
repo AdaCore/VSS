@@ -641,7 +641,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
         or else Position.Index < 1
         or else Position.Index > Source.Length
       then
-         return VSS.Implementation.String_Handlers.No_Character;
+         return VSS.Implementation.Strings.No_Character;
       end if;
 
       return
@@ -667,7 +667,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
         or else Position.Index
                   > VSS.Implementation.Strings.Character_Count (Source.Length)
       then
-         return VSS.Implementation.String_Handlers.No_Character;
+         return VSS.Implementation.Strings.No_Character;
       end if;
 
       return
@@ -738,7 +738,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Source : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
       Code   : VSS.Unicode.Code_Point'Base :=
-        VSS.Implementation.String_Handlers.No_Character;
+        VSS.Implementation.Strings.No_Character;
       Result : Boolean := False;
 
    begin
@@ -767,7 +767,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Source : constant UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
       Code   : VSS.Unicode.Code_Point'Base :=
-        VSS.Implementation.String_Handlers.No_Character;
+        VSS.Implementation.Strings.No_Character;
       Result : Boolean := False;
 
    begin

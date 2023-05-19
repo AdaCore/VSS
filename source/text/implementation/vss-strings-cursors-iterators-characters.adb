@@ -51,7 +51,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
       return
         VSS.Characters.Virtual_Character'Base'Val
-          (VSS.Implementation.String_Handlers.No_Character);
+          (VSS.Implementation.Strings.No_Character);
    end Element;
 
    -------------
@@ -83,7 +83,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Data   : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Code   : VSS.Unicode.Code_Point'Base :=
-        VSS.Implementation.String_Handlers.No_Character;
+        VSS.Implementation.Strings.No_Character;
       Result : Boolean := False;
 
    begin

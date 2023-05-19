@@ -25,10 +25,6 @@ package VSS.Implementation.String_Handlers is
 
    use type VSS.Implementation.Strings.Character_Count;
 
-   No_Character : constant VSS.Unicode.Code_Point'Base :=
-     Wide_Wide_Character'Pos (Wide_Wide_Character'Last);
-   --  Special value to return when there is no character at given position.
-
    -----------------------------
    -- Abstract_String_Handler --
    -----------------------------

@@ -198,7 +198,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    is
       Destination : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
-      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      L           : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       U1          : VSS.Unicode.UTF8_Code_Unit;
       U2          : VSS.Unicode.UTF8_Code_Unit;
       U3          : VSS.Unicode.UTF8_Code_Unit;
@@ -318,7 +318,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    is
       Destination : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
-      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      L           : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       U1          : VSS.Unicode.UTF8_Code_Unit;
       U2          : VSS.Unicode.UTF8_Code_Unit;
       U3          : VSS.Unicode.UTF8_Code_Unit;
@@ -911,7 +911,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Destination : UTF8_String_Data_Access
            with Import, Convention => Ada, Address => Data.Pointer'Address;
          Code        : VSS.Unicode.Code_Point;
-         L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+         L           : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
          U1          : VSS.Unicode.UTF8_Code_Unit;
          U2          : VSS.Unicode.UTF8_Code_Unit;
          U3          : VSS.Unicode.UTF8_Code_Unit;
@@ -983,7 +983,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          Destination : UTF8_In_Place_Data
            with Import, Convention => Ada, Address => Data.Storage'Address;
          Code        : VSS.Unicode.Code_Point;
-         L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+         L           : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
          U1          : VSS.Unicode.UTF8_Code_Unit;
          U2          : VSS.Unicode.UTF8_Code_Unit;
          U3          : VSS.Unicode.UTF8_Code_Unit;
@@ -1117,7 +1117,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    is
       Destination : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
-      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      L           : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       U1          : VSS.Unicode.UTF8_Code_Unit;
       U2          : VSS.Unicode.UTF8_Code_Unit;
       U3          : VSS.Unicode.UTF8_Code_Unit;
@@ -1165,7 +1165,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Destination  : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
 
-      L           : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      L           : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       U1          : VSS.Unicode.UTF8_Code_Unit;
       U2          : VSS.Unicode.UTF8_Code_Unit;
       U3          : VSS.Unicode.UTF8_Code_Unit;

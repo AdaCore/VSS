@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -17,10 +17,10 @@ package body VSS.Strings.Converters.Encoders.UTF8 is
       Source : VSS.Unicode.Code_Point;
       Target : in out VSS.Stream_Element_Vectors.Stream_Element_Vector'Class)
    is
-      Size    : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Size    : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       Encoded :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-          (VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length'Range);
+          (VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length'Range);
       Buffer  : Ada.Streams.Stream_Element_Array
                   (Ada.Streams.Stream_Element_Offset (Encoded'First)
                      .. Ada.Streams.Stream_Element_Offset (Encoded'Last))

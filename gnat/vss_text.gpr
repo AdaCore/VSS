@@ -40,7 +40,8 @@ library project VSS_Text is
    for Library_Options use OS_Library_Options;
 
    for Source_Dirs use
-     ("../source/os",
+     ("../source/gcc",
+      "../source/os",
       "../source/os/implementation",
       "../source/streams",
       "../source/streams/implementation",

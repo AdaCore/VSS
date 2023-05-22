@@ -476,6 +476,26 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end if;
    end Lookup_Grapheme_Cluster_Boundaries;
 
+   --------------------
+   -- Set_After_Last --
+   --------------------
+
+   procedure Set_After_Last
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Self.Reconnect (On'Unrestricted_Access);
+
+      Handler.After_Last_Character (On.Data, Position);
+      Self.Lookup_Grapheme_Cluster_Boundaries (Position);
+   end Set_After_Last;
+
    ------------
    -- Set_At --
    ------------
@@ -543,6 +563,26 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Dummy := Handler.Backward (On.Data, Position);
       Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Set_At_Last;
+
+   ----------------------
+   -- Set_Before_First --
+   ----------------------
+
+   procedure Set_Before_First
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Self.Reconnect (On'Unrestricted_Access);
+
+      Handler.Before_First_Character (On.Data, Position);
+      Self.Lookup_Grapheme_Cluster_Boundaries (Position);
+   end Set_Before_First;
 
    ---------------------
    -- String_Modified --

@@ -138,6 +138,23 @@ package body VSS.Strings is
       end return;
    end After_Last_Character;
 
+   ---------------------------------
+   -- After_Last_Grapheme_Cluster --
+   ---------------------------------
+
+   function After_Last_Grapheme_Cluster
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator is
+   begin
+      return Result :
+               VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+                 .Grapheme_Cluster_Iterator
+      do
+         Result.Set_After_Last (Self);
+      end return;
+   end After_Last_Grapheme_Cluster;
+
    ------------
    -- Append --
    ------------
@@ -378,6 +395,23 @@ package body VSS.Strings is
          Result.Set_Before_First (Self);
       end return;
    end Before_First_Character;
+
+   -----------------------------------
+   -- Before_First_Grapheme_Cluster --
+   -----------------------------------
+
+   function Before_First_Grapheme_Cluster
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator is
+   begin
+      return Result :
+               VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+                 .Grapheme_Cluster_Iterator
+      do
+         Result.Set_Before_First (Self);
+      end return;
+   end Before_First_Grapheme_Cluster;
 
    ----------------------
    -- Character_Length --

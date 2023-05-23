@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -18,8 +18,10 @@ package VSS.Unicode is
 
    pragma Pure;
 
-   type Code_Point is
-     new Interfaces.Unsigned_32 range 16#00_0000# .. 16#10_FFFF#;
+   type Code_Point_Unit is mod 2 ** 21;
+   subtype Code_Point is Code_Point_Unit range 16#00_0000# .. 16#10_FFFF#;
+   subtype Scalar_Value is Code_Point
+     with Static_Predicate => Scalar_Value not in 16#00_D800# .. 16#00_DF00#;
 
    type UTF8_Code_Unit is mod 2 ** 8;
    type UTF8_Code_Unit_Offset is new Interfaces.Integer_32;
@@ -33,11 +35,22 @@ package VSS.Unicode is
      UTF16_Code_Unit_Offset range 0 .. UTF16_Code_Unit_Offset'Last;
    subtype UTF16_Code_Unit_Index is UTF16_Code_Unit_Count;
 
-   type UTF32_Code_Unit is mod 2 ** 32; -- range 0 .. 16#10_FFFF#;
+   type UTF32_Code_Unit is mod 2 ** 32;
    type UTF32_Code_Unit_Offset is new Interfaces.Integer_32;
    subtype UTF32_Code_Unit_Count is
      UTF32_Code_Unit_Offset range 0 .. UTF32_Code_Unit_Offset'Last;
    subtype UTF32_Code_Unit_Index is UTF32_Code_Unit_Count;
+
+   subtype Scalar_Value_UTF8_Code_Unit_Count is
+     UTF8_Code_Unit_Count range 0 .. 4;
+   subtype Scalar_Value_UTF8_Code_Unit_Length is
+     UTF8_Code_Unit_Count range 1 .. 4;
+   subtype Scalar_Value_UTF16_Code_Unit_Count is
+     UTF16_Code_Unit_Count range 0 .. 2;
+   subtype Scalar_Value_UTF16_Code_Unit_Length is
+     UTF16_Code_Unit_Count range 1 .. 2;
+   --  These subtype are useful to store offsets of the single scalar value in
+   --  the bit-packed records.
 
    subtype Code_Point_Character is Wide_Wide_Character
      range Wide_Wide_Character'Val (16#00_0000#)

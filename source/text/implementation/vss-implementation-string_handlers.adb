@@ -223,7 +223,7 @@ package body VSS.Implementation.String_Handlers is
          return True;
 
       else
-         Element := No_Character;
+         Element := VSS.Implementation.Strings.No_Character;
 
          return False;
       end if;

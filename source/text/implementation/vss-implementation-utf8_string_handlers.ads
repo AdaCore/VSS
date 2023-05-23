@@ -23,16 +23,16 @@ package VSS.Implementation.UTF8_String_Handlers is
    type UTF8_String_Data (Bulk : VSS.Unicode.UTF8_Code_Unit_Count) is record
       Counter : System.Atomic_Counters.Atomic_Counter;
 
-      Storage :
-        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. Bulk);
-      --  Buffer to store string's data. First unused code unit is set to
-      --  zero, to allow to pass data to C.
-
       Size    : VSS.Unicode.UTF8_Code_Unit_Count           := 0;
       --  Number of code units in the buffer.
 
       Length  : VSS.Implementation.Strings.Character_Count := 0;
       --  Length of the string in Unicode Code Points.
+
+      Storage :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. Bulk);
+      --  Buffer to store string's data. First unused code unit is set to
+      --  zero, to allow to pass data to C.
    end record;
 
    type UTF8_String_Data_Access is access all UTF8_String_Data;

@@ -24,7 +24,7 @@
 --
 --  By default, shortest number of digits is used.
 --
---    #[1-9][0-9]+ - base
+--    #[1-9][0-9]* - base
 --
 --  By default, base is 10.
 

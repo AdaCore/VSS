@@ -13,9 +13,20 @@ package body VSS.Strings.Formatters.Generic_Integers is
    overriding function Format
      (Self   : Formatter;
       Format : VSS.Strings.Formatters.Format_Information)
-      return VSS.Strings.Virtual_String is
+      return VSS.Strings.Virtual_String
+   is
+      Buffer : constant Wide_Wide_String :=
+        Integer_Type'Wide_Wide_Image (Self.Value);
+
    begin
-      return Empty_Virtual_String;
+      if Buffer (Buffer'First) = ' ' then
+         return
+           VSS.Strings.To_Virtual_String
+             (Buffer (Buffer'First + 1 .. Buffer'Last));
+
+      else
+         return VSS.Strings.To_Virtual_String (Buffer);
+      end if;
    end Format;
 
    -----------

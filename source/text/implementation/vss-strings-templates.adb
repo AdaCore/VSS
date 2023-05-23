@@ -4,7 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-pragma Ada_2022;
+with VSS.Characters.Latin;
+with VSS.Implementation.String_Handlers;
+with VSS.Unicode;
 
 package body VSS.Strings.Templates is
 
@@ -25,11 +27,79 @@ package body VSS.Strings.Templates is
      (Self       : Virtual_String_Template'Class;
       Parameters : Formatter_Array) return VSS.Strings.Virtual_String
    is
-      pragma Unreferenced (Self);
-      pragma Unreferenced (Parameters);
+      use type VSS.Unicode.Code_Point;
+
+      type States is (Initial, Open_Bracket, Format);
+
+      procedure Append_Parameter;
+
+      Handler   : constant VSS.Implementation.Strings.String_Handler_Access :=
+        VSS.Implementation.Strings.Handler (Self.Template.Data);
+      Position  : VSS.Implementation.Strings.Cursor;
+      Code      : VSS.Unicode.Code_Point'Base;
+      Parameter : Positive := 1;
+      State     : States   := Initial;
+      Result    : VSS.Strings.Virtual_String;
+
+      ----------------------
+      -- Append_Parameter --
+      ----------------------
+
+      procedure Append_Parameter is
+      begin
+         if Parameters (Parameter) /= null then
+            Result.Append (Parameters (Parameter).Format ((others => <>)));
+            Parameter := @ + 1;
+         end if;
+      end Append_Parameter;
 
    begin
-      return Empty_Virtual_String;
+      Handler.Before_First_Character (Self.Template.Data, Position);
+
+      while Handler.Forward_Element (Self.Template.Data, Position, Code) loop
+         case State is
+            when Initial =>
+               if Code =
+                 VSS.Characters.Virtual_Character'Pos
+                   (VSS.Characters.Latin.Left_Curly_Bracket)
+               then
+                  State := Open_Bracket;
+
+               else
+                  Result.Append (VSS.Characters.Virtual_Character'Val (Code));
+               end if;
+
+            when Open_Bracket =>
+               if Code =
+                 VSS.Characters.Virtual_Character'Pos
+                   (VSS.Characters.Latin.Left_Curly_Bracket)
+               then
+                  Result.Append ('{');
+                  State := Initial;
+
+               elsif Code =
+                 VSS.Characters.Virtual_Character'Pos
+                   (VSS.Characters.Latin.Right_Curly_Bracket)
+               then
+                  Append_Parameter;
+                  State := Initial;
+
+               else
+                  State := Format;
+               end if;
+
+            when Format =>
+               if Code =
+                 VSS.Characters.Virtual_Character'Pos
+                   (VSS.Characters.Latin.Right_Curly_Bracket)
+               then
+                  Append_Parameter;
+                  State := Initial;
+               end if;
+         end case;
+      end loop;
+
+      return Result;
    end Format;
 
    ------------

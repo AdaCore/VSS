@@ -25,6 +25,8 @@ package body VSS.JSON.Implementation.Parsers is
    function Parse_Object (Self : in out JSON_Parser'Class) return Boolean;
 
    function Parse_Number (Self : in out JSON_Parser'Class) return Boolean;
+   --  Parse number. When parse of number is done Number_Value event is
+   --  reported, thus, subprogram returns False always.
 
    function Parse_String (Self : in out JSON_Parser'Class) return Boolean;
 
@@ -470,7 +472,8 @@ package body VSS.JSON.Implementation.Parsers is
       Frac_Digits,
       Exp_Sign_Or_Digits,
       Exp_Digit,
-      Exp_Digits);
+      Exp_Digits,
+      Report_Value);
 
    function Parse_Number (Self : in out JSON_Parser'Class) return Boolean is
       --  [RFC 8259]
@@ -532,24 +535,27 @@ package body VSS.JSON.Implementation.Parsers is
       end if;
 
       loop
+         case State is
+            when Report_Value =>
+               VSS.JSON.Implementation.Numbers.To_JSON_Number
+                 (Self.Number_State,
+                  Self.String_Value,
+                  Self.Number);
+               Self.Event := VSS.JSON.Pull_Readers.Number_Value;
+
+               return False;
+
+            when others =>
+               null;
+         end case;
+
          if not Self.Read (Parse_Number'Access, Number_State'Pos (State)) then
             if Self.Stream.Is_End_Of_Stream then
                if State
                     in Int_Digits | Frac_Or_Exp | Frac_Digits | Exp_Digits
                   --  XXX allowed states and conditions need to be checked.
                then
-                  --  Simulate successful read when 'string' parsing has been
-                  --  finished, 'string' is not nested into another construct,
-                  --  and end of stream has been reached.
-
-                  Self.C := Wide_Wide_Character'Last;
-
-                  VSS.JSON.Implementation.Numbers.To_JSON_Number
-                    (Self.Number_State,
-                     Self.String_Value,
-                     Self.Number);
-
-                  return True;
+                  State := Report_Value;
 
                else
                   --  XXX Self.Stack.Push???
@@ -602,12 +608,7 @@ package body VSS.JSON.Implementation.Parsers is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     VSS.JSON.Implementation.Numbers.To_JSON_Number
-                       (Self.Number_State,
-                        Self.String_Value,
-                        Self.Number);
-
-                     return True;
+                     State := Report_Value;
                end case;
 
             when Frac_Or_Exp =>
@@ -625,12 +626,7 @@ package body VSS.JSON.Implementation.Parsers is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     VSS.JSON.Implementation.Numbers.To_JSON_Number
-                       (Self.Number_State,
-                        Self.String_Value,
-                        Self.Number);
-
-                     return True;
+                     State := Report_Value;
                end case;
 
             when Frac_Digit =>
@@ -660,12 +656,7 @@ package body VSS.JSON.Implementation.Parsers is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     VSS.JSON.Implementation.Numbers.To_JSON_Number
-                       (Self.Number_State,
-                        Self.String_Value,
-                        Self.Number);
-
-                     return True;
+                     State := Report_Value;
                end case;
 
             when Exp_Sign_Or_Digits =>
@@ -714,13 +705,11 @@ package body VSS.JSON.Implementation.Parsers is
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
-                     VSS.JSON.Implementation.Numbers.To_JSON_Number
-                       (Self.Number_State,
-                        Self.String_Value,
-                        Self.Number);
-
-                     return True;
+                     State := Report_Value;
                end case;
+
+            when Report_Value =>
+               null;
          end case;
       end loop;
    end Parse_Number;
@@ -1231,7 +1220,6 @@ package body VSS.JSON.Implementation.Parsers is
    type Value_State is
      (Initial,
       Value_String,
-      Value_Number,
       Value_F,
       Value_FA,
       Value_FAL,
@@ -1245,7 +1233,8 @@ package body VSS.JSON.Implementation.Parsers is
       Finish);
 
    function Parse_Value (Self : in out JSON_Parser'Class) return Boolean is
-      State : Value_State;
+      State   : Value_State;
+      Success : Boolean;
 
    begin
       if not Self.Stack.Is_Empty then
@@ -1299,18 +1288,10 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Value_T;
 
                   when Hyphen_Minus | Digit_Zero .. Digit_Nine =>
-                     if not Self.Parse_Number then
-                        State := Value_Number;
-                        Self.Push
-                          (Parse_Value'Access, Value_State'Pos (State));
+                     Success := Self.Parse_Number;
+                     pragma Assert (not Success);  --  Always return False
 
-                        return False;
-
-                     else
-                        Self.Event := VSS.JSON.Pull_Readers.Number_Value;
-
-                        return False;
-                     end if;
+                     return False;
 
                   when Begin_Array =>
                      if not Self.Parse_Array then
@@ -1340,11 +1321,6 @@ package body VSS.JSON.Implementation.Parsers is
 
             when Value_String =>
                Self.Event := VSS.JSON.Pull_Readers.String_Value;
-
-               return False;
-
-            when Value_Number =>
-               Self.Event := VSS.JSON.Pull_Readers.Number_Value;
 
                return False;
 
@@ -1378,9 +1354,6 @@ package body VSS.JSON.Implementation.Parsers is
          case State is
             when Initial =>
                null;
-
-            when Value_Number =>
-               raise Program_Error;
 
             when Value_String =>
                raise Program_Error;

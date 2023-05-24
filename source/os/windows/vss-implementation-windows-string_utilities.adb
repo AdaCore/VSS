@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -69,9 +69,9 @@ package body VSS.Implementation.Windows.String_Utilities is
    begin
       while Index <= Item'Last loop
          declare
-            use type VSS.Unicode.Code_Point;
+            use type Interfaces.Unsigned_32;
 
-            C : VSS.Unicode.Code_Point :=
+            C : Interfaces.Unsigned_32 :=
               Interfaces.C.char16_t'Pos (Item (Index));
 
          begin

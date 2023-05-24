@@ -61,6 +61,50 @@ package body VSS.Strings.Cursors is
       end if;
    end Character_Length;
 
+   -------------
+   -- Element --
+   -------------
+
+   overriding function Element
+     (Self : Segment_Cursor_Base) return VSS.Strings.Virtual_String
+   is
+      Owner : VSS.Strings.Magic_String_Access renames
+        VSS.Strings.Magic_String_Access (Self.Owner);
+
+   begin
+      return Result : VSS.Strings.Virtual_String do
+         if Self.Owner /= null then
+            VSS.Implementation.Strings.Handler (Owner.Data).Slice
+              (Owner.Data,
+               Self.First_Position,
+               Self.Last_Position,
+               Result.Data);
+         end if;
+      end return;
+   end Element;
+
+   -------------
+   -- Element --
+   -------------
+
+   overriding function Element
+     (Self : Segment_Cursor_Limited_Base) return VSS.Strings.Virtual_String
+   is
+      Owner : VSS.Strings.Magic_String_Access renames
+        VSS.Strings.Magic_String_Access (Self.Owner);
+
+   begin
+      return Result : VSS.Strings.Virtual_String do
+         if Self.Owner /= null then
+            VSS.Implementation.Strings.Handler (Owner.Data).Slice
+              (Owner.Data,
+               Self.First_Position,
+               Self.Last_Position,
+               Result.Data);
+         end if;
+      end return;
+   end Element;
+
    ---------------------------
    -- First_Character_Index --
    ---------------------------

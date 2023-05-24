@@ -19,13 +19,10 @@ package VSS.Implementation.UTF8_Encoding is
      array (VSS.Unicode.UTF8_Code_Unit_Count range <>)
      of VSS.Unicode.UTF8_Code_Unit;
 
-   subtype UTF8_Sequence_Length
-     is VSS.Unicode.UTF8_Code_Unit_Count range 1 .. 4;
-
    pragma Warnings (Off, "aspect ""PRE"" not enforced on inlined subprogram");
    procedure Encode
      (Code   : VSS.Unicode.Code_Point;
-      Length : out UTF8_Sequence_Length;
+      Length : out VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       Unit_1 : out VSS.Unicode.UTF8_Code_Unit;
       Unit_2 : out VSS.Unicode.UTF8_Code_Unit;
       Unit_3 : out VSS.Unicode.UTF8_Code_Unit;
@@ -58,7 +55,7 @@ package VSS.Implementation.UTF8_Encoding is
    procedure Unchecked_Store
      (Storage : in out VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       From    : VSS.Unicode.UTF8_Code_Unit_Offset;
-      Length  : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Length  : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       Unit_1  : VSS.Unicode.UTF8_Code_Unit;
       Unit_2  : VSS.Unicode.UTF8_Code_Unit;
       Unit_3  : VSS.Unicode.UTF8_Code_Unit;

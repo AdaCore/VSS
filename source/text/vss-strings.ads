@@ -109,6 +109,13 @@ package VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Characters.Character_Iterator;
    --  Return iterator pointing after the last character of the string.
 
+   function Before_First_Grapheme_Cluster
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
+   --  Return iterator pointing before the first grapheme cluster of the
+   --  string.
+
    function At_First_Grapheme_Cluster
      (Self : Virtual_String'Class)
       return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
@@ -128,6 +135,12 @@ package VSS.Strings is
                .Grapheme_Cluster_Iterator;
    --  Return iterator pointing to the grapheme cluster of the string at the
    --  given position.
+
+   function After_Last_Grapheme_Cluster
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Grapheme_Clusters
+               .Grapheme_Cluster_Iterator;
+   --  Return iterator pointing after the last grapheme cluster of the string.
 
    function At_First_Word
      (Self : Virtual_String'Class)

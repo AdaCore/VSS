@@ -11,13 +11,10 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    type Grapheme_Cluster_Iterator is
      new Abstract_Segment_Iterator with private;
 
-   function Backward (Self : in out Grapheme_Cluster_Iterator) return Boolean;
-   --  Move iterator to previous grapheme cluster.
-
-   --  function Before_First
-   --    (Item : VSS.Strings.Virtual_String'Class)
-   --     return Grapheme_Cluster_Iterator;
-   --  Create iterator pointing before the first grapheme cluster of the given
+   procedure Set_Before_First
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Set iterator to point before the first grapheme cluster of the given
    --  string.
 
    procedure Set_At_First
@@ -35,11 +32,14 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       On   : VSS.Strings.Virtual_String'Class);
    --  Set iterator to point to the last grapheme cluster of the string.
 
-   --  function After_Last
-   --    (Item : VSS.Strings.Virtual_String'Class)
-   --     return Grapheme_Cluster_Iterator;
-   --  Create iterator pointing after the last grapheme cluster of the given
+   procedure Set_After_Last
+     (Self : in out Grapheme_Cluster_Iterator;
+      On   : VSS.Strings.Virtual_String'Class);
+   --  Set iterator to point after the last grapheme cluster of the given
    --  string.
+
+   function Backward (Self : in out Grapheme_Cluster_Iterator) return Boolean;
+   --  Move iterator to previous grapheme cluster.
 
 private
 

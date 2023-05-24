@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -35,7 +35,7 @@ package body VSS.Strings.Conversions is
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
       S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
-      Length   : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Length   : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       Last     : Natural := Into'First - 1;
 
    begin
@@ -94,7 +94,7 @@ package body VSS.Strings.Conversions is
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
       S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
-      Length   : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      Length   : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
 
    begin
       Last := From - 1;
@@ -232,7 +232,7 @@ package body VSS.Strings.Conversions is
          U_Buffer :
            VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
          S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
-         Length   : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+         Length   : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
          Last     : Natural := 0;
 
       begin

@@ -111,7 +111,7 @@ package body VSS.Implementation.Null_String_Handlers is
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point'Base is
-        (VSS.Implementation.String_Handlers.No_Character);
+        (VSS.Implementation.Strings.No_Character);
 
    ---------------
    -- Ends_With --

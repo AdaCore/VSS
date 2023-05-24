@@ -97,6 +97,11 @@ package VSS.Strings.Cursors is
       return VSS.Strings.Character_Count is abstract;
    --  Length of the segment in characters.
 
+   function Element
+     (Self : Abstract_Segment_Cursor)
+      return VSS.Strings.Virtual_String is abstract;
+   --  Returns text segment pointed by the cursor.
+
 private
 
    ---------------------------
@@ -244,6 +249,9 @@ private
    overriding function Character_Length
      (Self : Segment_Cursor_Base) return VSS.Strings.Character_Count;
 
+   overriding function Element
+     (Self : Segment_Cursor_Base) return VSS.Strings.Virtual_String;
+
    ---------------------------------
    -- Segment_Cursor_Limited_Base --
    ---------------------------------
@@ -295,6 +303,9 @@ private
 
    overriding function Character_Length
      (Self : Segment_Cursor_Limited_Base) return VSS.Strings.Character_Count;
+
+   overriding function Element
+     (Self : Segment_Cursor_Limited_Base) return VSS.Strings.Virtual_String;
 
    ---------------
    -- Utilities --

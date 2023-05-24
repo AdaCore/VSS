@@ -55,11 +55,11 @@ package body VSS.Text_Streams.Memory_UTF8_Output is
    is
       pragma Unreferenced (Success);
 
-      use type VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      use type VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
 
       Code : constant VSS.Unicode.Code_Point :=
         VSS.Characters.Virtual_Character'Pos (Item);
-      L    : VSS.Implementation.UTF8_Encoding.UTF8_Sequence_Length;
+      L    : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
       U1   : VSS.Unicode.UTF8_Code_Unit;
       U2   : VSS.Unicode.UTF8_Code_Unit;
       U3   : VSS.Unicode.UTF8_Code_Unit;

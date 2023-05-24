@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -246,7 +246,7 @@ package body VSS.JSON.Implementation.Parsers is
                   when others =>
                      return
                        Self.Report_Error
-                         ("value separator of end array expected");
+                         ("value separator or end array expected");
                end case;
 
             when Value =>

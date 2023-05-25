@@ -875,8 +875,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    ------------------
 
    type Object_State is
-     (Initial,
-      Whitespace_Or_Member,
+     (Whitespace_Or_Member,
       Member_Or_End_Object,
       Member_String,
       Member_Name_Separator,
@@ -908,22 +907,17 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end if;
 
       else
-         State := Initial;
+         pragma Assert (Self.C = Begin_Object);
+
+         State := Member_Or_End_Object;
+         Self.Event := VSS.JSON.Pull_Readers.Start_Object;
+         Self.Push (Parse_Object'Access, Object_State'Pos (State));
+
+         return False;
       end if;
 
       loop
          case State is
-            when Initial =>
-               if Self.C /= Begin_Object then
-                  raise Program_Error;
-               end if;
-
-               State := Member_Or_End_Object;
-               Self.Event := VSS.JSON.Pull_Readers.Start_Object;
-               Self.Push (Parse_Object'Access, Object_State'Pos (State));
-
-               return False;
-
             when Member_Or_End_Object =>
                null;
 
@@ -1022,9 +1016,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end if;
 
          case State is
-            when Initial =>
-               raise Program_Error;
-
             when Member_Or_End_Object =>
                case Self.C is
                   when Character_Tabulation

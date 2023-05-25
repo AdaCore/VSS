@@ -6,6 +6,8 @@
 
 --  RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange Format"
 
+with Ada.Unchecked_Conversion;
+
 with VSS.Characters;
 with VSS.Implementation.UCD_Core;
 
@@ -69,7 +71,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    Quotation_Mark            : constant Wide_Wide_Character := '"';  --  U+0022
    Hyphen_Minus              : constant Wide_Wide_Character := '-';
    Plus_Sign                 : constant Wide_Wide_Character := '+';
-   Reverse_Solidus           : constant Wide_Wide_Character := '\';  --  U+005C
+   Apostrophe                : constant Wide_Wide_Character := ''';  --  U+0027
    Solidus                   : constant Wide_Wide_Character := '/';  --  U+002F
    Digit_Zero                : constant Wide_Wide_Character := '0';
    Digit_One                 : constant Wide_Wide_Character := '1';
@@ -77,6 +79,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    Latin_Capital_Letter_A    : constant Wide_Wide_Character := 'A';  --  U+0041
    Latin_Capital_Letter_E    : constant Wide_Wide_Character := 'E';  --  U+0045
    Latin_Capital_Letter_F    : constant Wide_Wide_Character := 'F';  --  U+0046
+   Reverse_Solidus           : constant Wide_Wide_Character := '\';  --  U+005C
    Latin_Small_Letter_A      : constant Wide_Wide_Character := 'a';
    Latin_Small_Letter_B      : constant Wide_Wide_Character := 'b';  --  U+0062
    Latin_Small_Letter_E      : constant Wide_Wide_Character := 'e';
@@ -368,6 +371,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   when Begin_Array
                      | Begin_Object
                      | Quotation_Mark
+                     | Apostrophe
                      | Hyphen_Minus
                      | Digit_Zero .. Digit_Nine
                      | Latin_Small_Letter_F
@@ -980,7 +984,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   =>
                      null;
 
-                  when Quotation_Mark =>
+                  when Quotation_Mark | Apostrophe =>
                      State := Member_String;
 
                      if not Self.Parse_String then
@@ -1042,7 +1046,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   =>
                      null;
 
-                  when Quotation_Mark =>
+                  when Quotation_Mark | Apostrophe =>
                      State := Member_String;
 
                      if not Self.Parse_String then
@@ -1072,7 +1076,8 @@ package body VSS.JSON.Implementation.Parsers_5 is
    ------------------
 
    type String_State is
-     (Character_Data,
+     (Double_Character_Data,
+      Single_Character_Data,
       Escape,
       Escape_U,
       Escape_UX,
@@ -1086,10 +1091,23 @@ package body VSS.JSON.Implementation.Parsers_5 is
       Escape_UXXXX_Escape_UXXX,
       Finish);
 
+   type String_State_Record is record
+      Current : String_State;
+      Default : String_State;
+   end record with Size => Interfaces.Unsigned_32'Size;
+
    function Parse_String (Self : in out JSON5_Parser'Class) return Boolean is
 
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF16_Code_Unit;
+
+      function To_String_State is
+        new Ada.Unchecked_Conversion
+              (Interfaces.Unsigned_32, String_State_Record);
+
+      function To_Unsigned_32 is
+        new Ada.Unchecked_Conversion
+              (String_State_Record, Interfaces.Unsigned_32);
 
       function Hex_To_Code
         (Code : in out VSS.Unicode.UTF16_Code_Unit) return Boolean;
@@ -1131,11 +1149,11 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end case;
       end Hex_To_Code;
 
-      State : String_State;
+      State : String_State_Record;
 
    begin
       if not Self.Stack.Is_Empty then
-         State := String_State'Val (Self.Stack.Top.State);
+         State := To_String_State (Self.Stack.Top.State);
          Self.Stack.Pop;
 
          if not Self.Stack.Is_Empty then
@@ -1143,18 +1161,24 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end if;
 
       else
-         if Self.C /= Quotation_Mark then
-            raise Program_Error;
+         pragma Assert (Self.C in Quotation_Mark | Apostrophe);
+
+         if Self.C = Quotation_Mark then
+            State.Default := Double_Character_Data;
+
+         else
+            State.Default := Single_Character_Data;
          end if;
 
-         State := Character_Data;
          Self.Buffer.Clear;
+         State.Current := State.Default;
+
       end if;
 
       loop
-         if not Self.Read (Parse_String'Access, String_State'Pos (State)) then
+         if not Self.Read (Parse_String'Access, To_Unsigned_32 (State)) then
             if Self.Stream.Is_End_Of_Stream then
-               if State = Finish then
+               if State.Current = Finish then
                   return True;
 
                else
@@ -1166,11 +1190,11 @@ package body VSS.JSON.Implementation.Parsers_5 is
             end if;
          end if;
 
-         case State is
-            when Character_Data =>
+         case State.Current is
+            when Double_Character_Data =>
                case Self.C is
                   when Quotation_Mark =>
-                     State := Finish;
+                     State.Current := Finish;
 
                   when Wide_Wide_Character'Val (16#00_0000#)
                      .. Wide_Wide_Character'Val (16#00_001F#)
@@ -1178,7 +1202,25 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      return Self.Report_Error ("unescaped control character");
 
                   when Reverse_Solidus =>
-                     State := Escape;
+                     State.Current := Escape;
+
+                  when others =>
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+               end case;
+
+            when Single_Character_Data =>
+               case Self.C is
+                  when Apostrophe =>
+                     State.Current := Finish;
+
+                  when Wide_Wide_Character'Val (16#00_0000#)
+                     .. Wide_Wide_Character'Val (16#00_001F#)
+                  =>
+                     return Self.Report_Error ("unescaped control character");
+
+                  when Reverse_Solidus =>
+                     State.Current := Escape;
 
                   when others =>
                      Self.Buffer.Append
@@ -1188,48 +1230,53 @@ package body VSS.JSON.Implementation.Parsers_5 is
             when Escape =>
                case Self.C is
                   when Quotation_Mark =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Quotation_Mark));
 
+                  when Apostrophe =>
+                     State.Current := State.Default;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Apostrophe));
+
                   when Reverse_Solidus =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Reverse_Solidus));
 
                   when Solidus =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Solidus));
 
                   when Latin_Small_Letter_B =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Backspace));
 
                   when Latin_Small_Letter_F =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Form_Feed));
 
                   when Latin_Small_Letter_N =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Line_Feed));
 
                   when Latin_Small_Letter_R =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Carriage_Return));
 
                   when Latin_Small_Letter_T =>
-                     State := Character_Data;
+                     State.Current := State.Default;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character
                           (Character_Tabulation));
 
                   when Latin_Small_Letter_U =>
-                     State := Escape_U;
+                     State.Current := Escape_U;
 
                   when others =>
                      return
@@ -1238,7 +1285,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                end case;
 
             when Escape_U =>
-               State := Escape_UX;
+               State.Current := Escape_UX;
                Self.Code_Unit_1 := 0;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
@@ -1246,14 +1293,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
                end if;
 
             when Escape_UX =>
-               State := Escape_UXX;
+               State.Current := Escape_UXX;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
                   return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXX =>
-               State := Escape_UXXX;
+               State.Current := Escape_UXXX;
 
                if not Hex_To_Code (Self.Code_Unit_1) then
                   return Self.Report_Error ("hexadecimal letter expected");
@@ -1265,12 +1312,12 @@ package body VSS.JSON.Implementation.Parsers_5 is
                end if;
 
                if Self.Code_Unit_1 not in 16#D800# .. 16#DFFF# then
-                  State := Character_Data;
+                  State.Current := State.Default;
                   Self.Buffer.Append
                     (VSS.Characters.Virtual_Character'Val (Self.Code_Unit_1));
 
                elsif Self.Code_Unit_1 in 16#D800# .. 16#DBFF# then
-                  State := Escape_UXXXX;
+                  State.Current := Escape_UXXXX;
 
                else
                   return
@@ -1280,7 +1327,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
             when Escape_UXXXX =>
                case Self.C is
                   when Reverse_Solidus =>
-                     State := Escape_UXXXX_Escape;
+                     State.Current := Escape_UXXXX_Escape;
 
                   when others =>
                      return
@@ -1291,7 +1338,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
             when Escape_UXXXX_Escape =>
                case Self.C is
                   when Latin_Small_Letter_U =>
-                     State := Escape_UXXXX_Escape_U;
+                     State.Current := Escape_UXXXX_Escape_U;
 
                   when others =>
                      return
@@ -1300,7 +1347,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                end case;
 
             when Escape_UXXXX_Escape_U =>
-               State := Escape_UXXXX_Escape_UX;
+               State.Current := Escape_UXXXX_Escape_UX;
                Self.Code_Unit_2 := 0;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
@@ -1308,21 +1355,21 @@ package body VSS.JSON.Implementation.Parsers_5 is
                end if;
 
             when Escape_UXXXX_Escape_UX =>
-               State := Escape_UXXXX_Escape_UXX;
+               State.Current := Escape_UXXXX_Escape_UXX;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
                   return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UXX =>
-               State := Escape_UXXXX_Escape_UXXX;
+               State.Current := Escape_UXXXX_Escape_UXXX;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
                   return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
             when Escape_UXXXX_Escape_UXXX =>
-               State := Character_Data;
+               State.Current := State.Default;
 
                if not Hex_To_Code (Self.Code_Unit_2) then
                   return Self.Report_Error ("hexadecimal letter expected");
@@ -1410,7 +1457,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   =>
                      null;
 
-                  when Quotation_Mark =>
+                  when Quotation_Mark | Apostrophe =>
                      if not Self.Parse_String then
                         State := Value_String;
                         Self.Push

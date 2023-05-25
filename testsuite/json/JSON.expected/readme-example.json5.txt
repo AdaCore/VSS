@@ -1,0 +1,4 @@
+START_DOCUMENT
+START_OBJECT
+INVALID NOT_VALID "string or end object expected"
+END_DOCUMENT

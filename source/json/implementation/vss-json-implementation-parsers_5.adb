@@ -302,7 +302,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
    type Array_State is
      (Value_Or_End_Array,
-      Value,
       Value_Separator_Or_End_Array,
       Finish);
 
@@ -357,7 +356,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      null;
 
                   when Value_Separator =>
-                     State := Value;
+                     State := Value_Or_End_Array;
 
                   when End_Array =>
                      State := Finish;
@@ -376,9 +375,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
                             ("value separator or end array expected");
                      end if;
                end case;
-
-            when Value =>
-               null;
 
             when Finish =>
                null;
@@ -451,17 +447,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
                           Self.Report_Error ("value or end array expected");
                      end if;
                end case;
-
-            when Value =>
-               State := Value_Separator_Or_End_Array;
-
-               if not Self.Parse_Value then
-                  Self.Push (Parse_Array'Access, Array_State'Pos (State));
-
-                  return False;
-               end if;
-
-               raise Program_Error;
 
             when Value_Separator_Or_End_Array =>
                null;

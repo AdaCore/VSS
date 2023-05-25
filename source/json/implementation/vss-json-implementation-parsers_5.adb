@@ -7,6 +7,7 @@
 --  RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange Format"
 
 with VSS.Characters;
+with VSS.Implementation.UCD_Core;
 
 package body VSS.JSON.Implementation.Parsers_5 is
 
@@ -43,46 +44,71 @@ package body VSS.JSON.Implementation.Parsers_5 is
       Message : Wide_Wide_String) return Boolean;
    --  Set parser into document not valid state. Always return False.
 
-   Backspace              : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_0008#);
-   Character_Tabulation   : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_0009#);
-   Line_Feed              : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000A#);
-   Form_Feed              : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000C#);
-   Carriage_Return        : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000D#);
-   Space                  : constant Wide_Wide_Character := ' ';  --  U+0020
-   Quotation_Mark         : constant Wide_Wide_Character := '"';  --  U+0022
-   Hyphen_Minus           : constant Wide_Wide_Character := '-';
-   Plus_Sign              : constant Wide_Wide_Character := '+';
-   Reverse_Solidus        : constant Wide_Wide_Character := '\';  --  U+005C
-   Solidus                : constant Wide_Wide_Character := '/';  --  U+002F
-   Digit_Zero             : constant Wide_Wide_Character := '0';
-   Digit_One              : constant Wide_Wide_Character := '1';
-   Digit_Nine             : constant Wide_Wide_Character := '9';
-   Latin_Capital_Letter_A : constant Wide_Wide_Character := 'A';  --  U+0041
-   Latin_Capital_Letter_E : constant Wide_Wide_Character := 'E';  --  U+0045
-   Latin_Capital_Letter_F : constant Wide_Wide_Character := 'F';  --  U+0046
-   Latin_Small_Letter_A   : constant Wide_Wide_Character := 'a';
-   Latin_Small_Letter_B   : constant Wide_Wide_Character := 'b';  --  U+0062
-   Latin_Small_Letter_E   : constant Wide_Wide_Character := 'e';
-   Latin_Small_Letter_F   : constant Wide_Wide_Character := 'f';  --  U+0066
-   Latin_Small_Letter_L   : constant Wide_Wide_Character := 'l';
-   Latin_Small_Letter_N   : constant Wide_Wide_Character := 'n';  --  U+006E
-   Latin_Small_Letter_R   : constant Wide_Wide_Character := 'r';  --  U+0072
-   Latin_Small_Letter_S   : constant Wide_Wide_Character := 's';  --  U+0071
-   Latin_Small_Letter_T   : constant Wide_Wide_Character := 't';  --  U+0074
-   Latin_Small_Letter_U   : constant Wide_Wide_Character := 'u';  --  U+0075
+   function Is_Space_Separator (Self : JSON5_Parser'Class) return Boolean;
+   --  Returns True when current character belongs to Zs (space, separator)
+   --  general category.
 
-   Begin_Array            : constant Wide_Wide_Character := '[';
-   Begin_Object           : constant Wide_Wide_Character := '{';
-   End_Array              : constant Wide_Wide_Character := ']';
-   End_Object             : constant Wide_Wide_Character := '}';
-   Name_Separator         : constant Wide_Wide_Character := ':';
-   Value_Separator        : constant Wide_Wide_Character := ',';
-   Decimal_Point          : constant Wide_Wide_Character := '.';
+   function Extract_Core_Data
+     (Code : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Core.Core_Data_Record;
+   --  Retrieve core properties record for the given code point.
+
+   Backspace                 : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_0008#);
+   Character_Tabulation      : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_0009#);
+   Line_Feed                 : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_000A#);
+   Line_Tabulation           : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_000B#);
+   Form_Feed                 : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_000C#);
+   Carriage_Return           : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_000D#);
+   Space                     : constant Wide_Wide_Character := ' ';  --  U+0020
+   Quotation_Mark            : constant Wide_Wide_Character := '"';  --  U+0022
+   Hyphen_Minus              : constant Wide_Wide_Character := '-';
+   Plus_Sign                 : constant Wide_Wide_Character := '+';
+   Reverse_Solidus           : constant Wide_Wide_Character := '\';  --  U+005C
+   Solidus                   : constant Wide_Wide_Character := '/';  --  U+002F
+   Digit_Zero                : constant Wide_Wide_Character := '0';
+   Digit_One                 : constant Wide_Wide_Character := '1';
+   Digit_Nine                : constant Wide_Wide_Character := '9';
+   Latin_Capital_Letter_A    : constant Wide_Wide_Character := 'A';  --  U+0041
+   Latin_Capital_Letter_E    : constant Wide_Wide_Character := 'E';  --  U+0045
+   Latin_Capital_Letter_F    : constant Wide_Wide_Character := 'F';  --  U+0046
+   Latin_Small_Letter_A      : constant Wide_Wide_Character := 'a';
+   Latin_Small_Letter_B      : constant Wide_Wide_Character := 'b';  --  U+0062
+   Latin_Small_Letter_E      : constant Wide_Wide_Character := 'e';
+   Latin_Small_Letter_F      : constant Wide_Wide_Character := 'f';  --  U+0066
+   Latin_Small_Letter_L      : constant Wide_Wide_Character := 'l';
+   Latin_Small_Letter_N      : constant Wide_Wide_Character := 'n';  --  U+006E
+   Latin_Small_Letter_R      : constant Wide_Wide_Character := 'r';  --  U+0072
+   Latin_Small_Letter_S      : constant Wide_Wide_Character := 's';  --  U+0071
+   Latin_Small_Letter_T      : constant Wide_Wide_Character := 't';  --  U+0074
+   Latin_Small_Letter_U      : constant Wide_Wide_Character := 'u';  --  U+0075
+
+   Begin_Array               : constant Wide_Wide_Character := '[';
+   Begin_Object              : constant Wide_Wide_Character := '{';
+   End_Array                 : constant Wide_Wide_Character := ']';
+   End_Object                : constant Wide_Wide_Character := '}';
+   Name_Separator            : constant Wide_Wide_Character := ':';
+   Value_Separator           : constant Wide_Wide_Character := ',';
+   Decimal_Point             : constant Wide_Wide_Character := '.';
+
+   No_Break_Space            : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_00A0#);
+
+   Line_Separator            : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_2028#);
+   Paragraph_Separator       : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_2029#);
+
+   Zero_Width_No_Break_Space : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_FEFF#);
+
+   End_Of_Stream             : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#1F_FFFF#);
 
    ------------
    -- At_End --
@@ -137,6 +163,30 @@ package body VSS.JSON.Implementation.Parsers_5 is
       return Self.Event;
    end Event_Kind;
 
+   -----------------------
+   -- Extract_Core_Data --
+   -----------------------
+
+   function Extract_Core_Data
+     (Code : VSS.Unicode.Code_Point)
+      return VSS.Implementation.UCD_Core.Core_Data_Record
+   is
+      use type VSS.Implementation.UCD_Core.Core_Offset;
+      use type VSS.Unicode.Code_Point;
+
+      Block : constant VSS.Implementation.UCD_Core.Core_Index :=
+        VSS.Implementation.UCD_Core.Core_Index
+          (Code / VSS.Implementation.UCD_Core.Block_Size);
+      Offset : constant VSS.Implementation.UCD_Core.Core_Offset :=
+        VSS.Implementation.UCD_Core.Core_Offset
+          (Code mod VSS.Implementation.UCD_Core.Block_Size);
+
+   begin
+      return
+        VSS.Implementation.UCD_Core.Core_Data_Table
+          (VSS.Implementation.UCD_Core.Core_Index_Table (Block) + Offset);
+   end Extract_Core_Data;
+
    --------------
    -- Is_Empty --
    --------------
@@ -145,6 +195,17 @@ package body VSS.JSON.Implementation.Parsers_5 is
    begin
       return Self.Head = 0;
    end Is_Empty;
+
+   ------------------------
+   -- Is_Space_Separator --
+   ------------------------
+
+   function Is_Space_Separator (Self : JSON5_Parser'Class) return Boolean is
+      use all type VSS.Implementation.UCD_Core.GC_Values;
+
+   begin
+      return Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC = GC_Zs;
+   end Is_Space_Separator;
 
    ------------------
    -- Number_Value --
@@ -229,10 +290,16 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
             when Value_Separator_Or_End_Array =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
@@ -246,10 +313,15 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                      return False;
 
+                  when End_Of_Stream =>
+                     return Self.Report_Error ("unexpected end of document");
+
                   when others =>
-                     return
-                       Self.Report_Error
-                         ("value separator or end array expected");
+                     if not Self.Is_Space_Separator then
+                        return
+                          Self.Report_Error
+                            ("value separator or end array expected");
+                     end if;
                end case;
 
             when Value =>
@@ -280,10 +352,16 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
             when Value_Or_End_Array =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
@@ -314,8 +392,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                      return False;
 
+                  when End_Of_Stream =>
+                     raise Program_Error;
+
                   when others =>
-                     return Self.Report_Error ("value or end array expected");
+                     if not Self.Is_Space_Separator then
+                        return
+                          Self.Report_Error ("value or end array expected");
+                     end if;
                end case;
 
             when Value =>
@@ -392,22 +476,33 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
             when Whitespace_Or_End =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
-                  when Wide_Wide_Character'Last =>
-                     null;
+                  when End_Of_Stream =>
+                     Self.Event := VSS.JSON.Pull_Readers.End_Document;
+
+                     return False;
 
                   when others =>
-                     State := Done;
-                     Self.Push
-                       (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
+                     if not Self.Is_Space_Separator then
+                        State := Done;
+                        Self.Push
+                          (Parse_JSON_Text'Access,
+                           JSON_Text_State'Pos (State));
 
-                     return Self.Report_Error ("end of document expected");
+                        return Self.Report_Error ("end of document expected");
+                     end if;
                end case;
 
             when Done =>
@@ -784,26 +879,43 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
             when Member_Name_Separator =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
                   when Name_Separator =>
                      State := Member_Value;
 
+                  when End_Of_Stream =>
+                     return Self.Report_Error ("unexpected end of document");
+
                   when others =>
-                     return Self.Report_Error ("name separator expected");
+                     if not Self.Is_Space_Separator then
+                        return Self.Report_Error ("name separator expected");
+                     end if;
                end case;
 
             when Value_Separator_Or_End_Object =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
@@ -817,10 +929,15 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                      return False;
 
+                  when End_Of_Stream =>
+                     return Self.Report_Error ("unexpected end of document");
+
                   when others =>
-                     return
-                       Self.Report_Error
-                         ("value separator or end object expected");
+                     if not Self.Is_Space_Separator then
+                        return
+                          Self.Report_Error
+                            ("value separator or end object expected");
+                     end if;
                end case;
 
             when Finish =>
@@ -850,10 +967,16 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
             when Member_Or_End_Object =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
@@ -874,9 +997,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                      return False;
 
+                  when End_Of_Stream =>
+                     raise Program_Error;
+
                   when others =>
-                     return
-                       Self.Report_Error ("string or end object expected");
+                     if not Self.Is_Space_Separator then
+                        return
+                          Self.Report_Error ("string or end object expected");
+                     end if;
                end case;
 
             when Member_String =>
@@ -901,10 +1029,16 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
             when Whitespace_Or_Member =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
@@ -918,8 +1052,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
                         return False;
                      end if;
 
+                  when End_Of_Stream =>
+                     raise Program_Error;
+
                   when others =>
-                     return Self.Report_Error ("string expected");
+                     if not Self.Is_Space_Separator then
+                        return Self.Report_Error ("string expected");
+                     end if;
                end case;
 
             when Finish =>
@@ -1258,10 +1397,16 @@ package body VSS.JSON.Implementation.Parsers_5 is
          case State is
             when Initial =>
                case Self.C is
-                  when Space
-                     | Character_Tabulation
+                  when Character_Tabulation
                      | Line_Feed
+                     | Line_Tabulation
+                     | Form_Feed
                      | Carriage_Return
+                     | Space
+                     | No_Break_Space
+                     | Line_Separator
+                     | Paragraph_Separator
+                     | Zero_Width_No_Break_Space
                   =>
                      null;
 
@@ -1316,8 +1461,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
                         raise Program_Error;
                      end if;
 
+                  when End_Of_Stream =>
+                     raise Program_Error;
+
                   when others =>
-                     return Self.Report_Error ("value expected");
+                     if not Self.Is_Space_Separator then
+                        return Self.Report_Error ("value expected");
+                     end if;
                end case;
 
             when Value_String =>
@@ -1342,6 +1492,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
             if Self.Stream.Is_End_Of_Stream then
                if State = Finish then
                   return True;
+
+               elsif State = Initial then
+                  return Self.Report_Error ("value expected");
 
                else
                   return Self.Report_Error ("premature end of value");
@@ -1524,7 +1677,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
       if not Success then
          if Self.Stream.Is_End_Of_Stream then
-            Self.C := Wide_Wide_Character'Last;
+            Self.C := End_Of_Stream;
          end if;
 
          if Self.Stream.Has_Error then

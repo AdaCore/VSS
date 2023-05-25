@@ -8,30 +8,30 @@
 
 with VSS.Characters;
 
-package body VSS.JSON.Implementation.Parsers is
+package body VSS.JSON.Implementation.Parsers_5 is
 
    use type VSS.JSON.Pull_Readers.JSON_Event_Kind;
    use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    function Parse_JSON_Text
-     (Self : in out JSON_Parser'Class) return Boolean;
+     (Self : in out JSON5_Parser'Class) return Boolean;
    --  Parse 'json-text'.
 
-   function Parse_Value (Self : in out JSON_Parser'Class) return Boolean;
+   function Parse_Value (Self : in out JSON5_Parser'Class) return Boolean;
    --  Parse 'value'. Skip all leading whitespaces.
 
-   function Parse_Array (Self : in out JSON_Parser'Class) return Boolean;
+   function Parse_Array (Self : in out JSON5_Parser'Class) return Boolean;
 
-   function Parse_Object (Self : in out JSON_Parser'Class) return Boolean;
+   function Parse_Object (Self : in out JSON5_Parser'Class) return Boolean;
 
-   function Parse_Number (Self : in out JSON_Parser'Class) return Boolean;
+   function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean;
    --  Parse number. When parse of number is done Number_Value event is
    --  reported, thus, subprogram returns False always.
 
-   function Parse_String (Self : in out JSON_Parser'Class) return Boolean;
+   function Parse_String (Self : in out JSON5_Parser'Class) return Boolean;
 
    function Read
-     (Self  : in out JSON_Parser'Class;
+     (Self  : in out JSON5_Parser'Class;
       Parse : not null Parse_Subprogram;
       State : Interfaces.Unsigned_32) return Boolean;
    --  Attempt to read next character from the text stream. Return True is
@@ -39,7 +39,7 @@ package body VSS.JSON.Implementation.Parsers is
    --  parser's state stack and return False.
 
    function Report_Error
-     (Self    : in out JSON_Parser'Class;
+     (Self    : in out JSON5_Parser'Class;
       Message : Wide_Wide_String) return Boolean;
    --  Set parser into document not valid state. Always return False.
 
@@ -88,7 +88,7 @@ package body VSS.JSON.Implementation.Parsers is
    -- At_End --
    ------------
 
-   function At_End (Self : JSON_Parser'Class) return Boolean is
+   function At_End (Self : JSON5_Parser'Class) return Boolean is
    begin
       return
         Self.Stack.Is_Empty and
@@ -100,7 +100,7 @@ package body VSS.JSON.Implementation.Parsers is
    -- Boolean_Value --
    -------------------
 
-   function Boolean_Value (Self : JSON_Parser'Class) return Boolean is
+   function Boolean_Value (Self : JSON5_Parser'Class) return Boolean is
    begin
       return Self.Boolean;
    end Boolean_Value;
@@ -110,7 +110,7 @@ package body VSS.JSON.Implementation.Parsers is
    -----------
 
    function Error
-     (Self : JSON_Parser'Class)
+     (Self : JSON5_Parser'Class)
       return VSS.JSON.Pull_Readers.JSON_Reader_Error is
    begin
       return Self.Error;
@@ -121,7 +121,7 @@ package body VSS.JSON.Implementation.Parsers is
    -------------------
 
    function Error_Message
-     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String is
+     (Self : JSON5_Parser'Class) return VSS.Strings.Virtual_String is
    begin
       return Self.Message;
    end Error_Message;
@@ -131,7 +131,8 @@ package body VSS.JSON.Implementation.Parsers is
    ----------------
 
    function Event_Kind
-     (Self : JSON_Parser'Class) return VSS.JSON.Pull_Readers.JSON_Event_Kind is
+     (Self : JSON5_Parser'Class)
+      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
    begin
       return Self.Event;
    end Event_Kind;
@@ -150,7 +151,7 @@ package body VSS.JSON.Implementation.Parsers is
    ------------------
 
    function Number_Value
-     (Self : JSON_Parser'Class) return VSS.JSON.JSON_Number is
+     (Self : JSON5_Parser'Class) return VSS.JSON.JSON_Number is
    begin
       return Self.Number;
    end Number_Value;
@@ -159,7 +160,7 @@ package body VSS.JSON.Implementation.Parsers is
    -- Parse --
    -----------
 
-   procedure Parse (Self : in out JSON_Parser'Class) is
+   procedure Parse (Self : in out JSON5_Parser'Class) is
    begin
       if Self.Stack.Is_Empty then
          if Parse_JSON_Text (Self) then
@@ -186,7 +187,7 @@ package body VSS.JSON.Implementation.Parsers is
       Value_Separator_Or_End_Array,
       Finish);
 
-   function Parse_Array (Self : in out JSON_Parser'Class) return Boolean is
+   function Parse_Array (Self : in out JSON5_Parser'Class) return Boolean is
       --  [RFC 8259]
       --
       --  array = begin-array [ value *( value-separator value ) ] end-array
@@ -345,7 +346,7 @@ package body VSS.JSON.Implementation.Parsers is
    type JSON_Text_State is (Initial, Whitespace_Or_End, Done);
 
    function Parse_JSON_Text
-     (Self : in out JSON_Parser'Class) return Boolean
+     (Self : in out JSON5_Parser'Class) return Boolean
    is
       --  [RFC 8259]
       --
@@ -475,7 +476,7 @@ package body VSS.JSON.Implementation.Parsers is
       Exp_Digits,
       Report_Value);
 
-   function Parse_Number (Self : in out JSON_Parser'Class) return Boolean is
+   function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean is
       --  [RFC 8259]
       --
       --  number = [ minus ] int [ frac ] [ exp ]
@@ -728,7 +729,7 @@ package body VSS.JSON.Implementation.Parsers is
       Value_Separator_Or_End_Object,
       Finish);
 
-   function Parse_Object (Self : in out JSON_Parser'Class) return Boolean is
+   function Parse_Object (Self : in out JSON5_Parser'Class) return Boolean is
       --  [RFC 8259]
       --
       --  object = begin-object [ member *( value-separator member ) ]
@@ -946,7 +947,7 @@ package body VSS.JSON.Implementation.Parsers is
       Escape_UXXXX_Escape_UXXX,
       Finish);
 
-   function Parse_String (Self : in out JSON_Parser'Class) return Boolean is
+   function Parse_String (Self : in out JSON5_Parser'Class) return Boolean is
 
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF16_Code_Unit;
@@ -1232,7 +1233,7 @@ package body VSS.JSON.Implementation.Parsers is
       Value_TRU,
       Finish);
 
-   function Parse_Value (Self : in out JSON_Parser'Class) return Boolean is
+   function Parse_Value (Self : in out JSON5_Parser'Class) return Boolean is
       State   : Value_State;
       Success : Boolean;
 
@@ -1482,7 +1483,7 @@ package body VSS.JSON.Implementation.Parsers is
    ----------
 
    procedure Push
-     (Self  : in out JSON_Parser'Class;
+     (Self  : in out JSON5_Parser'Class;
       Parse : not null Parse_Subprogram;
       State : Interfaces.Unsigned_32) is
    begin
@@ -1511,7 +1512,7 @@ package body VSS.JSON.Implementation.Parsers is
    ----------
 
    function Read
-     (Self  : in out JSON_Parser'Class;
+     (Self  : in out JSON5_Parser'Class;
       Parse : not null Parse_Subprogram;
       State : Interfaces.Unsigned_32) return Boolean
    is
@@ -1559,7 +1560,7 @@ package body VSS.JSON.Implementation.Parsers is
    ------------------
 
    function Report_Error
-     (Self    : in out JSON_Parser'Class;
+     (Self    : in out JSON5_Parser'Class;
       Message : Wide_Wide_String) return Boolean is
    begin
       Self.Event := VSS.JSON.Pull_Readers.Invalid;
@@ -1574,7 +1575,7 @@ package body VSS.JSON.Implementation.Parsers is
    ----------------
 
    procedure Set_Stream
-     (Self   : in out JSON_Parser'Class;
+     (Self   : in out JSON5_Parser'Class;
       Stream : not null VSS.Text_Streams.Input_Text_Stream_Access) is
    begin
       Self.Stream := Stream;
@@ -1585,7 +1586,7 @@ package body VSS.JSON.Implementation.Parsers is
    ------------------
 
    function String_Value
-     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String is
+     (Self : JSON5_Parser'Class) return VSS.Strings.Virtual_String is
    begin
       return Self.Buffer;
    end String_Value;
@@ -1599,4 +1600,4 @@ package body VSS.JSON.Implementation.Parsers is
       return Self.Stack (Self.Head);
    end Top;
 
-end VSS.JSON.Implementation.Parsers;
+end VSS.JSON.Implementation.Parsers_5;

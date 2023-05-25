@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -59,7 +59,6 @@ package body Platform is
 
    function Use_Message_Box return Boolean is
       use type VSS.Implementation.Windows.DWORD;
-      use type VSS.Implementation.Windows.HANDLE;
       use type VSS.Implementation.Windows.HWND;
 
       Info : aliased VSS.Implementation.Windows.Kernel32.STARTUPINFO;

@@ -850,8 +850,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    ------------------
 
    type Object_State is
-     (Whitespace_Or_Member,
-      Member_Or_End_Object,
+     (Member_Or_End_Object,
       Member_String,
       Member_Name_Separator,
       Member_Value,
@@ -894,9 +893,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
       loop
          case State is
             when Member_Or_End_Object =>
-               null;
-
-            when Whitespace_Or_Member =>
                null;
 
             when Member_String =>
@@ -949,7 +945,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      null;
 
                   when Value_Separator =>
-                     State := Whitespace_Or_Member;
+                     State := Member_Or_End_Object;
 
                   when End_Object =>
                      State := Finish;
@@ -1052,40 +1048,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
             when Value_Separator_Or_End_Object =>
                null;
-
-            when Whitespace_Or_Member =>
-               case Self.C is
-                  when Character_Tabulation
-                     | Line_Feed
-                     | Line_Tabulation
-                     | Form_Feed
-                     | Carriage_Return
-                     | Space
-                     | No_Break_Space
-                     | Line_Separator
-                     | Paragraph_Separator
-                     | Zero_Width_No_Break_Space
-                  =>
-                     null;
-
-                  when Quotation_Mark | Apostrophe =>
-                     State := Member_String;
-
-                     if not Self.Parse_String then
-                        Self.Push
-                          (Parse_Object'Access, Object_State'Pos (State));
-
-                        return False;
-                     end if;
-
-                  when End_Of_Stream =>
-                     raise Program_Error;
-
-                  when others =>
-                     if not Self.Is_Space_Separator then
-                        return Self.Report_Error ("string expected");
-                     end if;
-               end case;
 
             when Finish =>
                return True;

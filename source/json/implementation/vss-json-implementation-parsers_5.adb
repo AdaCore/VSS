@@ -301,8 +301,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    -----------------
 
    type Array_State is
-     (Initial,
-      Value_Or_End_Array,
+     (Value_Or_End_Array,
       Value,
       Value_Separator_Or_End_Array,
       Finish);
@@ -328,22 +327,17 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end if;
 
       else
-         State := Initial;
+         pragma Assert (Self.C = Begin_Array);
+
+         State := Value_Or_End_Array;
+         Self.Event := VSS.JSON.Pull_Readers.Start_Array;
+         Self.Push (Parse_Array'Access, Array_State'Pos (State));
+
+         return False;
       end if;
 
       loop
          case State is
-            when Initial =>
-               if Self.C /= Begin_Array then
-                  raise Program_Error;
-               end if;
-
-               State := Value_Or_End_Array;
-               Self.Event := VSS.JSON.Pull_Readers.Start_Array;
-               Self.Push (Parse_Array'Access, Array_State'Pos (State));
-
-               return False;
-
             when Value_Or_End_Array =>
                null;
 
@@ -405,10 +399,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end if;
 
          case State is
-            when Initial =>
-               raise Program_Error;
-               --  Initial state is used to report Start_Array event.
-
             when Value_Or_End_Array =>
                case Self.C is
                   when Character_Tabulation

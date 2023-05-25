@@ -1196,10 +1196,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   when Quotation_Mark =>
                      State.Current := Finish;
 
-                  when Wide_Wide_Character'Val (16#00_0000#)
-                     .. Wide_Wide_Character'Val (16#00_001F#)
-                  =>
-                     return Self.Report_Error ("unescaped control character");
+                  when Line_Feed | Carriage_Return =>
+                     return Self.Report_Error ("unescaped line terminator");
+
+                  when Line_Separator | Paragraph_Separator =>
+                     --  XXX JSON5: it is recommended to report warning
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Reverse_Solidus =>
                      State.Current := Escape;
@@ -1214,10 +1217,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   when Apostrophe =>
                      State.Current := Finish;
 
-                  when Wide_Wide_Character'Val (16#00_0000#)
-                     .. Wide_Wide_Character'Val (16#00_001F#)
-                  =>
-                     return Self.Report_Error ("unescaped control character");
+                  when Line_Feed | Carriage_Return =>
+                     return Self.Report_Error ("unescaped line terminator");
+
+                  when Line_Separator | Paragraph_Separator =>
+                     --  XXX JSON5: it is recommended to report warning
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
 
                   when Reverse_Solidus =>
                      State.Current := Escape;

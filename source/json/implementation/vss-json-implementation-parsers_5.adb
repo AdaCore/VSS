@@ -613,6 +613,8 @@ package body VSS.JSON.Implementation.Parsers_5 is
       Decimal_Exponent_Signed_Integer,
       Decimal_Exponent_Digits,
       Decimal_Exponent_Digits_Opt,
+      Hex_Digits,
+      Hex_Digits_Opt,
       Number_I,
       Number_IN,
       Number_INF,
@@ -622,7 +624,8 @@ package body VSS.JSON.Implementation.Parsers_5 is
       Number_INFINIT,
       Number_N,
       Number_NA,
-      Report_Numeric_Value,
+      Report_Decimal_Value,
+      Report_Hex_Value,
       Report_Special_Value);
 
    function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean is
@@ -677,6 +680,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
       --
       --  HexDigit :: one of
       --    0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F
+
+      use type Interfaces.Integer_64;
+      use type Interfaces.Unsigned_64;
 
       State : Number_State;
 
@@ -735,11 +741,28 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
       loop
          case State is
-            when Report_Numeric_Value =>
+            when Report_Decimal_Value =>
                VSS.JSON.Implementation.Numbers.To_JSON_Number
                  (Self.Number_State,
                   Self.String_Value,
                   Self.Number);
+               Self.Event := VSS.JSON.Pull_Readers.Number_Value;
+
+               return False;
+
+            when Report_Hex_Value =>
+               if (Self.Unsigned and 16#8000_0000_0000_0000#) = 0 then
+                  Self.Number :=
+                    (JSON_Integer,
+                     Self.Buffer,
+                     (if not Self.Number_State.Minus
+                        then Interfaces.Integer_64 (Self.Unsigned)
+                        else -Interfaces.Integer_64 (Self.Unsigned)));
+
+               else
+                  Self.Number := (Out_Of_Range, Self.Buffer);
+               end if;
+
                Self.Event := VSS.JSON.Pull_Readers.Number_Value;
 
                return False;
@@ -755,7 +778,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                          | Decimal_Fraction_Digits_Opt
                          | Decimal_Exponent_Digits_Opt
                then
-                  State := Report_Numeric_Value;
+                  State := Report_Decimal_Value;
 
                else
                   --  XXX Self.Stack.Push???
@@ -816,7 +839,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (Self.Number_State);
 
                   when Digit_Zero .. Digit_Nine =>
-                     State := Report_Numeric_Value;
+                     State := Report_Decimal_Value;
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Decimal_Exponent_Signed_Integer;
@@ -824,10 +847,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when Latin_Capital_Letter_X | Latin_Small_Letter_X =>
-                     raise Program_Error;
+                     State := Hex_Digits;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Unsigned := 0;
 
                   when others =>
-                     State := Report_Numeric_Value;
+                     State := Report_Decimal_Value;
                end case;
 
             when Decimal_Integral_Digits_Opt =>
@@ -851,7 +877,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     State := Report_Numeric_Value;
+                     State := Report_Decimal_Value;
                end case;
 
             when Decimal_Fraction_Digits =>
@@ -881,7 +907,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     State := Report_Numeric_Value;
+                     State := Report_Decimal_Value;
                end case;
 
             when Decimal_Exponent_Signed_Integer =>
@@ -930,7 +956,72 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
-                     State := Report_Numeric_Value;
+                     State := Report_Decimal_Value;
+               end case;
+
+            when Hex_Digits =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
+                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
+                  =>
+                     declare
+                        Code    : VSS.Unicode.UTF16_Code_Unit := 0;
+                        Success : Boolean;
+
+                     begin
+                        State := Hex_Digits_Opt;
+                        Self.Buffer.Append
+                          (VSS.Characters.Virtual_Character (Self.C));
+                        Success := Self.Hex_To_Code (Code);
+                        pragma Assert (Success);
+
+                        if (Self.Unsigned and 16#F800_0000_0000_0000#) = 0 then
+                           Self.Unsigned :=
+                             Interfaces.Shift_Left (@, 4)
+                               + Interfaces.Unsigned_64 (Code);
+
+                        else
+                           Self.Unsigned := 16#FFFF_FFFF_FFFF_FFFF#;
+
+                           raise Program_Error;
+                        end if;
+                     end;
+
+                  when others =>
+                     return Self.Report_Error ("hexadecimal digit expected");
+               end case;
+
+            when Hex_Digits_Opt =>
+               case Self.C is
+                  when Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_A .. Latin_Capital_Letter_F
+                     | Latin_Small_Letter_A .. Latin_Small_Letter_F
+                  =>
+                     declare
+                        Code    : VSS.Unicode.UTF16_Code_Unit := 0;
+                        Success : Boolean;
+
+                     begin
+                        Self.Buffer.Append
+                          (VSS.Characters.Virtual_Character (Self.C));
+                        Success := Self.Hex_To_Code (Code);
+                        pragma Assert (Success);
+
+                        if (Self.Unsigned and 16#F800_0000_0000_0000#) = 0 then
+                           Self.Unsigned :=
+                             Interfaces.Shift_Left (@, 4)
+                               + Interfaces.Unsigned_64 (Code);
+
+                        else
+                           Self.Unsigned := 16#FFFF_FFFF_FFFF_FFFF#;
+
+                           raise Program_Error;
+                        end if;
+                     end;
+
+                  when others =>
+                     State := Report_Hex_Value;
                end case;
 
             when Number_I =>
@@ -1039,7 +1130,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                return False;
 
-            when Report_Numeric_Value =>
+            when Report_Decimal_Value | Report_Hex_Value =>
                null;
          end case;
       end loop;

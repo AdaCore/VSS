@@ -94,6 +94,7 @@ private
       Buffer       : VSS.Strings.Virtual_String;
       Boolean      : Standard.Boolean;
       Number       : VSS.JSON.JSON_Number;
+      Unsigned     : Interfaces.Unsigned_64;
       Code_Unit_1  : VSS.Unicode.UTF16_Code_Unit;
       Code_Unit_2  : VSS.Unicode.UTF16_Code_Unit;
       Number_State : VSS.JSON.Implementation.Numbers.Parsing_State;

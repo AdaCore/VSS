@@ -92,12 +92,15 @@ package body VSS.JSON.Implementation.Parsers_5 is
    Latin_Capital_Letter_A    : constant Wide_Wide_Character := 'A';  --  U+0041
    Latin_Capital_Letter_E    : constant Wide_Wide_Character := 'E';  --  U+0045
    Latin_Capital_Letter_F    : constant Wide_Wide_Character := 'F';  --  U+0046
+   Latin_Capital_Letter_I    : constant Wide_Wide_Character := 'I';  --  U+0049
+   Latin_Capital_Letter_N    : constant Wide_Wide_Character := 'N';  --  U+004E
    Reverse_Solidus           : constant Wide_Wide_Character := '\';  --  U+005C
    Latin_Small_Letter_A      : constant Wide_Wide_Character := 'a';
    Latin_Small_Letter_B      : constant Wide_Wide_Character := 'b';  --  U+0062
    Latin_Small_Letter_E      : constant Wide_Wide_Character := 'e';
    Latin_Small_Letter_F      : constant Wide_Wide_Character := 'f';  --  U+0066
-   Latin_Small_Letter_L      : constant Wide_Wide_Character := 'l';
+   Latin_Small_Letter_I      : constant Wide_Wide_Character := 'i';  --  U+0069
+   Latin_Small_Letter_L      : constant Wide_Wide_Character := 'l';  --  U+006C
    Latin_Small_Letter_N      : constant Wide_Wide_Character := 'n';  --  U+006E
    Latin_Small_Letter_R      : constant Wide_Wide_Character := 'r';  --  U+0072
    Latin_Small_Letter_S      : constant Wide_Wide_Character := 's';  --  U+0071
@@ -105,6 +108,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    Latin_Small_Letter_U      : constant Wide_Wide_Character := 'u';  --  U+0075
    Latin_Small_Letter_V      : constant Wide_Wide_Character := 'v';  --  U+0076
    Latin_Small_Letter_X      : constant Wide_Wide_Character := 'x';  --  U+0078
+   Latin_Small_Letter_Y      : constant Wide_Wide_Character := 'y';  --  U+0079
 
    Begin_Array               : constant Wide_Wide_Character := '[';
    Begin_Object              : constant Wide_Wide_Character := '{';
@@ -417,6 +421,8 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      | Plus_Sign
                      | Hyphen_Minus
                      | Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_I
+                     | Latin_Capital_Letter_N
                      | Latin_Small_Letter_F
                      | Latin_Small_Letter_N
                      | Latin_Small_Letter_T
@@ -605,7 +611,17 @@ package body VSS.JSON.Implementation.Parsers_5 is
       Exp_Sign_Or_Digits,
       Exp_Digit,
       Exp_Digits,
-      Report_Value);
+      Number_I,
+      Number_IN,
+      Number_INF,
+      Number_INFI,
+      Number_INFIN,
+      Number_INFINI,
+      Number_INFINIT,
+      Number_N,
+      Number_NA,
+      Report_Numeric_Value,
+      Report_Special_Value);
 
    function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean is
       --  [RFC 8259]
@@ -634,6 +650,11 @@ package body VSS.JSON.Implementation.Parsers_5 is
       --    JSON5NumericLiteral
       --    + JSON5NumericLiteral
       --    - JSON5NumericLiteral
+      --
+      --  JSON5NumericLiteral::
+      --    NumericLiteral
+      --    Infinity
+      --    NaN
 
       State : Number_State;
 
@@ -671,6 +692,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
                VSS.JSON.Implementation.Numbers.Int_Digit
                  (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
+            when Latin_Capital_Letter_I =>
+               State := Number_I;
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+
+            when Latin_Capital_Letter_N =>
+               State := Number_N;
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+
             when others =>
                raise Program_Error;
          end case;
@@ -678,7 +707,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
       loop
          case State is
-            when Report_Value =>
+            when Report_Numeric_Value =>
                VSS.JSON.Implementation.Numbers.To_JSON_Number
                  (Self.Number_State,
                   Self.String_Value,
@@ -697,7 +726,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                     in Int_Digits | Frac_Or_Exp | Frac_Digits | Exp_Digits
                   --  XXX allowed states and conditions need to be checked.
                then
-                  State := Report_Value;
+                  State := Report_Numeric_Value;
 
                else
                   --  XXX Self.Stack.Push???
@@ -725,6 +754,16 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      VSS.JSON.Implementation.Numbers.Int_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
+                  when Latin_Capital_Letter_I =>
+                     State := Number_I;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when Latin_Capital_Letter_N =>
+                     State := Number_N;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
                   when others =>
                      return Self.Report_Error ("digit expected");
                end case;
@@ -750,7 +789,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     State := Report_Value;
+                     State := Report_Numeric_Value;
                end case;
 
             when Frac_Or_Exp =>
@@ -768,7 +807,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     State := Report_Value;
+                     State := Report_Numeric_Value;
                end case;
 
             when Frac_Digit =>
@@ -798,7 +837,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     State := Report_Value;
+                     State := Report_Numeric_Value;
                end case;
 
             when Exp_Sign_Or_Digits =>
@@ -847,10 +886,116 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
-                     State := Report_Value;
+                     State := Report_Numeric_Value;
                end case;
 
-            when Report_Value =>
+            when Number_I =>
+               case Self.C is
+                  when Latin_Small_Letter_N =>
+                     State := Number_IN;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Number_IN =>
+               case Self.C is
+                  when Latin_Small_Letter_F =>
+                     State := Number_INF;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Number_INF =>
+               case Self.C is
+                  when Latin_Small_Letter_I =>
+                     State := Number_INFI;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when others =>
+                     return Self.Report_Error ("Infinity expected");
+               end case;
+
+            when Number_INFI =>
+               case Self.C is
+                  when Latin_Small_Letter_N =>
+                     State := Number_INFIN;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Number_INFIN =>
+               case Self.C is
+                  when Latin_Small_Letter_I =>
+                     State := Number_INFINI;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Number_INFINI =>
+               case Self.C is
+                  when Latin_Small_Letter_T =>
+                     State := Number_INFINIT;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Number_INFINIT =>
+               case Self.C is
+                  when Latin_Small_Letter_Y =>
+                     State := Report_Special_Value;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Number := (Out_Of_Range, Self.Buffer);
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Number_N =>
+               case Self.C is
+                  when Latin_Small_Letter_A =>
+                     State := Number_NA;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Number_NA =>
+               case Self.C is
+                  when Latin_Capital_Letter_N =>
+                     State := Report_Special_Value;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Number := (Out_Of_Range, Self.Buffer);
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Report_Special_Value =>
+               Self.Event := VSS.JSON.Pull_Readers.Number_Value;
+
+               return False;
+
+            when Report_Numeric_Value =>
                null;
          end case;
       end loop;
@@ -1555,7 +1700,12 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   when Latin_Small_Letter_T =>
                      State := Value_T;
 
-                  when Plus_Sign | Hyphen_Minus | Digit_Zero .. Digit_Nine =>
+                  when Plus_Sign
+                     | Hyphen_Minus
+                     | Digit_Zero .. Digit_Nine
+                     | Latin_Capital_Letter_I
+                     | Latin_Capital_Letter_N
+                  =>
                      Success := Self.Parse_Number;
                      pragma Assert (not Success);  --  Always return False
 

@@ -414,6 +414,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      | Begin_Object
                      | Quotation_Mark
                      | Apostrophe
+                     | Plus_Sign
                      | Hyphen_Minus
                      | Digit_Zero .. Digit_Nine
                      | Latin_Small_Letter_F
@@ -596,7 +597,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    ------------------
 
    type Number_State is
-     (Int,
+     (JSON5_Numeric_Literal,
       Int_Digits,
       Frac_Or_Exp,
       Frac_Digit,
@@ -629,6 +630,11 @@ package body VSS.JSON.Implementation.Parsers_5 is
       --
       --  zero = %x30                ; 0
 
+      --  JSON5Number::
+      --    JSON5NumericLiteral
+      --    + JSON5NumericLiteral
+      --    - JSON5NumericLiteral
+
       State : Number_State;
 
    begin
@@ -645,8 +651,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
          VSS.JSON.Implementation.Numbers.Reset (Self.Number_State);
 
          case Self.C is
+            when Plus_Sign =>
+               State := JSON5_Numeric_Literal;
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Number_State.Minus := False;
+
             when Hyphen_Minus =>
-               State := Int;
+               State := JSON5_Numeric_Literal;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
                Self.Number_State.Minus := True;
 
@@ -700,7 +711,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end if;
 
          case State is
-            when Int =>
+            when JSON5_Numeric_Literal =>
                case Self.C is
                   when Digit_Zero =>
                      State := Frac_Or_Exp;
@@ -1544,7 +1555,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   when Latin_Small_Letter_T =>
                      State := Value_T;
 
-                  when Hyphen_Minus | Digit_Zero .. Digit_Nine =>
+                  when Plus_Sign | Hyphen_Minus | Digit_Zero .. Digit_Nine =>
                      Success := Self.Parse_Number;
                      pragma Assert (not Success);  --  Always return False
 

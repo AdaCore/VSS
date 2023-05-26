@@ -94,6 +94,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    Latin_Capital_Letter_F    : constant Wide_Wide_Character := 'F';  --  U+0046
    Latin_Capital_Letter_I    : constant Wide_Wide_Character := 'I';  --  U+0049
    Latin_Capital_Letter_N    : constant Wide_Wide_Character := 'N';  --  U+004E
+   Latin_Capital_Letter_X    : constant Wide_Wide_Character := 'X';  --  U+0058
    Reverse_Solidus           : constant Wide_Wide_Character := '\';  --  U+005C
    Latin_Small_Letter_A      : constant Wide_Wide_Character := 'a';
    Latin_Small_Letter_B      : constant Wide_Wide_Character := 'b';  --  U+0062
@@ -420,6 +421,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      | Apostrophe
                      | Plus_Sign
                      | Hyphen_Minus
+                     | Decimal_Point
                      | Digit_Zero .. Digit_Nine
                      | Latin_Capital_Letter_I
                      | Latin_Capital_Letter_N
@@ -604,13 +606,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
    type Number_State is
      (JSON5_Numeric_Literal,
-      Int_Digits,
-      Frac_Or_Exp,
-      Frac_Digit,
-      Frac_Digits,
-      Exp_Sign_Or_Digits,
-      Exp_Digit,
-      Exp_Digits,
+      Numeric_0,
+      Decimal_Integral_Digits_Opt,
+      Decimal_Fraction_Digits,
+      Decimal_Fraction_Digits_Opt,
+      Decimal_Exponent_Signed_Integer,
+      Decimal_Exponent_Digits,
+      Decimal_Exponent_Digits_Opt,
       Number_I,
       Number_IN,
       Number_INF,
@@ -624,28 +626,6 @@ package body VSS.JSON.Implementation.Parsers_5 is
       Report_Special_Value);
 
    function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean is
-      --  [RFC 8259]
-      --
-      --  number = [ minus ] int [ frac ] [ exp ]
-      --
-      --  decimal-point = %x2E       ; .
-      --
-      --  digit1-9 = %x31-39         ; 1-9
-      --
-      --  e = %x65 / %x45            ; e E
-      --
-      --  exp = e [ minus / plus ] 1*DIGIT
-      --
-      --  frac = decimal-point 1*DIGIT
-      --
-      --  int = zero / ( digit1-9 *DIGIT )
-      --
-      --  minus = %x2D               ; -
-      --
-      --  plus = %x2B                ; +
-      --
-      --  zero = %x30                ; 0
-
       --  JSON5Number::
       --    JSON5NumericLiteral
       --    + JSON5NumericLiteral
@@ -655,6 +635,48 @@ package body VSS.JSON.Implementation.Parsers_5 is
       --    NumericLiteral
       --    Infinity
       --    NaN
+      --
+      --  NumericLiteral ::
+      --    DecimalLiteral
+      --    HexIntegerLiteral
+      --
+      --  DecimalLiteral ::
+      --    DecimalIntegerLiteral . DecimalDigitsopt ExponentPartopt
+      --    . DecimalDigits ExponentPartopt
+      --    DecimalIntegerLiteral ExponentPartopt
+      --
+      --  DecimalIntegerLiteral ::
+      --    0
+      --    NonZeroDigit DecimalDigitsopt
+      --
+      --  DecimalDigits ::
+      --    DecimalDigit
+      --    DecimalDigits DecimalDigit
+      --
+      --  DecimalDigit :: one of
+      --    0 1 2 3 4 5 6 7 8 9
+      --
+      --  NonZeroDigit :: one of
+      --    1 2 3 4 5 6 7 8 9
+      --
+      --  ExponentPart ::
+      --    ExponentIndicator SignedInteger
+      --
+      --  ExponentIndicator :: one of
+      --    e E
+      --
+      --  SignedInteger ::
+      --    DecimalDigits
+      --    + DecimalDigits
+      --    - DecimalDigits
+      --
+      --  HexIntegerLiteral ::
+      --    0x HexDigit
+      --    0X HexDigit
+      --    HexIntegerLiteral HexDigit
+      --
+      --  HexDigit :: one of
+      --    0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F
 
       State : Number_State;
 
@@ -682,12 +704,18 @@ package body VSS.JSON.Implementation.Parsers_5 is
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
                Self.Number_State.Minus := True;
 
+            when Decimal_Point =>
+               State := Decimal_Fraction_Digits;
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               VSS.JSON.Implementation.Numbers.Decimal_Point
+                 (Self.Number_State);
+
             when Digit_Zero =>
-               State := Frac_Or_Exp;
+               State := Numeric_0;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
 
             when Digit_One .. Digit_Nine =>
-               State := Int_Digits;
+               State := Decimal_Integral_Digits_Opt;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
                VSS.JSON.Implementation.Numbers.Int_Digit
                  (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
@@ -722,9 +750,10 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
          if not Self.Read (Parse_Number'Access, Number_State'Pos (State)) then
             if Self.Stream.Is_End_Of_Stream then
-               if State
-                    in Int_Digits | Frac_Or_Exp | Frac_Digits | Exp_Digits
-                  --  XXX allowed states and conditions need to be checked.
+               if State in Numeric_0
+                         | Decimal_Integral_Digits_Opt
+                         | Decimal_Fraction_Digits_Opt
+                         | Decimal_Exponent_Digits_Opt
                then
                   State := Report_Numeric_Value;
 
@@ -742,13 +771,20 @@ package body VSS.JSON.Implementation.Parsers_5 is
          case State is
             when JSON5_Numeric_Literal =>
                case Self.C is
+                  when Decimal_Point =>
+                     State := Decimal_Fraction_Digits;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Decimal_Point
+                       (Self.Number_State);
+
                   when Digit_Zero =>
-                     State := Frac_Or_Exp;
+                     State := Numeric_0;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when Digit_One .. Digit_Nine =>
-                     State := Int_Digits;
+                     State := Decimal_Integral_Digits_Opt;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
                      VSS.JSON.Implementation.Numbers.Int_Digit
@@ -765,10 +801,36 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (VSS.Characters.Virtual_Character (Self.C));
 
                   when others =>
-                     return Self.Report_Error ("digit expected");
+                     return
+                       Self.Report_Error
+                         ("point, digit, Infinity or Nan expected");
                end case;
 
-            when Int_Digits =>
+            when Numeric_0 =>
+               case Self.C is
+                  when Decimal_Point =>
+                     State := Decimal_Fraction_Digits_Opt;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+                     VSS.JSON.Implementation.Numbers.Decimal_Point
+                       (Self.Number_State);
+
+                  when Digit_Zero .. Digit_Nine =>
+                     State := Report_Numeric_Value;
+
+                  when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
+                     State := Decimal_Exponent_Signed_Integer;
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when Latin_Capital_Letter_X | Latin_Small_Letter_X =>
+                     raise Program_Error;
+
+                  when others =>
+                     State := Report_Numeric_Value;
+               end case;
+
+            when Decimal_Integral_Digits_Opt =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Buffer.Append
@@ -777,14 +839,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Decimal_Point =>
-                     State := Frac_Digit;
+                     State := Decimal_Fraction_Digits_Opt;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
                      VSS.JSON.Implementation.Numbers.Decimal_Point
                        (Self.Number_State);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
-                     State := Exp_Sign_Or_Digits;
+                     State := Decimal_Exponent_Signed_Integer;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
@@ -792,38 +854,20 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      State := Report_Numeric_Value;
                end case;
 
-            when Frac_Or_Exp =>
-               case Self.C is
-                  when Decimal_Point =>
-                     State := Frac_Digit;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
-                     VSS.JSON.Implementation.Numbers.Decimal_Point
-                       (Self.Number_State);
-
-                  when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
-                     State := Exp_Sign_Or_Digits;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
-
-                  when others =>
-                     State := Report_Numeric_Value;
-               end case;
-
-            when Frac_Digit =>
+            when Decimal_Fraction_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     State := Frac_Digits;
+                     State := Decimal_Fraction_Digits_Opt;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
                      VSS.JSON.Implementation.Numbers.Frac_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when others =>
-                     return Self.Report_Error ("frac digit expected");
+                     return Self.Report_Error ("digit expected");
                end case;
 
-            when Frac_Digits =>
+            when Decimal_Fraction_Digits_Opt =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Buffer.Append
@@ -832,7 +876,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
-                     State := Exp_Sign_Or_Digits;
+                     State := Decimal_Exponent_Signed_Integer;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
@@ -840,23 +884,23 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      State := Report_Numeric_Value;
                end case;
 
-            when Exp_Sign_Or_Digits =>
+            when Decimal_Exponent_Signed_Integer =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     State := Exp_Digits;
+                     State := Decimal_Exponent_Digits_Opt;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
                      VSS.JSON.Implementation.Numbers.Exp_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Hyphen_Minus =>
-                     State := Exp_Digit;
+                     State := Decimal_Exponent_Digits;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
                      Self.Number_State.Exp_Minus := True;
 
                   when Plus_Sign =>
-                     State := Exp_Digit;
+                     State := Decimal_Exponent_Digits;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
 
@@ -864,10 +908,10 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      return Self.Report_Error ("plus/minus or digit expected");
                end case;
 
-            when Exp_Digit =>
+            when Decimal_Exponent_Digits =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     State := Exp_Digits;
+                     State := Decimal_Exponent_Digits_Opt;
                      Self.Buffer.Append
                        (VSS.Characters.Virtual_Character (Self.C));
                      VSS.JSON.Implementation.Numbers.Exp_Digit
@@ -877,7 +921,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      return Self.Report_Error ("exp digit expected");
                end case;
 
-            when Exp_Digits =>
+            when Decimal_Exponent_Digits_Opt =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Buffer.Append
@@ -1702,6 +1746,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                   when Plus_Sign
                      | Hyphen_Minus
+                     | Decimal_Point
                      | Digit_Zero .. Digit_Nine
                      | Latin_Capital_Letter_I
                      | Latin_Capital_Letter_N

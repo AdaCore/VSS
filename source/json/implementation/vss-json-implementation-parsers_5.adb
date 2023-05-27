@@ -27,6 +27,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
    function Parse_Object (Self : in out JSON5_Parser'Class) return Boolean;
 
+   function Parse_Comment (Self : in out JSON5_Parser'Class) return Boolean;
+   --  Parse comment.
+
    function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean
      with Post => Parse_Number'Result = False;
    --  Parse number. When parse of number is done Number_Value event is
@@ -102,6 +105,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    Space                     : constant Wide_Wide_Character := ' ';  --  U+0020
    Quotation_Mark            : constant Wide_Wide_Character := '"';  --  U+0022
    Dollar_Sign               : constant Wide_Wide_Character := '$';  --  U+0024
+   Asterisk                  : constant Wide_Wide_Character := '*';  --  U+002A
    Plus_Sign                 : constant Wide_Wide_Character := '+';  --  U+002B
    Hyphen_Minus              : constant Wide_Wide_Character := '-';  --  U+002D
    Apostrophe                : constant Wide_Wide_Character := ''';  --  U+0027
@@ -413,6 +417,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   =>
                      null;
 
+                  when Solidus =>
+                     if not Self.Parse_Comment then
+                        Self.Push
+                          (Parse_Array'Access, Array_State'Pos (State));
+
+                        return False;
+                     end if;
+
                   when Value_Separator =>
                      State := Value_Or_End_Array;
 
@@ -466,6 +478,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   =>
                      null;
 
+                  when Solidus =>
+                     raise Program_Error;
+
                   when Begin_Array
                      | Begin_Object
                      | Quotation_Mark
@@ -517,6 +532,103 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end case;
       end loop;
    end Parse_Array;
+
+   -------------------
+   -- Parse_Comment --
+   -------------------
+
+   type Comment_State is
+     (Comment,
+      Single_Line,
+      Multi_Line,
+      Multi_Line_Asterisk,
+      Multi_Line_Done);
+
+   function Parse_Comment (Self : in out JSON5_Parser'Class) return Boolean is
+      State : Comment_State;
+
+   begin
+      if not Self.Stack.Is_Empty then
+         State := Comment_State'Val (Self.Stack.Top.State);
+         Self.Stack.Pop;
+
+         if not Self.Stack.Is_Empty then
+            raise Program_Error;
+         end if;
+
+      else
+         pragma Assert (Self.C = Solidus);
+
+         State := Comment;
+      end if;
+
+      loop
+         if not Self.Read
+                  (Parse_Comment'Access, Comment_State'Pos (State))
+         then
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
+
+            elsif State in Single_Line | Multi_Line_Done then
+               return True;
+
+            else
+               return Self.Report_Error ("unexpected end of document");
+            end if;
+         end if;
+
+         case State is
+            when Comment =>
+               case Self.C is
+                  when Solidus =>
+                     State := Single_Line;
+
+                  when Asterisk =>
+                     State := Multi_Line;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Single_Line =>
+               case Self.C is
+                  when Line_Feed
+                     | Carriage_Return
+                     | Line_Separator
+                     | Paragraph_Separator
+                  =>
+                     return True;
+
+                  when others =>
+                     null;
+               end case;
+
+            when Multi_Line =>
+               case Self.C is
+                  when Asterisk =>
+                     State := Multi_Line_Asterisk;
+
+                  when others =>
+                     null;
+               end case;
+
+            when Multi_Line_Asterisk =>
+               case Self.C is
+                  when Solidus =>
+                     State := Multi_Line_Done;
+
+                  when Asterisk =>
+                     null;
+
+                  when others =>
+                     State := Multi_Line;
+               end case;
+
+            when Multi_Line_Done =>
+               return True;
+         end case;
+      end loop;
+   end Parse_Comment;
 
    ----------------------
    -- Parse_Identifier --
@@ -706,12 +818,22 @@ package body VSS.JSON.Implementation.Parsers_5 is
          return False;
       end if;
 
+      <<Restart>>
+
       loop
          case State is
             when Initial =>
                null;
 
             when Whitespace_Or_End =>
+               if Self.Event = VSS.JSON.Pull_Readers.Invalid
+                 and then Self.Error = VSS.JSON.Pull_Readers.Not_Valid
+               then
+                  State := Done;
+
+                  goto Restart;
+               end if;
+
                case Self.C is
                   when Character_Tabulation
                      | Line_Feed
@@ -726,6 +848,18 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   =>
                      null;
 
+                  when Solidus =>
+                     if not Self.Parse_Comment then
+                        Self.Stack.Push
+                          (Parse_JSON_Text'Access,
+                           JSON_Text_State'Pos (State));
+
+                        return False;
+
+                     else
+                        goto Restart;
+                     end if;
+
                   when End_Of_Stream =>
                      Self.Event := VSS.JSON.Pull_Readers.End_Document;
 
@@ -734,7 +868,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   when others =>
                      if not Self.Is_Space_Separator then
                         State := Done;
-                        Self.Push
+                        Self.Stack.Push
                           (Parse_JSON_Text'Access,
                            JSON_Text_State'Pos (State));
 
@@ -767,7 +901,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      State := Whitespace_Or_End;
 
                   else
-                     State := Done;
+                     State := Whitespace_Or_End;
                   end if;
 
                   Self.Stack.Push
@@ -1406,6 +1540,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
                   =>
                      null;
 
+                  when Solidus =>
+                     raise Program_Error;
+
                   when Name_Separator =>
                      State := Member_Value;
 
@@ -1432,6 +1569,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      | Zero_Width_No_Break_Space
                   =>
                      null;
+
+                  when Solidus =>
+                     raise Program_Error;
 
                   when Value_Separator =>
                      State := Member_Or_End_Object;
@@ -1488,6 +1628,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      | Zero_Width_No_Break_Space
                   =>
                      null;
+
+                  when Solidus =>
+                     if not Self.Parse_Comment then
+                        Self.Push
+                          (Parse_Object'Access, Object_State'Pos (State));
+
+                        return False;
+                     end if;
 
                   when Quotation_Mark | Apostrophe =>
                      State := Member_String;
@@ -2010,6 +2158,8 @@ package body VSS.JSON.Implementation.Parsers_5 is
          State := Initial;
       end if;
 
+      <<Restart>>
+
       loop
          case State is
             when Initial =>
@@ -2026,6 +2176,17 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      | Zero_Width_No_Break_Space
                   =>
                      null;
+
+                  when Solidus =>
+                     if not Self.Parse_Comment then
+                        Self.Push
+                          (Parse_Value'Access, Value_State'Pos (State));
+
+                        return False;
+
+                     else
+                        goto Restart;
+                     end if;
 
                   when Quotation_Mark | Apostrophe =>
                      if not Self.Parse_String then
@@ -2085,7 +2246,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
                      end if;
 
                   when End_Of_Stream =>
-                     raise Program_Error;
+                     return Self.Report_Error ("value expected");
 
                   when others =>
                      if not Self.Is_Space_Separator then

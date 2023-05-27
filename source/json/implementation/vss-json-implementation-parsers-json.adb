@@ -76,18 +76,6 @@ package body VSS.JSON.Implementation.Parsers.JSON is
    Value_Separator        : constant Wide_Wide_Character := ',';
    Decimal_Point          : constant Wide_Wide_Character := '.';
 
-   ------------
-   -- At_End --
-   ------------
-
-   function At_End (Self : JSON_Parser'Class) return Boolean is
-   begin
-      return
-        Self.Stack.Is_Empty and
-          (Self.Stream.Is_End_Of_Stream
-           or Self.Error = VSS.JSON.Pull_Readers.Not_Valid);
-   end At_End;
-
    -----------
    -- Parse --
    -----------

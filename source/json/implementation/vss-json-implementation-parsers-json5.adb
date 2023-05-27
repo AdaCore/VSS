@@ -150,18 +150,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
    Zero_Width_No_Break_Space : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_FEFF#);
 
-   ------------
-   -- At_End --
-   ------------
-
-   function At_End (Self : JSON5_Parser'Class) return Boolean is
-   begin
-      return
-        Self.Stack.Is_Empty and
-          (Self.Stream.Is_End_Of_Stream
-           or Self.Error = VSS.JSON.Pull_Readers.Not_Valid);
-   end At_End;
-
    -----------------------
    -- Extract_Core_Data --
    -----------------------

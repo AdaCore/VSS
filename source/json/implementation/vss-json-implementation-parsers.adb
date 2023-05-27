@@ -8,6 +8,20 @@ with VSS.Characters;
 
 package body VSS.JSON.Implementation.Parsers is
 
+   ------------
+   -- At_End --
+   ------------
+
+   function At_End (Self : JSON_Parser_Base'Class) return Boolean is
+      use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
+
+   begin
+      return
+        Self.Stack.Is_Empty and
+          (Self.Stream.Is_End_Of_Stream
+             or Self.Error = VSS.JSON.Pull_Readers.Not_Valid);
+   end At_End;
+
    -------------------
    -- Boolean_Value --
    -------------------

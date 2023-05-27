@@ -19,6 +19,9 @@ package VSS.JSON.Implementation.Parsers is
      (Self   : in out JSON_Parser_Base'Class;
       Stream : not null VSS.Text_Streams.Input_Text_Stream_Access);
 
+   function At_End (Self : JSON_Parser_Base'Class) return Boolean;
+   --  Return True when end of document has been processed.
+
    function Event_Kind
      (Self : JSON_Parser_Base'Class)
       return VSS.JSON.Pull_Readers.JSON_Event_Kind;

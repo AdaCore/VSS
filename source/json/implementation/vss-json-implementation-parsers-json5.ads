@@ -19,9 +19,6 @@ package VSS.JSON.Implementation.Parsers.JSON5 is
    procedure Parse (Self : in out JSON5_Parser'Class);
    --  Parse single token.
 
-   function At_End (Self : JSON5_Parser'Class) return Boolean;
-   --  Return True when end of document has been processed.
-
 private
 
    type JSON5_Parser is limited new JSON_Parser_Base with record

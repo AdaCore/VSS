@@ -11,6 +11,7 @@ with Interfaces;
 
 with VSS.Command_Line;
 with VSS.JSON.Pull_Readers.Simple;
+with VSS.JSON.Pull_Readers.JSON5;
 with VSS.Strings.Conversions;
 with VSS.String_Vectors;
 
@@ -31,6 +32,7 @@ procedure Test_JSON_Pull_Reader is
 
       Performance      : Boolean := False;
       Incremental      : Boolean := False;
+      JSON5            : Boolean := False;
       Input_File_Name  : VSS.Strings.Virtual_String;
       Output_File_Name : VSS.Strings.Virtual_String;
 
@@ -51,6 +53,11 @@ procedure Test_JSON_Pull_Reader is
         (Short_Name  => <>,
          Long_Name   => "performance",
          Description => "Report performance statistic");
+
+      JSON5_Option        : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => <>,
+         Long_Name   => "json5",
+         Description => "Enable JSON5");
 
       Input_File_Option   : constant VSS.Command_Line.Positional_Option :=
         (Name        => "input",
@@ -78,6 +85,7 @@ procedure Test_JSON_Pull_Reader is
            VSS.Command_Line.Is_Specified (Incremental_Option);
          Options.Performance :=
            VSS.Command_Line.Is_Specified (Performance_Option);
+         Options.JSON5 := VSS.Command_Line.Is_Specified (JSON5_Option);
 
          Positionals := VSS.Command_Line.Positional_Arguments;
 
@@ -103,6 +111,7 @@ procedure Test_JSON_Pull_Reader is
       begin
          VSS.Command_Line.Add_Option (Incremental_Option);
          VSS.Command_Line.Add_Option (Performance_Option);
+         VSS.Command_Line.Add_Option (JSON5_Option);
          VSS.Command_Line.Add_Option (Input_File_Option);
          VSS.Command_Line.Add_Option (Output_File_Option);
       end Register_Switches;
@@ -110,7 +119,6 @@ procedure Test_JSON_Pull_Reader is
    end Command_Line;
 
    Input       : aliased Tests_Text_Streams.Memory_UTF8_Input_Stream;
-   Reader      : VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader;
    Count       : Natural := 0;
    Log_File    : Ada.Text_IO.File_Type;
 
@@ -150,12 +158,37 @@ begin
    declare
       use type Ada.Calendar.Time;
 
-      Start : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+      function Setup_Reader
+        return VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+
+      ------------------
+      -- Setup_Reader --
+      ------------------
+
+      function Setup_Reader
+        return VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class is
+      begin
+         Input.Set_Incremental (Options.Incremental);
+
+         if Options.JSON5 then
+            return Result : VSS.JSON.Pull_Readers.JSON5.JSON5_Pull_Reader do
+               Result.Set_Stream (Input'Unchecked_Access);
+            end return;
+
+         else
+            return Result :
+              VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader
+            do
+               Result.Set_Stream (Input'Unchecked_Access);
+            end return;
+         end if;
+      end Setup_Reader;
+
+      Reader : VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class :=
+        Setup_Reader;
+      Start  : constant Ada.Calendar.Time := Ada.Calendar.Clock;
 
    begin
-      Input.Set_Incremental (Options.Incremental);
-      Reader.Set_Stream (Input'Unchecked_Access);
-
       while not Reader.At_End loop
          Reader.Read_Next;
 

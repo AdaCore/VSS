@@ -17,59 +17,49 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
    use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    function Parse_JSON_Text
-     (Self : in out JSON5_Parser'Class) return Boolean;
+     (Self : in out JSON_Parser_Base'Class) return Boolean;
    --  Parse 'json-text'.
 
-   function Parse_Value (Self : in out JSON5_Parser'Class) return Boolean;
+   function Parse_Value (Self : in out JSON_Parser_Base'Class) return Boolean;
    --  Parse 'value'. Skip all leading whitespaces.
 
-   function Parse_Array (Self : in out JSON5_Parser'Class) return Boolean;
+   function Parse_Array (Self : in out JSON_Parser_Base'Class) return Boolean;
 
-   function Parse_Object (Self : in out JSON5_Parser'Class) return Boolean;
+   function Parse_Object (Self : in out JSON_Parser_Base'Class) return Boolean;
 
-   function Parse_Comment (Self : in out JSON5_Parser'Class) return Boolean;
+   function Parse_Comment
+     (Self : in out JSON_Parser_Base'Class) return Boolean;
    --  Parse comment.
 
-   function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean
+   function Parse_Number
+     (Parser : in out JSON_Parser_Base'Class) return Boolean
      with Post => Parse_Number'Result = False;
    --  Parse number. When parse of number is done Number_Value event is
    --  reported, thus, subprogram returns False always.
 
-   function Parse_String (Self : in out JSON5_Parser'Class) return Boolean;
+   function Parse_String
+     (Parser : in out JSON_Parser_Base'Class) return Boolean;
 
    function Parse_Identifier
-     (Self : in out JSON5_Parser'Class) return Boolean
+     (Self : in out JSON_Parser_Base'Class) return Boolean
      with Post => Parse_Identifier'Result = False;
    --  Parse JSON5Identifier. Emit Key_Name event when pasring is done, thus is
    --  never return True.
 
    function Parse_Unicode_Escape_Sequence
-     (Self : in out JSON5_Parser'Class) return Boolean;
+     (Parser : in out JSON_Parser_Base'Class) return Boolean;
    --  Parses UnicodeEspaceSequence production.
 
-   function Read
-     (Self  : in out JSON5_Parser'Class;
-      Parse : not null Parse_Subprogram;
-      State : Interfaces.Unsigned_32) return Boolean;
-   --  Attempt to read next character from the text stream. Return True is
-   --  operation is successful; otherwise push (Parse, State) pair into the
-   --  parser's state stack and return False.
-
-   function Report_Error
-     (Self    : in out JSON5_Parser'Class;
-      Message : Wide_Wide_String) return Boolean;
-   --  Set parser into document not valid state. Always return False.
-
-   function Is_Space_Separator (Self : JSON5_Parser'Class) return Boolean;
+   function Is_Space_Separator (Self : JSON_Parser_Base'Class) return Boolean;
    --  Returns True when current character belongs to Zs (space, separator)
    --  general category.
 
-   function Is_Unicode_Letter (Self : JSON5_Parser'Class) return Boolean;
+   function Is_Unicode_Letter (Self : JSON_Parser_Base'Class) return Boolean;
    --  Returns True when current character belongs to Lu (uppercase letter),
    --  Ll (lowercase letter), Lt (titlecase letter), Lm (modifier letter), Lo
    --  (other latter), Nl (letternumber) categories.
 
-   function Is_Identifier_Part (Self : JSON5_Parser'Class) return Boolean;
+   function Is_Identifier_Part (Self : JSON_Parser_Base'Class) return Boolean;
    --  Returns True when current character belongs to Lu (uppercase letter),
    --  Ll (lowercase letter), Lt (titlecase letter), Lm (modifier letter), Lo
    --  (other latter), Nl (letternumber), Mn (non-spacing mark), Mc (combining
@@ -160,9 +150,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
    Zero_Width_No_Break_Space : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_FEFF#);
 
-   End_Of_Stream             : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#1F_FFFF#);
-
    ------------
    -- At_End --
    ------------
@@ -240,20 +227,13 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       end case;
    end Hex_To_Code;
 
-   --------------
-   -- Is_Empty --
-   --------------
-
-   function Is_Empty (Self : Parse_Stack'Class) return Boolean is
-   begin
-      return Self.Head = 0;
-   end Is_Empty;
-
    ------------------------
    -- Is_Identifier_Part --
    ------------------------
 
-   function Is_Identifier_Part (Self : JSON5_Parser'Class) return Boolean is
+   function Is_Identifier_Part
+     (Self : JSON_Parser_Base'Class) return Boolean
+   is
       use all type VSS.Implementation.UCD_Core.GC_Values;
 
    begin
@@ -267,7 +247,9 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
    -- Is_Space_Separator --
    ------------------------
 
-   function Is_Space_Separator (Self : JSON5_Parser'Class) return Boolean is
+   function Is_Space_Separator
+     (Self : JSON_Parser_Base'Class) return Boolean
+   is
       use all type VSS.Implementation.UCD_Core.GC_Values;
 
    begin
@@ -278,7 +260,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
    -- Is_Unicode_Letter --
    -----------------------
 
-   function Is_Unicode_Letter (Self : JSON5_Parser'Class) return Boolean is
+   function Is_Unicode_Letter (Self : JSON_Parser_Base'Class) return Boolean is
       use all type VSS.Implementation.UCD_Core.GC_Values;
 
    begin
@@ -316,7 +298,9 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Value_Separator_Or_End_Array,
       Finish);
 
-   function Parse_Array (Self : in out JSON5_Parser'Class) return Boolean is
+   function Parse_Array
+     (Self : in out JSON_Parser_Base'Class) return Boolean
+   is
       --  [RFC 8259]
       --
       --  array = begin-array [ value *( value-separator value ) ] end-array
@@ -364,7 +348,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      null;
 
                   when Solidus =>
-                     if not Self.Parse_Comment then
+                     if not Parse_Comment (Self) then
                         return
                           Self.Push
                             (Parse_Array'Access, Array_State'Pos (State));
@@ -384,7 +368,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      return Self.Report_Error ("unexpected end of document");
 
                   when others =>
-                     if not Self.Is_Space_Separator then
+                     if not Is_Space_Separator (Self) then
                         return
                           Self.Report_Error
                             ("value separator or end array expected");
@@ -442,7 +426,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   =>
                      State := Value_Separator_Or_End_Array;
 
-                     if not Self.Parse_Value then
+                     if not Parse_Value (Self) then
                         return
                           Self.Push
                             (Parse_Array'Access, Array_State'Pos (State));
@@ -461,7 +445,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      raise Program_Error;
 
                   when others =>
-                     if not Self.Is_Space_Separator then
+                     if not Is_Space_Separator (Self) then
                         return
                           Self.Report_Error ("value or end array expected");
                      end if;
@@ -488,7 +472,9 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Multi_Line_Asterisk,
       Multi_Line_Done);
 
-   function Parse_Comment (Self : in out JSON5_Parser'Class) return Boolean is
+   function Parse_Comment
+     (Self : in out JSON_Parser_Base'Class) return Boolean
+   is
       State : Comment_State;
 
    begin
@@ -584,7 +570,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Report_Key_Name);
 
    function Parse_Identifier
-     (Self : in out JSON5_Parser'Class) return Boolean
+     (Self : in out JSON_Parser_Base'Class) return Boolean
    is
       --  JSON5Identifier::
       --    IdentifierName
@@ -625,7 +611,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       else
          pragma Assert
                  (Self.C in Dollar_Sign | Low_Line | Reverse_Solidus
-                    or Self.Is_Unicode_Letter);
+                    or Is_Unicode_Letter (Self));
 
          Self.Buffer.Clear;
 
@@ -640,7 +626,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                raise Program_Error;
 
             when others =>
-               pragma Assert (Self.Is_Unicode_Letter);
+               pragma Assert (Is_Unicode_Letter (Self));
 
                State := Identifier_Part;
                Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
@@ -683,7 +669,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      State := Escape;
 
                   when others =>
-                     if Self.Is_Identifier_Part then
+                     if Is_Identifier_Part (Self) then
                         Self.Buffer.Append
                           (VSS.Characters.Virtual_Character (Self.C));
 
@@ -697,7 +683,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   when Latin_Small_Letter_U =>
                      State := Identifier_Part;
 
-                     if not Self.Parse_Unicode_Escape_Sequence then
+                     if not Parse_Unicode_Escape_Sequence (Self) then
                         return
                           Self.Push
                             (Parse_Identifier'Access,
@@ -721,7 +707,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
    type JSON_Text_State is (Initial, Whitespace_Or_End, Done);
 
    function Parse_JSON_Text
-     (Self : in out JSON5_Parser'Class) return Boolean
+     (Self : in out JSON_Parser_Base'Class) return Boolean
    is
       --  [RFC 8259]
       --
@@ -791,7 +777,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      null;
 
                   when Solidus =>
-                     if not Self.Parse_Comment then
+                     if not Parse_Comment (Self) then
                         Self.Stack.Push
                           (Parse_JSON_Text'Access,
                            JSON_Text_State'Pos (State));
@@ -808,7 +794,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      return False;
 
                   when others =>
-                     if not Self.Is_Space_Separator then
+                     if not Is_Space_Separator (Self) then
                         State := Done;
                         Self.Stack.Push
                           (Parse_JSON_Text'Access,
@@ -838,7 +824,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
             when Initial =>
                State := Whitespace_Or_End;
 
-               if not Self.Parse_Value then
+               if not Parse_Value (Self) then
                   Self.Stack.Push
                     (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
@@ -888,7 +874,9 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Report_Hex_Value,
       Report_Special_Value);
 
-   function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean is
+   function Parse_Number
+     (Parser : in out JSON_Parser_Base'Class) return Boolean
+   is
       --  JSON5Number::
       --    JSON5NumericLiteral
       --    + JSON5NumericLiteral
@@ -945,6 +933,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       use type Interfaces.Unsigned_64;
 
       State : Number_State;
+      Self  : JSON5_Parser'Class renames JSON5_Parser'Class (Parser);
 
    begin
       if not Self.Stack.Is_Empty then
@@ -1406,7 +1395,9 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Value_Separator_Or_End_Object,
       Finish);
 
-   function Parse_Object (Self : in out JSON5_Parser'Class) return Boolean is
+   function Parse_Object
+     (Self : in out JSON_Parser_Base'Class) return Boolean
+   is
       --  JSON5Object:
       --    { }
       --    { JSON5MemberList ,opt }
@@ -1483,7 +1474,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      return Self.Report_Error ("unexpected end of document");
 
                   when others =>
-                     if not Self.Is_Space_Separator then
+                     if not Is_Space_Separator (Self) then
                         return Self.Report_Error ("name separator expected");
                      end if;
                end case;
@@ -1521,7 +1512,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      return Self.Report_Error ("unexpected end of document");
 
                   when others =>
-                     if not Self.Is_Space_Separator then
+                     if not Is_Space_Separator (Self) then
                         return
                           Self.Report_Error
                             ("value separator or end object expected");
@@ -1564,7 +1555,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      null;
 
                   when Solidus =>
-                     if not Self.Parse_Comment then
+                     if not Parse_Comment (Self) then
                         return
                           Self.Push
                             (Parse_Object'Access, Object_State'Pos (State));
@@ -1573,7 +1564,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   when Quotation_Mark | Apostrophe =>
                      State := Member_String;
 
-                     if not Self.Parse_String then
+                     if not Parse_String (Self) then
                         return
                           Self.Push
                             (Parse_Object'Access, Object_State'Pos (State));
@@ -1588,7 +1579,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                          (Parse_Object'Access, Object_State'Pos (State));
 
                   when Dollar_Sign | Low_Line | Reverse_Solidus =>
-                     Success := Self.Parse_Identifier;
+                     Success := Parse_Identifier (Self);
                      pragma Assert (not Success);  --  Always return False
 
                      State := Member_Name_Separator;
@@ -1601,8 +1592,8 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      raise Program_Error;
 
                   when others =>
-                     if Self.Is_Unicode_Letter then
-                        Success := Self.Parse_Identifier;
+                     if Is_Unicode_Letter (Self) then
+                        Success := Parse_Identifier (Self);
                         pragma Assert (not Success);  --  Always return False
 
                         State := Member_Name_Separator;
@@ -1611,7 +1602,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                           Self.Push
                             (Parse_Object'Access, Object_State'Pos (State));
 
-                     elsif not Self.Is_Space_Separator then
+                     elsif not Is_Space_Separator (Self) then
                         return
                           Self.Report_Error
                             ("string, identifier or end object expected");
@@ -1625,7 +1616,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                null;
 
             when Member_Value =>
-               if not Self.Parse_Value then
+               if not Parse_Value (Self) then
                   State := Value_Separator_Or_End_Object;
 
                   return
@@ -1662,7 +1653,9 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Default : String_State;
    end record with Size => Interfaces.Unsigned_32'Size;
 
-   function Parse_String (Self : in out JSON5_Parser'Class) return Boolean is
+   function Parse_String
+     (Parser : in out JSON_Parser_Base'Class) return Boolean
+   is
 
       function To_String_State is
         new Ada.Unchecked_Conversion
@@ -1673,6 +1666,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
               (String_State_Record, Interfaces.Unsigned_32);
 
       State : String_State_Record;
+      Self  : JSON5_Parser'Class renames JSON5_Parser'Class (Parser);
 
    begin
       if not Self.Stack.Is_Empty then
@@ -1827,7 +1821,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   when Latin_Small_Letter_U =>
                      State.Current := State.Default;
 
-                     if not Self.Parse_Unicode_Escape_Sequence then
+                     if not Parse_Unicode_Escape_Sequence (Self) then
                         return
                           Self.Push
                             (Parse_String'Access, To_Unsigned_32 (State));
@@ -1896,12 +1890,13 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Escape_UXXXX_Escape_UXXX);
 
    function Parse_Unicode_Escape_Sequence
-     (Self : in out JSON5_Parser'Class) return Boolean
+     (Parser : in out JSON_Parser_Base'Class) return Boolean
    is
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF16_Code_Unit;
 
       State : Unicode_Escape_Sequence_State;
+      Self  : JSON5_Parser'Class renames JSON5_Parser'Class (Parser);
 
    begin
       if not Self.Stack.Is_Empty then
@@ -2067,7 +2062,9 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       Value_TRU,
       Finish);
 
-   function Parse_Value (Self : in out JSON5_Parser'Class) return Boolean is
+   function Parse_Value
+     (Self : in out JSON_Parser_Base'Class) return Boolean
+   is
       State   : Value_State;
       Success : Boolean;
 
@@ -2106,7 +2103,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      null;
 
                   when Solidus =>
-                     if not Self.Parse_Comment then
+                     if not Parse_Comment (Self) then
                         return
                           Self.Push
                             (Parse_Value'Access, Value_State'Pos (State));
@@ -2116,7 +2113,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      end if;
 
                   when Quotation_Mark | Apostrophe =>
-                     if not Self.Parse_String then
+                     if not Parse_String (Self) then
                         State := Value_String;
 
                         return
@@ -2145,13 +2142,13 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      | Latin_Capital_Letter_I
                      | Latin_Capital_Letter_N
                   =>
-                     Success := Self.Parse_Number;
+                     Success := Parse_Number (Self);
                      pragma Assert (not Success);  --  Always return False
 
                      return False;
 
                   when Begin_Array =>
-                     if not Self.Parse_Array then
+                     if not Parse_Array (Self) then
                         return False;
 
                      else
@@ -2162,7 +2159,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      end if;
 
                   when Begin_Object =>
-                     if not Self.Parse_Object then
+                     if not Parse_Object (Self) then
                         return False;
 
                      else
@@ -2176,7 +2173,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      return Self.Report_Error ("value expected");
 
                   when others =>
-                     if not Self.Is_Space_Separator then
+                     if not Is_Space_Separator (Self) then
                         return Self.Report_Error ("value expected");
                      end if;
                end case;
@@ -2332,117 +2329,5 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
          end case;
       end loop;
    end Parse_Value;
-
-   ---------
-   -- Pop --
-   ---------
-
-   procedure Pop (Self : in out Parse_Stack'Class) is
-   begin
-      Self.Head := Self.Head - 1;
-   end Pop;
-
-   ----------
-   -- Push --
-   ----------
-
-   function Push
-     (Self  : in out JSON5_Parser'Class;
-      Parse : not null Parse_Subprogram;
-      State : Interfaces.Unsigned_32) return Boolean is
-   begin
-      if Self.Event /= VSS.JSON.Pull_Readers.Invalid
-        or else Self.Error /= VSS.JSON.Pull_Readers.Not_Valid
-      then
-         Self.Stack.Push (Parse, State);
-      end if;
-
-      return False;
-   end Push;
-
-   ----------
-   -- Push --
-   ----------
-
-   procedure Push
-     (Self  : in out Parse_Stack'Class;
-      Parse : not null Parse_Subprogram;
-      State : Interfaces.Unsigned_32) is
-   begin
-      Self.Head := Self.Head + 1;
-      Self.Stack (Self.Head) := (Parse, State);
-   end Push;
-
-   ----------
-   -- Read --
-   ----------
-
-   function Read
-     (Self  : in out JSON5_Parser'Class;
-      Parse : not null Parse_Subprogram;
-      State : Interfaces.Unsigned_32) return Boolean
-   is
-      Success   : Boolean := True;
-      Character : VSS.Characters.Virtual_Character;
-
-   begin
-      Self.Stream.Get (Character, Success);
-
-      if not Success then
-         if Self.Stream.Is_End_Of_Stream then
-            Self.C := End_Of_Stream;
-         end if;
-
-         if Self.Stream.Has_Error then
-            --  In case of IO error save error message and mark document as
-            --  invalid.
-
-            Self.Message := Self.Stream.Error_Message;
-            Self.Event   := VSS.JSON.Pull_Readers.Invalid;
-            Self.Error   := VSS.JSON.Pull_Readers.Not_Valid;
-
-            return False;
-
-         else
-            Self.Event := VSS.JSON.Pull_Readers.Invalid;
-            Self.Error := VSS.JSON.Pull_Readers.Premature_End_Of_Document;
-         end if;
-
-         if not Self.Stream.Is_End_Of_Stream then
-            Success := Self.Push (Parse, State);
-         end if;
-
-         return False;
-
-      else
-         Self.C := Wide_Wide_Character (Character);
-      end if;
-
-      return True;
-   end Read;
-
-   ------------------
-   -- Report_Error --
-   ------------------
-
-   function Report_Error
-     (Self    : in out JSON5_Parser'Class;
-      Message : Wide_Wide_String) return Boolean is
-   begin
-      Self.Event := VSS.JSON.Pull_Readers.Invalid;
-      Self.Error := VSS.JSON.Pull_Readers.Not_Valid;
-      Self.Message := VSS.Strings.To_Virtual_String (Message);
-
-      return False;
-   end Report_Error;
-
-   ---------
-   -- Top --
-   ---------
-
-   function Top (Self : Parse_Stack'Class) return Parse_State is
-   begin
-      return Self.Stack (Self.Head);
-   end Top;
 
 end VSS.JSON.Implementation.Parsers.JSON5;

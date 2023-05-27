@@ -253,16 +253,14 @@ package body VSS.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Array'Access, Array_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State = Finish then
-                  return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  return Self.Report_Error ("unexpected end of document");
-               end if;
+            elsif State = Finish then
+               return True;
 
             else
-               return False;
+               return Self.Report_Error ("unexpected end of document");
             end if;
          end if;
 
@@ -408,13 +406,11 @@ package body VSS.JSON.Implementation.Parsers is
          if not Self.Read
            (Parse_JSON_Text'Access, JSON_Text_State'Pos (State))
          then
-            if Self.Stream.Is_End_Of_Stream then
-               Self.Event := VSS.JSON.Pull_Readers.End_Document;
-
-               return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
             end if;
 
-            return False;
+            State := Done;
          end if;
 
          case State is
@@ -444,8 +440,8 @@ package body VSS.JSON.Implementation.Parsers is
 
                null;
 
-            when others =>
-               raise Program_Error with JSON_Text_State'Image (State);
+            when Done =>
+               null;
          end case;
       end loop;
    end Parse_JSON_Text;
@@ -540,21 +536,19 @@ package body VSS.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Number'Access, Number_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
+
+            elsif State
                     in Int_Digits | Frac_Or_Exp | Frac_Digits | Exp_Digits
                   --  XXX allowed states and conditions need to be checked.
-               then
-                  State := Report_Value;
-
-               else
-                  --  XXX Self.Stack.Push???
-
-                  raise Program_Error;
-               end if;
+            then
+               State := Report_Value;
 
             else
-               return False;
+               --  XXX Self.Stack.Push???
+
+               raise Program_Error;
             end if;
          end if;
 
@@ -814,16 +808,14 @@ package body VSS.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Object'Access, Object_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State = Finish then
-                  return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  return Self.Report_Error ("unexpected end of document");
-               end if;
+            elsif State = Finish then
+               return True;
 
             else
-               return False;
+               return Self.Report_Error ("unexpected end of document");
             end if;
          end if;
 
@@ -994,16 +986,14 @@ package body VSS.JSON.Implementation.Parsers is
 
       loop
          if not Self.Read (Parse_String'Access, String_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State = Finish then
-                  return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  return Self.Report_Error ("premature end of string");
-               end if;
+            elsif State = Finish then
+               return True;
 
             else
-               return False;
+               return Self.Report_Error ("premature end of string");
             end if;
          end if;
 
@@ -1319,16 +1309,14 @@ package body VSS.JSON.Implementation.Parsers is
          end case;
 
          if not Self.Read (Parse_Value'Access, Value_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State = Finish then
-                  return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  return Self.Report_Error ("premature end of value");
-               end if;
+            elsif State = Finish then
+               return True;
 
             else
-               return False;
+               return Self.Report_Error ("premature end of value");
             end if;
          end if;
 

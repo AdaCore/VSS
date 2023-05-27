@@ -439,16 +439,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end case;
 
          if not Self.Read (Parse_Array'Access, Array_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State = Finish then
-                  return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  return Self.Report_Error ("unexpected end of document");
-               end if;
+            elsif State = Finish then
+               return True;
 
             else
-               return False;
+               return Self.Report_Error ("unexpected end of document");
             end if;
          end if;
 
@@ -608,12 +606,11 @@ package body VSS.JSON.Implementation.Parsers_5 is
          if not Self.Read
                   (Parse_Identifier'Access, Identifier_State'Pos (State))
          then
-            if Self.Stream.Is_End_Of_Stream then
-               State := Report_Key_Name;
-
-            else
+            if not Self.Stream.Is_End_Of_Stream then
                return False;
             end if;
+
+            State := Report_Key_Name;
          end if;
 
          case State is
@@ -754,13 +751,11 @@ package body VSS.JSON.Implementation.Parsers_5 is
          if not Self.Read
            (Parse_JSON_Text'Access, JSON_Text_State'Pos (State))
          then
-            if Self.Stream.Is_End_Of_Stream then
-               Self.Event := VSS.JSON.Pull_Readers.End_Document;
-
-               return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
             end if;
 
-            return False;
+            State := Done;
          end if;
 
          case State is
@@ -790,8 +785,8 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                null;
 
-            when others =>
-               raise Program_Error with JSON_Text_State'Image (State);
+            when Done =>
+               null;
          end case;
       end loop;
    end Parse_JSON_Text;
@@ -968,22 +963,20 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end case;
 
          if not Self.Read (Parse_Number'Access, Number_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State in Numeric_0
-                         | Decimal_Integral_Digits_Opt
-                         | Decimal_Fraction_Digits_Opt
-                         | Decimal_Exponent_Digits_Opt
-               then
-                  State := Report_Decimal_Value;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  --  XXX Self.Stack.Push???
-
-                  raise Program_Error;
-               end if;
+            elsif State in Numeric_0
+                             | Decimal_Integral_Digits_Opt
+                             | Decimal_Fraction_Digits_Opt
+                             | Decimal_Exponent_Digits_Opt
+            then
+               State := Report_Decimal_Value;
 
             else
-               return False;
+               --  XXX Self.Stack.Push???
+
+               raise Program_Error;
             end if;
          end if;
 
@@ -1469,16 +1462,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end case;
 
          if not Self.Read (Parse_Object'Access, Object_State'Pos (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State = Finish then
-                  return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  return Self.Report_Error ("unexpected end of document");
-               end if;
+            elsif State = Finish then
+               return True;
 
             else
-               return False;
+               return Self.Report_Error ("unexpected end of document");
             end if;
          end if;
 
@@ -1631,16 +1622,14 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
       loop
          if not Self.Read (Parse_String'Access, To_Unsigned_32 (State)) then
-            if Self.Stream.Is_End_Of_Stream then
-               if State.Current = Finish then
-                  return True;
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
 
-               else
-                  return Self.Report_Error ("premature end of string");
-               end if;
+            elsif State.Current = Finish then
+               return True;
 
             else
-               return False;
+               return Self.Report_Error ("premature end of string");
             end if;
          end if;
 
@@ -1858,13 +1847,13 @@ package body VSS.JSON.Implementation.Parsers_5 is
            (Parse_Unicode_Escape_Sequence'Access,
             Unicode_Escape_Sequence_State'Pos (State))
          then
-            if Self.Stream.Is_End_Of_Stream then
+            if not Self.Stream.Is_End_Of_Stream then
+               return False;
+
+            else
                return
                  Self.Report_Error
                    ("premature end of unicode escape sequence");
-
-            else
-               return False;
             end if;
          end if;
 

@@ -11,7 +11,7 @@ with Ada.Unchecked_Conversion;
 with VSS.Characters;
 with VSS.Implementation.UCD_Core;
 
-package body VSS.JSON.Implementation.Parsers_5 is
+package body VSS.JSON.Implementation.Parsers.JSON5 is
 
    use type VSS.JSON.Pull_Readers.JSON_Event_Kind;
    use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
@@ -2517,4 +2517,4 @@ package body VSS.JSON.Implementation.Parsers_5 is
       return Self.Stack (Self.Head);
    end Top;
 
-end VSS.JSON.Implementation.Parsers_5;
+end VSS.JSON.Implementation.Parsers.JSON5;

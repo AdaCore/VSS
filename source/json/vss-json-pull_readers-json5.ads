@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-private with VSS.JSON.Implementation.Parsers_5;
+private with VSS.JSON.Implementation.Parsers.JSON5;
 with VSS.Text_Streams;
 
 package VSS.JSON.Pull_Readers.JSON5 is
@@ -18,7 +18,7 @@ package VSS.JSON.Pull_Readers.JSON5 is
 private
 
    type JSON5_Pull_Reader is limited new JSON_Pull_Reader with record
-      Parser : VSS.JSON.Implementation.Parsers_5.JSON5_Parser;
+      Parser : VSS.JSON.Implementation.Parsers.JSON5.JSON5_Parser;
    end record;
 
    overriding function At_End (Self : JSON5_Pull_Reader) return Boolean;

@@ -8,7 +8,7 @@
 
 with VSS.Characters;
 
-package body VSS.JSON.Implementation.Parsers is
+package body VSS.JSON.Implementation.Parsers.JSON is
 
    use type VSS.JSON.Pull_Readers.JSON_Event_Kind;
    use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
@@ -1561,4 +1561,4 @@ package body VSS.JSON.Implementation.Parsers is
       return Self.Stack (Self.Head);
    end Top;
 
-end VSS.JSON.Implementation.Parsers;
+end VSS.JSON.Implementation.Parsers.JSON;

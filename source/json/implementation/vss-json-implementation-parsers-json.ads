@@ -15,49 +15,49 @@ with VSS.Strings;
 with VSS.Text_Streams;
 private with VSS.Unicode;
 
-package VSS.JSON.Implementation.Parsers_5 is
+package VSS.JSON.Implementation.Parsers.JSON is
 
-   type JSON5_Parser is tagged limited private;
+   type JSON_Parser is tagged limited private;
 
    procedure Set_Stream
-     (Self   : in out JSON5_Parser'Class;
+     (Self   : in out JSON_Parser'Class;
       Stream : not null VSS.Text_Streams.Input_Text_Stream_Access);
 
-   procedure Parse (Self : in out JSON5_Parser'Class);
+   procedure Parse (Self : in out JSON_Parser'Class);
    --  Parse single token.
 
-   function At_End (Self : JSON5_Parser'Class) return Boolean;
+   function At_End (Self : JSON_Parser'Class) return Boolean;
    --  Return True when end of document has been processed.
 
    function Event_Kind
-     (Self : JSON5_Parser'Class)
+     (Self : JSON_Parser'Class)
       return VSS.JSON.Pull_Readers.JSON_Event_Kind;
    --  Return current event.
 
    function Error
-     (Self : JSON5_Parser'Class)
+     (Self : JSON_Parser'Class)
       return VSS.JSON.Pull_Readers.JSON_Reader_Error;
    --  Return current error.
 
    function Error_Message
-     (Self : JSON5_Parser'Class) return VSS.Strings.Virtual_String;
+     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String;
    --  Return error message.
 
    function String_Value
-     (Self : JSON5_Parser'Class) return VSS.Strings.Virtual_String;
+     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String;
    --  Return string data (key name or string value)
 
-   function Boolean_Value (Self : JSON5_Parser'Class) return Boolean;
+   function Boolean_Value (Self : JSON_Parser'Class) return Boolean;
    --  Return boolean value
 
    function Number_Value
-     (Self : JSON5_Parser'Class) return VSS.JSON.JSON_Number;
+     (Self : JSON_Parser'Class) return VSS.JSON.JSON_Number;
    --  Return number value
 
 private
 
    type Parse_Subprogram is
-     access function (Self : in out JSON5_Parser'Class) return Boolean;
+     access function (Self : in out JSON_Parser'Class) return Boolean;
 
    type Parse_State is record
       Parse : Parse_Subprogram;
@@ -82,7 +82,7 @@ private
 
    procedure Pop (Self : in out Parse_Stack'Class);
 
-   type JSON5_Parser is tagged limited record
+   type JSON_Parser is tagged limited record
       Stream       : VSS.Text_Streams.Input_Text_Stream_Access;
       Stack        : Parse_Stack;
       Event        : VSS.JSON.Pull_Readers.JSON_Event_Kind :=
@@ -94,18 +94,17 @@ private
       Buffer       : VSS.Strings.Virtual_String;
       Boolean      : Standard.Boolean;
       Number       : VSS.JSON.JSON_Number;
-      Unsigned     : Interfaces.Unsigned_64;
       Code_Unit_1  : VSS.Unicode.UTF16_Code_Unit;
       Code_Unit_2  : VSS.Unicode.UTF16_Code_Unit;
       Number_State : VSS.JSON.Implementation.Numbers.Parsing_State;
    end record;
 
    function Push
-      (Self  : in out JSON5_Parser'Class;
-       Parse : not null Parse_Subprogram;
+     (Self  : in out JSON_Parser'Class;
+      Parse : not null Parse_Subprogram;
       State : Interfaces.Unsigned_32) return Boolean
      with Post => Push'Result = False;
    --  Store state in the recovery stack. Do nothing if object is in error
    --  state.
 
-end VSS.JSON.Implementation.Parsers_5;
+end VSS.JSON.Implementation.Parsers.JSON;

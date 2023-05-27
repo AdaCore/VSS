@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-private with VSS.JSON.Implementation.Parsers;
+private with VSS.JSON.Implementation.Parsers.JSON;
 with VSS.Text_Streams;
 
 package VSS.JSON.Pull_Readers.Simple is
@@ -18,7 +18,7 @@ package VSS.JSON.Pull_Readers.Simple is
 private
 
    type JSON_Simple_Pull_Reader is limited new JSON_Pull_Reader with record
-      Parser : VSS.JSON.Implementation.Parsers.JSON_Parser;
+      Parser : VSS.JSON.Implementation.Parsers.JSON.JSON_Parser;
    end record;
 
    overriding function At_End (Self : JSON_Simple_Pull_Reader) return Boolean;

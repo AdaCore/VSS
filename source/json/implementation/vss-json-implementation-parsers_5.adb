@@ -27,11 +27,18 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
    function Parse_Object (Self : in out JSON5_Parser'Class) return Boolean;
 
-   function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean;
+   function Parse_Number (Self : in out JSON5_Parser'Class) return Boolean
+     with Post => Parse_Number'Result = False;
    --  Parse number. When parse of number is done Number_Value event is
    --  reported, thus, subprogram returns False always.
 
    function Parse_String (Self : in out JSON5_Parser'Class) return Boolean;
+
+   function Parse_Identifier
+     (Self : in out JSON5_Parser'Class) return Boolean
+     with Post => Parse_Identifier'Result = False;
+   --  Parse JSON5Identifier. Emit Key_Name event when pasring is done, thus is
+   --  never return True.
 
    function Parse_Unicode_Escape_Sequence
      (Self : in out JSON5_Parser'Class) return Boolean;
@@ -53,6 +60,18 @@ package body VSS.JSON.Implementation.Parsers_5 is
    function Is_Space_Separator (Self : JSON5_Parser'Class) return Boolean;
    --  Returns True when current character belongs to Zs (space, separator)
    --  general category.
+
+   function Is_Unicode_Letter (Self : JSON5_Parser'Class) return Boolean;
+   --  Returns True when current character belongs to Lu (uppercase letter),
+   --  Ll (lowercase letter), Lt (titlecase letter), Lm (modifier letter), Lo
+   --  (other latter), Nl (letternumber) categories.
+
+   function Is_Identifier_Part (Self : JSON5_Parser'Class) return Boolean;
+   --  Returns True when current character belongs to Lu (uppercase letter),
+   --  Ll (lowercase letter), Lt (titlecase letter), Lm (modifier letter), Lo
+   --  (other latter), Nl (letternumber), Mn (non-spacing mark), Mc (combining
+   --  spacing mark), Nd (decimal number), Pc (connector punctuation)
+   --  categories.
 
    function Hex_To_Code
      (Self : JSON5_Parser'Class;
@@ -82,8 +101,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
      Wide_Wide_Character'Val (16#00_000D#);
    Space                     : constant Wide_Wide_Character := ' ';  --  U+0020
    Quotation_Mark            : constant Wide_Wide_Character := '"';  --  U+0022
-   Hyphen_Minus              : constant Wide_Wide_Character := '-';
-   Plus_Sign                 : constant Wide_Wide_Character := '+';
+   Dollar_Sign               : constant Wide_Wide_Character := '$';  --  U+0024
+   Plus_Sign                 : constant Wide_Wide_Character := '+';  --  U+002B
+   Hyphen_Minus              : constant Wide_Wide_Character := '-';  --  U+002D
    Apostrophe                : constant Wide_Wide_Character := ''';  --  U+0027
    Solidus                   : constant Wide_Wide_Character := '/';  --  U+002F
    Digit_Zero                : constant Wide_Wide_Character := '0';
@@ -96,6 +116,7 @@ package body VSS.JSON.Implementation.Parsers_5 is
    Latin_Capital_Letter_N    : constant Wide_Wide_Character := 'N';  --  U+004E
    Latin_Capital_Letter_X    : constant Wide_Wide_Character := 'X';  --  U+0058
    Reverse_Solidus           : constant Wide_Wide_Character := '\';  --  U+005C
+   Low_Line                  : constant Wide_Wide_Character := '_';  --  U+005F
    Latin_Small_Letter_A      : constant Wide_Wide_Character := 'a';
    Latin_Small_Letter_B      : constant Wide_Wide_Character := 'b';  --  U+0062
    Latin_Small_Letter_E      : constant Wide_Wide_Character := 'e';
@@ -121,6 +142,11 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
    No_Break_Space            : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_00A0#);
+
+   Zero_Width_Non_Joiner     : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_200C#);
+   Zero_Width_Joiner         : constant Wide_Wide_Character :=
+     Wide_Wide_Character'Val (16#00_200D#);
 
    Line_Separator            : constant Wide_Wide_Character :=
      Wide_Wide_Character'Val (16#00_2028#);
@@ -261,6 +287,20 @@ package body VSS.JSON.Implementation.Parsers_5 is
    end Is_Empty;
 
    ------------------------
+   -- Is_Identifier_Part --
+   ------------------------
+
+   function Is_Identifier_Part (Self : JSON5_Parser'Class) return Boolean is
+      use all type VSS.Implementation.UCD_Core.GC_Values;
+
+   begin
+      return
+        Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC
+      in GC_Lu | GC_Ll | GC_Lt | GC_Lm | GC_Lo | GC_Nl | GC_Mn | GC_Mc
+          | GC_Nd | GC_Pc;
+   end Is_Identifier_Part;
+
+   ------------------------
    -- Is_Space_Separator --
    ------------------------
 
@@ -270,6 +310,19 @@ package body VSS.JSON.Implementation.Parsers_5 is
    begin
       return Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC = GC_Zs;
    end Is_Space_Separator;
+
+   -----------------------
+   -- Is_Unicode_Letter --
+   -----------------------
+
+   function Is_Unicode_Letter (Self : JSON5_Parser'Class) return Boolean is
+      use all type VSS.Implementation.UCD_Core.GC_Values;
+
+   begin
+      return
+        Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC
+          in GC_Lu | GC_Ll | GC_Lt | GC_Lm | GC_Lo | GC_Nl;
+   end Is_Unicode_Letter;
 
    ------------------
    -- Number_Value --
@@ -466,6 +519,149 @@ package body VSS.JSON.Implementation.Parsers_5 is
          end case;
       end loop;
    end Parse_Array;
+
+   ----------------------
+   -- Parse_Identifier --
+   ----------------------
+
+   type Identifier_State is
+     (Identifier_Part,
+      Escape,
+      Report_Key_Name);
+
+   function Parse_Identifier
+     (Self : in out JSON5_Parser'Class) return Boolean
+   is
+      --  JSON5Identifier::
+      --    IdentifierName
+      --
+      --  IdentifierName ::
+      --    IdentifierStart
+      --    IdentifierName IdentifierPart
+      --
+      --  IdentifierStart ::
+      --    UnicodeLetter
+      --    $
+      --    _
+      --    \ UnicodeEscapeSequence
+      --
+      --  IdentifierPart ::
+      --    IdentifierStart
+      --    UnicodeCombiningMark
+      --    UnicodeDigit
+      --    UnicodeConnectorPunctuation
+      --    <ZWNJ>
+      --    <ZWJ>
+
+      State : Identifier_State;
+
+   begin
+      if not Self.Stack.Is_Empty then
+         State := Identifier_State'Val (Self.Stack.Top.State);
+         Self.Stack.Pop;
+
+         if not Self.Stack.Is_Empty then
+            if not Self.Stack.Top.Parse (Self) then
+               Self.Push
+                 (Parse_Identifier'Access, Identifier_State'Pos (State));
+
+               return False;
+            end if;
+         end if;
+
+      else
+         pragma Assert
+                 (Self.C in Dollar_Sign | Low_Line | Reverse_Solidus
+                    or Self.Is_Unicode_Letter);
+
+         Self.Buffer.Clear;
+
+         case Self.C is
+            when Dollar_Sign | Low_Line =>
+               State := Identifier_Part;
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+
+            when Reverse_Solidus =>
+               State := Escape;
+
+               raise Program_Error;
+
+            when others =>
+               pragma Assert (Self.Is_Unicode_Letter);
+
+               State := Identifier_Part;
+               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+         end case;
+      end if;
+
+      loop
+         case State is
+            when Report_Key_Name =>
+               Self.Event := VSS.JSON.Pull_Readers.Key_Name;
+
+               return False;
+
+            when others =>
+               null;
+         end case;
+
+         if not Self.Read
+                  (Parse_Identifier'Access, Identifier_State'Pos (State))
+         then
+            if Self.Stream.Is_End_Of_Stream then
+               State := Report_Key_Name;
+
+            else
+               return False;
+            end if;
+         end if;
+
+         case State is
+            when Identifier_Part =>
+               case Self.C is
+                  when Dollar_Sign
+                     | Low_Line
+                     | Zero_Width_Non_Joiner
+                     | Zero_Width_Joiner
+                  =>
+                     Self.Buffer.Append
+                       (VSS.Characters.Virtual_Character (Self.C));
+
+                  when Reverse_Solidus =>
+                     State := Escape;
+
+                  when others =>
+                     if Self.Is_Identifier_Part then
+                        Self.Buffer.Append
+                          (VSS.Characters.Virtual_Character (Self.C));
+
+                     else
+                        State := Report_Key_Name;
+                     end if;
+               end case;
+
+            when Escape =>
+               case Self.C is
+                  when Latin_Small_Letter_U =>
+                     State := Identifier_Part;
+
+                     if not Self.Parse_Unicode_Escape_Sequence then
+                        Self.Push
+                          (Parse_Identifier'Access,
+                           Identifier_State'Pos (State));
+
+                        return False;
+                     end if;
+
+                  when others =>
+                     raise Program_Error;
+               end case;
+
+            when Report_Key_Name =>
+               null;
+         end case;
+      end loop;
+   end Parse_Identifier;
 
    ---------------------
    -- Parse_JSON_Text --
@@ -1149,14 +1345,23 @@ package body VSS.JSON.Implementation.Parsers_5 is
       Finish);
 
    function Parse_Object (Self : in out JSON5_Parser'Class) return Boolean is
-      --  [RFC 8259]
+      --  JSON5Object:
+      --    { }
+      --    { JSON5MemberList ,opt }
       --
-      --  object = begin-object [ member *( value-separator member ) ]
-      --           end-object
+      --  JSON5MemberList:
+      --    JSON5Member
+      --    JSON5MemberList , JSON5Member
       --
-      --  member = string name-separator value
+      --  JSON5Member:
+      --    JSON5MemberName : JSON5Value
+      --
+      --  JSON5MemberName:
+      --    JSON5Identifier
+      --    JSON5String
 
-      State : Object_State;
+      State   : Object_State;
+      Success : Boolean;
 
    begin
       if not Self.Stack.Is_Empty then
@@ -1310,13 +1515,34 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
                      return False;
 
+                  when Dollar_Sign | Low_Line | Reverse_Solidus =>
+                     Success := Self.Parse_Identifier;
+                     pragma Assert (not Success);  --  Always return False
+
+                     State := Member_Name_Separator;
+                     Self.Push
+                       (Parse_Object'Access, Object_State'Pos (State));
+
+                     return False;
+
                   when End_Of_Stream =>
                      raise Program_Error;
 
                   when others =>
-                     if not Self.Is_Space_Separator then
+                     if Self.Is_Unicode_Letter then
+                        Success := Self.Parse_Identifier;
+                        pragma Assert (not Success);  --  Always return False
+
+                        State := Member_Name_Separator;
+                        Self.Push
+                          (Parse_Object'Access, Object_State'Pos (State));
+
+                        return False;
+
+                     elsif not Self.Is_Space_Separator then
                         return
-                          Self.Report_Error ("string or end object expected");
+                          Self.Report_Error
+                            ("string, identifier or end object expected");
                      end if;
                end case;
 

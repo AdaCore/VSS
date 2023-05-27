@@ -887,16 +887,9 @@ package body VSS.JSON.Implementation.Parsers_5 is
 
          case State is
             when Initial =>
+               State := Whitespace_Or_End;
+
                if not Self.Parse_Value then
-                  if Self.Event /= VSS.JSON.Pull_Readers.Invalid
-                    or else Self.Error /= VSS.JSON.Pull_Readers.Not_Valid
-                  then
-                     State := Whitespace_Or_End;
-
-                  else
-                     State := Whitespace_Or_End;
-                  end if;
-
                   Self.Stack.Push
                     (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 

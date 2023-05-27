@@ -175,47 +175,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
            or Self.Error = VSS.JSON.Pull_Readers.Not_Valid);
    end At_End;
 
-   -------------------
-   -- Boolean_Value --
-   -------------------
-
-   function Boolean_Value (Self : JSON5_Parser'Class) return Boolean is
-   begin
-      return Self.Boolean;
-   end Boolean_Value;
-
-   -----------
-   -- Error --
-   -----------
-
-   function Error
-     (Self : JSON5_Parser'Class)
-      return VSS.JSON.Pull_Readers.JSON_Reader_Error is
-   begin
-      return Self.Error;
-   end Error;
-
-   -------------------
-   -- Error_Message --
-   -------------------
-
-   function Error_Message
-     (Self : JSON5_Parser'Class) return VSS.Strings.Virtual_String is
-   begin
-      return Self.Message;
-   end Error_Message;
-
-   ----------------
-   -- Event_Kind --
-   ----------------
-
-   function Event_Kind
-     (Self : JSON5_Parser'Class)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
-   begin
-      return Self.Event;
-   end Event_Kind;
-
    -----------------------
    -- Extract_Core_Data --
    -----------------------
@@ -327,16 +286,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
         Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC
           in GC_Lu | GC_Ll | GC_Lt | GC_Lm | GC_Lo | GC_Nl;
    end Is_Unicode_Letter;
-
-   ------------------
-   -- Number_Value --
-   ------------------
-
-   function Number_Value
-     (Self : JSON5_Parser'Class) return VSS.JSON.JSON_Number is
-   begin
-      return Self.Number;
-   end Number_Value;
 
    -----------
    -- Parse --
@@ -2486,27 +2435,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
       return False;
    end Report_Error;
-
-   ----------------
-   -- Set_Stream --
-   ----------------
-
-   procedure Set_Stream
-     (Self   : in out JSON5_Parser'Class;
-      Stream : not null VSS.Text_Streams.Input_Text_Stream_Access) is
-   begin
-      Self.Stream := Stream;
-   end Set_Stream;
-
-   ------------------
-   -- String_Value --
-   ------------------
-
-   function String_Value
-     (Self : JSON5_Parser'Class) return VSS.Strings.Virtual_String is
-   begin
-      return Self.Buffer;
-   end String_Value;
 
    ---------
    -- Top --

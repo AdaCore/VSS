@@ -10,49 +10,17 @@
 --  It use Input_Text_Stream interface as data source.
 
 private with VSS.JSON.Implementation.Numbers;
-with VSS.JSON.Pull_Readers;
-with VSS.Strings;
-with VSS.Text_Streams;
 private with VSS.Unicode;
 
 package VSS.JSON.Implementation.Parsers.JSON is
 
-   type JSON_Parser is tagged limited private;
-
-   procedure Set_Stream
-     (Self   : in out JSON_Parser'Class;
-      Stream : not null VSS.Text_Streams.Input_Text_Stream_Access);
+   type JSON_Parser is limited new JSON_Parser_Base with private;
 
    procedure Parse (Self : in out JSON_Parser'Class);
    --  Parse single token.
 
    function At_End (Self : JSON_Parser'Class) return Boolean;
    --  Return True when end of document has been processed.
-
-   function Event_Kind
-     (Self : JSON_Parser'Class)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
-   --  Return current event.
-
-   function Error
-     (Self : JSON_Parser'Class)
-      return VSS.JSON.Pull_Readers.JSON_Reader_Error;
-   --  Return current error.
-
-   function Error_Message
-     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String;
-   --  Return error message.
-
-   function String_Value
-     (Self : JSON_Parser'Class) return VSS.Strings.Virtual_String;
-   --  Return string data (key name or string value)
-
-   function Boolean_Value (Self : JSON_Parser'Class) return Boolean;
-   --  Return boolean value
-
-   function Number_Value
-     (Self : JSON_Parser'Class) return VSS.JSON.JSON_Number;
-   --  Return number value
 
 private
 
@@ -82,18 +50,9 @@ private
 
    procedure Pop (Self : in out Parse_Stack'Class);
 
-   type JSON_Parser is tagged limited record
-      Stream       : VSS.Text_Streams.Input_Text_Stream_Access;
+   type JSON_Parser is limited new JSON_Parser_Base with record
       Stack        : Parse_Stack;
-      Event        : VSS.JSON.Pull_Readers.JSON_Event_Kind :=
-        VSS.JSON.Pull_Readers.No_Token;
-      Error        : VSS.JSON.Pull_Readers.JSON_Reader_Error :=
-        VSS.JSON.Pull_Readers.No_Error;
-      Message      : VSS.Strings.Virtual_String;
       C            : Wide_Wide_Character;
-      Buffer       : VSS.Strings.Virtual_String;
-      Boolean      : Standard.Boolean;
-      Number       : VSS.JSON.JSON_Number;
       Code_Unit_1  : VSS.Unicode.UTF16_Code_Unit;
       Code_Unit_2  : VSS.Unicode.UTF16_Code_Unit;
       Number_State : VSS.JSON.Implementation.Numbers.Parsing_State;

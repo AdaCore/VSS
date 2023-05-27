@@ -99,9 +99,12 @@ private
       Number_State : VSS.JSON.Implementation.Numbers.Parsing_State;
    end record;
 
-   procedure Push
+   function Push
      (Self  : in out JSON_Parser'Class;
       Parse : not null Parse_Subprogram;
-      State : Interfaces.Unsigned_32);
+      State : Interfaces.Unsigned_32) return Boolean
+     with Post => Push'Result = False;
+   --  Store state in the recovery stack. Do nothing if object is in error
+   --  state.
 
 end VSS.JSON.Implementation.Parsers;

@@ -199,9 +199,7 @@ package body VSS.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Push (Parse_Array'Access, Array_State'Pos (State));
-
-               return False;
+               return Self.Push (Parse_Array'Access, Array_State'Pos (State));
             end if;
          end if;
 
@@ -210,9 +208,8 @@ package body VSS.JSON.Implementation.Parsers is
 
          State := Value_Or_End_Array;
          Self.Event := VSS.JSON.Pull_Readers.Start_Array;
-         Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
-         return False;
+         return Self.Push (Parse_Array'Access, Array_State'Pos (State));
       end if;
 
       loop
@@ -235,9 +232,9 @@ package body VSS.JSON.Implementation.Parsers is
                   when End_Array =>
                      State := Finish;
                      Self.Event := VSS.JSON.Pull_Readers.End_Array;
-                     Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
-                     return False;
+                     return
+                       Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
                   when others =>
                      return
@@ -286,10 +283,9 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Value_Separator_Or_End_Array;
 
                      if not Self.Parse_Value then
-                        Self.Push
-                          (Parse_Array'Access, Array_State'Pos (State));
-
-                        return False;
+                        return
+                          Self.Push
+                            (Parse_Array'Access, Array_State'Pos (State));
                      end if;
 
                      raise Program_Error;
@@ -297,9 +293,9 @@ package body VSS.JSON.Implementation.Parsers is
                   when End_Array =>
                      State := Finish;
                      Self.Event := VSS.JSON.Pull_Readers.End_Array;
-                     Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
-                     return False;
+                     return
+                       Self.Push (Parse_Array'Access, Array_State'Pos (State));
 
                   when others =>
                      return Self.Report_Error ("value or end array expected");
@@ -309,9 +305,8 @@ package body VSS.JSON.Implementation.Parsers is
                State := Value_Separator_Or_End_Array;
 
                if not Self.Parse_Value then
-                  Self.Push (Parse_Array'Access, Array_State'Pos (State));
-
-                  return False;
+                  return
+                    Self.Push (Parse_Array'Access, Array_State'Pos (State));
                end if;
 
                raise Program_Error;
@@ -367,9 +362,9 @@ package body VSS.JSON.Implementation.Parsers is
       else
          State := Initial;
          Self.Event := VSS.JSON.Pull_Readers.Start_Document;
-         Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
-         return False;
+         return
+           Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
       end if;
 
       loop
@@ -391,7 +386,7 @@ package body VSS.JSON.Implementation.Parsers is
 
                   when others =>
                      State := Done;
-                     Self.Push
+                     Self.Stack.Push
                        (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
 
                      return Self.Report_Error ("end of document expected");
@@ -728,9 +723,8 @@ package body VSS.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Push (Parse_Object'Access, Object_State'Pos (State));
-
-               return False;
+               return
+                 Self.Push (Parse_Object'Access, Object_State'Pos (State));
             end if;
          end if;
 
@@ -739,9 +733,8 @@ package body VSS.JSON.Implementation.Parsers is
 
          State := Member_Or_End_Object;
          Self.Event := VSS.JSON.Pull_Readers.Start_Object;
-         Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
-         return False;
+         return Self.Push (Parse_Object'Access, Object_State'Pos (State));
       end if;
 
       loop
@@ -755,9 +748,9 @@ package body VSS.JSON.Implementation.Parsers is
             when Member_String =>
                State := Member_Name_Separator;
                Self.Event := VSS.JSON.Pull_Readers.Key_Name;
-               Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
-               return False;
+               return
+                 Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
             when Member_Name_Separator =>
                case Self.C is
@@ -790,9 +783,10 @@ package body VSS.JSON.Implementation.Parsers is
                   when End_Object =>
                      State := Finish;
                      Self.Event := VSS.JSON.Pull_Readers.End_Object;
-                     Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
-                     return False;
+                     return
+                       Self.Push
+                         (Parse_Object'Access, Object_State'Pos (State));
 
                   when others =>
                      return
@@ -833,18 +827,18 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Member_String;
 
                      if not Self.Parse_String then
-                        Self.Push
-                          (Parse_Object'Access, Object_State'Pos (State));
-
-                        return False;
+                        return
+                          Self.Push
+                            (Parse_Object'Access, Object_State'Pos (State));
                      end if;
 
                   when End_Object =>
                      State := Finish;
                      Self.Event := VSS.JSON.Pull_Readers.End_Object;
-                     Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
-                     return False;
+                     return
+                       Self.Push
+                         (Parse_Object'Access, Object_State'Pos (State));
 
                   when others =>
                      return
@@ -860,9 +854,9 @@ package body VSS.JSON.Implementation.Parsers is
             when Member_Value =>
                if not Self.Parse_Value then
                   State := Value_Separator_Or_End_Object;
-                  Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
-                  return False;
+                  return
+                    Self.Push (Parse_Object'Access, Object_State'Pos (State));
 
                else
                   raise Program_Error;
@@ -884,10 +878,9 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Member_String;
 
                      if not Self.Parse_String then
-                        Self.Push
-                          (Parse_Object'Access, Object_State'Pos (State));
-
-                        return False;
+                        return
+                          Self.Push
+                            (Parse_Object'Access, Object_State'Pos (State));
                      end if;
 
                   when others =>
@@ -1214,9 +1207,7 @@ package body VSS.JSON.Implementation.Parsers is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               Self.Push (Parse_Value'Access, Value_State'Pos (State));
-
-               return False;
+               return Self.Push (Parse_Value'Access, Value_State'Pos (State));
             end if;
          end if;
 
@@ -1238,10 +1229,10 @@ package body VSS.JSON.Implementation.Parsers is
                   when Quotation_Mark =>
                      if not Self.Parse_String then
                         State := Value_String;
-                        Self.Push
-                          (Parse_Value'Access, Value_State'Pos (State));
 
-                        return False;
+                        return
+                          Self.Push
+                            (Parse_Value'Access, Value_State'Pos (State));
 
                      else
                         Self.Event := VSS.JSON.Pull_Readers.String_Value;
@@ -1360,9 +1351,9 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Boolean := False;
                      Self.Event := VSS.JSON.Pull_Readers.Boolean_Value;
-                     Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
-                     return False;
+                     return
+                       Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                   when others =>
                      return Self.Report_Error ("false expected");
@@ -1391,9 +1382,9 @@ package body VSS.JSON.Implementation.Parsers is
                   when Latin_Small_Letter_L =>
                      State := Finish;
                      Self.Event := VSS.JSON.Pull_Readers.Null_Value;
-                     Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
-                     return False;
+                     return
+                       Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                   when others =>
                      return Self.Report_Error ("null expected");
@@ -1423,9 +1414,9 @@ package body VSS.JSON.Implementation.Parsers is
                      State := Finish;
                      Self.Boolean := True;
                      Self.Event := VSS.JSON.Pull_Readers.Boolean_Value;
-                     Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
-                     return False;
+                     return
+                       Self.Push (Parse_Value'Access, Value_State'Pos (State));
 
                   when others =>
                      return Self.Report_Error ("true expected");
@@ -1450,16 +1441,18 @@ package body VSS.JSON.Implementation.Parsers is
    -- Push --
    ----------
 
-   procedure Push
+   function Push
      (Self  : in out JSON_Parser'Class;
       Parse : not null Parse_Subprogram;
-      State : Interfaces.Unsigned_32) is
+      State : Interfaces.Unsigned_32) return Boolean is
    begin
       if Self.Event /= VSS.JSON.Pull_Readers.Invalid
         or else Self.Error /= VSS.JSON.Pull_Readers.Not_Valid
       then
          Self.Stack.Push (Parse, State);
       end if;
+
+      return False;
    end Push;
 
    ----------
@@ -1511,7 +1504,7 @@ package body VSS.JSON.Implementation.Parsers is
          end if;
 
          if not Self.Stream.Is_End_Of_Stream then
-            Self.Push (Parse, State);
+            Success := Self.Push (Parse, State);
          end if;
 
          return False;

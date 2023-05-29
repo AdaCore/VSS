@@ -1,0 +1,6 @@
+START_DOCUMENT
+START_ARRAY
+STRING_VALUE "Comma after the close"
+END_ARRAY
+INVALID NOT_VALID "end of document expected"
+END_DOCUMENT

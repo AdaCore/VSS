@@ -127,8 +127,10 @@ check_json:
 	         `find data/json5-tests -name '*.txt'` \
 		 testsuite/json/JSONTestSuite/test_parsing/*.json \
 		 testsuite/json/JSON_checker/test/*.json; \
-		do echo -n "`basename $$f`: "; \
+		do echo -n "`basename $$f` (JSON): "; \
 		testsuite/run_json_reader_test $$f || touch .objs/tests/.fails; \
+		echo -n "`basename $$f` (JSON5): "; \
+		testsuite/run_json_reader_test $$f --json5 || touch .objs/tests/.fails; \
 	done
 	test ! -e .objs/tests/.fails
 	.objs/tests/test_json_writer testsuite/json/test_json_writer.expected

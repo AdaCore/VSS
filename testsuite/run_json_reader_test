@@ -1,20 +1,23 @@
 #!/bin/sh
 
+set -e
+
+if [ "$2" = "--json5" ]; then DATA_SUFFIX='5'; fi
+
 INPUT_FILE=$1
+FLAGS=$2
 NAME=`basename $INPUT_FILE`
 LOG_FILE=/tmp/$NAME.log
 ERROR_FILE=/tmp/$NAME.error
 DIFF_FILE=/tmp/$NAME.diff
-EXPECTED_FILE=testsuite/json/JSON.expected/$NAME.txt
-
-set -e
+EXPECTED_FILE=testsuite/json/JSON${DATA_SUFFIX}.expected/$NAME.txt
 
 if [ ! -f $EXPECTED_FILE ]; then echo "SKIP"; exit; fi
 
-.objs/tests/test_json_pull_reader $INPUT_FILE $LOG_FILE 2> $ERROR_FILE || (echo "(sr) FAIL"; cat $ERROR_FILE; false)
+.objs/tests/test_json_pull_reader $FLAGS $INPUT_FILE $LOG_FILE 2> $ERROR_FILE || (echo "(sr) FAIL"; cat $ERROR_FILE; false)
 diff -u --strip-trailing-cr $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(sd) FAIL"; cat $DIFF_FILE; false)
 
-.objs/tests/test_json_pull_reader --incremental $INPUT_FILE $LOG_FILE 2> $ERROR_FILE || (echo "(ir) FAIL"; cat $ERROR_FILE; false)
+.objs/tests/test_json_pull_reader --incremental $FLAGS $INPUT_FILE $LOG_FILE 2> $ERROR_FILE || (echo "(ir) FAIL"; cat $ERROR_FILE; false)
 diff -u $EXPECTED_FILE $LOG_FILE > $DIFF_FILE || (echo "(id) FAIL"; cat $DIFF_FILE; false)
 
 echo "PASS"

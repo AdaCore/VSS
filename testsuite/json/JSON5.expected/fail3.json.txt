@@ -1,0 +1,6 @@
+START_DOCUMENT
+START_OBJECT
+KEY_NAME "unquoted_key"
+STRING_VALUE "keys must be quoted"
+END_OBJECT
+END_DOCUMENT

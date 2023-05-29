@@ -6,13 +6,19 @@
 
 with Ada.Calendar;
 with Ada.Streams.Stream_IO;
-with Ada.Text_IO;
 with Interfaces;
 
 with VSS.Command_Line;
 with VSS.JSON.Pull_Readers.Simple;
+with VSS.JSON.Pull_Readers.JSON5;
 with VSS.Strings.Conversions;
+with VSS.Strings.Formatters.Booleans;
+with VSS.Strings.Formatters.Generic_Enumerations;
+with VSS.Strings.Formatters.Strings;
+with VSS.Strings.Templates;
 with VSS.String_Vectors;
+with VSS.Text_Streams.File_Output;
+with VSS.Text_Streams.Standards;
 
 with Tests_Text_Streams;
 
@@ -31,6 +37,7 @@ procedure Test_JSON_Pull_Reader is
 
       Performance      : Boolean := False;
       Incremental      : Boolean := False;
+      JSON5            : Boolean := False;
       Input_File_Name  : VSS.Strings.Virtual_String;
       Output_File_Name : VSS.Strings.Virtual_String;
 
@@ -51,6 +58,11 @@ procedure Test_JSON_Pull_Reader is
         (Short_Name  => <>,
          Long_Name   => "performance",
          Description => "Report performance statistic");
+
+      JSON5_Option        : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => <>,
+         Long_Name   => "json5",
+         Description => "Enable JSON5");
 
       Input_File_Option   : constant VSS.Command_Line.Positional_Option :=
         (Name        => "input",
@@ -78,6 +90,7 @@ procedure Test_JSON_Pull_Reader is
            VSS.Command_Line.Is_Specified (Incremental_Option);
          Options.Performance :=
            VSS.Command_Line.Is_Specified (Performance_Option);
+         Options.JSON5 := VSS.Command_Line.Is_Specified (JSON5_Option);
 
          Positionals := VSS.Command_Line.Positional_Arguments;
 
@@ -103,25 +116,35 @@ procedure Test_JSON_Pull_Reader is
       begin
          VSS.Command_Line.Add_Option (Incremental_Option);
          VSS.Command_Line.Add_Option (Performance_Option);
+         VSS.Command_Line.Add_Option (JSON5_Option);
          VSS.Command_Line.Add_Option (Input_File_Option);
          VSS.Command_Line.Add_Option (Output_File_Option);
       end Register_Switches;
 
    end Command_Line;
 
-   Input       : aliased Tests_Text_Streams.Memory_UTF8_Input_Stream;
-   Reader      : VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader;
-   Count       : Natural := 0;
-   Log_File    : Ada.Text_IO.File_Type;
+   package JSON_Number_Kind_Formatters is
+     new VSS.Strings.Formatters.Generic_Enumerations
+           (VSS.JSON.JSON_Number_Kind);
+
+   package JSON_Event_Kind_Formatters is
+     new VSS.Strings.Formatters.Generic_Enumerations
+           (VSS.JSON.Pull_Readers.JSON_Event_Kind);
+
+   package JSON_Reader_Error_Formatters is
+     new VSS.Strings.Formatters.Generic_Enumerations
+           (VSS.JSON.Pull_Readers.JSON_Reader_Error);
+
+   Input  : aliased Tests_Text_Streams.Memory_UTF8_Input_Stream;
+   Count  : Natural := 0;
+   Output : VSS.Text_Streams.File_Output.File_Output_Text_Stream;
+   Error  : VSS.Text_Streams.Output_Text_Stream'Class
+     renames VSS.Text_Streams.Standards.Standard_Error;
 
 begin
    Command_Line.Initialize;
 
-   Ada.Text_IO.Create
-     (Log_File,
-      Ada.Text_IO.Out_File,
-      VSS.Strings.Conversions.To_UTF_8_String (Options.Output_File_Name),
-      "text_translation=no");
+   Output.Create (Options.Output_File_Name);
 
    declare
       File : Ada.Streams.Stream_IO.File_Type;
@@ -150,30 +173,52 @@ begin
    declare
       use type Ada.Calendar.Time;
 
-      Start : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+      function Setup_Reader
+        return VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+
+      ------------------
+      -- Setup_Reader --
+      ------------------
+
+      function Setup_Reader
+        return VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class is
+      begin
+         Input.Set_Incremental (Options.Incremental);
+
+         if Options.JSON5 then
+            return Result : VSS.JSON.Pull_Readers.JSON5.JSON5_Pull_Reader do
+               Result.Set_Stream (Input'Unchecked_Access);
+            end return;
+
+         else
+            return Result :
+              VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader
+            do
+               Result.Set_Stream (Input'Unchecked_Access);
+            end return;
+         end if;
+      end Setup_Reader;
+
+      Reader  : VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class :=
+        Setup_Reader;
+      Start   : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+      Success : Boolean := True;
 
    begin
-      Input.Set_Incremental (Options.Incremental);
-      Reader.Set_Stream (Input'Unchecked_Access);
-
       while not Reader.At_End loop
          Reader.Read_Next;
 
          case Reader.Event_Kind is
             when Invalid =>
                if Reader.Error /= Premature_End_Of_Document then
-                  Ada.Text_IO.Put_Line
-                    (Log_File,
-                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
-                       (Reader.Event_Kind)
-
-                     & ' '
-                     & VSS.JSON.Pull_Readers.JSON_Reader_Error'Image
-                         (Reader.Error)
-                     & " """
-                     & VSS.Strings.Conversions.To_UTF_8_String
-                         (Reader.Error_Message)
-                     & '"');
+                  Output.Put_Line
+                    (VSS.Strings.Templates.To_Virtual_String_Template
+                       ("{} {} ""{}""").Format
+                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                          JSON_Reader_Error_Formatters.Image (Reader.Error),
+                          VSS.Strings.Formatters.Strings.Image
+                            (Reader.Error_Message)),
+                     Success);
 
                   if Reader.Error /= Not_Valid then
                      raise Program_Error;
@@ -194,85 +239,125 @@ begin
                Count := 0;
 
                if not Options.Performance then
-                  Ada.Text_IO.Put_Line
-                    (Log_File,
-                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
-                       (Reader.Event_Kind)
-                     & " """
-                     & VSS.Strings.Conversions.To_UTF_8_String
-                       (Reader.Key_Name)
-                     & '"');
+                  Output.Put_Line
+                    (VSS.Strings.Templates.To_Virtual_String_Template
+                       ("{} ""{}""").Format
+                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                          VSS.Strings.Formatters.Strings.Image
+                            (Reader.Key_Name)),
+                     Success);
                end if;
 
             when String_Value =>
                Count := 0;
 
                if not Options.Performance then
-                  Ada.Text_IO.Put_Line
-                    (Log_File,
-                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
-                       (Reader.Event_Kind)
-                     & " """
-                     & VSS.Strings.Conversions.To_UTF_8_String
-                       (Reader.String_Value)
-                     & '"');
+                  Output.Put_Line
+                    (VSS.Strings.Templates.To_Virtual_String_Template
+                       ("{} ""{}""").Format
+                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                          VSS.Strings.Formatters.Strings.Image
+                            (Reader.String_Value)),
+                     Success);
                end if;
 
             when Number_Value =>
                Count := 0;
 
                if not Options.Performance then
-                  Ada.Text_IO.Put_Line
-                    (Log_File,
-                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
-                       (Reader.Event_Kind)
-                     & ' '
-                     & VSS.JSON.JSON_Number_Kind'Image
-                       (Reader.Number_Value.Kind)
-                     & ' '
-                     & VSS.Strings.Conversions.To_UTF_8_String
-                       (Reader.Number_Value.String_Value)
-                     & (case Reader.Number_Value.Kind is
-                          when VSS.JSON.None => "",
-                          when VSS.JSON.Out_Of_Range => "",
-                          when VSS.JSON.JSON_Integer =>
-                            ' '
-                              & Interfaces.Integer_64'Image
-                                  (Reader.Number_Value.Integer_Value),
-                          when VSS.JSON.JSON_Float   =>
-                            ' '
-                              & Interfaces.IEEE_Float_64'Image
-                                  (Reader.Number_Value.Float_Value)));
+                  case Reader.Number_Value.Kind is
+                     when VSS.JSON.None =>
+                        Output.Put_Line
+                          (VSS.Strings.Templates.To_Virtual_String_Template
+                             ("{} {} {}").Format
+                               (JSON_Event_Kind_Formatters.Image
+                                    (Reader.Event_Kind),
+                                JSON_Number_Kind_Formatters.Image
+                                  (Reader.Number_Value.Kind),
+                                VSS.Strings.Formatters.Strings.Image
+                                  (Reader.Number_Value.String_Value)),
+                           Success);
+
+                     when VSS.JSON.JSON_Integer =>
+                        Output.Put_Line
+                          (VSS.Strings.Templates.To_Virtual_String_Template
+                             ("{} {} {} {}").Format
+                               (JSON_Event_Kind_Formatters.Image
+                                    (Reader.Event_Kind),
+                                JSON_Number_Kind_Formatters.Image
+                                  (Reader.Number_Value.Kind),
+                                VSS.Strings.Formatters.Strings.Image
+                                  (Reader.Number_Value.String_Value),
+                                VSS.Strings.Formatters.Strings.Image
+                                  (VSS.Strings.To_Virtual_String
+                                     (Interfaces.Integer_64'Wide_Wide_Image
+                                        (Reader.Number_Value.Integer_Value)))),
+                           Success);
+
+                     when VSS.JSON.JSON_Float =>
+                        Output.Put_Line
+                          (VSS.Strings.Templates.To_Virtual_String_Template
+                             ("{} {} {} {}").Format
+                               (JSON_Event_Kind_Formatters.Image
+                                    (Reader.Event_Kind),
+                                JSON_Number_Kind_Formatters.Image
+                                  (Reader.Number_Value.Kind),
+                                VSS.Strings.Formatters.Strings.Image
+                                  (Reader.Number_Value.String_Value),
+                                VSS.Strings.Formatters.Strings.Image
+                                  (VSS.Strings.To_Virtual_String
+                                     (Interfaces.IEEE_Float_64'Wide_Wide_Image
+                                        (Reader.Number_Value.Float_Value)))),
+                           Success);
+
+                     when VSS.JSON.Out_Of_Range =>
+                        Output.Put_Line
+                          (VSS.Strings.Templates.To_Virtual_String_Template
+                             ("{} {} {}").Format
+                               (JSON_Event_Kind_Formatters.Image
+                                    (Reader.Event_Kind),
+                                JSON_Number_Kind_Formatters.Image
+                                  (Reader.Number_Value.Kind),
+                                VSS.Strings.Formatters.Strings.Image
+                                  (Reader.Number_Value.String_Value)),
+                           Success);
+                  end case;
                end if;
 
             when Boolean_Value =>
                Count := 0;
 
                if not Options.Performance then
-                  Ada.Text_IO.Put_Line
-                    (Log_File,
-                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
-                       (Reader.Event_Kind)
-                     & " "
-                     & Boolean'Image (Reader.Boolean_Value));
+                  Output.Put_Line
+                    (VSS.Strings.Templates.To_Virtual_String_Template
+                       ("{} {}").Format
+                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                          VSS.Strings.Formatters.Booleans.Image
+                            (Reader.Boolean_Value)),
+                     Success);
                end if;
 
             when others =>
                Count := 0;
 
                if not Options.Performance then
-                  Ada.Text_IO.Put_Line
-                    (Log_File,
-                     VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
-                       (Reader.Event_Kind));
+                  Output.Put_Line
+                    (VSS.Strings.Templates.To_Virtual_String_Template
+                       ("{}").Format
+                         (JSON_Event_Kind_Formatters.Image
+                              (Reader.Event_Kind)),
+                     Success);
                end if;
          end case;
       end loop;
 
       if Options.Performance then
-         Ada.Text_IO.Put_Line (Duration'Image (Ada.Calendar.Clock - Start));
+         Error.Put_Line
+           (VSS.Strings.To_Virtual_String
+              (Duration'Wide_Wide_Image (Ada.Calendar.Clock - Start)),
+            Success);
       end if;
    end;
 
-   Ada.Text_IO.Close (Log_File);
+   Output.Close;
 end Test_JSON_Pull_Reader;

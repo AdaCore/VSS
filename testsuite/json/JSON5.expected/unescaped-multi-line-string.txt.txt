@@ -1,0 +1,3 @@
+START_DOCUMENT
+INVALID NOT_VALID "unescaped line terminator"
+END_DOCUMENT

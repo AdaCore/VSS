@@ -1,0 +1,170 @@
+START_DOCUMENT
+START_OBJECT
+KEY_NAME "name"
+STRING_VALUE "npm"
+KEY_NAME "publishConfig"
+START_OBJECT
+KEY_NAME "proprietary-attribs"
+BOOLEAN_VALUE FALSE
+END_OBJECT
+KEY_NAME "description"
+STRING_VALUE "A package manager for node"
+KEY_NAME "keywords"
+START_ARRAY
+STRING_VALUE "package manager"
+STRING_VALUE "modules"
+STRING_VALUE "install"
+STRING_VALUE "package.json"
+END_ARRAY
+KEY_NAME "version"
+STRING_VALUE "1.1.22"
+KEY_NAME "preferGlobal"
+BOOLEAN_VALUE TRUE
+KEY_NAME "config"
+START_OBJECT
+KEY_NAME "publishtest"
+BOOLEAN_VALUE FALSE
+END_OBJECT
+KEY_NAME "homepage"
+STRING_VALUE "http://npmjs.org/"
+KEY_NAME "author"
+STRING_VALUE "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)"
+KEY_NAME "repository"
+START_OBJECT
+KEY_NAME "type"
+STRING_VALUE "git"
+KEY_NAME "url"
+STRING_VALUE "https://github.com/isaacs/npm"
+END_OBJECT
+KEY_NAME "bugs"
+START_OBJECT
+KEY_NAME "email"
+STRING_VALUE "npm-@googlegroups.com"
+KEY_NAME "url"
+STRING_VALUE "http://github.com/isaacs/npm/issues"
+END_OBJECT
+KEY_NAME "directories"
+START_OBJECT
+KEY_NAME "doc"
+STRING_VALUE "./doc"
+KEY_NAME "man"
+STRING_VALUE "./man"
+KEY_NAME "lib"
+STRING_VALUE "./lib"
+KEY_NAME "bin"
+STRING_VALUE "./bin"
+END_OBJECT
+KEY_NAME "main"
+STRING_VALUE "./lib/npm.js"
+KEY_NAME "bin"
+STRING_VALUE "./bin/npm-cli.js"
+KEY_NAME "dependencies"
+START_OBJECT
+KEY_NAME "semver"
+STRING_VALUE "~1.0.14"
+KEY_NAME "ini"
+STRING_VALUE "1"
+KEY_NAME "slide"
+STRING_VALUE "1"
+KEY_NAME "abbrev"
+STRING_VALUE "1"
+KEY_NAME "graceful-fs"
+STRING_VALUE "~1.1.1"
+KEY_NAME "minimatch"
+STRING_VALUE "~0.2"
+KEY_NAME "nopt"
+STRING_VALUE "1"
+KEY_NAME "node-uuid"
+STRING_VALUE "~1.3"
+KEY_NAME "proto-list"
+STRING_VALUE "1"
+KEY_NAME "rimraf"
+STRING_VALUE "2"
+KEY_NAME "request"
+STRING_VALUE "~2.9"
+KEY_NAME "which"
+STRING_VALUE "1"
+KEY_NAME "tar"
+STRING_VALUE "~0.1.12"
+KEY_NAME "fstream"
+STRING_VALUE "~0.1.17"
+KEY_NAME "block-stream"
+STRING_VALUE "*"
+KEY_NAME "inherits"
+STRING_VALUE "1"
+KEY_NAME "mkdirp"
+STRING_VALUE "0.3"
+KEY_NAME "read"
+STRING_VALUE "0"
+KEY_NAME "lru-cache"
+STRING_VALUE "1"
+KEY_NAME "node-gyp"
+STRING_VALUE "~0.4.1"
+KEY_NAME "fstream-npm"
+STRING_VALUE "0 >=0.0.5"
+KEY_NAME "uid-number"
+STRING_VALUE "0"
+KEY_NAME "archy"
+STRING_VALUE "0"
+KEY_NAME "chownr"
+STRING_VALUE "0"
+END_OBJECT
+KEY_NAME "bundleDependencies"
+START_ARRAY
+STRING_VALUE "slide"
+STRING_VALUE "ini"
+STRING_VALUE "semver"
+STRING_VALUE "abbrev"
+STRING_VALUE "graceful-fs"
+STRING_VALUE "minimatch"
+STRING_VALUE "nopt"
+STRING_VALUE "node-uuid"
+STRING_VALUE "rimraf"
+STRING_VALUE "request"
+STRING_VALUE "proto-list"
+STRING_VALUE "which"
+STRING_VALUE "tar"
+STRING_VALUE "fstream"
+STRING_VALUE "block-stream"
+STRING_VALUE "inherits"
+STRING_VALUE "mkdirp"
+STRING_VALUE "read"
+STRING_VALUE "lru-cache"
+STRING_VALUE "node-gyp"
+STRING_VALUE "fstream-npm"
+STRING_VALUE "uid-number"
+STRING_VALUE "archy"
+STRING_VALUE "chownr"
+END_ARRAY
+KEY_NAME "devDependencies"
+START_OBJECT
+KEY_NAME "ronn"
+STRING_VALUE "https://github.com/isaacs/ronnjs/tarball/master"
+END_OBJECT
+KEY_NAME "engines"
+START_OBJECT
+KEY_NAME "node"
+STRING_VALUE "0.6 || 0.7 || 0.8"
+KEY_NAME "npm"
+STRING_VALUE "1"
+END_OBJECT
+KEY_NAME "scripts"
+START_OBJECT
+KEY_NAME "test"
+STRING_VALUE "node ./test/run.js"
+KEY_NAME "prepublish"
+STRING_VALUE "npm prune; rm -rf node_modules/*/{test,example,bench}*; make -j4 doc"
+KEY_NAME "dumpconf"
+STRING_VALUE "env | grep npm | sort | uniq"
+END_OBJECT
+KEY_NAME "licenses"
+START_ARRAY
+START_OBJECT
+KEY_NAME "type"
+STRING_VALUE "MIT +no-false-attribs"
+KEY_NAME "url"
+STRING_VALUE "http://github.com/isaacs/npm/raw/master/LICENSE"
+END_OBJECT
+END_ARRAY
+END_OBJECT
+END_DOCUMENT

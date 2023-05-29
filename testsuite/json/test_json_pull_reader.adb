@@ -1,17 +1,18 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with Ada.Calendar;
-with Ada.Command_Line;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
 with Interfaces;
 
-with VSS.Strings.Conversions;
+with VSS.Command_Line;
 with VSS.JSON.Pull_Readers.Simple;
+with VSS.Strings.Conversions;
+with VSS.String_Vectors;
 
 with Tests_Text_Streams;
 
@@ -20,42 +21,106 @@ procedure Test_JSON_Pull_Reader is
    use all type VSS.JSON.Pull_Readers.JSON_Event_Kind;
    use all type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
+   package Command_Line is
+
+      procedure Initialize;
+
+   end Command_Line;
+
+   package Options is
+
+      Performance      : Boolean := False;
+      Incremental      : Boolean := False;
+      Input_File_Name  : VSS.Strings.Virtual_String;
+      Output_File_Name : VSS.Strings.Virtual_String;
+
+   end Options;
+
+   -----------------
+   -- Command_Lne --
+   -----------------
+
+   package body Command_Line is
+
+      Incremental_Option  : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => <>,
+         Long_Name   => "incremental",
+         Description => "Activate incremental parsing mode");
+
+      Performance_Option  : constant VSS.Command_Line.Binary_Option :=
+        (Short_Name  => <>,
+         Long_Name   => "performance",
+         Description => "Report performance statistic");
+
+      Input_File_Option   : constant VSS.Command_Line.Positional_Option :=
+        (Name        => "input",
+         Description => "Name of the input file");
+
+      Output_File_Option  : constant VSS.Command_Line.Positional_Option :=
+        (Name        => "output",
+         Description => "Name of the input file");
+
+      procedure Register_Switches;
+
+      ----------------
+      -- Initialize --
+      ----------------
+
+      procedure Initialize is
+         Positionals : VSS.String_Vectors.Virtual_String_Vector;
+
+      begin
+         Register_Switches;
+
+         VSS.Command_Line.Process;
+
+         Options.Incremental :=
+           VSS.Command_Line.Is_Specified (Incremental_Option);
+         Options.Performance :=
+           VSS.Command_Line.Is_Specified (Performance_Option);
+
+         Positionals := VSS.Command_Line.Positional_Arguments;
+
+         if Positionals.Length = 0 then
+            VSS.Command_Line.Report_Error ("Input file not specified");
+         end if;
+
+         if Positionals.Length = 1 then
+            VSS.Command_Line.Report_Error ("Output file not specified");
+         end if;
+
+         Options.Input_File_Name  :=
+           VSS.Command_Line.Value (Input_File_Option);
+         Options.Output_File_Name :=
+           VSS.Command_Line.Value (Output_File_Option);
+      end Initialize;
+
+      -----------------------
+      -- Register_Switches --
+      -----------------------
+
+      procedure Register_Switches is
+      begin
+         VSS.Command_Line.Add_Option (Incremental_Option);
+         VSS.Command_Line.Add_Option (Performance_Option);
+         VSS.Command_Line.Add_Option (Input_File_Option);
+         VSS.Command_Line.Add_Option (Output_File_Option);
+      end Register_Switches;
+
+   end Command_Line;
+
    Input       : aliased Tests_Text_Streams.Memory_UTF8_Input_Stream;
    Reader      : VSS.JSON.Pull_Readers.Simple.JSON_Simple_Pull_Reader;
    Count       : Natural := 0;
-   Perfomance  : Boolean := False;
-   Incremental : Boolean := False;
    Log_File    : Ada.Text_IO.File_Type;
 
 begin
-   if Ada.Command_Line.Argument_Count /= 3 then
-      raise Program_Error with "incorrect command line arguments";
-   end if;
-
-   if Ada.Command_Line.Argument (1) = "s" then
-      Incremental := False;
-      Perfomance := False;
-
-   elsif Ada.Command_Line.Argument (1) = "sp" then
-      Incremental := False;
-      Perfomance := True;
-
-   elsif Ada.Command_Line.Argument (1) = "i" then
-      Incremental := True;
-      Perfomance := False;
-
-   elsif Ada.Command_Line.Argument (1) = "ip" then
-      Incremental := True;
-      Perfomance := True;
-
-   else
-      raise Program_Error with "incorrect parsing mode";
-   end if;
+   Command_Line.Initialize;
 
    Ada.Text_IO.Create
      (Log_File,
       Ada.Text_IO.Out_File,
-      Ada.Command_Line.Argument (3),
+      VSS.Strings.Conversions.To_UTF_8_String (Options.Output_File_Name),
       "text_translation=no");
 
    declare
@@ -67,7 +132,8 @@ begin
       Ada.Streams.Stream_IO.Open
         (File,
          Ada.Streams.Stream_IO.In_File,
-         Ada.Command_Line.Argument (2),
+         VSS.Strings.Conversions.To_UTF_8_String
+           (Options.Input_File_Name),
          "text_translation=no");
 
       while not Ada.Streams.Stream_IO.End_Of_File (File) loop
@@ -87,7 +153,7 @@ begin
       Start : constant Ada.Calendar.Time := Ada.Calendar.Clock;
 
    begin
-      Input.Set_Incremental (Incremental);
+      Input.Set_Incremental (Options.Incremental);
       Reader.Set_Stream (Input'Unchecked_Access);
 
       while not Reader.At_End loop
@@ -113,7 +179,7 @@ begin
                      raise Program_Error;
                   end if;
 
-               elsif not Incremental then
+               elsif not Options.Incremental then
                   raise Program_Error;
 
                else
@@ -127,7 +193,7 @@ begin
             when Key_Name =>
                Count := 0;
 
-               if not Perfomance then
+               if not Options.Performance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
                      VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
@@ -141,7 +207,7 @@ begin
             when String_Value =>
                Count := 0;
 
-               if not Perfomance then
+               if not Options.Performance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
                      VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
@@ -155,7 +221,7 @@ begin
             when Number_Value =>
                Count := 0;
 
-               if not Perfomance then
+               if not Options.Performance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
                      VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
@@ -182,7 +248,7 @@ begin
             when Boolean_Value =>
                Count := 0;
 
-               if not Perfomance then
+               if not Options.Performance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
                      VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
@@ -194,7 +260,7 @@ begin
             when others =>
                Count := 0;
 
-               if not Perfomance then
+               if not Options.Performance then
                   Ada.Text_IO.Put_Line
                     (Log_File,
                      VSS.JSON.Pull_Readers.JSON_Event_Kind'Image
@@ -203,7 +269,7 @@ begin
          end case;
       end loop;
 
-      if Perfomance then
+      if Options.Performance then
          Ada.Text_IO.Put_Line (Duration'Image (Ada.Calendar.Clock - Start));
       end if;
    end;

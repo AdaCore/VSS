@@ -1,0 +1,4 @@
+START_DOCUMENT
+START_ARRAY
+INVALID NOT_VALID "invalid UTF-8 sequence (wrong second code unit of four code units sequence)"
+END_DOCUMENT

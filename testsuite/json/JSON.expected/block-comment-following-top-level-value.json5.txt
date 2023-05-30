@@ -1,0 +1,4 @@
+START_DOCUMENT
+NULL_VALUE
+INVALID NOT_VALID "end of document expected"
+END_DOCUMENT

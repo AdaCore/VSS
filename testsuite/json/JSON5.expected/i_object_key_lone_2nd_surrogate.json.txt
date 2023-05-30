@@ -1,0 +1,4 @@
+START_DOCUMENT
+START_OBJECT
+INVALID NOT_VALID "high surrogate code point unexpected"
+END_DOCUMENT

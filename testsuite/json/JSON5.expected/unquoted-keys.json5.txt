@@ -1,0 +1,16 @@
+START_DOCUMENT
+START_OBJECT
+KEY_NAME "hello"
+STRING_VALUE "world"
+KEY_NAME "_"
+STRING_VALUE "underscore"
+KEY_NAME "$"
+STRING_VALUE "dollar sign"
+KEY_NAME "one1"
+STRING_VALUE "numerals"
+KEY_NAME "_$_"
+STRING_VALUE "multiple symbols"
+KEY_NAME "$_$hello123world_$_"
+STRING_VALUE "mixed"
+END_OBJECT
+END_DOCUMENT

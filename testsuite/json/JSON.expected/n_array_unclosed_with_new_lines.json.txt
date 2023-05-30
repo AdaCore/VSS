@@ -3,5 +3,5 @@ START_ARRAY
 NUMBER_VALUE JSON_INTEGER 1  1
 NUMBER_VALUE JSON_INTEGER 1  1
 NUMBER_VALUE JSON_INTEGER 1  1
-INVALID NOT_VALID "value separator of end array expected"
+INVALID NOT_VALID "value separator or end array expected"
 END_DOCUMENT

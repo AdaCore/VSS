@@ -1,0 +1,3 @@
+START_DOCUMENT
+STRING_VALUE "This inline comment // isn't really an inline comment."
+END_DOCUMENT

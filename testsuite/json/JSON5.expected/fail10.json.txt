@@ -1,0 +1,7 @@
+START_DOCUMENT
+START_OBJECT
+KEY_NAME "Extra value after close"
+BOOLEAN_VALUE TRUE
+END_OBJECT
+INVALID NOT_VALID "end of document expected"
+END_DOCUMENT

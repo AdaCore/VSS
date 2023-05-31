@@ -48,7 +48,9 @@ package body VSS.Strings.Templates is
       procedure Append_Parameter is
       begin
          if Parameters (Parameter) /= null then
+            pragma Warnings (Off, "aggregate not fully initialized");
             Result.Append (Parameters (Parameter).Format ((others => <>)));
+            pragma Warnings (On, "aggregate not fully initialized");
             Parameter := @ + 1;
          end if;
       end Append_Parameter;

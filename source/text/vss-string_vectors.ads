@@ -46,6 +46,10 @@ package VSS.String_Vectors is
       Index : Positive) return VSS.Strings.Virtual_String;
    --  Return given element. Return "null" string when index is out of bound.
 
+   function First_Element
+     (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String;
+   --  Return first element of the vector.
+
    function Last_Element
      (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String;
    --  Return last element of the vector.

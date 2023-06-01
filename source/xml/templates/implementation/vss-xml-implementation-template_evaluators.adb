@@ -648,6 +648,12 @@ package body VSS.XML.Implementation.Template_Evaluators is
                when VSS.XML.Templates.Values.String =>
                   return not Value.String_Value.Is_Empty;
 
+               when VSS.XML.Templates.Values.Nothing =>
+                  return False;
+
+               when VSS.XML.Templates.Values.Default =>
+                  return True;
+
                when others =>
                   raise Program_Error;
             end case;

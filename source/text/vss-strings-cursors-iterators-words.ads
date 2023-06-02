@@ -16,6 +16,16 @@ package VSS.Strings.Cursors.Iterators.Words is
    function Backward (Self : in out Word_Iterator) return Boolean;
    --  Move iterator to previous word.
 
+   function On_Whitespace (Self : Word_Iterator'Class) return Boolean;
+   --  Returns True when current text element is sequence of horizontal
+   --  whitespace characters.
+   --
+   --  Note, this function returns False when horizontal whitespace character
+   --  is followed by some combining character.
+
+   function On_Line_Break (Self : Word_Iterator'Class) return Boolean;
+   --  Returns True when current text element is a line separator.
+
    procedure Set_Before_First
      (Self : in out Word_Iterator'Class;
       On   : VSS.Strings.Virtual_String'Class);
@@ -43,8 +53,10 @@ package VSS.Strings.Cursors.Iterators.Words is
 
 private
 
+   type Element_Kind is (Text, Whitespace, Line_Break);
+
    type Word_Iterator is new Abstract_Segment_Iterator with record
-      null;
+      Kind : Element_Kind;
    end record;
 
    overriding procedure Invalidate (Self : in out Word_Iterator);

@@ -9,7 +9,7 @@ with VSS.Implementation.UCD_Core;
 
 with VSS.Strings.Cursors.Markers;
 pragma Unreferenced (VSS.Strings.Cursors.Markers);
---  XXX GNAT 20210710: crash without clause above.
+--  XXX GNAT 20230326: crash without clause above.
 
 package body VSS.Strings.Cursors.Iterators.Words is
 
@@ -314,6 +314,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Done               : Boolean := False;
 
    begin
+      Self.Kind := Text;
       Self.First_Position := Self.Last_Position;
       Success := Handler.Forward (Data, Self.First_Position);
 
@@ -327,6 +328,12 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Right            := Self.First_Position;
       Right_Properties :=
         Extract_Core_Data (Handler.Element (Data, Right));
+
+      Self.Kind :=
+        (case Right_Properties.WB is
+            when WB_WSegSpace          => Whitespace,
+            when WB_CR | WB_LF | WB_NL => Line_Break,
+            when others                => Text);
 
       loop
          Left            := Right;
@@ -387,6 +394,10 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          if Right_Properties.WB in WB_Extend | WB_FO | WB_ZWJ then
             --  Rule WB4
+
+            Self.Kind := Text;
+            --  Whitespace might be followed by combinig character(s), such
+            --  text segment is not reported as whitespace.
 
             loop
                Left            := Right;
@@ -618,6 +629,24 @@ package body VSS.Strings.Cursors.Iterators.Words is
          raise Program_Error;
       end if;
    end Lookup_Word_Boundaries;
+
+   -------------------
+   -- On_Line_Break --
+   -------------------
+
+   function On_Line_Break (Self : Word_Iterator'Class) return Boolean is
+   begin
+      return Self.Has_Element and then Self.Kind = Line_Break;
+   end On_Line_Break;
+
+   -------------------
+   -- On_Whitespace --
+   -------------------
+
+   function On_Whitespace (Self : Word_Iterator'Class) return Boolean is
+   begin
+      return Self.Has_Element and then Self.Kind = Whitespace;
+   end On_Whitespace;
 
    --------------------
    -- Set_After_Last --

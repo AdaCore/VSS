@@ -1,3 +1,3 @@
 # VSS Documentation
 
-* [API Reference](html/index.html)
+* [API Reference](https://adacore.github.io/VSS/)

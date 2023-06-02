@@ -593,7 +593,10 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       if Position.Index = 0 then
-         raise Program_Error;
+         --  Before the first character of the string.
+
+         Self.First_Position := Position;
+         Self.Last_Position  := Position;
 
       elsif Position.Index > Handler.Length (Data) then
          --  After last character of the string.
@@ -616,12 +619,32 @@ package body VSS.Strings.Cursors.Iterators.Words is
       end if;
    end Lookup_Word_Boundaries;
 
+   --------------------
+   -- Set_After_Last --
+   --------------------
+
+   procedure Set_After_Last
+     (Self : in out Word_Iterator'Class;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Self.Reconnect (On'Unrestricted_Access);
+
+      Handler.After_Last_Character (On.Data, Position);
+      Self.Lookup_Word_Boundaries (Position);
+   end Set_After_Last;
+
    ------------
    -- Set_At --
    ------------
 
    procedure Set_At
-     (Self     : in out Word_Iterator;
+     (Self     : in out Word_Iterator'Class;
       Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
    is
       Cursor_Owner    : VSS.Implementation.Referrers.Magic_String_Access;
@@ -645,7 +668,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ------------------
 
    procedure Set_At_First
-     (Self : in out Word_Iterator;
+     (Self : in out Word_Iterator'Class;
       On   : VSS.Strings.Virtual_String'Class)
    is
       Handler  :
@@ -667,7 +690,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    -----------------
 
    procedure Set_At_Last
-     (Self : in out Word_Iterator;
+     (Self : in out Word_Iterator'Class;
       On   : VSS.Strings.Virtual_String'Class)
    is
       Handler  :
@@ -683,6 +706,26 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Dummy := Handler.Backward (On.Data, Position);
       Self.Lookup_Word_Boundaries (Position);
    end Set_At_Last;
+
+   ----------------------
+   -- Set_Before_First --
+   ----------------------
+
+   procedure Set_Before_First
+     (Self : in out Word_Iterator'Class;
+      On   : VSS.Strings.Virtual_String'Class)
+   is
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (On.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Self.Reconnect (On'Unrestricted_Access);
+
+      Handler.Before_First_Character (On.Data, Position);
+      Self.Lookup_Word_Boundaries (Position);
+   end Set_Before_First;
 
    ---------------------
    -- String_Modified --

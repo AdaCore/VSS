@@ -155,6 +155,19 @@ package body VSS.Strings is
       end return;
    end After_Last_Grapheme_Cluster;
 
+   ---------------------
+   -- After_Last_Word --
+   ---------------------
+
+   function After_Last_Word
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
+   begin
+      return Result : VSS.Strings.Cursors.Iterators.Words.Word_Iterator do
+         Result.Set_After_Last (Self);
+      end return;
+   end After_Last_Word;
+
    ------------
    -- Append --
    ------------
@@ -412,6 +425,19 @@ package body VSS.Strings is
          Result.Set_Before_First (Self);
       end return;
    end Before_First_Grapheme_Cluster;
+
+   -----------------------
+   -- Before_First_Word --
+   -----------------------
+
+   function Before_First_Word
+     (Self : Virtual_String'Class)
+      return VSS.Strings.Cursors.Iterators.Words.Word_Iterator is
+   begin
+      return Result : VSS.Strings.Cursors.Iterators.Words.Word_Iterator do
+         Result.Set_Before_First (Self);
+      end return;
+   end Before_First_Word;
 
    ----------------------
    -- Character_Length --

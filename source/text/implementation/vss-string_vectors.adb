@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -215,6 +215,23 @@ package body VSS.String_Vectors is
    begin
       return (Index => (if Self.Last > 0 then 1 else 0));
    end First;
+
+   -------------------
+   -- First_Element --
+   -------------------
+
+   function First_Element
+     (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String is
+   begin
+      if Self.Data /= null and then Self.Data.Last /= 0 then
+         return
+           VSS.Strings.Internals.To_Virtual_String
+             (Self.Data.Data (Self.Data.Data'First));
+
+      else
+         return VSS.Strings.Empty_Virtual_String;
+      end if;
+   end First_Element;
 
    --------------
    -- Is_Empty --

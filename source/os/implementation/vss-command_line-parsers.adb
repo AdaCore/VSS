@@ -6,14 +6,12 @@
 
 with VSS.Characters.Latin;
 with VSS.Strings.Character_Iterators;
-pragma Warnings
-  (Off, "unit ""VSS.Strings.Grapheme_Cluster_Iterators"" is not referenced");
---  GNAT Pro 20220609 reports unreferenced unit, while it is necessary
---  to be able to use grapheme cluster iterator as parameter of the
---  Virtual_String.Slice subprogram.
 with VSS.Strings.Grapheme_Cluster_Iterators;
+with VSS.Strings.Word_Iterators;
 
 package body VSS.Command_Line.Parsers is
+
+   use type VSS.Strings.Grapheme_Cluster_Count;
 
    procedure Parse_Argument
      (Self      : in out Command_Line_Parser'Class;
@@ -30,6 +28,22 @@ package body VSS.Command_Line.Parsers is
    Short_Prefix : constant VSS.Strings.Virtual_String := "-";
    Long_Prefix  : constant VSS.Strings.Virtual_String := "--";
 
+   Screen_Width      : constant VSS.Strings.Grapheme_Cluster_Count := 80;
+   Option_Width      : constant VSS.Strings.Grapheme_Cluster_Count := 28;
+   Description_Width : constant VSS.Strings.Grapheme_Cluster_Count :=
+     Screen_Width - Option_Width - 2;
+
+   Description_Continuation_Indent : constant := 2;
+
+   function Length
+     (Item : VSS.Strings.Virtual_String)
+      return VSS.Strings.Grapheme_Cluster_Count;
+   --  Computes length of the given string in grapheme clusters.
+
+   function Format_Description
+     (Item : VSS.Strings.Virtual_String)
+      return VSS.String_Vectors.Virtual_String_Vector;
+
    ----------------
    -- Add_Option --
    ----------------
@@ -39,6 +53,8 @@ package body VSS.Command_Line.Parsers is
       Option : Abstract_Option'Class) is
    begin
       if Option in Named_Option'Class then
+         Self.Defined_Named_Options_List.Append (Named_Option'Class (Option));
+
          if not Named_Option'Class (Option).Short_Name.Is_Empty then
             Self.Defined_Short_Options.Insert
               (Named_Option'Class (Option).Short_Name);
@@ -71,6 +87,212 @@ package body VSS.Command_Line.Parsers is
       return Self.Error_Message;
    end Error_Message;
 
+   ------------------------
+   -- Format_Description --
+   ------------------------
+
+   function Format_Description
+     (Item : VSS.Strings.Virtual_String)
+      return VSS.String_Vectors.Virtual_String_Vector
+   is
+      function Max_Width return VSS.Strings.Grapheme_Cluster_Count;
+      --  Maximun width of the currently constructed line.
+
+      procedure Append_Line;
+      --  Appends currently constructed line to the result.
+
+      Result       : VSS.String_Vectors.Virtual_String_Vector;
+      Line         : VSS.Strings.Virtual_String;
+      Line_Length  : VSS.Strings.Grapheme_Cluster_Count := 0;
+      Space        : VSS.Strings.Virtual_String;
+      Space_Length : VSS.Strings.Grapheme_Cluster_Count := 0;
+      Word         : VSS.Strings.Virtual_String;
+      Word_Length  : VSS.Strings.Grapheme_Cluster_Count := 0;
+      Iterator     : VSS.Strings.Word_Iterators.Word_Iterator :=
+        Item.Before_First_Word;
+
+      -----------------
+      -- Append_Line --
+      -----------------
+
+      procedure Append_Line is
+      begin
+         if not Result.Is_Empty then
+            for J in 1 .. Description_Continuation_Indent loop
+               Line.Prepend (' ');
+            end loop;
+         end if;
+
+         Result.Append (Line);
+      end Append_Line;
+
+      ---------------
+      -- Max_Width --
+      ---------------
+
+      function Max_Width return VSS.Strings.Grapheme_Cluster_Count is
+      begin
+         if Result.Is_Empty then
+            return Description_Width;
+
+         else
+            return Description_Width - Description_Continuation_Indent;
+         end if;
+      end Max_Width;
+
+   begin
+      while Iterator.Forward loop
+         if Iterator.On_Whitespace then
+            Space        := Iterator.Element;
+            Space_Length := Length (Space);
+
+         else
+            Word        := Iterator.Element;
+            Word_Length := Length (Word);
+
+            if Line_Length + Space_Length + Word_Length
+                 < Max_Width
+            then
+               Line.Append (Space);
+               Line.Append (Word);
+               Line_Length := @ + Space_Length + Word_Length;
+
+            else
+               Append_Line;
+
+               Line        := Word;
+               Line_Length := Word_Length;
+            end if;
+
+            Space.Clear;
+            Space_Length := 0;
+         end if;
+      end loop;
+
+      if not Line.Is_Empty then
+         Append_Line;
+      end if;
+
+      return Result;
+   end Format_Description;
+
+   ---------------
+   -- Help_Text --
+   ---------------
+
+   function Help_Text
+     (Self : Command_Line_Parser'Class)
+      return VSS.String_Vectors.Virtual_String_Vector
+   is
+      procedure Append_Option_Description
+        (Option_Text : in out VSS.Strings.Virtual_String;
+         Description : VSS.Strings.Virtual_String);
+
+      Result      : VSS.String_Vectors.Virtual_String_Vector;
+      Option_Text : VSS.Strings.Virtual_String;
+      Indent      : VSS.Strings.Virtual_String;
+
+      -------------------------------
+      -- Append_Option_Description --
+      -------------------------------
+
+      procedure Append_Option_Description
+        (Option_Text : in out VSS.Strings.Virtual_String;
+         Description : VSS.Strings.Virtual_String)
+      is
+         Description_Text : VSS.String_Vectors.Virtual_String_Vector :=
+           Format_Description (Description);
+
+      begin
+         if Length (Option_Text) < Option_Width then
+            Option_Text.Append (' ');
+
+            for J in Length (Option_Text) .. Option_Width loop
+               Option_Text.Append (' ');
+            end loop;
+
+            Option_Text.Append (Description_Text.First_Element);
+            Description_Text.Delete_First;
+         end if;
+
+         Result.Append (Option_Text);
+
+         for Line of Description_Text loop
+            Option_Text := Indent;
+            Option_Text.Append (Line);
+            Result.Append (Option_Text);
+         end loop;
+      end Append_Option_Description;
+
+   begin
+      for J in 1 .. Option_Width + 1 loop
+         Indent.Append (' ');
+      end loop;
+
+      declare
+         Usage : VSS.Strings.Virtual_String := "Usage: <exe>";
+
+      begin
+         if not Self.Defined_Named_Options_List.Is_Empty then
+            Usage.Append (" [options]");
+         end if;
+
+         for Option of Self.Defined_Positional_Options loop
+            Usage.Append (' ');
+            Usage.Append (Option.Name);
+         end loop;
+
+         Result.Append (Usage);
+      end;
+
+      if not Self.Defined_Named_Options_List.Is_Empty then
+         Result.Append (VSS.Strings.Empty_Virtual_String);
+         Result.Append ("Options:");
+
+         for Option of Self.Defined_Named_Options_List loop
+            Option_Text.Clear;
+            Option_Text.Append ("  ");
+
+            if not Option.Short_Name.Is_Empty then
+               Option_Text.Append (Short_Prefix);
+               Option_Text.Append (Option.Short_Name);
+
+               if not Option.Long_Name.Is_Empty then
+                  Option_Text.Append (", ");
+               end if;
+            end if;
+
+            if not Option.Long_Name.Is_Empty then
+               Option_Text.Append (Long_Prefix);
+               Option_Text.Append (Option.Long_Name);
+            end if;
+
+            if Option in Value_Option'Class then
+               Option_Text.Append (" <");
+               Option_Text.Append (Value_Option'Class (Option).Value_Name);
+               Option_Text.Append (">");
+            end if;
+
+            Append_Option_Description (Option_Text, Option.Description);
+         end loop;
+      end if;
+
+      if not Self.Defined_Positional_Options.Is_Empty then
+         Result.Append (VSS.Strings.Empty_Virtual_String);
+         Result.Append ("Arguments:");
+
+         for Option of Self.Defined_Positional_Options loop
+            Option_Text.Clear;
+            Option_Text.Append ("  ");
+            Option_Text.Append (Option.Name);
+
+            Append_Option_Description (Option_Text, Option.Description);
+         end loop;
+      end if;
+
+      return Result;
+   end Help_Text;
+
    ------------------
    -- Is_Specified --
    ------------------
@@ -91,6 +313,27 @@ package body VSS.Command_Line.Parsers is
                 <= Self.Positional_Options_Values.Length;
       end if;
    end Is_Specified;
+
+   ------------
+   -- Length --
+   ------------
+
+   function Length
+     (Item : VSS.Strings.Virtual_String)
+      return VSS.Strings.Grapheme_Cluster_Count
+   is
+      Iterator :
+        VSS.Strings.Grapheme_Cluster_Iterators.Grapheme_Cluster_Iterator
+          := Item.Before_First_Grapheme_Cluster;
+      Result   : VSS.Strings.Grapheme_Cluster_Count := 0;
+
+   begin
+      while Iterator.Forward loop
+         Result := @ + 1;
+      end loop;
+
+      return Result;
+   end Length;
 
    -----------
    -- Parse --

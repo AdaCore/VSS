@@ -17,11 +17,18 @@ package body Platform is
    --  Return True then message box should be used instead of standard error
    --  stream to report errors.
 
-   ------------------
-   -- Report_Error --
-   ------------------
+   procedure Display_Message_Box
+     (Message  : VSS.Strings.Virtual_String;
+      Is_Error : Boolean);
 
-   procedure Report_Error (Message : VSS.Strings.Virtual_String) is
+   -------------------------
+   -- Display_Message_Box --
+   -------------------------
+
+   procedure Display_Message_Box
+     (Message  : VSS.Strings.Virtual_String;
+      Is_Error : Boolean)
+   is
       use type VSS.Implementation.Windows.UINT;
 
       Title  : VSS.Implementation.Windows.String_Utilities.char16_array_access;
@@ -29,29 +36,68 @@ package body Platform is
       Result : Interfaces.C.int with Unreferenced;
 
    begin
+      Text :=
+        VSS.Implementation.Windows.String_Utilities.To_New_Native_String
+          (Message);
+      Title :=
+        VSS.Implementation.Windows.String_Utilities.To_New_Native_String
+          (VSS.Application.Application_File);
+      Result :=
+        VSS.Implementation.Windows.User32.MessageBox
+          (0,
+           Text (Text'First)'Access,
+           Title (Title'First)'Access,
+           VSS.Implementation.Windows.User32.MB_OK
+             or VSS.Implementation.Windows.User32.MB_TOPMOST
+             or VSS.Implementation.Windows.User32.MB_SETFOREGROUND
+             or (if Is_Error
+                   then VSS.Implementation.Windows.User32.MB_ICONERROR
+                   else VSS.Implementation.Windows.User32.MB_ICONINFORMATION));
+      VSS.Implementation.Windows.String_Utilities.Free (Text);
+      VSS.Implementation.Windows.String_Utilities.Free (Title);
+   end Display_Message_Box;
+
+   --------------------
+   -- Report_Message --
+   --------------------
+
+   procedure Report_Message
+     (Message  : VSS.Strings.Virtual_String;
+      Is_Error : Boolean) is
+   begin
       if Use_Message_Box then
-         Text :=
-           VSS.Implementation.Windows.String_Utilities.To_New_Native_String
-             (Message);
-         Title :=
-           VSS.Implementation.Windows.String_Utilities.To_New_Native_String
-             (VSS.Application.Application_File);
-         Result :=
-           VSS.Implementation.Windows.User32.MessageBox
-             (0,
-              Text (Text'First)'Access,
-              Title (Title'First)'Access,
-              VSS.Implementation.Windows.User32.MB_OK
-                or VSS.Implementation.Windows.User32.MB_TOPMOST
-                or VSS.Implementation.Windows.User32.MB_SETFOREGROUND
-                or VSS.Implementation.Windows.User32.MB_ICONERROR);
-         VSS.Implementation.Windows.String_Utilities.Free (Text);
-         VSS.Implementation.Windows.String_Utilities.Free (Title);
+         Display_Message_Box (Message, Is_Error);
+
+      elsif Is_Error then
+         Put_Line_Error (Message);
 
       else
-         Output_Error (Message);
+         Put_Line_Output (Message);
       end if;
-   end Report_Error;
+   end Report_Message;
+
+   --------------------
+   -- Report_Message --
+   --------------------
+
+   procedure Report_Message
+     (Message  : VSS.String_Vectors.Virtual_String_Vector;
+      Is_Error : Boolean) is
+   begin
+      if Use_Message_Box then
+         Display_Message_Box (Message.Join_Lines (VSS.Strings.CRLF), Is_Error);
+
+      else
+         for Line of Message loop
+            if Is_Error then
+               Put_Line_Error (Line);
+
+            else
+               Put_Line_Output (Line);
+            end if;
+         end loop;
+      end if;
+   end Report_Message;
 
    ---------------------
    -- Use_Message_Box --

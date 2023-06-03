@@ -34,6 +34,11 @@ package VSS.Command_Line.Parsers is
      (Self : Command_Line_Parser'Class) return VSS.Strings.Virtual_String;
    --  Return error message if any.
 
+   function Help_Text
+     (Self : Command_Line_Parser'Class)
+      return VSS.String_Vectors.Virtual_String_Vector;
+   --  Construct description of all registered options and returns it.
+
    function Is_Specified
      (Self   : Command_Line_Parser'Class;
       Option : Abstract_Option'Class) return Boolean;
@@ -101,7 +106,13 @@ private
        (Index_Type   => Positive,
         Element_Type => Positional_Option'Class);
 
+   package Named_Option_Vectors is
+     new Ada.Containers.Indefinite_Vectors
+       (Index_Type   => Positive,
+        Element_Type => Named_Option'Class);
+
    type Command_Line_Parser is tagged limited record
+      Defined_Named_Options_List   : Named_Option_Vectors.Vector;
       Defined_Short_Options        : Name_Sets.Set;
       Defined_Long_Options         : Name_Sets.Set;
       Defined_Named_Options        : Named_Option_Maps.Map;

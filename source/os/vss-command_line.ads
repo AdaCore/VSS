@@ -47,6 +47,10 @@ package VSS.Command_Line is
 
    procedure Add_Option (Option : Abstract_Option'Class);
 
+   procedure Add_Help_Option;
+   --  Adds builtin definition of the option to display help information. This
+   --  option is handled automatically.
+
    procedure Process;
    --  Parse command line. If error is found then report it and terminate
    --  application.

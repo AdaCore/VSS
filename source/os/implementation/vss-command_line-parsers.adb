@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+with VSS.Application;
 with VSS.Characters.Latin;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Grapheme_Cluster_Iterators;
@@ -230,9 +231,14 @@ package body VSS.Command_Line.Parsers is
       end loop;
 
       declare
-         Usage : VSS.Strings.Virtual_String := "Usage: <exe>";
+         Executable : constant VSS.Strings.Virtual_String :=
+           VSS.Application.Application_File.Split
+             ('/').Last_Element.Split ('\').Last_Element;
+         Usage      : VSS.Strings.Virtual_String := "Usage: ";
 
       begin
+         Usage.Append (Executable);
+
          if not Self.Defined_Named_Options_List.Is_Empty then
             Usage.Append (" [options]");
          end if;

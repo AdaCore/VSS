@@ -4,8 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
---  Binding for GCC's builtins. Some of them require specific '-m<>' switches
---  to compile compilation unit that use this package.
+--  Binding of built-in functions provided by GCC. Some of them might require
+--  specific '-m<>' switches to compile compilation unit that use this package.
 
 with Interfaces;
 
@@ -13,7 +13,7 @@ package VSS.Implementation.GCC is
 
    pragma Preelaborate;
 
-   function bsawp32 (X : Interfaces.Unsigned_32) return Interfaces.Unsigned_32
+   function bswap32 (X : Interfaces.Unsigned_32) return Interfaces.Unsigned_32
      with Import,
           Convention    => Intrinsic,
           External_Name => "__builtin_bswap32";

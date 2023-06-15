@@ -49,4 +49,8 @@ package VSS.JSON.Streams.Cursors is
    function Boolean_Value
      (Self : JSON_Stream_Cursor) return Boolean is abstract;
 
+   function Element
+     (Self : JSON_Stream_Cursor'Class)
+      return VSS.JSON.Streams.JSON_Stream_Element;
+
 end VSS.JSON.Streams.Cursors;

@@ -6,6 +6,61 @@
 
 package body VSS.JSON.Streams.Cursors is
 
+   -------------
+   -- Element --
+   -------------
+
+   function Element
+     (Self : JSON_Stream_Cursor'Class)
+      return VSS.JSON.Streams.JSON_Stream_Element is
+   begin
+      case Self.Element_Kind is
+         when None =>
+            return (Kind => None);
+
+         when Invalid =>
+            return (Kind => Invalid);
+
+         when Start_Document =>
+            return (Kind => Start_Document);
+
+         when End_Document =>
+            return (Kind => End_Document);
+
+         when Comment =>
+            raise Program_Error;
+            --  XXX Not implemented.
+
+         when Start_Array =>
+            return (Kind => Start_Array);
+
+         when End_Array =>
+            return (Kind => End_Array);
+
+         when Start_Object =>
+            return (Kind => Start_Object);
+
+         when End_Object =>
+            return (Kind => End_Object);
+
+         when Key_Name =>
+            return (Kind => Key_Name, Key => Self.Key_Name);
+
+         when String_Value =>
+            return (Kind => String_Value, String_Value => Self.String_Value);
+
+         when Number_Value =>
+            return (Kind => Number_Value, Number_Value => Self.Number_Value);
+
+         when Boolean_Value =>
+            return
+              (Kind => Boolean_Value, Boolean_Value => Self.Boolean_Value);
+
+         when Null_Value =>
+            return (Kind => Null_Value);
+      end case;
+   end Element;
+
    ----------------------
    -- Is_Boolean_Value --
    ----------------------

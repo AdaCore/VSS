@@ -192,7 +192,7 @@ procedure Test_JSON_Writer is
       --  All kinds of events as elements of arrays, to check failure at array
       --  element delimiter. It tests many cases for primitive types too.
       All_Array_Scenario : constant Test_Scenario :=
-        ((1, (Kind => VSS.JSON.Streams.Start_Array)),
+        [(1, (Kind => VSS.JSON.Streams.Start_Array)),
          (4, (Kind => VSS.JSON.Streams.Null_Value)),
          (2, (Kind => VSS.JSON.Streams.Start_Array)),
          (1, (Kind => VSS.JSON.Streams.End_Array)),
@@ -215,12 +215,12 @@ procedure Test_JSON_Writer is
          (5, (Kind          => VSS.JSON.Streams.Boolean_Value,
               Boolean_Value => True)),
          (5, (Kind => VSS.JSON.Streams.Null_Value)),
-         (1, (Kind => VSS.JSON.Streams.End_Array)));
+         (1, (Kind => VSS.JSON.Streams.End_Array))];
 
       --  Few key-value pairs in the object to check failure at pairs
       --  delimiter.
       Object_Key_Scenario : constant Test_Scenario :=
-        ((1, (Kind => VSS.JSON.Streams.Start_Object)),
+        [(1, (Kind => VSS.JSON.Streams.Start_Object)),
          (7, (Kind     => VSS.JSON.Streams.Key_Name,
               Key_Name => "name")),
          (2, (Kind         => VSS.JSON.Streams.String_Value,
@@ -229,18 +229,18 @@ procedure Test_JSON_Writer is
                Key_Name => "surname")),
          (2, (Kind         => VSS.JSON.Streams.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
-         (1, (Kind => VSS.JSON.Streams.End_Object)));
+         (1, (Kind => VSS.JSON.Streams.End_Object))];
 
       --  All control characters in the string literal
       All_Controls_Scenario : constant Test_Scenario :=
-        (1 =>
+        [1 =>
            (174, (Kind         => VSS.JSON.Streams.String_Value,
-                  String_Value => All_Controls)));
+                  String_Value => All_Controls))];
 
       Escaped_Scenario : constant Test_Scenario :=
-        (1 =>
+        [1 =>
            (6, (Kind         => VSS.JSON.Streams.String_Value,
-                String_Value => Escaped)));
+                String_Value => Escaped))];
 
    begin
       --  This test cover simplest cases only, content of the generated JSON

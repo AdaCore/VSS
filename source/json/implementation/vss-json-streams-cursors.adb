@@ -44,7 +44,7 @@ package body VSS.JSON.Streams.Cursors is
             return (Kind => End_Object);
 
          when Key_Name =>
-            return (Kind => Key_Name, Key => Self.Key_Name);
+            return (Kind => Key_Name, Key_Name => Self.Key_Name);
 
          when String_Value =>
             return (Kind => String_Value, String_Value => Self.String_Value);

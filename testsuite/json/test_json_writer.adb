@@ -123,7 +123,7 @@ procedure Test_JSON_Writer is
                         Writer.End_Object (Success);
 
                      when VSS.JSON.Streams.Key_Name =>
-                        Writer.Key_Name (Scenario (J).Event.Key, Success);
+                        Writer.Key_Name (Scenario (J).Event.Key_Name, Success);
 
                      when VSS.JSON.Streams.String_Value =>
                         Writer.String_Value
@@ -221,12 +221,12 @@ procedure Test_JSON_Writer is
       --  delimiter.
       Object_Key_Scenario : constant Test_Scenario :=
         ((1, (Kind => VSS.JSON.Streams.Start_Object)),
-         (7, (Kind => VSS.JSON.Streams.Key_Name,
-              Key  => "name")),
+         (7, (Kind     => VSS.JSON.Streams.Key_Name,
+              Key_Name => "name")),
          (2, (Kind         => VSS.JSON.Streams.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
-         (11, (Kind => VSS.JSON.Streams.Key_Name,
-               Key  => "surname")),
+         (11, (Kind     => VSS.JSON.Streams.Key_Name,
+               Key_Name => "surname")),
          (2, (Kind         => VSS.JSON.Streams.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
          (1, (Kind => VSS.JSON.Streams.End_Object)));

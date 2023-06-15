@@ -40,7 +40,7 @@ package VSS.JSON.Streams is
             null;
 
          when Key_Name =>
-            Key : VSS.Strings.Virtual_String;
+            Key_Name : VSS.Strings.Virtual_String;
 
          when String_Value =>
             String_Value : VSS.Strings.Virtual_String;

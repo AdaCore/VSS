@@ -18,6 +18,10 @@ package VSS.JSON.Pull_Readers.Simple is
    --  XXX GNAT 20230626: These functions can be moved to private part,
    --  however, they are not visible then due to compiler's bug.
 
+   overriding function Element_Kind
+     (Self : JSON_Simple_Pull_Reader)
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
+
    overriding function Boolean_Value
      (Self : JSON_Simple_Pull_Reader) return Boolean;
 
@@ -39,10 +43,6 @@ private
    overriding function At_End (Self : JSON_Simple_Pull_Reader) return Boolean;
 
    overriding procedure Clear (Self : in out JSON_Simple_Pull_Reader);
-
-   overriding function Element_Kind
-     (Self : JSON_Simple_Pull_Reader)
-      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
 
    overriding function Error
      (Self : JSON_Simple_Pull_Reader)

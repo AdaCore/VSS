@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -9,7 +9,7 @@ with Ada.Streams.Stream_IO;
 with Ada.Text_IO;
 with Interfaces;
 
-with VSS.JSON.Events;
+with VSS.JSON.Streams;
 with VSS.JSON.Push_Writers;
 with VSS.Stream_Element_Vectors.Conversions;
 with VSS.Strings.Conversions;
@@ -21,38 +21,38 @@ procedure Test_JSON_Writer is
 
    All_Controls : constant VSS.Strings.Virtual_String :=
      VSS.Strings.Conversions.To_Virtual_String
-       ((Character'Val (16#00#),
-        Character'Val (16#01#),
-        Character'Val (16#02#),
-        Character'Val (16#03#),
-        Character'Val (16#04#),
-        Character'Val (16#05#),
-        Character'Val (16#06#),
-        Character'Val (16#07#),
-        Character'Val (16#08#),
-        Character'Val (16#09#),
-        Character'Val (16#0A#),
-        Character'Val (16#0B#),
-        Character'Val (16#0C#),
-        Character'Val (16#0D#),
-        Character'Val (16#0E#),
-        Character'Val (16#0F#),
-        Character'Val (16#10#),
-        Character'Val (16#11#),
-        Character'Val (16#12#),
-        Character'Val (16#13#),
-        Character'Val (16#14#),
-        Character'Val (16#15#),
-        Character'Val (16#16#),
-        Character'Val (16#17#),
-        Character'Val (16#18#),
-        Character'Val (16#19#),
-        Character'Val (16#1A#),
-        Character'Val (16#1B#),
-        Character'Val (16#1C#),
-        Character'Val (16#1D#),
-        Character'Val (16#1E#),
-        Character'Val (16#1F#)));
+       ([Character'Val (16#00#),
+         Character'Val (16#01#),
+         Character'Val (16#02#),
+         Character'Val (16#03#),
+         Character'Val (16#04#),
+         Character'Val (16#05#),
+         Character'Val (16#06#),
+         Character'Val (16#07#),
+         Character'Val (16#08#),
+         Character'Val (16#09#),
+         Character'Val (16#0A#),
+         Character'Val (16#0B#),
+         Character'Val (16#0C#),
+         Character'Val (16#0D#),
+         Character'Val (16#0E#),
+         Character'Val (16#0F#),
+         Character'Val (16#10#),
+         Character'Val (16#11#),
+         Character'Val (16#12#),
+         Character'Val (16#13#),
+         Character'Val (16#14#),
+         Character'Val (16#15#),
+         Character'Val (16#16#),
+         Character'Val (16#17#),
+         Character'Val (16#18#),
+         Character'Val (16#19#),
+         Character'Val (16#1A#),
+         Character'Val (16#1B#),
+         Character'Val (16#1C#),
+         Character'Val (16#1D#),
+         Character'Val (16#1E#),
+         Character'Val (16#1F#)]);
    --  All control characters required to be escaped
 
    Escaped : constant VSS.Strings.Virtual_String := "\""";
@@ -71,7 +71,7 @@ procedure Test_JSON_Writer is
    is
       type Test_Event is record
          Length : VSS.Strings.Character_Count;
-         Event  : VSS.JSON.Events.JSON_Event;
+         Event  : VSS.JSON.Streams.JSON_Stream_Element;
       end record;
 
       type Test_Scenario is array (Positive range <>) of Test_Event;
@@ -110,26 +110,26 @@ procedure Test_JSON_Writer is
                   Length := Length + Scenario (J).Length;
 
                   case Scenario (J).Event.Kind is
-                     when VSS.JSON.Events.Start_Array =>
+                     when VSS.JSON.Streams.Start_Array =>
                         Writer.Start_Array (Success);
 
-                     when VSS.JSON.Events.End_Array =>
+                     when VSS.JSON.Streams.End_Array =>
                         Writer.End_Array (Success);
 
-                     when VSS.JSON.Events.Start_Object =>
+                     when VSS.JSON.Streams.Start_Object =>
                         Writer.Start_Object (Success);
 
-                     when VSS.JSON.Events.End_Object =>
+                     when VSS.JSON.Streams.End_Object =>
                         Writer.End_Object (Success);
 
-                     when VSS.JSON.Events.Key_Name =>
+                     when VSS.JSON.Streams.Key_Name =>
                         Writer.Key_Name (Scenario (J).Event.Key, Success);
 
-                     when VSS.JSON.Events.String_Value =>
+                     when VSS.JSON.Streams.String_Value =>
                         Writer.String_Value
                           (Scenario (J).Event.String_Value, Success);
 
-                     when VSS.JSON.Events.Number_Value =>
+                     when VSS.JSON.Streams.Number_Value =>
                         case Scenario (J).Event.Number_Value.Kind is
                            when VSS.JSON.JSON_Integer =>
                               Writer.Integer_Value
@@ -145,11 +145,11 @@ procedure Test_JSON_Writer is
                               raise Program_Error;
                         end case;
 
-                     when VSS.JSON.Events.Boolean_Value =>
+                     when VSS.JSON.Streams.Boolean_Value =>
                         Writer.Boolean_Value
                           (Scenario (J).Event.Boolean_Value, Success);
 
-                     when VSS.JSON.Events.Null_Value =>
+                     when VSS.JSON.Streams.Null_Value =>
                         Writer.Null_Value (Success);
 
                      when others =>
@@ -192,54 +192,54 @@ procedure Test_JSON_Writer is
       --  All kinds of events as elements of arrays, to check failure at array
       --  element delimiter. It tests many cases for primitive types too.
       All_Array_Scenario : constant Test_Scenario :=
-        ((1, (Kind => VSS.JSON.Events.Start_Array)),
-         (4, (Kind => VSS.JSON.Events.Null_Value)),
-         (2, (Kind => VSS.JSON.Events.Start_Array)),
-         (1, (Kind => VSS.JSON.Events.End_Array)),
-         (2, (Kind => VSS.JSON.Events.Start_Object)),
-         (1, (Kind => VSS.JSON.Events.End_Object)),
-         (3, (Kind         => VSS.JSON.Events.String_Value,
+        ((1, (Kind => VSS.JSON.Streams.Start_Array)),
+         (4, (Kind => VSS.JSON.Streams.Null_Value)),
+         (2, (Kind => VSS.JSON.Streams.Start_Array)),
+         (1, (Kind => VSS.JSON.Streams.End_Array)),
+         (2, (Kind => VSS.JSON.Streams.Start_Object)),
+         (1, (Kind => VSS.JSON.Streams.End_Object)),
+         (3, (Kind         => VSS.JSON.Streams.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
-         (2, (Kind         => VSS.JSON.Events.Number_Value,
+         (2, (Kind         => VSS.JSON.Streams.Number_Value,
               Number_Value => (Kind          => VSS.JSON.JSON_Integer,
                                String_Value  =>
                                  VSS.Strings.Empty_Virtual_String,
                                Integer_Value => 0))),
-         (21, (Kind         => VSS.JSON.Events.Number_Value,
+         (21, (Kind         => VSS.JSON.Streams.Number_Value,
                Number_Value => (Kind          => VSS.JSON.JSON_Float,
                                 String_Value  =>
                                   VSS.Strings.Empty_Virtual_String,
                                 Float_Value   => 0.0))),
-         (6, (Kind          => VSS.JSON.Events.Boolean_Value,
+         (6, (Kind          => VSS.JSON.Streams.Boolean_Value,
               Boolean_Value => False)),
-         (5, (Kind          => VSS.JSON.Events.Boolean_Value,
+         (5, (Kind          => VSS.JSON.Streams.Boolean_Value,
               Boolean_Value => True)),
-         (5, (Kind => VSS.JSON.Events.Null_Value)),
-         (1, (Kind => VSS.JSON.Events.End_Array)));
+         (5, (Kind => VSS.JSON.Streams.Null_Value)),
+         (1, (Kind => VSS.JSON.Streams.End_Array)));
 
       --  Few key-value pairs in the object to check failure at pairs
       --  delimiter.
       Object_Key_Scenario : constant Test_Scenario :=
-        ((1, (Kind => VSS.JSON.Events.Start_Object)),
-         (7, (Kind => VSS.JSON.Events.Key_Name,
+        ((1, (Kind => VSS.JSON.Streams.Start_Object)),
+         (7, (Kind => VSS.JSON.Streams.Key_Name,
               Key  => "name")),
-         (2, (Kind         => VSS.JSON.Events.String_Value,
+         (2, (Kind         => VSS.JSON.Streams.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
-         (11, (Kind => VSS.JSON.Events.Key_Name,
+         (11, (Kind => VSS.JSON.Streams.Key_Name,
                Key  => "surname")),
-         (2, (Kind         => VSS.JSON.Events.String_Value,
+         (2, (Kind         => VSS.JSON.Streams.String_Value,
               String_Value => VSS.Strings.Empty_Virtual_String)),
-         (1, (Kind => VSS.JSON.Events.End_Object)));
+         (1, (Kind => VSS.JSON.Streams.End_Object)));
 
       --  All control characters in the string literal
       All_Controls_Scenario : constant Test_Scenario :=
         (1 =>
-           (174, (Kind         => VSS.JSON.Events.String_Value,
+           (174, (Kind         => VSS.JSON.Streams.String_Value,
                   String_Value => All_Controls)));
 
       Escaped_Scenario : constant Test_Scenario :=
         (1 =>
-           (6, (Kind         => VSS.JSON.Events.String_Value,
+           (6, (Kind         => VSS.JSON.Streams.String_Value,
                 String_Value => Escaped)));
 
    begin

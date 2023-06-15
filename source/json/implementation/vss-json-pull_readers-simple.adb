@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -35,6 +35,17 @@ package body VSS.JSON.Pull_Readers.Simple is
       raise Program_Error;
    end Clear;
 
+   ------------------
+   -- Element_Kind --
+   ------------------
+
+   overriding function Element_Kind
+     (Self : JSON_Simple_Pull_Reader)
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind is
+   begin
+      return Self.Parser.Element_Kind;
+   end Element_Kind;
+
    -----------
    -- Error --
    -----------
@@ -55,17 +66,6 @@ package body VSS.JSON.Pull_Readers.Simple is
    begin
       return Self.Parser.Error_Message;
    end Error_Message;
-
-   ----------------
-   -- Event_Kind --
-   ----------------
-
-   overriding function Event_Kind
-     (Self : JSON_Simple_Pull_Reader)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
-   begin
-      return Self.Parser.Event_Kind;
-   end Event_Kind;
 
    --------------
    -- Key_Name --
@@ -104,11 +104,11 @@ package body VSS.JSON.Pull_Readers.Simple is
 
    overriding function Read_Next
      (Self : in out JSON_Simple_Pull_Reader)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind is
    begin
       Self.Parser.Parse;
 
-      return Self.Parser.Event_Kind;
+      return Self.Parser.Element_Kind;
    end Read_Next;
 
    ----------------
@@ -168,32 +168,34 @@ package body VSS.JSON.Pull_Readers.Simple is
    overriding procedure Skip_Current_Value
      (Self : in out JSON_Simple_Pull_Reader) is
    begin
-      case Self.Event_Kind is
-         when No_Token =>
+      case Self.Element_Kind is
+         when VSS.JSON.Streams.None =>
             raise Program_Error;
-         when Invalid =>
+         when VSS.JSON.Streams.Invalid =>
             raise Program_Error;
-         when Start_Document =>
+         when VSS.JSON.Streams.Start_Document =>
             raise Program_Error;
-         when End_Document =>
+         when VSS.JSON.Streams.End_Document =>
             raise Program_Error;
-         when Start_Array =>
+         when VSS.JSON.Streams.Comment =>
+            Self.Read_Next;
+         when VSS.JSON.Streams.Start_Array =>
             Self.Skip_Current_Array;
-         when End_Array =>
+         when VSS.JSON.Streams.End_Array =>
             raise Program_Error;
-         when Start_Object =>
+         when VSS.JSON.Streams.Start_Object =>
             Self.Skip_Current_Object;
-         when End_Object =>
+         when VSS.JSON.Streams.End_Object =>
             raise Program_Error;
-         when Key_Name =>
+         when VSS.JSON.Streams.Key_Name =>
             raise Program_Error;
-         when String_Value =>
+         when VSS.JSON.Streams.String_Value =>
             Self.Read_Next;
-         when Number_Value =>
+         when VSS.JSON.Streams.Number_Value =>
             Self.Read_Next;
-         when Boolean_Value =>
+         when VSS.JSON.Streams.Boolean_Value =>
             Self.Read_Next;
-         when Null_Value =>
+         when VSS.JSON.Streams.Null_Value =>
             Self.Read_Next;
       end case;
    end Skip_Current_Value;

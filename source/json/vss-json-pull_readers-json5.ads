@@ -28,16 +28,16 @@ private
 
    overriding procedure Clear (Self : in out JSON5_Pull_Reader);
 
+   overriding function Element_Kind
+     (Self : JSON5_Pull_Reader)
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
+
    overriding function Error
      (Self : JSON5_Pull_Reader)
       return VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    overriding function Error_Message
      (Self : JSON5_Pull_Reader) return VSS.Strings.Virtual_String;
-
-   overriding function Event_Kind
-     (Self : JSON5_Pull_Reader)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
 
    overriding function Key_Name
      (Self : JSON5_Pull_Reader) return VSS.Strings.Virtual_String;
@@ -51,7 +51,7 @@ private
 
    overriding function Read_Next
      (Self : in out JSON5_Pull_Reader)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
 
    overriding procedure Skip_Current_Array
      (Self : in out JSON5_Pull_Reader);

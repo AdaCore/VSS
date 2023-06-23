@@ -953,7 +953,7 @@ package body JSON_Schema.Writers.Types is
       New_Line;
       Put ("with Ada.Finalization;");
       New_Line;
-      Put ("with VSS.JSON.Events;");
+      Put ("with VSS.JSON.Streams;");
       New_Line;
       Put ("with VSS.Strings;");
       New_Line;
@@ -968,7 +968,7 @@ package body JSON_Schema.Writers.Types is
       Put
         ("package JSON_Event_Lists is new Ada.Containers.Doubly_Linked_Lists");
       New_Line;
-      Put ("(VSS.JSON.Events.JSON_Event, VSS.JSON.Events.""="");");
+      Put ("(VSS.JSON.Streams.JSON_Stream_Element, VSS.JSON.Streams.""="");");
       New_Line;
       New_Line;
       Put ("type Any_Value is new JSON_Event_Lists.List with null record;");

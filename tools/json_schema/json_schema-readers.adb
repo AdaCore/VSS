@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -446,36 +446,18 @@ package body JSON_Schema.Readers is
      (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
       Result : in out JSON_Event_Vectors.Vector'Class)
    is
-      use all type VSS.JSON.Pull_Readers.JSON_Event_Kind;
-
-      function To_Event (Reader : VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class)
-        return VSS.JSON.Events.JSON_Event is
-          (case Reader.Event_Kind is
-           when Start_Array => (Kind => VSS.JSON.Events.Start_Array),
-           when End_Array => (Kind => VSS.JSON.Events.End_Array),
-           when Start_Object => (Kind => VSS.JSON.Events.Start_Object),
-           when End_Object => (Kind => VSS.JSON.Events.End_Object),
-           when Key_Name => (VSS.JSON.Events.Key_Name, Reader.Key_Name),
-           when String_Value =>
-             (VSS.JSON.Events.String_Value, Reader.String_Value),
-           when Number_Value =>
-             (VSS.JSON.Events.Number_Value, Reader.Number_Value),
-           when Boolean_Value =>
-             (VSS.JSON.Events.Boolean_Value, Reader.Boolean_Value),
-           when Null_Value => (Kind => VSS.JSON.Events.Null_Value),
-           when others => raise Program_Error);
-
       Depth : Natural := 0;
+
    begin
       while not Reader.At_End loop
-         Result.Append (To_Event (Reader));
+         Result.Append (Reader.Element);
 
          Depth := Depth +
-            (case Reader.Event_Kind is
-               when VSS.JSON.Pull_Readers.Start_Array
-                  | VSS.JSON.Pull_Readers.Start_Object => 1,
-               when VSS.JSON.Pull_Readers.End_Array
-                  | VSS.JSON.Pull_Readers.End_Object => -1,
+            (case Reader.Element_Kind is
+               when VSS.JSON.Streams.Start_Array
+                  | VSS.JSON.Streams.Start_Object => 1,
+               when VSS.JSON.Streams.End_Array
+                  | VSS.JSON.Streams.End_Object => -1,
                when others => 0);
 
          Reader.Read_Next;

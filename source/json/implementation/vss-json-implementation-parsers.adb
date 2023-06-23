@@ -31,6 +31,17 @@ package body VSS.JSON.Implementation.Parsers is
       return Self.Boolean;
    end Boolean_Value;
 
+   ------------------
+   -- Element_Kind --
+   ------------------
+
+   function Element_Kind
+     (Self : JSON_Parser_Base'Class)
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind is
+   begin
+      return Self.Event;
+   end Element_Kind;
+
    -----------
    -- Error --
    -----------
@@ -51,17 +62,6 @@ package body VSS.JSON.Implementation.Parsers is
    begin
       return Self.Message;
    end Error_Message;
-
-   ----------------
-   -- Event_Kind --
-   ----------------
-
-   function Event_Kind
-     (Self : JSON_Parser_Base'Class)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind is
-   begin
-      return Self.Event;
-   end Event_Kind;
 
    --------------
    -- Is_Empty --
@@ -100,11 +100,11 @@ package body VSS.JSON.Implementation.Parsers is
       Parse : not null Parse_Subprogram;
       State : Interfaces.Unsigned_32) return Boolean
    is
-      use type VSS.JSON.Pull_Readers.JSON_Event_Kind;
+      use type VSS.JSON.Streams.JSON_Stream_Element_Kind;
       use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    begin
-      if Self.Event /= VSS.JSON.Pull_Readers.Invalid
+      if Self.Event /= VSS.JSON.Streams.Invalid
         or else Self.Error /= VSS.JSON.Pull_Readers.Not_Valid
       then
          Self.Stack.Push (Parse, State);
@@ -151,13 +151,13 @@ package body VSS.JSON.Implementation.Parsers is
             --  invalid.
 
             Self.Message := Self.Stream.Error_Message;
-            Self.Event   := VSS.JSON.Pull_Readers.Invalid;
+            Self.Event   := VSS.JSON.Streams.Invalid;
             Self.Error   := VSS.JSON.Pull_Readers.Not_Valid;
 
             return False;
 
          else
-            Self.Event := VSS.JSON.Pull_Readers.Invalid;
+            Self.Event := VSS.JSON.Streams.Invalid;
             Self.Error := VSS.JSON.Pull_Readers.Premature_End_Of_Document;
          end if;
 
@@ -182,7 +182,7 @@ package body VSS.JSON.Implementation.Parsers is
      (Self    : in out JSON_Parser_Base'Class;
       Message : Wide_Wide_String) return Boolean is
    begin
-      Self.Event := VSS.JSON.Pull_Readers.Invalid;
+      Self.Event := VSS.JSON.Streams.Invalid;
       Self.Error := VSS.JSON.Pull_Readers.Not_Valid;
       Self.Message := VSS.Strings.To_Virtual_String (Message);
 

@@ -10,7 +10,7 @@ with VSS.Characters;
 
 package body VSS.JSON.Implementation.Parsers.JSON is
 
-   use type VSS.JSON.Pull_Readers.JSON_Event_Kind;
+   use type VSS.JSON.Streams.JSON_Stream_Element_Kind;
    use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    function Parse_JSON_Text
@@ -131,7 +131,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
          pragma Assert (Self.C = Begin_Array);
 
          State := Value_Or_End_Array;
-         Self.Event := VSS.JSON.Pull_Readers.Start_Array;
+         Self.Event := VSS.JSON.Streams.Start_Array;
 
          return Self.Push (Parse_Array'Access, Array_State'Pos (State));
       end if;
@@ -155,7 +155,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
                   when End_Array =>
                      State := Finish;
-                     Self.Event := VSS.JSON.Pull_Readers.End_Array;
+                     Self.Event := VSS.JSON.Streams.End_Array;
 
                      return
                        Self.Push (Parse_Array'Access, Array_State'Pos (State));
@@ -216,7 +216,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
                   when End_Array =>
                      State := Finish;
-                     Self.Event := VSS.JSON.Pull_Readers.End_Array;
+                     Self.Event := VSS.JSON.Streams.End_Array;
 
                      return
                        Self.Push (Parse_Array'Access, Array_State'Pos (State));
@@ -268,7 +268,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
          if not Self.Stack.Is_Empty then
             if not Self.Stack.Top.Parse (Self) then
-               if Self.Event /= VSS.JSON.Pull_Readers.Invalid
+               if Self.Event /= VSS.JSON.Streams.Invalid
                  or else Self.Error /= VSS.JSON.Pull_Readers.Not_Valid
                then
                   Self.Stack.Push
@@ -286,7 +286,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
       else
          State := Initial;
-         Self.Event := VSS.JSON.Pull_Readers.Start_Document;
+         Self.Event := VSS.JSON.Streams.Start_Document;
 
          return
            Self.Push (Parse_JSON_Text'Access, JSON_Text_State'Pos (State));
@@ -318,7 +318,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                end case;
 
             when Done =>
-               Self.Event := VSS.JSON.Pull_Readers.End_Document;
+               Self.Event := VSS.JSON.Streams.End_Document;
 
                return True;
          end case;
@@ -336,7 +336,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
          case State is
             when Initial =>
                if not Parse_Value (Self) then
-                  if Self.Event /= VSS.JSON.Pull_Readers.Invalid
+                  if Self.Event /= VSS.JSON.Streams.Invalid
                     or else Self.Error /= VSS.JSON.Pull_Readers.Not_Valid
                   then
                      State := Whitespace_Or_End;
@@ -450,7 +450,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                  (Self.Number_State,
                   Self.String_Value,
                   Self.Number);
-               Self.Event := VSS.JSON.Pull_Readers.Number_Value;
+               Self.Event := VSS.JSON.Streams.Number_Value;
 
                return False;
 
@@ -662,7 +662,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
          pragma Assert (Self.C = Begin_Object);
 
          State := Member_Or_End_Object;
-         Self.Event := VSS.JSON.Pull_Readers.Start_Object;
+         Self.Event := VSS.JSON.Streams.Start_Object;
 
          return Self.Push (Parse_Object'Access, Object_State'Pos (State));
       end if;
@@ -677,7 +677,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
             when Member_String =>
                State := Member_Name_Separator;
-               Self.Event := VSS.JSON.Pull_Readers.Key_Name;
+               Self.Event := VSS.JSON.Streams.Key_Name;
 
                return
                  Self.Push (Parse_Object'Access, Object_State'Pos (State));
@@ -712,7 +712,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
                   when End_Object =>
                      State := Finish;
-                     Self.Event := VSS.JSON.Pull_Readers.End_Object;
+                     Self.Event := VSS.JSON.Streams.End_Object;
 
                      return
                        Self.Push
@@ -764,7 +764,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
                   when End_Object =>
                      State := Finish;
-                     Self.Event := VSS.JSON.Pull_Readers.End_Object;
+                     Self.Event := VSS.JSON.Streams.End_Object;
 
                      return
                        Self.Push
@@ -1173,7 +1173,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                             (Parse_Value'Access, Value_State'Pos (State));
 
                      else
-                        Self.Event := VSS.JSON.Pull_Readers.String_Value;
+                        Self.Event := VSS.JSON.Streams.String_Value;
 
                         return False;
                      end if;
@@ -1220,7 +1220,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                end case;
 
             when Value_String =>
-               Self.Event := VSS.JSON.Pull_Readers.String_Value;
+               Self.Event := VSS.JSON.Streams.String_Value;
 
                return False;
 
@@ -1288,7 +1288,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                   when Latin_Small_Letter_E =>
                      State := Finish;
                      Self.Boolean := False;
-                     Self.Event := VSS.JSON.Pull_Readers.Boolean_Value;
+                     Self.Event := VSS.JSON.Streams.Boolean_Value;
 
                      return
                        Self.Push (Parse_Value'Access, Value_State'Pos (State));
@@ -1319,7 +1319,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                case Self.C is
                   when Latin_Small_Letter_L =>
                      State := Finish;
-                     Self.Event := VSS.JSON.Pull_Readers.Null_Value;
+                     Self.Event := VSS.JSON.Streams.Null_Value;
 
                      return
                        Self.Push (Parse_Value'Access, Value_State'Pos (State));
@@ -1351,7 +1351,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                   when Latin_Small_Letter_E =>
                      State := Finish;
                      Self.Boolean := True;
-                     Self.Event := VSS.JSON.Pull_Readers.Boolean_Value;
+                     Self.Event := VSS.JSON.Streams.Boolean_Value;
 
                      return
                        Self.Push (Parse_Value'Access, Value_State'Pos (State));

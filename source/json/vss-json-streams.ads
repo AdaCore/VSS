@@ -6,12 +6,17 @@
 
 with VSS.Strings;
 
-package VSS.JSON.Events is
+package VSS.JSON.Streams is
 
    pragma Preelaborate;
 
-   type JSON_Event_Kind is
+   type JSON_Stream_Element_Kind is
      (None,
+      Invalid,
+      Start_Document,
+      End_Document,
+      Comment,
+      --  Comment in JSON5 format, not implemented.
       Start_Array,
       End_Array,
       Start_Object,
@@ -21,17 +26,21 @@ package VSS.JSON.Events is
       Number_Value,
       Boolean_Value,
       Null_Value);
+   --  Kinds of elements in the JSON stream.
 
-   type JSON_Event (Kind : JSON_Event_Kind := None) is record
+   type JSON_Stream_Element (Kind : JSON_Stream_Element_Kind := None) is record
       case Kind is
-         when None =>
+         when None | Invalid | Start_Document | End_Document =>
             null;
+
+         when Comment =>
+            Text : VSS.Strings.Virtual_String;
 
          when Start_Array | End_Array | Start_Object | End_Object =>
             null;
 
          when Key_Name =>
-            Key : VSS.Strings.Virtual_String;
+            Key_Name : VSS.Strings.Virtual_String;
 
          when String_Value =>
             String_Value : VSS.Strings.Virtual_String;
@@ -47,4 +56,4 @@ package VSS.JSON.Events is
       end case;
    end record;
 
-end VSS.JSON.Events;
+end VSS.JSON.Streams;

@@ -11,6 +11,7 @@ with Interfaces;
 with VSS.Command_Line;
 with VSS.JSON.Pull_Readers.Simple;
 with VSS.JSON.Pull_Readers.JSON5;
+with VSS.JSON.Streams;
 with VSS.Strings.Conversions;
 with VSS.Strings.Formatters.Booleans;
 with VSS.Strings.Formatters.Generic_Enumerations;
@@ -24,7 +25,7 @@ with Tests_Text_Streams;
 
 procedure Test_JSON_Pull_Reader is
 
-   use all type VSS.JSON.Pull_Readers.JSON_Event_Kind;
+--   use all type VSS.JSON.Pull_Readers.JSON_Event_Kind;
    use all type VSS.JSON.Pull_Readers.JSON_Reader_Error;
 
    package Command_Line is
@@ -127,9 +128,9 @@ procedure Test_JSON_Pull_Reader is
      new VSS.Strings.Formatters.Generic_Enumerations
            (VSS.JSON.JSON_Number_Kind);
 
-   package JSON_Event_Kind_Formatters is
+   package JSON_Stream_Element_Kind_Formatters is
      new VSS.Strings.Formatters.Generic_Enumerations
-           (VSS.JSON.Pull_Readers.JSON_Event_Kind);
+           (VSS.JSON.Streams.JSON_Stream_Element_Kind);
 
    package JSON_Reader_Error_Formatters is
      new VSS.Strings.Formatters.Generic_Enumerations
@@ -208,13 +209,14 @@ begin
       while not Reader.At_End loop
          Reader.Read_Next;
 
-         case Reader.Event_Kind is
-            when Invalid =>
+         case Reader.Element_Kind is
+            when VSS.JSON.Streams.Invalid =>
                if Reader.Error /= Premature_End_Of_Document then
                   Output.Put_Line
                     (VSS.Strings.Templates.To_Virtual_String_Template
                        ("{} {} ""{}""").Format
-                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                         (JSON_Stream_Element_Kind_Formatters.Image
+                            (Reader.Element_Kind),
                           JSON_Reader_Error_Formatters.Image (Reader.Error),
                           VSS.Strings.Formatters.Strings.Image
                             (Reader.Error_Message)),
@@ -235,33 +237,35 @@ begin
                   end if;
                end if;
 
-            when Key_Name =>
+            when VSS.JSON.Streams.Key_Name =>
                Count := 0;
 
                if not Options.Performance then
                   Output.Put_Line
                     (VSS.Strings.Templates.To_Virtual_String_Template
                        ("{} ""{}""").Format
-                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                         (JSON_Stream_Element_Kind_Formatters.Image
+                            (Reader.Element_Kind),
                           VSS.Strings.Formatters.Strings.Image
                             (Reader.Key_Name)),
                      Success);
                end if;
 
-            when String_Value =>
+            when VSS.JSON.Streams.String_Value =>
                Count := 0;
 
                if not Options.Performance then
                   Output.Put_Line
                     (VSS.Strings.Templates.To_Virtual_String_Template
                        ("{} ""{}""").Format
-                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                         (JSON_Stream_Element_Kind_Formatters.Image
+                            (Reader.Element_Kind),
                           VSS.Strings.Formatters.Strings.Image
                             (Reader.String_Value)),
                      Success);
                end if;
 
-            when Number_Value =>
+            when VSS.JSON.Streams.Number_Value =>
                Count := 0;
 
                if not Options.Performance then
@@ -270,8 +274,8 @@ begin
                         Output.Put_Line
                           (VSS.Strings.Templates.To_Virtual_String_Template
                              ("{} {} {}").Format
-                               (JSON_Event_Kind_Formatters.Image
-                                    (Reader.Event_Kind),
+                               (JSON_Stream_Element_Kind_Formatters.Image
+                                    (Reader.Element_Kind),
                                 JSON_Number_Kind_Formatters.Image
                                   (Reader.Number_Value.Kind),
                                 VSS.Strings.Formatters.Strings.Image
@@ -282,8 +286,8 @@ begin
                         Output.Put_Line
                           (VSS.Strings.Templates.To_Virtual_String_Template
                              ("{} {} {} {}").Format
-                               (JSON_Event_Kind_Formatters.Image
-                                    (Reader.Event_Kind),
+                               (JSON_Stream_Element_Kind_Formatters.Image
+                                    (Reader.Element_Kind),
                                 JSON_Number_Kind_Formatters.Image
                                   (Reader.Number_Value.Kind),
                                 VSS.Strings.Formatters.Strings.Image
@@ -298,8 +302,8 @@ begin
                         Output.Put_Line
                           (VSS.Strings.Templates.To_Virtual_String_Template
                              ("{} {} {} {}").Format
-                               (JSON_Event_Kind_Formatters.Image
-                                    (Reader.Event_Kind),
+                               (JSON_Stream_Element_Kind_Formatters.Image
+                                    (Reader.Element_Kind),
                                 JSON_Number_Kind_Formatters.Image
                                   (Reader.Number_Value.Kind),
                                 VSS.Strings.Formatters.Strings.Image
@@ -314,8 +318,8 @@ begin
                         Output.Put_Line
                           (VSS.Strings.Templates.To_Virtual_String_Template
                              ("{} {} {}").Format
-                               (JSON_Event_Kind_Formatters.Image
-                                    (Reader.Event_Kind),
+                               (JSON_Stream_Element_Kind_Formatters.Image
+                                    (Reader.Element_Kind),
                                 JSON_Number_Kind_Formatters.Image
                                   (Reader.Number_Value.Kind),
                                 VSS.Strings.Formatters.Strings.Image
@@ -324,14 +328,15 @@ begin
                   end case;
                end if;
 
-            when Boolean_Value =>
+            when VSS.JSON.Streams.Boolean_Value =>
                Count := 0;
 
                if not Options.Performance then
                   Output.Put_Line
                     (VSS.Strings.Templates.To_Virtual_String_Template
                        ("{} {}").Format
-                         (JSON_Event_Kind_Formatters.Image (Reader.Event_Kind),
+                         (JSON_Stream_Element_Kind_Formatters.Image
+                            (Reader.Element_Kind),
                           VSS.Strings.Formatters.Booleans.Image
                             (Reader.Boolean_Value)),
                      Success);
@@ -344,8 +349,8 @@ begin
                   Output.Put_Line
                     (VSS.Strings.Templates.To_Virtual_String_Template
                        ("{}").Format
-                         (JSON_Event_Kind_Formatters.Image
-                              (Reader.Event_Kind)),
+                         (JSON_Stream_Element_Kind_Formatters.Image
+                              (Reader.Element_Kind)),
                      Success);
                end if;
          end case;

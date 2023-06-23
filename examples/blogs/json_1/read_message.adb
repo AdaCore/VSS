@@ -2,6 +2,7 @@
 with Ada.Wide_Wide_Text_IO;
 
 with VSS.JSON.Pull_Readers.Simple;
+with VSS.JSON.Streams;
 with VSS.Strings.Conversions;
 with VSS.Text_Streams.Memory_UTF8_Input;
 
@@ -10,7 +11,7 @@ with Messages;
 with Input;
 
 procedure Read_Message is
-   use type VSS.JSON.Pull_Readers.JSON_Event_Kind;
+   use type VSS.JSON.Streams.JSON_Stream_Element_Kind;
 
    Text    : constant Wide_Wide_String :=
      "{""range"":{""start"":{""line"":5,""character"":23},"
@@ -26,14 +27,14 @@ begin
    Stream.Set_Data (Blog_Utilities.Encode (Text));
    Reader.Set_Stream (Stream'Unchecked_Access);
 
-   if Reader.Read_Next /= VSS.JSON.Pull_Readers.Start_Document then
+   if Reader.Read_Next /= VSS.JSON.Streams.Start_Document then
       Success := False;
    end if;
 
    Input.Read (Reader, Message, Success);
 
    if Success
-     and then Reader.Read_Next /= VSS.JSON.Pull_Readers.End_Document
+     and then Reader.Read_Next /= VSS.JSON.Streams.End_Document
    then
       Success := False;
    end if;

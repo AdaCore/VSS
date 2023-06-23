@@ -20,9 +20,9 @@ package body JSON_Schema.Readers is
    --  all sub-schemas into Other map. Use Prefix for subschema names.
 
    Version_URL : constant array (Schema_Version) of URI :=
-     (Draft_4 => "http://json-schema.org/draft-04/schema#",
+     [Draft_4 => "http://json-schema.org/draft-04/schema#",
       Draft_6 => "http://json-schema.org/draft-06/schema#",
-      Draft_7 => "http://json-schema.org/draft-07/schema#");
+      Draft_7 => "http://json-schema.org/draft-07/schema#"];
 
    function Id_Key (Value : Schema_Version) return VSS.Strings.Virtual_String;
    --  Return `$id` or `id` depending on schema version

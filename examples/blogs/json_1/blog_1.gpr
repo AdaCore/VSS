@@ -7,7 +7,7 @@ project Blog_1 is
    for Main use ("write_message.adb", "read_message.adb");
 
    package Compiler is
-      for Switches ("Ada") use ("-g");
+      for Switches ("Ada") use ("-g", "-gnat2022");
    end Compiler;
 
 end Blog_1;

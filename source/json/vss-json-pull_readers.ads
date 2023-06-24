@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -8,24 +8,11 @@
 
 with VSS.Strings;
 
+with VSS.JSON.Streams.Cursors;
+
 package VSS.JSON.Pull_Readers is
 
    pragma Preelaborate;
-
-   type JSON_Event_Kind is
-     (No_Token,
-      Invalid,
-      Start_Document,
-      End_Document,
-      Start_Array,
-      End_Array,
-      Start_Object,
-      End_Object,
-      Key_Name,
-      String_Value,
-      Number_Value,
-      Boolean_Value,
-      Null_Value);
 
    type JSON_Reader_Error is
      (No_Error,
@@ -33,12 +20,14 @@ package VSS.JSON.Pull_Readers is
       Not_Valid,
       Premature_End_Of_Document);
 
-   type JSON_Pull_Reader is limited interface;
+   type JSON_Pull_Reader is limited interface
+     and VSS.JSON.Streams.Cursors.JSON_Stream_Cursor;
 
    function At_End (Self : JSON_Pull_Reader) return Boolean is abstract;
 
    function Read_Next
-     (Self : in out JSON_Pull_Reader) return JSON_Event_Kind is abstract;
+     (Self : in out JSON_Pull_Reader)
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind is abstract;
 
    procedure Read_Next (Self : in out JSON_Pull_Reader'Class);
 
@@ -56,43 +45,6 @@ package VSS.JSON.Pull_Readers is
      (Self    : in out JSON_Pull_Reader;
       Message : VSS.Strings.Virtual_String := VSS.Strings.Empty_Virtual_String)
    is abstract;
-
-   function Event_Kind
-     (Self : JSON_Pull_Reader) return JSON_Event_Kind is abstract;
-
-   function Is_Start_Document (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_End_Document (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_Start_Array (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_End_Array (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_Start_Object (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_End_Object (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_Key_Name (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_String_Value (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_Number_Value (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_Boolean_Value (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Is_Null_Value (Self : JSON_Pull_Reader'Class) return Boolean;
-
-   function Key_Name
-     (Self : JSON_Pull_Reader) return VSS.Strings.Virtual_String is abstract;
-
-   function String_Value
-     (Self : JSON_Pull_Reader) return VSS.Strings.Virtual_String is abstract;
-
-   function Number_Value
-     (Self : JSON_Pull_Reader) return VSS.JSON.JSON_Number is abstract;
-
-   function Boolean_Value
-     (Self : JSON_Pull_Reader) return Boolean is abstract;
 
    procedure Skip_Current_Array (Self : in out JSON_Pull_Reader) is abstract;
 

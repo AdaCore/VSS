@@ -7,6 +7,7 @@
 --  Common code for implementation of JSON parsers.
 
 with VSS.JSON.Pull_Readers;
+with VSS.JSON.Streams;
 with VSS.Text_Streams;
 
 package VSS.JSON.Implementation.Parsers is
@@ -22,9 +23,9 @@ package VSS.JSON.Implementation.Parsers is
    function At_End (Self : JSON_Parser_Base'Class) return Boolean;
    --  Return True when end of document has been processed.
 
-   function Event_Kind
+   function Element_Kind
      (Self : JSON_Parser_Base'Class)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
    --  Return current event.
 
    function Error
@@ -82,8 +83,8 @@ private
         VSS.JSON.Pull_Readers.No_Error;
       Message : VSS.Strings.Virtual_String;
 
-      Event   : VSS.JSON.Pull_Readers.JSON_Event_Kind :=
-        VSS.JSON.Pull_Readers.No_Token;
+      Event   : VSS.JSON.Streams.JSON_Stream_Element_Kind :=
+        VSS.JSON.Streams.None;
       Buffer  : VSS.Strings.Virtual_String;
       Boolean : Standard.Boolean;
       Number  : VSS.JSON.JSON_Number;

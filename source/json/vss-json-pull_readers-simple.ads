@@ -15,6 +15,25 @@ package VSS.JSON.Pull_Readers.Simple is
      (Self   : in out JSON_Simple_Pull_Reader'Class;
       Stream : not null VSS.Text_Streams.Input_Text_Stream_Access);
 
+   --  XXX GNAT 20230626: These functions can be moved to private part,
+   --  however, they are not visible then due to compiler's bug.
+
+   overriding function Element_Kind
+     (Self : JSON_Simple_Pull_Reader)
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
+
+   overriding function Boolean_Value
+     (Self : JSON_Simple_Pull_Reader) return Boolean;
+
+   overriding function Key_Name
+     (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
+
+   overriding function Number_Value
+     (Self : JSON_Simple_Pull_Reader) return VSS.JSON.JSON_Number;
+
+   overriding function String_Value
+     (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
+
 private
 
    type JSON_Simple_Pull_Reader is limited new JSON_Pull_Reader with record
@@ -22,9 +41,6 @@ private
    end record;
 
    overriding function At_End (Self : JSON_Simple_Pull_Reader) return Boolean;
-
-   overriding function Boolean_Value
-     (Self : JSON_Simple_Pull_Reader) return Boolean;
 
    overriding procedure Clear (Self : in out JSON_Simple_Pull_Reader);
 
@@ -35,23 +51,13 @@ private
    overriding function Error_Message
      (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
 
-   overriding function Event_Kind
-     (Self : JSON_Simple_Pull_Reader)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
-
-   overriding function Key_Name
-     (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
-
-   overriding function Number_Value
-     (Self : JSON_Simple_Pull_Reader) return VSS.JSON.JSON_Number;
-
    overriding procedure Raise_Error
      (Self    : in out JSON_Simple_Pull_Reader;
       Message : VSS.Strings.Virtual_String);
 
    overriding function Read_Next
      (Self : in out JSON_Simple_Pull_Reader)
-      return VSS.JSON.Pull_Readers.JSON_Event_Kind;
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
 
    overriding procedure Skip_Current_Array
      (Self : in out JSON_Simple_Pull_Reader);
@@ -61,8 +67,5 @@ private
 
    overriding procedure Skip_Current_Value
      (Self : in out JSON_Simple_Pull_Reader);
-
-   overriding function String_Value
-     (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String;
 
 end VSS.JSON.Pull_Readers.Simple;

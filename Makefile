@@ -147,17 +147,20 @@ check_html:
 	test ! -e .objs/tests/.fails
 
 check_install:
-	echo 'with "vss_text.gpr";'             >  example.gpr
-	echo 'with "vss_json.gpr";'             >> example.gpr
-	echo 'with "vss_regexp.gpr";'           >> example.gpr
-	echo 'project Example is'               >> example.gpr
-	echo '   for Main use ("example.adb");' >> example.gpr
-	echo 'end Example;'                     >> example.gpr
-	echo 'with VSS.Strings;'                >  example.adb
-	echo 'with VSS.JSON;'                   >> example.adb
-	echo 'with VSS.Regular_Expressions;'    >> example.adb
-	echo 'procedure Example is'             >> example.adb
-	echo 'begin null; end;'                 >> example.adb
+	echo 'with "vss_text.gpr";'                          >  example.gpr
+	echo 'with "vss_json.gpr";'                          >> example.gpr
+	echo 'with "vss_regexp.gpr";'                        >> example.gpr
+	echo 'project Example is'                            >> example.gpr
+	echo '   for Main use ("example.adb");'              >> example.gpr
+	echo '   package Compiler is'                        >> example.gpr
+	echo '      for Switches ("Ada") use ("-gnat2022");' >> example.gpr
+	echo '   end Compiler;'                              >> example.gpr
+	echo 'end Example;'                                  >> example.gpr
+	echo 'with VSS.Strings;'                             >  example.adb
+	echo 'with VSS.JSON;'                                >> example.adb
+	echo 'with VSS.Regular_Expressions;'                 >> example.adb
+	echo 'procedure Example is'                          >> example.adb
+	echo 'begin null; end;'                              >> example.adb
 	gprbuild -aP $(INSTALL_PROJECT_DIR) -P example.gpr
 	gprclean -aP $(INSTALL_PROJECT_DIR) -P example.gpr
 	rm -f example.*

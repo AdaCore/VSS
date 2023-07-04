@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -186,27 +186,35 @@ package body JSON_Schema.Writers.Outputs is
       Put ("begin"); New_Line;
       Put ("   for Item of Value loop"); New_Line;
       Put ("      case Item.Kind is"); New_Line;
-      Put ("         when VSS.JSON.Events.Start_Array =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.Start_Array =>"); New_Line;
       Put ("            Handler.Start_Array;"); New_Line;
-      Put ("         when VSS.JSON.Events.End_Array =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.End_Array =>"); New_Line;
       Put ("            Handler.End_Array;"); New_Line;
-      Put ("         when VSS.JSON.Events.Start_Object =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.Start_Object =>"); New_Line;
       Put ("            Handler.Start_Object;"); New_Line;
-      Put ("         when VSS.JSON.Events.End_Object =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.End_Object =>"); New_Line;
       Put ("            Handler.End_Object;"); New_Line;
-      Put ("         when VSS.JSON.Events.Key_Name =>"); New_Line;
-      Put ("            Handler.Key_Name (Item.Key);"); New_Line;
-      Put ("         when VSS.JSON.Events.String_Value =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.Key_Name =>"); New_Line;
+      Put ("            Handler.Key_Name (Item.Key_Name);"); New_Line;
+      Put ("         when VSS.JSON.Streams.String_Value =>"); New_Line;
       Put ("            Handler.String_Value (Item.String_Value);"); New_Line;
-      Put ("         when VSS.JSON.Events.Number_Value =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.Number_Value =>"); New_Line;
       Put ("            Handler.Number_Value (Item.Number_Value);"); New_Line;
-      Put ("         when VSS.JSON.Events.Boolean_Value =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.Boolean_Value =>"); New_Line;
       Put ("            Handler.Boolean_Value (Item.Boolean_Value);");
       New_Line;
-      Put ("         when VSS.JSON.Events.Null_Value =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.Null_Value =>"); New_Line;
       Put ("            Handler.Null_Value;"); New_Line;
-      Put ("         when VSS.JSON.Events.None =>"); New_Line;
+      Put ("         when VSS.JSON.Streams.None =>"); New_Line;
       Put ("            null;"); New_Line;
+      Put ("         when VSS.JSON.Streams.Invalid =>"); New_Line;
+      Put ("            raise Program_Error;"); New_Line;
+      Put ("         when VSS.JSON.Streams.Start_Document =>"); New_Line;
+      Put ("            raise Program_Error;"); New_Line;
+      Put ("         when VSS.JSON.Streams.End_Document =>"); New_Line;
+      Put ("            raise Program_Error;"); New_Line;
+      Put ("         when VSS.JSON.Streams.Comment =>"); New_Line;
+      Put ("            raise Program_Error;"); New_Line;
       Put ("      end case;"); New_Line;
       Put ("   end loop;"); New_Line;
       Put ("end Output_Any_Value;");
@@ -485,7 +493,7 @@ package body JSON_Schema.Writers.Outputs is
       Holders  : VSS.String_Vectors.Virtual_String_Vector)
    is
       use type VSS.Strings.Virtual_String;
-      use all type VSS.JSON.Events.JSON_Event_Kind;
+      use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;
 
       procedure Write_Key_And_Value
         (Field_Name : VSS.Strings.Virtual_String;

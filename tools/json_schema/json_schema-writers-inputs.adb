@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -306,39 +306,34 @@ package body JSON_Schema.Writers.Inputs is
       Put ("VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;"); New_Line;
       Put ("   Value   : out Any_Value'Class;"); New_Line;
       Put ("   Success : in out Boolean) is"); New_Line;
-      Put ("use type VSS.JSON.Pull_Readers.JSON_Event_Kind;"); New_Line;
+      Put ("use type VSS.JSON.Streams.JSON_Stream_Element_Kind;"); New_Line;
       Put ("begin"); New_Line;
-      Put ("case Reader.Event_Kind is"); New_Line;
-      Put ("when VSS.JSON.Pull_Readers.Start_Array =>"); New_Line;
-      Put ("Value.Append ((Kind => VSS.JSON.Events.Start_Array));"); New_Line;
+      Put ("case Reader.Element_Kind is"); New_Line;
+      Put ("when VSS.JSON.Streams.Start_Array =>"); New_Line;
+      Put ("Value.Append ((Kind => VSS.JSON.Streams.Start_Array));"); New_Line;
       Put ("Reader.Read_Next;"); New_Line;
-      Put ("while Success and Reader.Event_Kind /= ");
-      Put ("VSS.JSON.Pull_Readers.End_Array loop"); New_Line;
+      Put ("while Success and Reader.Element_Kind /= ");
+      Put ("VSS.JSON.Streams.End_Array loop"); New_Line;
       Put ("Input_Any_Value (Reader, Value, Success);"); New_Line;
       Put ("end loop;"); New_Line;
-      Put ("Value.Append ((Kind => VSS.JSON.Events.End_Array));"); New_Line;
-      Put ("when VSS.JSON.Pull_Readers.Start_Object =>"); New_Line;
-      Put ("Value.Append ((Kind => VSS.JSON.Events.Start_Object));"); New_Line;
+      Put ("Value.Append ((Kind => VSS.JSON.Streams.End_Array));"); New_Line;
+      Put ("when VSS.JSON.Streams.Start_Object =>"); New_Line;
+      Put ("Value.Append ((Kind => VSS.JSON.Streams.Start_Object));");
+      New_Line;
       Put ("Reader.Read_Next;"); New_Line;
-      Put ("while Success and Reader.Event_Kind = ");
-      Put ("VSS.JSON.Pull_Readers.Key_Name loop"); New_Line;
-      Put ("Value.Append ((VSS.JSON.Events.Key_Name, ");
-      Put ("Reader.Key_Name));"); New_Line;
+      Put ("while Success and Reader.Element_Kind = ");
+      Put ("VSS.JSON.Streams.Key_Name loop"); New_Line;
+      Put ("Value.Append (Reader.Element);"); New_Line;
       Put ("Reader.Read_Next;"); New_Line;
       Put ("Input_Any_Value (Reader, Value, Success);"); New_Line;
       Put ("end loop;"); New_Line;
-      Put ("Value.Append ((Kind => VSS.JSON.Events.End_Object));"); New_Line;
-      Put ("when VSS.JSON.Pull_Readers.String_Value =>"); New_Line;
-      Put ("Value.Append ((VSS.JSON.Events.String_Value, ");
-      Put ("Reader.String_Value));"); New_Line;
-      Put ("when VSS.JSON.Pull_Readers.Number_Value =>"); New_Line;
-      Put ("Value.Append ((VSS.JSON.Events.Number_Value, ");
-      Put ("Reader.Number_Value));"); New_Line;
-      Put ("when VSS.JSON.Pull_Readers.Boolean_Value =>"); New_Line;
-      Put ("Value.Append ((VSS.JSON.Events.Boolean_Value, ");
-      Put ("Reader.Boolean_Value));"); New_Line;
-      Put ("when VSS.JSON.Pull_Readers.Null_Value =>"); New_Line;
-      Put ("Value.Append ((Kind => VSS.JSON.Events.Null_Value));"); New_Line;
+      Put ("Value.Append ((Kind => VSS.JSON.Streams.End_Object));"); New_Line;
+      Put ("when VSS.JSON.Streams.String_Value"); New_Line;
+      Put ("   | VSS.JSON.Streams.Number_Value"); New_Line;
+      Put ("   | VSS.JSON.Streams.Boolean_Value"); New_Line;
+      Put ("   | VSS.JSON.Streams.Null_Value"); New_Line;
+      Put ("=>"); New_Line;
+      Put ("Value.Append (Reader.Element);"); New_Line;
       Put ("when others =>"); New_Line;
       Put ("Success := False;"); New_Line;
       Put ("end case;"); New_Line;
@@ -715,7 +710,7 @@ package body JSON_Schema.Writers.Inputs is
       Holders  : VSS.String_Vectors.Virtual_String_Vector)
    is
       use type VSS.Strings.Virtual_String;
-      use all type VSS.JSON.Events.JSON_Event_Kind;
+      use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;
 
       procedure Write_Value
         (Field_Name  : VSS.Strings.Virtual_String;

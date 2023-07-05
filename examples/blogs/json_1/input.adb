@@ -1,9 +1,10 @@
 
+with VSS.JSON.Streams;
 with VSS.Strings;
 
 package body Input is
 
-   use type VSS.JSON.Pull_Readers.JSON_Event_Kind;
+   use type VSS.JSON.Streams.JSON_Stream_Element_Kind;
    use type VSS.Strings.Virtual_String;
 
    procedure Read
@@ -27,10 +28,10 @@ package body Input is
    begin
       while Success loop
          case Reader.Read_Next is
-            when VSS.JSON.Pull_Readers.Key_Name =>
+            when VSS.JSON.Streams.Key_Name =>
                if Reader.Key_Name = "line" then
                   case Reader.Read_Next is
-                     when VSS.JSON.Pull_Readers.Number_Value =>
+                     when VSS.JSON.Streams.Number_Value =>
                         Item.Line :=
                           Natural (VSS.JSON.As_Integer (Reader.Number_Value));
 
@@ -40,7 +41,7 @@ package body Input is
 
                elsif Reader.Key_Name = "character" then
                   case Reader.Read_Next is
-                     when VSS.JSON.Pull_Readers.Number_Value =>
+                     when VSS.JSON.Streams.Number_Value =>
                         Item.Character :=
                           Natural (VSS.JSON.As_Integer (Reader.Number_Value));
 
@@ -52,10 +53,10 @@ package body Input is
                   Success := False;
                end if;
 
-            when VSS.JSON.Pull_Readers.Start_Object =>
+            when VSS.JSON.Streams.Start_Object =>
                null;
 
-            when VSS.JSON.Pull_Readers.End_Object =>
+            when VSS.JSON.Streams.End_Object =>
                exit;
 
             when others =>
@@ -75,7 +76,7 @@ package body Input is
    begin
       while Success loop
          case Reader.Read_Next is
-            when VSS.JSON.Pull_Readers.Key_Name =>
+            when VSS.JSON.Streams.Key_Name =>
                if Reader.Key_Name = "start" then
                   Read (Reader, Item.Range_Start, Success);
 
@@ -86,10 +87,10 @@ package body Input is
                   Success := False;
                end if;
 
-            when VSS.JSON.Pull_Readers.Start_Object =>
+            when VSS.JSON.Streams.Start_Object =>
                null;
 
-            when VSS.JSON.Pull_Readers.End_Object =>
+            when VSS.JSON.Streams.End_Object =>
                exit;
 
             when others =>
@@ -109,13 +110,13 @@ package body Input is
    begin
       while Success loop
          case Reader.Read_Next is
-            when VSS.JSON.Pull_Readers.Key_Name =>
+            when VSS.JSON.Streams.Key_Name =>
                if Reader.Key_Name = "range" then
                   Read (Reader, Item.Text_Range, Success);
 
                elsif Reader.Key_Name = "newText" then
                   case Reader.Read_Next is
-                     when VSS.JSON.Pull_Readers.String_Value =>
+                     when VSS.JSON.Streams.String_Value =>
                         Item.New_Text := Reader.String_Value;
 
                      when others =>
@@ -126,10 +127,10 @@ package body Input is
                   Success := False;
                end if;
 
-            when VSS.JSON.Pull_Readers.Start_Object =>
+            when VSS.JSON.Streams.Start_Object =>
                null;
 
-            when VSS.JSON.Pull_Readers.End_Object =>
+            when VSS.JSON.Streams.End_Object =>
                exit;
 
             when others =>

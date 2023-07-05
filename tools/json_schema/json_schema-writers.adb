@@ -608,7 +608,8 @@ package body JSON_Schema.Writers is
      (Map       : JSON_Schema.Readers.Schema_Map;
       Schema    : Schema_Access) return VSS.Strings.Virtual_String
    is
-      use all type VSS.JSON.Events.JSON_Event_Kind;
+      use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;
+
    begin
       if Schema.Ref.Is_Empty then
          for Property of Schema.Properties loop

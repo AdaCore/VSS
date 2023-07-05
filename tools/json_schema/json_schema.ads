@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,7 +11,7 @@ with Ada.Containers.Vectors;
 with VSS.Strings;
 with VSS.String_Vectors;
 with VSS.JSON;
-with VSS.JSON.Events;
+with VSS.JSON.Streams;
 
 package JSON_Schema is
    pragma Preelaborate;
@@ -67,7 +67,7 @@ package JSON_Schema is
      (Positive, Definitions.Simple_Types, Definitions."=");
 
    package JSON_Event_Vectors is new Ada.Containers.Vectors
-     (Positive, VSS.JSON.Events.JSON_Event, VSS.JSON.Events."=");
+     (Positive, VSS.JSON.Streams.JSON_Stream_Element, VSS.JSON.Streams."=");
 
    type JSON_Value is new JSON_Event_Vectors.Vector with null record;
    --  Any JSON values.

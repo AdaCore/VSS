@@ -6,6 +6,7 @@
 
 --  Common code for implementation of JSON parsers.
 
+private with VSS.Implementation.Character_Codes;
 with VSS.JSON.Pull_Readers;
 with VSS.JSON.Streams;
 with VSS.Text_Streams;
@@ -91,7 +92,7 @@ private
       Number  : VSS.JSON.JSON_Number;
 
       Stack   : Parse_Stack;
-      C       : Wide_Wide_Character;
+      C       : VSS.Unicode.Code_Point_Unit;
       --  Currently processed character. When end of stream is reached it sets
       --  to End_Of_Stream value.
    end record;
@@ -116,11 +117,6 @@ private
    --  Append current character to the text buffer
 
    procedure Store_Character
-     (Self      : in out JSON_Parser_Base'Class;
-      Character : Wide_Wide_Character);
-   --  Append given character to the text buffer
-
-   procedure Store_Character
      (Self : in out JSON_Parser_Base'Class;
       Code : VSS.Unicode.UTF16_Code_Unit);
    --  Append character with given code to the text buffer.
@@ -137,7 +133,23 @@ private
       Message : Wide_Wide_String) return Boolean;
    --  Set parser into document not valid state. Always return False.
 
-   End_Of_Stream : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#1F_FFFF#);
+   End_Of_Stream : constant VSS.Unicode.Code_Point_Unit :=
+     VSS.Unicode.Code_Point_Unit'Last;
+
+   Begin_Array     : constant :=
+     VSS.Implementation.Character_Codes.Left_Square_Bracket;
+   Begin_Object    : constant :=
+     VSS.Implementation.Character_Codes.Left_Curly_Bracket;
+   End_Array       : constant :=
+     VSS.Implementation.Character_Codes.Right_Square_Bracket;
+   End_Object      : constant :=
+     VSS.Implementation.Character_Codes.Right_Curly_Bracket;
+   Name_Separator  : constant :=
+     VSS.Implementation.Character_Codes.Colon;
+   Value_Separator : constant :=
+     VSS.Implementation.Character_Codes.Comma;
+   Decimal_Point   : constant :=
+     VSS.Implementation.Character_Codes.Full_Stop;
+   --  Common delimiter character codes.
 
 end VSS.JSON.Implementation.Parsers;

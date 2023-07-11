@@ -168,7 +168,7 @@ package body VSS.JSON.Implementation.Parsers is
          return False;
 
       else
-         Self.C := Wide_Wide_Character (Character);
+         Self.C := VSS.Characters.Virtual_Character'Pos (Character);
       end if;
 
       return True;
@@ -206,18 +206,7 @@ package body VSS.JSON.Implementation.Parsers is
 
    procedure Store_Character (Self : in out JSON_Parser_Base'Class) is
    begin
-      Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
-   end Store_Character;
-
-   ---------------------
-   -- Store_Character --
-   ---------------------
-
-   procedure Store_Character
-     (Self      : in out JSON_Parser_Base'Class;
-      Character : Wide_Wide_Character) is
-   begin
-      Self.Buffer.Append (VSS.Characters.Virtual_Character (Character));
+      Self.Buffer.Append (VSS.Characters.Virtual_Character'Val (Self.C));
    end Store_Character;
 
    ---------------------

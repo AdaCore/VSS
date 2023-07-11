@@ -12,8 +12,10 @@ with VSS.Implementation.UCD_Core;
 
 package body VSS.JSON.Implementation.Parsers.JSON5 is
 
+   use VSS.Implementation.Character_Codes;
    use type VSS.JSON.Streams.JSON_Stream_Element_Kind;
    use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
+   use type VSS.Unicode.Code_Point_Unit;
 
    function Parse_JSON_Text
      (Self : in out JSON_Parser_Base'Class) return Boolean;
@@ -77,78 +79,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       return VSS.Implementation.UCD_Core.Core_Data_Record;
    --  Retrieve core properties record for the given code point.
 
-   Nul                       : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_0000#);
-   Backspace                 : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_0008#);
-   Character_Tabulation      : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_0009#);
-   Line_Feed                 : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000A#);
-   Line_Tabulation           : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000B#);
-   Form_Feed                 : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000C#);
-   Carriage_Return           : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000D#);
-   Space                     : constant Wide_Wide_Character := ' ';  --  U+0020
-   Quotation_Mark            : constant Wide_Wide_Character := '"';  --  U+0022
-   Dollar_Sign               : constant Wide_Wide_Character := '$';  --  U+0024
-   Asterisk                  : constant Wide_Wide_Character := '*';  --  U+002A
-   Plus_Sign                 : constant Wide_Wide_Character := '+';  --  U+002B
-   Hyphen_Minus              : constant Wide_Wide_Character := '-';  --  U+002D
-   Apostrophe                : constant Wide_Wide_Character := ''';  --  U+0027
-   Solidus                   : constant Wide_Wide_Character := '/';  --  U+002F
-   Digit_Zero                : constant Wide_Wide_Character := '0';
-   Digit_One                 : constant Wide_Wide_Character := '1';
-   Digit_Nine                : constant Wide_Wide_Character := '9';
-   Latin_Capital_Letter_A    : constant Wide_Wide_Character := 'A';  --  U+0041
-   Latin_Capital_Letter_E    : constant Wide_Wide_Character := 'E';  --  U+0045
-   Latin_Capital_Letter_F    : constant Wide_Wide_Character := 'F';  --  U+0046
-   Latin_Capital_Letter_I    : constant Wide_Wide_Character := 'I';  --  U+0049
-   Latin_Capital_Letter_N    : constant Wide_Wide_Character := 'N';  --  U+004E
-   Latin_Capital_Letter_X    : constant Wide_Wide_Character := 'X';  --  U+0058
-   Reverse_Solidus           : constant Wide_Wide_Character := '\';  --  U+005C
-   Low_Line                  : constant Wide_Wide_Character := '_';  --  U+005F
-   Latin_Small_Letter_A      : constant Wide_Wide_Character := 'a';
-   Latin_Small_Letter_B      : constant Wide_Wide_Character := 'b';  --  U+0062
-   Latin_Small_Letter_E      : constant Wide_Wide_Character := 'e';
-   Latin_Small_Letter_F      : constant Wide_Wide_Character := 'f';  --  U+0066
-   Latin_Small_Letter_I      : constant Wide_Wide_Character := 'i';  --  U+0069
-   Latin_Small_Letter_L      : constant Wide_Wide_Character := 'l';  --  U+006C
-   Latin_Small_Letter_N      : constant Wide_Wide_Character := 'n';  --  U+006E
-   Latin_Small_Letter_R      : constant Wide_Wide_Character := 'r';  --  U+0072
-   Latin_Small_Letter_S      : constant Wide_Wide_Character := 's';  --  U+0071
-   Latin_Small_Letter_T      : constant Wide_Wide_Character := 't';  --  U+0074
-   Latin_Small_Letter_U      : constant Wide_Wide_Character := 'u';  --  U+0075
-   Latin_Small_Letter_V      : constant Wide_Wide_Character := 'v';  --  U+0076
-   Latin_Small_Letter_X      : constant Wide_Wide_Character := 'x';  --  U+0078
-   Latin_Small_Letter_Y      : constant Wide_Wide_Character := 'y';  --  U+0079
-
-   Begin_Array               : constant Wide_Wide_Character := '[';
-   Begin_Object              : constant Wide_Wide_Character := '{';
-   End_Array                 : constant Wide_Wide_Character := ']';
-   End_Object                : constant Wide_Wide_Character := '}';
-   Name_Separator            : constant Wide_Wide_Character := ':';
-   Value_Separator           : constant Wide_Wide_Character := ',';
-   Decimal_Point             : constant Wide_Wide_Character := '.';
-
-   No_Break_Space            : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_00A0#);
-
-   Zero_Width_Non_Joiner     : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_200C#);
-   Zero_Width_Joiner         : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_200D#);
-
-   Line_Separator            : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_2028#);
-   Paragraph_Separator       : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_2029#);
-
-   Zero_Width_No_Break_Space : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_FEFF#);
-
    -----------------------
    -- Extract_Core_Data --
    -----------------------
@@ -158,7 +88,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       return VSS.Implementation.UCD_Core.Core_Data_Record
    is
       use type VSS.Implementation.UCD_Core.Core_Offset;
-      use type VSS.Unicode.Code_Point;
 
       Block : constant VSS.Implementation.UCD_Core.Core_Index :=
         VSS.Implementation.UCD_Core.Core_Index
@@ -188,24 +117,23 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
          when Digit_Zero .. Digit_Nine =>
             Code :=
               Code * 16#10#
-                + (Wide_Wide_Character'Pos (Self.C)
-                     - Wide_Wide_Character'Pos (Digit_Zero));
+                + VSS.Unicode.UTF16_Code_Unit (Self.C - Digit_Zero);
 
             return True;
 
          when Latin_Capital_Letter_A .. Latin_Capital_Letter_F =>
             Code :=
               Code * 16#10#
-                 + (Wide_Wide_Character'Pos (Self.C)
-                     - Wide_Wide_Character'Pos (Latin_Capital_Letter_A) + 10);
+                + VSS.Unicode.UTF16_Code_Unit
+                    (Self.C - Latin_Capital_Letter_A + 10);
 
             return True;
 
          when Latin_Small_Letter_A .. Latin_Small_Letter_F =>
             Code :=
               Code * 16#10#
-                 + (Wide_Wide_Character'Pos (Self.C)
-                     - Wide_Wide_Character'Pos (Latin_Small_Letter_A) + 10);
+                + VSS.Unicode.UTF16_Code_Unit
+                    (Self.C - Latin_Small_Letter_A + 10);
 
             return True;
 
@@ -225,7 +153,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
    begin
       return
-        Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC
+        Extract_Core_Data (Self.C).GC
       in GC_Lu | GC_Ll | GC_Lt | GC_Lm | GC_Lo | GC_Nl | GC_Mn | GC_Mc
           | GC_Nd | GC_Pc;
    end Is_Identifier_Part;
@@ -240,7 +168,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
       use all type VSS.Implementation.UCD_Core.GC_Values;
 
    begin
-      return Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC = GC_Zs;
+      return Extract_Core_Data (Self.C).GC = GC_Zs;
    end Is_Space_Separator;
 
    -----------------------
@@ -252,7 +180,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
    begin
       return
-        Extract_Core_Data (Wide_Wide_Character'Pos (Self.C)).GC
+        Extract_Core_Data (Self.C).GC
           in GC_Lu | GC_Ll | GC_Lt | GC_Lm | GC_Lo | GC_Nl;
    end Is_Unicode_Letter;
 
@@ -958,7 +886,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                State := Decimal_Integral_Digits_Opt;
                Self.Store_Character;
                VSS.JSON.Implementation.Numbers.Int_Digit
-                 (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                 (Self.Number_State, Self.C);
 
             when Latin_Capital_Letter_I =>
                State := Number_I;
@@ -1040,7 +968,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      State := Decimal_Integral_Digits_Opt;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Int_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when Latin_Capital_Letter_I =>
                      State := Number_I;
@@ -1085,7 +1013,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Int_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when Decimal_Point =>
                      State := Decimal_Fraction_Digits_Opt;
@@ -1107,7 +1035,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      State := Decimal_Fraction_Digits_Opt;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Frac_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when others =>
                      return Self.Report_Error ("digit expected");
@@ -1118,7 +1046,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Frac_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Decimal_Exponent_Signed_Integer;
@@ -1134,7 +1062,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      State := Decimal_Exponent_Digits_Opt;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when Hyphen_Minus =>
                      State := Decimal_Exponent_Digits;
@@ -1155,7 +1083,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      State := Decimal_Exponent_Digits_Opt;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when others =>
                      return Self.Report_Error ("exp digit expected");
@@ -1166,7 +1094,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when others =>
                      State := Report_Decimal_Value;

@@ -8,8 +8,10 @@
 
 package body VSS.JSON.Implementation.Parsers.JSON is
 
+   use VSS.Implementation.Character_Codes;
    use type VSS.JSON.Streams.JSON_Stream_Element_Kind;
    use type VSS.JSON.Pull_Readers.JSON_Reader_Error;
+   use type VSS.Unicode.Code_Point_Unit;
 
    function Parse_JSON_Text
      (Parser : in out JSON_Parser_Base'Class) return Boolean;
@@ -32,47 +34,6 @@ package body VSS.JSON.Implementation.Parsers.JSON is
 
    function Parse_String
      (Parser : in out JSON_Parser_Base'Class) return Boolean;
-
-   Backspace              : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_0008#);
-   Character_Tabulation   : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_0009#);
-   Line_Feed              : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000A#);
-   Form_Feed              : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000C#);
-   Carriage_Return        : constant Wide_Wide_Character :=
-     Wide_Wide_Character'Val (16#00_000D#);
-   Space                  : constant Wide_Wide_Character := ' ';  --  U+0020
-   Quotation_Mark         : constant Wide_Wide_Character := '"';  --  U+0022
-   Hyphen_Minus           : constant Wide_Wide_Character := '-';
-   Plus_Sign              : constant Wide_Wide_Character := '+';
-   Reverse_Solidus        : constant Wide_Wide_Character := '\';  --  U+005C
-   Solidus                : constant Wide_Wide_Character := '/';  --  U+002F
-   Digit_Zero             : constant Wide_Wide_Character := '0';
-   Digit_One              : constant Wide_Wide_Character := '1';
-   Digit_Nine             : constant Wide_Wide_Character := '9';
-   Latin_Capital_Letter_A : constant Wide_Wide_Character := 'A';  --  U+0041
-   Latin_Capital_Letter_E : constant Wide_Wide_Character := 'E';  --  U+0045
-   Latin_Capital_Letter_F : constant Wide_Wide_Character := 'F';  --  U+0046
-   Latin_Small_Letter_A   : constant Wide_Wide_Character := 'a';
-   Latin_Small_Letter_B   : constant Wide_Wide_Character := 'b';  --  U+0062
-   Latin_Small_Letter_E   : constant Wide_Wide_Character := 'e';
-   Latin_Small_Letter_F   : constant Wide_Wide_Character := 'f';  --  U+0066
-   Latin_Small_Letter_L   : constant Wide_Wide_Character := 'l';
-   Latin_Small_Letter_N   : constant Wide_Wide_Character := 'n';  --  U+006E
-   Latin_Small_Letter_R   : constant Wide_Wide_Character := 'r';  --  U+0072
-   Latin_Small_Letter_S   : constant Wide_Wide_Character := 's';  --  U+0071
-   Latin_Small_Letter_T   : constant Wide_Wide_Character := 't';  --  U+0074
-   Latin_Small_Letter_U   : constant Wide_Wide_Character := 'u';  --  U+0075
-
-   Begin_Array            : constant Wide_Wide_Character := '[';
-   Begin_Object           : constant Wide_Wide_Character := '{';
-   End_Array              : constant Wide_Wide_Character := ']';
-   End_Object             : constant Wide_Wide_Character := '}';
-   Name_Separator         : constant Wide_Wide_Character := ':';
-   Value_Separator        : constant Wide_Wide_Character := ',';
-   Decimal_Point          : constant Wide_Wide_Character := '.';
 
    -----------
    -- Parse --
@@ -434,7 +395,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                State := Int_Digits;
                Self.Store_Character;
                VSS.JSON.Implementation.Numbers.Int_Digit
-                 (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                 (Self.Number_State, Self.C);
 
             when others =>
                raise Program_Error;
@@ -484,7 +445,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                      State := Int_Digits;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Int_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when others =>
                      return Self.Report_Error ("digit expected");
@@ -495,7 +456,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Int_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when Decimal_Point =>
                      State := Frac_Digit;
@@ -533,7 +494,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                      State := Frac_Digits;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Frac_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when others =>
                      return Self.Report_Error ("frac digit expected");
@@ -544,7 +505,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Frac_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Exp_Sign_Or_Digits;
@@ -560,7 +521,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                      State := Exp_Digits;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when Hyphen_Minus =>
                      State := Exp_Digit;
@@ -581,7 +542,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                      State := Exp_Digits;
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when others =>
                      return Self.Report_Error ("exp digit expected");
@@ -592,7 +553,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                   when Digit_Zero .. Digit_Nine =>
                      Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
-                       (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
+                       (Self.Number_State, Self.C);
 
                   when others =>
                      State := Report_Value;
@@ -848,24 +809,23 @@ package body VSS.JSON.Implementation.Parsers.JSON is
             when Digit_Zero .. Digit_Nine =>
                Code :=
                  Code * 16#10#
-                   + (Wide_Wide_Character'Pos (Self.C)
-                        - Wide_Wide_Character'Pos (Digit_Zero));
+                   + VSS.Unicode.UTF16_Code_Unit (Self.C - Digit_Zero);
 
                return True;
 
             when Latin_Capital_Letter_A .. Latin_Capital_Letter_F =>
                Code :=
                  Code * 16#10#
-                   + (Wide_Wide_Character'Pos (Self.C)
-                      - Wide_Wide_Character'Pos (Latin_Capital_Letter_A) + 10);
+                   + VSS.Unicode.UTF16_Code_Unit
+                       (Self.C - Latin_Capital_Letter_A + 10);
 
                return True;
 
             when Latin_Small_Letter_A .. Latin_Small_Letter_F =>
                Code :=
                  Code * 16#10#
-                   + (Wide_Wide_Character'Pos (Self.C)
-                        - Wide_Wide_Character'Pos (Latin_Small_Letter_A) + 10);
+                   + VSS.Unicode.UTF16_Code_Unit
+                       (Self.C - Latin_Small_Letter_A + 10);
 
                return True;
 
@@ -914,9 +874,7 @@ package body VSS.JSON.Implementation.Parsers.JSON is
                   when Quotation_Mark =>
                      State := Finish;
 
-                  when Wide_Wide_Character'Val (16#00_0000#)
-                     .. Wide_Wide_Character'Val (16#00_001F#)
-                  =>
+                  when 16#00_0000# .. 16#00_001F# =>
                      return Self.Report_Error ("unescaped control character");
 
                   when Reverse_Solidus =>

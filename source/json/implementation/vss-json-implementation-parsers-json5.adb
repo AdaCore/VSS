@@ -8,7 +8,6 @@
 
 with Ada.Unchecked_Conversion;
 
-with VSS.Characters;
 with VSS.Implementation.UCD_Core;
 
 package body VSS.JSON.Implementation.Parsers.JSON5 is
@@ -606,7 +605,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
          case Self.C is
             when Dollar_Sign | Low_Line =>
                State := Identifier_Part;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
 
             when Reverse_Solidus =>
                State := Escape;
@@ -617,7 +616,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                pragma Assert (Is_Unicode_Letter (Self));
 
                State := Identifier_Part;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
          end case;
       end if;
 
@@ -650,16 +649,14 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      | Zero_Width_Non_Joiner
                      | Zero_Width_Joiner
                   =>
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when Reverse_Solidus =>
                      State := Escape;
 
                   when others =>
                      if Is_Identifier_Part (Self) then
-                        Self.Buffer.Append
-                          (VSS.Characters.Virtual_Character (Self.C));
+                        Self.Store_Character;
 
                      else
                         State := Report_Key_Name;
@@ -939,37 +936,37 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
          case Self.C is
             when Plus_Sign =>
                State := JSON5_Numeric_Literal;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
                Self.Number_State.Minus := False;
 
             when Hyphen_Minus =>
                State := JSON5_Numeric_Literal;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
                Self.Number_State.Minus := True;
 
             when Decimal_Point =>
                State := Decimal_Fraction_Digits;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
                VSS.JSON.Implementation.Numbers.Decimal_Point
                  (Self.Number_State);
 
             when Digit_Zero =>
                State := Numeric_0;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
 
             when Digit_One .. Digit_Nine =>
                State := Decimal_Integral_Digits_Opt;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
                VSS.JSON.Implementation.Numbers.Int_Digit
                  (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
             when Latin_Capital_Letter_I =>
                State := Number_I;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
 
             when Latin_Capital_Letter_N =>
                State := Number_N;
-               Self.Buffer.Append (VSS.Characters.Virtual_Character (Self.C));
+               Self.Store_Character;
 
             when others =>
                raise Program_Error;
@@ -1031,32 +1028,27 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Decimal_Point =>
                      State := Decimal_Fraction_Digits;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Decimal_Point
                        (Self.Number_State);
 
                   when Digit_Zero =>
                      State := Numeric_0;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when Digit_One .. Digit_Nine =>
                      State := Decimal_Integral_Digits_Opt;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Int_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Latin_Capital_Letter_I =>
                      State := Number_I;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when Latin_Capital_Letter_N =>
                      State := Number_N;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      return
@@ -1068,8 +1060,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Decimal_Point =>
                      State := Decimal_Fraction_Digits_Opt;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Decimal_Point
                        (Self.Number_State);
 
@@ -1078,13 +1069,11 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Decimal_Exponent_Signed_Integer;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when Latin_Capital_Letter_X | Latin_Small_Letter_X =>
                      State := Hex_Digits;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      Self.Unsigned := 0;
 
                   when others =>
@@ -1094,22 +1083,19 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
             when Decimal_Integral_Digits_Opt =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Int_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Decimal_Point =>
                      State := Decimal_Fraction_Digits_Opt;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Decimal_Point
                        (Self.Number_State);
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Decimal_Exponent_Signed_Integer;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      State := Report_Decimal_Value;
@@ -1119,8 +1105,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Decimal_Fraction_Digits_Opt;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Frac_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
@@ -1131,15 +1116,13 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
             when Decimal_Fraction_Digits_Opt =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Frac_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Latin_Capital_Letter_E | Latin_Small_Letter_E =>
                      State := Decimal_Exponent_Signed_Integer;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      State := Report_Decimal_Value;
@@ -1149,21 +1132,18 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Decimal_Exponent_Digits_Opt;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
                   when Hyphen_Minus =>
                      State := Decimal_Exponent_Digits;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      Self.Number_State.Exp_Minus := True;
 
                   when Plus_Sign =>
                      State := Decimal_Exponent_Digits;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      return Self.Report_Error ("plus/minus or digit expected");
@@ -1173,8 +1153,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
                      State := Decimal_Exponent_Digits_Opt;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
@@ -1185,8 +1164,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
             when Decimal_Exponent_Digits_Opt =>
                case Self.C is
                   when Digit_Zero .. Digit_Nine =>
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      VSS.JSON.Implementation.Numbers.Exp_Digit
                        (Self.Number_State, Wide_Wide_Character'Pos (Self.C));
 
@@ -1206,8 +1184,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
                      begin
                         State := Hex_Digits_Opt;
-                        Self.Buffer.Append
-                          (VSS.Characters.Virtual_Character (Self.C));
+                        Self.Store_Character;
                         Success := Self.Hex_To_Code (Code);
                         pragma Assert (Success);
 
@@ -1238,8 +1215,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                         Success : Boolean;
 
                      begin
-                        Self.Buffer.Append
-                          (VSS.Characters.Virtual_Character (Self.C));
+                        Self.Store_Character;
                         Success := Self.Hex_To_Code (Code);
                         pragma Assert (Success);
 
@@ -1263,8 +1239,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_N =>
                      State := Number_IN;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      raise Program_Error;
@@ -1274,8 +1249,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_F =>
                      State := Number_INF;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      raise Program_Error;
@@ -1285,8 +1259,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_I =>
                      State := Number_INFI;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      return Self.Report_Error ("Infinity expected");
@@ -1296,8 +1269,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_N =>
                      State := Number_INFIN;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      raise Program_Error;
@@ -1307,8 +1279,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_I =>
                      State := Number_INFINI;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      raise Program_Error;
@@ -1318,8 +1289,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_T =>
                      State := Number_INFINIT;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      raise Program_Error;
@@ -1329,8 +1299,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_Y =>
                      State := Report_Special_Value;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      Self.Number := (Out_Of_Range, Self.Buffer);
 
                   when others =>
@@ -1341,8 +1310,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Small_Letter_A =>
                      State := Number_NA;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when others =>
                      raise Program_Error;
@@ -1352,8 +1320,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                case Self.C is
                   when Latin_Capital_Letter_N =>
                      State := Report_Special_Value;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                      Self.Number := (Out_Of_Range, Self.Buffer);
 
                   when others =>
@@ -1707,15 +1674,13 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
                   when Line_Separator | Paragraph_Separator =>
                      --  XXX JSON5: it is recommended to report warning
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when Reverse_Solidus =>
                      State.Current := Escape;
 
                   when others =>
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                end case;
 
             when Single_Character_Data =>
@@ -1728,15 +1693,13 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
                   when Line_Separator | Paragraph_Separator =>
                      --  XXX JSON5: it is recommended to report warning
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                   when Reverse_Solidus =>
                      State.Current := Escape;
 
                   when others =>
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
                end case;
 
             when Escape =>
@@ -1752,28 +1715,23 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
                   when Quotation_Mark =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Quotation_Mark));
+                     Self.Store_Character (Quotation_Mark);
 
                   when Apostrophe =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Apostrophe));
+                     Self.Store_Character (Apostrophe);
 
                   when Reverse_Solidus =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Reverse_Solidus));
+                     Self.Store_Character (Reverse_Solidus);
 
                   when Solidus =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Solidus));
+                     Self.Store_Character (Solidus);
 
                   when Digit_Zero =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Nul));
+                     Self.Store_Character (Nul);
 
                   when Digit_One .. Digit_Nine =>
                      return
@@ -1782,29 +1740,23 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
                   when Latin_Small_Letter_B =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Backspace));
+                     Self.Store_Character (Backspace);
 
                   when Latin_Small_Letter_F =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Form_Feed));
+                     Self.Store_Character (Form_Feed);
 
                   when Latin_Small_Letter_N =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Line_Feed));
+                     Self.Store_Character (Line_Feed);
 
                   when Latin_Small_Letter_R =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Carriage_Return));
+                     Self.Store_Character (Carriage_Return);
 
                   when Latin_Small_Letter_T =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character
-                          (Character_Tabulation));
+                     Self.Store_Character (Character_Tabulation);
 
                   when Latin_Small_Letter_U =>
                      State.Current := State.Default;
@@ -1817,16 +1769,14 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
 
                   when Latin_Small_Letter_V =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Line_Tabulation));
+                     Self.Store_Character (Line_Tabulation);
 
                   when Latin_Small_Letter_X =>
                      State.Current := Escape_X;
 
                   when others =>
                      State.Current := State.Default;
-                     Self.Buffer.Append
-                       (VSS.Characters.Virtual_Character (Self.C));
+                     Self.Store_Character;
 
                end case;
 
@@ -1852,8 +1802,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                   return Self.Report_Error ("hexadecimal letter expected");
                end if;
 
-               Self.Buffer.Append
-                 (VSS.Characters.Virtual_Character'Val (Self.Code_Unit_1));
+               Self.Store_Character (Self.Code_Unit_1);
 
             when Finish =>
                return True;
@@ -1880,9 +1829,6 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
    function Parse_Unicode_Escape_Sequence
      (Parser : in out JSON_Parser_Base'Class) return Boolean
    is
-      use type VSS.Unicode.Code_Point;
-      use type VSS.Unicode.UTF16_Code_Unit;
-
       State : Unicode_Escape_Sequence_State;
       Self  : JSON5_Parser'Class renames JSON5_Parser'Class (Parser);
 
@@ -1946,8 +1892,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                end if;
 
                if Self.Code_Unit_1 not in 16#D800# .. 16#DFFF# then
-                  Self.Buffer.Append
-                    (VSS.Characters.Virtual_Character'Val (Self.Code_Unit_1));
+                  Self.Store_Character (Self.Code_Unit_1);
 
                   return True;
 
@@ -2012,19 +1957,7 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                     Self.Report_Error ("low surrogate code point expected");
                end if;
 
-               declare
-                  Code : VSS.Unicode.Code_Point := 16#01_0000#;
-
-               begin
-                  Code :=
-                    Code
-                      + VSS.Unicode.Code_Point
-                         (Self.Code_Unit_1 and 16#03FF#) * 16#0400#
-                      + VSS.Unicode.Code_Point
-                         (Self.Code_Unit_2 and 16#03FF#);
-                  Self.Buffer.Append
-                    (VSS.Characters.Virtual_Character'Val (Code));
-               end;
+               Self.Store_Character (Self.Code_Unit_1, Self.Code_Unit_2);
 
                return True;
          end case;

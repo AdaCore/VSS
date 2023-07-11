@@ -9,6 +9,7 @@
 with VSS.JSON.Pull_Readers;
 with VSS.JSON.Streams;
 with VSS.Text_Streams;
+private with VSS.Unicode;
 
 package VSS.JSON.Implementation.Parsers is
 
@@ -110,6 +111,26 @@ private
    --  Attempt to read next character from the text stream. Return True is
    --  operation is successful; otherwise push (Parse, State) pair into the
    --  parser's state stack and return False.
+
+   procedure Store_Character (Self : in out JSON_Parser_Base'Class);
+   --  Append current character to the text buffer
+
+   procedure Store_Character
+     (Self      : in out JSON_Parser_Base'Class;
+      Character : Wide_Wide_Character);
+   --  Append given character to the text buffer
+
+   procedure Store_Character
+     (Self : in out JSON_Parser_Base'Class;
+      Code : VSS.Unicode.UTF16_Code_Unit);
+   --  Append character with given code to the text buffer.
+
+   procedure Store_Character
+     (Self : in out JSON_Parser_Base'Class;
+      High : VSS.Unicode.UTF16_Code_Unit;
+      Low  : VSS.Unicode.UTF16_Code_Unit);
+   --  Construct character from the given surrogate and append it to the text
+   --  buffer.
 
    function Report_Error
      (Self    : in out JSON_Parser_Base'Class;

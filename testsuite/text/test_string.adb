@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,6 +11,7 @@ with Test_Support;
 
 procedure Test_String is
 
+   procedure Test_Ends_With;
    procedure Test_Prepend;
    procedure Test_Replace;
    procedure Test_Tail;
@@ -20,6 +21,8 @@ procedure Test_String is
    --  internal string data.
    --
    --  This test requires valgrind.
+
+   procedure Test_Ends_With is separate;
 
    ------------------
    -- Test_Prepend --
@@ -195,6 +198,7 @@ procedure Test_String is
    end Test_V705_011;
 
 begin
+   Test_Ends_With;
    Test_Prepend;
    Test_Replace;
    Test_Tail;

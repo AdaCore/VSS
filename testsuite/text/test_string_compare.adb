@@ -181,15 +181,6 @@ procedure Test_String_Compare is
          Character'Val (16#D0#),
          Character'Val (16#B0#)]);
 
-   --  "𝜕 "
-   Suffix_1 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.Conversions.To_Virtual_String
-       ([Character'Val (16#F0#),
-         Character'Val (16#9D#),
-         Character'Val (16#9C#),
-         Character'Val (16#95#),
-         Character'Val (16#20#)]);
-
 begin
    ---------
    -- "=" --
@@ -472,62 +463,6 @@ begin
    end if;
 
    if Prefix_2.Starts_With (S1) then
-      raise Program_Error;
-   end if;
-
-   ----------
-   -- Ends --
-   ----------
-
-   if not SD1.Ends_With (SD2) then
-      raise Program_Error;
-   end if;
-
-   if not SD1.Ends_With (SE1) then
-      raise Program_Error;
-   end if;
-
-   if SD1.Ends_With (Prefix_1) then
-      raise Program_Error;
-   end if;
-
-   if SD1.Ends_With (Prefix_2) then
-      raise Program_Error;
-   end if;
-
-   if not SE1.Ends_With (SD1) then
-      raise Program_Error;
-   end if;
-
-   if not SE1.Ends_With (SE1) then
-      raise Program_Error;
-   end if;
-
-   if not SE1.Ends_With (SE2) then
-      raise Program_Error;
-   end if;
-
-   if not S1.Ends_With (SD1) then
-      raise Program_Error;
-   end if;
-
-   if not S1.Ends_With (SE1) then
-      raise Program_Error;
-   end if;
-
-   if not S1.Ends_With (Suffix_1) then
-      raise Program_Error;
-   end if;
-
-   if S1.Ends_With (Prefix_2) then
-      raise Program_Error;
-   end if;
-
-   if Prefix_1.Ends_With (S1) then
-      raise Program_Error;
-   end if;
-
-   if Prefix_2.Ends_With (S1) then
       raise Program_Error;
    end if;
 

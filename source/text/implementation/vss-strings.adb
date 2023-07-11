@@ -5,6 +5,7 @@
 --
 
 with VSS.Implementation.FNV_Hash;
+with VSS.Implementation.Line_Terminator;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
 with VSS.Implementation.UTF8_Casing;
@@ -530,6 +531,62 @@ package body VSS.Strings is
            Self_Handler.Ends_With
              (Self.Data, Suffix_Handler.all, Suffix.Data);
       end if;
+   end Ends_With;
+
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   function Ends_With
+     (Self   : Virtual_String'Class;
+      Suffix : VSS.Characters.Virtual_Character) return Boolean
+   is
+      Handler :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Self.Data);
+      Aux     : VSS.Implementation.Strings.String_Data;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      if Handler.Is_Empty (Self.Data) then
+         return False;
+
+      else
+         VSS.Implementation.Strings.Handler (Aux).Append
+           (Aux, VSS.Characters.Virtual_Character'Pos (Suffix), Offset);
+
+         return
+           Handler.Ends_With
+             (Self.Data, VSS.Implementation.Strings.Handler (Aux).all, Aux);
+      end if;
+   end Ends_With;
+
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   function Ends_With
+     (Self : Virtual_String'Class; Suffix : Line_Terminator) return Boolean is
+   begin
+      return
+        Self.Ends_With (VSS.Implementation.Line_Terminator.Sequence (Suffix));
+   end Ends_With;
+
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   function Ends_With
+     (Self   : Virtual_String'Class;
+      Suffix : Line_Terminator_Set) return Boolean is
+   begin
+      for J in Suffix'Range loop
+         if Suffix (J) and then Self.Ends_With (J) then
+            return True;
+         end if;
+      end loop;
+
+      return False;
    end Ends_With;
 
    --------------

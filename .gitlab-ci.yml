@@ -7,7 +7,6 @@ variables:
   - |
     set -x
     export PATH=/it/e3/bin:$PATH
-  - . ~/.aws_container_credentials
 
 .detect-branches:
   #  Version 1.

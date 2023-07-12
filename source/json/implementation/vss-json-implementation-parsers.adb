@@ -168,7 +168,7 @@ package body VSS.JSON.Implementation.Parsers is
          return False;
 
       else
-         Self.C := Wide_Wide_Character (Character);
+         Self.C := VSS.Characters.Virtual_Character'Pos (Character);
       end if;
 
       return True;
@@ -199,6 +199,48 @@ package body VSS.JSON.Implementation.Parsers is
    begin
       Self.Stream := Stream;
    end Set_Stream;
+
+   ---------------------
+   -- Store_Character --
+   ---------------------
+
+   procedure Store_Character (Self : in out JSON_Parser_Base'Class) is
+   begin
+      Self.Buffer.Append (VSS.Characters.Virtual_Character'Val (Self.C));
+   end Store_Character;
+
+   ---------------------
+   -- Store_Character --
+   ---------------------
+
+   procedure Store_Character
+     (Self : in out JSON_Parser_Base'Class;
+      Code : VSS.Unicode.UTF16_Code_Unit) is
+   begin
+      Self.Buffer.Append (VSS.Characters.Virtual_Character'Val (Code));
+   end Store_Character;
+
+   ---------------------
+   -- Store_Character --
+   ---------------------
+
+   procedure Store_Character
+     (Self : in out JSON_Parser_Base'Class;
+      High : VSS.Unicode.UTF16_Code_Unit;
+      Low  : VSS.Unicode.UTF16_Code_Unit)
+   is
+      use type VSS.Unicode.Code_Point;
+      use type VSS.Unicode.UTF16_Code_Unit;
+
+      Code : VSS.Unicode.Code_Point := 16#01_0000#;
+
+   begin
+      Code :=
+        Code
+          + VSS.Unicode.Code_Point (High and 16#03FF#) * 16#0400#
+          + VSS.Unicode.Code_Point (Low and 16#03FF#);
+      Self.Buffer.Append (VSS.Characters.Virtual_Character'Val (Code));
+   end Store_Character;
 
    ------------------
    -- String_Value --

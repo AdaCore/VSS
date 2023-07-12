@@ -7,6 +7,7 @@
 with Ada.Unchecked_Deallocation;
 with System.Storage_Elements;
 
+with VSS.Implementation.Character_Codes;
 with VSS.Implementation.String_Handlers;
 with VSS.Unicode;
 
@@ -17,26 +18,17 @@ package body VSS.Implementation.String_Vectors is
        (VSS.Implementation.String_Vectors.String_Vector_Data,
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
-   Line_Feed           : constant VSS.Unicode.Code_Point := 16#00_000A#;
-   Line_Tabulation     : constant VSS.Unicode.Code_Point := 16#00_000B#;
-   Form_Feed           : constant VSS.Unicode.Code_Point := 16#00_000C#;
-   Carriage_Return     : constant VSS.Unicode.Code_Point := 16#00_000D#;
-   Next_Line           : constant VSS.Unicode.Code_Point := 16#00_0085#;
-   Line_Separator      : constant VSS.Unicode.Code_Point := 16#00_2028#;
-   Paragraph_Separator : constant VSS.Unicode.Code_Point := 16#00_2029#;
-   --  XXX These constants should be moved into own package and reused between
-   --  all packages.
-
    Line_Terminator_To_Code_Point : constant
      array (VSS.Strings.Line_Terminator) of VSS.Unicode.Code_Point :=
-       [VSS.Strings.CR   => Carriage_Return,
-        VSS.Strings.LF   => Line_Feed,
-        VSS.Strings.CRLF => Carriage_Return,
-        VSS.Strings.NEL  => Next_Line,
-        VSS.Strings.VT   => Line_Tabulation,
-        VSS.Strings.FF   => Form_Feed,
-        VSS.Strings.LS   => Line_Separator,
-        VSS.Strings.PS   => Paragraph_Separator];
+       [VSS.Strings.CR   => VSS.Implementation.Character_Codes.Carriage_Return,
+        VSS.Strings.LF   => VSS.Implementation.Character_Codes.Line_Feed,
+        VSS.Strings.CRLF => VSS.Implementation.Character_Codes.Carriage_Return,
+        VSS.Strings.NEL  => VSS.Implementation.Character_Codes.Next_Line,
+        VSS.Strings.VT   => VSS.Implementation.Character_Codes.Line_Tabulation,
+        VSS.Strings.FF   => VSS.Implementation.Character_Codes.Form_Feed,
+        VSS.Strings.LS   => VSS.Implementation.Character_Codes.Line_Separator,
+        VSS.Strings.PS   =>
+          VSS.Implementation.Character_Codes.Paragraph_Separator];
    --  Mapping from Line_Terminator to code point of first character of the
    --  line terminator sequence. Only CRLF case requires longer sequence and
    --  it is processed separately.
@@ -233,7 +225,9 @@ package body VSS.Implementation.String_Vectors is
 
             if Terminator = VSS.Strings.CRLF then
                VSS.Implementation.Strings.Handler (Result).Append
-                 (Result, Line_Feed, Offset);
+                 (Result,
+                  VSS.Implementation.Character_Codes.Line_Feed,
+                  Offset);
             end if;
          end if;
       end loop;

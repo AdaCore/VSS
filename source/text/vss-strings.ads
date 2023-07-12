@@ -392,6 +392,20 @@ package VSS.Strings is
    --  whether search is case sensitive or not, and select algorithm for the
    --  last.
 
+   function Ends_With
+     (Self   : Virtual_String'Class;
+      Suffix : VSS.Characters.Virtual_Character) return Boolean;
+   --  Return True when Self has given Suffix.
+
+   function Ends_With
+     (Self : Virtual_String'Class; Suffix : Line_Terminator) return Boolean;
+   --  Return True when Self has given Suffix.
+
+   function Ends_With
+     (Self   : Virtual_String'Class;
+      Suffix : Line_Terminator_Set) return Boolean;
+   --  Return True when Self has given Suffix.
+
    function To_Virtual_String (Item : Wide_Wide_String) return Virtual_String;
    --  Convert given string into virtual string.
 

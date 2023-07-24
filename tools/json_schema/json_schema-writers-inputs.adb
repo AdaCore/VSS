@@ -592,7 +592,8 @@ package body JSON_Schema.Writers.Inputs is
 
       if not Schema.Any_Of.Is_Empty then
          --  Declaration items for union type reader
-         Put ("use all type VSS.JSON.Pull_Readers.JSON_Event_Kind;"); New_Line;
+         Put ("use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;");
+         New_Line;
          New_Line;
          Put ("Look_Ahead : ");
          Put ("VSS.JSON.Pull_Readers.Look_Ahead.JSON_Look_Ahead_Reader");

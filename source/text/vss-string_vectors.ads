@@ -26,7 +26,8 @@ package VSS.String_Vectors is
        Default_Iterator  => Iterate,
        Iterator_Element  => VSS.Strings.Virtual_String,
        Aggregate         => (Empty       => Empty_Virtual_String_Vector,
-                             Add_Unnamed => Append_Syntax_Sugar);
+                             Add_Unnamed => Append_Syntax_Sugar),
+       Preelaborable_Initialization;
 
    Empty_Virtual_String_Vector : constant Virtual_String_Vector;
 

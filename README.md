@@ -67,4 +67,4 @@ or submit PRs.
 
 ## License
 
-[GPL-3](LICENSE) with [GCC runtime library exception](COPYING.RUNTIME).
+[Apache License v2.0 with LLVM Exceptions](LICENSE.txt).

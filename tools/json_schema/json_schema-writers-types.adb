@@ -840,34 +840,69 @@ package body JSON_Schema.Writers.Types is
    is
       use type VSS.Strings.Virtual_String;
 
-      Fallback : constant VSS.Strings.Virtual_String :=
-        Ref_To_Type_Name (Name) & "_" & Property.Name;
-   begin
-      declare
-         Field_Name : constant VSS.Strings.Virtual_String :=
-           Escape_Keywords (Property.Name);
+      function Get_Default_Value (Field_Type : VSS.Strings.Virtual_String)
+        return VSS.Strings.Virtual_String;
+      --  Return default value for the record component
 
-         Field_Type : VSS.Strings.Virtual_String :=
-           Writers.Types.Field_Type (Map, Property.Schema, Required, Fallback);
+      -----------------------
+      -- Get_Default_Value --
+      -----------------------
+
+      function Get_Default_Value (Field_Type : VSS.Strings.Virtual_String)
+        return VSS.Strings.Virtual_String is
       begin
-         if Field_Type.Is_Empty then
-            --  Skip unneeded properties
-            return;
-         elsif Is_Holder then
-            Field_Type.Append ("_Holder");
-         elsif Field_Name.To_Lowercase = Field_Type.To_Lowercase then
-            Field_Type.Prepend (".");
-            Field_Type.Prepend (Root_Package);
+         if Required then
+            return VSS.Strings.Empty_Virtual_String;
+         elsif Field_Type = "Boolean"
+           or else Field_Type.Starts_With ("Enum.")
+         then
+            return Field_Type & "'First";
+         elsif Field_Type = "Integer" then
+            return "0";
+         elsif Field_Type = "Float" then
+            return "0.0";
+         else
+            return VSS.Strings.Empty_Virtual_String;
          end if;
 
-         Put (Field_Name);
-         Put (" : ");
-         Put (Field_Type);
-         Put (";");
-         New_Line;
+      end Get_Default_Value;
 
-         Write_Comment (Property.Schema.Description, 6);
-      end;
+      Fallback : constant VSS.Strings.Virtual_String :=
+        Ref_To_Type_Name (Name) & "_" & Property.Name;
+
+      Field_Name : constant VSS.Strings.Virtual_String :=
+        Escape_Keywords (Property.Name);
+
+      Field_Type : VSS.Strings.Virtual_String :=
+        Writers.Types.Field_Type (Map, Property.Schema, Required, Fallback);
+
+      Default  : constant VSS.Strings.Virtual_String :=
+        Get_Default_Value (Field_Type);
+
+   begin
+      if Field_Type.Is_Empty then
+         --  Skip unneeded properties
+         return;
+      elsif Is_Holder then
+         Field_Type.Append ("_Holder");
+      elsif Field_Name.To_Lowercase = Field_Type.To_Lowercase then
+         Field_Type.Prepend (".");
+         Field_Type.Prepend (Root_Package);
+      end if;
+
+      Put (Field_Name);
+      Put (" : ");
+      Put (Field_Type);
+
+      if not Default.Is_Empty then
+         Put (" := ");
+         Put (Default);
+      end if;
+
+      Put (";");
+      New_Line;
+
+      Write_Comment (Property.Schema.Description, 6);
    end Write_Record_Component;
 
    -----------------------

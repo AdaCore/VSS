@@ -15,11 +15,8 @@ package VSS.JSON.Pull_Readers.JSON5 is
      (Self   : in out JSON5_Pull_Reader'Class;
       Stream : not null VSS.Text_Streams.Input_Text_Stream_Access);
 
-private
-
-   type JSON5_Pull_Reader is limited new JSON_Pull_Reader with record
-      Parser : VSS.JSON.Implementation.Parsers.JSON5.JSON5_Parser;
-   end record;
+   --  XXX GNAT 20230626: These functions can be moved to private part,
+   --  however, they are not visible then due to compiler's bug.
 
    overriding function At_End (Self : JSON5_Pull_Reader) return Boolean;
 
@@ -64,5 +61,11 @@ private
 
    overriding function String_Value
      (Self : JSON5_Pull_Reader) return VSS.Strings.Virtual_String;
+
+private
+
+   type JSON5_Pull_Reader is limited new JSON_Pull_Reader with record
+      Parser : VSS.JSON.Implementation.Parsers.JSON5.JSON5_Parser;
+   end record;
 
 end VSS.JSON.Pull_Readers.JSON5;

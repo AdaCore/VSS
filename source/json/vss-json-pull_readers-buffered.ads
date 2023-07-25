@@ -24,6 +24,11 @@ package VSS.JSON.Pull_Readers.Buffered is
    procedure Unmark (Self : in out JSON_Buffered_Pull_Reader'Class);
    --  Remove position mark.
 
+   overriding function Key_Name
+     (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String;
+   --  GNAT 20230603: subprogram is invisible when declared in the private
+   --  part.
+
 private
 
    package JSON_Stream_Element_Vectors is
@@ -43,9 +48,6 @@ private
    overriding function Element_Kind
      (Self : JSON_Buffered_Pull_Reader)
       return VSS.JSON.Streams.JSON_Stream_Element_Kind;
-
-   overriding function Key_Name
-     (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String;
 
    overriding function String_Value
      (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String;

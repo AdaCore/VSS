@@ -341,7 +341,7 @@ package body Test_Support is
 
       for Testsuite of Controller.Testsuite_Set.Testsuites loop
 
-         Ada.Text_IO.Put (Output, "<testsuite name='");
+         Ada.Text_IO.Put (Output, " <testsuite name='");
 
          Ada.Text_IO.Put
            (Output, Ada.Strings.Unbounded.To_String (Testsuite.Name));
@@ -350,7 +350,7 @@ package body Test_Support is
 
          for Testcase of Testsuite.Testcases loop
 
-            Ada.Text_IO.Put (Output, "<testcase name='");
+            Ada.Text_IO.Put (Output, "  <testcase name='");
 
             Ada.Text_IO.Put
               (Output, Ada.Strings.Unbounded.To_String (Testcase.Name));
@@ -379,7 +379,7 @@ package body Test_Support is
             end case;
          end loop;
 
-         Ada.Text_IO.Put_Line (Output, "</testsuite>");
+         Ada.Text_IO.Put_Line (Output, " </testsuite>");
 
       end loop;
 

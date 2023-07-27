@@ -108,7 +108,7 @@ build_and_test:
 
       # Build VSS and run tests
       ( eval $(anod printenv --sandbox-dir /it/wave gnatall) ;\
-        make COVERAGE_MODE=gcov build-libs-static check ;\
+        make COVERAGE_MODE=gcov JUNIT_XML=junit.xml build-libs-static check ;\
         ENABLE_GCOV=y gcovr --print-summary --cobertura gcov.xml )
       make clean
 
@@ -117,12 +117,14 @@ build_and_test:
 
   coverage: /^\s*lines:\s*\d+.\d+\%/
   artifacts:
+    when: always
     reports:
       coverage_report:
         coverage_format: cobertura
         path: gcov.xml
       codequality:
         - spellcheck.json
+      junit: junit.xml
 
 build_gnatdoc:
   services:

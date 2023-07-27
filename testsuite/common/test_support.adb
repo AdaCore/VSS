@@ -90,9 +90,7 @@ package body Test_Support is
       Controller.Active_Testcase.Assertions := @ + 1;
 
       if not Condition then
-         raise Test_Failed with "at "
-                 & Location
-                 & (if Message /= "" then " " & Message else "");
+         Fail (Message, Location);
       end if;
    end Assert;
 
@@ -124,10 +122,7 @@ package body Test_Support is
 
    procedure Fail
      (Message  : String := "";
-      Location : String := GNAT.Source_Info.Source_Location)
-   is
-      pragma Unreferenced (Message, Location);
-
+      Location : String := GNAT.Source_Info.Source_Location) is
    begin
       if Controller.Active_Testcase.Name = "" then
          --  Start default testcase.
@@ -137,7 +132,9 @@ package body Test_Support is
 
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
-      raise Test_Failed;
+      raise Test_Failed with "at "
+              & Location
+              & (if Message /= "" then " " & Message else "");
    end Fail;
 
    --------------

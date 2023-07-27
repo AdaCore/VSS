@@ -7,9 +7,12 @@
 with Ada.Containers.Vectors;
 with Ada.Command_Line;
 with Ada.Environment_Variables;
+with Ada.Exceptions;
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
+
+with GNAT.Exception_Actions;
 
 package body Test_Support is
 
@@ -49,6 +52,9 @@ package body Test_Support is
    end record;
 
    overriding procedure Finalize (Self : in out Test_Information);
+
+   procedure Global_Unhandled_Exception
+     (Occurrence : Ada.Exceptions.Exception_Occurrence);
 
    Controller : Test_Information;
 
@@ -166,6 +172,35 @@ package body Test_Support is
          end loop;
       end loop;
    end Finalize;
+
+   --------------------------------
+   -- Global_Unhandled_Exception --
+   --------------------------------
+
+   procedure Global_Unhandled_Exception
+     (Occurrence : Ada.Exceptions.Exception_Occurrence)
+   is
+      use type Ada.Exceptions.Exception_Id;
+
+   begin
+      --  Set status of the active testcase depending of the unhandled
+      --  exception. It is case when default testsuite and default testcase
+      --  are used.
+
+      if Ada.Exceptions.Exception_Identity (Occurrence)
+           = Test_Failed'Identity
+      then
+         Controller.Active_Testcase.Status := Failed;
+
+      elsif Ada.Exceptions.Exception_Identity (Occurrence)
+              = Test_Skipped'Identity
+      then
+         Controller.Active_Testcase.Status := Skipped;
+
+      else
+         Controller.Active_Testcase.Status := Errored;
+      end if;
+   end Global_Unhandled_Exception;
 
    ------------------
    -- Run_Testcase --
@@ -355,4 +390,6 @@ package body Test_Support is
 begin
    Controller.Testsuite_Set.Name :=
      Ada.Strings.Unbounded.To_Unbounded_String (Ada.Command_Line.Command_Name);
+   GNAT.Exception_Actions.Register_Global_Unhandled_Action
+     (Global_Unhandled_Exception'Access);
 end Test_Support;

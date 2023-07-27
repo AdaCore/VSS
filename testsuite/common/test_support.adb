@@ -9,6 +9,7 @@ with Ada.Command_Line;
 with Ada.Environment_Variables;
 with Ada.Exceptions;
 with Ada.Finalization;
+with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
@@ -24,8 +25,9 @@ package body Test_Support is
    type Testcase_Status is (Unknown, Succeed, Failed, Errored, Skipped);
 
    type Testcase_Information is record
-      Name   : Ada.Strings.Unbounded.Unbounded_String;
-      Status : Testcase_Status := Unknown;
+      Name       : Ada.Strings.Unbounded.Unbounded_String;
+      Status     : Testcase_Status := Unknown;
+      Assertions : Natural := 0;
    end record;
 
    package Testcase_Vectors is
@@ -83,6 +85,10 @@ package body Test_Support is
          Start_Testcase (Default_Testcase);
       end if;
 
+      --  Increment assertions count
+
+      Controller.Active_Testcase.Assertions := @ + 1;
+
       if not Condition then
          raise Test_Failed with "at "
                  & Location
@@ -98,7 +104,8 @@ package body Test_Support is
    begin
       Controller.Active_Testsuite.Testcases.Append
         (Controller.Active_Testcase);
-      Controller.Active_Testcase := (Name => <>, Status => Succeed);
+      Controller.Active_Testcase :=
+        (Name => <>, Status => Unknown, Assertions => 0);
    end End_Testcase;
 
    -------------------
@@ -299,8 +306,9 @@ package body Test_Support is
       end if;
 
       Controller.Active_Testcase :=
-        (Name   => Ada.Strings.Unbounded.To_Unbounded_String (Name),
-         Status => Succeed);
+        (Name       => Ada.Strings.Unbounded.To_Unbounded_String (Name),
+         Status     => Succeed,
+         Assertions => 0);
    end Start_Testcase;
 
    ---------------------
@@ -355,6 +363,11 @@ package body Test_Support is
             Ada.Text_IO.Put
               (Output, Ada.Strings.Unbounded.To_String (Testcase.Name));
 
+            Ada.Text_IO.Put (Output, "' assertions='");
+            Ada.Text_IO.Put
+              (Output,
+               Ada.Strings.Fixed.Trim
+                 (Natural'Image (Testcase.Assertions), Ada.Strings.Both));
             Ada.Text_IO.Put (Output, "'");
 
             case Testcase.Status is

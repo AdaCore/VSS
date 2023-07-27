@@ -37,6 +37,10 @@
 --
 --  If some testcase failed/errored/skipped, execution of other testcases and
 --  testsuites continues.
+--
+--  It is possible to avoid call of Run_Testsuite when there is only single
+--  testsuite present, testsuite name <<DEFAULT>> will be created in such
+--  case. However, it is not recommended.
 
 with GNAT.Source_Info;
 

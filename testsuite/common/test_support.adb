@@ -15,6 +15,8 @@ package body Test_Support is
 
    use type Ada.Strings.Unbounded.Unbounded_String;
 
+   Default_Testsuite : constant String := "<<DEFAULT>>";
+
    type Testcase_Status is (Unknown, Succeed, Failed, Errored, Skipped);
 
    type Testcase_Information is record
@@ -119,6 +121,12 @@ package body Test_Support is
    overriding procedure Finalize (Self : in out Test_Information) is
       JUnit_XML_Variable : constant String := "JUNIT_XML";
    begin
+      if Controller.Active_Testsuite.Name = Default_Testsuite then
+         --  End default testsuite.
+
+         End_Testsuite;
+      end if;
+
       if Ada.Environment_Variables.Exists (JUnit_XML_Variable) then
          Write_JUnit_XML
            (Ada.Environment_Variables.Value (JUnit_XML_Variable));
@@ -222,6 +230,12 @@ package body Test_Support is
       if Controller.Active_Testcase.Name /= "" then
          raise Program_Error;
          --  XXX Nested testcases is not supported.
+      end if;
+
+      if Controller.Active_Testsuite.Name = "" then
+         --  Start default testsuite.
+
+         Start_Testsuite (Default_Testsuite);
       end if;
 
       Controller.Active_Testcase :=

@@ -191,6 +191,10 @@ package body Test_Support is
       use type Ada.Exceptions.Exception_Id;
 
    begin
+      if Controller.Active_Testcase.Name = "" then
+         Start_Testcase (Default_Testcase);
+      end if;
+
       --  Set status of the active testcase depending of the unhandled
       --  exception. It is case when default testsuite and default testcase
       --  are used.

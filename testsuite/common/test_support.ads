@@ -66,12 +66,12 @@ package Test_Support is
 
    procedure Fail
      (Message  : String := "";
-      Location : String := GNAT.Source_Info.Source_Location);
+      Location : String := GNAT.Source_Info.Source_Location) with No_Return;
    --  Terminates testcase execution and mark testcase as failed.
 
    procedure Skip
      (Message  : String := "";
-      Location : String := GNAT.Source_Info.Source_Location);
+      Location : String := GNAT.Source_Info.Source_Location) with No_Return;
    --  Terminates testcase execution and mark testcase as skipped.
 
 private

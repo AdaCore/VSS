@@ -39,8 +39,12 @@
 --  testsuites continues.
 --
 --  It is possible to avoid call of Run_Testsuite when there is only single
---  testsuite present, testsuite name <<DEFAULT>> will be created in such
---  case. However, it is not recommended.
+--  testsuite present, testsuite name DEFAULT_TESTSUITE will be created in
+--  such case. However, it is not recommended.
+--
+--  Likewise, it is possible to avoit call of Run_Testcase and use only Assert,
+--  Fail, Skip subprograms. Both default testsuite and testcase will be created
+--  in this case. It is not recommended too.
 
 with GNAT.Source_Info;
 

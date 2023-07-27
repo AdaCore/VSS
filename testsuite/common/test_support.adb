@@ -15,7 +15,8 @@ package body Test_Support is
 
    use type Ada.Strings.Unbounded.Unbounded_String;
 
-   Default_Testsuite : constant String := "<<DEFAULT>>";
+   Default_Testsuite : constant String := "DEFAULT_TESTSUITE";
+   Default_Testcase  : constant String := "DEFAULT_TESTCASE";
 
    type Testcase_Status is (Unknown, Succeed, Failed, Errored, Skipped);
 
@@ -70,6 +71,12 @@ package body Test_Support is
       Message   : String := "";
       Location  : String := GNAT.Source_Info.Source_Location) is
    begin
+      if Controller.Active_Testcase.Name = "" then
+         --  Start default testcase.
+
+         Start_Testcase (Default_Testcase);
+      end if;
+
       if not Condition then
          raise Test_Failed with "at "
                  & Location
@@ -109,6 +116,12 @@ package body Test_Support is
       pragma Unreferenced (Message, Location);
 
    begin
+      if Controller.Active_Testcase.Name = "" then
+         --  Start default testcase.
+
+         Start_Testcase (Default_Testcase);
+      end if;
+
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
       raise Test_Failed;
@@ -121,6 +134,12 @@ package body Test_Support is
    overriding procedure Finalize (Self : in out Test_Information) is
       JUnit_XML_Variable : constant String := "JUNIT_XML";
    begin
+      if Controller.Active_Testcase.Name = Default_Testcase then
+         --  End default testcase.
+
+         End_Testcase;
+      end if;
+
       if Controller.Active_Testsuite.Name = Default_Testsuite then
          --  End default testsuite.
 
@@ -216,6 +235,12 @@ package body Test_Support is
       pragma Unreferenced (Message, Location);
 
    begin
+      if Controller.Active_Testcase.Name = "" then
+         --  Start default testcase.
+
+         Start_Testcase (Default_Testcase);
+      end if;
+
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
       raise Test_Skipped;

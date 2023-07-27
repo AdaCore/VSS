@@ -6,6 +6,7 @@
 
 with Ada.Containers.Vectors;
 with Ada.Command_Line;
+with Ada.Environment_Variables;
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
@@ -55,6 +56,8 @@ package body Test_Support is
    procedure Start_Testcase (Name : String);
 
    procedure End_Testcase;
+
+   procedure Write_JUnit_XML (File : String);
 
    ------------
    -- Assert --
@@ -114,7 +117,13 @@ package body Test_Support is
    --------------
 
    overriding procedure Finalize (Self : in out Test_Information) is
+      JUnit_XML_Variable : constant String := "JUNIT_XML";
    begin
+      if Ada.Environment_Variables.Exists (JUnit_XML_Variable) then
+         Write_JUnit_XML
+           (Ada.Environment_Variables.Value (JUnit_XML_Variable));
+      end if;
+
       Ada.Text_IO.Put_Line
         (Ada.Strings.Unbounded.To_String (Controller.Testsuite_Set.Name)
          & ':');
@@ -235,6 +244,74 @@ package body Test_Support is
         (Name      => Ada.Strings.Unbounded.To_Unbounded_String (Name),
          Testcases => <>);
    end Start_Testsuite;
+
+   ---------------------
+   -- Write_JUnit_XML --
+   ---------------------
+
+   procedure Write_JUnit_XML (File : String) is
+      Output : Ada.Text_IO.File_Type;
+   begin
+      Ada.Text_IO.Create (Output, Name => File, Form => "WCEM=8");
+
+      Ada.Text_IO.Put_Line
+        (Output, "<?xml version='1.0' encoding='UTF-8' ?>");
+
+      Ada.Text_IO.Put (Output, "<testsuites name='");
+
+      Ada.Text_IO.Put
+        (Output,
+         Ada.Strings.Unbounded.To_String (Controller.Testsuite_Set.Name));
+
+      Ada.Text_IO.Put_Line (Output, "'>");
+
+      for Testsuite of Controller.Testsuite_Set.Testsuites loop
+
+         Ada.Text_IO.Put (Output, "<testsuite name='");
+
+         Ada.Text_IO.Put
+           (Output, Ada.Strings.Unbounded.To_String (Testsuite.Name));
+
+         Ada.Text_IO.Put_Line (Output, "'>");
+
+         for Testcase of Testsuite.Testcases loop
+
+            Ada.Text_IO.Put (Output, "<testcase name='");
+
+            Ada.Text_IO.Put
+              (Output, Ada.Strings.Unbounded.To_String (Testcase.Name));
+
+            Ada.Text_IO.Put (Output, "'");
+
+            case Testcase.Status is
+               when Unknown =>
+                  Ada.Text_IO.Put_Line
+                    (Output,
+                     ">BAD TESTSUITE: Unknown testcase status</testcase>");
+               when Succeed =>
+                  Ada.Text_IO.Put_Line (Output, "/>");
+               when Failed =>
+                  Ada.Text_IO.Put_Line
+                    (Output,
+                     "><failure>Test failed</failure></testcase>");
+               when Errored =>
+                  Ada.Text_IO.Put_Line
+                    (Output,
+                     "><error>Exception raised</error></testcase>");
+               when Skipped =>
+                  Ada.Text_IO.Put_Line
+                    (Output,
+                     "><skipped>Test skipped</skipped></testcase>");
+            end case;
+         end loop;
+
+         Ada.Text_IO.Put_Line (Output, "</testsuite>");
+
+      end loop;
+
+      Ada.Text_IO.Put_Line (Output, "</testsuites>");
+      Ada.Text_IO.Close (Output);
+   end Write_JUnit_XML;
 
 begin
    Controller.Testsuite_Set.Name :=

@@ -27,6 +27,7 @@ package body Test_Support is
    type Testcase_Information is record
       Name       : Ada.Strings.Unbounded.Unbounded_String;
       Status     : Testcase_Status := Unknown;
+      Message    : Ada.Strings.Unbounded.Unbounded_String;
       Assertions : Natural := 0;
    end record;
 
@@ -103,7 +104,7 @@ package body Test_Support is
       Controller.Active_Testsuite.Testcases.Append
         (Controller.Active_Testcase);
       Controller.Active_Testcase :=
-        (Name => <>, Status => Unknown, Assertions => 0);
+        (Name => <>, Status => Unknown, Message => <>, Assertions => 0);
    end End_Testcase;
 
    -------------------
@@ -129,6 +130,9 @@ package body Test_Support is
 
          Start_Testcase (Default_Testcase);
       end if;
+
+      Controller.Active_Testcase.Message :=
+        Ada.Strings.Unbounded.To_Unbounded_String (Message);
 
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
@@ -271,7 +275,7 @@ package body Test_Support is
      (Message  : String := "";
       Location : String := GNAT.Source_Info.Source_Location)
    is
-      pragma Unreferenced (Message, Location);
+      pragma Unreferenced (Location);
 
    begin
       if Controller.Active_Testcase.Name = "" then
@@ -279,6 +283,9 @@ package body Test_Support is
 
          Start_Testcase (Default_Testcase);
       end if;
+
+      Controller.Active_Testcase.Message :=
+        Ada.Strings.Unbounded.To_Unbounded_String (Message);
 
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
@@ -305,6 +312,7 @@ package body Test_Support is
       Controller.Active_Testcase :=
         (Name       => Ada.Strings.Unbounded.To_Unbounded_String (Name),
          Status     => Succeed,
+         Message    => <>,
          Assertions => 0);
    end Start_Testcase;
 
@@ -375,17 +383,30 @@ package body Test_Support is
                when Succeed =>
                   Ada.Text_IO.Put_Line (Output, "/>");
                when Failed =>
-                  Ada.Text_IO.Put_Line
+                  Ada.Text_IO.Put
+                    (Output, "><failure message='");
+                  Ada.Text_IO.Put
                     (Output,
-                     "><failure>Test failed</failure></testcase>");
+                     Ada.Strings.Unbounded.To_String (Testcase.Message));
+                  Ada.Text_IO.Put_Line
+                    (Output, "'></failure></testcase>");
                when Errored =>
                   Ada.Text_IO.Put_Line
                     (Output,
                      "><error>Exception raised</error></testcase>");
+
                when Skipped =>
-                  Ada.Text_IO.Put_Line
+                  --  There is no clear definition of use of the 'message'
+                  --  attribute of the 'skipped' tag. It is generated for
+                  --  compatibility with e3's XUnit XML convertor'.
+
+                  Ada.Text_IO.Put
+                    (Output, "><skipped message='");
+                  Ada.Text_IO.Put
                     (Output,
-                     "><skipped>Test skipped</skipped></testcase>");
+                     Ada.Strings.Unbounded.To_String (Testcase.Message));
+                  Ada.Text_IO.Put_Line
+                    (Output, "'/></testcase>");
             end case;
          end loop;
 

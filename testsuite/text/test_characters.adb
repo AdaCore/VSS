@@ -69,6 +69,8 @@ procedure Test_Characters is
 
    procedure Test_Properties is
    begin
+      Initialize_UCD;
+
       if not UCD_Loaded then
          Test_Support.Fail ("UCD is not available");
       end if;
@@ -302,8 +304,6 @@ procedure Test_Characters is
 begin
    Test_Support.Run_Testcase
      (Test_Well_Known'Access, "well-known-character-properties");
-
-   Initialize_UCD;
 
    Test_Support.Run_Testcase
      (Test_Properties'Access,

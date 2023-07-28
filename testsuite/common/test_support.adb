@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+with Ada.Characters.Latin_1;
 with Ada.Containers.Vectors;
 with Ada.Command_Line;
 with Ada.Directories;
@@ -148,6 +149,13 @@ package body Test_Support is
 
    overriding procedure Finalize (Self : in out Test_Information) is
       JUnit_XML_Variable : constant String := "XUNIT_XML_PATH";
+
+      Verbose            : constant Boolean :=
+        (for some J in 1 .. Ada.Command_Line.Argument_Count =>
+           Ada.Command_Line.Argument (J) = "--verbose")
+        or else
+          Ada.Environment_Variables.Exists ("VERBOSE_TEST_REPORT");
+
    begin
       if Controller.Active_Testcase.Name = Default_Testcase then
          --  End default testcase.
@@ -187,9 +195,28 @@ package body Test_Support is
          for Testcase of Testsuite.Testcases loop
             Ada.Text_IO.Put_Line
               ("    " & Ada.Strings.Unbounded.To_String (Testcase.Name)
-               & ": " & Testcase_Status'Image (Testcase.Status));
+               & ": " & Testcase_Status'Image (Testcase.Status)
+               & (if Verbose and then Testcase.Message /= ""
+                  then Ada.Characters.Latin_1.HT &
+                   Ada.Strings.Unbounded.To_String (Testcase.Message)
+                  else ""));
          end loop;
       end loop;
+
+      if (for some Testsuite of Controller.Testsuite_Set.Testsuites =>
+           (for some Testcase of Testsuite.Testcases =>
+             Testcase.Status /= Succeed))
+      then
+         Ada.Text_IO.New_Line;
+         Ada.Text_IO.Put_Line ("SOME TESTCASE HAS NOT SUCCEED!");
+
+         if not Verbose then
+            Ada.Text_IO.New_Line;
+            Ada.Text_IO.Put ("Run with `--verbose` option or ");
+            Ada.Text_IO.Put ("VERBOSE_TEST_REPORT environment set ");
+            Ada.Text_IO.Put_Line ("to see more info.");
+         end if;
+      end if;
    exception
       when E : others =>
          --  Handle all exceptions in the finalization.
@@ -260,8 +287,13 @@ package body Test_Support is
          Controller.Active_Testcase.Status := Skipped;
          End_Testcase;
 
-      when others =>
+      when E : others =>
          Controller.Active_Testcase.Status := Errored;
+
+         Controller.Active_Testcase.Message :=
+           Ada.Strings.Unbounded.To_Unbounded_String
+             (Ada.Exceptions.Exception_Information (E));
+
          End_Testcase;
    end Run_Testcase;
 

@@ -48,7 +48,7 @@ project VSS_Text_Tests is
    end Compiler;
 
    package Binder is
-      for Switches ("Ada") use ("-Wb");
+      for Switches ("Ada") use ("-Wb", "-Es");
    end Binder;
 
 end VSS_Text_Tests;

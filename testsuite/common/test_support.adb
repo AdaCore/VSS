@@ -30,6 +30,7 @@ package body Test_Support is
       Name       : Ada.Strings.Unbounded.Unbounded_String;
       Status     : Testcase_Status := Unknown;
       Message    : Ada.Strings.Unbounded.Unbounded_String;
+      Traceback  : Ada.Strings.Unbounded.Unbounded_String;
       Assertions : Natural := 0;
    end record;
 
@@ -105,8 +106,13 @@ package body Test_Support is
    begin
       Controller.Active_Testsuite.Testcases.Append
         (Controller.Active_Testcase);
+
       Controller.Active_Testcase :=
-        (Name => <>, Status => Unknown, Message => <>, Assertions => 0);
+        (Name       => <>,
+         Status     => Unknown,
+         Message    => <>,
+         Traceback  => <>,
+         Assertions => 0);
    end End_Testcase;
 
    -------------------
@@ -135,6 +141,9 @@ package body Test_Support is
 
       Controller.Active_Testcase.Message :=
         Ada.Strings.Unbounded.To_Unbounded_String (Message);
+
+      Controller.Active_Testcase.Traceback :=
+        Ada.Strings.Unbounded.To_Unbounded_String (Location);
 
       Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
@@ -200,6 +209,13 @@ package body Test_Support is
                   then Ada.Characters.Latin_1.HT &
                    Ada.Strings.Unbounded.To_String (Testcase.Message)
                   else ""));
+
+            if Verbose and Testcase.Traceback /= "" then
+               Ada.Text_IO.Put_Line
+                 (Ada.Strings.Unbounded.To_String (Testcase.Traceback));
+
+               Ada.Text_IO.New_Line;
+            end if;
          end loop;
       end loop;
 
@@ -292,6 +308,10 @@ package body Test_Support is
 
          Controller.Active_Testcase.Message :=
            Ada.Strings.Unbounded.To_Unbounded_String
+             (Ada.Exceptions.Exception_Message (E));
+
+         Controller.Active_Testcase.Traceback :=
+           Ada.Strings.Unbounded.To_Unbounded_String
              (Ada.Exceptions.Exception_Information (E));
 
          End_Testcase;
@@ -367,6 +387,7 @@ package body Test_Support is
         (Name       => Ada.Strings.Unbounded.To_Unbounded_String (Name),
          Status     => Succeed,
          Message    => <>,
+         Traceback  => <>,
          Assertions => 0);
    end Start_Testcase;
 
@@ -434,20 +455,37 @@ package body Test_Support is
                   Ada.Text_IO.Put_Line
                     (Output,
                      ">BAD TESTSUITE: Unknown testcase status</testcase>");
+
                when Succeed =>
                   Ada.Text_IO.Put_Line (Output, "/>");
+
                when Failed =>
-                  Ada.Text_IO.Put
-                    (Output, "><failure message='");
+                  Ada.Text_IO.Put (Output, "><failure message='");
+
                   Ada.Text_IO.Put
                     (Output,
                      Ada.Strings.Unbounded.To_String (Testcase.Message));
-                  Ada.Text_IO.Put_Line
-                    (Output, "'></failure></testcase>");
-               when Errored =>
+
+                  Ada.Text_IO.Put_Line (Output, "'>");
+
                   Ada.Text_IO.Put_Line
                     (Output,
-                     "><error>Exception raised</error></testcase>");
+                     Ada.Strings.Unbounded.To_String (Testcase.Traceback));
+
+                  Ada.Text_IO.Put_Line (Output, "</failure></testcase>");
+
+               when Errored =>
+                  Ada.Text_IO.Put_Line (Output, "><error>");
+
+                  Ada.Text_IO.Put
+                    (Output,
+                     Ada.Strings.Unbounded.To_String (Testcase.Message));
+
+                  Ada.Text_IO.Put_Line
+                    (Output,
+                     Ada.Strings.Unbounded.To_String (Testcase.Traceback));
+
+                  Ada.Text_IO.Put_Line (Output, "</error></testcase>");
 
                when Skipped =>
                   --  There is no clear definition of use of the 'message'

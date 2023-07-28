@@ -6,6 +6,7 @@
 
 with Ada.Containers.Vectors;
 with Ada.Command_Line;
+with Ada.Directories;
 with Ada.Environment_Variables;
 with Ada.Exceptions;
 with Ada.Finalization;
@@ -146,7 +147,7 @@ package body Test_Support is
    --------------
 
    overriding procedure Finalize (Self : in out Test_Information) is
-      JUnit_XML_Variable : constant String := "JUNIT_XML";
+      JUnit_XML_Variable : constant String := "XUNIT_XML_PATH";
    begin
       if Controller.Active_Testcase.Name = Default_Testcase then
          --  End default testcase.
@@ -161,8 +162,18 @@ package body Test_Support is
       end if;
 
       if Ada.Environment_Variables.Exists (JUnit_XML_Variable) then
-         Write_JUnit_XML
-           (Ada.Environment_Variables.Value (JUnit_XML_Variable));
+         declare
+            Path : constant String :=
+              Ada.Environment_Variables.Value (JUnit_XML_Variable);
+
+            Main : constant String := Ada.Directories.Base_Name
+              (Ada.Command_Line.Command_Name);
+
+            File : constant String := Ada.Directories.Compose
+              (Path, Main, "xml");
+         begin
+            Write_JUnit_XML (File);
+         end;
       end if;
 
       Ada.Text_IO.Put_Line
@@ -179,6 +190,13 @@ package body Test_Support is
                & ": " & Testcase_Status'Image (Testcase.Status));
          end loop;
       end loop;
+   exception
+      when E : others =>
+         --  Handle all exceptions in the finalization.
+         --  GDB can't catch them, because they raised in the runtime
+         --  finalization and this makes hard to debug.
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Information (E));
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
    end Finalize;
 
    --------------------------------
@@ -328,7 +346,7 @@ package body Test_Support is
    begin
       if Controller.Active_Testsuite.Name /= "" then
          raise Program_Error;
-         --  XXX Not implemented.
+         --  XXX Nested testsuites not implemented.
       end if;
 
       Controller.Active_Testsuite :=

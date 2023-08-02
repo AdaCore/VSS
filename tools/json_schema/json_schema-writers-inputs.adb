@@ -286,7 +286,7 @@ package body JSON_Schema.Writers.Inputs is
       New_Line;
 
       if Union_Types_Count > 0 then
-         Put ("with VSS.JSON.Pull_Readers.Look_Ahead;");
+         Put ("with VSS.JSON.Pull_Readers.Buffered;");
          New_Line;
       end if;
 
@@ -596,16 +596,20 @@ package body JSON_Schema.Writers.Inputs is
          New_Line;
          New_Line;
          Put ("Look_Ahead : ");
-         Put ("VSS.JSON.Pull_Readers.Look_Ahead.JSON_Look_Ahead_Reader");
+         Put ("VSS.JSON.Pull_Readers.Buffered.JSON_Buffered_Pull_Reader");
          Put (" (Reader'Access);"); New_Line;
          New_Line;
          Put ("Variant_Key : constant VSS.Strings.Virtual_String :=");
          Put (" ""kind"";");
          New_Line;
+         Put ("begin");
+         New_Line;
+         Put ("Look_Ahead.Mark;");
+         New_Line;
+      else
+         Put ("begin");
+         New_Line;
       end if;
-
-      Put ("begin");
-      New_Line;
 
       if not Schema.All_Of.Is_Empty or not Schema.Properties.Is_Empty then
          Write_Object_Reader (Map, Name, "", Schema, Holders);
@@ -938,7 +942,8 @@ package body JSON_Schema.Writers.Inputs is
       Put ("_Minimal_Perfect_Hash.Get_Index"); New_Line;
       Put ("(Look_Ahead.String_Value);"); New_Line;
       Put ("begin"); New_Line;
-      Put ("Look_Ahead.Rewind;"); New_Line;
+      Put ("Look_Ahead.Reset;"); New_Line;
+      Put ("Look_Ahead.Unmark;"); New_Line;
       New_Line;
       Put ("case Index is"); New_Line;
 

@@ -24,10 +24,20 @@ package VSS.JSON.Pull_Readers.Buffered is
    procedure Unmark (Self : in out JSON_Buffered_Pull_Reader'Class);
    --  Remove position mark.
 
+   --  GNAT 20230603: subprograms below are invisible when declared in the
+   --  private part.
+
+   overriding function Element_Kind
+     (Self : JSON_Buffered_Pull_Reader)
+      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
    overriding function Key_Name
      (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String;
-   --  GNAT 20230603: subprogram is invisible when declared in the private
-   --  part.
+   overriding function String_Value
+     (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String;
+   overriding function Number_Value
+     (Self : JSON_Buffered_Pull_Reader) return VSS.JSON.JSON_Number;
+   overriding function Boolean_Value
+     (Self : JSON_Buffered_Pull_Reader) return Boolean;
 
 private
 
@@ -44,19 +54,6 @@ private
       Current : Natural := 0;
       Store   : Boolean := False;
    end record with Preelaborable_Initialization;
-
-   overriding function Element_Kind
-     (Self : JSON_Buffered_Pull_Reader)
-      return VSS.JSON.Streams.JSON_Stream_Element_Kind;
-
-   overriding function String_Value
-     (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String;
-
-   overriding function Number_Value
-     (Self : JSON_Buffered_Pull_Reader) return VSS.JSON.JSON_Number;
-
-   overriding function Boolean_Value
-     (Self : JSON_Buffered_Pull_Reader) return Boolean;
 
    overriding function At_End
      (Self : JSON_Buffered_Pull_Reader) return Boolean;

@@ -853,9 +853,7 @@ package body JSON_Schema.Writers.Types is
       begin
          if Required then
             return VSS.Strings.Empty_Virtual_String;
-         elsif Field_Type = "Boolean"
-           or else Field_Type.Starts_With ("Enum.")
-         then
+         elsif Field_Type = "Boolean" then
             return Field_Type & "'First";
          elsif Field_Type = "Integer" then
             return "0";

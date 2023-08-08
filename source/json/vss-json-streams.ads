@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -27,6 +27,11 @@ package VSS.JSON.Streams is
       Boolean_Value,
       Null_Value);
    --  Kinds of elements in the JSON stream.
+
+   subtype Valid_JSON_Stream_Element_Kind is
+     JSON_Stream_Element_Kind range Start_Document .. Null_Value;
+   --  Valid stream element is an element that is not a special JSON parser
+   --  state.
 
    type JSON_Stream_Element (Kind : JSON_Stream_Element_Kind := None) is record
       case Kind is

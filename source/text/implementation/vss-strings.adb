@@ -41,6 +41,23 @@ package body VSS.Strings is
    end "&";
 
    ---------
+   -- "*" --
+   ---------
+
+   function "*"
+     (Left  : Character_Count;
+      Right : VSS.Characters.Virtual_Character) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         --  Result.Set_Capacity (Left);
+
+         for J in 1 .. Left loop
+            Result.Append (Right);
+         end loop;
+      end return;
+   end "*";
+
+   ---------
    -- "<" --
    ---------
 

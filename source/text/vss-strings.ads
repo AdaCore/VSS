@@ -221,6 +221,11 @@ package VSS.Strings is
    --     Right : VSS.Characters.Virtual_Character) return Virtual_String;
    --  --  Concatenation operator for virtual string and virtual characters.
 
+   function "*"
+     (Left  : Character_Count;
+      Right : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  Create string by repeating given number of given character.
+
    procedure Clear (Self : in out Virtual_String'Class);
    --  Remove all data.
 

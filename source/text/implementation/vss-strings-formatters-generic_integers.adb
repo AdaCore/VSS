@@ -48,13 +48,39 @@ package body VSS.Strings.Formatters.Generic_Integers is
       use type Interfaces.Unsigned_128;
       use type VSS.Unicode.Code_Point_Unit;
 
-      Buffer  : Wide_Wide_String (1 .. Integer_Type'Size);
-      First   : Positive := Buffer'Last + 1;
-      Options : Formatter_Options;
-      Value   : Interfaces.Unsigned_128;
-      Result  : VSS.Strings.Virtual_String;
-      Digit   : VSS.Unicode.Code_Point_Unit;
-      Length  : VSS.Strings.Grapheme_Cluster_Count;
+      Buffer   : Wide_Wide_String (1 .. Integer_Type'Size);
+      First    : Positive := Buffer'Last + 1;
+      Options  : Formatter_Options;
+      Negative : Boolean;
+      Value    : Interfaces.Unsigned_128;
+      Result   : VSS.Strings.Virtual_String;
+      Digit    : VSS.Unicode.Code_Point_Unit;
+      Length   : VSS.Strings.Grapheme_Cluster_Count;
+
+      procedure Append_Sign;
+
+      -----------------
+      -- Append_Sign --
+      -----------------
+
+      procedure Append_Sign is
+      begin
+         if Negative then
+            Result.Append (VSS.Characters.Latin.Hyphen_Minus);
+
+         else
+            case Options.Sign is
+               when Compact =>
+                  null;
+
+               when Space_Or_Minus =>
+                  Result.Append (VSS.Characters.Latin.Space);
+
+               when Plus_Or_Minus =>
+                  Result.Append (VSS.Characters.Latin.Plus_Sign);
+            end case;
+         end if;
+      end Append_Sign;
 
    begin
       Parse (Format.Format, Options);
@@ -66,24 +92,13 @@ package body VSS.Strings.Formatters.Generic_Integers is
             pragma Suppress (Overflow_Check);
 
          begin
-            Value := Interfaces.Unsigned_128 (-Self.Value);
+            Negative := True;
+            Value    := Interfaces.Unsigned_128 (-Self.Value);
          end;
 
-         Result.Append ('-');
-
       else
-         Value := Interfaces.Unsigned_128 (Self.Value);
-
-         case Options.Sign is
-            when Compact =>
-               null;
-
-            when Space_Or_Minus =>
-               Result.Append (' ');
-
-            when Plus_Or_Minus =>
-               Result.Append ('+');
-         end case;
+         Negative := False;
+         Value    := Interfaces.Unsigned_128 (Self.Value);
       end if;
 
       --  Convert positive integer value into the text representation.
@@ -114,26 +129,32 @@ package body VSS.Strings.Formatters.Generic_Integers is
          Value := Value / Interfaces.Unsigned_128 (Options.Base);
       end loop;
 
-      --  Fill leading zeros/spaces.
+      --  Fill leading zeros/spaces and sign.
 
-      if Options.Width /= 0 then
-         Length :=
-           VSS.Strings.Grapheme_Cluster_Count (Buffer'Last - First + 1);
+      Length := VSS.Strings.Grapheme_Cluster_Count (Buffer'Last - First + 1);
+
+      if Options.Width = 0 then
+         Append_Sign;
+
+      elsif Options.Leading_Zeros then
+         Append_Sign;
 
          for J in reverse Length + 1 .. Options.Width loop
-            if Options.Leading_Zeros then
-               Result.Append (VSS.Characters.Latin.Digit_Zero);
+            Result.Append (VSS.Characters.Latin.Digit_Zero);
 
-               if Options.Group /= 0
-                 and then (J - 1) mod Options.Group = 0
-               then
-                  Result.Append (Options.Separator);
-               end if;
-
-            else
-               Result.Append (VSS.Characters.Latin.Space);
+            if Options.Group /= 0
+              and then (J - 1) mod Options.Group = 0
+            then
+               Result.Append (Options.Separator);
             end if;
          end loop;
+
+      else
+         for J in reverse Length + 1 .. Options.Width loop
+            Result.Append (VSS.Characters.Latin.Space);
+         end loop;
+
+         Append_Sign;
       end if;
 
       --  Append text representation.

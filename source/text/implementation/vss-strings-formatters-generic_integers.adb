@@ -4,7 +4,34 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+with Interfaces;
+
+with VSS.Characters.Latin;
+with VSS.Implementation.Character_Codes;
+with VSS.Implementation.String_Handlers;
+with VSS.Unicode;
+
 package body VSS.Strings.Formatters.Generic_Integers is
+
+   type Sign_Options is
+     (Compact,
+      --  Don't preserve space for sign, but start negative values with
+      --  hyphen-minus.
+      Space_Or_Minus,
+      --  Preserve space for sign, fill it by whitespace for positive values.
+      Plus_Or_Minus);
+      --  Preserve space for sign, fill it by plus sign for positive values.
+
+   type Formatter_Options is record
+      Sign          : Sign_Options                       := Compact;
+      Width         : VSS.Strings.Grapheme_Cluster_Count := 0;
+      Leading_Zeros : Boolean                            := False;
+      Base          : Natural                            := 10;
+   end record;
+
+   procedure Parse
+     (Format  : VSS.Strings.Virtual_String;
+      Options : in out Formatter_Options);
 
    ------------
    -- Format --
@@ -15,18 +42,91 @@ package body VSS.Strings.Formatters.Generic_Integers is
       Format : VSS.Strings.Formatters.Format_Information)
       return VSS.Strings.Virtual_String
    is
-      Buffer : constant Wide_Wide_String :=
-        Integer_Type'Wide_Wide_Image (Self.Value);
+      use VSS.Implementation.Character_Codes;
+      use type Interfaces.Integer_128;
+      use type VSS.Unicode.Code_Point_Unit;
+
+      Buffer  : Wide_Wide_String (1 .. Integer_Type'Size);
+      First   : Positive := Buffer'Last + 1;
+      Options : Formatter_Options;
+      Value   : Interfaces.Integer_128 := Interfaces.Integer_128 (Self.Value);
+      Result  : VSS.Strings.Virtual_String;
+      Digit   : VSS.Unicode.Code_Point_Unit;
+      Length  : VSS.Strings.Grapheme_Cluster_Count;
 
    begin
-      if Buffer (Buffer'First) = ' ' then
-         return
-           VSS.Strings.To_Virtual_String
-             (Buffer (Buffer'First + 1 .. Buffer'Last));
+      Parse (Format.Format, Options);
+
+      --  Process sign
+
+      if Value < 0 then
+         Value := -Value;
+         Result.Append ('-');
 
       else
-         return VSS.Strings.To_Virtual_String (Buffer);
+         case Options.Sign is
+            when Compact =>
+               null;
+
+            when Space_Or_Minus =>
+               Result.Append (' ');
+
+            when Plus_Or_Minus =>
+               Result.Append ('+');
+         end case;
       end if;
+
+      --  Convert positive integer value into the text representation.
+
+      if Value = 0 then
+         First := @ - 1;
+         Buffer (First) := Wide_Wide_Character'Val (Digit_Zero);
+      end if;
+
+      while Value /= 0 loop
+         Digit :=
+           VSS.Unicode.Code_Point_Unit
+             (Value mod Interfaces.Integer_128 (Options.Base));
+
+         if Digit in 0 .. 9 then
+            First := @ - 1;
+            Buffer (First) := Wide_Wide_Character'Val (Digit + Digit_Zero);
+
+         elsif Digit in 10 .. 25 then
+            First := @ - 1;
+            Buffer (First) :=
+              Wide_Wide_Character'Val (Digit - 10 + Latin_Capital_Letter_A);
+
+         else
+            raise Program_Error;
+         end if;
+
+         Value := Value / Interfaces.Integer_128 (Options.Base);
+      end loop;
+
+      --  Fill leading zeros/spaces.
+
+      if Options.Width /= 0 then
+         Length :=
+           VSS.Strings.Grapheme_Cluster_Count (Buffer'Last - First + 1);
+
+         for J in 1 .. Options.Width - Length loop
+            if Options.Leading_Zeros then
+               Result.Append (VSS.Characters.Latin.Digit_Zero);
+
+            else
+               Result.Append (VSS.Characters.Latin.Space);
+            end if;
+         end loop;
+      end if;
+
+      --  Append text representation.
+
+      for J in First .. Buffer'Last loop
+         Result.Append (VSS.Characters.Virtual_Character (Buffer (J)));
+      end loop;
+
+      return Result;
    end Format;
 
    -----------
@@ -58,5 +158,111 @@ package body VSS.Strings.Formatters.Generic_Integers is
    begin
       return Self.Name;
    end Name;
+
+   -----------
+   -- Parse --
+   -----------
+
+   procedure Parse
+     (Format  : VSS.Strings.Virtual_String;
+      Options : in out Formatter_Options)
+   is
+      use VSS.Implementation.Character_Codes;
+      use type VSS.Unicode.Code_Point_Unit;
+
+      type States is (Initial, Zero_Width_Base, Width, Base, Error);
+
+      Handler  :
+        constant VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Format.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+      Code     : VSS.Unicode.Code_Point'Base;
+      State    : States := Initial;
+
+   begin
+      Handler.Before_First_Character (Format.Data, Position);
+
+      while Handler.Forward_Element (Format.Data, Position, Code) loop
+         case State is
+            when Initial =>
+               case Code is
+                  when Plus_Sign =>
+                     State        := Zero_Width_Base;
+                     Options.Sign := Plus_Or_Minus;
+
+                  when Hyphen_Minus =>
+                     State        := Zero_Width_Base;
+                     Options.Sign := Space_Or_Minus;
+
+                  when Digit_Zero =>
+                     State                 := Width;
+                     Options.Leading_Zeros := True;
+                     Options.Width         := 0;
+
+                  when Digit_One .. Digit_Nine =>
+                     State                 := Width;
+                     Options.Leading_Zeros := False;
+                     Options.Width         :=
+                       VSS.Strings.Grapheme_Cluster_Count (Code - Digit_Zero);
+
+                  when Number_Sign =>
+                     State        := Base;
+                     Options.Base := 0;
+
+                  when others =>
+                     State := Error;
+               end case;
+
+            when Zero_Width_Base =>
+               case Code is
+                  when Digit_Zero =>
+                     State                 := Width;
+                     Options.Leading_Zeros := True;
+                     Options.Width         := 0;
+
+                  when Digit_One .. Digit_Nine =>
+                     State                 := Width;
+                     Options.Leading_Zeros := False;
+                     Options.Width         :=
+                       VSS.Strings.Grapheme_Cluster_Count (Code - Digit_Zero);
+
+                  when Number_Sign =>
+                     State        := Base;
+                     Options.Base := 0;
+
+                  when others =>
+                     State := Error;
+               end case;
+
+            when Width =>
+               case Code is
+                  when Digit_Zero .. Digit_Nine =>
+                     Options.Width :=
+                       @ * 10
+                         + VSS.Strings.Grapheme_Cluster_Count
+                             (Code - Digit_Zero);
+
+                  when Number_Sign =>
+                     State        := Base;
+                     Options.Base := 0;
+
+                  when others =>
+                     State := Error;
+               end case;
+
+            when Base =>
+               case Code is
+                  when Digit_Zero .. Digit_Nine =>
+                     Options.Base := @ * 10 + Natural (Code - Digit_Zero);
+
+                  when others =>
+                     State := Error;
+               end case;
+
+            when Error =>
+               exit;
+         end case;
+      end loop;
+   end Parse;
 
 end VSS.Strings.Formatters.Generic_Integers;

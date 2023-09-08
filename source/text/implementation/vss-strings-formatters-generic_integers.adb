@@ -45,13 +45,13 @@ package body VSS.Strings.Formatters.Generic_Integers is
       return VSS.Strings.Virtual_String
    is
       use VSS.Implementation.Character_Codes;
-      use type Interfaces.Integer_128;
+      use type Interfaces.Unsigned_128;
       use type VSS.Unicode.Code_Point_Unit;
 
       Buffer  : Wide_Wide_String (1 .. Integer_Type'Size);
       First   : Positive := Buffer'Last + 1;
       Options : Formatter_Options;
-      Value   : Interfaces.Integer_128 := Interfaces.Integer_128 (Self.Value);
+      Value   : Interfaces.Unsigned_128;
       Result  : VSS.Strings.Virtual_String;
       Digit   : VSS.Unicode.Code_Point_Unit;
       Length  : VSS.Strings.Grapheme_Cluster_Count;
@@ -61,11 +61,19 @@ package body VSS.Strings.Formatters.Generic_Integers is
 
       --  Process sign
 
-      if Value < 0 then
-         Value := -Value;
+      if Self.Value < 0 then
+         declare
+            pragma Suppress (Overflow_Check);
+
+         begin
+            Value := Interfaces.Unsigned_128 (-Self.Value);
+         end;
+
          Result.Append ('-');
 
       else
+         Value := Interfaces.Unsigned_128 (Self.Value);
+
          case Options.Sign is
             when Compact =>
                null;
@@ -88,7 +96,7 @@ package body VSS.Strings.Formatters.Generic_Integers is
       while Value /= 0 loop
          Digit :=
            VSS.Unicode.Code_Point_Unit
-             (Value mod Interfaces.Integer_128 (Options.Base));
+             (Value mod Interfaces.Unsigned_128 (Options.Base));
 
          if Digit in 0 .. 9 then
             First := @ - 1;
@@ -103,7 +111,7 @@ package body VSS.Strings.Formatters.Generic_Integers is
             raise Program_Error;
          end if;
 
-         Value := Value / Interfaces.Integer_128 (Options.Base);
+         Value := Value / Interfaces.Unsigned_128 (Options.Base);
       end loop;
 
       --  Fill leading zeros/spaces.

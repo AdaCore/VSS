@@ -27,6 +27,8 @@ package body VSS.Strings.Formatters.Generic_Integers is
       Width         : VSS.Strings.Grapheme_Cluster_Count := 0;
       Leading_Zeros : Boolean                            := False;
       Base          : Natural                            := 10;
+      Group         : VSS.Strings.Grapheme_Cluster_Count := 0;
+      Separator     : VSS.Characters.Virtual_Character   := '_';
    end record;
 
    procedure Parse
@@ -110,9 +112,15 @@ package body VSS.Strings.Formatters.Generic_Integers is
          Length :=
            VSS.Strings.Grapheme_Cluster_Count (Buffer'Last - First + 1);
 
-         for J in 1 .. Options.Width - Length loop
+         for J in reverse Length + 1 .. Options.Width loop
             if Options.Leading_Zeros then
                Result.Append (VSS.Characters.Latin.Digit_Zero);
+
+               if Options.Group /= 0
+                 and then (J - 1) mod Options.Group = 0
+               then
+                  Result.Append (Options.Separator);
+               end if;
 
             else
                Result.Append (VSS.Characters.Latin.Space);
@@ -124,6 +132,14 @@ package body VSS.Strings.Formatters.Generic_Integers is
 
       for J in First .. Buffer'Last loop
          Result.Append (VSS.Characters.Virtual_Character (Buffer (J)));
+
+         if Options.Group /= 0
+           and then J /= Buffer'Last
+           and then VSS.Strings.Grapheme_Cluster_Count (Buffer'Last - J)
+                      mod Options.Group = 0
+         then
+            Result.Append (Options.Separator);
+         end if;
       end loop;
 
       return Result;
@@ -170,7 +186,8 @@ package body VSS.Strings.Formatters.Generic_Integers is
       use VSS.Implementation.Character_Codes;
       use type VSS.Unicode.Code_Point_Unit;
 
-      type States is (Initial, Zero_Width_Base, Width, Base, Error);
+      type States is
+        (Initial, Zero_Width_Base_Group, Width, Base, Group, Error);
 
       Handler  :
         constant VSS.Implementation.Strings.String_Handler_Access :=
@@ -187,11 +204,11 @@ package body VSS.Strings.Formatters.Generic_Integers is
             when Initial =>
                case Code is
                   when Plus_Sign =>
-                     State        := Zero_Width_Base;
+                     State        := Zero_Width_Base_Group;
                      Options.Sign := Plus_Or_Minus;
 
                   when Hyphen_Minus =>
-                     State        := Zero_Width_Base;
+                     State        := Zero_Width_Base_Group;
                      Options.Sign := Space_Or_Minus;
 
                   when Digit_Zero =>
@@ -209,11 +226,14 @@ package body VSS.Strings.Formatters.Generic_Integers is
                      State        := Base;
                      Options.Base := 0;
 
+                  when Low_Line =>
+                     State := Group;
+
                   when others =>
                      State := Error;
                end case;
 
-            when Zero_Width_Base =>
+            when Zero_Width_Base_Group =>
                case Code is
                   when Digit_Zero =>
                      State                 := Width;
@@ -229,6 +249,9 @@ package body VSS.Strings.Formatters.Generic_Integers is
                   when Number_Sign =>
                      State        := Base;
                      Options.Base := 0;
+
+                  when Low_Line =>
+                     State := Group;
 
                   when others =>
                      State := Error;
@@ -246,6 +269,9 @@ package body VSS.Strings.Formatters.Generic_Integers is
                      State        := Base;
                      Options.Base := 0;
 
+                  when Low_Line =>
+                     State := Group;
+
                   when others =>
                      State := Error;
                end case;
@@ -255,8 +281,25 @@ package body VSS.Strings.Formatters.Generic_Integers is
                   when Digit_Zero .. Digit_Nine =>
                      Options.Base := @ * 10 + Natural (Code - Digit_Zero);
 
+                  when Low_Line =>
+                     State := Group;
+
                   when others =>
                      State := Error;
+               end case;
+
+            when Group =>
+               case Code is
+                  when Digit_Zero .. Digit_Nine =>
+                     Options.Group :=
+                       @ * 10
+                         + VSS.Strings.Grapheme_Cluster_Count
+                             (Code - Digit_Zero);
+
+                  when others =>
+                     State             := Error;
+                     Options.Separator :=
+                       VSS.Characters.Virtual_Character'Val (Code);
                end case;
 
             when Error =>

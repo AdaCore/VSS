@@ -7,7 +7,7 @@
 --  This package provides formatter for integer types.
 --
 --  Integer_Formatter supports following formatting options:
---    [+-][0][1-9[0-9]*][#[1-9][0-9]+]
+--    [+-][0][1-9[0-9]*][#[1-9][0-9]+][_[1-9][0-9]+[_,. ]]
 --
 --    +  - reserve space for sign, put plus sign for positive values and minus
 --         sign for negative values
@@ -27,6 +27,13 @@
 --    #[1-9][0-9]* - base
 --
 --  By default, base is 10.
+--
+--    _[1-9][0-9]+[^}]  - groups separation
+--
+--  Number of digits in group and character to be used as group separator.
+--
+--  By default, group separation is disabled; default group separator is
+--  low line character.
 
 generic
    type Integer_Type is range <>;

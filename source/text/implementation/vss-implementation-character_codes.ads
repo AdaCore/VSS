@@ -22,7 +22,7 @@ package VSS.Implementation.Character_Codes is
    Space                                    : constant := 16#00_0020#;  --  ' '
 
    Quotation_Mark                           : constant := 16#00_0022#;  --  '"'
-
+   Number_Sign                              : constant := 16#00_0023#;  --  '#'
    Dollar_Sign                              : constant := 16#00_0024#;  --  '$'
 
    Apostrophe                               : constant := 16#00_0027#;  --  '''

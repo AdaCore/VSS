@@ -210,16 +210,13 @@ package VSS.Strings is
    function "&"
      (Left  : Virtual_String;
       Right : Virtual_String) return Virtual_String;
-   --  function "&"
-   --    (Left  : Virtual_String;
-   --     Right : VSS.Characters.Virtual_Character) return Virtual_String;
-   --  function "&"
-   --    (Left  : VSS.Characters.Virtual_Character;
-   --     Right : Virtual_String) return Virtual_String;
-   --  function "&"
-   --    (Left  : VSS.Characters.Virtual_Character;
-   --     Right : VSS.Characters.Virtual_Character) return Virtual_String;
-   --  --  Concatenation operator for virtual string and virtual characters.
+   function "&"
+     (Left  : Virtual_String;
+      Right : VSS.Characters.Virtual_Character) return Virtual_String;
+   function "&"
+     (Left  : VSS.Characters.Virtual_Character;
+      Right : Virtual_String) return Virtual_String;
+   --  Concatenation operator for virtual string and virtual characters.
 
    function "*"
      (Left  : Character_Count;

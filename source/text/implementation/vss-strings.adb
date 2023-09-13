@@ -41,6 +41,52 @@ package body VSS.Strings is
    end "&";
 
    ---------
+   -- "&" --
+   ---------
+
+   function "&"
+     (Left  : Virtual_String;
+      Right : VSS.Characters.Virtual_Character) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         declare
+            Offset : VSS.Implementation.Strings.Cursor_Offset;
+
+         begin
+            Result.Data := Left.Data;
+            VSS.Implementation.Strings.Reference (Result.Data);
+            VSS.Implementation.Strings.Handler (Result.Data).Append
+              (Result.Data,
+               VSS.Characters.Virtual_Character'Pos (Right),
+               Offset);
+         end;
+      end return;
+   end "&";
+
+   ---------
+   -- "&" --
+   ---------
+
+   function "&"
+     (Left  : VSS.Characters.Virtual_Character;
+      Right : Virtual_String) return Virtual_String is
+   begin
+      return Result : Virtual_String do
+         declare
+            Offset : VSS.Implementation.Strings.Cursor_Offset;
+
+         begin
+            VSS.Implementation.Strings.Handler (Result.Data).Append
+              (Result.Data,
+               VSS.Characters.Virtual_Character'Pos (Left),
+               Offset);
+            VSS.Implementation.Strings.Handler (Result.Data).Append
+              (Result.Data, Right.Data, Offset);
+         end;
+      end return;
+   end "&";
+
+   ---------
    -- "*" --
    ---------
 

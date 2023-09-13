@@ -11,6 +11,7 @@ with Test_Support;
 
 procedure Test_String is
 
+   procedure Test_Ampersand_Character;
    procedure Test_Asterisk_Character;
    procedure Test_Ends_With;
    procedure Test_Prepend;
@@ -22,6 +23,8 @@ procedure Test_String is
    --  internal string data.
    --
    --  This test requires valgrind.
+
+   procedure Test_Ampersand_Character is separate;
 
    procedure Test_Asterisk_Character is separate;
 
@@ -201,6 +204,7 @@ procedure Test_String is
    end Test_V705_011;
 
 begin
+   Test_Ampersand_Character;
    Test_Asterisk_Character;
    Test_Ends_With;
    Test_Prepend;

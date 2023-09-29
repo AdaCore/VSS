@@ -15,6 +15,7 @@ procedure Test_String is
    procedure Test_Asterisk_Character;
    procedure Test_Ends_With;
    procedure Test_Prepend;
+   procedure Test_Put_Image;
    procedure Test_Replace;
    procedure Test_Tail;
 
@@ -89,6 +90,8 @@ procedure Test_String is
       S.Prepend (' ');
       Test_Support.Assert (S = VSS.Strings.To_Virtual_String (' ' & Long));
    end Test_Prepend;
+
+   procedure Test_Put_Image is separate;
 
    ------------------
    -- Test_Replace --
@@ -208,6 +211,7 @@ begin
    Test_Asterisk_Character;
    Test_Ends_With;
    Test_Prepend;
+   Test_Put_Image;
    Test_Replace;
    Test_Tail;
 

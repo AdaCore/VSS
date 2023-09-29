@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+with VSS.Implementation.Character_Codes;
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.Line_Terminator;
 with VSS.Implementation.String_Configuration;
@@ -831,6 +832,43 @@ package body VSS.Strings is
          (Index_Offset => 0, UTF8_Offset => 0, UTF16_Offset => 0),
          Offset);
    end Prepend;
+
+   ---------------
+   -- Put_Image --
+   ---------------
+
+   procedure Put_Image
+     (Buffer : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;
+      Item   : Virtual_String)
+   is
+      Aux      : Wide_Wide_String (1 .. 1);
+      Handler  :
+        constant not null VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Item.Data);
+      Position : VSS.Implementation.Strings.Cursor;
+
+   begin
+      Buffer.Wide_Wide_Put ("""");
+
+      Handler.Before_First_Character (Item.Data, Position);
+
+      while Handler.Forward (Item.Data, Position) loop
+         Aux (1) :=
+           Wide_Wide_Character'Val
+             (Handler.Element (Item.Data, Position));
+
+         if Aux (1) =
+           Wide_Wide_Character'Val
+             (VSS.Implementation.Character_Codes.Quotation_Mark)
+         then
+            Buffer.Wide_Wide_Put ("""");
+         end if;
+
+         Buffer.Wide_Wide_Put (Aux);
+      end loop;
+
+      Buffer.Wide_Wide_Put ("""");
+   end Put_Image;
 
    ----------
    -- Read --

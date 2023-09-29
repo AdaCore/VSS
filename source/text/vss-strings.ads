@@ -7,6 +7,7 @@
 --  API to process string data as sequences of Unicode Code Points.
 
 private with Ada.Streams;
+private with Ada.Strings.Text_Buffers;
 
 with VSS.Characters;
 private with VSS.Implementation.Referrers;
@@ -476,12 +477,17 @@ private
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
       Self   : Virtual_String);
 
+   procedure Put_Image
+     (Buffer : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;
+      Item   : Virtual_String);
+
    type Virtual_String is
      new VSS.Implementation.Referrers.Magic_String_Base with record
       Data : aliased VSS.Implementation.Strings.String_Data;
    end record
-     with Read  => Read,
-          Write => Write;
+     with Read      => Read,
+          Write     => Write,
+          Put_Image => Put_Image;
 
    overriding procedure Adjust (Self : in out Virtual_String);
    overriding procedure Finalize (Self : in out Virtual_String);

@@ -771,7 +771,7 @@ procedure Markus_Kuhn_Test is
       Input   : VSS.Text_Streams.Memory_UTF8_Input.Memory_UTF8_Input_Stream;
       Output  : VSS.Text_Streams.Memory_UTF8_Output.Memory_UTF8_Output_Stream;
       Text    : VSS.Strings.Virtual_String;
-      C       : VSS.Characters.Virtual_Character;
+      C       : VSS.Characters.Virtual_Character'Base;
       Success : Boolean := True;
 
    begin
@@ -813,7 +813,7 @@ procedure Markus_Kuhn_Test is
       use type VSS.Strings.Virtual_String;
 
       Input   : VSS.Text_Streams.Memory_UTF8_Input.Memory_UTF8_Input_Stream;
-      C       : VSS.Characters.Virtual_Character;
+      C       : VSS.Characters.Virtual_Character'Base;
       Success : Boolean := True;
 
    begin
@@ -824,7 +824,7 @@ procedure Markus_Kuhn_Test is
       if Success then
          raise Program_Error;
 
-      elsif C /= VSS.Characters.Virtual_Character'Val (16#0000#) then
+      elsif C /= VSS.Characters.Virtual_Character'Base'Last then
          raise Program_Error;
 
       elsif not Input.Has_Error then

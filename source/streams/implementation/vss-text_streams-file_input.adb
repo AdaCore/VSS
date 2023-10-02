@@ -7,7 +7,6 @@
 with Ada.Streams;
 with Interfaces.C;
 
-with VSS.Characters.Latin;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
 
@@ -60,13 +59,13 @@ package body VSS.Text_Streams.File_Input is
 
    overriding procedure Get
      (Self    : in out File_Input_Text_Stream;
-      Item    : out VSS.Characters.Virtual_Character;
+      Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean) is
    begin
       if Self.Buffer.Is_Empty then
          if Self.Stream = Interfaces.C_Streams.NULL_Stream then
             Self.Error := "File is not open";
-            Item       := VSS.Characters.Latin.Nul;
+            Item       := VSS.Characters.Virtual_Character'Base'Last;
             Success    := False;
 
             return;
@@ -111,7 +110,7 @@ package body VSS.Text_Streams.File_Input is
       end if;
 
       if Self.Buffer.Is_Empty then
-         Item    := VSS.Characters.Latin.Nul;
+         Item    := VSS.Characters.Virtual_Character'Base'Last;
          Success := False;
 
       else

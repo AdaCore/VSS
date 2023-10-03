@@ -107,6 +107,10 @@ build_and_test:
         $VSS_URL/packages/generic/$PACKAGE/$VERSION/$PACKAGE |\
         tar xjf - -C ./data
 
+      # Make directory for XUnit test reports
+      export XUNIT_XML_PATH=.xunit-logs/
+      mkdir -p $XUNIT_XML_PATH
+
       # Build VSS and run tests
       ( eval $(anod printenv --sandbox-dir /it/wave gnatall) ;\
         make COVERAGE_MODE=gcov build-libs-static check ;\
@@ -118,12 +122,14 @@ build_and_test:
 
   coverage: /^\s*lines:\s*\d+.\d+\%/
   artifacts:
+    when: always
     reports:
       coverage_report:
         coverage_format: cobertura
         path: gcov.xml
       codequality:
         - spellcheck.json
+      junit: .xunit-logs/*.xml
 
 build_gnatdoc:
   services:

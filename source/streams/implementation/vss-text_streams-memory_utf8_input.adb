@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -86,7 +86,7 @@ package body VSS.Text_Streams.Memory_UTF8_Input is
 
    overriding procedure Get
      (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Virtual_Character;
+      Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean)
    is
       Code : VSS.Unicode.Code_Point;
@@ -94,7 +94,11 @@ package body VSS.Text_Streams.Memory_UTF8_Input is
    begin
       VSS.Implementation.UTF8_Encoding.Decode
         (Self.Buffer, Self.Current, Code, Success, Self.Error);
-      Item := VSS.Characters.Virtual_Character'Val (Code);
+
+      Item :=
+        (if Success
+           then VSS.Characters.Virtual_Character'Val (Code)
+           else VSS.Characters.Virtual_Character'Base'Last);
    end Get;
 
    ---------------

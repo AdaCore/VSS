@@ -28,7 +28,7 @@ package body Tests_Text_Streams is
 
    overriding procedure Get
      (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Virtual_Character;
+      Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean)
    is
       procedure Report_Error (Message : String);
@@ -39,8 +39,8 @@ package body Tests_Text_Streams is
 
       procedure Report_Error (Message : String) is
       begin
+         Item    := VSS.Characters.Virtual_Character'Base'Last;
          Success := False;
-         Item    := VSS.Characters.Virtual_Character'Val (0);
 
          Self.Diagnosis := VSS.Strings.Conversions.To_Virtual_String (Message);
       end Report_Error;
@@ -52,8 +52,8 @@ package body Tests_Text_Streams is
       if Self.Incremental then
          if Self.Skip then
             Self.Skip := False;
-            Success := False;
-            Item := VSS.Characters.Virtual_Character'Val (0);
+            Item      := VSS.Characters.Virtual_Character'Base'Last;
+            Success   := False;
 
             return;
 

@@ -30,7 +30,7 @@ package Tests_Text_Streams is
 
    overriding procedure Get
      (Self    : in out Memory_UTF8_Input_Stream;
-      Item    : out VSS.Characters.Virtual_Character;
+      Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean);
 
    overriding function Is_End_Of_Data

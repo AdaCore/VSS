@@ -19,8 +19,16 @@ package VSS.Text_Streams is
 
    procedure Get
      (Self    : in out Input_Text_Stream;
-      Item    : out VSS.Characters.Virtual_Character;
+      Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean) is abstract;
+   --  Get character from the input stream.
+   --
+   --  @param Self     Text stream itself
+   --  @param Item
+   --    Buffer to store character. It should be set to invalid value in case
+   --  of stream error or unavailable data
+   --  @param Success
+   --    Subprogram do nothing when False, and set it to False on failure.
 
    function Is_End_Of_Data
      (Self : Input_Text_Stream) return Boolean is abstract;
@@ -51,7 +59,7 @@ package VSS.Text_Streams is
    --  @param Self     Text stream itself
    --  @param Item     Character to output
    --  @param Success
-   --    Subprogram do nothing when True, and set it to True on failure.
+   --    Subprogram do nothing when False, and set it to False on failure.
 
    procedure Put
      (Self    : in out Output_Text_Stream;
@@ -62,7 +70,7 @@ package VSS.Text_Streams is
    --  @param Self     Text stream itself
    --  @param Item     String to output
    --  @param Success
-   --    Subprogram do nothing when True, and set it to True on failure.
+   --    Subprogram do nothing when False, and set it to False on failure.
 
    procedure Put_Line
      (Self    : in out Output_Text_Stream;
@@ -74,7 +82,7 @@ package VSS.Text_Streams is
    --  @param Self     Text stream itself
    --  @param Item     String to output
    --  @param Success
-   --    Subprogram do nothing when True, and set it to True on failure.
+   --    Subprogram do nothing when False, and set it to False on failure.
 
    procedure New_Line
      (Self    : in out Output_Text_Stream;
@@ -83,7 +91,7 @@ package VSS.Text_Streams is
    --
    --  @param Self     Text stream itself
    --  @param Success
-   --    Subprogram do nothing when True, and set it to True on failure.
+   --    Subprogram do nothing when False, and set it to False on failure.
 
    function Has_Error (Self : Output_Text_Stream) return Boolean is abstract;
    --  Return True when any error is detected.

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -52,7 +52,7 @@ private
 
    overriding procedure Get
      (Self    : in out File_Input_Text_Stream;
-      Item    : out VSS.Characters.Virtual_Character;
+      Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean);
 
    overriding function Is_End_Of_Data

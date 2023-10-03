@@ -47,7 +47,7 @@ private
 
       case Kind is
          when Split =>
-            Fallback : Instruction_Address;
+            Fallback : Instruction_Offset;
          when Character =>
             Character : VSS.Characters.Virtual_Character;
          when Class =>

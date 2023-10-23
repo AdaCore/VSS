@@ -41,6 +41,7 @@ procedure Test_RegExp_RE_Tests is
 
    procedure Verify
      (Line   : Wide_Wide_String;
+      Regexp : VSS.Regular_Expressions.Regular_Expression;
       Match  : VSS.Regular_Expressions.Regular_Expression_Match;
       Expr   : VSS.Strings.Virtual_String;
       Expect : VSS.Strings.Virtual_String;
@@ -188,6 +189,7 @@ procedure Test_RegExp_RE_Tests is
 
    procedure Verify
      (Line   : Wide_Wide_String;
+      Regexp : VSS.Regular_Expressions.Regular_Expression;
       Match  : VSS.Regular_Expressions.Regular_Expression_Match;
       Expr   : VSS.Strings.Virtual_String;
       Expect : VSS.Strings.Virtual_String;
@@ -223,6 +225,7 @@ procedure Test_RegExp_RE_Tests is
       Result : VSS.Strings.Virtual_String;
       Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
         Expr.At_First_Character;
+      Mark   : VSS.Strings.Cursors.Markers.Character_Marker;
    begin
       loop
          case Cursor.Element is
@@ -262,25 +265,54 @@ procedure Test_RegExp_RE_Tests is
 
                      pragma Assert (Cursor.Element = ']');
 
-                  when '+' =>  --  &+[X] - the X group end offset
-                     pragma Assert (Cursor.Forward);
-                     pragma Assert (Cursor.Element = '[');
-                     pragma Assert (Cursor.Forward);
-                     pragma Assert (Cursor.Element in '0' .. '9');
+                  when '+' =>
+                     Mark := Cursor.Marker;
 
-                     declare
-                        Index : constant Natural := Read_Natural (Cursor);
+                     if Cursor.Forward and then Cursor.Element = '[' then
+                        --  &+[X] - the X group end offset
+                        pragma Assert (Cursor.Forward);
+                        pragma Assert (Cursor.Element in '0' .. '9');
 
-                        Marker : constant
-                          VSS.Strings.Cursors.Markers.Character_Marker :=
-                            Match.Last_Marker (Index);
-                     begin
-                        if Marker.Is_Valid then
-                           Result.Append (Image (Marker.Character_Index));
+                        declare
+                           Index : constant Natural := Read_Natural (Cursor);
+
+                           Marker : constant
+                             VSS.Strings.Cursors.Markers.Character_Marker :=
+                               Match.Last_Marker (Index);
+                        begin
+                           if Marker.Is_Valid then
+                              Result.Append (Image (Marker.Character_Index));
+                           end if;
+                        end;
+
+                        pragma Assert (Cursor.Element = ']');
+                     else
+                        --  &+ - Take rightmost matched group, this isn't what
+                        --  Perl does, but should work for tests, I hope
+
+                        for J in reverse 1 .. Regexp.Capture_Group_Count loop
+                           if Match.Has_Capture (J) then
+                              Result.Append (Match.Captured (J));
+                              exit;
+                           end if;
+                        end loop;
+
+                        Cursor.Set_At (Mark);
+
+                     end if;
+
+                  when '^' =>
+                     --  $^N - Take rightmost matched group, this isn't what
+                     --  Perl does, but should work for tests, I hope
+                     pragma Assert (Cursor.Forward);
+                     pragma Assert (Cursor.Element = 'N');
+
+                     for J in reverse 1 .. Regexp.Capture_Group_Count loop
+                        if Match.Has_Capture (J) then
+                           Result.Append (Match.Captured (J));
+                           exit;
                         end if;
-                     end;
-
-                     pragma Assert (Cursor.Element = ']');
+                     end loop;
 
                   when others =>
                      raise Program_Error;
@@ -363,6 +395,7 @@ begin
                         if Last_Match.Has_Match then
                            Verify
                              (Line,
+                              Last_Pattern,
                               Last_Match,
                               Check.Expr,
                               Check.Expect,

@@ -7,14 +7,16 @@
 with Ada.Containers.Vectors;
 with Ada.Unchecked_Deallocation;
 
-with VSS.Regular_Expressions.ECMA_Parser;
-with VSS.Strings.Character_Iterators;
+with VSS.Characters.Latin;
+with VSS.Characters.Punctuations;
+with VSS.Implementation.String_Handlers;
 with VSS.Implementation.Strings;
-with VSS.Strings.Cursors.Internals;
+with VSS.Regular_Expressions.ECMA_Parser;
 with VSS.Regular_Expressions.Matches;
+with VSS.Strings.Character_Iterators;
+with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Markers.Internals;
 with VSS.Strings.Internals;
-with VSS.Implementation.String_Handlers;
 with VSS.Unicode;
 
 package body VSS.Regular_Expressions.Pike_Engines is
@@ -510,6 +512,10 @@ package body VSS.Regular_Expressions.Pike_Engines is
         (Value : VSS.Characters.Virtual_Character) return Node;
       --  Generate <char[next:unlinked]>
 
+      function Create_Any_Character return Node;
+      --  Generate <class[0,10FFFF,next:unlinked]> for Dot_Matches_Everything
+      --  or [^\n\r\u2028-\2029] otherwise
+
       function Create_Character_Range
         (From, To : VSS.Characters.Virtual_Character) return Node;
       --  Generate <class[from,to,next:unlinked]>
@@ -580,6 +586,39 @@ package body VSS.Regular_Expressions.Pike_Engines is
             end loop;
          end return;
       end Create_Alternative;
+
+      --------------------------
+      -- Create_Any_Character --
+      --------------------------
+
+      function Create_Any_Character return Node is
+         subtype Char is VSS.Characters.Virtual_Character;
+      begin
+         if Options (Dot_Matches_Everything) then
+            return Create_Character_Range
+              (From => Char (VSS.Unicode.Code_Point_Character'First),
+               To   => Char (VSS.Unicode.Code_Point_Character'Last));
+
+         else
+            declare
+               CR : constant Node :=
+                 Create_Character (VSS.Characters.Latin.Carriage_Return);
+
+               LF : constant Node :=
+                 Create_Character (VSS.Characters.Latin.Line_Feed);
+
+               LS_PS : constant Node := Create_Character_Range
+                 (VSS.Characters.Punctuations.Line_Separator,
+                  VSS.Characters.Punctuations.Paragraph_Separator);
+
+            begin
+               return
+                 Create_Negated_Class
+                   (Create_Alternative
+                     (CR, Create_Alternative (LF, LS_PS)));
+            end;
+         end if;
+      end Create_Any_Character;
 
       ----------------------
       -- Create_Character --

@@ -18,6 +18,8 @@ private generic
    with function Create_Character (Value : VSS.Characters.Virtual_Character)
      return Node is <>;
 
+   with function Create_Any_Character return Node is <>;
+
    with function Create_Character_Range
      (From, To : VSS.Characters.Virtual_Character) return Node is <>;
 

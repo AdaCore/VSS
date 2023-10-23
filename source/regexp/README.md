@@ -8,6 +8,7 @@ For now we have:
 
 |  RegExp                   | Description                               |
 | ------------------------- | ----------------------------------------- |
+| *.*                       | Match any character except new line       |
 | *x* *y*                   | Match the *x* then *y*                    |
 | *x* **\|** *y*            | Match either the *x* or *y*               |
 | *x* **\***                | Match the *x* zero or more times          |

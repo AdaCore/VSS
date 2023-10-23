@@ -248,7 +248,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                   Atom_Escape (Value, Ok);
                end if;
 
-            when '^' | '$' | '.' | '*' | '+' | '?' | ']' | '{' | '}' =>
+            when '^' | '$' | '*' | '+' | '?' | ']' | '{' | '}' =>
                if Error.Is_Empty then
                   Error := "Unexpected '";
                   Error.Append (Cursor.Element);
@@ -256,6 +256,11 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                end if;
 
                Ok := False;
+
+            when '.' =>
+               Expect ('.', Ok);
+               Value := From_Node (Create_Any_Character);
+
             when others =>
                Value := From_Node (Create_Character (Cursor.Element));
                Expect (Cursor.Element, Ok);

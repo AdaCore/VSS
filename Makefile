@@ -28,7 +28,7 @@ GPRINSTALL_FLAGS = \
     --lib-subdir=$(INSTALL_ALI_DIR) --project-subdir=$(INSTALL_PROJECT_DIR) \
     --link-lib-subdir=$(INSTALL_LIBRARY_DIR) --sources-subdir=$(INSTALL_INCLUDE_DIR)
 
-OK_RE_TESTS := 526 # Number of re_tests to be passed
+OK_RE_TESTS := 614 # Number of re_tests to be passed
 
 ifeq ($(OS),Windows_NT)
 	VSS_PS=;

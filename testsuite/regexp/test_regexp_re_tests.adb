@@ -37,10 +37,12 @@ procedure Test_RegExp_RE_Tests is
      (Line    : Wide_Wide_String;
       Pattern : out VSS.Strings.Virtual_String;
       Sample  : out VSS.Strings.Virtual_String;
-      Check   : out Check_Value);
+      Check   : out Check_Value;
+      Options : out VSS.Regular_Expressions.Pattern_Options);
 
    procedure Verify
      (Line   : Wide_Wide_String;
+      Regexp : VSS.Regular_Expressions.Regular_Expression;
       Match  : VSS.Regular_Expressions.Regular_Expression_Match;
       Expr   : VSS.Strings.Virtual_String;
       Expect : VSS.Strings.Virtual_String;
@@ -129,11 +131,13 @@ procedure Test_RegExp_RE_Tests is
      (Line    : Wide_Wide_String;
       Pattern : out VSS.Strings.Virtual_String;
       Sample  : out VSS.Strings.Virtual_String;
-      Check   : out Check_Value)
+      Check   : out Check_Value;
+      Options : out VSS.Regular_Expressions.Pattern_Options)
    is
       List : constant VSS.String_Vectors.Virtual_String_Vector :=
         VSS.Strings.To_Virtual_String (Line).Split (Tab);
    begin
+      Options := VSS.Regular_Expressions.No_Pattern_Options;
       --  Parse 5 columns
       --  1 => pattern
       --  2 => sample
@@ -143,24 +147,44 @@ procedure Test_RegExp_RE_Tests is
 
       if not List (1).Starts_With ("/") then
          Pattern := List (1);
-      elsif List (1).Ends_With ("/") then  --  Pattern is `/regexp/`
+      else  --  Pattern in form of `/regexp/FLAGS`
          Pattern := List (1);
 
          declare
+            use type VSS.Characters.Virtual_Character;
+            use all type VSS.Regular_Expressions.Pattern_Option;
+
             From : VSS.Strings.Character_Iterators.Character_Iterator :=
               Pattern.At_First_Character;
             To : VSS.Strings.Character_Iterators.Character_Iterator :=
-              Pattern.At_Last_Character;
+              Pattern.After_Last_Character;
          begin
-            if From.Forward and To.Backward then
-               Pattern := Pattern.Slice (From, To);
-            else
-               raise Program_Error;
-            end if;
+            while To.Backward and then To.Element /= '/' loop
+               case To.Element is
+                  when 's' =>
+                     Options (Dot_Matches_Everything) := True;
+                  when 'i' =>
+                     Options (Case_Insensitive) := True;
+                  when 'm' =>
+                     Options (Multiline) := True;
+                  when 'x' =>
+                     Options (Extended_Pattern_Syntax) := True;
+                  when 'U' =>
+                     Options (Inverted_Greediness) := True;
+                  when 'n' =>
+                     Options (Dont_Capture) := True;
+                  when others =>
+                     --  Skipping on an unsupported flag
+                     Check := (Kind => Skip);
+                     return;
+               end case;
+            end loop;
+
+            pragma Assert (From.Forward);
+            pragma Assert (To.Backward);
+
+            Pattern := Pattern.Slice (From, To);
          end;
-      else  --  Pattern in form of `/regexp/FLAGS` isn't supported yet
-         Check := (Kind => Skip);
-         return;
       end if;
 
       Sample := List (2);
@@ -188,6 +212,7 @@ procedure Test_RegExp_RE_Tests is
 
    procedure Verify
      (Line   : Wide_Wide_String;
+      Regexp : VSS.Regular_Expressions.Regular_Expression;
       Match  : VSS.Regular_Expressions.Regular_Expression_Match;
       Expr   : VSS.Strings.Virtual_String;
       Expect : VSS.Strings.Virtual_String;
@@ -223,6 +248,7 @@ procedure Test_RegExp_RE_Tests is
       Result : VSS.Strings.Virtual_String;
       Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
         Expr.At_First_Character;
+      Mark   : VSS.Strings.Cursors.Markers.Character_Marker;
    begin
       loop
          case Cursor.Element is
@@ -262,25 +288,54 @@ procedure Test_RegExp_RE_Tests is
 
                      pragma Assert (Cursor.Element = ']');
 
-                  when '+' =>  --  &+[X] - the X group end offset
-                     pragma Assert (Cursor.Forward);
-                     pragma Assert (Cursor.Element = '[');
-                     pragma Assert (Cursor.Forward);
-                     pragma Assert (Cursor.Element in '0' .. '9');
+                  when '+' =>
+                     Mark := Cursor.Marker;
 
-                     declare
-                        Index : constant Natural := Read_Natural (Cursor);
+                     if Cursor.Forward and then Cursor.Element = '[' then
+                        --  &+[X] - the X group end offset
+                        pragma Assert (Cursor.Forward);
+                        pragma Assert (Cursor.Element in '0' .. '9');
 
-                        Marker : constant
-                          VSS.Strings.Cursors.Markers.Character_Marker :=
-                            Match.Last_Marker (Index);
-                     begin
-                        if Marker.Is_Valid then
-                           Result.Append (Image (Marker.Character_Index));
+                        declare
+                           Index : constant Natural := Read_Natural (Cursor);
+
+                           Marker : constant
+                             VSS.Strings.Cursors.Markers.Character_Marker :=
+                               Match.Last_Marker (Index);
+                        begin
+                           if Marker.Is_Valid then
+                              Result.Append (Image (Marker.Character_Index));
+                           end if;
+                        end;
+
+                        pragma Assert (Cursor.Element = ']');
+                     else
+                        --  &+ - Take rightmost matched group, this isn't what
+                        --  Perl does, but should work for tests, I hope
+
+                        for J in reverse 1 .. Regexp.Capture_Group_Count loop
+                           if Match.Has_Capture (J) then
+                              Result.Append (Match.Captured (J));
+                              exit;
+                           end if;
+                        end loop;
+
+                        Cursor.Set_At (Mark);
+
+                     end if;
+
+                  when '^' =>
+                     --  $^N - Take rightmost matched group, this isn't what
+                     --  Perl does, but should work for tests, I hope
+                     pragma Assert (Cursor.Forward);
+                     pragma Assert (Cursor.Element = 'N');
+
+                     for J in reverse 1 .. Regexp.Capture_Group_Count loop
+                        if Match.Has_Capture (J) then
+                           Result.Append (Match.Captured (J));
+                           exit;
                         end if;
-                     end;
-
-                     pragma Assert (Cursor.Element = ']');
+                     end loop;
 
                   when others =>
                      raise Program_Error;
@@ -310,6 +365,8 @@ procedure Test_RegExp_RE_Tests is
    Last_Pattern : VSS.Regular_Expressions.Regular_Expression;
    Last_Sample  : VSS.Strings.Virtual_String;
    Last_Match   : VSS.Regular_Expressions.Regular_Expression_Match;
+   Last_Options : VSS.Regular_Expressions.Pattern_Options :=
+     VSS.Regular_Expressions.No_Pattern_Options;
 
 begin
    if VSS.Application.Arguments.Is_Empty then
@@ -338,18 +395,24 @@ begin
          elsif Line (1) not in ''' then
             declare
                use type VSS.Strings.Virtual_String;
+               use type VSS.Regular_Expressions.Pattern_Options;
 
                Pattern : VSS.Strings.Virtual_String;
                Sample  : VSS.Strings.Virtual_String;
                Check   : Check_Value;
+               Options : VSS.Regular_Expressions.Pattern_Options;
             begin
-               Parse_Line (Line, Pattern, Sample, Check);
+               Parse_Line (Line, Pattern, Sample, Check, Options);
 
                if Check.Kind /= Skip then
-                  if Last_Pattern.Pattern /= Pattern then
+                  if Last_Pattern.Pattern /= Pattern
+                    or Options /= Last_Options
+                  then
                      Last_Pattern :=
-                       VSS.Regular_Expressions.To_Regular_Expression (Pattern);
+                       VSS.Regular_Expressions.To_Regular_Expression
+                         (Pattern, Options);
 
+                     Last_Options := Options;
                      Last_Sample := "not-a-sample";
                   end if;
 
@@ -363,10 +426,18 @@ begin
                         if Last_Match.Has_Match then
                            Verify
                              (Line,
+                              Last_Pattern,
                               Last_Match,
                               Check.Expr,
                               Check.Expect,
                               Total);
+                        elsif not Last_Pattern.Error_String.Is_Empty then
+                           Ada.Wide_Wide_Text_IO.Put ("ERROR: ");
+                           Ada.Wide_Wide_Text_IO.Put (Line);
+                           Ada.Wide_Wide_Text_IO.Put (" -> ");
+                           Ada.Wide_Wide_Text_IO.Put_Line
+                             (VSS.Strings.Conversions.To_Wide_Wide_String
+                                (Last_Pattern.Error_String));
                         else
                            Ada.Wide_Wide_Text_IO.Put ("DONT: ");
                            Ada.Wide_Wide_Text_IO.Put_Line (Line);

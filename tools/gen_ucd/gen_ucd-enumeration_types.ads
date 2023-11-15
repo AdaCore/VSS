@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -16,6 +16,13 @@ package Gen_UCD.Enumeration_Types is
    procedure Initialize
      (Self     : in out Enumeration_Type'Class;
       Property : not null UCD.Properties.Property_Access);
+   --  Initialize mapping of used enumeration property values to continuous
+   --  range of natural numbers used for internal representation.
+
+   procedure Initialize
+     (Self     : in out Enumeration_Type'Class;
+      Property : not null UCD.Properties.Property_Access;
+      Zero     : Wide_Wide_String);
    --  Initialize mapping of used enumeration property values to continuous
    --  range of natural numbers used for internal representation.
 
@@ -39,9 +46,21 @@ private
         UCD.Properties.Hash,
         UCD.Properties."=");
 
+   function Hash (Item : Natural) return Ada.Containers.Hash_Type is
+     (Ada.Containers.Hash_Type (Item));
+
+   package Integer_Property_Value_Maps is
+     new Ada.Containers.Hashed_Maps
+       (Natural,
+        UCD.Properties.Property_Value_Access,
+        Hash,
+        "=",
+        UCD.Properties."=");
+
    type Enumeration_Type is tagged limited record
-      Property : UCD.Properties.Property_Access;
-      Map      : Property_Value_Integer_Maps.Map;
+      Property          : UCD.Properties.Property_Access;
+      To_Representation : Property_Value_Integer_Maps.Map;
+      To_Value          : Integer_Property_Value_Maps.Map;
    end record;
 
 end Gen_UCD.Enumeration_Types;

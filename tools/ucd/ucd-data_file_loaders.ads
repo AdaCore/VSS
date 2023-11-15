@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -17,7 +17,8 @@ package UCD.Data_File_Loaders is
    procedure Open
      (Self      : in out File_Loader;
       UCD_Root  : Wide_Wide_String;
-      File_Name : Wide_Wide_String);
+      File_Name : Wide_Wide_String;
+      Qualifier : Wide_Wide_String := "");
 
    procedure Close (Self : in out File_Loader);
 
@@ -25,12 +26,18 @@ package UCD.Data_File_Loaders is
 
    procedure Skip_Line (Self : in out File_Loader);
 
-   function Get_Field
-     (Self : File_Loader; Index : Field_Index) return Wide_Wide_String;
+   function Is_Missing (Self : File_Loader) return Boolean;
+   --  Returns True when current line is @missing line.
 
    function Get_Field
-     (Self  : File_Loader;
-      Index : Field_Index) return UCD.Code_Point_Vectors.Vector;
+     (Self          : File_Loader;
+      Index         : Field_Index;
+      Allow_Missing : Boolean := False) return Wide_Wide_String;
+
+   function Get_Field
+     (Self          : File_Loader;
+      Index         : Field_Index;
+      Allow_Missing : Boolean := False) return UCD.Code_Point_Vectors.Vector;
 
    function Has_Field (Self : File_Loader; Index : Field_Index) return Boolean;
 
@@ -62,10 +69,12 @@ private
    type Field_Array is array (Field_Index) of Field;
 
    type File_Loader is new Ada.Finalization.Limited_Controlled with record
-      File      : File_Type;
-      Buffer    : Wide_Wide_String (1 .. 2048);
-      Line_Last : Natural;
-      Fields    : Field_Array;
+      File       : File_Type;
+      Buffer     : Wide_Wide_String (1 .. 2048);
+      Line_First : Positive;
+      Line_Last  : Natural;
+      Is_Missing : Boolean;
+      Fields     : Field_Array;
    end record;
 
    overriding procedure Finalize (Self : in out File_Loader);

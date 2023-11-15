@@ -1,16 +1,15 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
+with Ada.Wide_Wide_Text_IO;
 
 with UCD.Characters;
 with UCD.Data_File_Loaders;
 with UCD.Properties;
-
-with Ada.Wide_Wide_Text_IO;
 
 package body UCD.Derived_Normalization_Props_Loader is
 
@@ -28,41 +27,6 @@ package body UCD.Derived_Normalization_Props_Loader is
       Loader : UCD.Data_File_Loaders.File_Loader;
 
    begin
-      --  Default value for derived NFD_Quick_Check, NFC_Quick_Check,
-      --  NFKD_Quick_Check properties is 'Y', this feature is not supported
-      --  by the loader, thus set it manually.
-
-      declare
-         NFD_QC_Property  : constant not null Properties.Property_Access :=
-           Properties.Resolve ("NFD_QC");
-         NFD_QC_Y         : constant not null
-           Properties.Property_Value_Access :=
-             Properties.Resolve (NFD_QC_Property, "Y");
-         NFC_QC_Property  : constant not null Properties.Property_Access :=
-           Properties.Resolve ("NFC_QC");
-         NFC_QC_Y         : constant not null
-           Properties.Property_Value_Access :=
-             Properties.Resolve (NFC_QC_Property, "Y");
-         NFKD_QC_Property : constant not null Properties.Property_Access :=
-           Properties.Resolve ("NFKD_QC");
-         NFKD_QC_Y        : constant not null
-           Properties.Property_Value_Access :=
-             Properties.Resolve (NFKD_QC_Property, "Y");
-         NFKC_QC_Property : constant not null Properties.Property_Access :=
-           Properties.Resolve ("NFKC_QC");
-         NFKC_QC_Y        : constant not null
-           Properties.Property_Value_Access :=
-             Properties.Resolve (NFKC_QC_Property, "Y");
-
-      begin
-         for Code in Code_Point loop
-            Characters.Set (Code, NFD_QC_Property, NFD_QC_Y);
-            Characters.Set (Code, NFC_QC_Property, NFC_QC_Y);
-            Characters.Set (Code, NFKD_QC_Property, NFKD_QC_Y);
-            Characters.Set (Code, NFKC_QC_Property, NFKC_QC_Y);
-         end loop;
-      end;
-
       Loader.Open (UCD_Root, "DerivedNormalizationProps.txt");
 
       while not Loader.End_Of_File loop
@@ -73,9 +37,16 @@ package body UCD.Derived_Normalization_Props_Loader is
          begin
             Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
+            if Loader.Is_Missing then
+               Ada.Wide_Wide_Text_IO.Put_Line
+                 ("  - set " & Loader.Get_Field (1, True)
+                  & " to '" & Loader.Get_Field (2, True)
+                  & "' in " & Loader.Get_Field (0, True));
+            end if;
+
             declare
                Property_Name : constant Wide_Wide_String :=
-                 Loader.Get_Field (Name_Field);
+                 Loader.Get_Field (Name_Field, True);
                Property      : constant not null Properties.Property_Access :=
                  Properties.Resolve (Property_Name);
 
@@ -112,29 +83,31 @@ package body UCD.Derived_Normalization_Props_Loader is
                        (Code,
                         Property,
                         Properties.Resolve
-                          (Property, Loader.Get_Field (Value_Field)));
+                          (Property, Loader.Get_Field (Value_Field, True)));
                   end loop;
 
-               elsif Property_Name = "NFKC_CF" then
+               elsif Property_Name in "NFKC_CF" | "NFKC_SCF" then
                   --  String property
 
                   Property.Is_String := True;
 
-                  for Code in First_Code .. Last_Code loop
-                     Characters.Set
-                       (Code,
-                        Property,
-                        new Properties.Property_Value'
-                          (Names                           => <>,
-                           Is_Used                         => <>,
-                           Canonical_Combining_Class_Value => <>,
-                           String                          =>
-                             Loader.Get_Field (Value_Field)));
-                  end loop;
+                  if Loader.Get_Field (Value_Field, True)
+                    /= "<code point>"
+                  then
+                     for Code in First_Code .. Last_Code loop
+                        Characters.Set
+                          (Code,
+                           Property,
+                           new Properties.Property_Value'
+                             (Names                           => <>,
+                              Is_Used                         => <>,
+                              Canonical_Combining_Class_Value => <>,
+                              String                          =>
+                                Loader.Get_Field (Value_Field, True)));
+                     end loop;
+                  end if;
 
                else
-                  Ada.Wide_Wide_Text_IO.Put_Line (''' & Property_Name & ''');
-
                   raise Program_Error;
                end if;
             end;

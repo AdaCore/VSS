@@ -5,6 +5,7 @@
 --
 
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
+with Ada.Wide_Wide_Text_IO;
 
 with UCD.Characters;
 with UCD.Data_File_Loaders;
@@ -25,27 +26,6 @@ package body UCD.Derived_Core_Properties_Loader is
       Loader      : UCD.Data_File_Loaders.File_Loader;
 
    begin
-      --  Unicode 15.1: Setup default value of Indic_Conjunct_Break
-      --
-      --  XXX Default value can be constructed from @missing line
-
-      declare
-         InCB_Property : constant not null UCD.Properties.Property_Access :=
-           UCD.Properties.Resolve ("InCB");
-         InCB_None     :
-           constant not null UCD.Properties.Property_Value_Access :=
-             UCD.Properties.Resolve (InCB_Property, "None");
-
-      begin
-         --  Setup default value for all characters.
-
-         InCB_None.Is_Used := True;
-
-         for Code in UCD.Code_Point loop
-            UCD.Characters.Set (Code, InCB_Property, InCB_None);
-         end loop;
-      end;
-
       --  Load data
 
       Loader.Open (UCD_Root, "DerivedCoreProperties.txt");
@@ -58,9 +38,16 @@ package body UCD.Derived_Core_Properties_Loader is
          begin
             Loader.Get_Code_Point_Range (First_Code, Last_Code);
 
+            if Loader.Is_Missing then
+               Ada.Wide_Wide_Text_IO.Put_Line
+                 ("  - set " & Loader.Get_Field (1, True)
+                  & " to '" & Loader.Get_Field (2, True)
+                  & "' in " & Loader.Get_Field (0, True));
+            end if;
+
             declare
                Property : constant not null Properties.Property_Access :=
-                 Properties.Resolve (Loader.Get_Field (Name_Field));
+                 Properties.Resolve (Loader.Get_Field (Name_Field, True));
 
             begin
                for Code in First_Code .. Last_Code loop
@@ -72,7 +59,7 @@ package body UCD.Derived_Core_Properties_Loader is
                         Property,
                         Property.Name_To_Value.Element
                           (To_Unbounded_Wide_Wide_String
-                               (Loader.Get_Field (Value_Field))));
+                               (Loader.Get_Field (Value_Field, True))));
 
                   else
                      --  Only property name is specified, value assumed as "Y"

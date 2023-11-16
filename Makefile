@@ -193,6 +193,7 @@ misc: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat examples/regexp/grep.gpr
 	gprbuild $(GPRBUILD_FLAGS) examples/blogs/json_1/blog_1.gpr
+	gprbuild $(GPRBUILD_FLAGS) examples/command_line/command/command_line_command.gpr
 
 spellcheck:
 	@STATUS=0; \

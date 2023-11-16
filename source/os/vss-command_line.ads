@@ -84,6 +84,10 @@ package VSS.Command_Line is
      with No_Return;
    --  Report error and terminate application.
 
+   procedure Report_Error (Message : VSS.String_Vectors.Virtual_String_Vector)
+     with No_Return;
+   --  Report error and terminate application.
+
 private
 
    function Unique_Name

@@ -353,6 +353,12 @@ package body VSS.Command_Line.Parsers is
       Success : Boolean  := True;
 
    begin
+      Self.Error_Message.Clear;
+      Self.Known_Named_Options_Values.Clear;
+      Self.Unknown_Named_Options_Values.Clear;
+      Self.Positional_Options_Values.Clear;
+      Self.Only_Positional := False;
+
       while Index <= Arguments.Length loop
          Self.Parse_Argument (Arguments, Index, Success);
 

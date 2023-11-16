@@ -145,6 +145,19 @@ package body VSS.Command_Line is
       GNAT.OS_Lib.OS_Exit (1);
    end Report_Error;
 
+   ------------------
+   -- Report_Error --
+   ------------------
+
+   procedure Report_Error
+     (Message : VSS.String_Vectors.Virtual_String_Vector) is
+   begin
+      Platform.Report_Message
+        (Message  => Message,
+         Is_Error => True);
+      GNAT.OS_Lib.OS_Exit (1);
+   end Report_Error;
+
    -----------------
    -- Unique_Name --
    -----------------

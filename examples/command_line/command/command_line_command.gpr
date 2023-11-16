@@ -1,0 +1,12 @@
+with "vss_text";
+
+project Command_Line_Command is
+
+   for Object_Dir use ".objs";
+   for Main use ("command_line_command.adb");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g", "-gnatW8", "-gnat2022");
+   end Compiler;
+
+end Command_Line_Command;

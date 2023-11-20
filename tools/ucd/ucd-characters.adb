@@ -180,26 +180,6 @@ package body UCD.Characters is
       --  thus it is initialized when corresponding data is loaded from the
       --  emoji/emoji-data.txt file.
 
-      --  Default value for General_Category is 'Cn' ("Unassigned")
-
-      declare
-         GC_Property    : constant not null Properties.Property_Access :=
-           Properties.Resolve ("gc");
-         GC_Value       : constant not null Properties.Property_Value_Access :=
-           Properties.Resolve (GC_Property, "Cn");
-         GC_Index       : constant Positive :=
-           Enumeration_Property_To_Index (GC_Property);
-         GC_Value_Index : constant Interfaces.Unsigned_16 :=
-           Internal_Enumeration_Value (GC_Property, GC_Value);
-
-      begin
-         for C in Code_Point loop
-            Database (C).Enumeration (GC_Index) := GC_Value_Index;
-         end loop;
-
-         GC_Value.Is_Used := True;
-      end;
-
       --  Default value for Canonical_Combining_Class is 'NR' ("Not_Reordered")
 
       declare

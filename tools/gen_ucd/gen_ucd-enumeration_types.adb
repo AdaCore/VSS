@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -40,19 +40,19 @@ package body Gen_UCD.Enumeration_Types is
    begin
       Put_Line (File, "   type " & Type_Identifier (Self.Property) & " is");
 
-      for Value of Self.Property.All_Values loop
-         if Value.Is_Used then
-            if First then
-               Put (File, "     (");
-               First := False;
+      for Representation in 0 .. Natural (Self.To_Value.Length) - 1 loop
+         if First then
+            Put (File, "     (");
+            First := False;
 
-            else
-               Put_Line (File, ",");
-               Put (File, "      ");
-            end if;
-
-            Put (File, Value_Identifier (Self.Property, Value));
+         else
+            Put_Line (File, ",");
+            Put (File, "      ");
          end if;
+
+         Put
+           (File,
+            Value_Identifier (Self.Property, Self.To_Value (Representation)));
       end loop;
 
       Put_Line (File, ");");
@@ -60,26 +60,26 @@ package body Gen_UCD.Enumeration_Types is
       Put_Line
         (File,
          "   for " & Type_Identifier (Self.Property) & "'Size use"
-         & Natural'Wide_Wide_Image (Minimum_Bits (Self.Map.Length))
+         & Natural'Wide_Wide_Image (Minimum_Bits (Self.To_Value.Length))
          & ";");
       Put_Line (File, "   for " & Type_Identifier (Self.Property) & " use");
       First := True;
 
-      for Value of Self.Property.All_Values loop
-         if Value.Is_Used then
-            if First then
-               Put (File, "     (");
-               First := False;
+      for Representation in 0 .. Natural (Self.To_Value.Length) - 1 loop
+         if First then
+            Put (File, "     (");
+            First := False;
 
-            else
-               Put_Line (File, ",");
-               Put (File, "      ");
-            end if;
-
-            Put (File, Value_Identifier (Self.Property, Value));
-            Put (File, " =>");
-            Put (File, Integer'Wide_Wide_Image (Self.Representation (Value)));
+         else
+            Put_Line (File, ",");
+            Put (File, "      ");
          end if;
+
+         Put
+           (File,
+            Value_Identifier (Self.Property, Self.To_Value (Representation)));
+         Put (File, " =>");
+         Put (File, Integer'Wide_Wide_Image (Representation));
       end loop;
 
       Put_Line (File, ");");
@@ -92,13 +92,49 @@ package body Gen_UCD.Enumeration_Types is
 
    procedure Initialize
      (Self     : in out Enumeration_Type'Class;
-      Property : not null UCD.Properties.Property_Access) is
+      Property : not null UCD.Properties.Property_Access)
+   is
+      Representation : Natural;
+
    begin
       Self.Property := Property;
 
       for Value of Self.Property.All_Values loop
          if Value.Is_Used then
-            Self.Map.Insert (Value, Natural (Self.Map.Length));
+            Representation := Natural (Self.To_Value.Length);
+            Self.To_Representation.Insert (Value, Representation);
+            Self.To_Value.Insert (Representation, Value);
+         end if;
+      end loop;
+   end Initialize;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize
+     (Self     : in out Enumeration_Type'Class;
+      Property : not null UCD.Properties.Property_Access;
+      Zero     : Wide_Wide_String)
+   is
+      use type UCD.Properties.Property_Value_Access;
+
+      Zero_Value     : constant
+        not null UCD.Properties.Property_Value_Access :=
+          UCD.Properties.Resolve (Property, Zero);
+      Representation : Natural := 0;
+
+   begin
+      Self.Property := Property;
+
+      Self.To_Representation.Insert (Zero_Value, Representation);
+      Self.To_Value.Insert (Representation, Zero_Value);
+
+      for Value of Self.Property.All_Values loop
+         if Value.Is_Used and Value /= Zero_Value then
+            Representation := Natural (Self.To_Value.Length);
+            Self.To_Representation.Insert (Value, Representation);
+            Self.To_Value.Insert (Representation, Value);
          end if;
       end loop;
    end Initialize;
@@ -144,7 +180,7 @@ package body Gen_UCD.Enumeration_Types is
      (Self  : Enumeration_Type'Class;
       Value : not null UCD.Properties.Property_Value_Access) return Natural is
    begin
-      return Self.Map (Value);
+      return Self.To_Representation (Value);
    end Representation;
 
    ---------------------

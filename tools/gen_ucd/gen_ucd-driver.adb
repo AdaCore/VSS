@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -38,10 +38,11 @@ begin
 
    begin
       UCD.Property_Aliases_Loader.Load (UCD_Root);
-      UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+      UCD.Property_Value_Aliases_Loader.Load_Aliases (UCD_Root);
 
       UCD.Characters.Initialize_Character_Database;
 
+      UCD.Property_Value_Aliases_Loader.Load_Missing (UCD_Root);
       UCD.Unicode_Data_Loader.Load (UCD_Root);
       UCD.Prop_List_Loader.Load (UCD_Root);
       UCD.Derived_Core_Properties_Loader.Load (UCD_Root);

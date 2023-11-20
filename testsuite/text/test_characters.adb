@@ -52,10 +52,11 @@ procedure Test_Characters is
 
       begin
          UCD.Property_Aliases_Loader.Load (UCD_Root);
-         UCD.Property_Value_Aliases_Loader.Load (UCD_Root);
+         UCD.Property_Value_Aliases_Loader.Load_Aliases (UCD_Root);
 
          UCD.Characters.Initialize_Character_Database;
 
+         UCD.Property_Value_Aliases_Loader.Load_Missing (UCD_Root);
          UCD.Derived_General_Category_Loader.Load (UCD_Root);
          UCD.Derived_Core_Properties_Loader.Load (UCD_Root);
 

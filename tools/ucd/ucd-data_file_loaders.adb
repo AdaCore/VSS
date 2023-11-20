@@ -17,6 +17,8 @@ package body UCD.Data_File_Loaders is
    function Parse_Sequence_Of_Code_Unit
      (Buffer : Wide_Wide_String) return UCD.Code_Point_Vectors.Vector;
 
+   Missing_Prefix : constant Wide_Wide_String := "# @missing: ";
+
    -----------
    -- Close --
    -----------
@@ -76,14 +78,14 @@ package body UCD.Data_File_Loaders is
       end Is_Start_Of_Unicode_Data_Range;
 
    begin
-      if Is_Start_Of_Unicode_Data_Range then
+      if not Self.Is_Missing and then Is_Start_Of_Unicode_Data_Range then
          First_Code := To_Code_Point (Self.Get_Field (0));
          Self.Skip_Line;
          Last_Code := To_Code_Point (Self.Get_Field (0));
 
       else
          declare
-            Buffer  : constant Wide_Wide_String := Self.Get_Field (0);
+            Buffer  : constant Wide_Wide_String := Self.Get_Field (0, True);
             Current : Positive;
             First   : Positive;
             Last    : Natural;
@@ -145,9 +147,14 @@ package body UCD.Data_File_Loaders is
    ---------------
 
    function Get_Field
-     (Self  : File_Loader;
-      Index : Field_Index) return Wide_Wide_String is
+     (Self          : File_Loader;
+      Index         : Field_Index;
+      Allow_Missing : Boolean := False) return Wide_Wide_String is
    begin
+      if not Allow_Missing and Self.Is_Missing then
+         raise Program_Error with "@missing is not supported by loader";
+      end if;
+
       return
         Self.Buffer (Self.Fields (Index).First .. Self.Fields (Index).Last);
    end Get_Field;
@@ -157,10 +164,17 @@ package body UCD.Data_File_Loaders is
    ---------------
 
    function Get_Field
-     (Self  : File_Loader;
-      Index : Field_Index) return UCD.Code_Point_Vectors.Vector is
+     (Self          : File_Loader;
+      Index         : Field_Index;
+      Allow_Missing : Boolean := False)
+      return UCD.Code_Point_Vectors.Vector is
    begin
-      return Parse_Sequence_Of_Code_Unit (Self.Get_Field (Index));
+      if not Allow_Missing and Self.Is_Missing then
+         raise Program_Error with "@missing is not supported by loader";
+      end if;
+
+      return
+        Parse_Sequence_Of_Code_Unit (Self.Get_Field (Index, Allow_Missing));
    end Get_Field;
 
    ---------------
@@ -224,6 +238,15 @@ package body UCD.Data_File_Loaders is
           or else Self.Fields (Index).First <= Self.Fields (Index).Last;
    end Has_Field;
 
+   ----------------
+   -- Is_Missing --
+   ----------------
+
+   function Is_Missing (Self : File_Loader) return Boolean is
+   begin
+      return Self.Is_Missing;
+   end Is_Missing;
+
    ----------
    -- Open --
    ----------
@@ -231,10 +254,14 @@ package body UCD.Data_File_Loaders is
    procedure Open
      (Self      : in out File_Loader;
       UCD_Root  : Wide_Wide_String;
-      File_Name : Wide_Wide_String)
-   is
+      File_Name : Wide_Wide_String;
+      Qualifier : Wide_Wide_String := "") is
    begin
-      Put_Line ("Loading " & File_Name & "...");
+      Put_Line
+        ("Loading "
+         & File_Name
+         & (if Qualifier /= "" then " (" & Qualifier & ')' else "")
+         & "...");
       Open (Self.File, In_File, Encode (UCD_Root & '/' & File_Name), "wcem=8");
       Self.Scan_Next_Line;
    end Open;
@@ -298,15 +325,28 @@ package body UCD.Data_File_Loaders is
       Self.Fields := [others => (1, 0)];
 
       loop
-         Self.Line_Last := 0;
+         Self.Line_First := Self.Buffer'First;
+         Self.Line_Last  := 0;
+         Self.Is_Missing := False;
 
          exit when End_Of_File (Self.File);
 
          Get_Line (Self.File, Self.Buffer, Self.Line_Last);
 
+         --  Check for "# @missing: " prefix
+
+         if Self.Line_Last - Self.Line_First + 1 >= Missing_Prefix'Length
+           and then Self.Buffer
+             (Self.Line_First .. Self.Line_First + Missing_Prefix'Length - 1)
+                = Missing_Prefix
+         then
+            Self.Line_First := Self.Line_First + Missing_Prefix'Length;
+            Self.Is_Missing := True;
+         end if;
+
          --  Remove comments
 
-         for J in Self.Buffer'First .. Self.Line_Last loop
+         for J in Self.Line_First .. Self.Line_Last loop
             if Self.Buffer (J) = '#' then
                Self.Line_Last := J - 1;
 
@@ -314,8 +354,8 @@ package body UCD.Data_File_Loaders is
             end if;
          end loop;
 
-         if Self.Buffer'First <= Self.Line_Last then
-            Current := Self.Buffer'First;
+         if Self.Line_First <= Self.Line_Last then
+            Current := Self.Line_First;
 
             loop
                Field_First := Current;

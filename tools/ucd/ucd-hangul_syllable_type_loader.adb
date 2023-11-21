@@ -26,8 +26,6 @@ package body UCD.Hangul_Syllable_Type_Loader is
       Loader       : UCD.Data_File_Loaders.File_Loader;
 
    begin
-      --  Setup default value for all characters.
-
       Loader.Open (UCD_Root, "HangulSyllableType.txt");
 
       while not Loader.End_Of_File loop

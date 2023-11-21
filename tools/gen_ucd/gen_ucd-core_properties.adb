@@ -23,6 +23,7 @@ package body Gen_UCD.Core_Properties is
    GCB_Enumeration  : Gen_UCD.Enumeration_Types.Enumeration_Type;
    WB_Enumeration   : Gen_UCD.Enumeration_Types.Enumeration_Type;
    InCB_Enumeration : Gen_UCD.Enumeration_Types.Enumeration_Type;
+   EA_Enumeration   : Gen_UCD.Enumeration_Types.Enumeration_Type;
 
    package Database is
 
@@ -43,6 +44,8 @@ package body Gen_UCD.Core_Properties is
       procedure Set_WB (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_5);
 
       procedure Set_InCB (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_2);
+
+      procedure Set_EA (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_3);
 
       function Uncompressed_Size return Positive;
 
@@ -73,6 +76,8 @@ package body Gen_UCD.Core_Properties is
         UCD.Properties.Resolve ("WB");
       InCB_Property : constant not null UCD.Properties.Property_Access :=
         UCD.Properties.Resolve ("InCB");
+      EA_Property   : constant not null UCD.Properties.Property_Access :=
+        UCD.Properties.Resolve ("ea");
 
    begin
       Put ("   ... core properties");
@@ -81,6 +86,7 @@ package body Gen_UCD.Core_Properties is
       GCB_Enumeration.Initialize (GCB_Property);
       WB_Enumeration.Initialize (WB_Property);
       InCB_Enumeration.Initialize (InCB_Property, "None");
+      EA_Enumeration.Initialize (EA_Property, "N");
 
       Database.Initialize (8);
 
@@ -126,6 +132,9 @@ package body Gen_UCD.Core_Properties is
 
             Database.Set_InCB
               (Code, Unsigned_2 (InCB_Enumeration.Representation (Code)));
+
+            Database.Set_EA
+              (Code, Unsigned_3 (EA_Enumeration.Representation (Code)));
          end loop;
       end;
 
@@ -159,28 +168,29 @@ package body Gen_UCD.Core_Properties is
       --  Forth byte is reserved for alignment purposes.
 
       --   31  |  30  |  29  |  28  |  27  |  26  |  25  |  24
-      --
+      --   --     --     --     --     --     --     --     --
       --
       --   23  |  22  |  21  |  20  |  19  |  18  |  17  |  16
-      --                     |                WB
+      --          EA         |                WB
       --
       --   15  |  14  |  13  |  12  |  11  |  10  |  09  |  08
-      --       | EPic |     InCB    |            GCB
+      --   --  | EPic |     InCB    |            GCB
       --
       --   07  |  06  |  05  |  04  |  03  |  02  |  01  |  00
-      --       | OUpp | OLow |                CG
+      --   --  | OUpp | OLow |                CG
 
       type Core_Data_Record is record
-         GC         : Gen_UCD.Unsigned_5  := 0;
-         OLower     : Gen_UCD.Unsigned_1  := 0;
-         OUpper     : Gen_UCD.Unsigned_1  := 0;
-         Reserved_1 : Gen_UCD.Unsigned_1  := 0;
-         GCB        : Gen_UCD.Unsigned_4  := 0;
-         InCB       : Gen_UCD.Unsigned_2  := 0;
-         ExtPict    : Gen_UCD.Unsigned_1  := 0;
-         Reserved_2 : Gen_UCD.Unsigned_1  := 0;
-         WB         : Gen_UCD.Unsigned_5  := 0;
-         Reserved_3 : Gen_UCD.Unsigned_11 := 0;
+         GC         : Gen_UCD.Unsigned_5 := 0;
+         OLower     : Gen_UCD.Unsigned_1 := 0;
+         OUpper     : Gen_UCD.Unsigned_1 := 0;
+         Reserved_1 : Gen_UCD.Unsigned_1 := 0;
+         GCB        : Gen_UCD.Unsigned_4 := 0;
+         InCB       : Gen_UCD.Unsigned_2 := 0;
+         ExtPict    : Gen_UCD.Unsigned_1 := 0;
+         Reserved_2 : Gen_UCD.Unsigned_1 := 0;
+         WB         : Gen_UCD.Unsigned_5 := 0;
+         EA         : Gen_UCD.Unsigned_3 := 0;
+         Reserved_3 : Gen_UCD.Unsigned_8 := 0;
       end record;
       for Core_Data_Record'Size use 32;
       for Core_Data_Record use record
@@ -193,7 +203,8 @@ package body Gen_UCD.Core_Properties is
          ExtPict    at 0 range 14 .. 14;
          Reserved_2 at 0 range 15 .. 15;
          WB         at 0 range 16 .. 20;
-         Reserved_3 at 0 range 21 .. 31;
+         EA         at 0 range 21 .. 23;
+         Reserved_3 at 0 range 24 .. 31;
       end record;
 
       type Core_Data_Array is
@@ -444,6 +455,15 @@ package body Gen_UCD.Core_Properties is
                 else Index_Data'Length * 4));
       end Memory_Consumption;
 
+      ------------
+      -- Set_EA --
+      ------------
+
+      procedure Set_EA (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_3) is
+      begin
+         Raw (Gen_UCD.Unsigned_32 (Code)).EA := To;
+      end Set_EA;
+
       -----------------
       -- Set_ExtPict --
       -----------------
@@ -553,6 +573,10 @@ package body Gen_UCD.Core_Properties is
 
       InCB_Enumeration.Generate_Type_Declaration (File);
 
+      --  Generate EA_Values type
+
+      EA_Enumeration.Generate_Type_Declaration (File);
+
       --  Generate types for index and data tables.
 
       declare
@@ -592,6 +616,7 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "      InCB    : INCB_Values;");
          Put_Line (File, "      ExtPict : Boolean;");
          Put_Line (File, "      WB      : WB_Values;");
+         Put_Line (File, "      EA      : EA_Values;");
          Put_Line (File, "   end record;");
          Put_Line (File, "   for Core_Data_Record'Size use 32;");
          Put_Line (File, "   for Core_Data_Record use record");
@@ -602,6 +627,7 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "      InCB    at 0 range 12 .. 13;");
          Put_Line (File, "      ExtPict at 0 range 14 .. 14;");
          Put_Line (File, "      WB      at 0 range 16 .. 20;");
+         Put_Line (File, "      EA      at 0 range 21 .. 23;");
          Put_Line (File, "   end record;");
          New_Line (File);
 

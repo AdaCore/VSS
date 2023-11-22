@@ -1,0 +1,59 @@
+on: [workflow_dispatch]
+name: Build GNAT
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Get VSS
+        uses: actions/checkout@v3
+        with:
+          path: ./vss
+      - name: Build GNAT
+        run: |
+          sudo apt remove -y gcc binutils
+          sudo apt autoremove -y
+          sudo apt install -y libc6-dev-arm64-cross linux-libc-dev-arm64-cross binutils-aarch64-linux-gnu libc6-dev texinfo bison m4 flex
+          curl -L https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-13.2.0-1/gnat-x86_64-linux-13.2.0-1.tar.gz | tar xzf -
+          curl -L https://ftp.gwdg.de/pub/misc/gcc/releases/gcc-13.2.0/gcc-13.2.0.tar.xz |tar xJf -
+          export PATH=$PWD/gnat-x86_64-linux-13.2.0-1/bin:$PATH
+          cd gcc-13.2.0
+          ./contrib/download_prerequisites
+          mkdir ../build
+          cd ../build
+          CC="x86_64-pc-linux-gnu-gcc" CXX="x86_64-pc-linux-gnu-g++" \
+          ../gcc-13.2.0/configure \
+            --prefix=/usr \
+            --enable-languages=c,ada,c++ \
+            --enable-libstdcxx --enable-libstdcxx-threads --enable-libada --disable-nls \
+            --without-libiconv-prefix --disable-libstdcxx-pch --enable-lto \
+            --libdir=/usr/lib --includedir=/usr/aarch64-linux-gnu/include --with-sysroot=/ \
+            --without-target-system-zlib --program-prefix=aarch64-linux-gnu- \
+            --with-gnu-ld --with-gnu-as \
+            --target=aarch64-linux-gnu --build=x86_64-pc-linux-gnu
+          make -j4 all
+          make install-strip DESTDIR=$PWD/../destdir
+          # missing files required to rebuild RTS
+          cp -v gcc/ada/rts/*.{c,h,gpr,lst} ../gcc-13.2.0/libgcc/unwind-pe.h \
+             ../destdir/usr/lib/gcc/aarch64-linux-gnu/13.2.0/adainclude/
+          cd ..
+          tar cavf aarch64-Linux-gcc-13.2.tar.bz2 -C destdir .
+          rm -rf destdir
+
+      - name: Build GMP
+        run: |
+          export PATH=$PWD/gnat-x86_64-linux-13.2.0-1/bin:$PATH
+          sudo tar xaf aarch64-Linux-gcc-13.2.tar.bz2 -C /
+          cd gcc-13.2.0/gmp
+          ./configure --host=aarch64-linux-gnu --build=x86_64-pc-linux-gnu --prefix=/usr/aarch64-linux-gnu
+          make -j4 all
+          make install DESTDIR=$PWD/../../destdir
+          cd ../..
+          tar cavf aarch64-Linux-gmp-6.2.1.tar.bz2 -C destdir .
+
+      - name: Archive GNAT binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: aarch64-gnat-13
+          path: |
+            aarch64-Linux-gcc-13.2.tar.bz2
+            aarch64-Linux-gmp-6.2.1.tar.bz2

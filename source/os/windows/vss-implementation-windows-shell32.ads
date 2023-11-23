@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -13,6 +13,6 @@ package VSS.Implementation.Windows.Shell32 is
    function CommandLineToArgv
      (lpCmdLine : LPCWSTR;
       pNumArgs  : out Interfaces.C.int) return LPWSTR_Pointer
-     with Import, Convention => Stdcall, Link_Name => "CommandLineToArgvW";
+     with Import, Convention => Stdcall, External_Name => "CommandLineToArgvW";
 
 end VSS.Implementation.Windows.Shell32;

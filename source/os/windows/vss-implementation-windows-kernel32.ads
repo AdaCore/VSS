@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -37,19 +37,19 @@ package VSS.Implementation.Windows.Kernel32 is
    STARTF_USESTDHANDLES : constant DWORD := 16#0000_0100#;
 
    function CloseHandle (hObject : HANDLE) return BOOL
-     with Import, Convention => Stdcall, Link_Name => "CloseHandle";
+     with Import, Convention => Stdcall, External_Name => "CloseHandle";
 
    function GetCommandLine return LPWSTR
-     with Import, Convention => Stdcall, Link_Name => "GetCommandLineW";
+     with Import, Convention => Stdcall, External_Name => "GetCommandLineW";
 
    function GetConsoleWindow return HWND
-     with Import, Convention => Stdcall, Link_Name => "GetConsoleWindow";
+     with Import, Convention => Stdcall, External_Name => "GetConsoleWindow";
 
    function GetCurrentProcess return HANDLE
-     with Import, Convention => Stdcall, Link_Name => "GetCurrentProcess";
+     with Import, Convention => Stdcall, External_Name => "GetCurrentProcess";
 
    function GetLastError return DWORD
-     with Import, Convention => Stdcall, Link_Name => "GetLastError";
+     with Import, Convention => Stdcall, External_Name => "GetLastError";
 
    function GetEnvironmentVariable
      (lpName   : LPCWSTR;
@@ -57,30 +57,30 @@ package VSS.Implementation.Windows.Kernel32 is
       nSize    : DWORD) return DWORD
      with Import,
           Convention => Stdcall,
-          Link_Name  => "GetEnvironmentVariableW";
+          External_Name  => "GetEnvironmentVariableW";
 
    procedure GetStartupInfo
      (lpStartupInfo : Kernel32.LPSTARTUPINFO)
-     with Import, Convention => StdCall, Link_Name => "GetStartupInfoW";
+     with Import, Convention => StdCall, External_Name => "GetStartupInfoW";
 
    function GetTempPath
      (nBufferLength : DWORD;
       lpBuffer      : LPWSTR) return DWORD
-      with Import, Convention => Stdcall, Link_Name => "GetTempPathW";
+      with Import, Convention => Stdcall, External_Name => "GetTempPathW";
 
    function GetLongPathName
      (lpszShortPath : LPCWSTR;
       lpszLongPath  : LPWSTR;
       cchBuffer     : DWORD) return DWORD
-      with Import, Convention => Stdcall, Link_Name => "GetLongPathNameW";
+      with Import, Convention => Stdcall, External_Name => "GetLongPathNameW";
 
    function GetModuleFileName
      (hModule    : HANDLE;
       lpFilename : LPWSTR;
       nSize      : DWORD) return DWORD
-     with Import, Convention => StdCall, Link_Name => "GetModuleFileNameW";
+     with Import, Convention => StdCall, External_Name => "GetModuleFileNameW";
 
    procedure LocalFree (hMem : LPWSTR_Pointer)
-     with Import, Convention => StdCall, Link_Name => "LocalFree";
+     with Import, Convention => StdCall, External_Name => "LocalFree";
 
 end VSS.Implementation.Windows.Kernel32;

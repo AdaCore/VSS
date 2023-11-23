@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -15,6 +15,6 @@ package VSS.Implementation.Windows.Advapi32 is
       DesiredAccess : DWORD;
       TokenHandle   : out HANDLE)
       return BOOL
-     with Import, Convention => Stdcall, Link_Name => "OpenProcessToken";
+     with Import, Convention => Stdcall, External_Name => "OpenProcessToken";
 
 end VSS.Implementation.Windows.Advapi32;

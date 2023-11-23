@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -21,6 +21,6 @@ package VSS.Implementation.Windows.User32 is
       lpText    : LPCWSTR;
       lpCaption : LPCWSTR;
       uType     : UINT) return Interfaces.C.int
-     with Import, Convention => StdCall, Link_Name => "MessageBoxW";
+     with Import, Convention => StdCall, External_Name => "MessageBoxW";
 
 end VSS.Implementation.Windows.User32;

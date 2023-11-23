@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -17,6 +17,6 @@ package VSS.Implementation.Windows.Userenv is
       return BOOL
      with Import,
           Convention => Stdcall,
-          Link_Name  => "GetUserProfileDirectoryW";
+          External_Name  => "GetUserProfileDirectoryW";
 
 end VSS.Implementation.Windows.Userenv;

@@ -57,3 +57,13 @@ jobs:
           path: |
             aarch64-Linux-gcc-13.2.tar.bz2
             aarch64-Linux-gmp-6.2.1.tar.bz2
+
+      - name: AWS S3 upload
+        if: ${{ github.repository == 'AdaCore/VSS' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.GHA_CACHE_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.GHA_CACHE_SECRET}}
+          AWS_DEFAULT_REGION: eu-west-1
+        run: |
+            aws s3 cp . s3://adacore-gha-tray-eu-west-1/libadalang/ --recursive --exclude "*" --include "*.tar.bz2" --sse=AES256
+            aws s3 ls s3://adacore-gha-tray-eu-west-1/libadalang/

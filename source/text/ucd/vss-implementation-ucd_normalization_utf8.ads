@@ -1,3 +1,4 @@
+pragma Ada_2022;
 pragma Restrictions (No_Elaboration_Code);
 
 with VSS.Implementation.Strings;

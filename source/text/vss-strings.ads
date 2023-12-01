@@ -6,6 +6,8 @@
 
 --  API to process string data as sequences of Unicode Code Points.
 
+pragma Ada_2022;
+
 private with Ada.Streams;
 private with Ada.Strings.Text_Buffers;
 

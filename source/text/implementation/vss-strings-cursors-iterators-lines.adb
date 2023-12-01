@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Handlers;
 with VSS.Strings.Cursors.Markers.Internals;

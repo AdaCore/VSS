@@ -6,6 +6,8 @@
 
 --  Tables for fast string to float conversion
 
+pragma Ada_2022;
+
 private package VSS.JSON.Implementation.Numbers.Tables is
 
    pragma Preelaborate;

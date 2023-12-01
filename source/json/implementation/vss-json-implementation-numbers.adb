@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 with VSS.JSON.Implementation.Big_Integers;
 with VSS.JSON.Implementation.Numbers.Clinger;
 with VSS.JSON.Implementation.Numbers.Eisel_Lemire;

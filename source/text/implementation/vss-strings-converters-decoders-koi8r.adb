@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 with VSS.Implementation.String_Handlers;
 
 package body VSS.Strings.Converters.Decoders.KOI8R is

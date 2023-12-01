@@ -4,6 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
 pragma Style_Checks ("M131");
 
 --  This package contains data from index-gb18030-ranges.txt file

@@ -6,6 +6,8 @@
 
 --  RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange Format"
 
+pragma Ada_2022;
+
 with Ada.Unchecked_Conversion;
 
 with VSS.Implementation.UCD_Core;

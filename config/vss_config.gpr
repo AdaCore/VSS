@@ -9,6 +9,11 @@
 --
 --  Set of switches for all build modes are the same with Alire. Project
 --  specific switches should be added in VSS_Common project file.
+--
+--  Note, to enforce compatibility of the library code with Ada2012 dialect
+--  "-gnat2012" switch is used here; and all compilation units that use Ada2022
+--  are explicitly marked by "pragma Ada_2022;". Alire defaults to Ada2022 and
+--  override this setting.
 
 abstract project Vss_Config is
    Crate_Version := "wavefront";
@@ -52,7 +57,7 @@ abstract project Vss_Config is
            ,"-gnatyt" -- Check token spacing
            ,"-gnatyu" -- Check unnecessary blank lines
            ,"-gnatyx" -- Check extra parentheses
-           ,"-gnat2022" -- Ada 2022 Mode
+           ,"-gnat2012" -- Ada 2012 Mode, see comment.
           );
    Validation_Ada_Compiler_Switches :=
           (
@@ -90,7 +95,7 @@ abstract project Vss_Config is
            ,"-gnatyt" -- Check token spacing
            ,"-gnatyu" -- Check unnecessary blank lines
            ,"-gnatyx" -- Check extra parentheses
-           ,"-gnat2022" -- Ada 2022 Mode
+           ,"-gnat2012" -- Ada 2012 Mode, see comment.
           );
    Release_Ada_Compiler_Switches :=
           (
@@ -98,7 +103,7 @@ abstract project Vss_Config is
            ,"-gnatn" -- Enable inlining
            ,"-ffunction-sections" -- Separate ELF section for each function
            ,"-fdata-sections" -- Separate ELF section for each variable
-           ,"-gnat2022" -- Ada 2022 Mode
+           ,"-gnat2012" -- Ada 2012 Mode, see comment.
           );
 
    type Build_Profile_Kind is ("release", "validation", "development");

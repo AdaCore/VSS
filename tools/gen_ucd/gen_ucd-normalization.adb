@@ -995,6 +995,7 @@ package body Gen_UCD.Normalization is
    begin
       Put_Line ("   ... normalization");
 
+      Put_Line (File, "pragma Ada_2022;");
       Put_Line (File, "pragma Restrictions (No_Elaboration_Code);");
       New_Line (File);
 
@@ -1217,6 +1218,7 @@ package body Gen_UCD.Normalization is
 
       --  Generate common composition data
 
+      Put_Line (File, "pragma Ada_2022;");
       Put_Line (File, "pragma Restrictions (No_Elaboration_Code);");
       New_Line (File);
 

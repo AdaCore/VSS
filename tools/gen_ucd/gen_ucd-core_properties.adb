@@ -547,6 +547,7 @@ package body Gen_UCD.Core_Properties is
    begin
       Put_Line ("   ... core properties");
 
+      Put_Line (File, "pragma Ada_2022;");
       Put_Line (File, "pragma Restrictions (No_Elaboration_Code);");
       New_Line (File);
 

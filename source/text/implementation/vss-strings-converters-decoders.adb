@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 with Ada.Unchecked_Deallocation;
 
 with VSS.Stream_Element_Vectors.Internals;

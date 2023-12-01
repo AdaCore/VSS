@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 package body VSS.JSON.Pull_Readers.Buffered is
 
    use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;

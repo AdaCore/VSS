@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 package body VSS.JSON.Implementation.Packed_Decimals is
 
    use type Interfaces.Integer_32;

@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 with VSS.Strings;
 
 package VSS.XML.Implementation.HTML_Writer_Data is

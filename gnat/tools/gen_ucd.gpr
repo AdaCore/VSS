@@ -15,7 +15,10 @@ project Gen_UCD is
       "../../tools/ucd");
    for Main use ("gen_ucd-driver.adb");
 
-   package Compiler renames VSS_Common.Compiler;
+   package Compiler is
+      for Switches ("Ada") use
+        VSS_Common.Ada_Compiler_Switches & "-gnat2022";
+   end Compiler;
 
    package Linker renames VSS_Common.Linker;
 

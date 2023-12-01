@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 pragma Warnings (Off, "is an internal GNAT unit");
 with Ada.Strings.Unbounded.Aux;
 pragma Warnings (On, "is an internal GNAT unit");

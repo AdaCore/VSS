@@ -6,6 +6,8 @@
 
 --  Vector of strings and operations on it.
 
+pragma Ada_2022;
+
 with Ada.Iterator_Interfaces;
 
 private with Ada.Finalization;

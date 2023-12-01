@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 private with Ada.Finalization;
 
 with VSS.Strings.Cursors.Markers;

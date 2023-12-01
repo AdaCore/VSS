@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 with Ada.Unchecked_Conversion;
 
 with VSS.JSON.Implementation.Numbers.Tables;

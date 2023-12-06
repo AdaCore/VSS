@@ -178,7 +178,7 @@ clean:
 
 install: install-libs-relocatable
 
-install-all-libs: install-libs-relocatable install-libs-static install-libs-static-pic
+install-all-libs: install-libs-static install-libs-static-pic install-libs-relocatable
 
 install-libs-%:
 	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr

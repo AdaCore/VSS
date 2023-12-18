@@ -9,7 +9,7 @@
 pragma Ada_2022;
 
 private with Ada.Streams;
-private with Ada.Strings.Text_Buffers;
+with Ada.Strings.Text_Buffers;
 
 with VSS.Characters;
 private with VSS.Implementation.Referrers;
@@ -66,7 +66,8 @@ package VSS.Strings is
      [CR | LF | CRLF | NEL => True, others => False];
 
    type Virtual_String is tagged private
-     with String_Literal => To_Virtual_String;
+     with String_Literal => To_Virtual_String,
+          Put_Image => Put_Image;
    pragma Preelaborable_Initialization (Virtual_String);
 
    Empty_Virtual_String : constant Virtual_String;
@@ -464,6 +465,10 @@ package VSS.Strings is
       Form : Normalization_Form) return Virtual_String;
    --  Convert string to given normalization form.
 
+   procedure Put_Image
+     (Buffer : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;
+      Item   : Virtual_String);
+
 private
 
    type Magic_String_Access is access all Virtual_String'Class;
@@ -479,17 +484,12 @@ private
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
       Self   : Virtual_String);
 
-   procedure Put_Image
-     (Buffer : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;
-      Item   : Virtual_String);
-
    type Virtual_String is
      new VSS.Implementation.Referrers.Magic_String_Base with record
       Data : aliased VSS.Implementation.Strings.String_Data;
    end record
      with Read      => Read,
-          Write     => Write,
-          Put_Image => Put_Image;
+          Write     => Write;
 
    overriding procedure Adjust (Self : in out Virtual_String);
    overriding procedure Finalize (Self : in out Virtual_String);

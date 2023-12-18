@@ -17,6 +17,7 @@ with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 with VSS.Strings.Cursors.Iterators.Lines;
 with VSS.Strings.Cursors.Iterators.Words;
 with VSS.String_Vectors.Internals;
+with VSS.Transformers;
 
 package body VSS.Strings is
 
@@ -1366,6 +1367,29 @@ package body VSS.Strings is
          end if;
       end return;
    end To_Virtual_String;
+
+   ---------------
+   -- Transform --
+   ---------------
+
+   function Transform
+     (Self        : Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class)
+      return Virtual_String is
+   begin
+      return Transformer.Transform (Self);
+   end Transform;
+
+   ---------------
+   -- Transform --
+   ---------------
+
+   procedure Transform
+     (Self        : in out Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class) is
+   begin
+      Transformer.Transform (Self);
+   end Transform;
 
    -----------
    -- Write --

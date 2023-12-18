@@ -19,6 +19,7 @@ limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Cursors.Iterators.Words;
+limited with VSS.Transformers;
 
 package VSS.Strings is
 
@@ -468,6 +469,17 @@ package VSS.Strings is
    procedure Put_Image
      (Buffer : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;
       Item   : Virtual_String);
+
+   function Transform
+     (Self        : Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class)
+      return Virtual_String;
+   --  Transform given text using given text transformer.
+
+   procedure Transform
+     (Self        : in out Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class);
+   --  Transform given text using given text transformer.
 
 private
 

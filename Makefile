@@ -87,13 +87,13 @@ check_text:
 	.objs/tests/test_string_hash
 	.objs/tests/test_string_insert
 	.objs/tests/test_string_buffer
-	.objs/tests/test_string_normalization data/ucd
 	.objs/tests/test_string_slice
 	.objs/tests/test_string_split
 	.objs/tests/test_string_split_lines
 	.objs/tests/test_string
 	.objs/tests/test_string_template
 	.objs/tests/test_string_vector
+	.objs/tests/test_transformer data/ucd
 	for f in testsuite/text/w3c-i18n-tests-casing/*.txt; do \
 		echo "   $$f"; .objs/tests/test_string_casing_w3c_i18n $$f || return 1; \
 	done

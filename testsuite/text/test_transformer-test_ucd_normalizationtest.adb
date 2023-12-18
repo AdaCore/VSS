@@ -4,18 +4,13 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with Ada.Command_Line;
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
-
 with VSS.Characters;
-with VSS.Strings;
 with VSS.Transformers.Normalization;
 
 with UCD.Data_File_Loaders;
 
-with Test_Support;
-
-procedure Test_String_Normalization is
+separate (Test_Transformer)
+procedure Test_UCD_NormalizationTest is
 
    function Get_Field
      (Loader : UCD.Data_File_Loaders.File_Loader'Class;
@@ -41,10 +36,6 @@ procedure Test_String_Normalization is
          end loop;
       end return;
    end Get_Field;
-
-   UCD_Root : constant Wide_Wide_String :=
-     Ada.Strings.UTF_Encoding.Wide_Wide_Strings.Decode
-       (Ada.Command_Line.Argument (1));
 
    Loader : UCD.Data_File_Loaders.File_Loader;
 
@@ -80,19 +71,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                    VSS.Transformers.Normalization.Normalization_Form_C
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                    VSS.Transformers.Normalization.Normalization_Form_C
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                    VSS.Transformers.Normalization.Normalization_Form_C
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                    VSS.Transformers.Normalization.Normalization_Form_C
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                    VSS.Transformers.Normalization.Normalization_Form_C
                       .Transform (C4);
 
                begin
@@ -107,19 +98,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                    VSS.Transformers.Normalization.Normalization_Form_D
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                    VSS.Transformers.Normalization.Normalization_Form_D
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                    VSS.Transformers.Normalization.Normalization_Form_D
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                    VSS.Transformers.Normalization.Normalization_Form_D
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                    VSS.Transformers.Normalization.Normalization_Form_D
                       .Transform (C5);
 
                begin
@@ -134,19 +125,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                    VSS.Transformers.Normalization.Normalization_Form_KC
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                    VSS.Transformers.Normalization.Normalization_Form_KC
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                    VSS.Transformers.Normalization.Normalization_Form_KC
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                    VSS.Transformers.Normalization.Normalization_Form_KC
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                    VSS.Transformers.Normalization.Normalization_Form_KC
                       .Transform (C5);
 
                begin
@@ -161,19 +152,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                    VSS.Transformers.Normalization.Normalization_Form_KD
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                    VSS.Transformers.Normalization.Normalization_Form_KD
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                    VSS.Transformers.Normalization.Normalization_Form_KD
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                    VSS.Transformers.Normalization.Normalization_Form_KD
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                    VSS.Transformers.Normalization.Normalization_Form_KD
                       .Transform (C5);
 
                begin
@@ -192,4 +183,4 @@ begin
    end loop;
 
    Loader.Close;
-end Test_String_Normalization;
+end Test_UCD_NormalizationTest;

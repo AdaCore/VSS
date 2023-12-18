@@ -389,6 +389,8 @@ package VSS.Strings is
    --  Return True when Self starts with Prefix. Case_Sensitivity defines
    --  whether search is case sensitive or not, and select algorithm for the
    --  last.
+   --
+   --  XXX Don't use Case_Sensitivity parameter, it will be removed.
 
    function Ends_With
      (Self             : Virtual_String'Class;
@@ -398,6 +400,8 @@ package VSS.Strings is
    --  Return True when Self has given Suffix. Case_Sensitivity defines
    --  whether search is case sensitive or not, and select algorithm for the
    --  last.
+   --
+   --  XXX Don't use Case_Sensitivity parameter, it will be removed.
 
    function Ends_With
      (Self   : Virtual_String'Class;
@@ -430,41 +434,6 @@ package VSS.Strings is
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean := False)
       return VSS.String_Vectors.Virtual_String_Vector;
-
-   function To_Lowercase (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to lowercase form using default full case conversion.
-   --
-   --  See VSS.Locales.To_Lowercase for case conversions with tailoring by
-   --  the locale.
-
---   function To_Titlecase (Self : Virtual_String'Class) return Virtual_String;
---   --  Convert string to titlecase form using default full case conversion.
---   --
---   --  See VSS.Locales.To_Titlecase for case conversions with tailoring by
---   --  the locale.
-
-   function To_Uppercase (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to uppercase form using default full case conversion.
-   --
-   --  See VSS.Locales.To_Uppercase for case conversions with tailoring by
-   --  the locale.
-
-   function To_Simple_Lowercase
-     (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to lowercase form using default simple case conversion.
-
---   function To_Simple_Titlecase
---     (Self : Virtual_String'Class) return Virtual_String;
---   --  Convert string to titlecase form using default simple case conversion.
-
-   function To_Simple_Uppercase
-     (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to uppercase form using default simple case conversion.
-
-   function To_Normalized
-     (Self : Virtual_String'Class;
-      Form : Normalization_Form) return Virtual_String;
-   --  Convert string to given normalization form.
 
    procedure Put_Image
      (Buffer : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;

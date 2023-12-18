@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -9,6 +9,7 @@ with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
 with VSS.Characters;
 with VSS.Strings;
+with VSS.Transformers.Normalization;
 
 with UCD.Data_File_Loaders;
 
@@ -79,15 +80,20 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    C1.To_Normalized (VSS.Strings.Normalization_Form_C);
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                      .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    C2.To_Normalized (VSS.Strings.Normalization_Form_C);
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                      .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    C3.To_Normalized (VSS.Strings.Normalization_Form_C);
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                      .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    C4.To_Normalized (VSS.Strings.Normalization_Form_C);
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                      .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    C5.To_Normalized (VSS.Strings.Normalization_Form_C);
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
+                      .Transform (C4);
 
                begin
                   Test_Support.Assert (C2 = C1N);
@@ -101,15 +107,20 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    C1.To_Normalized (VSS.Strings.Normalization_Form_D);
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                      .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    C2.To_Normalized (VSS.Strings.Normalization_Form_D);
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                      .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    C3.To_Normalized (VSS.Strings.Normalization_Form_D);
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                      .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    C4.To_Normalized (VSS.Strings.Normalization_Form_D);
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                      .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    C5.To_Normalized (VSS.Strings.Normalization_Form_D);
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
+                      .Transform (C5);
 
                begin
                   Test_Support.Assert (C3 = C1N);
@@ -123,15 +134,20 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    C1.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                      .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    C2.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                      .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    C3.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                      .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    C4.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                      .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    C5.To_Normalized (VSS.Strings.Normalization_Form_KC);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
+                      .Transform (C5);
 
                begin
                   Test_Support.Assert (C4 = C1N);
@@ -145,15 +161,20 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    C1.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                      .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    C2.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                      .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    C3.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                      .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    C4.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                      .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    C5.To_Normalized (VSS.Strings.Normalization_Form_KD);
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
+                      .Transform (C5);
 
                begin
                   Test_Support.Assert (C5 = C1N);

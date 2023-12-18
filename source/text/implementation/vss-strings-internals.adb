@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -16,6 +16,19 @@ package body VSS.Strings.Internals is
    begin
       return Self.Data'Unchecked_Access;
    end Data_Access_Constant;
+
+   -----------------
+   -- Set_By_Move --
+   -----------------
+
+   procedure Set_By_Move
+     (Self : in out VSS.Strings.Virtual_String'Class;
+      To   : in out VSS.Implementation.Strings.String_Data) is
+   begin
+      VSS.Implementation.Strings.Unreference (Self.Data);
+      Self.Data := To;
+      To := (others => <>);
+   end Set_By_Move;
 
    ----------------------------
    -- To_Magic_String_Access --

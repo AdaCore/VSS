@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -33,6 +33,12 @@ package VSS.Strings.Internals is
       return not null VSS.Strings.Internals.String_Data_Constant_Access;
    --  Return access to string data member of the Virtual_String.
 
+   procedure Set_By_Move
+     (Self : in out VSS.Strings.Virtual_String'Class;
+      To   : in out VSS.Implementation.Strings.String_Data);
+   --  Set given string to given data. Initial data of the Self is
+   --  unreferenced, given data is copied and given value is reset.
+
    function To_Virtual_String_Access
      (Item : VSS.Implementation.Referrers.Magic_String_Access)
       return VSS.Implementation.Referrers.Virtual_String_Access with Inline;
@@ -40,6 +46,6 @@ package VSS.Strings.Internals is
      (Item : VSS.Implementation.Referrers.Virtual_String_Access)
       return VSS.Implementation.Referrers.Magic_String_Access with Inline;
    --  Do type conversion. It is intended to be used inside the
-   --  VSS.Implementation.Refrrals package.
+   --  VSS.Implementation.Referrals package.
 
 end VSS.Strings.Internals;

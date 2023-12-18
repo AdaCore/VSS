@@ -4,6 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+with VSS.Transformers.Casing;
+
 with VSS.Regular_Expressions.Category_Maps;
 
 package body VSS.Regular_Expressions.Name_Sets is
@@ -60,7 +62,9 @@ package body VSS.Regular_Expressions.Name_Sets is
          Initialize;
       end if;
 
-      Cursor := Map.Find (Name.To_Simple_Lowercase);
+      Cursor :=
+        Map.Find
+          (VSS.Transformers.Casing.Simple_Lowercase.Transform (Name));
 
       if Category_Maps.Maps.Has_Element (Cursor) then
          Value := Category_Maps.Maps.Element (Cursor);

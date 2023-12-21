@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Push_Readers</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#853491b045bfa58786603846fc48dc52108f81ce7c82384ce3a3ca33adeac3d8>JSON_Push_Reader</a></ul><h3>Subprograms</h3><ul><li><a href=#42bee2b33e89045f6c572b2d7c3ff1a581409f3028788d27805cfcf542c92065>Set_Content_Handler</a></ul><h2>Description</h2><p>Copyright (C) 2021, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=853491b045bfa58786603846fc48dc52108f81ce7c82384ce3a3ca33adeac3d8>JSON_Push_Reader</h4><pre class=ada-code-snippet><code>type JSON_Push_Reader is limited interface;
+</code></pre><h4 id=42bee2b33e89045f6c572b2d7c3ff1a581409f3028788d27805cfcf542c92065>Set_Content_Handler</h4><pre class=ada-code-snippet><code>procedure Set_Content_Handler
+  (Self : in out JSON_Push_Reader;
+   To   : VSS.JSON.Content_Handlers.JSON_Content_Handler_Access)
+</code></pre><p>Set content handler to process stream.<h5>Parameters</h5><dl><dt>Self<dd><dt>To<dd></dl>

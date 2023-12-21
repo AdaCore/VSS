@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Text_Streams.Memory_UTF8_Input</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#9c3aef02c2eb48a9fc499c6c6854df0169414678806daf9eb7c9cb340e527df8>Memory_UTF8_Input_Stream</a></ul><h3>Subprograms</h3><ul><li><a href=#6e5c20002c6f785ec6eaf9a30bb06fe5f31707fc64eddbd88a8e37e4daced8c0>Rewind</a><li><a href=#2818f4bc91a7305f0245bdeee3104cf579fca6fcfc99c2e279d1feabce757a73>Set_Data</a></ul><h2>Description</h2><p>Copyright (C) 2020-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=9c3aef02c2eb48a9fc499c6c6854df0169414678806daf9eb7c9cb340e527df8>Memory_UTF8_Input_Stream</h4><pre class=ada-code-snippet><code>type Memory_UTF8_Input_Stream is
+  limited new VSS.Text_Streams.Input_Text_Stream with private;
+</code></pre><h4 id=6e5c20002c6f785ec6eaf9a30bb06fe5f31707fc64eddbd88a8e37e4daced8c0>Rewind</h4><pre class=ada-code-snippet><code>procedure Rewind (Self : in out Memory_UTF8_Input_Stream'Class)
+</code></pre><p>Move current position to be processed to the begin of the data.<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=2818f4bc91a7305f0245bdeee3104cf579fca6fcfc99c2e279d1feabce757a73>Set_Data</h4><pre class=ada-code-snippet><code>procedure Set_Data
+  (Self : in out Memory_UTF8_Input_Stream'Class;
+   Data : VSS.Stream_Element_Vectors.Stream_Element_Vector)
+</code></pre><p>Set data to be processed.<h5>Parameters</h5><dl><dt>Self<dd><dt>Data<dd></dl>

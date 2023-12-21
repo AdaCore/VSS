@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Error_Handlers</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#de8e7ccff57eba7aa830c03d2de3a97905fbe5836d1634466c17df5cc9bd0670>SAX_Error_Handler</a></ul><h3>Access Types</h3><ul><li><a href=#f3aa5c54bd7c4afd1bf6ee1bde49448d9ed13effde102aed9acf6ab41c8530de>SAX_Error_Handler_Access</a></ul><h3>Subprograms</h3><ul><li><a href=#6616645b8d854da35d8edaa0266379e6c7a0e0584ca778d4ad365f0763095c58>Error</a><li><a href=#b45d508c88d7e08d4a531057bfa45e8908686634aaaf115a0522c106533edd0f>Fatal_Error</a><li><a href=#dd916535a63c6263b1b3cefe48fb81ff4aac5e73066fffa2e756eb549b60d48d>Warning</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=6616645b8d854da35d8edaa0266379e6c7a0e0584ca778d4ad365f0763095c58>Error</h4><pre class=ada-code-snippet><code>procedure Error
+  (Self    : in out SAX_Error_Handler;
+   Error   : VSS.XML.Parse_Errors.SAX_Parse_Error'Class;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Error<dd><dt>Success<dd></dl><h4 id=b45d508c88d7e08d4a531057bfa45e8908686634aaaf115a0522c106533edd0f>Fatal_Error</h4><pre class=ada-code-snippet><code>procedure Fatal_Error
+  (Self    : in out SAX_Error_Handler;
+   Error   : VSS.XML.Parse_Errors.SAX_Parse_Error'Class;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Error<dd><dt>Success<dd></dl><h4 id=de8e7ccff57eba7aa830c03d2de3a97905fbe5836d1634466c17df5cc9bd0670>SAX_Error_Handler</h4><pre class=ada-code-snippet><code>type SAX_Error_Handler is limited interface;
+</code></pre><h4 id=f3aa5c54bd7c4afd1bf6ee1bde49448d9ed13effde102aed9acf6ab41c8530de>SAX_Error_Handler_Access</h4><pre class=ada-code-snippet><code>type SAX_Error_Handler_Access is access all SAX_Error_Handler'Class;
+</code></pre><h4 id=dd916535a63c6263b1b3cefe48fb81ff4aac5e73066fffa2e756eb549b60d48d>Warning</h4><pre class=ada-code-snippet><code>procedure Warning
+  (Self    : in out SAX_Error_Handler;
+   Error   : VSS.XML.Parse_Errors.SAX_Parse_Error'Class;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Error<dd><dt>Success<dd></dl>

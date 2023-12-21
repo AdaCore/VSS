@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Templates.Processors</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#09700ff87cc46de586e7c53a7e68eec6673a2c18363b833fe054ac556fedb089>XML_Template_Processor</a></ul><h3>Subprograms</h3><ul><li><a href=#05a5d484cd065c20a7371ad284ac7af45e2743e885a889716343f839d84e4763>Bind</a><li><a href=#6388ae9c6741c28578851b602b74547688932fccb0709e7377a805bb6eb403ec>Bind</a><li><a href=#1602e6ce8b34debe21cfb3051837f24bc26e78d7049a86a687288f36cef00673>Set_Content_Handler</a><li><a href=#efcbcc4b2627a3f63f8dc6a264f2b1903d857e0f4c4ab5242204a488f2349c20>Set_Error_Handler</a></ul><h2>Description</h2><p>Copyright (C) 2022-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=05a5d484cd065c20a7371ad284ac7af45e2743e885a889716343f839d84e4763>Bind</h4><pre class=ada-code-snippet><code>procedure Bind
+  (Self  : in out XML_Template_Processor'Class;
+   Path  : VSS.String_Vectors.Virtual_String_Vector;
+   Proxy : not null VSS.XML.Templates.Proxies.Proxy_Access)
+</code></pre><p>Bind given proxy to given path. Ownership of the proxy object is moved to template processor, thus application must not use it anymore. Proxy will be released by the templates processor.<p>Use of the subprogram is discouraged. It is recommended to define custom composite proxy and bind it to the segment of the root namespace.<h5>Parameters</h5><dl><dt>Self<dd><dt>Path<dd><dt>Proxy<dd></dl><h4 id=6388ae9c6741c28578851b602b74547688932fccb0709e7377a805bb6eb403ec>Bind</h4><pre class=ada-code-snippet><code>procedure Bind
+  (Self    : in out XML_Template_Processor'Class;
+   Segment : VSS.Strings.Virtual_String;
+   Proxy   : not null VSS.XML.Templates.Proxies.Proxy_Access)
+</code></pre><p>Bind given proxy to given segment of the root namespace. Ownership of the proxy object is moved to template processor, thus application must not use it anymore. Proxy will be released by the templates processor.<h5>Parameters</h5><dl><dt>Self<dd><dt>Segment<dd><dt>Proxy<dd></dl><h4 id=1602e6ce8b34debe21cfb3051837f24bc26e78d7049a86a687288f36cef00673>Set_Content_Handler</h4><pre class=ada-code-snippet><code>procedure Set_Content_Handler
+  (Self    : in out XML_Template_Processor;
+   Handler : VSS.XML.Content_Handlers.SAX_Content_Handler_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Handler<dd></dl><h4 id=efcbcc4b2627a3f63f8dc6a264f2b1903d857e0f4c4ab5242204a488f2349c20>Set_Error_Handler</h4><pre class=ada-code-snippet><code>procedure Set_Error_Handler
+  (Self    : in out XML_Template_Processor;
+   Handler : VSS.XML.Error_Handlers.SAX_Error_Handler_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Handler<dd></dl><h4 id=09700ff87cc46de586e7c53a7e68eec6673a2c18363b833fe054ac556fedb089>XML_Template_Processor</h4><pre class=ada-code-snippet><code>type XML_Template_Processor is
+  limited new VSS.XML.Content_Handlers.SAX_Content_Handler
+    and VSS.XML.Lexical_Handlers.SAX_Lexical_Handler with private;
+</code></pre>

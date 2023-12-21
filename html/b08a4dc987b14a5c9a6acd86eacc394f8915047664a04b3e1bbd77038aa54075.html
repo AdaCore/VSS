@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Standard_Paths</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#f43c4a9d51688b53df055c9efb154e01415857c109cda8da843a3489e55f0711>Standard_Location</a></ul><h3>Subprograms</h3><ul><li><a href=#346af0384bf61e78d181614fc91942ac3fc2b37f00c5db22adf45038438f0c54>Writable_Location</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=f43c4a9d51688b53df055c9efb154e01415857c109cda8da843a3489e55f0711>Standard_Location</h4><pre class=ada-code-snippet><code>type Standard_Location is
+  (Home_Location,
+   Temp_Location);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>Home_Location<dd><dt>Temp_Location<dd></dl><h4 id=346af0384bf61e78d181614fc91942ac3fc2b37f00c5db22adf45038438f0c54>Writable_Location</h4><pre class=ada-code-snippet><code>function Writable_Location
+  (Location : Standard_Location) return VSS.Strings.Virtual_String
+</code></pre><p>Return the directory where files of given kind should be written to, or an empty string if the location can't be determined.<h5>Parameters</h5><dl><dt>Location<dd></dl><h5>Return Value</h5><dl><dd></dl>

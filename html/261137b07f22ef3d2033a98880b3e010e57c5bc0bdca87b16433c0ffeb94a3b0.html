@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.HTML.Writers</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#ffecdbf42305de46aa022bea9ff45cf5f876a75e188fe9bd3db48ee8296a910b>HTML5_Writer</a></ul><h3>Subprograms</h3><ul><li><a href=#27dcd40fdb2356e88db75a4d0ccf310478d9ebc74ef01e1755c0207f3c763bc4>Set_Error_Handler</a><li><a href=#ec2d9e945d88bbf784593763585d7a10f92a8c91634416c0963fb3b9d0cf942c>Set_Output_Stream</a></ul><h2>Description</h2><p>pragma Preelaborate;<h4 id=ffecdbf42305de46aa022bea9ff45cf5f876a75e188fe9bd3db48ee8296a910b>HTML5_Writer</h4><pre class=ada-code-snippet><code>type HTML5_Writer is
+  limited new VSS.XML.Content_Handlers.SAX_Content_Handler
+    and VSS.XML.Lexical_Handlers.SAX_Lexical_Handler with private;
+</code></pre><h4 id=27dcd40fdb2356e88db75a4d0ccf310478d9ebc74ef01e1755c0207f3c763bc4>Set_Error_Handler</h4><pre class=ada-code-snippet><code>procedure Set_Error_Handler
+  (Self : in out HTML5_Writer'Class;
+   To   : VSS.XML.Error_Handlers.SAX_Error_Handler_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>To<dd></dl><h4 id=ec2d9e945d88bbf784593763585d7a10f92a8c91634416c0963fb3b9d0cf942c>Set_Output_Stream</h4><pre class=ada-code-snippet><code>procedure Set_Output_Stream
+  (Self   : in out HTML5_Writer'Class;
+   Stream : VSS.Text_Streams.Output_Text_Stream_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Stream<dd></dl>

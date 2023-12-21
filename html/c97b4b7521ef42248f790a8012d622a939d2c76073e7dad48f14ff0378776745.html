@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Push_Readers.Simple</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#2410a1a619ea9487c7b1822565b56666bc194ed910f4510fd12b552a61af8191>JSON_Simple_Push_Reader</a></ul><h3>Subprograms</h3><ul><li><a href=#dbf79b94cb3b52996c3cee0c5ec113a8cc40e16d7cc63b3501fd78425a57b825>Error_Message</a><li><a href=#360c7caafe27c66f8df3daee078cf9eb7e3bec3949a7448e5b9d2922ce7efa82>Has_Error</a><li><a href=#eafc7d29e8fdafca581d08758c3e1f07f6f67fc14cad5720d67fa1bb86a4a497>Parse</a><li><a href=#8b0ba5407002ae4850d160c117558e5f9701a901b92a37e050ba3b47e2672896>Set_Stream</a></ul><h2>Description</h2><p>Copyright (C) 2021, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=dbf79b94cb3b52996c3cee0c5ec113a8cc40e16d7cc63b3501fd78425a57b825>Error_Message</h4><pre class=ada-code-snippet><code>function Error_Message
+  (Self : JSON_Simple_Push_Reader'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return text of the last detected error.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=360c7caafe27c66f8df3daee078cf9eb7e3bec3949a7448e5b9d2922ce7efa82>Has_Error</h4><pre class=ada-code-snippet><code>function Has_Error (Self : JSON_Simple_Push_Reader'Class) return Boolean
+</code></pre><p>Return True when some error is detected by the parser of reported by the handlers.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2410a1a619ea9487c7b1822565b56666bc194ed910f4510fd12b552a61af8191>JSON_Simple_Push_Reader</h4><pre class=ada-code-snippet><code>type JSON_Simple_Push_Reader is
+  limited new VSS.JSON.Push_Readers.JSON_Push_Reader
+    with private;
+</code></pre><h4 id=eafc7d29e8fdafca581d08758c3e1f07f6f67fc14cad5720d67fa1bb86a4a497>Parse</h4><pre class=ada-code-snippet><code>procedure Parse (Self : in out JSON_Simple_Push_Reader'Class)
+</code></pre><p>Parse all available data and return. It can be called again when non-blocking text stream is used and new data is available.<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=8b0ba5407002ae4850d160c117558e5f9701a901b92a37e050ba3b47e2672896>Set_Stream</h4><pre class=ada-code-snippet><code>procedure Set_Stream
+  (Self   : in out JSON_Simple_Push_Reader'Class;
+   Stream : not null VSS.Text_Streams.Input_Text_Stream_Access)
+</code></pre><p>Set text stream to be used to obtain data.<h5>Parameters</h5><dl><dt>Self<dd><dt>Stream<dd></dl>

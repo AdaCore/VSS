@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Streams</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#1bbaa5a290eb67d98740fdd1b032138009d8bd7504ffdd9590b5828a08a4cf0a>JSON_Stream_Element_Kind</a></ul><h3>Record Types</h3><ul><li><a href=#95d3831f051b44e78c72fdab5dd33986b02164e1cfeb154a67ee9bd28ace41ed>JSON_Stream_Element</a></ul><h3>Subtypes</h3><ul><li><a href=#a2f36cbd4f981b84d38c0adc7f6f788efda34c2eb880ca5b91827f139b4ac86a>Valid_JSON_Stream_Element_Kind</a></ul><h2>Description</h2><p>Copyright (C) 2020-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=95d3831f051b44e78c72fdab5dd33986b02164e1cfeb154a67ee9bd28ace41ed>JSON_Stream_Element</h4><pre class=ada-code-snippet><code>type JSON_Stream_Element (Kind : JSON_Stream_Element_Kind := None) is record
+   case Kind is
+      when None | Invalid | Start_Document | End_Document =>
+         null;
+      when Comment =>
+         Text : VSS.Strings.Virtual_String;
+      when Start_Array | End_Array | Start_Object | End_Object =>
+         null;
+      when Key_Name =>
+         Key_Name : VSS.Strings.Virtual_String;
+      when String_Value =>
+         String_Value : VSS.Strings.Virtual_String;
+      when Number_Value =>
+         Number_Value : VSS.JSON.JSON_Number;
+      when Boolean_Value =>
+         Boolean_Value : Boolean;
+      when Null_Value =>
+         null;
+   end case;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Kind<dd><dt>Text<dd><dt>Key_Name<dd><dt>String_Value<dd><dt>Number_Value<dd><dt>Boolean_Value<dd></dl><h4 id=1bbaa5a290eb67d98740fdd1b032138009d8bd7504ffdd9590b5828a08a4cf0a>JSON_Stream_Element_Kind</h4><pre class=ada-code-snippet><code>type JSON_Stream_Element_Kind is
+  (None,
+   Invalid,
+   Start_Document,
+   End_Document,
+   Comment,
+   Start_Array,
+   End_Array,
+   Start_Object,
+   End_Object,
+   Key_Name,
+   String_Value,
+   Number_Value,
+   Boolean_Value,
+   Null_Value);
+</code></pre><p>Kinds of elements in the JSON stream.<h5>Enumeration Literal</h5><dl><dt>None<dd><dt>Invalid<dd><dt>Start_Document<dd><dt>End_Document<dd><dt>Comment<dd><p>Comment in JSON5 format, not implemented.<dt>Start_Array<dd><dt>End_Array<dd><dt>Start_Object<dd><dt>End_Object<dd><dt>Key_Name<dd><dt>String_Value<dd><dt>Number_Value<dd><dt>Boolean_Value<dd><dt>Null_Value<dd></dl><h4 id=a2f36cbd4f981b84d38c0adc7f6f788efda34c2eb880ca5b91827f139b4ac86a>Valid_JSON_Stream_Element_Kind</h4><pre class=ada-code-snippet><code>subtype Valid_JSON_Stream_Element_Kind is
+  JSON_Stream_Element_Kind range Start_Document .. Null_Value;
+</code></pre><p>Valid stream element is an element that is not a special JSON parser state.

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Lexical_Handlers</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#86a23465ff1c7502386c6c139d1e543ca68e49b551921b58fefe4378019a70ef>SAX_Lexical_Handler</a></ul><h3>Access Types</h3><ul><li><a href=#5945135746b283f632b24d128c33af8fb61f48967c4fa95188a3e1b4445d107a>SAX_Lexical_Handler_Access</a></ul><h3>Subprograms</h3><ul><li><a href=#f2c11126a9dc805ee686d398ee7aeb8704be9919ced960db8e5472ed03224bb0>Comment</a><li><a href=#b425acacca1a05163552f4928da02fb4a0650ea423d91582570ae0de754a7a30>End_CDATA</a><li><a href=#9b0a28f7d5e6990fc58fb3704f56c84012ee6055318a799b1a3dda74fb63e037>End_DTD</a><li><a href=#a5e83b3bf228d5f92f093946f070d06936884ab0e69e6c58fa1c3c65af701f95>End_Entity</a><li><a href=#fc4aff2d650f9960fe52a7895a705022446ce8d1d2e1c14a73e81278fdcf97dd>Start_CDATA</a><li><a href=#4efd8df7d03bf35a65d551885450fb8432c3bc7dd6dd83633ac3b2d50b51cca0>Start_DTD</a><li><a href=#459a56bd36dfd9f8d58fcbca1e17707d51ae3d10d90a4bafe1b12faf0b1db61f>Start_Entity</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=f2c11126a9dc805ee686d398ee7aeb8704be9919ced960db8e5472ed03224bb0>Comment</h4><pre class=ada-code-snippet><code>procedure Comment
+  (Self    : in out SAX_Lexical_Handler;
+   Text    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Text<dd><dt>Success<dd></dl><h4 id=b425acacca1a05163552f4928da02fb4a0650ea423d91582570ae0de754a7a30>End_CDATA</h4><pre class=ada-code-snippet><code>procedure End_CDATA
+  (Self    : in out SAX_Lexical_Handler;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=9b0a28f7d5e6990fc58fb3704f56c84012ee6055318a799b1a3dda74fb63e037>End_DTD</h4><pre class=ada-code-snippet><code>procedure End_DTD
+  (Self    : in out SAX_Lexical_Handler;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=a5e83b3bf228d5f92f093946f070d06936884ab0e69e6c58fa1c3c65af701f95>End_Entity</h4><pre class=ada-code-snippet><code>procedure End_Entity
+  (Self    : in out SAX_Lexical_Handler;
+   Name    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd><dt>Success<dd></dl><h4 id=86a23465ff1c7502386c6c139d1e543ca68e49b551921b58fefe4378019a70ef>SAX_Lexical_Handler</h4><pre class=ada-code-snippet><code>type SAX_Lexical_Handler is limited interface;
+</code></pre><h4 id=5945135746b283f632b24d128c33af8fb61f48967c4fa95188a3e1b4445d107a>SAX_Lexical_Handler_Access</h4><pre class=ada-code-snippet><code>type SAX_Lexical_Handler_Access is access all SAX_Lexical_Handler'Class;
+</code></pre><h4 id=fc4aff2d650f9960fe52a7895a705022446ce8d1d2e1c14a73e81278fdcf97dd>Start_CDATA</h4><pre class=ada-code-snippet><code>procedure Start_CDATA
+  (Self    : in out SAX_Lexical_Handler;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=4efd8df7d03bf35a65d551885450fb8432c3bc7dd6dd83633ac3b2d50b51cca0>Start_DTD</h4><pre class=ada-code-snippet><code>procedure Start_DTD
+  (Self      : in out SAX_Lexical_Handler;
+   Name      : VSS.Strings.Virtual_String;
+   Public_Id : VSS.Strings.Virtual_String;
+   System_Id : VSS.Strings.Virtual_String;
+   Success   : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd><dt>Public_Id<dd><dt>System_Id<dd><dt>Success<dd></dl><h4 id=459a56bd36dfd9f8d58fcbca1e17707d51ae3d10d90a4bafe1b12faf0b1db61f>Start_Entity</h4><pre class=ada-code-snippet><code>procedure Start_Entity
+  (Self    : in out SAX_Lexical_Handler;
+   Name    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd><dt>Success<dd></dl>

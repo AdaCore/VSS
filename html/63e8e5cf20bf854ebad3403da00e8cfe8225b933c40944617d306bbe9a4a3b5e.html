@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.IRIs</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#1579d711e091ef7fc144207d30be18a19914e88bc19958355a2686e98c4e7e92>IRI</a></ul><h3>Constants</h3><ul><li><a href=#f651b17509122d30202f42818a4f2a0fde4ef6c96b3cae75edfe454a2c43134f>Empty_IRI</a></ul><h3>Subprograms</h3><ul><li><a href=#9ffa34fce3038ba170f39ddeb530c6b58e53ba34534df1cb6d3d4de0661a8326>To_IRI</a><li><a href=#ff8830c6b4e8341200ced16ab6aed2fb5966ea3c79a300ff48c9bf020f88cfdc>To_Virtual_String</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=f651b17509122d30202f42818a4f2a0fde4ef6c96b3cae75edfe454a2c43134f>Empty_IRI</h4><pre class=ada-code-snippet><code>Empty_IRI : constant IRI;
+</code></pre><h4 id=1579d711e091ef7fc144207d30be18a19914e88bc19958355a2686e98c4e7e92>IRI</h4><pre class=ada-code-snippet><code>type IRI is tagged private;
+</code></pre><h4 id=9ffa34fce3038ba170f39ddeb530c6b58e53ba34534df1cb6d3d4de0661a8326>To_IRI</h4><pre class=ada-code-snippet><code>function To_IRI (Image : VSS.Strings.Virtual_String) return IRI
+</code></pre><h5>Parameters</h5><dl><dt>Image<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=ff8830c6b4e8341200ced16ab6aed2fb5966ea3c79a300ff48c9bf020f88cfdc>To_Virtual_String</h4><pre class=ada-code-snippet><code>function To_Virtual_String
+  (Self : IRI'Class) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

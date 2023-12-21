@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Stream_Element_Vectors</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#85ccac9e46f4d73a951906b06a776fe0cf71e57deb70303c69f84d0256aba0eb>Cursor</a></ul><h3>Tagged Types</h3><ul><li><a href=#7dcf733486a9c72e51a05b82a6cfd46eccaf7a32a432d347c24b66ac28240d18>Reversible_Iterator</a><li><a href=#1f0752caea4a33b6a353d68a2a0bc7607f46ecafe24c0022d3fdee69e0c17794>Stream_Element_Vector</a></ul><h3>Subprograms</h3><ul><li><a href=#f88b5c6657ddb3db17f3f76f90d18916f149d5c4cef704b84c7b43ce8c250e61>"="</a><li><a href=#e12ce2a49a9f5dbb6a51e742eebd0f6c3c388ad10e858bce1315f759eca922c4>Append</a><li><a href=#8fdf44776820fa402f76a0a5d010b46333defa8fef2735ccd93c3401a969adb9>Append</a><li><a href=#08b0ac3ba341f5bb43f57f7015314aa6fe9d0c7e2c233d31a55b00debb199e90>Element</a><li><a href=#ecd0769803a755bcec533211922b1dcbf5f871e74c143c16d28fd3e989b523c0>Element</a><li><a href=#b098323cb0ab52314a54b6985fd5f493d0c12e54cbb1a285b684b952a7e79a42>First</a><li><a href=#4b162d3cd7e536425f68551950793b9ffcccc6a80c6840f3e7672d0926afe59f>Has_Element</a><li><a href=#aeebdd83bb13f5adbac343e0b13e16bd845d30aa6c83254a0ef4b463b1f6891b>Is_Empty</a><li><a href=#4509f27fc66a5ea1b1dae8354d9576ddc325489596a105a27f609a5f83d86aec>Iterate</a><li><a href=#dd24b72789216b53fce637b768262900f6237657a7f4c4284daefcf91a72e4c8>Last</a><li><a href=#d7124c5bd4a4d3edaf291e7d9b605bc9e860ff66385ec4abc8673ff7ce77fac7>Length</a><li><a href=#69005f89ff7d4e5aca64ccbc70b7ebb2c6753b76c2ba09ad6bd9d166ccfa9ae4>Next</a><li><a href=#2f3996d8394b027f10c4078a0aa0c5a0876b1ccc6d1f61e1c8a8d914df7d84d5>Previous</a><li><a href=#60c7a61b8eca4d37b5a6858c8d87cb23728349a96af9ca41932310c7f46d0c49>Set_Capacity</a></ul><h3>Generic Instantiations</h3><ul><li><a href=#ede95d70a9a2ad7898b82eca965d5ae39f55c20e09143c00908f37977f30be5d>Iterator_Interfaces</a></ul><h2>Description</h2><p>Copyright (C) 2020-2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=f88b5c6657ddb3db17f3f76f90d18916f149d5c4cef704b84c7b43ce8c250e61>"="</h4><pre class=ada-code-snippet><code>function "="
+  (Left  : Stream_Element_Vector;
+   Right : Stream_Element_Vector) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Left<dd><dt>Right<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=e12ce2a49a9f5dbb6a51e742eebd0f6c3c388ad10e858bce1315f759eca922c4>Append</h4><pre class=ada-code-snippet><code>procedure Append
+  (Self : in out Stream_Element_Vector'Class;
+   Item : Ada.Streams.Stream_Element)
+</code></pre><p>Append stream element to the end of the buffer<h5>Parameters</h5><dl><dt>Self<dd><dt>Item<dd></dl><h4 id=8fdf44776820fa402f76a0a5d010b46333defa8fef2735ccd93c3401a969adb9>Append</h4><pre class=ada-code-snippet><code>procedure Append
+  (Self : in out Stream_Element_Vector'Class;
+   Item : Stream_Element_Vector'Class)
+</code></pre><p>Append stream element vector to the end of the buffer<h5>Parameters</h5><dl><dt>Self<dd><dt>Item<dd></dl><h4 id=85ccac9e46f4d73a951906b06a776fe0cf71e57deb70303c69f84d0256aba0eb>Cursor</h4><pre class=ada-code-snippet><code>type Cursor is private;
+</code></pre><h4 id=08b0ac3ba341f5bb43f57f7015314aa6fe9d0c7e2c233d31a55b00debb199e90>Element</h4><pre class=ada-code-snippet><code>function Element
+  (Self  : Stream_Element_Vector'Class;
+   Index : Ada.Streams.Stream_Element_Count)
+   return Ada.Streams.Stream_Element
+</code></pre><p>Return element at given index (starting from 1).<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=ecd0769803a755bcec533211922b1dcbf5f871e74c143c16d28fd3e989b523c0>Element</h4><pre class=ada-code-snippet><code>function Element
+  (Self     : Stream_Element_Vector'Class;
+   Position : Cursor)
+   return Ada.Streams.Stream_Element
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=b098323cb0ab52314a54b6985fd5f493d0c12e54cbb1a285b684b952a7e79a42>First</h4><pre class=ada-code-snippet><code>function First (Self : Reversible_Iterator) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4b162d3cd7e536425f68551950793b9ffcccc6a80c6840f3e7672d0926afe59f>Has_Element</h4><pre class=ada-code-snippet><code>function Has_Element (Self : Cursor) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=aeebdd83bb13f5adbac343e0b13e16bd845d30aa6c83254a0ef4b463b1f6891b>Is_Empty</h4><pre class=ada-code-snippet><code>function Is_Empty (Self : Stream_Element_Vector'Class) return Boolean
+</code></pre><p>Return True when stream element vector doesn't contain any elements.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4509f27fc66a5ea1b1dae8354d9576ddc325489596a105a27f609a5f83d86aec>Iterate</h4><pre class=ada-code-snippet><code>function Iterate
+  (Self : Stream_Element_Vector'Class) return Reversible_Iterator
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=ede95d70a9a2ad7898b82eca965d5ae39f55c20e09143c00908f37977f30be5d>Iterator_Interfaces</h4><pre class=ada-code-snippet><code>package Iterator_Interfaces is new Ada.Iterator_Interfaces
+  (Cursor, Has_Element);
+</code></pre><h4 id=dd24b72789216b53fce637b768262900f6237657a7f4c4284daefcf91a72e4c8>Last</h4><pre class=ada-code-snippet><code>function Last (Self : Reversible_Iterator) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d7124c5bd4a4d3edaf291e7d9b605bc9e860ff66385ec4abc8673ff7ce77fac7>Length</h4><pre class=ada-code-snippet><code>function Length
+  (Self : Stream_Element_Vector'Class)
+   return Ada.Streams.Stream_Element_Count
+</code></pre><p>Return size of accumulated data.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=69005f89ff7d4e5aca64ccbc70b7ebb2c6753b76c2ba09ad6bd9d166ccfa9ae4>Next</h4><pre class=ada-code-snippet><code>function Next
+  (Self     : Reversible_Iterator;
+   Position : Cursor) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2f3996d8394b027f10c4078a0aa0c5a0876b1ccc6d1f61e1c8a8d914df7d84d5>Previous</h4><pre class=ada-code-snippet><code>function Previous
+  (Self     : Reversible_Iterator;
+   Position : Cursor) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7dcf733486a9c72e51a05b82a6cfd46eccaf7a32a432d347c24b66ac28240d18>Reversible_Iterator</h4><pre class=ada-code-snippet><code>type Reversible_Iterator is
+  limited new Iterator_Interfaces.Reversible_Iterator with private;
+</code></pre><h4 id=60c7a61b8eca4d37b5a6858c8d87cb23728349a96af9ca41932310c7f46d0c49>Set_Capacity</h4><pre class=ada-code-snippet><code>procedure Set_Capacity
+  (Self     : in out Stream_Element_Vector'Class;
+   Capacity : Ada.Streams.Stream_Element_Count)
+</code></pre><p>Request to pre-allocate memory to store given number of stream elements.<h5>Parameters</h5><dl><dt>Self<dd><dt>Capacity<dd></dl><h4 id=1f0752caea4a33b6a353d68a2a0bc7607f46ecafe24c0022d3fdee69e0c17794>Stream_Element_Vector</h4><pre class=ada-code-snippet><code>type Stream_Element_Vector is tagged private
+  with
+    Constant_Indexing => Element,
+    Default_Iterator  => Iterate,
+    Iterator_Element  => Ada.Streams.Stream_Element;
+</code></pre>

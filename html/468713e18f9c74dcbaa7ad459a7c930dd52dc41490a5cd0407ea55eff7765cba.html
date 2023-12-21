@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Attributes.Containers</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#51ab9f3f36bf052b389c5b20e8e0e7df6834acb549d9382db33c9dc702238665>Attributes</a></ul><h3>Subprograms</h3><ul><li><a href=#24aab9ec905600818b6970efccd51b5611cbd59a6003fe6d6ee837e0f88c11ac>Clear</a><li><a href=#f8591c5fada8a01ffc6d2be853fbc3c1529e900c3fbdf460ddb4b87f7735467d>Insert</a></ul><h2>Description</h2><p>This package provides container for set of values of XML attributes to be used by applications.<h4 id=51ab9f3f36bf052b389c5b20e8e0e7df6834acb549d9382db33c9dc702238665>Attributes</h4><pre class=ada-code-snippet><code>type Attributes is
+  new VSS.XML.Attributes.XML_Attributes with private;
+</code></pre><h4 id=24aab9ec905600818b6970efccd51b5611cbd59a6003fe6d6ee837e0f88c11ac>Clear</h4><pre class=ada-code-snippet><code>procedure Clear (Self : in out Attributes'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=f8591c5fada8a01ffc6d2be853fbc3c1529e900c3fbdf460ddb4b87f7735467d>Insert</h4><pre class=ada-code-snippet><code>procedure Insert
+  (Self  : in out Attributes'Class;
+   URI   : VSS.IRIs.IRI;
+   Name  : VSS.Strings.Virtual_String;
+   Value : VSS.Strings.Virtual_String)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>URI<dd><dt>Name<dd><dt>Value<dd></dl>

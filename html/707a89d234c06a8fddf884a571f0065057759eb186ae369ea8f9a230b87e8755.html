@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Templates.Proxies</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#a55ea34cb178d0f128425c121c6599e88e1c76121d6d0ff0604497e4a8a0d5b7>Abstract_Composite_Proxy</a><li><a href=#eb37891a7162a09ec891d544a2f590422438b44d3287026d68d641271cba3b52>Abstract_Iterable_Iterator</a><li><a href=#14514f2e28fed459ba4d4ee340e9d096f0f16177cebdc5459efb770783a3c908>Abstract_Iterable_Proxy</a><li><a href=#dd73948728ca1f70d33ba92763b6a3f462a0538a2f5eefafb9bfffd746325467>Abstract_Proxy</a><li><a href=#f67a3358f6aebcd7272dd593275aba9975fad87b9ef01ab8ea55e983e8473f0b>Abstract_Value_Proxy</a></ul><h3>Tagged Types</h3><ul><li><a href=#d2cda7d5d52b683df41248fd50e1e283d625fb244b7fbb712dd525dee445a533>Error_Proxy</a></ul><h3>Access Types</h3><ul><li><a href=#02bcfd116b3352d01833d4c1c26321d63f1ed47cdce1b44e4352f6c7abce7ee4>Proxy_Access</a></ul><h3>Subprograms</h3><ul><li><a href=#8287b03622d2cd001fc80d3d0e10c38106a786475048bd8b074f41a1b0484476>Component</a><li><a href=#46bc1ead6305c41a20b7144e960a1821fbbaebc88b155906cc44b99e3f7ddbde>Element</a><li><a href=#63d49bd2defe58704987eee3237d9689516ce92692d1e602fe8d58fcbcd8fe49>Is_Empty</a><li><a href=#36605ab78dc167a34af57655561fea0bd6b58f3b2d1de3f8a7d7af5ff36c10c6>Iterator</a><li><a href=#215038815ae1305aa87bf015068ad7ec7cc78f6e4007b087c8b44787ba7bffb6>Next</a><li><a href=#ce22797bc9f68eb4fa7d828873eadcd5b570926064ebb2c2f6f0b185df91feac>Value</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=a55ea34cb178d0f128425c121c6599e88e1c76121d6d0ff0604497e4a8a0d5b7>Abstract_Composite_Proxy</h4><pre class=ada-code-snippet><code>type Abstract_Composite_Proxy is limited interface and Abstract_Proxy;
+</code></pre><h4 id=eb37891a7162a09ec891d544a2f590422438b44d3287026d68d641271cba3b52>Abstract_Iterable_Iterator</h4><pre class=ada-code-snippet><code>type Abstract_Iterable_Iterator is limited interface and Abstract_Proxy;
+</code></pre><h4 id=14514f2e28fed459ba4d4ee340e9d096f0f16177cebdc5459efb770783a3c908>Abstract_Iterable_Proxy</h4><pre class=ada-code-snippet><code>type Abstract_Iterable_Proxy is limited interface and Abstract_Proxy;
+</code></pre><h4 id=dd73948728ca1f70d33ba92763b6a3f462a0538a2f5eefafb9bfffd746325467>Abstract_Proxy</h4><pre class=ada-code-snippet><code>type Abstract_Proxy is limited interface;
+</code></pre><h4 id=f67a3358f6aebcd7272dd593275aba9975fad87b9ef01ab8ea55e983e8473f0b>Abstract_Value_Proxy</h4><pre class=ada-code-snippet><code>type Abstract_Value_Proxy is limited interface and Abstract_Proxy;
+</code></pre><h4 id=8287b03622d2cd001fc80d3d0e10c38106a786475048bd8b074f41a1b0484476>Component</h4><pre class=ada-code-snippet><code>function Component
+  (Self : in out Abstract_Composite_Proxy;
+   Name : VSS.Strings.Virtual_String)
+   return Abstract_Proxy'Class
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=46bc1ead6305c41a20b7144e960a1821fbbaebc88b155906cc44b99e3f7ddbde>Element</h4><pre class=ada-code-snippet><code>function Element
+  (Self : in out Abstract_Iterable_Iterator)
+   return Abstract_Proxy'Class
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d2cda7d5d52b683df41248fd50e1e283d625fb244b7fbb712dd525dee445a533>Error_Proxy</h4><pre class=ada-code-snippet><code>type Error_Proxy is limited new Abstract_Proxy with record
+   Message : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Message<dd></dl><h4 id=63d49bd2defe58704987eee3237d9689516ce92692d1e602fe8d58fcbcd8fe49>Is_Empty</h4><pre class=ada-code-snippet><code>function Is_Empty
+  (Self : Abstract_Iterable_Proxy) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=36605ab78dc167a34af57655561fea0bd6b58f3b2d1de3f8a7d7af5ff36c10c6>Iterator</h4><pre class=ada-code-snippet><code>function Iterator
+  (Self : in out Abstract_Iterable_Proxy)
+   return Abstract_Iterable_Iterator'Class
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=215038815ae1305aa87bf015068ad7ec7cc78f6e4007b087c8b44787ba7bffb6>Next</h4><pre class=ada-code-snippet><code>function Next
+  (Self : in out Abstract_Iterable_Iterator) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=02bcfd116b3352d01833d4c1c26321d63f1ed47cdce1b44e4352f6c7abce7ee4>Proxy_Access</h4><pre class=ada-code-snippet><code>type Proxy_Access is
+  access all VSS.XML.Templates.Proxies.Abstract_Proxy'Class;
+</code></pre><h4 id=ce22797bc9f68eb4fa7d828873eadcd5b570926064ebb2c2f6f0b185df91feac>Value</h4><pre class=ada-code-snippet><code>function Value
+  (Self : Abstract_Value_Proxy)
+   return VSS.XML.Templates.Values.Value
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

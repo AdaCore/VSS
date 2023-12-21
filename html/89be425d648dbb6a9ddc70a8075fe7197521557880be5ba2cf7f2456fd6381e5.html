@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Templates.Proxies.Strings</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#e3c7d1f5ab2ae109c3fa8b033c3e41cc61df6419fc839902632dbe8f1d851c5e>Virtual_String_Proxy</a></ul><h3>Subprograms</h3><ul><li><a href=#36feda05e118b3d20442d461840575acddc2a42e7c74b70ab1a1c9abd0af20fb>Value</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=36feda05e118b3d20442d461840575acddc2a42e7c74b70ab1a1c9abd0af20fb>Value</h4><pre class=ada-code-snippet><code>function Value
+  (Self : Virtual_String_Proxy) return VSS.XML.Templates.Values.Value
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=e3c7d1f5ab2ae109c3fa8b033c3e41cc61df6419fc839902632dbe8f1d851c5e>Virtual_String_Proxy</h4><pre class=ada-code-snippet><code>type Virtual_String_Proxy is
+  limited new VSS.XML.Templates.Proxies.Abstract_Value_Proxy with
+record
+   Text : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Text<dd></dl>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.String_Vectors</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#4aed0064002886e27ea125048ba10cbcc6576775e21b6b13ce271e741f8e5c89>Cursor</a></ul><h3>Tagged Types</h3><ul><li><a href=#3fad6a57d323ebe523caa1a7e685f08000d503d3b8c16a948d5230ebec867e91>Reversible_Iterator</a><li><a href=#65ca3012bfda0c93b6078dc6806795e21bdaf1ac0af8c9b352c76150218f235d>Virtual_String_Vector</a></ul><h3>Constants</h3><ul><li><a href=#d3b6d006ba03e3fec4a6551dc606aa1fc7286a8d53b8d204ebf566c4fc0de0b5>Empty_Virtual_String_Vector</a></ul><h3>Subprograms</h3><ul><li><a href=#8e2428f808bf85d9f9e4cedc64b36acc80f0e4468ecc60845150c7ffa9a7f069>"="</a><li><a href=#feafcc1c8677e0925c301a02bbfcd5898682922630a4578edb2c416dd219b08e>Append</a><li><a href=#d5b4192e10342df3ce45126c2065ac43192bd8d1583fbcc4429415e702d6de97>Append</a><li><a href=#7c1727953a56f98172b8a128377dbf7a27b6a45f952d9e6c20f6a21b835648dc>Append_Syntax_Sugar</a><li><a href=#5856d7cd069a11a291607a565913d8153f0e2241d4aa594ba20843aeaf858fc3>Clear</a><li><a href=#86bbb4a7b7179cef6f425f028ce073fbb65ab74208d6a2ea6bf594c04e1ebee2>Contains</a><li><a href=#d7f1f84d3248d5b1d59ee86f1f261b5e7b42b234ff107b7002e7bbf5900cb028>Delete</a><li><a href=#e14a929c0141b4bbeb9a45177ca0dde8afcbd6d063bfd4fbb8bba0941ac388fd>Delete_First</a><li><a href=#df60b5ac6d5ed3e495aefa213435c865fbef71d4c82dd2667774b05e40a2a92b>Delete_First</a><li><a href=#cabc41616a7f936109324a48544b58a552d42cc84f7995b2db8391d53c2c20a6>Delete_Last</a><li><a href=#94325bad54f735b352e7eed4e17a787d0ee0ba1102518a63b84dbd1cc3c4830b>Element</a><li><a href=#8459a96a55174c41640fdd727b69f6f08bec1381a4bdeb8318dbaad1c5f94224>Element</a><li><a href=#47ebe1e7c6c2205d109469b671988a4320aef8fd8174983cf1874c1e896be8bb>First</a><li><a href=#d1e9c52f23ec30e05b08d316b13c9a73ae1e2bd9367735c08e67b48238979da1>First_Element</a><li><a href=#1a3efc228ea8796d078cce6740da63556d42bfc9d6a2c92d5a9985169726404a>Has_Element</a><li><a href=#91446ff2afe39ba5df7c462a05c774739a79d5f273f7926b4bcdfa5de3e9e514>Is_Empty</a><li><a href=#0f9e23d1520e28258fd8f308caae75d6d7160c311cee2b50d2e480dd141c5f8e>Iterate</a><li><a href=#66ad9cbcaf0350971fcde8f843386861fc36184df32520f4ab5fdcb64150386a>Join</a><li><a href=#003cbb6ca8c9866ebc29d3af7624b8a1dd48010447786ef0020cf4b6d36f4fa9>Join_Lines</a><li><a href=#683c6619d84af6895a37a22bf200c9c8274f5c7eacd2debd0551753fa4c096ca>Last</a><li><a href=#dcac6c6f23720914994d22fc039ee1058d0676dc35cdf0648dca0f4bd55d534b>Last_Element</a><li><a href=#a6c66b2a57ff82cae1f1cb3d95d1e78c521374da42b6565c5fb9aa8a75730e96>Length</a><li><a href=#27b8bec325c4a0fba2bb7ff9e880daf1f31c7236045c053d9e31154c9bce5b09>Next</a><li><a href=#9590582da0b255456168643cc0e72743477e9880c435624dd3b12d6f97e35e48>Prepend</a><li><a href=#123ea51c78f28e7f65f622cfcfb22fcd2e99d42361d57c17436a6587aefc64dc>Previous</a><li><a href=#cad9fce9078a8a42cae780383fb557fff0e394724ce3e9422dfe722e0e16a433>Replace</a></ul><h3>Generic Instantiations</h3><ul><li><a href=#61a28d9a06af41bf80d13e08799fd01540d24451d6cee21af10eee73b68a7b7c>Iterator_Interfaces</a></ul><h2>Description</h2><p>Vector of strings and operations on it.<h4 id=8e2428f808bf85d9f9e4cedc64b36acc80f0e4468ecc60845150c7ffa9a7f069>"="</h4><pre class=ada-code-snippet><code>function "="
+  (Left  : Virtual_String_Vector;
+   Right : Virtual_String_Vector) return Boolean
+</code></pre><p>Compare two string vectors.<h5>Parameters</h5><dl><dt>Left<dd><dt>Right<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=feafcc1c8677e0925c301a02bbfcd5898682922630a4578edb2c416dd219b08e>Append</h4><pre class=ada-code-snippet><code>procedure Append
+  (Self : in out Virtual_String_Vector'Class;
+   Item : Virtual_String_Vector'Class)
+</code></pre><p>Append strings of Item to the end of the vector.<h5>Parameters</h5><dl><dt>Self<dd><dt>Item<dd></dl><h4 id=d5b4192e10342df3ce45126c2065ac43192bd8d1583fbcc4429415e702d6de97>Append</h4><pre class=ada-code-snippet><code>procedure Append
+  (Self : in out Virtual_String_Vector'Class;
+   Item : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Append string to the end of the vector.<h5>Parameters</h5><dl><dt>Self<dd><dt>Item<dd></dl><h4 id=7c1727953a56f98172b8a128377dbf7a27b6a45f952d9e6c20f6a21b835648dc>Append_Syntax_Sugar</h4><pre class=ada-code-snippet><code>procedure Append_Syntax_Sugar
+  (Self : in out Virtual_String_Vector;
+   Item : VSS.Strings.Virtual_String)
+</code></pre><p>Append operation to match expected profile of Aggregate aspect.<h5>Parameters</h5><dl><dt>Self<dd><dt>Item<dd></dl><h4 id=5856d7cd069a11a291607a565913d8153f0e2241d4aa594ba20843aeaf858fc3>Clear</h4><pre class=ada-code-snippet><code>procedure Clear (Self : in out Virtual_String_Vector'Class)
+</code></pre><p>Remove all strings from the vector<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=86bbb4a7b7179cef6f425f028ce073fbb65ab74208d6a2ea6bf594c04e1ebee2>Contains</h4><pre class=ada-code-snippet><code>function Contains
+  (Self             : Virtual_String_Vector'Class;
+   Item             : VSS.Strings.Virtual_String;
+   Case_Sensitivity : VSS.Strings.Case_Sensitivity :=
+     VSS.Strings.Case_Sensitive)
+   return Boolean
+</code></pre><p>Return True when vector contains given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>Item<dd><dt>Case_Sensitivity<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4aed0064002886e27ea125048ba10cbcc6576775e21b6b13ce271e741f8e5c89>Cursor</h4><pre class=ada-code-snippet><code>type Cursor is private;
+</code></pre><h4 id=d7f1f84d3248d5b1d59ee86f1f261b5e7b42b234ff107b7002e7bbf5900cb028>Delete</h4><pre class=ada-code-snippet><code>procedure Delete
+  (Self  : in out Virtual_String_Vector'Class;
+   Index : Positive)
+</code></pre><p>Delete element at the given index.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h4 id=e14a929c0141b4bbeb9a45177ca0dde8afcbd6d063bfd4fbb8bba0941ac388fd>Delete_First</h4><pre class=ada-code-snippet><code>function Delete_First
+  (Self : Virtual_String_Vector'Class) return Virtual_String_Vector
+</code></pre><p>Delete first element and return result vector.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=df60b5ac6d5ed3e495aefa213435c865fbef71d4c82dd2667774b05e40a2a92b>Delete_First</h4><pre class=ada-code-snippet><code>procedure Delete_First (Self : in out Virtual_String_Vector'Class)
+</code></pre><p>Delete first element from the vector.<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=cabc41616a7f936109324a48544b58a552d42cc84f7995b2db8391d53c2c20a6>Delete_Last</h4><pre class=ada-code-snippet><code>procedure Delete_Last (Self : in out Virtual_String_Vector'Class)
+</code></pre><p>Delete the last element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=94325bad54f735b352e7eed4e17a787d0ee0ba1102518a63b84dbd1cc3c4830b>Element</h4><pre class=ada-code-snippet><code>function Element
+  (Self  : Virtual_String_Vector'Class;
+   Index : Positive) return VSS.Strings.Virtual_String
+</code></pre><p>Return given element. Return "null" string when index is out of bound.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=8459a96a55174c41640fdd727b69f6f08bec1381a4bdeb8318dbaad1c5f94224>Element</h4><pre class=ada-code-snippet><code>function Element
+  (Self     : Virtual_String_Vector'Class;
+   Position : Cursor) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d3b6d006ba03e3fec4a6551dc606aa1fc7286a8d53b8d204ebf566c4fc0de0b5>Empty_Virtual_String_Vector</h4><pre class=ada-code-snippet><code>Empty_Virtual_String_Vector : constant Virtual_String_Vector;
+</code></pre><h4 id=47ebe1e7c6c2205d109469b671988a4320aef8fd8174983cf1874c1e896be8bb>First</h4><pre class=ada-code-snippet><code>function First (Self : Reversible_Iterator) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d1e9c52f23ec30e05b08d316b13c9a73ae1e2bd9367735c08e67b48238979da1>First_Element</h4><pre class=ada-code-snippet><code>function First_Element
+  (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return first element of the vector.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=1a3efc228ea8796d078cce6740da63556d42bfc9d6a2c92d5a9985169726404a>Has_Element</h4><pre class=ada-code-snippet><code>function Has_Element (Self : Cursor) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=91446ff2afe39ba5df7c462a05c774739a79d5f273f7926b4bcdfa5de3e9e514>Is_Empty</h4><pre class=ada-code-snippet><code>function Is_Empty (Self : Virtual_String_Vector'Class) return Boolean
+</code></pre><p>Return True when string vector is empty.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=0f9e23d1520e28258fd8f308caae75d6d7160c311cee2b50d2e480dd141c5f8e>Iterate</h4><pre class=ada-code-snippet><code>function Iterate
+  (Self : Virtual_String_Vector'Class) return Reversible_Iterator
+</code></pre><p>Return an iterator over each element in the vector<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=61a28d9a06af41bf80d13e08799fd01540d24451d6cee21af10eee73b68a7b7c>Iterator_Interfaces</h4><pre class=ada-code-snippet><code>package Iterator_Interfaces is new Ada.Iterator_Interfaces
+  (Cursor, Has_Element);
+</code></pre><h4 id=66ad9cbcaf0350971fcde8f843386861fc36184df32520f4ab5fdcb64150386a>Join</h4><pre class=ada-code-snippet><code>function Join
+  (Self      : Virtual_String_Vector'Class;
+   Separator : VSS.Characters.Virtual_Character)
+   return VSS.Strings.Virtual_String
+</code></pre><p>Join all strings in the string vector into single string with each element separated by the given separator.<h5>Parameters</h5><dl><dt>Self<dd><dt>Separator<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=003cbb6ca8c9866ebc29d3af7624b8a1dd48010447786ef0020cf4b6d36f4fa9>Join_Lines</h4><pre class=ada-code-snippet><code>function Join_Lines
+  (Self           : Virtual_String_Vector'Class;
+   Terminator     : VSS.Strings.Line_Terminator;
+   Terminate_Last : Boolean := True)
+   return VSS.Strings.Virtual_String
+</code></pre><p>Join all string vector's strings with each element separated by given Terminator. When Terminate_Last is True line terminator is added after last line.<h5>Parameters</h5><dl><dt>Self<dd><dt>Terminator<dd><dt>Terminate_Last<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=683c6619d84af6895a37a22bf200c9c8274f5c7eacd2debd0551753fa4c096ca>Last</h4><pre class=ada-code-snippet><code>function Last (Self : Reversible_Iterator) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=dcac6c6f23720914994d22fc039ee1058d0676dc35cdf0648dca0f4bd55d534b>Last_Element</h4><pre class=ada-code-snippet><code>function Last_Element
+  (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return last element of the vector.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=a6c66b2a57ff82cae1f1cb3d95d1e78c521374da42b6565c5fb9aa8a75730e96>Length</h4><pre class=ada-code-snippet><code>function Length (Self : Virtual_String_Vector'Class) return Natural
+</code></pre><p>Number of elements in the vector.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=27b8bec325c4a0fba2bb7ff9e880daf1f31c7236045c053d9e31154c9bce5b09>Next</h4><pre class=ada-code-snippet><code>function Next
+  (Self     : Reversible_Iterator;
+   Position : Cursor) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=9590582da0b255456168643cc0e72743477e9880c435624dd3b12d6f97e35e48>Prepend</h4><pre class=ada-code-snippet><code>procedure Prepend
+  (Self : in out Virtual_String_Vector'Class;
+   Item : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Insert given string before existing strings in the vector.<h5>Parameters</h5><dl><dt>Self<dd><dt>Item<dd></dl><h4 id=123ea51c78f28e7f65f622cfcfb22fcd2e99d42361d57c17436a6587aefc64dc>Previous</h4><pre class=ada-code-snippet><code>function Previous
+  (Self     : Reversible_Iterator;
+   Position : Cursor) return Cursor
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=cad9fce9078a8a42cae780383fb557fff0e394724ce3e9422dfe722e0e16a433>Replace</h4><pre class=ada-code-snippet><code>procedure Replace
+  (Self  : in out Virtual_String_Vector'Class;
+   Index : Positive;
+   Item  : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Replace a string vector item with given Index by a new value.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd><dt>Item<dd></dl><h4 id=3fad6a57d323ebe523caa1a7e685f08000d503d3b8c16a948d5230ebec867e91>Reversible_Iterator</h4><pre class=ada-code-snippet><code>type Reversible_Iterator is
+  limited new Iterator_Interfaces.Reversible_Iterator with private;
+</code></pre><h4 id=65ca3012bfda0c93b6078dc6806795e21bdaf1ac0af8c9b352c76150218f235d>Virtual_String_Vector</h4><pre class=ada-code-snippet><code>type Virtual_String_Vector is tagged private
+  with
+    Constant_Indexing => Element,
+    Default_Iterator  => Iterate,
+    Iterator_Element  => VSS.Strings.Virtual_String,
+    Aggregate         => (Empty       => Empty_Virtual_String_Vector,
+                          Add_Unnamed => Append_Syntax_Sugar),
+    Preelaborable_Initialization;
+</code></pre>

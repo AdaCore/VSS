@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Content_Handlers</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#a3a448fd6bff0f7879a9a73387f84576061cd78ece787195db22f0e08dd0483c>JSON_Content_Handler</a></ul><h3>Access Types</h3><ul><li><a href=#b801c357e039e60166d5ee8ca3a863b9b4b3b9e2ed3a949f72d697802aaa9e24>JSON_Content_Handler_Access</a></ul><h3>Subprograms</h3><ul><li><a href=#6663b96bfb50a85cc56c0615e4a14f2662829b0632e881afb88dd4f002cd3d42>Boolean_Value</a><li><a href=#2503491810b0c273341e278ee21ac66ee6f55023b397d6e2f4cc7fb09684461e>Boolean_Value</a><li><a href=#e884202b27d85bf1dc2aa832e19b0aa3cd43dcef0804aa64a208be4903106c18>End_Array</a><li><a href=#6872a43a863cfc90d4fc7cfd20ab0c83c8bacfdd27926bf6787b4c23e98c689e>End_Array</a><li><a href=#333fbcec9cad7460dec0bc124dd031ddd7df9808a12e7d508ce29c4b64a50094>End_Document</a><li><a href=#2df7ff1ed5295821c4b5a249d253a987ad8b65dcdaf8fd9514e66595f388be11>End_Document</a><li><a href=#7aaeaa9d240bb1f1f6fdc1e698326147dee50e4a08fcd1db7772854e43231c9a>End_Object</a><li><a href=#d256eb455c31ac8f290a6c28852722888faf25a9ed7e586af3b32ebbf698aa74>End_Object</a><li><a href=#ea2a82e4624ec21aad7c82bb58009fd4f7e577c99b11ed5adc928fa07bd8cf3c>Error_Message</a><li><a href=#efc60b3cb551fb51ce3a12e5cbb599eee41eeb707a9304bcfac2f3b1ebc7c835>Float_Value</a><li><a href=#7a4c6110e394e988adba11316d44f2899195fbe60b6696a0b2c806aa28245a68>Float_Value</a><li><a href=#2bb9d9796c63d809bc214714c4641a75072e8d4f929a3364ad69045c648ae23f>Integer_Value</a><li><a href=#dc6982147451061ada5a7ca80e6d7d4f5ee47ed507f3f6bb7d2b07d26bee9a9e>Integer_Value</a><li><a href=#ad9125ccce59a9e8208588d5d4bcb432cf9cc52cbeb2873f66a715d19afc3bb3>Key_Name</a><li><a href=#0c41c0d5cd5e6e0b315d3b877f6868abfd4697923aa1d425b3eb7e5b408a6550>Key_Name</a><li><a href=#666e0cd6001635282cbb9d294e88244ea176a2efc04d8d0f82158796d96a5df5>Null_Value</a><li><a href=#c523bf7032e632a23d9f2b751c22008c511e71a8a7c62458b7f6afbd448b256c>Null_Value</a><li><a href=#066926822a83d7c85a3792cd3abc6f45f109ceebe7aa8b25dbee5d353377c783>Number_Value</a><li><a href=#80272d96b11ef67d00ccf4c8f7b69847528e5f9e86f050c8c355989ef54f781f>Number_Value</a><li><a href=#9e090a0c2f18c688158ca20a1f337df2406461e60fc95da623430382ccd665a5>Start_Array</a><li><a href=#ddff49d863fd89d14aec18e9bbe340102574188bc64d80569e7007fea266ea25>Start_Array</a><li><a href=#44cb28a7fd89aff6cd4c524c468e53b5fe086cdeba87be9b494b879d360b39d0>Start_Document</a><li><a href=#84b1a9084f8a114fc35423f7580007acaaa3657257ec832cb8ce0b62fdbada50>Start_Document</a><li><a href=#9a611fdf2e8c01841ad5a7ddaac81270d9d4a64e8d5c8bd28a84662db9c6ca95>Start_Object</a><li><a href=#36eb66ccb5acb7127c69dc95912c872c7aa83a6cbbceeb71430c7f251513ae4a>Start_Object</a><li><a href=#f450ff8f1be021811522b866ceb297138a80b831b7f8ee95508e61075e877305>String_Value</a><li><a href=#11333874440f8e071efda7d6dd2aa61f08e17042e744847cef653df1f8a7e39e>String_Value</a></ul><h2>Description</h2><p>This package declares interface type to be used as abstract interface to process JSON streams in callback style API.<h4 id=6663b96bfb50a85cc56c0615e4a14f2662829b0632e881afb88dd4f002cd3d42>Boolean_Value</h4><pre class=ada-code-snippet><code>procedure Boolean_Value
+  (Self  : in out JSON_Content_Handler'Class;
+   Value : Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd></dl><h4 id=2503491810b0c273341e278ee21ac66ee6f55023b397d6e2f4cc7fb09684461e>Boolean_Value</h4><pre class=ada-code-snippet><code>procedure Boolean_Value
+  (Self    : in out JSON_Content_Handler;
+   Value   : Boolean;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd><dt>Success<dd></dl><h4 id=e884202b27d85bf1dc2aa832e19b0aa3cd43dcef0804aa64a208be4903106c18>End_Array</h4><pre class=ada-code-snippet><code>procedure End_Array (Self : in out JSON_Content_Handler'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=6872a43a863cfc90d4fc7cfd20ab0c83c8bacfdd27926bf6787b4c23e98c689e>End_Array</h4><pre class=ada-code-snippet><code>procedure End_Array
+  (Self : in out JSON_Content_Handler; Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=333fbcec9cad7460dec0bc124dd031ddd7df9808a12e7d508ce29c4b64a50094>End_Document</h4><pre class=ada-code-snippet><code>procedure End_Document (Self : in out JSON_Content_Handler'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=2df7ff1ed5295821c4b5a249d253a987ad8b65dcdaf8fd9514e66595f388be11>End_Document</h4><pre class=ada-code-snippet><code>procedure End_Document
+  (Self : in out JSON_Content_Handler; Success : in out Boolean)
+</code></pre><p>Called when processing of JSON document has need finished with any reason (document processed completely, document is invalid, processing is terminated by application). No other subprograms will be called before new call of Start_Document.<h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=7aaeaa9d240bb1f1f6fdc1e698326147dee50e4a08fcd1db7772854e43231c9a>End_Object</h4><pre class=ada-code-snippet><code>procedure End_Object (Self : in out JSON_Content_Handler'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=d256eb455c31ac8f290a6c28852722888faf25a9ed7e586af3b32ebbf698aa74>End_Object</h4><pre class=ada-code-snippet><code>procedure End_Object
+  (Self : in out JSON_Content_Handler; Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=ea2a82e4624ec21aad7c82bb58009fd4f7e577c99b11ed5adc928fa07bd8cf3c>Error_Message</h4><pre class=ada-code-snippet><code>function Error_Message
+  (Self : JSON_Content_Handler) return VSS.Strings.Virtual_String
+</code></pre><p>Return diagnosis message for error detected by handler. Usually called by the reader to get diagnosis and provide it for higher level component.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=efc60b3cb551fb51ce3a12e5cbb599eee41eeb707a9304bcfac2f3b1ebc7c835>Float_Value</h4><pre class=ada-code-snippet><code>procedure Float_Value
+  (Self  : in out JSON_Content_Handler'Class;
+   Value : Interfaces.IEEE_Float_64)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd></dl><h4 id=7a4c6110e394e988adba11316d44f2899195fbe60b6696a0b2c806aa28245a68>Float_Value</h4><pre class=ada-code-snippet><code>procedure Float_Value
+  (Self    : in out JSON_Content_Handler'Class;
+   Value   : Interfaces.IEEE_Float_64;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd><dt>Success<dd></dl><h4 id=2bb9d9796c63d809bc214714c4641a75072e8d4f929a3364ad69045c648ae23f>Integer_Value</h4><pre class=ada-code-snippet><code>procedure Integer_Value
+  (Self  : in out JSON_Content_Handler'Class;
+   Value : Interfaces.Integer_64)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd></dl><h4 id=dc6982147451061ada5a7ca80e6d7d4f5ee47ed507f3f6bb7d2b07d26bee9a9e>Integer_Value</h4><pre class=ada-code-snippet><code>procedure Integer_Value
+  (Self    : in out JSON_Content_Handler'Class;
+   Value   : Interfaces.Integer_64;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd><dt>Success<dd></dl><h4 id=a3a448fd6bff0f7879a9a73387f84576061cd78ece787195db22f0e08dd0483c>JSON_Content_Handler</h4><pre class=ada-code-snippet><code>type JSON_Content_Handler is limited interface;
+</code></pre><h4 id=b801c357e039e60166d5ee8ca3a863b9b4b3b9e2ed3a949f72d697802aaa9e24>JSON_Content_Handler_Access</h4><pre class=ada-code-snippet><code>type JSON_Content_Handler_Access is access all JSON_Content_Handler'Class;
+</code></pre><h4 id=ad9125ccce59a9e8208588d5d4bcb432cf9cc52cbeb2873f66a715d19afc3bb3>Key_Name</h4><pre class=ada-code-snippet><code>procedure Key_Name
+  (Self : in out JSON_Content_Handler'Class;
+   Name : VSS.Strings.Virtual_String'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd></dl><h4 id=0c41c0d5cd5e6e0b315d3b877f6868abfd4697923aa1d425b3eb7e5b408a6550>Key_Name</h4><pre class=ada-code-snippet><code>procedure Key_Name
+  (Self    : in out JSON_Content_Handler;
+   Name    : VSS.Strings.Virtual_String'Class;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd><dt>Success<dd></dl><h4 id=666e0cd6001635282cbb9d294e88244ea176a2efc04d8d0f82158796d96a5df5>Null_Value</h4><pre class=ada-code-snippet><code>procedure Null_Value (Self : in out JSON_Content_Handler'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=c523bf7032e632a23d9f2b751c22008c511e71a8a7c62458b7f6afbd448b256c>Null_Value</h4><pre class=ada-code-snippet><code>procedure Null_Value
+  (Self : in out JSON_Content_Handler; Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=066926822a83d7c85a3792cd3abc6f45f109ceebe7aa8b25dbee5d353377c783>Number_Value</h4><pre class=ada-code-snippet><code>procedure Number_Value
+  (Self  : in out JSON_Content_Handler'Class;
+   Value : VSS.JSON.JSON_Number)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd></dl><h4 id=80272d96b11ef67d00ccf4c8f7b69847528e5f9e86f050c8c355989ef54f781f>Number_Value</h4><pre class=ada-code-snippet><code>procedure Number_Value
+  (Self    : in out JSON_Content_Handler;
+   Value   : VSS.JSON.JSON_Number;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd><dt>Success<dd></dl><h4 id=9e090a0c2f18c688158ca20a1f337df2406461e60fc95da623430382ccd665a5>Start_Array</h4><pre class=ada-code-snippet><code>procedure Start_Array (Self : in out JSON_Content_Handler'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=ddff49d863fd89d14aec18e9bbe340102574188bc64d80569e7007fea266ea25>Start_Array</h4><pre class=ada-code-snippet><code>procedure Start_Array
+  (Self : in out JSON_Content_Handler; Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=44cb28a7fd89aff6cd4c524c468e53b5fe086cdeba87be9b494b879d360b39d0>Start_Document</h4><pre class=ada-code-snippet><code>procedure Start_Document (Self : in out JSON_Content_Handler'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=84b1a9084f8a114fc35423f7580007acaaa3657257ec832cb8ce0b62fdbada50>Start_Document</h4><pre class=ada-code-snippet><code>procedure Start_Document
+  (Self : in out JSON_Content_Handler; Success : in out Boolean)
+</code></pre><p>Called when processing of JSON document has been started<h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=9a611fdf2e8c01841ad5a7ddaac81270d9d4a64e8d5c8bd28a84662db9c6ca95>Start_Object</h4><pre class=ada-code-snippet><code>procedure Start_Object (Self : in out JSON_Content_Handler'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=36eb66ccb5acb7127c69dc95912c872c7aa83a6cbbceeb71430c7f251513ae4a>Start_Object</h4><pre class=ada-code-snippet><code>procedure Start_Object
+  (Self : in out JSON_Content_Handler; Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=f450ff8f1be021811522b866ceb297138a80b831b7f8ee95508e61075e877305>String_Value</h4><pre class=ada-code-snippet><code>procedure String_Value
+  (Self  : in out JSON_Content_Handler'Class;
+   Value : VSS.Strings.Virtual_String'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd></dl><h4 id=11333874440f8e071efda7d6dd2aa61f08e17042e744847cef653df1f8a7e39e>String_Value</h4><pre class=ada-code-snippet><code>procedure String_Value
+  (Self    : in out JSON_Content_Handler;
+   Value   : VSS.Strings.Virtual_String'Class;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd><dt>Success<dd></dl>

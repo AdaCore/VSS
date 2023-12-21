@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Regular_Expressions.Utilities</h1><h2>Entities</h2><h3>Subprograms</h3><ul><li><a href=#e8b7cff3ec31cfc1bb5e67ea6d61a9eabfd55c070614b59e04a5dd87a8a52574>Escape</a><li><a href=#7fdf046bc9cbf00a2e6e3b757a5fb16eb27290b721a94014655dae1f9d68d94a>Wildcard_To_Regular_Expression</a></ul><h2>Description</h2><p>Copyright (C) 2021, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=e8b7cff3ec31cfc1bb5e67ea6d61a9eabfd55c070614b59e04a5dd87a8a52574>Escape</h4><pre class=ada-code-snippet><code>function Escape
+  (Item : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String
+</code></pre><p>Escapes all characters of the Item that they don't have any special meaning when used as regular expression pattern string and returns escaped string.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7fdf046bc9cbf00a2e6e3b757a5fb16eb27290b721a94014655dae1f9d68d94a>Wildcard_To_Regular_Expression</h4><pre class=ada-code-snippet><code>function Wildcard_To_Regular_Expression
+  (Item : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String
+</code></pre><p>Returns a regular expression representation of the glob pattern Item.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl>

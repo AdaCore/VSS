@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Cursors.Iterators</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#a7d571310caee96531aec0d9a6b204333952c3261b8d74518204335022b46cde>Abstract_Character_Iterator</a><li><a href=#05b9e8e8f4a819df4bab7c2d9df26c3d29aee6446b34378ae3b0d956ae190762>Abstract_Segment_Iterator</a></ul><h3>Subprograms</h3><ul><li><a href=#85a4f421c1fe3cc9da22596f3f3d4f3b47976f448768e2911965495c0ab22d6c>Backward</a><li><a href=#6dda564980408d1bd7369c1a6328be95173a8d734e672795d8abfff01598b733>Forward</a><li><a href=#267fbb6e5ab0c5566f50760c7db66743cb2e9eeb886a95a608ce96ab0e654ad2>Forward</a><li><a href=#68eb1638b3f70e30527b04da0e355730eba5cfd567f81462d17bdd2ee8686733>Has_Element</a><li><a href=#4f399b84aa1ad97d24a5ba0b50031f0cf60feddf584c6e5f132fd140117bd5c3>Has_Element</a></ul><h2>Description</h2><p>Copyright (C) 2020-2021, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=a7d571310caee96531aec0d9a6b204333952c3261b8d74518204335022b46cde>Abstract_Character_Iterator</h4><pre class=ada-code-snippet><code>type Abstract_Character_Iterator is
+  abstract limited new VSS.Strings.Cursors.Abstract_Character_Cursor
+    with private;
+</code></pre><h4 id=05b9e8e8f4a819df4bab7c2d9df26c3d29aee6446b34378ae3b0d956ae190762>Abstract_Segment_Iterator</h4><pre class=ada-code-snippet><code>type Abstract_Segment_Iterator is
+  abstract limited new VSS.Strings.Cursors.Abstract_Segment_Cursor
+    with private;
+</code></pre><h4 id=85a4f421c1fe3cc9da22596f3f3d4f3b47976f448768e2911965495c0ab22d6c>Backward</h4><pre class=ada-code-snippet><code>function Backward
+  (Self : in out Abstract_Character_Iterator) return Boolean
+</code></pre><p>Move cursor one character backward<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=6dda564980408d1bd7369c1a6328be95173a8d734e672795d8abfff01598b733>Forward</h4><pre class=ada-code-snippet><code>function Forward
+  (Self : in out Abstract_Character_Iterator) return Boolean
+</code></pre><p>Move cursor one character forward<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=267fbb6e5ab0c5566f50760c7db66743cb2e9eeb886a95a608ce96ab0e654ad2>Forward</h4><pre class=ada-code-snippet><code>function Forward
+  (Self : in out Abstract_Segment_Iterator) return Boolean
+</code></pre><p>Move cursor to the next segment<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=68eb1638b3f70e30527b04da0e355730eba5cfd567f81462d17bdd2ee8686733>Has_Element</h4><pre class=ada-code-snippet><code>function Has_Element
+  (Self : Abstract_Character_Iterator) return Boolean
+</code></pre><p>Returns True when iterator points to the text element<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4f399b84aa1ad97d24a5ba0b50031f0cf60feddf584c6e5f132fd140117bd5c3>Has_Element</h4><pre class=ada-code-snippet><code>function Has_Element
+  (Self : Abstract_Segment_Iterator) return Boolean
+</code></pre><p>Return True when iterator points to the text element<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

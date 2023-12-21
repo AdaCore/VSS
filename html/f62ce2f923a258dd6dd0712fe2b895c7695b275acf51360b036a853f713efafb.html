@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Locators</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#f20a6c0447d14ef8695e306280b6ef851b92c6d980bb0510d6f3143fdd28fffe>SAX_Locator</a></ul><h3>Access Types</h3><ul><li><a href=#91106eb3476d88009f9d4721afe544bc6f1e0fdbefd5409c6f8dd0ba168e06e3>SAX_Locator_Access</a></ul><h3>Subprograms</h3><ul><li><a href=#066a1d880f8dbdeb57c5fdce02c63967988880f0deadc1f0907647376e9e91ce>Get_Column_Number</a><li><a href=#7b9ebd22306c502ce87f9aa578dea7d1ff9a6ddc6d627c16ff8bb48f2b5e28c3>Get_Line_Number</a><li><a href=#fdf34cc593168a5f40938549509de415b354552147f5acc48ed66403551c3bbe>Get_Public_Id</a><li><a href=#9b45b7552cfd2b79131b439cc116da8eaf48dd0df2070737f92832aa655cb993>Get_System_Id</a></ul><h2>Description</h2><p>Copyright (C) 2022-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=066a1d880f8dbdeb57c5fdce02c63967988880f0deadc1f0907647376e9e91ce>Get_Column_Number</h4><pre class=ada-code-snippet><code>function Get_Column_Number
+  (Self : SAX_Locator) return VSS.Strings.Character_Index'Base
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7b9ebd22306c502ce87f9aa578dea7d1ff9a6ddc6d627c16ff8bb48f2b5e28c3>Get_Line_Number</h4><pre class=ada-code-snippet><code>function Get_Line_Number
+  (Self : SAX_Locator) return VSS.Strings.Line_Index'Base
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=fdf34cc593168a5f40938549509de415b354552147f5acc48ed66403551c3bbe>Get_Public_Id</h4><pre class=ada-code-snippet><code>function Get_Public_Id
+  (Self : SAX_Locator) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=9b45b7552cfd2b79131b439cc116da8eaf48dd0df2070737f92832aa655cb993>Get_System_Id</h4><pre class=ada-code-snippet><code>function Get_System_Id
+  (Self : SAX_Locator) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f20a6c0447d14ef8695e306280b6ef851b92c6d980bb0510d6f3143fdd28fffe>SAX_Locator</h4><pre class=ada-code-snippet><code>type SAX_Locator is limited interface;
+</code></pre><h4 id=91106eb3476d88009f9d4721afe544bc6f1e0fdbefd5409c6f8dd0ba168e06e3>SAX_Locator_Access</h4><pre class=ada-code-snippet><code>type SAX_Locator_Access is access all SAX_Locator'Class;
+</code></pre>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Regular_Expressions</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#2be2852c63f3cf197f8fef5962cbff46cfa179518a075a1bf379e628daf6ee90>Match_Option</a><li><a href=#a4228b1abcf211ba7c4165119482ed1a04aed61dcf0bcf86644e96d4381f3483>Pattern_Option</a></ul><h3>Array Types</h3><ul><li><a href=#83365e75480361290f036417dd168ef94d85a94ffda20e8a2d325ddcf128a1c2>Match_Options</a><li><a href=#ed5dce04ce99c87ada33c5eb9ad59aacafdacb4aaa4757a4f58e2281f3330669>Pattern_Options</a></ul><h3>Tagged Types</h3><ul><li><a href=#055e80551a0aafeab1b3b17d05e0a782f9aa8687c8b7a14073554d30e4e92c16>Regular_Expression</a><li><a href=#ef1db3e64c197149bf81ccf20fbff904c42f0ff711410682de42cd5d2833bb68>Regular_Expression_Match</a></ul><h3>Constants</h3><ul><li><a href=#866cd548033d09d543588cefdddf3761e101d050d3dc04cb7b6447a1470c9449>No_Match_Options</a><li><a href=#9fce93ac521ef5c610e246333ccc7954c27b3206c6574e91bc2cc7e4d8970634>No_Pattern_Options</a></ul><h3>Subprograms</h3><ul><li><a href=#81482776215ebb684cc71b03a3b6e55d66e79b125b47af7954a5411d63964fbe>"="</a><li><a href=#f06b19224dd85b5ae28089c94ba1082c2e2a1e865ddb6a8b854292967c0ba96d>"="</a><li><a href=#9ae47d022f331bae0fe62feed7f9c65004704fe025891e0c6e51ed65a9ef5cee>Capture_Group_Count</a><li><a href=#b742568ea94c270c21178c1f8f0bba1b7f05fcbe1cf9a47a55d12598c7118841>Capture_Group_Names</a><li><a href=#d8ded527618586c82602cdd82782842bdde93006837a35fd286ba76b0f29d703>Captured</a><li><a href=#70784045f2e45b798022c1adbd5b6b0db0f714421da72c0f3d84d4e2cfce2aa3>Captured</a><li><a href=#360197b9f68d56b0569e517964a3c43a9c73f9a212944705122f2e72dd971b48>Error_String</a><li><a href=#6387be739a33f7249df579fc97ecf55437e061c4e3c9003d85621b25e8251896>First_Marker</a><li><a href=#4d96a7c3ec15d53f65077f684d9a9d771047e199033a1fefd3fe95a1e0b9d280>First_Marker</a><li><a href=#45fa3fdb0dc8bd6afbbc528d9714678ffa0060f3cacaf580478cdeff0962447f>Has_Capture</a><li><a href=#c9a121fea9391e7c8e07f24afc94c1102320af114199f37b34fe183b59d1b8a9>Has_Match</a><li><a href=#048f61510f8c803b527aa2c8f2e23d9b3322d27286dc94766efd4240d02797e7>Is_Valid</a><li><a href=#f6235376be121ccc5f5b1acf83fd77e2fff0088579a1c427f4b88253b910746e>Is_Valid</a><li><a href=#fe919ec65650d5d571d1bbdbdd22e8db42ceba32e676c5b0a78ad176b9029bba>Last_Marker</a><li><a href=#525f7c2a1b2bfc82b5b7e192eba7e65881c4a6cc56fc76306a04fcf3decb0b06>Last_Marker</a><li><a href=#df4246759862e43687ddb1c61bf230ae5c049ade4ae6eae208fba23eab5b773b>Marker</a><li><a href=#655ca904002aa4eca8eb0a9a1cdaf034355a0e77e6117b5d5aeb3e3f20e953f4>Marker</a><li><a href=#98bc0715c7effe6c42cfc040dc870c7d355b72a0304d3c64660e88c605096681>Match</a><li><a href=#82401e2cccb5871841a96cdcae3d86a616b475c6a41476e996b9628b1e54eedf>Match</a><li><a href=#4e75707af399c4424d5f41eded29f21840da3d661327ade4f626cd1ca69abe54>Options</a><li><a href=#998b70b65aade78c5e449a23bbd22bfd4f41576934840d3acb631106ea83b8d5>Pattern</a><li><a href=#201fdee4fbaa5e6461b8fc8c59ad864d95a39599ea24d2c7cd9469c2cccd2949>To_Regular_Expression</a></ul><h2>Description</h2><p>Copyright (C) 2021-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=81482776215ebb684cc71b03a3b6e55d66e79b125b47af7954a5411d63964fbe>"="</h4><pre class=ada-code-snippet><code>function "="
+  (Left : Regular_Expression; Right : Regular_Expression) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Left<dd><dt>Right<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f06b19224dd85b5ae28089c94ba1082c2e2a1e865ddb6a8b854292967c0ba96d>"="</h4><pre class=ada-code-snippet><code>function "="
+  (Left  : Regular_Expression_Match;
+   Right : Regular_Expression_Match) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Left<dd><dt>Right<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=9ae47d022f331bae0fe62feed7f9c65004704fe025891e0c6e51ed65a9ef5cee>Capture_Group_Count</h4><pre class=ada-code-snippet><code>function Capture_Group_Count
+  (Self : Regular_Expression'Class) return Natural
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=b742568ea94c270c21178c1f8f0bba1b7f05fcbe1cf9a47a55d12598c7118841>Capture_Group_Names</h4><pre class=ada-code-snippet><code>function Capture_Group_Names
+  (Self : Regular_Expression'Class)
+   return VSS.String_Vectors.Virtual_String_Vector
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d8ded527618586c82602cdd82782842bdde93006837a35fd286ba76b0f29d703>Captured</h4><pre class=ada-code-snippet><code>function Captured
+  (Self  : Regular_Expression_Match'Class;
+   Index : Natural := 0) return VSS.Strings.Virtual_String
+</code></pre><p>Return substring captured by the Index capturing group. If capture group did not captured substring or there is no such captured group, returned string is null. Capture group 0 means substring matched by the entire pattern.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=70784045f2e45b798022c1adbd5b6b0db0f714421da72c0f3d84d4e2cfce2aa3>Captured</h4><pre class=ada-code-snippet><code>function Captured
+  (Self : Regular_Expression_Match'Class;
+   Name : VSS.Strings.Virtual_String) return VSS.Strings.Virtual_String
+</code></pre><p>Return substring captured by the named capture group Name. If capture group did not captured substring or there is no such named captured group, returned string is null.<h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=360197b9f68d56b0569e517964a3c43a9c73f9a212944705122f2e72dd971b48>Error_String</h4><pre class=ada-code-snippet><code>function Error_String
+  (Self : Regular_Expression'Class) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=6387be739a33f7249df579fc97ecf55437e061c4e3c9003d85621b25e8251896>First_Marker</h4><pre class=ada-code-snippet><code>function First_Marker
+  (Self  : Regular_Expression_Match'Class;
+   Index : Natural := 0)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker at first position of the substring captured by capture group Index.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4d96a7c3ec15d53f65077f684d9a9d771047e199033a1fefd3fe95a1e0b9d280>First_Marker</h4><pre class=ada-code-snippet><code>function First_Marker
+  (Self : Regular_Expression_Match'Class;
+   Name : VSS.Strings.Virtual_String)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker at first position of the substring captured by named capture group Name.<h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=45fa3fdb0dc8bd6afbbc528d9714678ffa0060f3cacaf580478cdeff0962447f>Has_Capture</h4><pre class=ada-code-snippet><code>function Has_Capture
+  (Self  : Regular_Expression_Match'Class;
+   Index : Positive) return Boolean
+</code></pre><p>Check if the capturing group with given Index has been captured.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=c9a121fea9391e7c8e07f24afc94c1102320af114199f37b34fe183b59d1b8a9>Has_Match</h4><pre class=ada-code-snippet><code>function Has_Match (Self : Regular_Expression_Match'Class) return Boolean
+</code></pre><p>Return True when regular expression matched against the subject string.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=048f61510f8c803b527aa2c8f2e23d9b3322d27286dc94766efd4240d02797e7>Is_Valid</h4><pre class=ada-code-snippet><code>function Is_Valid (Self : Regular_Expression'Class) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f6235376be121ccc5f5b1acf83fd77e2fff0088579a1c427f4b88253b910746e>Is_Valid</h4><pre class=ada-code-snippet><code>function Is_Valid (Self : Regular_Expression_Match'Class) return Boolean
+</code></pre><p>Return True when object was obtained as result of matching of valid regular expression.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=fe919ec65650d5d571d1bbdbdd22e8db42ceba32e676c5b0a78ad176b9029bba>Last_Marker</h4><pre class=ada-code-snippet><code>function Last_Marker
+  (Self  : Regular_Expression_Match'Class;
+   Index : Natural := 0)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker at last position of the substring captured by capture group Index.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=525f7c2a1b2bfc82b5b7e192eba7e65881c4a6cc56fc76306a04fcf3decb0b06>Last_Marker</h4><pre class=ada-code-snippet><code>function Last_Marker
+  (Self : Regular_Expression_Match'Class;
+   Name : VSS.Strings.Virtual_String)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker at last position of the substring captured by named capture group Name.<h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=df4246759862e43687ddb1c61bf230ae5c049ade4ae6eae208fba23eab5b773b>Marker</h4><pre class=ada-code-snippet><code>function Marker
+  (Self  : Regular_Expression_Match'Class;
+   Index : Natural := 0)
+   return VSS.Strings.Cursors.Markers.Segment_Marker
+</code></pre><p>Return segment marker for capture group Index.<h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=655ca904002aa4eca8eb0a9a1cdaf034355a0e77e6117b5d5aeb3e3f20e953f4>Marker</h4><pre class=ada-code-snippet><code>function Marker
+  (Self : Regular_Expression_Match'Class;
+   Name : VSS.Strings.Virtual_String)
+   return VSS.Strings.Cursors.Markers.Segment_Marker
+</code></pre><p>Return segment marker for named capture group Name.<h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=98bc0715c7effe6c42cfc040dc870c7d355b72a0304d3c64660e88c605096681>Match</h4><pre class=ada-code-snippet><code>function Match
+  (Self    : Regular_Expression'Class;
+   Subject : VSS.Strings.Virtual_String;
+   Options : Match_Options := No_Match_Options)
+   return Regular_Expression_Match
+</code></pre><p>Perform a regular expression match of the Subject against given regexp taking Options (if provided) into account.<h5>Parameters</h5><dl><dt>Self<dd><dt>Subject<dd><dt>Options<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=82401e2cccb5871841a96cdcae3d86a616b475c6a41476e996b9628b1e54eedf>Match</h4><pre class=ada-code-snippet><code>function Match
+  (Self    : Regular_Expression'Class;
+   Subject : VSS.Strings.Virtual_String;
+   From    : VSS.Strings.Cursors.Abstract_Cursor'Class;
+   Options : Match_Options := No_Match_Options)
+   return Regular_Expression_Match
+</code></pre><p>Perform a regular expression match of the Subject starting from given position (From) against the regexp. Take Options (if provided) into account. The beginning of a line assertion (`^`) matches From position even if Subject has character before it.<h5>Parameters</h5><dl><dt>Self<dd><dt>Subject<dd><dt>From<dd><dt>Options<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2be2852c63f3cf197f8fef5962cbff46cfa179518a075a1bf379e628daf6ee90>Match_Option</h4><pre class=ada-code-snippet><code>type Match_Option is
+  (Anchored_Match);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>Anchored_Match<dd><p>Match whole string</dl><h4 id=83365e75480361290f036417dd168ef94d85a94ffda20e8a2d325ddcf128a1c2>Match_Options</h4><pre class=ada-code-snippet><code>type Match_Options is array (Match_Option) of Boolean;
+</code></pre><h4 id=866cd548033d09d543588cefdddf3761e101d050d3dc04cb7b6447a1470c9449>No_Match_Options</h4><pre class=ada-code-snippet><code>No_Match_Options : constant Match_Options := [others => False];
+</code></pre><h4 id=9fce93ac521ef5c610e246333ccc7954c27b3206c6574e91bc2cc7e4d8970634>No_Pattern_Options</h4><pre class=ada-code-snippet><code>No_Pattern_Options : constant Pattern_Options := [others => False];
+</code></pre><h4 id=4e75707af399c4424d5f41eded29f21840da3d661327ade4f626cd1ca69abe54>Options</h4><pre class=ada-code-snippet><code>function Options (Self : Regular_Expression'Class) return Pattern_Options
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=998b70b65aade78c5e449a23bbd22bfd4f41576934840d3acb631106ea83b8d5>Pattern</h4><pre class=ada-code-snippet><code>function Pattern
+  (Self : Regular_Expression'Class) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=a4228b1abcf211ba7c4165119482ed1a04aed61dcf0bcf86644e96d4381f3483>Pattern_Option</h4><pre class=ada-code-snippet><code>type Pattern_Option is
+  (Case_Insensitive,
+   Dot_Matches_Everything,
+   Multiline,
+   Extended_Pattern_Syntax,
+   Inverted_Greediness,
+   Dont_Capture,
+   Dont_Use_Unicode_Properties);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>Case_Insensitive<dd><dt>Dot_Matches_Everything<dd><dt>Multiline<dd><dt>Extended_Pattern_Syntax<dd><dt>Inverted_Greediness<dd><dt>Dont_Capture<dd><dt>Dont_Use_Unicode_Properties<dd></dl><h4 id=ed5dce04ce99c87ada33c5eb9ad59aacafdacb4aaa4757a4f58e2281f3330669>Pattern_Options</h4><pre class=ada-code-snippet><code>type Pattern_Options is array (Pattern_Option) of Boolean;
+</code></pre><h4 id=055e80551a0aafeab1b3b17d05e0a782f9aa8687c8b7a14073554d30e4e92c16>Regular_Expression</h4><pre class=ada-code-snippet><code>type Regular_Expression is tagged private;
+</code></pre><h4 id=ef1db3e64c197149bf81ccf20fbff904c42f0ff711410682de42cd5d2833bb68>Regular_Expression_Match</h4><pre class=ada-code-snippet><code>type Regular_Expression_Match is tagged private;
+</code></pre><h4 id=201fdee4fbaa5e6461b8fc8c59ad864d95a39599ea24d2c7cd9469c2cccd2949>To_Regular_Expression</h4><pre class=ada-code-snippet><code>function To_Regular_Expression
+  (Pattern : VSS.Strings.Virtual_String;
+   Options : Pattern_Options := No_Pattern_Options)
+   return Regular_Expression
+</code></pre><h5>Parameters</h5><dl><dt>Pattern<dd><dt>Options<dd></dl><h5>Return Value</h5><dl><dd></dl>

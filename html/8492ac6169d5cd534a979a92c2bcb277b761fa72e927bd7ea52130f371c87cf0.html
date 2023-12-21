@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Cursors.Iterators.Grapheme_Clusters</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#1239a2de1131c48938637c0deba664f13eb88962a6c3bc2ae219a74ce5233af4>Grapheme_Cluster_Iterator</a></ul><h3>Subprograms</h3><ul><li><a href=#992747140fdfe7fd53002326c59ffb479fe2cdc321815e477f31a5f7c79c9120>Backward</a><li><a href=#8d49ebdfe4c1544113cc775ffd62b790fa347535610fd22111669427013ea2cb>Set_After_Last</a><li><a href=#62693dc6ae31a8578034fa566205856450f6b84dc2ee7885d8e2245c888a7ef4>Set_At</a><li><a href=#233fad4a0eda2a49fae87bbdc3c4d458f859ee77e309306fcf5739940aaacb4b>Set_At_First</a><li><a href=#5ba0bfae9558a097973fb1b4537ada9725d7664d8a6eadf0262a7911e60111d5>Set_At_Last</a><li><a href=#0c29e74b3ed94ab3c68b78d0b5d87746f6541d974c37576c8887d884192ddb1d>Set_Before_First</a></ul><h2>Description</h2><p>Copyright (C) 2021-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=992747140fdfe7fd53002326c59ffb479fe2cdc321815e477f31a5f7c79c9120>Backward</h4><pre class=ada-code-snippet><code>function Backward (Self : in out Grapheme_Cluster_Iterator) return Boolean
+</code></pre><p>Move iterator to previous grapheme cluster.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=1239a2de1131c48938637c0deba664f13eb88962a6c3bc2ae219a74ce5233af4>Grapheme_Cluster_Iterator</h4><pre class=ada-code-snippet><code>type Grapheme_Cluster_Iterator is
+  new Abstract_Segment_Iterator with private;
+</code></pre><h4 id=8d49ebdfe4c1544113cc775ffd62b790fa347535610fd22111669427013ea2cb>Set_After_Last</h4><pre class=ada-code-snippet><code>procedure Set_After_Last
+  (Self : in out Grapheme_Cluster_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point after the last grapheme cluster of the given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=62693dc6ae31a8578034fa566205856450f6b84dc2ee7885d8e2245c888a7ef4>Set_At</h4><pre class=ada-code-snippet><code>procedure Set_At
+  (Self     : in out Grapheme_Cluster_Iterator;
+   Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+</code></pre><p>Set iterator to point to the grapheme cluster at the given position.<h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h4 id=233fad4a0eda2a49fae87bbdc3c4d458f859ee77e309306fcf5739940aaacb4b>Set_At_First</h4><pre class=ada-code-snippet><code>procedure Set_At_First
+  (Self : in out Grapheme_Cluster_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point to the first grapheme cluster of the string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=5ba0bfae9558a097973fb1b4537ada9725d7664d8a6eadf0262a7911e60111d5>Set_At_Last</h4><pre class=ada-code-snippet><code>procedure Set_At_Last
+  (Self : in out Grapheme_Cluster_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point to the last grapheme cluster of the string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=0c29e74b3ed94ab3c68b78d0b5d87746f6541d974c37576c8887d884192ddb1d>Set_Before_First</h4><pre class=ada-code-snippet><code>procedure Set_Before_First
+  (Self : in out Grapheme_Cluster_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point before the first grapheme cluster of the given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl>

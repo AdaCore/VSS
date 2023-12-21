@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Parse_Errors</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#f8bdcf0d39c4bc5527ca0141ca55ada5d79defb3387633b6b3711c924da7d77c>SAX_Parse_Error</a></ul><h3>Subprograms</h3><ul><li><a href=#790edb508d54b0000e6d16c4b9af6fb0a0be6ec5f2e13d552ca4628992a6b8b0>Get_Column_Number</a><li><a href=#75ffadd3b4e54990e053a2ecbfef8f8b030ac8c6c61907fdf4cf6743e6a8ac8e>Get_Line_Number</a><li><a href=#1dc061f07932aadcc3d956e95f05ac1751568cb463e4f2b1264079897d49c026>Get_Message</a><li><a href=#3a5fa52bb29d56bb5cf95b64965043a8353a5477dec4881ec5b173a72d3b7fbc>Get_Public_Id</a><li><a href=#430f46f8e95e2f79742095dd5907ecdef8d6b4301810109735e9cb4582071715>Get_System_Id</a></ul><h2>Description</h2><p>Copyright (C) 2022-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=790edb508d54b0000e6d16c4b9af6fb0a0be6ec5f2e13d552ca4628992a6b8b0>Get_Column_Number</h4><pre class=ada-code-snippet><code>function Get_Column_Number
+  (Self : SAX_Parse_Error)
+   return VSS.Strings.Character_Index'Base
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=75ffadd3b4e54990e053a2ecbfef8f8b030ac8c6c61907fdf4cf6743e6a8ac8e>Get_Line_Number</h4><pre class=ada-code-snippet><code>function Get_Line_Number
+  (Self : SAX_Parse_Error) return VSS.Strings.Line_Index'Base
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=1dc061f07932aadcc3d956e95f05ac1751568cb463e4f2b1264079897d49c026>Get_Message</h4><pre class=ada-code-snippet><code>function Get_Message
+  (Self : SAX_Parse_Error) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=3a5fa52bb29d56bb5cf95b64965043a8353a5477dec4881ec5b173a72d3b7fbc>Get_Public_Id</h4><pre class=ada-code-snippet><code>function Get_Public_Id
+  (Self : SAX_Parse_Error) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=430f46f8e95e2f79742095dd5907ecdef8d6b4301810109735e9cb4582071715>Get_System_Id</h4><pre class=ada-code-snippet><code>function Get_System_Id
+  (Self : SAX_Parse_Error) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f8bdcf0d39c4bc5527ca0141ca55ada5d79defb3387633b6b3711c924da7d77c>SAX_Parse_Error</h4><pre class=ada-code-snippet><code>type SAX_Parse_Error is limited interface;
+</code></pre>

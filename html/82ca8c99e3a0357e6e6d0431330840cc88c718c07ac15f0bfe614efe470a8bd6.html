@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Attributes</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#36c3954bb87c6a9f056b3fadc12949c6b803654d31ce17848c58b64999176e81>XML_Attributes</a></ul><h3>Subprograms</h3><ul><li><a href=#75cc3140c89fffceb51ed5a2a52e689679f4c072b2666c22780c8fae3e6f773c>Get_Length</a><li><a href=#04cf67d30ce8278fa3c04f3ed71e013c39dc8770c12606cd847be862fb86e003>Get_Name</a><li><a href=#2163186584cec028d8dd9107048b0b41ae390995f6d903f733f8f9d7e605c91f>Get_URI</a><li><a href=#e6d92e636dd305f4760eda4a57fef4cb77e2049747d5626eb10875ed98befccc>Get_Value</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=75cc3140c89fffceb51ed5a2a52e689679f4c072b2666c22780c8fae3e6f773c>Get_Length</h4><pre class=ada-code-snippet><code>function Get_Length (Self : XML_Attributes) return Natural
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=04cf67d30ce8278fa3c04f3ed71e013c39dc8770c12606cd847be862fb86e003>Get_Name</h4><pre class=ada-code-snippet><code>function Get_Name
+  (Self  : XML_Attributes;
+   Index : Positive) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2163186584cec028d8dd9107048b0b41ae390995f6d903f733f8f9d7e605c91f>Get_URI</h4><pre class=ada-code-snippet><code>function Get_URI
+  (Self  : XML_Attributes;
+   Index : Positive) return VSS.IRIs.IRI
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=e6d92e636dd305f4760eda4a57fef4cb77e2049747d5626eb10875ed98befccc>Get_Value</h4><pre class=ada-code-snippet><code>function Get_Value
+  (Self  : XML_Attributes;
+   Index : Positive) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Index<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=36c3954bb87c6a9f056b3fadc12949c6b803654d31ce17848c58b64999176e81>XML_Attributes</h4><pre class=ada-code-snippet><code>type XML_Attributes is limited interface;
+</code></pre>

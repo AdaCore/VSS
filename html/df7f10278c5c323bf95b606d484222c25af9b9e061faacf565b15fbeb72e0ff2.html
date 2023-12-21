@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Regular_Expressions.Matches</h1><h2>Entities</h2><h3>Array Types</h3><ul><li><a href=#98dab222e0b4fc0f25ccea052f025a599a6530e683be9f91efa1898a786d7c5e>Segment_Marker_Array</a></ul><h3>Tagged Types</h3><ul><li><a href=#e87c50ca07a730ed83f8f35b32ae0ee27650b82c73a2b252222ef5d5af9c052b>Match</a></ul><h3>Subprograms</h3><ul><li><a href=#956769df3a63db9e278ef92dfcb0673c2054708f4f0537ff910d929d739a4560>Invalidate</a><li><a href=#cddab0552984803b733d0f7ca3d9fabbbcc32023555273782e71af1c770612c2>String_Modified</a></ul><h2>Description</h2><p>Copyright (C) 2020-2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=956769df3a63db9e278ef92dfcb0673c2054708f4f0537ff910d929d739a4560>Invalidate</h4><pre class=ada-code-snippet><code>procedure Invalidate (Self : in out Match)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=e87c50ca07a730ed83f8f35b32ae0ee27650b82c73a2b252222ef5d5af9c052b>Match</h4><pre class=ada-code-snippet><code>type Match (Length : Natural := 0) is
+  new VSS.Implementation.Referrers.Referal_Limited_Base with record
+   Counter   : System.Atomic_Counters.Atomic_Counter;
+   Has_Match : Boolean;
+   Markers   : Segment_Marker_Array (1 .. Length);
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Length<dd><dt>Counter<dd><dt>Has_Match<dd><dt>Markers<dd></dl><h4 id=98dab222e0b4fc0f25ccea052f025a599a6530e683be9f91efa1898a786d7c5e>Segment_Marker_Array</h4><pre class=ada-code-snippet><code>type Segment_Marker_Array is array (Positive range &lt;>) of
+  VSS.Strings.Cursors.Markers.Segment_Marker;
+</code></pre><h4 id=cddab0552984803b733d0f7ca3d9fabbbcc32023555273782e71af1c770612c2>String_Modified</h4><pre class=ada-code-snippet><code>procedure String_Modified
+  (Self     : in out Match;
+   Start    : VSS.Implementation.Strings.Cursor;
+   Removed  : VSS.Implementation.Strings.Cursor_Offset;
+   Inserted : VSS.Implementation.Strings.Cursor_Offset)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Start<dd><dt>Removed<dd><dt>Inserted<dd></dl>

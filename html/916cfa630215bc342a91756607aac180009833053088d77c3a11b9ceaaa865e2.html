@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Readers</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#1039e38bf6fbd6adcf21b378c99e0f2b5f24ef0164424820e09f1d49510ab4ec>SAX_Reader</a></ul><h3>Subprograms</h3><ul><li><a href=#0eb8bebc3b243d6a3458df14e66f33d53fa423077ac146f66e36a6f45e0a320d>Set_Content_Handler</a><li><a href=#acac8d6ccd664ec143f579928485fa63b79edc1ad054b31123b5bf908ffc0bee>Set_Error_Handler</a><li><a href=#a29869d84e9039b7009bba4c668fe725c1ded19f5079c9a6d07faaec6834b902>Set_Lexical_Handler</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=1039e38bf6fbd6adcf21b378c99e0f2b5f24ef0164424820e09f1d49510ab4ec>SAX_Reader</h4><pre class=ada-code-snippet><code>type SAX_Reader is limited interface;
+</code></pre><h4 id=0eb8bebc3b243d6a3458df14e66f33d53fa423077ac146f66e36a6f45e0a320d>Set_Content_Handler</h4><pre class=ada-code-snippet><code>procedure Set_Content_Handler
+  (Self    : in out SAX_Reader;
+   Handler : VSS.XML.Content_Handlers.SAX_Content_Handler_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Handler<dd></dl><h4 id=acac8d6ccd664ec143f579928485fa63b79edc1ad054b31123b5bf908ffc0bee>Set_Error_Handler</h4><pre class=ada-code-snippet><code>procedure Set_Error_Handler
+  (Self    : in out SAX_Reader;
+   Handler : VSS.XML.Error_Handlers.SAX_Error_Handler_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Handler<dd></dl><h4 id=a29869d84e9039b7009bba4c668fe725c1ded19f5079c9a6d07faaec6834b902>Set_Lexical_Handler</h4><pre class=ada-code-snippet><code>procedure Set_Lexical_Handler
+  (Self    : in out SAX_Reader;
+   Handler : VSS.XML.Lexical_Handlers.SAX_Lexical_Handler_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Handler<dd></dl>

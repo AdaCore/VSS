@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Stream_Element_Vectors.Conversions</h1><h2>Entities</h2><h3>Subprograms</h3><ul><li><a href=#50a8caf9b9e4b7b00ea87c6408ec158f7853a72d80b3acbda043c6df5451fc75>To_Stream_Element_Array</a><li><a href=#d514d0df0e574571cbddaf01a102472875488709e69ce5914954e1252445c06c>To_Stream_Element_Vector</a><li><a href=#ab37c90919c21185a3458d3ad75528fb9dddc01dafd4481bdd4ccb1ee46b5f16>Unchecked_From_Unbounded_String</a><li><a href=#5835e3dfef7cf22928640c4afe216493e6274789cce5fc9fbae8c49f8b695674>Unchecked_To_String</a></ul><h2>Description</h2><p>This package provides conversion subprograms between object of Stream_Element_Vector type and some types from the standard run-time library (String, Unbounded_String, Stream_Element_Array).<p>Conversion subprograms must be used carefully, some of them returns object of unconstrained type and its use may be dangerous due to possible stack overflow or memory corruption for large amount of elements.<h4 id=50a8caf9b9e4b7b00ea87c6408ec158f7853a72d80b3acbda043c6df5451fc75>To_Stream_Element_Array</h4><pre class=ada-code-snippet><code>function To_Stream_Element_Array
+  (Item : Stream_Element_Vector'Class)
+   return Ada.Streams.Stream_Element_Array
+</code></pre><p>Return data as array of stream elements.<p>Note: this function returns object of unconstrained type, thus its use may result in stack overflow or memory corruption.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d514d0df0e574571cbddaf01a102472875488709e69ce5914954e1252445c06c>To_Stream_Element_Vector</h4><pre class=ada-code-snippet><code>function To_Stream_Element_Vector
+  (Item : Ada.Streams.Stream_Element_Array) return Stream_Element_Vector
+</code></pre><p>Convert Stream_Element_Array into Stream_Element_Buffer.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=ab37c90919c21185a3458d3ad75528fb9dddc01dafd4481bdd4ccb1ee46b5f16>Unchecked_From_Unbounded_String</h4><pre class=ada-code-snippet><code>function Unchecked_From_Unbounded_String
+  (Item : Ada.Strings.Unbounded.Unbounded_String)
+   return Stream_Element_Vector
+</code></pre><p>Converts Unbounded_String into Stream_Element_Buffer without any checks.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=5835e3dfef7cf22928640c4afe216493e6274789cce5fc9fbae8c49f8b695674>Unchecked_To_String</h4><pre class=ada-code-snippet><code>function Unchecked_To_String
+  (Item : Stream_Element_Vector'Class) return String
+</code></pre><p>Convert content of the buffer to standard string. It do binary conversion without any assumptions or checks.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl>

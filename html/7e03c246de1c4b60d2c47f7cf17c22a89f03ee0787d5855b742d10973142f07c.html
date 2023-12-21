@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Push_Writers</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#7966e3fd3904b0cee59e8344e7f7f03243c16ebccac2612b24c61cdded21a306>JSON_Simple_Push_Writer</a></ul><h3>Subprograms</h3><ul><li><a href=#1c00b161bde358c456249dc567cbc8084e256a57428d11c9475bcfcf1b31d685>Set_Stream</a></ul><h2>Description</h2><p>Copyright (C) 2020-2021, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=7966e3fd3904b0cee59e8344e7f7f03243c16ebccac2612b24c61cdded21a306>JSON_Simple_Push_Writer</h4><pre class=ada-code-snippet><code>type JSON_Simple_Push_Writer is
+  limited new VSS.JSON.Content_Handlers.JSON_Content_Handler
+    with private;
+</code></pre><h4 id=1c00b161bde358c456249dc567cbc8084e256a57428d11c9475bcfcf1b31d685>Set_Stream</h4><pre class=ada-code-snippet><code>procedure Set_Stream
+  (Self   : in out JSON_Simple_Push_Writer'Class;
+   Stream : not null VSS.Text_Streams.Output_Text_Stream_Access)
+</code></pre><p>Sets output text stream to be used to generate JSON document. Change of the stream is effective only before call to Start_Document.<h5>Parameters</h5><dl><dt>Self<dd><dt>Stream<dd></dl>

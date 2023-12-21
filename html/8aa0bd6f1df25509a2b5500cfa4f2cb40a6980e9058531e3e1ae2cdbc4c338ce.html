@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Converters.Decoders</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#18fc9c703be6bf017c4e8b62bbaff1e125208a6ebfd584f66c022650cf03354b>Virtual_String_Decoder</a></ul><h3>Subprograms</h3><ul><li><a href=#7d6c067e6e199d964a55c68f8d1d37fa53dccd81985c6cb86f1d2e666aef95dc>Decode</a><li><a href=#a42b00518b91d56c2fae10567b9506ce5bbefc3a9a629cb41f6c4957e3574036>Decode</a><li><a href=#b1b0d69a7eb8c01a4d5c882359a553ce1056866b1dfdb8cb2eae3dd7e23ccdd0>Error_Message</a><li><a href=#86f3a6b7f4c36326bc0a324ba528abd28e418e82e1dec1a40bf831384c57c2f7>Has_Error</a><li><a href=#e91afd16f84cb4d4d21030cb81ef098cb60bb2c5a156c48ce586338ebc46ea29>Initialize</a><li><a href=#6bd90ac668e96c58f66e195ab5956f46e7b01dbe82c0379e172c6dea050fd324>Is_Valid</a><li><a href=#1ab356f6baeaa0c473223c98ce859b35dc0192da651b2279d378501e7cdc876d>Reset_State</a></ul><h2>Description</h2><p>This package provides string data decoder from external encoding to Virtual_String.<h4 id=7d6c067e6e199d964a55c68f8d1d37fa53dccd81985c6cb86f1d2e666aef95dc>Decode</h4><pre class=ada-code-snippet><code>function Decode
+  (Self        : in out Virtual_String_Decoder'Class;
+   Data_Chunk  : Ada.Streams.Stream_Element_Array;
+   End_Of_Data : Boolean := True)
+   return VSS.Strings.Virtual_String
+</code></pre><p>Decode Data and return result. When Stateless flag was set to False, and End_Of_Data parameter is False, it returns only fully decoded portion of the data, and save incomplete data to be decoded with next call of Decode. When Stateless flag was set to True, or End_Of_Data is True, incomplete data is not allowed, it will be returned as decoding error.<h5>Parameters</h5><dl><dt>Self<dd><dt>Data_Chunk<dd><dt>End_Of_Data<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=a42b00518b91d56c2fae10567b9506ce5bbefc3a9a629cb41f6c4957e3574036>Decode</h4><pre class=ada-code-snippet><code>function Decode
+  (Self        : in out Virtual_String_Decoder'Class;
+   Data_Chunk  : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+   End_Of_Data : Boolean := True)
+   return VSS.Strings.Virtual_String
+</code></pre><p>Decode Data and return result. When Stateless flag was set to False, and End_Of_Data parameter is False, it returns only fully decoded portion of the data, and save incomplete data to be decoded with next call of Decode. When Stateless flag was set to True, or End_Of_Data is True, incomplete data is not allowed, it will be returned as decoding error.<h5>Parameters</h5><dl><dt>Self<dd><dt>Data_Chunk<dd><dt>End_Of_Data<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=b1b0d69a7eb8c01a4d5c882359a553ce1056866b1dfdb8cb2eae3dd7e23ccdd0>Error_Message</h4><pre class=ada-code-snippet><code>function Error_Message
+  (Self : Virtual_String_Decoder'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return error message for latest detected error.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=86f3a6b7f4c36326bc0a324ba528abd28e418e82e1dec1a40bf831384c57c2f7>Has_Error</h4><pre class=ada-code-snippet><code>function Has_Error (Self : Virtual_String_Decoder'Class) return Boolean
+</code></pre><p>Return True when some error has been found during decoding.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=e91afd16f84cb4d4d21030cb81ef098cb60bb2c5a156c48ce586338ebc46ea29>Initialize</h4><pre class=ada-code-snippet><code>procedure Initialize
+  (Self     : in out Virtual_String_Decoder'Class;
+   Encoding : VSS.Strings.Virtual_String;
+   Flags    : Converter_Flags := Default_Converter_Flags)
+</code></pre><p>Initialize decoder to decode text data in given encoding. Is_Valid return True when decoder has been initialized successfully.<h5>Parameters</h5><dl><dt>Self<dd><dt>Encoding<dd><dt>Flags<dd></dl><h4 id=6bd90ac668e96c58f66e195ab5956f46e7b01dbe82c0379e172c6dea050fd324>Is_Valid</h4><pre class=ada-code-snippet><code>function Is_Valid (Self : Virtual_String_Decoder'Class) return Boolean
+</code></pre><p>Return True when decoder is initialized successfully.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=1ab356f6baeaa0c473223c98ce859b35dc0192da651b2279d378501e7cdc876d>Reset_State</h4><pre class=ada-code-snippet><code>procedure Reset_State (Self : in out Virtual_String_Decoder'Class)
+</code></pre><p>Reset state of the decoder to initial (after call of Initialize). All accumulated incomplete data will be lost.<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=18fc9c703be6bf017c4e8b62bbaff1e125208a6ebfd584f66c022650cf03354b>Virtual_String_Decoder</h4><pre class=ada-code-snippet><code>type Virtual_String_Decoder is tagged limited private;
+</code></pre>

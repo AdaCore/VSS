@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Pull_Readers.Simple</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#7e7a71b032ae580532ef025e225dc61efb3458f0ccd9fb05303c308c2cfe5006>JSON_Simple_Pull_Reader</a></ul><h3>Subprograms</h3><ul><li><a href=#6d06c4af259669702a6c3f5690dcb918a6a06ed2f4645af29652b61db3b57235>Boolean_Value</a><li><a href=#165c8c688f2296b8af0b09796fa8f3873539ddb203aa5663afa7d582bf964a07>Element_Kind</a><li><a href=#dc91df1274a8124df06126799d55a5146af3140ab1fc4764d4d52514e51cc6ef>Key_Name</a><li><a href=#864ca66abccd8de8b3349d97214a023a3c7c53da4b58394f4f69ba06e4b1cd95>Number_Value</a><li><a href=#982499b232cafc146d3583785ced50c520c4bb71d0259ae6e431446f79ac5859>Set_Stream</a><li><a href=#6557e98ffc9b4b86a7e58f3807c5fcb62768e32cd9d66424cc1338eaea882db7>String_Value</a></ul><h2>Description</h2><p>Copyright (C) 2020-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=6d06c4af259669702a6c3f5690dcb918a6a06ed2f4645af29652b61db3b57235>Boolean_Value</h4><pre class=ada-code-snippet><code>function Boolean_Value
+  (Self : JSON_Simple_Pull_Reader) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=165c8c688f2296b8af0b09796fa8f3873539ddb203aa5663afa7d582bf964a07>Element_Kind</h4><pre class=ada-code-snippet><code>function Element_Kind
+  (Self : JSON_Simple_Pull_Reader)
+   return VSS.JSON.Streams.JSON_Stream_Element_Kind
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7e7a71b032ae580532ef025e225dc61efb3458f0ccd9fb05303c308c2cfe5006>JSON_Simple_Pull_Reader</h4><pre class=ada-code-snippet><code>type JSON_Simple_Pull_Reader is limited new JSON_Pull_Reader with private;
+</code></pre><h4 id=dc91df1274a8124df06126799d55a5146af3140ab1fc4764d4d52514e51cc6ef>Key_Name</h4><pre class=ada-code-snippet><code>function Key_Name
+  (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=864ca66abccd8de8b3349d97214a023a3c7c53da4b58394f4f69ba06e4b1cd95>Number_Value</h4><pre class=ada-code-snippet><code>function Number_Value
+  (Self : JSON_Simple_Pull_Reader) return VSS.JSON.JSON_Number
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=982499b232cafc146d3583785ced50c520c4bb71d0259ae6e431446f79ac5859>Set_Stream</h4><pre class=ada-code-snippet><code>procedure Set_Stream
+  (Self   : in out JSON_Simple_Pull_Reader'Class;
+   Stream : not null VSS.Text_Streams.Input_Text_Stream_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Stream<dd></dl><h4 id=6557e98ffc9b4b86a7e58f3807c5fcb62768e32cd9d66424cc1338eaea882db7>String_Value</h4><pre class=ada-code-snippet><code>function String_Value
+  (Self : JSON_Simple_Pull_Reader) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

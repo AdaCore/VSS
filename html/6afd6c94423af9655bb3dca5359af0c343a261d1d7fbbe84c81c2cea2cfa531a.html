@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Regular_Expressions.Name_Sets</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#7e1c0965abd5905f870b59ed2547fc9670dba0975d2c8ecbe442126b1a2ba842>General_Category_Set</a></ul><h3>Subprograms</h3><ul><li><a href=#ceb85303c6eb5f4cea433ea1ee5a49be1e3cab1fca7285983efae94f6ff77f5a>"not"</a><li><a href=#f4a519b0ec31658127ce8d29ebc0d5bbfeba8b5638bce9cd49ffa67051548b8e>"or"</a><li><a href=#493e0f4cff3bfa046cab4dd07bc54b5061d95a82ba87a41475433e484c28ae66>Contains</a><li><a href=#d1f28806c12a3f08e0e5a9eccd9ea69c38da5777df5dada924ffeffdce5d9f54>Empty</a><li><a href=#2bc6f8b5fc8e77c80e4a2d427fa50bf01810c0218ac58119836da5ce20029474>Include</a><li><a href=#4a6f1ba74e08fbea43391a1920351e0edfec1a1212f63e3bee7715f502804978>Initialize</a><li><a href=#9a0b9618d1088c6ed83413ddf28fc389549acc7077c83b4aae52fe5ee5d30c37>To_General_Category_Set</a></ul><h2>Description</h2><p>Copyright (C) 2022-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=ceb85303c6eb5f4cea433ea1ee5a49be1e3cab1fca7285983efae94f6ff77f5a>"not"</h4><pre class=ada-code-snippet><code>function "not" (Left : General_Category_Set) return General_Category_Set
+</code></pre><h5>Parameters</h5><dl><dt>Left<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f4a519b0ec31658127ce8d29ebc0d5bbfeba8b5638bce9cd49ffa67051548b8e>"or"</h4><pre class=ada-code-snippet><code>function "or"
+  (Left, Right : General_Category_Set) return General_Category_Set
+</code></pre><h5>Parameters</h5><dl><dt>Left<dd><dt>Right<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=493e0f4cff3bfa046cab4dd07bc54b5061d95a82ba87a41475433e484c28ae66>Contains</h4><pre class=ada-code-snippet><code>function Contains
+  (Self  : General_Category_Set;
+   Value : VSS.Characters.General_Category) return Boolean
+</code></pre><p>Check if set contains a value<h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d1f28806c12a3f08e0e5a9eccd9ea69c38da5777df5dada924ffeffdce5d9f54>Empty</h4><pre class=ada-code-snippet><code>function Empty return General_Category_Set
+</code></pre><p>Return an empty set<h5>Return Value</h5><dl><dd></dl><h4 id=7e1c0965abd5905f870b59ed2547fc9670dba0975d2c8ecbe442126b1a2ba842>General_Category_Set</h4><pre class=ada-code-snippet><code>type General_Category_Set is private
+  with Aggregate => (Empty       => Empty,
+                     Add_Unnamed => Include);
+</code></pre><h4 id=2bc6f8b5fc8e77c80e4a2d427fa50bf01810c0218ac58119836da5ce20029474>Include</h4><pre class=ada-code-snippet><code>procedure Include
+  (Self  : in out General_Category_Set;
+   Value : VSS.Characters.General_Category)
+</code></pre><p>Include a value into set<h5>Parameters</h5><dl><dt>Self<dd><dt>Value<dd></dl><h4 id=4a6f1ba74e08fbea43391a1920351e0edfec1a1212f63e3bee7715f502804978>Initialize</h4><pre class=ada-code-snippet><code>procedure Initialize
+</code></pre><p>Initialize internal data. The call of it is optional<h4 id=9a0b9618d1088c6ed83413ddf28fc389549acc7077c83b4aae52fe5ee5d30c37>To_General_Category_Set</h4><pre class=ada-code-snippet><code>procedure To_General_Category_Set
+  (Name  : VSS.Strings.Virtual_String;
+   Value : out General_Category_Set;
+   Ok    : out Boolean)
+</code></pre><p>Return set corresponding to well-known name<h5>Parameters</h5><dl><dt>Name<dd><dt>Value<dd><dt>Ok<dd></dl>

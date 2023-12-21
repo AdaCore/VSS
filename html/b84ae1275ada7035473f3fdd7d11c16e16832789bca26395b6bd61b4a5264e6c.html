@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Templates.Proxies.Booleans</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#fbe4504eef5e028db32eee35286a1e6fcd1ffda66109d3c87033a5bdbda2dada>Boolean_Proxy</a></ul><h3>Subprograms</h3><ul><li><a href=#487bada896419b10eb79df8ecb899bc6eeb46075b6b540221569c11652596485>Value</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=fbe4504eef5e028db32eee35286a1e6fcd1ffda66109d3c87033a5bdbda2dada>Boolean_Proxy</h4><pre class=ada-code-snippet><code>type Boolean_Proxy is
+  limited new VSS.XML.Templates.Proxies.Abstract_Value_Proxy with
+record
+   Value : Boolean;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Value<dd></dl><h4 id=487bada896419b10eb79df8ecb899bc6eeb46075b6b540221569c11652596485>Value</h4><pre class=ada-code-snippet><code>function Value
+  (Self : Boolean_Proxy) return VSS.XML.Templates.Values.Value
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

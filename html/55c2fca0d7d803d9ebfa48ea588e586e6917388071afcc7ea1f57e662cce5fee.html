@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Command_Line</h1><h2>Entities</h2><h3>Record Types</h3><ul><li><a href=#2bbe3fb3573eb41f55e49845e87196625c9776114d393e53e4ff5e170785135f>Abstract_Option</a><li><a href=#bd4fe9ab27621b73319501888631269b6c9a5525768212aade7daebf4f569e39>Name_Value</a></ul><h3>Tagged Types</h3><ul><li><a href=#0ec65f2a13107df926dc3b9d43ad91127f83e7240e85dec813b40616ea83f390>Binary_Option</a><li><a href=#edb5a4826a99ec2ed5b5fa2a821b05449dae073056574ebc2dc45697219bf0ba>Name_Value_Option</a><li><a href=#aa9df42bec6045c1e980612db8e089acc989f371e4ce21a1f2af08893f682700>Named_Option</a><li><a href=#69247e3d391300aceee0817bf6766fcfb66599e9accfecd487cc3e1a4437069e>Positional_Option</a><li><a href=#7752a7231e88f434cfd7c6486cfdd38eaf7c79285bf4bee130dc36ccd13046c8>Value_Option</a></ul><h3>Subprograms</h3><ul><li><a href=#2fd07ad046571f86e4b916c61f3f702353c3f80399176e1f05e63e050697a6cf>Add_Help_Option</a><li><a href=#d189734c587f7cc3ee7a99b6c1fdc4e3476e9b73c8663ad8233e97a6b423007d>Add_Option</a><li><a href=#de261018ca7a7378121b142671c9fde6fc534113ecbcf9323661bc53c2ab9414>Is_Specified</a><li><a href=#2e728e96d814cdfb256e7948c86589487804657ab5f99555d92827328ce125c1>Positional_Arguments</a><li><a href=#c317dfc13fdc58804e5601ec12adf18ded0f9301e84a6bc071cf4def208b0c2c>Process</a><li><a href=#3befac7fa8e4d443ac14ffb6f742925db9237da993503e6c0d60df88fd1e06a0>Report_Error</a><li><a href=#500984c4e781c0840414b9c25f949bdd1801e20d1e33864d6802376011af187c>Report_Error</a><li><a href=#30f3d183adcfc703ee8af23b2a0af86907501426cf6a985a90bc909237b980bf>Value</a><li><a href=#b5ddbe5d8e379c2f9c6f3699f5d08f28f6ec6bcd1e1fd4dcfc41580c19c014fa>Value</a><li><a href=#b342ec0c33854b1ade64317f33458fedffd09f11647915cb72aaac3ecd80e1c4>Values</a><li><a href=#a7707ca9c45b4bab7d03fd67d726a14bc6cf2f8a7a722208c2effb8e0f7b003c>Values</a></ul><h3>Generic Instantiations</h3><ul><li><a href=#aae17143e4f53d6f116ff8bd8c46ab3f9d46d3d3fb266df501040f386791eeb9>Name_Value_Vectors</a></ul><h2>Description</h2><p>This package provides access to command line arguments as parsed options.<h4 id=2bbe3fb3573eb41f55e49845e87196625c9776114d393e53e4ff5e170785135f>Abstract_Option</h4><pre class=ada-code-snippet><code>type Abstract_Option is abstract tagged record
+   Description : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Description<dd></dl><h4 id=2fd07ad046571f86e4b916c61f3f702353c3f80399176e1f05e63e050697a6cf>Add_Help_Option</h4><pre class=ada-code-snippet><code>procedure Add_Help_Option
+</code></pre><p>Adds builtin definition of the option to display help information. This option is handled automatically.<h4 id=d189734c587f7cc3ee7a99b6c1fdc4e3476e9b73c8663ad8233e97a6b423007d>Add_Option</h4><pre class=ada-code-snippet><code>procedure Add_Option (Option : Abstract_Option'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Option<dd></dl><h4 id=0ec65f2a13107df926dc3b9d43ad91127f83e7240e85dec813b40616ea83f390>Binary_Option</h4><pre class=ada-code-snippet><code>type Binary_Option is new Named_Option with null record;
+</code></pre><h4 id=de261018ca7a7378121b142671c9fde6fc534113ecbcf9323661bc53c2ab9414>Is_Specified</h4><pre class=ada-code-snippet><code>function Is_Specified (Option : Abstract_Option'Class) return Boolean
+</code></pre><p>Return True when given option has been specified the command line.<h5>Parameters</h5><dl><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=bd4fe9ab27621b73319501888631269b6c9a5525768212aade7daebf4f569e39>Name_Value</h4><pre class=ada-code-snippet><code>type Name_Value is record
+   Name  : VSS.Strings.Virtual_String;
+   Value : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Name<dd><dt>Value<dd></dl><h4 id=edb5a4826a99ec2ed5b5fa2a821b05449dae073056574ebc2dc45697219bf0ba>Name_Value_Option</h4><pre class=ada-code-snippet><code>type Name_Value_Option is new Named_Option with record
+   Name_Name  : VSS.Strings.Virtual_String;
+   Value_Name : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Name_Name<dd><dt>Value_Name<dd></dl><h4 id=aae17143e4f53d6f116ff8bd8c46ab3f9d46d3d3fb266df501040f386791eeb9>Name_Value_Vectors</h4><pre class=ada-code-snippet><code>package Name_Value_Vectors is
+   new Ada.Containers.Vectors (Positive, Name_Value);
+</code></pre><h4 id=aa9df42bec6045c1e980612db8e089acc989f371e4ce21a1f2af08893f682700>Named_Option</h4><pre class=ada-code-snippet><code>type Named_Option is abstract new Abstract_Option with record
+   Short_Name : VSS.Strings.Virtual_String;
+   Long_Name  : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Short_Name<dd><dt>Long_Name<dd></dl><h4 id=2e728e96d814cdfb256e7948c86589487804657ab5f99555d92827328ce125c1>Positional_Arguments</h4><pre class=ada-code-snippet><code>function Positional_Arguments
+  return VSS.String_Vectors.Virtual_String_Vector
+</code></pre><p>Return list of positional arguments.<h5>Return Value</h5><dl><dd></dl><h4 id=69247e3d391300aceee0817bf6766fcfb66599e9accfecd487cc3e1a4437069e>Positional_Option</h4><pre class=ada-code-snippet><code>type Positional_Option is new Abstract_Option with record
+   Name : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Name<dd></dl><h4 id=c317dfc13fdc58804e5601ec12adf18ded0f9301e84a6bc071cf4def208b0c2c>Process</h4><pre class=ada-code-snippet><code>procedure Process
+</code></pre><p>Parse command line. If error is found then report it and terminate application.<h4 id=3befac7fa8e4d443ac14ffb6f742925db9237da993503e6c0d60df88fd1e06a0>Report_Error</h4><pre class=ada-code-snippet><code>procedure Report_Error (Message : VSS.String_Vectors.Virtual_String_Vector)
+</code></pre><p>Report error and terminate application.<h5>Parameters</h5><dl><dt>Message<dd></dl><h4 id=500984c4e781c0840414b9c25f949bdd1801e20d1e33864d6802376011af187c>Report_Error</h4><pre class=ada-code-snippet><code>procedure Report_Error (Message : VSS.Strings.Virtual_String)
+</code></pre><p>Report error and terminate application.<h5>Parameters</h5><dl><dt>Message<dd></dl><h4 id=30f3d183adcfc703ee8af23b2a0af86907501426cf6a985a90bc909237b980bf>Value</h4><pre class=ada-code-snippet><code>function Value
+  (Option : Positional_Option'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the given option.<h5>Parameters</h5><dl><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=b5ddbe5d8e379c2f9c6f3699f5d08f28f6ec6bcd1e1fd4dcfc41580c19c014fa>Value</h4><pre class=ada-code-snippet><code>function Value
+  (Option : Value_Option'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the given option.<h5>Parameters</h5><dl><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7752a7231e88f434cfd7c6486cfdd38eaf7c79285bf4bee130dc36ccd13046c8>Value_Option</h4><pre class=ada-code-snippet><code>type Value_Option is new Named_Option with record
+   Value_Name : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Value_Name<dd></dl><h4 id=b342ec0c33854b1ade64317f33458fedffd09f11647915cb72aaac3ecd80e1c4>Values</h4><pre class=ada-code-snippet><code>function Values
+  (Option : Name_Value_Option'Class) return Name_Value_Vectors.Vector
+</code></pre><p>Return all name=value pairs of the given option specified in the command line.<h5>Parameters</h5><dl><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=a7707ca9c45b4bab7d03fd67d726a14bc6cf2f8a7a722208c2effb8e0f7b003c>Values</h4><pre class=ada-code-snippet><code>function Values
+  (Option : Value_Option'Class)
+   return VSS.String_Vectors.Virtual_String_Vector
+</code></pre><p>Return all values of the given option specified in the command line.<h5>Parameters</h5><dl><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl>

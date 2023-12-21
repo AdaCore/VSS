@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Formatters</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#e4653c374f4a0416173d880758ddb012915f3a197f23ce3e4031ed8c36994b90>Field_Alignment</a></ul><h3>Record Types</h3><ul><li><a href=#00fc8e7bc63701401720e64a690b33944bcdc4d0e5d0588709f82c5ce30dee6e>Format_Information</a></ul><h3>Interface Types</h3><ul><li><a href=#884320aa3d6bc3c072b3ae1b6ca981d9e4ebae3910772e5b728835439776880b>Abstract_Formatter</a></ul><h3>Subprograms</h3><ul><li><a href=#2d150de67cdd787c13edcfb86cca918670a68a126acafc3c789a8cc928cee29f>Format</a><li><a href=#29080ae63df2559e1bc5825058b4e0a2c77d42cee98ab4a73cce65ef13e0c74a>Name</a></ul><h2>Description</h2><p>This package provides base type for formatters, used by string templates processor. Children packages provides implementations of formatters for some types, applications can define own formatters too.<h4 id=884320aa3d6bc3c072b3ae1b6ca981d9e4ebae3910772e5b728835439776880b>Abstract_Formatter</h4><pre class=ada-code-snippet><code>type Abstract_Formatter is limited interface;
+</code></pre><h4 id=e4653c374f4a0416173d880758ddb012915f3a197f23ce3e4031ed8c36994b90>Field_Alignment</h4><pre class=ada-code-snippet><code>type Field_Alignment is (Default, Left, Center, Right, Fill);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>Default<dd><dt>Left<dd><dt>Center<dd><dt>Right<dd><dt>Fill<dd></dl><h4 id=2d150de67cdd787c13edcfb86cca918670a68a126acafc3c789a8cc928cee29f>Format</h4><pre class=ada-code-snippet><code>function Format
+  (Self   : Abstract_Formatter;
+   Format : Format_Information)
+   return VSS.Strings.Virtual_String
+</code></pre><p>Format value using given format specification.<h5>Parameters</h5><dl><dt>Self<dd><dt>Format<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=00fc8e7bc63701401720e64a690b33944bcdc4d0e5d0588709f82c5ce30dee6e>Format_Information</h4><pre class=ada-code-snippet><code>type Format_Information is record
+   Width     : VSS.Strings.Grapheme_Cluster_Count := 0;
+   Alignment : Field_Alignment                    := Default;
+   Format    : VSS.Strings.Virtual_String;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Width<dd><dt>Alignment<dd><dt>Format<dd></dl><h4 id=29080ae63df2559e1bc5825058b4e0a2c77d42cee98ab4a73cce65ef13e0c74a>Name</h4><pre class=ada-code-snippet><code>function Name
+  (Self : Abstract_Formatter)
+   return VSS.Strings.Virtual_String
+</code></pre><p>Name of the parameter.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

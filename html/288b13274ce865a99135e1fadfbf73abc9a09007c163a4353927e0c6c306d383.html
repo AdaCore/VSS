@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Pull_Readers.Buffered</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#fd65dc18caa856cbdf81950334f7cd2a8552404f88e2e84aeb82fec4eb91f196>JSON_Buffered_Pull_Reader</a></ul><h3>Subprograms</h3><ul><li><a href=#1e410f0feabf43a741e70dcdc685d391157b69e7011fb9ca201608a0b4ba19fb>Boolean_Value</a><li><a href=#8478c9fa468de2e66f8032e413e80c4d87fad1395964f5b6a51b0f0f64c55403>Element_Kind</a><li><a href=#1ee21e8e9b185ea15744dded1ace15012ab2473297e6370697bf110b01c13655>Key_Name</a><li><a href=#6c6ccb89933656f5cbdcbfc986015a89fd89c994b03fa5ccfcc6a789a5954c24>Mark</a><li><a href=#6a77f2066d398f8ced67e21388cda136234f46fc02b2d79f68a4bbe823024484>Number_Value</a><li><a href=#9f6ad92886122b93ee29510d5b01a0d41e7159ea9df7aaa0a94e6d5ba8cf38a4>Reset</a><li><a href=#350663cb8cef14aefce561916a025b7734c68cbcc5182a6c8757e811126cbc3d>String_Value</a><li><a href=#3da8f5eb13584ab96574a7dfa3c18605696278b328959f73d0d8f9fb5295c461>Unmark</a></ul><h2>Description</h2><p>Copyright (C) 2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=1e410f0feabf43a741e70dcdc685d391157b69e7011fb9ca201608a0b4ba19fb>Boolean_Value</h4><pre class=ada-code-snippet><code>function Boolean_Value
+  (Self : JSON_Buffered_Pull_Reader) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=8478c9fa468de2e66f8032e413e80c4d87fad1395964f5b6a51b0f0f64c55403>Element_Kind</h4><pre class=ada-code-snippet><code>function Element_Kind
+  (Self : JSON_Buffered_Pull_Reader)
+   return VSS.JSON.Streams.JSON_Stream_Element_Kind
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=fd65dc18caa856cbdf81950334f7cd2a8552404f88e2e84aeb82fec4eb91f196>JSON_Buffered_Pull_Reader</h4><pre class=ada-code-snippet><code>type JSON_Buffered_Pull_Reader
+  (Reader : not null access JSON_Pull_Reader'Class)
+     is limited new JSON_Pull_Reader with private;
+</code></pre><h4 id=1ee21e8e9b185ea15744dded1ace15012ab2473297e6370697bf110b01c13655>Key_Name</h4><pre class=ada-code-snippet><code>function Key_Name
+  (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=6c6ccb89933656f5cbdcbfc986015a89fd89c994b03fa5ccfcc6a789a5954c24>Mark</h4><pre class=ada-code-snippet><code>procedure Mark (Self : in out JSON_Buffered_Pull_Reader'Class)
+</code></pre><p>Mark position in the input stream. Call of the Reset subprogram reposition stream to the marked position.<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=6a77f2066d398f8ced67e21388cda136234f46fc02b2d79f68a4bbe823024484>Number_Value</h4><pre class=ada-code-snippet><code>function Number_Value
+  (Self : JSON_Buffered_Pull_Reader) return VSS.JSON.JSON_Number
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=9f6ad92886122b93ee29510d5b01a0d41e7159ea9df7aaa0a94e6d5ba8cf38a4>Reset</h4><pre class=ada-code-snippet><code>procedure Reset (Self : in out JSON_Buffered_Pull_Reader'Class)
+</code></pre><p>Reposition stream to the last marked position.<h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=350663cb8cef14aefce561916a025b7734c68cbcc5182a6c8757e811126cbc3d>String_Value</h4><pre class=ada-code-snippet><code>function String_Value
+  (Self : JSON_Buffered_Pull_Reader) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=3da8f5eb13584ab96574a7dfa3c18605696278b328959f73d0d8f9fb5295c461>Unmark</h4><pre class=ada-code-snippet><code>procedure Unmark (Self : in out JSON_Buffered_Pull_Reader'Class)
+</code></pre><p>Remove position mark.<h5>Parameters</h5><dl><dt>Self<dd></dl>

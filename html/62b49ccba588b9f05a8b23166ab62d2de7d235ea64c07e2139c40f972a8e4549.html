@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Cursors.Markers</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#20fbe0dab990bedacc9e64e9b1ee86b5597ecd416be28e47fac8c6307552ea48>Character_Marker</a><li><a href=#2384db035226019d8780ecdd3d033328f3833ddbd10fab84985ed3cb06e6ca41>Segment_Marker</a></ul><h3>Subprograms</h3><ul><li><a href=#f5ce5e1f77ccd35aa2c45cff3970e9220490997a2b76cdd3010f11e8cc6a693f>Character_Length</a><li><a href=#d1b988da5f6a3b4aa25d90c1b3d2f3ff2cfc7a729daf03ce189c1240fcd63bdd>Is_Valid</a><li><a href=#96ad3a04ac3c06e7f92e23ffdce1755d0d3c61c4f14db2864de2d8dd7d75595b>Is_Valid</a></ul><h2>Description</h2><p>Copyright (C) 2021, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=f5ce5e1f77ccd35aa2c45cff3970e9220490997a2b76cdd3010f11e8cc6a693f>Character_Length</h4><pre class=ada-code-snippet><code>function Character_Length (Self : Segment_Marker)
+  return VSS.Strings.Character_Count
+</code></pre><p>GNAT 20210421: This function is invisible otherwise.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=20fbe0dab990bedacc9e64e9b1ee86b5597ecd416be28e47fac8c6307552ea48>Character_Marker</h4><pre class=ada-code-snippet><code>type Character_Marker is
+  new VSS.Strings.Cursors.Abstract_Character_Cursor with private;
+</code></pre><h4 id=d1b988da5f6a3b4aa25d90c1b3d2f3ff2cfc7a729daf03ce189c1240fcd63bdd>Is_Valid</h4><pre class=ada-code-snippet><code>function Is_Valid (Self : Character_Marker) return Boolean
+</code></pre><p>GNAT 20210421: This function is invisible otherwise.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=96ad3a04ac3c06e7f92e23ffdce1755d0d3c61c4f14db2864de2d8dd7d75595b>Is_Valid</h4><pre class=ada-code-snippet><code>function Is_Valid (Self : Segment_Marker) return Boolean
+</code></pre><p>GNAT 20210421: This function is invisible otherwise.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2384db035226019d8780ecdd3d033328f3833ddbd10fab84985ed3cb06e6ca41>Segment_Marker</h4><pre class=ada-code-snippet><code>type Segment_Marker is
+  new VSS.Strings.Cursors.Abstract_Segment_Cursor with private;
+</code></pre>

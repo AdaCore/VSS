@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Formatters.Strings</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#90d0c2fe79cfe65389fd4a4b663a675f9e8f62bfa7c92d9b7a0806036ca1e90e>Formatter</a></ul><h3>Subprograms</h3><ul><li><a href=#3fb51e439262c2a96b70dacdcd588fbe6e558332f26b86ab80731e44d6da72ab>Image</a><li><a href=#72a988b5221faac180908f22c56dbbec80a2f1698aa2f1319271e288e13601b2>Image</a></ul><h2>Description</h2><p>This package provides dummy formatter for strings.<p>String_Formatter doesn't support any formatting options.<h4 id=90d0c2fe79cfe65389fd4a4b663a675f9e8f62bfa7c92d9b7a0806036ca1e90e>Formatter</h4><pre class=ada-code-snippet><code>type Formatter is
+  new VSS.Strings.Formatters.Abstract_Formatter with private;
+</code></pre><h4 id=3fb51e439262c2a96b70dacdcd588fbe6e558332f26b86ab80731e44d6da72ab>Image</h4><pre class=ada-code-snippet><code>function Image (Item : VSS.Strings.Virtual_String) return Formatter
+</code></pre><h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=72a988b5221faac180908f22c56dbbec80a2f1698aa2f1319271e288e13601b2>Image</h4><pre class=ada-code-snippet><code>function Image
+  (Name : VSS.Strings.Virtual_String;
+   Item : VSS.Strings.Virtual_String) return Formatter
+</code></pre><h5>Parameters</h5><dl><dt>Name<dd><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl>

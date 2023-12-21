@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Formatters.Generic_Modulars</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#2094b2edb5009319d6532db8fedac9381cef840bf1ff0499791bc8232dfc6fea>Formatter</a></ul><h3>Subprograms</h3><ul><li><a href=#c5ab0e7c6ce30dbb86b3c33ff66f55fa79a908cf4ecc1a1206f314b121641a5e>Image</a><li><a href=#2b73a4729963ae9da56ee027132b4c51681574ff08b4686850033f3b296bf173>Image</a></ul><h2>Description</h2><p>This package provides formatter for integer types.<p>Integer_Formatter supports following formatting options: [0][1-9[0-9]*][#[1-9][0-9]+]<p>0 - fill leading zeros<p>By default, leading zeros is not filled.<p>1-9[0-9]* - number of digits (not include sign)<p>By default, shortest number of digits is used.<p>#[1-9][0-9]* - base<p>By default, base is 10.<h4 id=2094b2edb5009319d6532db8fedac9381cef840bf1ff0499791bc8232dfc6fea>Formatter</h4><pre class=ada-code-snippet><code>type Formatter is
+  new VSS.Strings.Formatters.Abstract_Formatter with private;
+</code></pre><h4 id=c5ab0e7c6ce30dbb86b3c33ff66f55fa79a908cf4ecc1a1206f314b121641a5e>Image</h4><pre class=ada-code-snippet><code>function Image (Item : Modular_Type) return Formatter
+</code></pre><h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2b73a4729963ae9da56ee027132b4c51681574ff08b4686850033f3b296bf173>Image</h4><pre class=ada-code-snippet><code>function Image
+  (Name : VSS.Strings.Virtual_String;
+   Item : Modular_Type) return Formatter
+</code></pre><h5>Parameters</h5><dl><dt>Name<dd><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl>

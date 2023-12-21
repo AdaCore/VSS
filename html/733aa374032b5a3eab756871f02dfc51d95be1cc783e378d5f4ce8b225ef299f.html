@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Converters</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#ee7695e26556f785b0860ea25216b1d41fcf6b72fe95643c1808628d5f29147d>Converter_Flag</a></ul><h3>Array Types</h3><ul><li><a href=#28b557bce7ccfe9d2d90a740b7323ad69bda33cc2517bbaef2c9f068af6d0598>Converter_Flags</a></ul><h3>Constants</h3><ul><li><a href=#f9e307a6e6bf7b1f8f81894c2610df5ec25fda79fee2a22691f67cb9abbb929a>Default_Converter_Flags</a></ul><h2>Description</h2><p>Copyright (C) 2021-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=ee7695e26556f785b0860ea25216b1d41fcf6b72fe95643c1808628d5f29147d>Converter_Flag</h4><pre class=ada-code-snippet><code>type Converter_Flag is
+  (Stateless,
+   Stop_On_Error,
+   Process_BOM);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>Stateless<dd><p>Converter doesn't save state between two conversions, and report an error when provided data is incomplete.<dt>Stop_On_Error<dd><p>Stop conversion on first found error and report it. Consequential calls of converter's will do nothing, till its state is reset.<p>Otherwise, errors of conversion are reported, one or more replacement characters (uFFFD) are added at place of error and conversion continues.<dt>Process_BOM<dd><p>Process BOM by converter. When enabled, decoder will skip BOM, and encoder will generate BOM.</dl><h4 id=28b557bce7ccfe9d2d90a740b7323ad69bda33cc2517bbaef2c9f068af6d0598>Converter_Flags</h4><pre class=ada-code-snippet><code>type Converter_Flags is array (Converter_Flag) of Boolean
+  with Pack;
+</code></pre><h4 id=f9e307a6e6bf7b1f8f81894c2610df5ec25fda79fee2a22691f67cb9abbb929a>Default_Converter_Flags</h4><pre class=ada-code-snippet><code>Default_Converter_Flags : constant Converter_Flags := [others => False];
+</code></pre>

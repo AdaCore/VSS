@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Characters</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#3bdda947d1d3ce7f5786624d1f54a11e57612db90c6a296706a9d41b8ecd8c9b>General_Category</a><li><a href=#84b4ca1b89dc83fd77acdc3733a83ed6966f377021fc88941b257b69c76e9e75>Virtual_Character</a></ul><h3>Subtypes</h3><ul><li><a href=#f8d2295c287774847a102bff923c6e5c5b3a2ff53629c6238db9f79141be77ef>Cased_Letter</a><li><a href=#ab24cceb7e4e594b32141624b849a21131d818b75a809f75d400476e5b815ee0>Letter</a><li><a href=#b2cd692a37a14b42561705802bb846c88cf1495dd95437c4581cb40bf9840f43>Mark</a><li><a href=#de988586d0c4464b88bf28881474559c65b81185aea9b79c16ae690e0012ebe0>Number</a><li><a href=#9fbcb2f8cd19b81d9fb7ead4a5a72f73ffff15cd9ce5dd3b0ab51ee03b55b3c4>Other</a><li><a href=#116bcc3db098aa72c6a7edd75d034d93cebdb22b3cc314b4f9f3879cea598c8a>Punctuation</a><li><a href=#c9ff58f6612c09712f425222e7c6e439e35e1cc1fbec08019a44efb2d6dc5915>Separator</a><li><a href=#5fd16e31a2b6acfa69b5ff72f65ff3db7c3c35ebb45d9a6848ffc7b2a4f35c60>Symbol</a></ul><h3>Subprograms</h3><ul><li><a href=#ecfdf4e345a63b5220bd5e658042e3c3e0a9190d7f2cfa28651db1ea3b7f6288>Get_Cased</a><li><a href=#c56ce023f95a2f569a23dec784c62372c40fafa54ba9de3e32ebe2f14e339075>Get_General_Category</a><li><a href=#43e84112f5842c0e800eec091886deed06035338a24e09e361186bc6ffaa7c72>Get_Lowercase</a><li><a href=#5e62f5afbb52f804782d068dd8dcf837031feee82d861833e55eb71d6e5e9468>Get_Lowercase_Mapping</a><li><a href=#8c9ef72fe5107a31d5d0f53f8d277c515adc452d58c717971c762c36f97ef3c3>Get_Lowercase_Mapping</a><li><a href=#c9b0f92cb896cf9af7d6eaf3cb9a6d5d3610f2e8ea86ba2d69481f5ed8dde398>Get_Simple_Lowercase_Mapping</a><li><a href=#ba84d1d9cee8724672ac3d7e877e9bec5251d045a72c0a4b3ef6e677870a490f>Get_Simple_Titlecase_Mapping</a><li><a href=#346e05cd73fa2715dd2b4c092cfa9855799a5fc007a7aecf80ac5a9a2f71fac8>Get_Simple_Uppercase_Mapping</a><li><a href=#acb039b180138a3529c8b239b9cf8bfef04a74bf9cd8c30dfaa52ce272ff29a2>Get_Titlecase_Mapping</a><li><a href=#e954f5250bf4f70fab340761b92a92347650598c789b8c70efd93060672e032d>Get_Titlecase_Mapping</a><li><a href=#79d015970edb8f6aad0c0ecdc44a8e255e449b6a8715cc45dea4c219f4956767>Get_Uppercase</a><li><a href=#4c5b5890fdb0a8f251b0e43489813b4890deea74793ca725714db934c47605f7>Get_Uppercase_Mapping</a><li><a href=#2eb0484748b77fba80f15da4efdc23c068b59213fdd0a6eb8ffd1a2f97269bf4>Get_Uppercase_Mapping</a><li><a href=#429e02403355762582a114684fcf8a867a42c6f86d137d4a851c0085398ef511>Is_Control</a><li><a href=#9484291e526b16c6cfd20547e9898ea31b513bb548198ccf37b57053e3a3edca>Is_Format</a><li><a href=#7b5278e9798c4bf832bfcad1b8780a196fcf3be6a0b2cc2df7ac08c4b5c5c03b>Is_Graphic</a><li><a href=#5565df288d0c55f18ad1c87d69f791dd102f0b0b20299c897fa61e89a7c27956>Is_Valid_Virtual_Character</a></ul><h2>Description</h2><p>Data type to represent individual abstract character<h4 id=f8d2295c287774847a102bff923c6e5c5b3a2ff53629c6238db9f79141be77ef>Cased_Letter</h4><pre class=ada-code-snippet><code>subtype Cased_Letter is
+  General_Category range Uppercase_Letter .. Titlecase_Letter;
+</code></pre><h4 id=3bdda947d1d3ce7f5786624d1f54a11e57612db90c6a296706a9d41b8ecd8c9b>General_Category</h4><pre class=ada-code-snippet><code>type General_Category is
+  (Uppercase_Letter,
+   Lowercase_Letter,
+   Titlecase_Letter,
+   Modifier_Letter,
+   Other_Letter,
+   Nonspacing_Mark,
+   Spacing_Mark,
+   Enclosing_Mark,
+   Decimal_Number,
+   Letter_Number,
+   Other_Number,
+   Connector_Punctuation,
+   Dash_Punctuation,
+   Open_Punctuation,
+   Close_Punctuation,
+   Initial_Punctuation,
+   Final_Punctuation,
+   Other_Punctuation,
+   Math_Symbol,
+   Currency_Symbol,
+   Modifier_Symbol,
+   Other_Symbol,
+   Space_Separator,
+   Line_Separator,
+   Paragraph_Separator,
+   Control,
+   Format,
+   Surrogate,
+   Private_Use,
+   Unassigned);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>Uppercase_Letter<dd><dt>Lowercase_Letter<dd><dt>Titlecase_Letter<dd><dt>Modifier_Letter<dd><dt>Other_Letter<dd><dt>Nonspacing_Mark<dd><dt>Spacing_Mark<dd><dt>Enclosing_Mark<dd><dt>Decimal_Number<dd><dt>Letter_Number<dd><dt>Other_Number<dd><dt>Connector_Punctuation<dd><dt>Dash_Punctuation<dd><dt>Open_Punctuation<dd><dt>Close_Punctuation<dd><dt>Initial_Punctuation<dd><dt>Final_Punctuation<dd><dt>Other_Punctuation<dd><dt>Math_Symbol<dd><dt>Currency_Symbol<dd><dt>Modifier_Symbol<dd><dt>Other_Symbol<dd><dt>Space_Separator<dd><dt>Line_Separator<dd><dt>Paragraph_Separator<dd><dt>Control<dd><dt>Format<dd><dt>Surrogate<dd><dt>Private_Use<dd><dt>Unassigned<dd></dl><h4 id=ecfdf4e345a63b5220bd5e658042e3c3e0a9190d7f2cfa28651db1ea3b7f6288>Get_Cased</h4><pre class=ada-code-snippet><code>function Get_Cased (Self : Virtual_Character) return Boolean
+</code></pre><p>Return value of the Cased property of the character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=c56ce023f95a2f569a23dec784c62372c40fafa54ba9de3e32ebe2f14e339075>Get_General_Category</h4><pre class=ada-code-snippet><code>function Get_General_Category
+  (Self : Virtual_Character'Base) return General_Category
+</code></pre><p>Return General_Category property for given character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=43e84112f5842c0e800eec091886deed06035338a24e09e361186bc6ffaa7c72>Get_Lowercase</h4><pre class=ada-code-snippet><code>function Get_Lowercase (Self : Virtual_Character) return Boolean
+</code></pre><p>Return value of the Lowercase property of the character.<p>Note, value of Lowercase property of the given character may be different from value of Is_Lowercase function of string composed from the same character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=5e62f5afbb52f804782d068dd8dcf837031feee82d861833e55eb71d6e5e9468>Get_Lowercase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Lowercase_Mapping
+  (Self   : Virtual_Character) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the Lowercase_Mapping property of the character with tailoring by the locale of the current task.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=8c9ef72fe5107a31d5d0f53f8d277c515adc452d58c717971c762c36f97ef3c3>Get_Lowercase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Lowercase_Mapping
+  (Self   : Virtual_Character;
+   Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the Lowercase_Mapping property of the character with tailoring by the given locale.<h5>Parameters</h5><dl><dt>Self<dd><dt>Locale<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=c9b0f92cb896cf9af7d6eaf3cb9a6d5d3610f2e8ea86ba2d69481f5ed8dde398>Get_Simple_Lowercase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Simple_Lowercase_Mapping
+  (Self : Virtual_Character) return Virtual_Character
+</code></pre><p>Return value of the Simple_Lowercase_Mapping property of the character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=ba84d1d9cee8724672ac3d7e877e9bec5251d045a72c0a4b3ef6e677870a490f>Get_Simple_Titlecase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Simple_Titlecase_Mapping
+  (Self : Virtual_Character) return Virtual_Character
+</code></pre><p>Return value of the Simple_Titlecase_Mapping property of the character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=346e05cd73fa2715dd2b4c092cfa9855799a5fc007a7aecf80ac5a9a2f71fac8>Get_Simple_Uppercase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Simple_Uppercase_Mapping
+  (Self : Virtual_Character) return Virtual_Character
+</code></pre><p>Return value of the Simple_Uppercase_Mapping property of the character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=acb039b180138a3529c8b239b9cf8bfef04a74bf9cd8c30dfaa52ce272ff29a2>Get_Titlecase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Titlecase_Mapping
+  (Self : Virtual_Character) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the Titlecase_Mapping property of the character with tailoring by the locale of the current task.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=e954f5250bf4f70fab340761b92a92347650598c789b8c70efd93060672e032d>Get_Titlecase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Titlecase_Mapping
+  (Self   : Virtual_Character;
+   Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the Titlecase_Mapping property of the character with tailoring by the given locale.<h5>Parameters</h5><dl><dt>Self<dd><dt>Locale<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=79d015970edb8f6aad0c0ecdc44a8e255e449b6a8715cc45dea4c219f4956767>Get_Uppercase</h4><pre class=ada-code-snippet><code>function Get_Uppercase (Self : Virtual_Character) return Boolean
+</code></pre><p>Return value of the Uppercase property of the character.<p>Note, value of Uppercase property of the given character may be different from value of Is_Lowercase function of string composed from the same character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4c5b5890fdb0a8f251b0e43489813b4890deea74793ca725714db934c47605f7>Get_Uppercase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Uppercase_Mapping
+  (Self : Virtual_Character) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the Uppercase_Mapping property of the character with tailoring by the locale of the current task.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2eb0484748b77fba80f15da4efdc23c068b59213fdd0a6eb8ffd1a2f97269bf4>Get_Uppercase_Mapping</h4><pre class=ada-code-snippet><code>function Get_Uppercase_Mapping
+  (Self   : Virtual_Character;
+   Locale : VSS.Locales.Locale) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the Uppercase_Mapping property of the character with tailoring by the given locale.<h5>Parameters</h5><dl><dt>Self<dd><dt>Locale<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=429e02403355762582a114684fcf8a867a42c6f86d137d4a851c0085398ef511>Is_Control</h4><pre class=ada-code-snippet><code>function Is_Control (Self : Virtual_Character) return Boolean
+</code></pre><p>Return True when character belong to Format type, which includes characters with general category Control.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=9484291e526b16c6cfd20547e9898ea31b513bb548198ccf37b57053e3a3edca>Is_Format</h4><pre class=ada-code-snippet><code>function Is_Format (Self : Virtual_Character) return Boolean
+</code></pre><p>Return True when character belong to Format type, which includes characters with general category Format, Line_Separator, and Paragraph_Separator.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7b5278e9798c4bf832bfcad1b8780a196fcf3be6a0b2cc2df7ac08c4b5c5c03b>Is_Graphic</h4><pre class=ada-code-snippet><code>function Is_Graphic (Self : Virtual_Character) return Boolean
+</code></pre><p>Return True when character belong to Graphic type, which includes characters with general category Letter, Mark, Number, Punctuation, Symbol, and Space_Separator.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=5565df288d0c55f18ad1c87d69f791dd102f0b0b20299c897fa61e89a7c27956>Is_Valid_Virtual_Character</h4><pre class=ada-code-snippet><code>function Is_Valid_Virtual_Character
+  (Self : Virtual_Character'Base) return Boolean
+</code></pre><p>Returns True when given character is inside the range of the allowed characters and outside of the range of the<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=ab24cceb7e4e594b32141624b849a21131d818b75a809f75d400476e5b815ee0>Letter</h4><pre class=ada-code-snippet><code>subtype Letter is
+  General_Category range Uppercase_Letter .. Other_Letter;
+</code></pre><h4 id=b2cd692a37a14b42561705802bb846c88cf1495dd95437c4581cb40bf9840f43>Mark</h4><pre class=ada-code-snippet><code>subtype Mark is
+  General_Category range Nonspacing_Mark .. Enclosing_Mark;
+</code></pre><h4 id=de988586d0c4464b88bf28881474559c65b81185aea9b79c16ae690e0012ebe0>Number</h4><pre class=ada-code-snippet><code>subtype Number is
+  General_Category range Decimal_Number .. Other_Number;
+</code></pre><h4 id=9fbcb2f8cd19b81d9fb7ead4a5a72f73ffff15cd9ce5dd3b0ab51ee03b55b3c4>Other</h4><pre class=ada-code-snippet><code>subtype Other is
+  General_Category range Control .. Unassigned;
+</code></pre><h4 id=116bcc3db098aa72c6a7edd75d034d93cebdb22b3cc314b4f9f3879cea598c8a>Punctuation</h4><pre class=ada-code-snippet><code>subtype Punctuation is
+  General_Category range Connector_Punctuation .. Other_Punctuation;
+</code></pre><h4 id=c9ff58f6612c09712f425222e7c6e439e35e1cc1fbec08019a44efb2d6dc5915>Separator</h4><pre class=ada-code-snippet><code>subtype Separator is
+  General_Category range Space_Separator .. Paragraph_Separator;
+</code></pre><h4 id=5fd16e31a2b6acfa69b5ff72f65ff3db7c3c35ebb45d9a6848ffc7b2a4f35c60>Symbol</h4><pre class=ada-code-snippet><code>subtype Symbol is
+  General_Category range Math_Symbol .. Other_Symbol;
+</code></pre><h4 id=84b4ca1b89dc83fd77acdc3733a83ed6966f377021fc88941b257b69c76e9e75>Virtual_Character</h4><pre class=ada-code-snippet><code>type Virtual_Character is new VSS.Unicode.Scalar_Value_Character;
+</code></pre>

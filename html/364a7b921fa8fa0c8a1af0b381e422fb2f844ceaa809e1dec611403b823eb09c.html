@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Text_Streams</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#fe381e9aa4a0e6c14ce29397743c80b7c19c92e2e5b217d4fa7283437a0d7a9f>Input_Text_Stream</a><li><a href=#8e6d5da3704a683c3a834bab3fa5e657b4fe9b12f2292f97343eacef4dc94117>Output_Text_Stream</a></ul><h3>Access Types</h3><ul><li><a href=#6e48dc153b928a26e696b3aa300d8888e6e165deb786a4864af6ade788704787>Input_Text_Stream_Access</a><li><a href=#7fdbb92209322f852966cbc920b2c74d639e0f4d3355b3bf058d8f20682bda2f>Output_Text_Stream_Access</a></ul><h3>Subprograms</h3><ul><li><a href=#1e130ff60fdfe2b1cca915e70c7560875b5c315639ebbfc916b9ad94af6d1bb1>Error_Message</a><li><a href=#468774ad444342896cb2e74633e23483e0e48e2161490d6b93a56bd25a0d7cd4>Error_Message</a><li><a href=#0e94c9a4f7091ec3a6101fc59f131c90cfb92463e1f93e7df87ed7b9c290be9c>Get</a><li><a href=#305a7323b49e5a0fbf9959561c3f3990b2db1feaf6044e88e4d855051ea98e99>Has_Error</a><li><a href=#10c7806437326ae2fabc389e5d15f231a8c811149489252cde73f35853271da1>Has_Error</a><li><a href=#1d0fc7189c04034a73f7c1112444a58e6bc525b28fad198d0c2a904285f99f45>Is_End_Of_Data</a><li><a href=#0ed5ea05259bcbcae9537261bed5f0766a838c45e74f8e4e16f7e14f86d7b799>Is_End_Of_Stream</a><li><a href=#fdbd8aa39f7d87f8600eeb15af0300c6ad49d11012b272b472ef055ce7c212fb>New_Line</a><li><a href=#fd931691f8789d228756339730f2eb650d947a92b537b5c5166b287ac4db832c>Put</a><li><a href=#26e8988f637f781811a0b86e9e0b47cf57177f2d202e4f948a353f0cc4e5bfa8>Put</a><li><a href=#653cb3e68a71a70ab5138af2ab52a0242cd492d1d96653fb75cbfa00c03b4d55>Put_Line</a></ul><h2>Description</h2><p>Abstract API of the streams interpreted as sequence of characters.<h4 id=1e130ff60fdfe2b1cca915e70c7560875b5c315639ebbfc916b9ad94af6d1bb1>Error_Message</h4><pre class=ada-code-snippet><code>function Error_Message
+  (Self : Input_Text_Stream) return VSS.Strings.Virtual_String
+</code></pre><p>Return error message when Has_Error returns True, or 'null' string.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=468774ad444342896cb2e74633e23483e0e48e2161490d6b93a56bd25a0d7cd4>Error_Message</h4><pre class=ada-code-snippet><code>function Error_Message
+  (Self : Output_Text_Stream) return VSS.Strings.Virtual_String
+</code></pre><p>Return error message when Has_Error returns True, or 'null' string.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=0e94c9a4f7091ec3a6101fc59f131c90cfb92463e1f93e7df87ed7b9c290be9c>Get</h4><pre class=ada-code-snippet><code>procedure Get
+  (Self    : in out Input_Text_Stream;
+   Item    : out VSS.Characters.Virtual_Character'Base;
+   Success : in out Boolean)
+</code></pre><p>Get character from the input stream.<h5>Parameters</h5><dl><dt>Self<dd><p>Text stream itself<dt>Item<dd><p>Buffer to store character. It should be set to invalid value in case of stream error or unavailable data<dt>Success<dd><p>Subprogram do nothing when False, and set it to False on failure.</dl><h4 id=305a7323b49e5a0fbf9959561c3f3990b2db1feaf6044e88e4d855051ea98e99>Has_Error</h4><pre class=ada-code-snippet><code>function Has_Error (Self : Input_Text_Stream) return Boolean
+</code></pre><p>Return True when any error is detected.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=10c7806437326ae2fabc389e5d15f231a8c811149489252cde73f35853271da1>Has_Error</h4><pre class=ada-code-snippet><code>function Has_Error (Self : Output_Text_Stream) return Boolean
+</code></pre><p>Return True when any error is detected.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=fe381e9aa4a0e6c14ce29397743c80b7c19c92e2e5b217d4fa7283437a0d7a9f>Input_Text_Stream</h4><pre class=ada-code-snippet><code>type Input_Text_Stream is limited interface;
+</code></pre><h4 id=6e48dc153b928a26e696b3aa300d8888e6e165deb786a4864af6ade788704787>Input_Text_Stream_Access</h4><pre class=ada-code-snippet><code>type Input_Text_Stream_Access is access all Input_Text_Stream'Class;
+</code></pre><h4 id=1d0fc7189c04034a73f7c1112444a58e6bc525b28fad198d0c2a904285f99f45>Is_End_Of_Data</h4><pre class=ada-code-snippet><code>function Is_End_Of_Data
+  (Self : Input_Text_Stream) return Boolean
+</code></pre><p>Return True when there is no more data is available now.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=0ed5ea05259bcbcae9537261bed5f0766a838c45e74f8e4e16f7e14f86d7b799>Is_End_Of_Stream</h4><pre class=ada-code-snippet><code>function Is_End_Of_Stream
+  (Self : Input_Text_Stream) return Boolean
+</code></pre><p>Return True when when end of stream is reached.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=fdbd8aa39f7d87f8600eeb15af0300c6ad49d11012b272b472ef055ce7c212fb>New_Line</h4><pre class=ada-code-snippet><code>procedure New_Line
+  (Self    : in out Output_Text_Stream;
+   Success : in out Boolean)
+</code></pre><p>Output line terminator sequence to the text stream.<h5>Parameters</h5><dl><dt>Self<dd><p>Text stream itself<dt>Success<dd><p>Subprogram do nothing when False, and set it to False on failure.</dl><h4 id=8e6d5da3704a683c3a834bab3fa5e657b4fe9b12f2292f97343eacef4dc94117>Output_Text_Stream</h4><pre class=ada-code-snippet><code>type Output_Text_Stream is limited interface;
+</code></pre><h4 id=7fdbb92209322f852966cbc920b2c74d639e0f4d3355b3bf058d8f20682bda2f>Output_Text_Stream_Access</h4><pre class=ada-code-snippet><code>type Output_Text_Stream_Access is access all Output_Text_Stream'Class;
+</code></pre><h4 id=fd931691f8789d228756339730f2eb650d947a92b537b5c5166b287ac4db832c>Put</h4><pre class=ada-code-snippet><code>procedure Put
+  (Self    : in out Output_Text_Stream;
+   Item    : VSS.Characters.Virtual_Character;
+   Success : in out Boolean)
+</code></pre><p>Output character to stream with conversion to the stream's text encoding.<h5>Parameters</h5><dl><dt>Self<dd><p>Text stream itself<dt>Item<dd><p>Character to output<dt>Success<dd><p>Subprogram do nothing when False, and set it to False on failure.</dl><h4 id=26e8988f637f781811a0b86e9e0b47cf57177f2d202e4f948a353f0cc4e5bfa8>Put</h4><pre class=ada-code-snippet><code>procedure Put
+  (Self    : in out Output_Text_Stream;
+   Item    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><p>Output string to stream with conversion to the stream's text encoding.<h5>Parameters</h5><dl><dt>Self<dd><p>Text stream itself<dt>Item<dd><p>String to output<dt>Success<dd><p>Subprogram do nothing when False, and set it to False on failure.</dl><h4 id=653cb3e68a71a70ab5138af2ab52a0242cd492d1d96653fb75cbfa00c03b4d55>Put_Line</h4><pre class=ada-code-snippet><code>procedure Put_Line
+  (Self    : in out Output_Text_Stream;
+   Item    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><p>Output string to stream with conversion to the stream's text encoding and output line terminator sequence.<h5>Parameters</h5><dl><dt>Self<dd><p>Text stream itself<dt>Item<dd><p>String to output<dt>Success<dd><p>Subprogram do nothing when False, and set it to False on failure.</dl>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Templates.Values</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#0e86931c99cb4c01243af8a2a583e5029da68c399419d5192479be0c60650dff>Value_Kind</a></ul><h3>Record Types</h3><ul><li><a href=#97ade5bee2fcafb646e4e99d6fbb525d6e529ddb4f641ff936adaea92676eedb>Value</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=97ade5bee2fcafb646e4e99d6fbb525d6e529ddb4f641ff936adaea92676eedb>Value</h4><pre class=ada-code-snippet><code>type Value (Kind : Value_Kind) is record
+   case Kind is
+      when Nothing | Default =>
+         null;
+      when Error =>
+         Message       : VSS.Strings.Virtual_String;
+      when Boolean =>
+         Boolean_Value : Standard.Boolean;
+      when String =>
+         String_Value  : VSS.Strings.Virtual_String;
+      when Content =>
+         Content_Value : VSS.XML.Event_Vectors.Vector;
+   end case;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Kind<dd><dt>Message<dd><dt>Boolean_Value<dd><dt>String_Value<dd><dt>Content_Value<dd></dl><h4 id=0e86931c99cb4c01243af8a2a583e5029da68c399419d5192479be0c60650dff>Value_Kind</h4><pre class=ada-code-snippet><code>type Value_Kind is (Error, Nothing, Default, Boolean, String, Content);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>Error<dd><dt>Nothing<dd><dt>Default<dd><dt>Boolean<dd><dt>String<dd><dt>Content<dd></dl>

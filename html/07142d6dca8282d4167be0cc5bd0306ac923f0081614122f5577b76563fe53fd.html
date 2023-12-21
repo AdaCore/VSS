@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Conversions</h1><h2>Entities</h2><h3>Subprograms</h3><ul><li><a href=#0ec75bebbb13765b9cd8234ba351742b52fa5160e9bb672d3c35da60e94c9dab>Set_UTF_8_String</a><li><a href=#d50f796e98332c4455b80765a054594052da5dd78a060c977fa92ee1ab606a33>Set_UTF_8_String</a><li><a href=#c36d5fe2debdc807472f8a4b90ddaf616f4534969267da3596769da24d3c921e>Set_UTF_8_String</a><li><a href=#a82714c286d9e9f94f65b079f03f9c30bfd314e21fc74ed18e0c54a0dcba0875>Set_Wide_Wide_String</a><li><a href=#46078d79cd5d3db23138d0d63c5978e6392b6395d78b60079de865576baa104b>Set_Wide_Wide_String</a><li><a href=#0ee4e26c4c7d337fe7ce65dfdcb314bc2b4515df1b5dccd6b4b3f72f35483381>Set_Wide_Wide_String</a><li><a href=#3fed565815bbe0c32e5b5c71dfcb1dcd7dcf18594ae2695709f98bb50ef964c9>To_Unbounded_UTF_8_String</a><li><a href=#f9bac31cfbd358371835127fc86d847c2a306833c6144b4285b71b5f11efae69>To_Unbounded_Wide_Wide_String</a><li><a href=#d12bef407a6971c335ee2ec82fbfc0581a5539050f244c807df091abc068f72f>To_UTF_8_String</a><li><a href=#8679438ea3d6f74c8e0c65713d46ff41e65963c6070c234f1121ad75708091c5>To_Virtual_String</a><li><a href=#db60ee6086424945169e2e2716766bd538a030524872d016ae4c86b6abf10973>To_Virtual_String</a><li><a href=#d4a55b510df21e2e44e58c921c47d6d3138e753c8f2931019ac0fa1cf781e583>To_Virtual_String</a><li><a href=#f5c382d35418216e77abd8edc3025da2893f41941d57f66f24f40e1d5adff8ce>To_Wide_Wide_String</a></ul><h2>Description</h2><p>Conversion between standard string types and Magic_String.<h4 id=0ec75bebbb13765b9cd8234ba351742b52fa5160e9bb672d3c35da60e94c9dab>Set_UTF_8_String</h4><pre class=ada-code-snippet><code>procedure Set_UTF_8_String
+  (Item : Virtual_String'Class;
+   Into : out Ada.Strings.UTF_Encoding.UTF_8_String)
+</code></pre><p>Set given Into string to content of virtual string. Length of the Into string must be equal to the length in code units of the content of the virtual string encoded in UTF-8; otherwise Constraint_Error is raised.<h5>Parameters</h5><dl><dt>Item<dd><dt>Into<dd></dl><h4 id=d50f796e98332c4455b80765a054594052da5dd78a060c977fa92ee1ab606a33>Set_UTF_8_String</h4><pre class=ada-code-snippet><code>procedure Set_UTF_8_String
+  (Item : Virtual_String'Class;
+   Last : out Natural;
+   Into : out Ada.Strings.UTF_Encoding.UTF_8_String)
+</code></pre><p>Fill given Into string by content of virtual string. Data is written starting from the first character. Remaining length of the string must be at least the length in code units of the content of the virtual string encoded in UTF-8; otherwise Constraint_Error is raised.<h5>Parameters</h5><dl><dt>Item<dd><dt>Last<dd><dt>Into<dd></dl><h4 id=c36d5fe2debdc807472f8a4b90ddaf616f4534969267da3596769da24d3c921e>Set_UTF_8_String</h4><pre class=ada-code-snippet><code>procedure Set_UTF_8_String
+  (Item : Virtual_String'Class;
+   From : Positive;
+   Last : out Natural;
+   Into : out Ada.Strings.UTF_Encoding.UTF_8_String)
+</code></pre><p>Fill given Into string by content of virtual string. Data is written starting From character. Remaining length of the string must be at least the length in code units of the content of the virtual string encoded in UTF-8; otherwise Constraint_Error is raised.<h5>Parameters</h5><dl><dt>Item<dd><dt>From<dd><dt>Last<dd><dt>Into<dd></dl><h4 id=a82714c286d9e9f94f65b079f03f9c30bfd314e21fc74ed18e0c54a0dcba0875>Set_Wide_Wide_String</h4><pre class=ada-code-snippet><code>procedure Set_Wide_Wide_String
+  (Item : Virtual_String'Class;
+   Last : out Natural;
+   Into : out Wide_Wide_String)
+</code></pre><p>Fill given Into string by content of virtual string. Data is written starting from first character. Length of the string must be at least the length in characters of the virtual string; otherwise Constraint_Error is raised.<h5>Parameters</h5><dl><dt>Item<dd><dt>Last<dd><dt>Into<dd></dl><h4 id=46078d79cd5d3db23138d0d63c5978e6392b6395d78b60079de865576baa104b>Set_Wide_Wide_String</h4><pre class=ada-code-snippet><code>procedure Set_Wide_Wide_String
+  (Item : Virtual_String'Class;
+   From : Positive;
+   Last : out Natural;
+   Into : out Wide_Wide_String)
+</code></pre><p>Fill given Into string by content of virtual string. Data is written starting From character. Remaining length of the string must be at least the length in characters of the virtual string; otherwise Constraint_Error is raised.<h5>Parameters</h5><dl><dt>Item<dd><dt>From<dd><dt>Last<dd><dt>Into<dd></dl><h4 id=0ee4e26c4c7d337fe7ce65dfdcb314bc2b4515df1b5dccd6b4b3f72f35483381>Set_Wide_Wide_String</h4><pre class=ada-code-snippet><code>procedure Set_Wide_Wide_String
+  (Item : Virtual_String'Class;
+   Into : out Wide_Wide_String)
+</code></pre><p>Set given Into string to content of virtual string. Length of the string must be equal to the length in characters of the virtual string; otherwise Constraint_Error is raised.<h5>Parameters</h5><dl><dt>Item<dd><dt>Into<dd></dl><h4 id=3fed565815bbe0c32e5b5c71dfcb1dcd7dcf18594ae2695709f98bb50ef964c9>To_Unbounded_UTF_8_String</h4><pre class=ada-code-snippet><code>function To_Unbounded_UTF_8_String
+  (Item : Virtual_String'Class)
+   return Ada.Strings.Unbounded.Unbounded_String
+</code></pre><p>Convert virtual string into UTF-8 encoded unbounded string.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f9bac31cfbd358371835127fc86d847c2a306833c6144b4285b71b5f11efae69>To_Unbounded_Wide_Wide_String</h4><pre class=ada-code-snippet><code>function To_Unbounded_Wide_Wide_String
+  (Item : Virtual_String'Class)
+   return Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String
+</code></pre><p>Convert virtual string into Wide_Wide_String.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d12bef407a6971c335ee2ec82fbfc0581a5539050f244c807df091abc068f72f>To_UTF_8_String</h4><pre class=ada-code-snippet><code>function To_UTF_8_String
+  (Item : Virtual_String'Class)
+   return Ada.Strings.UTF_Encoding.UTF_8_String
+</code></pre><p>Convert virtual string into UTF-8 encoded string.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=8679438ea3d6f74c8e0c65713d46ff41e65963c6070c234f1121ad75708091c5>To_Virtual_String</h4><pre class=ada-code-snippet><code>function To_Virtual_String
+  (Item : Ada.Strings.Unbounded.Unbounded_String) return Virtual_String
+</code></pre><p>Convert UTF-8 encoded unbounded string into Virtual_String.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=db60ee6086424945169e2e2716766bd538a030524872d016ae4c86b6abf10973>To_Virtual_String</h4><pre class=ada-code-snippet><code>function To_Virtual_String
+  (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=d4a55b510df21e2e44e58c921c47d6d3138e753c8f2931019ac0fa1cf781e583>To_Virtual_String</h4><pre class=ada-code-snippet><code>function To_Virtual_String
+  (Item : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String)
+   return Virtual_String
+</code></pre><p>Convert UCS-4 encoded unbounded string into Virtual_String.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f5c382d35418216e77abd8edc3025da2893f41941d57f66f24f40e1d5adff8ce>To_Wide_Wide_String</h4><pre class=ada-code-snippet><code>function To_Wide_Wide_String
+  (Item : Virtual_String'Class) return Wide_Wide_String
+</code></pre><p>Convert virtual string into Wide_Wide_String.<h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl>

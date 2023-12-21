@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Cursors.Iterators.Words</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#d6c868daf76d0f7c739563f8d9a62c7fadb4f4d7c1675fc393e806486115b797>Word_Iterator</a></ul><h3>Subprograms</h3><ul><li><a href=#fbd25c3c56aad1aae5531de64439a5425edf5116a5e78beef7db0d69f1054649>Backward</a><li><a href=#28b5162cb11f6b88ed41bf2c8ba37503b40f3eeecd1127e7b47940507bab2ce7>On_Line_Break</a><li><a href=#f5db9084ca8c9d7a3d234c08184c187071e6613d75a2034fc58220d77cb3d730>On_Whitespace</a><li><a href=#a935792c29447cd2ae1bc956596e41c6068c2ec1bf4671c5c7becb2f3df54c0e>Set_After_Last</a><li><a href=#b58ec7267eff490df83e80e9eac56db51d8e53cf9cab6b03be3cfd2387e2f684>Set_At</a><li><a href=#fa2575586458fec32e537303633b9b481a54b3b97781f2a17424ada4d24a26be>Set_At_First</a><li><a href=#9fb641cc9703a9bf330fbf9f0d8ab06f875d8325c0f065f093b85fb83c0ea20a>Set_At_Last</a><li><a href=#629322b8191bec4ec5960d14ad82bb48690378e5f5b67f144e87575f9bdc3200>Set_Before_First</a></ul><h2>Description</h2><p>Iterator to iterate over word boundaries. Pointing element is not necessary a word, it may point to the sequence of word separators too.<h4 id=fbd25c3c56aad1aae5531de64439a5425edf5116a5e78beef7db0d69f1054649>Backward</h4><pre class=ada-code-snippet><code>function Backward (Self : in out Word_Iterator) return Boolean
+</code></pre><p>Move iterator to previous word.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=28b5162cb11f6b88ed41bf2c8ba37503b40f3eeecd1127e7b47940507bab2ce7>On_Line_Break</h4><pre class=ada-code-snippet><code>function On_Line_Break (Self : Word_Iterator'Class) return Boolean
+</code></pre><p>Returns True when current text element is a line separator.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=f5db9084ca8c9d7a3d234c08184c187071e6613d75a2034fc58220d77cb3d730>On_Whitespace</h4><pre class=ada-code-snippet><code>function On_Whitespace (Self : Word_Iterator'Class) return Boolean
+</code></pre><p>Returns True when current text element is sequence of horizontal whitespace characters.<p>Note, this function returns False when horizontal whitespace character is followed by some combining character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=a935792c29447cd2ae1bc956596e41c6068c2ec1bf4671c5c7becb2f3df54c0e>Set_After_Last</h4><pre class=ada-code-snippet><code>procedure Set_After_Last
+  (Self : in out Word_Iterator'Class;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point after the last word of the string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=b58ec7267eff490df83e80e9eac56db51d8e53cf9cab6b03be3cfd2387e2f684>Set_At</h4><pre class=ada-code-snippet><code>procedure Set_At
+  (Self     : in out Word_Iterator'Class;
+   Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+</code></pre><p>Set iterator to point to the word segment at the given position.<h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h4 id=fa2575586458fec32e537303633b9b481a54b3b97781f2a17424ada4d24a26be>Set_At_First</h4><pre class=ada-code-snippet><code>procedure Set_At_First
+  (Self : in out Word_Iterator'Class;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point to the first word segment of the string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=9fb641cc9703a9bf330fbf9f0d8ab06f875d8325c0f065f093b85fb83c0ea20a>Set_At_Last</h4><pre class=ada-code-snippet><code>procedure Set_At_Last
+  (Self : in out Word_Iterator'Class;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point to the last word segment of the string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=629322b8191bec4ec5960d14ad82bb48690378e5f5b67f144e87575f9bdc3200>Set_Before_First</h4><pre class=ada-code-snippet><code>procedure Set_Before_First
+  (Self : in out Word_Iterator'Class;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Set iterator to point before the first word of the string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=d6c868daf76d0f7c739563f8d9a62c7fadb4f4d7c1675fc393e806486115b797>Word_Iterator</h4><pre class=ada-code-snippet><code>type Word_Iterator is new Abstract_Segment_Iterator with private;
+</code></pre>

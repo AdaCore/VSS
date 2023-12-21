@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON.Pull_Readers</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#a45f2ef5a8225e83e6a5fdd01004256aaf54f6910011b8e2c756e34c0d41bf23>JSON_Reader_Error</a></ul><h3>Interface Types</h3><ul><li><a href=#1e116a766b429b8aaa360825728ad1228329fe1c94bc71741f9a3cb8f283978b>JSON_Pull_Reader</a></ul><h3>Subprograms</h3><ul><li><a href=#6d4744bb2f67dccde8d6683d51d2d4c8d22d07a5e018f8fd3b934aeaf64fb74c>At_End</a><li><a href=#5e49cc4dc208bc6cf6cf7bb7e288cc90aaacfacb1b90656d7e0fdfe8b8c35ee9>Clear</a><li><a href=#bf91797ffeede1d3e7ef4c50a28467705997725e0a513b187dda018a70c7ddb6>Error</a><li><a href=#63852f578863b8f6ec00acebb1a0d0dcb5fc87deaeb9ea2695d2866190f98b70>Error_Message</a><li><a href=#e2dadae5e2384d49fc5070c7e238ce4c5353e2146aec2ed13513e698b5004f85>Has_Error</a><li><a href=#4a8e912825561710403a8ff761ef4e698ad3097903f4205de2d3117f2cdf1062>Raise_Error</a><li><a href=#d53677bf068d13be2365e4628e80aab1e4da41bc3ee34f3fd0b526eccc5032cc>Read_Next</a><li><a href=#4e4ea6395d688ef10f150f76b3a1898040aea1e35060ae4fd5442675e9039d8c>Read_Next</a><li><a href=#bc3ffc285dfb8726589d12415ac93eb1ce911424e8800827703e490896634de0>Skip_Current_Array</a><li><a href=#3392fe2015efd2f5d7123fb07f9b570612344a4e95e9691f7003574403ee7bb1>Skip_Current_Object</a><li><a href=#fb8e21a634c053a893888aad6d60776f3373992799706f663c47e29d325fe3ca>Skip_Current_Value</a></ul><h2>Description</h2><p>Abstract API of the JSON "pull" reader.<h4 id=6d4744bb2f67dccde8d6683d51d2d4c8d22d07a5e018f8fd3b934aeaf64fb74c>At_End</h4><pre class=ada-code-snippet><code>function At_End (Self : JSON_Pull_Reader) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=5e49cc4dc208bc6cf6cf7bb7e288cc90aaacfacb1b90656d7e0fdfe8b8c35ee9>Clear</h4><pre class=ada-code-snippet><code>procedure Clear (Self : in out JSON_Pull_Reader)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=bf91797ffeede1d3e7ef4c50a28467705997725e0a513b187dda018a70c7ddb6>Error</h4><pre class=ada-code-snippet><code>function Error
+  (Self : JSON_Pull_Reader) return JSON_Reader_Error
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=63852f578863b8f6ec00acebb1a0d0dcb5fc87deaeb9ea2695d2866190f98b70>Error_Message</h4><pre class=ada-code-snippet><code>function Error_Message
+  (Self : JSON_Pull_Reader) return VSS.Strings.Virtual_String
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=e2dadae5e2384d49fc5070c7e238ce4c5353e2146aec2ed13513e698b5004f85>Has_Error</h4><pre class=ada-code-snippet><code>function Has_Error (Self : JSON_Pull_Reader'Class) return Boolean
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=1e116a766b429b8aaa360825728ad1228329fe1c94bc71741f9a3cb8f283978b>JSON_Pull_Reader</h4><pre class=ada-code-snippet><code>type JSON_Pull_Reader is limited interface
+  and VSS.JSON.Streams.Cursors.JSON_Stream_Cursor;
+</code></pre><h4 id=a45f2ef5a8225e83e6a5fdd01004256aaf54f6910011b8e2c756e34c0d41bf23>JSON_Reader_Error</h4><pre class=ada-code-snippet><code>type JSON_Reader_Error is
+  (No_Error,
+   Custom_Error,
+   Not_Valid,
+   Premature_End_Of_Document);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>No_Error<dd><dt>Custom_Error<dd><dt>Not_Valid<dd><dt>Premature_End_Of_Document<dd></dl><h4 id=4a8e912825561710403a8ff761ef4e698ad3097903f4205de2d3117f2cdf1062>Raise_Error</h4><pre class=ada-code-snippet><code>procedure Raise_Error
+  (Self    : in out JSON_Pull_Reader;
+   Message : VSS.Strings.Virtual_String := VSS.Strings.Empty_Virtual_String)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Message<dd></dl><h4 id=d53677bf068d13be2365e4628e80aab1e4da41bc3ee34f3fd0b526eccc5032cc>Read_Next</h4><pre class=ada-code-snippet><code>function Read_Next
+  (Self : in out JSON_Pull_Reader)
+   return VSS.JSON.Streams.JSON_Stream_Element_Kind
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4e4ea6395d688ef10f150f76b3a1898040aea1e35060ae4fd5442675e9039d8c>Read_Next</h4><pre class=ada-code-snippet><code>procedure Read_Next (Self : in out JSON_Pull_Reader'Class)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=bc3ffc285dfb8726589d12415ac93eb1ce911424e8800827703e490896634de0>Skip_Current_Array</h4><pre class=ada-code-snippet><code>procedure Skip_Current_Array (Self : in out JSON_Pull_Reader)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=3392fe2015efd2f5d7123fb07f9b570612344a4e95e9691f7003574403ee7bb1>Skip_Current_Object</h4><pre class=ada-code-snippet><code>procedure Skip_Current_Object
+  (Self : in out JSON_Pull_Reader)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl><h4 id=fb8e21a634c053a893888aad6d60776f3373992799706f663c47e29d325fe3ca>Skip_Current_Value</h4><pre class=ada-code-snippet><code>procedure Skip_Current_Value (Self : in out JSON_Pull_Reader)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd></dl>

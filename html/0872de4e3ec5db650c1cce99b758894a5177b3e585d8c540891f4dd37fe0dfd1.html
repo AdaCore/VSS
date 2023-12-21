@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Text_Streams.Memory_UTF8_Output</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#dc664ce11c32ec6bedd724053004511009b4039c24d21da76381560b4edc53ad>Memory_UTF8_Output_Stream</a></ul><h2>Description</h2><p>Simple implementation of the text stream to store output in the memory as sequence of stream elements in UTF-8 text encoding and using LF as line separator.<h4 id=dc664ce11c32ec6bedd724053004511009b4039c24d21da76381560b4edc53ad>Memory_UTF8_Output_Stream</h4><pre class=ada-code-snippet><code>type Memory_UTF8_Output_Stream is
+  limited new VSS.Text_Streams.Output_Text_Stream with record
+   Buffer : VSS.Stream_Element_Vectors.Stream_Element_Vector;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Buffer<dd></dl>

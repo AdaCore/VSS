@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Cursors</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#fa3e4f9f49192495360a522c7dd7a74e0442fc75c422e9da236fc435dc093597>Abstract_Character_Cursor</a><li><a href=#3bb5c06fccb14e0f6de9ab9b6aa35a307206256597a34f5f1a8409591cd955a0>Abstract_Cursor</a><li><a href=#777f662248c0f9a421be89995ecbe92470c2b29a69c7bb827693344932b48521>Abstract_Segment_Cursor</a></ul><h3>Subprograms</h3><ul><li><a href=#57168ebcad5f7589115a367bfcbee9b60432b8e1f33ffa91601574887e807a41>Character_Index</a><li><a href=#0dfae03906e9b314648a66a40011a916f9787a6da06ee8da8d8b7a9055fc125b>Character_Length</a><li><a href=#72facb50bba45221889d0b8c98e1ee93ea26f06e58971490a3ae98edc38afdf7>Element</a><li><a href=#8fcdf96e65c5774d005428829428ca3ffad8a4378aa0f12e4c107e411d79b0bc>First_Character_Index</a><li><a href=#85d39052a35c8ff31e3ec43752f52640124cdfe48523a69c2be346addb22e3d5>First_Marker</a><li><a href=#8bf584f496858fe1385e479adedc94a414bfc09f17bf938bc010080d6bd74d83>First_UTF16_Offset</a><li><a href=#14a5fd3829d07008d80e140cc93c98679034ce9584e966364714bf2dbdb50b53>First_UTF8_Offset</a><li><a href=#58014aa38cedb15f89f4dc47fae301699810ea4070112196fecc561568ebfeae>Is_Valid</a><li><a href=#5f7b60cf0a83777b43af8ba3b8c382ad293f88212ea15464d2d903804bd35a9e>Last_Character_Index</a><li><a href=#ed8682ae912d66af7fced0c11caf0b9158b30a2804d75928506c30069a7b93d2>Last_Marker</a><li><a href=#c155988bbb1c38e72238b799983e862219f96ac8cd961dd68f3f658409ae07ce>Last_UTF16_Offset</a><li><a href=#69463bc414cb725c682a14d780eea36888d48959a9cfb468f0c8c758e4218e7b>Last_UTF8_Offset</a><li><a href=#0937a6bc55f02a2fc9746b55b0b5b63bd1b9d41493edaa84077248bd3a9e5272>Marker</a></ul><h2>Description</h2><p>------------------- Abstract_Cursor -- -------------------<h4 id=fa3e4f9f49192495360a522c7dd7a74e0442fc75c422e9da236fc435dc093597>Abstract_Character_Cursor</h4><pre class=ada-code-snippet><code>type Abstract_Character_Cursor is limited interface and Abstract_Cursor;
+</code></pre><p>Cursor that points to single character.<h4 id=3bb5c06fccb14e0f6de9ab9b6aa35a307206256597a34f5f1a8409591cd955a0>Abstract_Cursor</h4><pre class=ada-code-snippet><code>type Abstract_Cursor is limited interface;
+</code></pre><h4 id=777f662248c0f9a421be89995ecbe92470c2b29a69c7bb827693344932b48521>Abstract_Segment_Cursor</h4><pre class=ada-code-snippet><code>type Abstract_Segment_Cursor is limited interface and Abstract_Cursor;
+</code></pre><p>Cursor that points to some segment of the string.<h4 id=57168ebcad5f7589115a367bfcbee9b60432b8e1f33ffa91601574887e807a41>Character_Index</h4><pre class=ada-code-snippet><code>function Character_Index
+  (Self : Abstract_Character_Cursor'Class)
+   return VSS.Strings.Character_Index'Base
+</code></pre><p>Returns index of the character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=0dfae03906e9b314648a66a40011a916f9787a6da06ee8da8d8b7a9055fc125b>Character_Length</h4><pre class=ada-code-snippet><code>function Character_Length
+  (Self : Abstract_Segment_Cursor)
+   return VSS.Strings.Character_Count
+</code></pre><p>Length of the segment in characters.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=72facb50bba45221889d0b8c98e1ee93ea26f06e58971490a3ae98edc38afdf7>Element</h4><pre class=ada-code-snippet><code>function Element
+  (Self : Abstract_Segment_Cursor)
+   return VSS.Strings.Virtual_String
+</code></pre><p>Returns text segment pointed by the cursor.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=8fcdf96e65c5774d005428829428ca3ffad8a4378aa0f12e4c107e411d79b0bc>First_Character_Index</h4><pre class=ada-code-snippet><code>function First_Character_Index
+  (Self : Abstract_Cursor)
+   return VSS.Strings.Character_Index'Base
+</code></pre><p>Return index of the first character of the logical element. This index is zero when cursor is invalid or points before the first character of the string data; or large than length of the string when cursor points after last characters of the string data.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=85d39052a35c8ff31e3ec43752f52640124cdfe48523a69c2be346addb22e3d5>First_Marker</h4><pre class=ada-code-snippet><code>function First_Marker
+  (Self : Abstract_Cursor)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker of the first character of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=8bf584f496858fe1385e479adedc94a414bfc09f17bf938bc010080d6bd74d83>First_UTF16_Offset</h4><pre class=ada-code-snippet><code>function First_UTF16_Offset
+  (Self : Abstract_Cursor)
+   return VSS.Unicode.UTF16_Code_Unit_Index
+</code></pre><p>Return offset of the first UTF-16 code unit of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=14a5fd3829d07008d80e140cc93c98679034ce9584e966364714bf2dbdb50b53>First_UTF8_Offset</h4><pre class=ada-code-snippet><code>function First_UTF8_Offset
+  (Self : Abstract_Cursor)
+   return VSS.Unicode.UTF8_Code_Unit_Index
+</code></pre><p>Return offset of the first UTF-8 code unit of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=58014aa38cedb15f89f4dc47fae301699810ea4070112196fecc561568ebfeae>Is_Valid</h4><pre class=ada-code-snippet><code>function Is_Valid (Self : Abstract_Cursor) return Boolean
+</code></pre><p>Return True when cursor is valid: it points to some logical element in the string, including logical element before the string and after the string when applicable.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=5f7b60cf0a83777b43af8ba3b8c382ad293f88212ea15464d2d903804bd35a9e>Last_Character_Index</h4><pre class=ada-code-snippet><code>function Last_Character_Index
+  (Self : Abstract_Cursor)
+   return VSS.Strings.Character_Index'Base
+</code></pre><p>Return index of the last character of the logical element. Returned value when cursor points to the empty logical element or to the logical element before or after the string data depends from the particular implementation.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=ed8682ae912d66af7fced0c11caf0b9158b30a2804d75928506c30069a7b93d2>Last_Marker</h4><pre class=ada-code-snippet><code>function Last_Marker
+  (Self : Abstract_Cursor)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker of the last character of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=c155988bbb1c38e72238b799983e862219f96ac8cd961dd68f3f658409ae07ce>Last_UTF16_Offset</h4><pre class=ada-code-snippet><code>function Last_UTF16_Offset
+  (Self : Abstract_Cursor)
+   return VSS.Unicode.UTF16_Code_Unit_Index
+</code></pre><p>Return offset of the last UTF-16 code unit of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=69463bc414cb725c682a14d780eea36888d48959a9cfb468f0c8c758e4218e7b>Last_UTF8_Offset</h4><pre class=ada-code-snippet><code>function Last_UTF8_Offset
+  (Self : Abstract_Cursor)
+   return VSS.Unicode.UTF8_Code_Unit_Index
+</code></pre><p>Return offset of the last UTF-8 code unit of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=0937a6bc55f02a2fc9746b55b0b5b63bd1b9d41493edaa84077248bd3a9e5272>Marker</h4><pre class=ada-code-snippet><code>function Marker
+  (Self : Abstract_Character_Cursor'Class)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker of the character.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

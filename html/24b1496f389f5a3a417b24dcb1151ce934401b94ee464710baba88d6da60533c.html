@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Content_Handlers</h1><h2>Entities</h2><h3>Interface Types</h3><ul><li><a href=#3be791f81f91cbab18de64e05370ce758ae5944f0634cbb3de70433ee782e75c>SAX_Content_Handler</a></ul><h3>Access Types</h3><ul><li><a href=#47206a3969791e872ff727a34d2cef298c20d39f026c602cb31bcf0927495efe>SAX_Content_Handler_Access</a></ul><h3>Subprograms</h3><ul><li><a href=#7ce9e7b940b69d6903e63d802547e7ade82ac135d25a4fe9d08aad993e0bb931>Characters</a><li><a href=#088b53faa4283435c479d7423405f9ce6377d9dae3e6a2e010588b81e86ff97a>End_Document</a><li><a href=#53ce2fe5e10de300ca5cc9f8465d5c2e86f41f88b79100ab03acbb79792b9923>End_Element</a><li><a href=#c3764ac9f0097f90fbcea102456e57597448fc9e3fc11f7ed20610b5a7652663>End_Prefix_Mapping</a><li><a href=#3c1b9096b3f0be20c93a0d33f612d712b7e215d926493dc0d7a3f593e447c5c6>Ignorable_Whitespace</a><li><a href=#e434347831c27dec4649c539be3f9b4b6f6e1c7b37cb66f1dca7d59bb1b25619>Processing_Instruction</a><li><a href=#1a99133762082a6931096e6cf981ef0a13e4b15f77aaa043bcf9c87a729c46b1>Set_Document_Locator</a><li><a href=#896d327970c23639570f81251559600a55ccfb61ff127af1e5a76d9d7d47dafa>Skipped_Entity</a><li><a href=#ceb48cf84db7c3289046e6431b335f2a96743a9bdf447774c35156da709cf497>Start_Document</a><li><a href=#74c61a2cb90343e08591f135aa2b8bf0ab506d729817fe196b193ae75f915385>Start_Element</a><li><a href=#8e8b14250491112b3605159d7cd79e29f7f669e180b174d6942334e71a32fc99>Start_Prefix_Mapping</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=7ce9e7b940b69d6903e63d802547e7ade82ac135d25a4fe9d08aad993e0bb931>Characters</h4><pre class=ada-code-snippet><code>procedure Characters
+  (Self    : in out SAX_Content_Handler;
+   Text    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Text<dd><dt>Success<dd></dl><h4 id=088b53faa4283435c479d7423405f9ce6377d9dae3e6a2e010588b81e86ff97a>End_Document</h4><pre class=ada-code-snippet><code>procedure End_Document
+  (Self    : in out SAX_Content_Handler;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=53ce2fe5e10de300ca5cc9f8465d5c2e86f41f88b79100ab03acbb79792b9923>End_Element</h4><pre class=ada-code-snippet><code>procedure End_Element
+  (Self    : in out SAX_Content_Handler;
+   URI     : VSS.IRIs.IRI;
+   Name    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>URI<dd><dt>Name<dd><dt>Success<dd></dl><h4 id=c3764ac9f0097f90fbcea102456e57597448fc9e3fc11f7ed20610b5a7652663>End_Prefix_Mapping</h4><pre class=ada-code-snippet><code>procedure End_Prefix_Mapping
+  (Self    : in out SAX_Content_Handler;
+   Prefix  : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Prefix<dd><dt>Success<dd></dl><h4 id=3c1b9096b3f0be20c93a0d33f612d712b7e215d926493dc0d7a3f593e447c5c6>Ignorable_Whitespace</h4><pre class=ada-code-snippet><code>procedure Ignorable_Whitespace
+  (Self    : in out SAX_Content_Handler;
+   Text    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Text<dd><dt>Success<dd></dl><h4 id=e434347831c27dec4649c539be3f9b4b6f6e1c7b37cb66f1dca7d59bb1b25619>Processing_Instruction</h4><pre class=ada-code-snippet><code>procedure Processing_Instruction
+  (Self    : in out SAX_Content_Handler;
+   Target  : VSS.Strings.Virtual_String;
+   Data    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Target<dd><dt>Data<dd><dt>Success<dd></dl><h4 id=3be791f81f91cbab18de64e05370ce758ae5944f0634cbb3de70433ee782e75c>SAX_Content_Handler</h4><pre class=ada-code-snippet><code>type SAX_Content_Handler is limited interface;
+</code></pre><h4 id=47206a3969791e872ff727a34d2cef298c20d39f026c602cb31bcf0927495efe>SAX_Content_Handler_Access</h4><pre class=ada-code-snippet><code>type SAX_Content_Handler_Access is access all SAX_Content_Handler'Class;
+</code></pre><h4 id=1a99133762082a6931096e6cf981ef0a13e4b15f77aaa043bcf9c87a729c46b1>Set_Document_Locator</h4><pre class=ada-code-snippet><code>procedure Set_Document_Locator
+  (Self    : in out SAX_Content_Handler;
+   Locator : VSS.XML.Locators.SAX_Locator_Access)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Locator<dd></dl><h4 id=896d327970c23639570f81251559600a55ccfb61ff127af1e5a76d9d7d47dafa>Skipped_Entity</h4><pre class=ada-code-snippet><code>procedure Skipped_Entity
+  (Self    : in out SAX_Content_Handler;
+   Name    : VSS.Strings.Virtual_String;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Name<dd><dt>Success<dd></dl><h4 id=ceb48cf84db7c3289046e6431b335f2a96743a9bdf447774c35156da709cf497>Start_Document</h4><pre class=ada-code-snippet><code>procedure Start_Document
+  (Self    : in out SAX_Content_Handler;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Success<dd></dl><h4 id=74c61a2cb90343e08591f135aa2b8bf0ab506d729817fe196b193ae75f915385>Start_Element</h4><pre class=ada-code-snippet><code>procedure Start_Element
+  (Self       : in out SAX_Content_Handler;
+   URI        : VSS.IRIs.IRI;
+   Name       : VSS.Strings.Virtual_String;
+   Attributes : VSS.XML.Attributes.XML_Attributes'Class;
+   Success    : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>URI<dd><dt>Name<dd><dt>Attributes<dd><dt>Success<dd></dl><h4 id=8e8b14250491112b3605159d7cd79e29f7f669e180b174d6942334e71a32fc99>Start_Prefix_Mapping</h4><pre class=ada-code-snippet><code>procedure Start_Prefix_Mapping
+  (Self    : in out SAX_Content_Handler;
+   Prefix  : VSS.Strings.Virtual_String;
+   URI     : VSS.IRIs.IRI;
+   Success : in out Boolean)
+</code></pre><h5>Parameters</h5><dl><dt>Self<dd><dt>Prefix<dd><dt>URI<dd><dt>Success<dd></dl>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Cursors.Iterators.Characters</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#42048f939bee7f73c1eea25fcb230d0329205e8ff12e307ac0d1a26dc8f44146>Character_Iterator</a></ul><h3>Subprograms</h3><ul><li><a href=#e27b9031c7cda42fde91105066b74373a75a84d696af3b57690f975f49899800>Element</a><li><a href=#457ac53dd5a18ecd47c37e777d48a8f41bc9e3118e6ad1bd8556f1eb767c8984>Forward</a><li><a href=#63d7548dba2ae815dbcce4c1522af4bc018da024b73923a822f1ff4f19141543>Set_After_Last</a><li><a href=#22b0c9912f63de62173cf4ee8657827d851ad8bab15d179e81b96e0c9882b649>Set_At</a><li><a href=#2cfaf44cff229168cc34a62592821a8d375e1c24606ec69a35a727032c356ddd>Set_At_First</a><li><a href=#d67a938cce26ebf1899d5f0a3651b9536bf503619b397e394599567b8e747005>Set_At_Last</a><li><a href=#9aceecea161512ce738b94ee0838db8063312ca47cc9726133eab733f06008cb>Set_Before_First</a></ul><h2>Description</h2><p>Copyright (C) 2020-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=42048f939bee7f73c1eea25fcb230d0329205e8ff12e307ac0d1a26dc8f44146>Character_Iterator</h4><pre class=ada-code-snippet><code>type Character_Iterator is new Abstract_Character_Iterator with private;
+</code></pre><h4 id=e27b9031c7cda42fde91105066b74373a75a84d696af3b57690f975f49899800>Element</h4><pre class=ada-code-snippet><code>function Element
+  (Self : Character_Iterator'Class)
+   return VSS.Characters.Virtual_Character'Base
+</code></pre><p>Return character pointed by iterator. Return invalid value when iterator points outside of the text data.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=457ac53dd5a18ecd47c37e777d48a8f41bc9e3118e6ad1bd8556f1eb767c8984>Forward</h4><pre class=ada-code-snippet><code>function Forward
+  (Self    : in out Character_Iterator;
+   Element : out VSS.Characters.Virtual_Character'Base) return Boolean
+</code></pre><p>Moves the iterator one character forward, returning True if the new position points to any character within the string data. The element is set to the value of the new pointing character, or to an invalid character if the new position is outside of the string data.<h5>Parameters</h5><dl><dt>Self<dd><dt>Element<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=63d7548dba2ae815dbcce4c1522af4bc018da024b73923a822f1ff4f19141543>Set_After_Last</h4><pre class=ada-code-snippet><code>procedure Set_After_Last
+  (Self : in out Character_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Initialize iterator to point after the last character of the given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=22b0c9912f63de62173cf4ee8657827d851ad8bab15d179e81b96e0c9882b649>Set_At</h4><pre class=ada-code-snippet><code>procedure Set_At
+  (Self     : in out Character_Iterator;
+   Position : VSS.Strings.Cursors.Abstract_Character_Cursor'Class)
+</code></pre><p>Initialize iterator to point at the character at given position.<h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd></dl><h4 id=2cfaf44cff229168cc34a62592821a8d375e1c24606ec69a35a727032c356ddd>Set_At_First</h4><pre class=ada-code-snippet><code>procedure Set_At_First
+  (Self : in out Character_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Initialize iterator to point to the first character of the given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=d67a938cce26ebf1899d5f0a3651b9536bf503619b397e394599567b8e747005>Set_At_Last</h4><pre class=ada-code-snippet><code>procedure Set_At_Last
+  (Self : in out Character_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Initialize iterator to point to the last character of the given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl><h4 id=9aceecea161512ce738b94ee0838db8063312ca47cc9726133eab733f06008cb>Set_Before_First</h4><pre class=ada-code-snippet><code>procedure Set_Before_First
+  (Self : in out Character_Iterator;
+   On   : VSS.Strings.Virtual_String'Class)
+</code></pre><p>Initialize iterator to point before the first character of the given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd></dl>

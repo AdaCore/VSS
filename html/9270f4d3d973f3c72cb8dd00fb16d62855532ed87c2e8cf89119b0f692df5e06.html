@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.JSON</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#8931c460c3be09686a1fb4354ae50eb4cbaa6abeca283086fb534766ab58b641>JSON_Number_Kind</a></ul><h3>Record Types</h3><ul><li><a href=#eada18cc01fcbf942aa158e6b3b8f88691295501ec718f75dbfd38f43ce4afb6>JSON_Number</a></ul><h3>Subprograms</h3><ul><li><a href=#14fab236df9c146ceba9d10048d43cb411ae92ca35b24d6dbc474ac836aba6ff>As_Float</a><li><a href=#1258f56a43fdacb263f210168ebe74c757ea2aa5756eb85a3eef9b8415c9286b>As_Integer</a></ul><h2>Description</h2><p>Copyright (C) 2020, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=14fab236df9c146ceba9d10048d43cb411ae92ca35b24d6dbc474ac836aba6ff>As_Float</h4><pre class=ada-code-snippet><code>function As_Float (Self : JSON_Number) return Interfaces.IEEE_Float_64
+</code></pre><p>Return number value as floating point value.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h5>Raised exceptions</h5><dl><dt>Constraint_Error<dd><p>is raised when value is out of range or not present.</dl><h4 id=1258f56a43fdacb263f210168ebe74c757ea2aa5756eb85a3eef9b8415c9286b>As_Integer</h4><pre class=ada-code-snippet><code>function As_Integer (Self : JSON_Number) return Interfaces.Integer_64
+</code></pre><p>Return number value as integer number. Non-integer value is rounded to integer.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h5>Raised exceptions</h5><dl><dt>Constraint_Error<dd><p>is raised when value is out of range or not present.</dl><h4 id=eada18cc01fcbf942aa158e6b3b8f88691295501ec718f75dbfd38f43ce4afb6>JSON_Number</h4><pre class=ada-code-snippet><code>type JSON_Number (Kind : JSON_Number_Kind := None) is record
+   case Kind is
+      when None =>
+         null;
+      when others =>
+         String_Value : VSS.Strings.Virtual_String;
+         case Kind is
+            when None | Out_Of_Range =>
+               null;
+            when JSON_Integer =>
+               Integer_Value : Interfaces.Integer_64;
+            when JSON_Float =>
+               Float_Value   : Interfaces.IEEE_Float_64;
+         end case;
+   end case;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Kind<dd><dt>String_Value<dd><dt>Integer_Value<dd><dt>Float_Value<dd></dl><h4 id=8931c460c3be09686a1fb4354ae50eb4cbaa6abeca283086fb534766ab58b641>JSON_Number_Kind</h4><pre class=ada-code-snippet><code>type JSON_Number_Kind is (None, JSON_Integer, JSON_Float, Out_Of_Range);
+</code></pre><p>Format of the number used to represent value. Note, it is only hint in most cases, implementation may use other format for some reason.<h5>Enumeration Literal</h5><dl><dt>None<dd><dt>JSON_Integer<dd><dt>JSON_Float<dd><dt>Out_Of_Range<dd></dl>

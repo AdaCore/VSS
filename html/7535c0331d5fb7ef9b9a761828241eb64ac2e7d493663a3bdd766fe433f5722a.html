@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Command_Line.Parsers</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#2591ca6020965d5b7dfb1453b68ed422bd3a27b8376189b65c007c9c5b1444dc>Command_Line_Parser</a></ul><h3>Subprograms</h3><ul><li><a href=#0f7f74704cddd6be7ac3a10b29b4df417006f4bfc15e448ccef92df119fc5436>Add_Option</a><li><a href=#cbc92cb3cb0618b3f1fdbff8ed9320e004b8e168611f6e7ad2aec7d211456ce5>Error_Message</a><li><a href=#afcbe49a44fd617d06ed9ad8abc01e761256a491e4327cf26592224dfca1bdbf>Help_Text</a><li><a href=#7c0e9c908f952317c164f9f36466e2724321754829b89f8762eb3df4c366db98>Is_Specified</a><li><a href=#297a95fa64eb755c48e9cdf49b009acb691f5e87c6d137ee4438582c737b4db9>Parse</a><li><a href=#0220e2f556cd4511bf7146f50683bb7281bbce4cc45553ace54ad46db1530765>Positional_Arguments</a><li><a href=#c51a29941b72cf3bffa39d154bef870a7fa5e6e39e2b88671d677160237a6082>Unknown_Option_Arguments</a><li><a href=#a04427fceca4164264e2d03b348f220c41da47b2740277db814a7a0f309fcae0>Value</a><li><a href=#b7b1e59f45cd1a44b2e1ad3ed71544d7823d7335e37d8cf6bc97a8783d1ef210>Value</a><li><a href=#80d647b719c3c173666040da1706ea4a0c22363661f124301cb49d3cf735c711>Values</a><li><a href=#04905e92c84b7de0cb73152218c9f0dba3aa40b783daba8146165d841672c18d>Values</a></ul><h2>Description</h2><p>This package provides parser of command line arguments.<h4 id=0f7f74704cddd6be7ac3a10b29b4df417006f4bfc15e448ccef92df119fc5436>Add_Option</h4><pre class=ada-code-snippet><code>procedure Add_Option
+  (Self   : in out Command_Line_Parser'Class;
+   Option : Abstract_Option'Class)
+</code></pre><p>Add command line option.<h5>Parameters</h5><dl><dt>Self<dd><dt>Option<dd></dl><h4 id=2591ca6020965d5b7dfb1453b68ed422bd3a27b8376189b65c007c9c5b1444dc>Command_Line_Parser</h4><pre class=ada-code-snippet><code>type Command_Line_Parser is tagged limited private;
+</code></pre><h4 id=cbc92cb3cb0618b3f1fdbff8ed9320e004b8e168611f6e7ad2aec7d211456ce5>Error_Message</h4><pre class=ada-code-snippet><code>function Error_Message
+  (Self : Command_Line_Parser'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return error message if any.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=afcbe49a44fd617d06ed9ad8abc01e761256a491e4327cf26592224dfca1bdbf>Help_Text</h4><pre class=ada-code-snippet><code>function Help_Text
+  (Self : Command_Line_Parser'Class)
+   return VSS.String_Vectors.Virtual_String_Vector
+</code></pre><p>Construct description of all registered options and returns it.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7c0e9c908f952317c164f9f36466e2724321754829b89f8762eb3df4c366db98>Is_Specified</h4><pre class=ada-code-snippet><code>function Is_Specified
+  (Self   : Command_Line_Parser'Class;
+   Option : Abstract_Option'Class) return Boolean
+</code></pre><p>Return True when given option has been specified the command line.<h5>Parameters</h5><dl><dt>Self<dd><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=297a95fa64eb755c48e9cdf49b009acb691f5e87c6d137ee4438582c737b4db9>Parse</h4><pre class=ada-code-snippet><code>function Parse
+  (Self      : in out Command_Line_Parser'Class;
+   Arguments : VSS.String_Vectors.Virtual_String_Vector) return Boolean
+</code></pre><p>Parse given arguments. Return True on success, otherwise return False and set error message that can be retrieved with Error_Message subprogram.<h5>Parameters</h5><dl><dt>Self<dd><dt>Arguments<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=0220e2f556cd4511bf7146f50683bb7281bbce4cc45553ace54ad46db1530765>Positional_Arguments</h4><pre class=ada-code-snippet><code>function Positional_Arguments
+  (Self : Command_Line_Parser'Class)
+   return VSS.String_Vectors.Virtual_String_Vector
+</code></pre><p>Return list of positional arguments.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=c51a29941b72cf3bffa39d154bef870a7fa5e6e39e2b88671d677160237a6082>Unknown_Option_Arguments</h4><pre class=ada-code-snippet><code>function Unknown_Option_Arguments
+  (Self : Command_Line_Parser'Class)
+   return VSS.String_Vectors.Virtual_String_Vector
+</code></pre><p>Return list of undefined options found in the list of arguments.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=a04427fceca4164264e2d03b348f220c41da47b2740277db814a7a0f309fcae0>Value</h4><pre class=ada-code-snippet><code>function Value
+  (Self   : Command_Line_Parser'Class;
+   Option : Positional_Option'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the given option.<h5>Parameters</h5><dl><dt>Self<dd><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=b7b1e59f45cd1a44b2e1ad3ed71544d7823d7335e37d8cf6bc97a8783d1ef210>Value</h4><pre class=ada-code-snippet><code>function Value
+  (Self   : Command_Line_Parser'Class;
+   Option : Value_Option'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return value of the given option.<h5>Parameters</h5><dl><dt>Self<dd><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=80d647b719c3c173666040da1706ea4a0c22363661f124301cb49d3cf735c711>Values</h4><pre class=ada-code-snippet><code>function Values
+  (Self   : Command_Line_Parser'Class;
+   Option : Name_Value_Option'Class) return Name_Value_Vectors.Vector
+</code></pre><p>Return all name=value pairs of the given option specified in the command line.<h5>Parameters</h5><dl><dt>Self<dd><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=04905e92c84b7de0cb73152218c9f0dba3aa40b783daba8146165d841672c18d>Values</h4><pre class=ada-code-snippet><code>function Values
+  (Self   : Command_Line_Parser'Class;
+   Option : Value_Option'Class)
+   return VSS.String_Vectors.Virtual_String_Vector
+</code></pre><p>Return all values of the given option specified in the command line.<h5>Parameters</h5><dl><dt>Self<dd><dt>Option<dd></dl><h5>Return Value</h5><dl><dd></dl>

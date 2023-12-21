@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Formatters.Generic_Enumerations</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#891f6185d3063caf968830d637ce20f3289b681ca4f3fdadc53762a644ad5aeb>Formatter</a></ul><h3>Subprograms</h3><ul><li><a href=#77bf25da2ed747dbb5555712aea4271c20f9410f728c17c8ffce7d027769f48c>Image</a><li><a href=#4d7b8d04fe3373a7e54e57c42491f03e25786c93566ce37229bf827116400c18>Image</a></ul><h2>Description</h2><p>This package provides formatter for enumeration types.<h4 id=891f6185d3063caf968830d637ce20f3289b681ca4f3fdadc53762a644ad5aeb>Formatter</h4><pre class=ada-code-snippet><code>type Formatter is
+  new VSS.Strings.Formatters.Abstract_Formatter with private;
+</code></pre><h4 id=77bf25da2ed747dbb5555712aea4271c20f9410f728c17c8ffce7d027769f48c>Image</h4><pre class=ada-code-snippet><code>function Image (Item : Enumeration_Type) return Formatter
+</code></pre><h5>Parameters</h5><dl><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=4d7b8d04fe3373a7e54e57c42491f03e25786c93566ce37229bf827116400c18>Image</h4><pre class=ada-code-snippet><code>function Image
+  (Name : VSS.Strings.Virtual_String;
+   Item : Enumeration_Type) return Formatter
+</code></pre><h5>Parameters</h5><dl><dt>Name<dd><dt>Item<dd></dl><h5>Return Value</h5><dl><dd></dl>

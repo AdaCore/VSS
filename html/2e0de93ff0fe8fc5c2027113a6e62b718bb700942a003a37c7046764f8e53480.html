@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.XML.Events</h1><h2>Entities</h2><h3>Simple Types</h3><ul><li><a href=#a6b1ff835fc74b4b1545cb6901bb8530d5b610fd26f7664be29c984a12fd9091>XML_Event_Kind</a></ul><h3>Record Types</h3><ul><li><a href=#6588f4cd0d8deaa42331f0dd7754465b294ef6db449ec901e1da83f17c69f65f>XML_Event</a></ul><h2>Description</h2><p>Copyright (C) 2022, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=6588f4cd0d8deaa42331f0dd7754465b294ef6db449ec901e1da83f17c69f65f>XML_Event</h4><pre class=ada-code-snippet><code>type XML_Event (Kind : XML_Event_Kind := None) is record
+   case Kind is
+      when None =>
+         null;
+      when Start_Element | Attribute | End_Element =>
+         URI  : VSS.IRIs.IRI;
+         Name : VSS.Strings.Virtual_String;
+         case Kind is
+            when Attribute =>
+               Value : VSS.Strings.Virtual_String;
+            when others =>
+               null;
+         end case;
+      when Text | CDATA | Comment =>
+         Text : VSS.Strings.Virtual_String;
+      when Processing_Instruction =>
+         Target : VSS.Strings.Virtual_String;
+         Data   : VSS.Strings.Virtual_String;
+   end case;
+end record;
+</code></pre><h5>Record fields</h5><dl><dt>Kind<dd><dt>URI<dd><dt>Name<dd><dt>Value<dd><dt>Text<dd><dt>Target<dd><dt>Data<dd></dl><h4 id=a6b1ff835fc74b4b1545cb6901bb8530d5b610fd26f7664be29c984a12fd9091>XML_Event_Kind</h4><pre class=ada-code-snippet><code>type XML_Event_Kind is
+  (None,
+   Start_Element,
+   Attribute,
+   End_Element,
+   Comment,
+   Processing_Instruction,
+   Text,
+   CDATA);
+</code></pre><h5>Enumeration Literal</h5><dl><dt>None<dd><dt>Start_Element<dd><dt>Attribute<dd><dt>End_Element<dd><dt>Comment<dd><dt>Processing_Instruction<dd><dt>Text<dd><dt>CDATA<dd></dl>

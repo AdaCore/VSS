@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html class=main>
+<link rel=stylesheet href=gnatdoc.css><body class=content><h1>VSS.Strings.Cursors.Iterators.Lines</h1><h2>Entities</h2><h3>Tagged Types</h3><ul><li><a href=#2bf36e453d5749169aa3842c50c22d840c9b88bffdfbb66b8a18ec12c9e3c8ef>Line_Iterator</a></ul><h3>Subprograms</h3><ul><li><a href=#546193b585967f748917d7591aaf65ffc35a5aac73232269b4f6ceb74f901eb2>Element_Terminator</a><li><a href=#95e059e6316dfe16695e112bb4e6db6e6bf255e697c40598259830ea18ee6c0c>Has_Line_Terminator</a><li><a href=#c3cc8d27b6b0073735a3a1741ea10984ba0b2b40c80c31d1596e7a96e907a46d>Set_At</a><li><a href=#a5c9364efba4313389b09bfe6f0e58392fd9bed44f7015a64cd15cc8313371f8>Set_At_First</a><li><a href=#25f5a882329aae699b1a95448e935fd6ee0aac44da1a752ce6386017a1562273>Terminator_First_Character_Index</a><li><a href=#c11ed9d52fdc7461898770e1225e1afae098a37b6b64785ded61c0ce0b0cc4da>Terminator_First_Marker</a><li><a href=#dcd28af40992abaa42994bb0e652dd38e0a1dac5255a8edffb583a0e696fc046>Terminator_First_UTF16_Offset</a><li><a href=#2c3e9b3350302d64edfd84f586d89b8f5c68067b06398fc30f680b91ee2fad95>Terminator_First_UTF8_Offset</a><li><a href=#6367ea7d6d364060689fbcb8a60a2033dde1cf4238a93cc5a69f450f78a1df54>Terminator_Last_Character_Index</a><li><a href=#b667fa8c18d8d9fef8ff515bf83c95dcfbe899d7ea3ad1bf2dc6216c0a0821d2>Terminator_Last_Marker</a><li><a href=#7a61fe7c11f5629903d52d7b5097e13cf8d95c3671e4813507ac6b6ebc4a7276>Terminator_Last_UTF16_Offset</a><li><a href=#52a00c4a76d478e9ff63e3eaf64810c057cbcdad50c5c0523763639ca2d06a52>Terminator_Last_UTF8_Offset</a></ul><h2>Description</h2><p>Copyright (C) 2021-2023, AdaCore<p>SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception<h4 id=546193b585967f748917d7591aaf65ffc35a5aac73232269b4f6ceb74f901eb2>Element_Terminator</h4><pre class=ada-code-snippet><code>function Element_Terminator
+  (Self : Line_Iterator'Class) return VSS.Strings.Virtual_String
+</code></pre><p>Return line terminator sequence of the current line. Return empty string when line is not terminated by line termination sequence (it is last line in the source string).<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=95e059e6316dfe16695e112bb4e6db6e6bf255e697c40598259830ea18ee6c0c>Has_Line_Terminator</h4><pre class=ada-code-snippet><code>function Has_Line_Terminator (Self : Line_Iterator'Class) return Boolean
+</code></pre><p>Return True when line has lime terminator sequence. Only last line of the text may not have line terminator. This function is independent from the Keep_Terminator mode.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2bf36e453d5749169aa3842c50c22d840c9b88bffdfbb66b8a18ec12c9e3c8ef>Line_Iterator</h4><pre class=ada-code-snippet><code>type Line_Iterator is new Abstract_Segment_Iterator with private;
+</code></pre><h4 id=c3cc8d27b6b0073735a3a1741ea10984ba0b2b40c80c31d1596e7a96e907a46d>Set_At</h4><pre class=ada-code-snippet><code>procedure Set_At
+  (Self            : in out Line_Iterator;
+   Position        : VSS.Strings.Cursors.Abstract_Character_Cursor'Class;
+   Terminators     : Line_Terminator_Set := New_Line_Function;
+   Keep_Terminator : Boolean             := False)
+</code></pre><p>Initialize iterator to point at the line at the given position.<h5>Parameters</h5><dl><dt>Self<dd><dt>Position<dd><dt>Terminators<dd><dt>Keep_Terminator<dd></dl><h4 id=a5c9364efba4313389b09bfe6f0e58392fd9bed44f7015a64cd15cc8313371f8>Set_At_First</h4><pre class=ada-code-snippet><code>procedure Set_At_First
+  (Self            : in out Line_Iterator;
+   On              : VSS.Strings.Virtual_String'Class;
+   Terminators     : Line_Terminator_Set := New_Line_Function;
+   Keep_Terminator : Boolean             := False)
+</code></pre><p>Initialize iterator to point to the first line of the given string.<h5>Parameters</h5><dl><dt>Self<dd><dt>On<dd><dt>Terminators<dd><dt>Keep_Terminator<dd></dl><h4 id=25f5a882329aae699b1a95448e935fd6ee0aac44da1a752ce6386017a1562273>Terminator_First_Character_Index</h4><pre class=ada-code-snippet><code>function Terminator_First_Character_Index
+  (Self : Line_Iterator'Class)
+   return VSS.Strings.Character_Index
+</code></pre><p>Return index of the first character of the line terminator sequence.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=c11ed9d52fdc7461898770e1225e1afae098a37b6b64785ded61c0ce0b0cc4da>Terminator_First_Marker</h4><pre class=ada-code-snippet><code>function Terminator_First_Marker
+  (Self : Line_Iterator'Class)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker of the first character of the line terminator sequence.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=dcd28af40992abaa42994bb0e652dd38e0a1dac5255a8edffb583a0e696fc046>Terminator_First_UTF16_Offset</h4><pre class=ada-code-snippet><code>function Terminator_First_UTF16_Offset
+  (Self : Line_Iterator'Class)
+   return VSS.Unicode.UTF16_Code_Unit_Index
+</code></pre><p>Return offset of the first UTF-16 code unit of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=2c3e9b3350302d64edfd84f586d89b8f5c68067b06398fc30f680b91ee2fad95>Terminator_First_UTF8_Offset</h4><pre class=ada-code-snippet><code>function Terminator_First_UTF8_Offset
+  (Self : Line_Iterator'Class)
+   return VSS.Unicode.UTF8_Code_Unit_Index
+</code></pre><p>Return offset of the first UTF-8 code unit of the line terminator sequence.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=6367ea7d6d364060689fbcb8a60a2033dde1cf4238a93cc5a69f450f78a1df54>Terminator_Last_Character_Index</h4><pre class=ada-code-snippet><code>function Terminator_Last_Character_Index
+  (Self : Line_Iterator'Class)
+   return VSS.Strings.Character_Index
+</code></pre><p>Return index of the last character of the line terminator sequence.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=b667fa8c18d8d9fef8ff515bf83c95dcfbe899d7ea3ad1bf2dc6216c0a0821d2>Terminator_Last_Marker</h4><pre class=ada-code-snippet><code>function Terminator_Last_Marker
+  (Self : Line_Iterator'Class)
+   return VSS.Strings.Cursors.Markers.Character_Marker
+</code></pre><p>Return marker of the last character of the line terminator sequence.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=7a61fe7c11f5629903d52d7b5097e13cf8d95c3671e4813507ac6b6ebc4a7276>Terminator_Last_UTF16_Offset</h4><pre class=ada-code-snippet><code>function Terminator_Last_UTF16_Offset
+  (Self : Line_Iterator'Class)
+   return VSS.Unicode.UTF16_Code_Unit_Index
+</code></pre><p>Return offset of the last UTF-16 code unit of the logical element.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl><h4 id=52a00c4a76d478e9ff63e3eaf64810c057cbcdad50c5c0523763639ca2d06a52>Terminator_Last_UTF8_Offset</h4><pre class=ada-code-snippet><code>function Terminator_Last_UTF8_Offset
+  (Self : Line_Iterator'Class)
+   return VSS.Unicode.UTF8_Code_Unit_Index
+</code></pre><p>Return offset of the last UTF-8 code unit of the line terminator sequence.<h5>Parameters</h5><dl><dt>Self<dd></dl><h5>Return Value</h5><dl><dd></dl>

@@ -6,6 +6,7 @@
 
 pragma Ada_2022;
 
+with Ada.Finalization;
 with Ada.Unchecked_Deallocation;
 
 with VSS.IRIs;

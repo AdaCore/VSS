@@ -382,26 +382,22 @@ package VSS.Strings is
    --  position.
 
    function Starts_With
-     (Self             : Virtual_String'Class;
-      Prefix           : Virtual_String'Class;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+     (Self   : Virtual_String'Class;
+      Prefix : Virtual_String'Class) return Boolean;
+   --  Return True when Self starts with Prefix.
+
+   function Starts_With
+     (Self        : Virtual_String'Class;
+      Prefix      : Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class)
       return Boolean;
-   --  Return True when Self starts with Prefix. Case_Sensitivity defines
-   --  whether search is case sensitive or not, and select algorithm for the
-   --  last.
-   --
-   --  XXX Don't use Case_Sensitivity parameter, it will be removed.
+   --  Return True when Self starts with Prefix. Transformer defines
+   --  transformation of both strings before compare.
 
    function Ends_With
-     (Self             : Virtual_String'Class;
-      Suffix           : Virtual_String'Class;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean;
-   --  Return True when Self has given Suffix. Case_Sensitivity defines
-   --  whether search is case sensitive or not, and select algorithm for the
-   --  last.
-   --
-   --  XXX Don't use Case_Sensitivity parameter, it will be removed.
+     (Self   : Virtual_String'Class;
+      Suffix : Virtual_String'Class) return Boolean;
+   --  Return True when Self has given Suffix.
 
    function Ends_With
      (Self   : Virtual_String'Class;

@@ -9,8 +9,6 @@ with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.Line_Terminator;
 with VSS.Implementation.String_Configuration;
 with VSS.Implementation.String_Handlers;
-with VSS.Implementation.UTF8_Casing;
-with VSS.Implementation.UTF8_Normalization;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
 with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
@@ -569,13 +567,9 @@ package body VSS.Strings is
    ---------------
 
    function Ends_With
-     (Self             : Virtual_String'Class;
-      Suffix           : Virtual_String'Class;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean
+     (Self   : Virtual_String'Class;
+      Suffix : Virtual_String'Class) return Boolean
    is
-      pragma Unreferenced (Case_Sensitivity);
-
       use type VSS.Implementation.Strings.Character_Count;
 
       Self_Handler   :
@@ -1073,10 +1067,8 @@ package body VSS.Strings is
    -----------------
 
    function Starts_With
-     (Self             : Virtual_String'Class;
-      Prefix           : Virtual_String'Class;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity := Case_Sensitive)
-      return Boolean
+     (Self   : Virtual_String'Class;
+      Prefix : Virtual_String'Class) return Boolean
    is
       use type VSS.Implementation.Strings.Character_Count;
 
@@ -1088,88 +1080,35 @@ package body VSS.Strings is
           VSS.Implementation.Strings.Handler (Prefix.Data);
 
    begin
-      case Case_Sensitivity is
-         when Case_Sensitive =>
-            if Self_Handler.Length (Self.Data)
-                 < Prefix_Handler.Length (Prefix.Data)
-            then
-               return False;
+      if Self_Handler.Length (Self.Data)
+           < Prefix_Handler.Length (Prefix.Data)
+      then
+         return False;
 
-            else
-               return
-                 Self_Handler.Starts_With
-                   (Self.Data, Prefix_Handler.all, Prefix.Data);
-            end if;
+      else
+         return
+           Self_Handler.Starts_With
+             (Self.Data, Prefix_Handler.all, Prefix.Data);
+      end if;
+   end Starts_With;
 
-         when Default_Caseless =>
-            raise Program_Error;
+   -----------------
+   -- Starts_With --
+   -----------------
 
-         when Canonical_Caseless =>
-            raise Program_Error;
+   function Starts_With
+     (Self        : Virtual_String'Class;
+      Prefix      : Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class)
+      return Boolean
+   is
+      Self_Transformed   : constant VSS.Strings.Virtual_String :=
+         Transformer.Transform (Self);
+      Prefix_Transformed : constant VSS.Strings.Virtual_String :=
+         Transformer.Transform (Prefix);
 
-         when Compatibility_Caseless =>
-            raise Program_Error;
-
-         when Identifier_Caseless =>
-            declare
-               Self_NFD         : VSS.Implementation.Strings.String_Data;
-               Prefix_NFD       : VSS.Implementation.Strings.String_Data;
-               Self_CF_Mapped   : VSS.Implementation.Strings.String_Data;
-               Prefix_CF_Mapped : VSS.Implementation.Strings.String_Data;
-               Self_CF_NFC      : VSS.Implementation.Strings.String_Data;
-               Prefix_CF_NFC    : VSS.Implementation.Strings.String_Data;
-
-            begin
-               VSS.Implementation.UTF8_Normalization.Normalize
-                 (Self.Data, VSS.Strings.Normalization_Form_D, Self_NFD);
-               VSS.Implementation.UTF8_Casing.Convert_Case
-                 (Self_NFD,
-                  VSS.Implementation.UTF8_Casing.NFKC_Casefold,
-                  Self_CF_Mapped);
-               VSS.Implementation.UTF8_Normalization.Normalize
-                 (Self_CF_Mapped,
-                  VSS.Strings.Normalization_Form_C,
-                  Self_CF_NFC);
-
-               VSS.Implementation.UTF8_Normalization.Normalize
-                 (Prefix.Data, VSS.Strings.Normalization_Form_D, Prefix_NFD);
-               VSS.Implementation.UTF8_Casing.Convert_Case
-                 (Prefix_NFD,
-                  VSS.Implementation.UTF8_Casing.NFKC_Casefold,
-                  Prefix_CF_Mapped);
-               VSS.Implementation.UTF8_Normalization.Normalize
-                 (Prefix_CF_Mapped,
-                  VSS.Strings.Normalization_Form_C,
-                  Prefix_CF_NFC);
-
-               return Result : constant Boolean :=
-                 (if VSS.Implementation.Strings.Handler
-                    (Self_CF_NFC).Length (Self_CF_NFC)
-                  < VSS.Implementation.Strings.Handler
-                    (Prefix_CF_NFC).Length (Prefix_CF_NFC)
-                  then False
-                  else
-                     VSS.Implementation.Strings.Handler
-                    (Self_CF_NFC).Starts_With
-                  (Self_CF_NFC,
-                       VSS.Implementation.Strings.Handler (Prefix_CF_NFC).all,
-                       Prefix_CF_NFC))
-               do
-                  VSS.Implementation.Strings.Handler (Self_NFD).Unreference
-                    (Self_NFD);
-                  VSS.Implementation.Strings.Handler
-                    (Self_CF_Mapped).Unreference (Self_CF_Mapped);
-                  VSS.Implementation.Strings.Handler (Self_CF_NFC).Unreference
-                    (Self_CF_NFC);
-                  VSS.Implementation.Strings.Handler (Prefix_NFD).Unreference
-                    (Prefix_NFD);
-                  VSS.Implementation.Strings.Handler
-                    (Prefix_CF_Mapped).Unreference (Prefix_CF_Mapped);
-                  VSS.Implementation.Strings.Handler
-                    (Prefix_CF_NFC).Unreference (Prefix_CF_NFC);
-               end return;
-            end;
-      end case;
+   begin
+      return Self_Transformed.Starts_With (Prefix_Transformed);
    end Starts_With;
 
    ----------------

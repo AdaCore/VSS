@@ -54,35 +54,39 @@ procedure Test_Casing_Minimal is
      VSS.Strings.Empty_Virtual_String;
 
 begin
-   Test_Support.Assert (VSS.Transformers.Casing.Lowercase.Transform (S1) = E1);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Lowercase.Transform (S1S) = S1E);
+     (VSS.Transformers.Casing.To_Lowercase.Transform (S1) = E1);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Lowercase.Transform (S2S) = S2E);
+     (VSS.Transformers.Casing.To_Lowercase.Transform (S1S) = S1E);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Lowercase.Transform (S3S) = S3E);
+     (VSS.Transformers.Casing.To_Lowercase.Transform (S2S) = S2E);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Lowercase.Transform (S4S) = S4E);
+     (VSS.Transformers.Casing.To_Lowercase.Transform (S3S) = S3E);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Lowercase.Transform (S5S) = S5E);
+     (VSS.Transformers.Casing.To_Lowercase.Transform (S4S) = S4E);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Lowercase.Transform (S6S) = S6E);
+     (VSS.Transformers.Casing.To_Lowercase.Transform (S5S) = S5E);
+   Test_Support.Assert
+     (VSS.Transformers.Casing.To_Lowercase.Transform (S6S) = S6E);
 
-   Test_Support.Assert (VSS.Transformers.Casing.Lowercase.Transform (U1) = L1);
-   Test_Support.Assert (VSS.Transformers.Casing.Uppercase.Transform (L1) = U1);
+   Test_Support.Assert
+     (VSS.Transformers.Casing.To_Lowercase.Transform (U1) = L1);
+   Test_Support.Assert
+     (VSS.Transformers.Casing.To_Uppercase.Transform (L1) = U1);
 
    --  Test for null string for code coverage of Null_String_Handler.
 
-   Test_Support.Assert (VSS.Transformers.Casing.Lowercase.Transform (SN) = SN);
+   Test_Support.Assert
+     (VSS.Transformers.Casing.To_Lowercase.Transform (SN) = SN);
 
    --  Test of simple case conversion.
 
    Test_Support.Assert
-     (VSS.Transformers.Casing.Simple_Lowercase.Transform (S1) = E1);
+     (VSS.Transformers.Casing.To_Simple_Lowercase.Transform (S1) = E1);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Simple_Uppercase.Transform (E1) = S1);
+     (VSS.Transformers.Casing.To_Simple_Uppercase.Transform (E1) = S1);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Simple_Lowercase.Transform (U1) = L1);
+     (VSS.Transformers.Casing.To_Simple_Lowercase.Transform (U1) = L1);
    Test_Support.Assert
-     (VSS.Transformers.Casing.Simple_Uppercase.Transform (L1) = U1);
+     (VSS.Transformers.Casing.To_Simple_Uppercase.Transform (L1) = U1);
 end Test_Casing_Minimal;

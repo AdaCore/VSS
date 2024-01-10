@@ -71,19 +71,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_C
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_C
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_C
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_C
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_C
+                    VSS.Transformers.Normalization.To_Normalization_Form_C
                       .Transform (C4);
 
                begin
@@ -98,19 +98,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_D
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_D
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_D
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_D
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_D
+                    VSS.Transformers.Normalization.To_Normalization_Form_D
                       .Transform (C5);
 
                begin
@@ -125,19 +125,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KC
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KC
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KC
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KC
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KC
+                    VSS.Transformers.Normalization.To_Normalization_Form_KC
                       .Transform (C5);
 
                begin
@@ -152,19 +152,19 @@ begin
 
                declare
                   C1N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KD
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
                       .Transform (C1);
                   C2N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KD
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
                       .Transform (C2);
                   C3N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KD
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
                       .Transform (C3);
                   C4N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KD
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
                       .Transform (C4);
                   C5N : constant VSS.Strings.Virtual_String :=
-                    VSS.Transformers.Normalization.Normalization_Form_KD
+                    VSS.Transformers.Normalization.To_Normalization_Form_KD
                       .Transform (C5);
 
                begin

@@ -90,13 +90,13 @@ package VSS.Transformers.Casing is
       Item : in out VSS.Strings.Virtual_String'Class);
    --  @private
 
-   Lowercase        : constant Lowercase_Transformer :=
+   To_Lowercase        : constant Lowercase_Transformer :=
      Lowercase_Transformer'(null record);
-   Simple_Lowercase : constant Simple_Lowercase_Transformer :=
+   To_Simple_Lowercase : constant Simple_Lowercase_Transformer :=
      Simple_Lowercase_Transformer'(null record);
-   Simple_Uppercase : constant Simple_Uppercase_Transformer :=
+   To_Simple_Uppercase : constant Simple_Uppercase_Transformer :=
      Simple_Uppercase_Transformer'(null record);
-   Uppercase        : constant Uppercase_Transformer :=
+   To_Uppercase        : constant Uppercase_Transformer :=
      Uppercase_Transformer'(null record);
 
    --   Lowercase        : constant Abstract_Transformer'Class :=

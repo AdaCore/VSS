@@ -88,13 +88,13 @@ package VSS.Transformers.Normalization is
       Item : in out VSS.Strings.Virtual_String'Class);
    --  @private
 
-   Normalization_Form_D  : constant Normalization_Form_D_Transformer :=
+   To_Normalization_Form_D  : constant Normalization_Form_D_Transformer :=
      Normalization_Form_D_Transformer'(null record);
-   Normalization_Form_C  : constant Normalization_Form_C_Transformer :=
+   To_Normalization_Form_C  : constant Normalization_Form_C_Transformer :=
      Normalization_Form_C_Transformer'(null record);
-   Normalization_Form_KD : constant Normalization_Form_KD_Transformer :=
+   To_Normalization_Form_KD : constant Normalization_Form_KD_Transformer :=
      Normalization_Form_KD_Transformer'(null record);
-   Normalization_Form_KC : constant Normalization_Form_KC_Transformer :=
+   To_Normalization_Form_KC : constant Normalization_Form_KC_Transformer :=
      Normalization_Form_KC_Transformer'(null record);
 
   --   Normalization_Form_D  : constant Abstract_Transformer'Class :=

@@ -64,7 +64,7 @@ package body VSS.Regular_Expressions.Name_Sets is
 
       Cursor :=
         Map.Find
-          (VSS.Transformers.Casing.Simple_Lowercase.Transform (Name));
+          (VSS.Transformers.Casing.To_Simple_Lowercase.Transform (Name));
 
       if Category_Maps.Maps.Has_Element (Cursor) then
          Value := Category_Maps.Maps.Element (Cursor);

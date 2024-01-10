@@ -60,10 +60,10 @@ begin
 
    if Lowercase then
       Test_Support.Assert
-        (VSS.Transformers.Casing.Lowercase.Transform (Source) = Expected);
+        (VSS.Transformers.Casing.To_Lowercase.Transform (Source) = Expected);
 
    else
       Test_Support.Assert
-        (VSS.Transformers.Casing.Uppercase.Transform (Source) = Expected);
+        (VSS.Transformers.Casing.To_Uppercase.Transform (Source) = Expected);
    end if;
 end Test_Casing_W3C_I18N;

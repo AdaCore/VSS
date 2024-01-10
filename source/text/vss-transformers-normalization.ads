@@ -30,51 +30,63 @@ package VSS.Transformers.Normalization is
 
    type Normalization_Form_D_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Normalization_Form_D_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Normalization_Form_D_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    type Normalization_Form_C_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Normalization_Form_C_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Normalization_Form_C_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    type Normalization_Form_KD_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Normalization_Form_KD_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Normalization_Form_KD_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    type Normalization_Form_KC_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Normalization_Form_KC_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Normalization_Form_KC_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    Normalization_Form_D  : constant Normalization_Form_D_Transformer :=
      Normalization_Form_D_Transformer'(null record);

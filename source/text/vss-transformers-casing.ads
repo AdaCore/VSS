@@ -32,51 +32,63 @@ package VSS.Transformers.Casing is
 
    type Simple_Lowercase_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Simple_Lowercase_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Simple_Lowercase_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    type Simple_Uppercase_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Simple_Uppercase_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Simple_Uppercase_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    type Lowercase_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Lowercase_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Lowercase_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    type Uppercase_Transformer is
      limited new Abstract_Transformer with null record;
+   --  @private
 
    overriding function Transform
      (Self : Uppercase_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String;
+   --  @private
 
    overriding procedure Transform
      (Self : Uppercase_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
+   --  @private
 
    Lowercase        : constant Lowercase_Transformer :=
      Lowercase_Transformer'(null record);

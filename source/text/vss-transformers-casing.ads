@@ -14,19 +14,21 @@ package VSS.Transformers.Casing is
 
    pragma Preelaborate;
 
-   Lowercase        : constant Abstract_Transformer'Class;
-   --  Convert text to lowercase using default full case conversion.
-
-   Uppercase        : constant Abstract_Transformer'Class;
-   --  Convert text to uppercase using default full case conversion.
-
-   Simple_Lowercase : constant Abstract_Transformer'Class;
-   --  Convert text to lowercase using default simple case conversion.
-
-   Simple_Uppercase : constant Abstract_Transformer'Class;
-   --  Convert text to uppercase using default simple case conversion.
-
-private
+   --  XXX GNAT 20231112 All types need to be make publicaly declared and
+   --  constants are declared as constants of that type (not classwide type
+   --  of base type)
+   --
+   --   Lowercase        : constant Abstract_Transformer'Class;
+   --   --  Convert text to lowercase using default full case conversion.
+   --
+   --   Uppercase        : constant Abstract_Transformer'Class;
+   --   --  Convert text to uppercase using default full case conversion.
+   --
+   --   Simple_Lowercase : constant Abstract_Transformer'Class;
+   --   --  Convert text to lowercase using default simple case conversion.
+   --
+   --   Simple_Uppercase : constant Abstract_Transformer'Class;
+   --   --  Convert text to uppercase using default simple case conversion.
 
    type Simple_Lowercase_Transformer is
      limited new Abstract_Transformer with null record;
@@ -76,13 +78,22 @@ private
      (Self : Uppercase_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
 
-   Lowercase        : constant Abstract_Transformer'Class :=
+   Lowercase        : constant Lowercase_Transformer :=
      Lowercase_Transformer'(null record);
-   Simple_Lowercase : constant Abstract_Transformer'Class :=
+   Simple_Lowercase : constant Simple_Lowercase_Transformer :=
      Simple_Lowercase_Transformer'(null record);
-   Simple_Uppercase : constant Abstract_Transformer'Class :=
+   Simple_Uppercase : constant Simple_Uppercase_Transformer :=
      Simple_Uppercase_Transformer'(null record);
-   Uppercase        : constant Abstract_Transformer'Class :=
+   Uppercase        : constant Uppercase_Transformer :=
      Uppercase_Transformer'(null record);
+
+   --   Lowercase        : constant Abstract_Transformer'Class :=
+   --     Lowercase_Transformer'(null record);
+   --   Simple_Lowercase : constant Abstract_Transformer'Class :=
+   --     Simple_Lowercase_Transformer'(null record);
+   --   Simple_Uppercase : constant Abstract_Transformer'Class :=
+   --     Simple_Uppercase_Transformer'(null record);
+   --   Uppercase        : constant Abstract_Transformer'Class :=
+   --     Uppercase_Transformer'(null record);
 
 end VSS.Transformers.Casing;

@@ -12,19 +12,21 @@ package VSS.Transformers.Normalization is
 
    pragma Preelaborate;
 
-   Normalization_Form_D  : constant Abstract_Transformer'Class;
-   --  Transform text to Normalization Form D.
-
-   Normalization_Form_C  : constant Abstract_Transformer'Class;
-   --  Transform text to Normalization Form C.
-
-   Normalization_Form_KD : constant Abstract_Transformer'Class;
-   --  Transform text to Normalization Form KD.
-
-   Normalization_Form_KC : constant Abstract_Transformer'Class;
-   --  Transform text to Normalization Form KC.
-
-private
+   --  XXX GNAT 20231112 All types need to be make publicaly declared and
+   --  constants are declared as constants of that type (not classwide type
+   --  of base type)
+   --
+   --   Normalization_Form_D  : constant Abstract_Transformer'Class;
+   --   --  Transform text to Normalization Form D.
+   --
+   --   Normalization_Form_C  : constant Abstract_Transformer'Class;
+   --   --  Transform text to Normalization Form C.
+   --
+   --   Normalization_Form_KD : constant Abstract_Transformer'Class;
+   --   --  Transform text to Normalization Form KD.
+   --
+   --   Normalization_Form_KC : constant Abstract_Transformer'Class;
+   --   --  Transform text to Normalization Form KC.
 
    type Normalization_Form_D_Transformer is
      limited new Abstract_Transformer with null record;
@@ -74,13 +76,22 @@ private
      (Self : Normalization_Form_KC_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class);
 
-   Normalization_Form_D  : constant Abstract_Transformer'Class :=
+   Normalization_Form_D  : constant Normalization_Form_D_Transformer :=
      Normalization_Form_D_Transformer'(null record);
-   Normalization_Form_C  : constant Abstract_Transformer'Class :=
+   Normalization_Form_C  : constant Normalization_Form_C_Transformer :=
      Normalization_Form_C_Transformer'(null record);
-   Normalization_Form_KD : constant Abstract_Transformer'Class :=
+   Normalization_Form_KD : constant Normalization_Form_KD_Transformer :=
      Normalization_Form_KD_Transformer'(null record);
-   Normalization_Form_KC : constant Abstract_Transformer'Class :=
+   Normalization_Form_KC : constant Normalization_Form_KC_Transformer :=
      Normalization_Form_KC_Transformer'(null record);
+
+  --   Normalization_Form_D  : constant Abstract_Transformer'Class :=
+  --     Normalization_Form_D_Transformer'(null record);
+  --   Normalization_Form_C  : constant Abstract_Transformer'Class :=
+  --     Normalization_Form_C_Transformer'(null record);
+  --   Normalization_Form_KD : constant Abstract_Transformer'Class :=
+  --     Normalization_Form_KD_Transformer'(null record);
+  --   Normalization_Form_KC : constant Abstract_Transformer'Class :=
+  --     Normalization_Form_KC_Transformer'(null record);
 
 end VSS.Transformers.Normalization;

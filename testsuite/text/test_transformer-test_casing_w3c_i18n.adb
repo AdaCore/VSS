@@ -1,17 +1,15 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with Ada.Command_Line;
 with Ada.Wide_Wide_Text_IO;
 
-with VSS.Strings;
+with VSS.Transformers.Casing;
 
-with Test_Support;
-
-procedure Test_String_Casing_W3C_I18N is
+separate (Test_Transformer)
+procedure Test_Casing_W3C_I18N is
    use type VSS.Strings.Virtual_String;
 
    File      : Ada.Wide_Wide_Text_IO.File_Type;
@@ -25,7 +23,7 @@ begin
    Ada.Wide_Wide_Text_IO.Open
      (File,
       Ada.Wide_Wide_Text_IO.In_File,
-      Ada.Command_Line.Argument (1),
+      VSS.Strings.Conversions.To_UTF_8_String (W3C_I18N_File),
       "wcem=8");
 
    --  Skip name of the test
@@ -61,9 +59,11 @@ begin
    Ada.Wide_Wide_Text_IO.Close (File);
 
    if Lowercase then
-      Test_Support.Assert (Source.To_Lowercase = Expected);
+      Test_Support.Assert
+        (VSS.Transformers.Casing.To_Lowercase.Transform (Source) = Expected);
 
    else
-      Test_Support.Assert (Source.To_Uppercase = Expected);
+      Test_Support.Assert
+        (VSS.Transformers.Casing.To_Uppercase.Transform (Source) = Expected);
    end if;
-end Test_String_Casing_W3C_I18N;
+end Test_Casing_W3C_I18N;

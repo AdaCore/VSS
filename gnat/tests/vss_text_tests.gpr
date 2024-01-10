@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -26,8 +26,6 @@ project VSS_Text_Tests is
                  "test_line_iterators.adb",
                  "test_string",
                  "test_string_append",
-                 "test_string_casing.adb",
-                 "test_string_casing_w3c_i18n.adb",
                  "test_string_compare",
                  "test_string_conversions.adb",
                  "test_string_decoder.adb",
@@ -35,12 +33,12 @@ project VSS_Text_Tests is
                  "test_string_hash",
                  "test_string_insert",
                  "test_string_buffer",
-                 "test_string_normalization",
                  "test_string_slice",
                  "test_string_split",
                  "test_string_split_lines",
                  "test_string_template",
                  "test_string_vector",
+                 "test_transformer",
                  "test_word_iterators");
 
    package Compiler is

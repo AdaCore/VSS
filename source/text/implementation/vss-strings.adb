@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -17,6 +17,7 @@ with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 with VSS.Strings.Cursors.Iterators.Lines;
 with VSS.Strings.Cursors.Iterators.Words;
 with VSS.String_Vectors.Internals;
+with VSS.Transformers;
 
 package body VSS.Strings is
 
@@ -1231,108 +1232,6 @@ package body VSS.Strings is
       end return;
    end Tail_From;
 
-   ------------------
-   -- To_Lowercase --
-   ------------------
-
-   function To_Lowercase (Self : Virtual_String'Class) return Virtual_String is
-   begin
-      return Result : Virtual_String do
-         VSS.Implementation.UTF8_Casing.Convert_Case
-           (Self.Data,
-            VSS.Implementation.UTF8_Casing.Lowercase,
-            Result.Data);
-      end return;
-   end To_Lowercase;
-
-   -------------------
-   -- To_Normalized --
-   -------------------
-
-   function To_Normalized
-     (Self : Virtual_String'Class;
-      Form : Normalization_Form) return Virtual_String is
-   begin
-      return Result : Virtual_String do
-         VSS.Implementation.UTF8_Normalization.Normalize
-           (Self.Data, Form, Result.Data);
-      end return;
-   end To_Normalized;
-
-   -------------------------
-   -- To_Simple_Lowercase --
-   -------------------------
-
-   function To_Simple_Lowercase
-     (Self : Virtual_String'Class) return Virtual_String is
-   begin
-      return Result : Virtual_String do
-         VSS.Implementation.UTF8_Casing.Convert_Case
-           (Self.Data,
-            VSS.Implementation.UTF8_Casing.Simple_Lowercase,
-            Result.Data);
-      end return;
-   end To_Simple_Lowercase;
-
-   -------------------------
-   -- To_Simple_Titlecase --
-   -------------------------
-
---   function To_Simple_Titlecase
---     (Self : Virtual_String'Class) return Virtual_String is
---   begin
---      return Result : Virtual_String do
---         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
---           (Self.Data,
---            VSS.Implementation.String_Handlers.Simple_Titlecase,
---            Result.Data);
---      end return;
---   end To_Simple_Titlecase;
-
-   -------------------------
-   -- To_Simple_Uppercase --
-   -------------------------
-
-   function To_Simple_Uppercase
-     (Self : Virtual_String'Class) return Virtual_String is
-   begin
-      return Result : Virtual_String do
-         VSS.Implementation.UTF8_Casing.Convert_Case
-           (Self.Data,
-            VSS.Implementation.UTF8_Casing.Simple_Uppercase,
-            Result.Data);
-      end return;
-   end To_Simple_Uppercase;
-
-   ------------------
-   -- To_Titlecase --
-   ------------------
-
---   function To_Titlecase
---     (Self : Virtual_String'Class) return Virtual_String is
---   begin
---      return Result : Virtual_String do
---         VSS.Implementation.Strings.Handler (Self.Data).Convert_Case
---           (Self.Data,
---            VSS.Implementation.String_Handlers.Titlecase,
---            Result.Data);
---      end return;
---   end To_Titlecase;
-
-   ------------------
-   -- To_Uppercase --
-   ------------------
-
-   function To_Uppercase (Self : Virtual_String'Class) return Virtual_String is
-   begin
-      return Result : Virtual_String do
-         VSS.Implementation.UTF8_Casing.Convert_Case
-           (Self.Data,
-            VSS.Implementation.UTF8_Casing.Uppercase,
-            Result.Data);
-      end return;
-   end To_Uppercase;
-
    -----------------------
    -- To_Virtual_String --
    -----------------------
@@ -1366,6 +1265,29 @@ package body VSS.Strings is
          end if;
       end return;
    end To_Virtual_String;
+
+   ---------------
+   -- Transform --
+   ---------------
+
+   function Transform
+     (Self        : Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class)
+      return Virtual_String is
+   begin
+      return Transformer.Transform (Self);
+   end Transform;
+
+   ---------------
+   -- Transform --
+   ---------------
+
+   procedure Transform
+     (Self        : in out Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class) is
+   begin
+      Transformer.Transform (Self);
+   end Transform;
 
    -----------
    -- Write --

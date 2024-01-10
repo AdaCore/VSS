@@ -1,8 +1,10 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
+
+with VSS.Transformers.Casing;
 
 with VSS.Regular_Expressions.Category_Maps;
 
@@ -60,7 +62,9 @@ package body VSS.Regular_Expressions.Name_Sets is
          Initialize;
       end if;
 
-      Cursor := Map.Find (Name.To_Simple_Lowercase);
+      Cursor :=
+        Map.Find
+          (VSS.Transformers.Casing.To_Simple_Lowercase.Transform (Name));
 
       if Category_Maps.Maps.Has_Element (Cursor) then
          Value := Category_Maps.Maps.Element (Cursor);

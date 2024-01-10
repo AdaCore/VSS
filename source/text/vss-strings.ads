@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -19,6 +19,7 @@ limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
 limited with VSS.Strings.Cursors.Iterators.Lines;
 limited with VSS.Strings.Cursors.Iterators.Words;
+limited with VSS.Transformers;
 
 package VSS.Strings is
 
@@ -388,6 +389,8 @@ package VSS.Strings is
    --  Return True when Self starts with Prefix. Case_Sensitivity defines
    --  whether search is case sensitive or not, and select algorithm for the
    --  last.
+   --
+   --  XXX Don't use Case_Sensitivity parameter, it will be removed.
 
    function Ends_With
      (Self             : Virtual_String'Class;
@@ -397,6 +400,8 @@ package VSS.Strings is
    --  Return True when Self has given Suffix. Case_Sensitivity defines
    --  whether search is case sensitive or not, and select algorithm for the
    --  last.
+   --
+   --  XXX Don't use Case_Sensitivity parameter, it will be removed.
 
    function Ends_With
      (Self   : Virtual_String'Class;
@@ -430,44 +435,20 @@ package VSS.Strings is
       Keep_Terminator : Boolean := False)
       return VSS.String_Vectors.Virtual_String_Vector;
 
-   function To_Lowercase (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to lowercase form using default full case conversion.
-   --
-   --  See VSS.Locales.To_Lowercase for case conversions with tailoring by
-   --  the locale.
-
---   function To_Titlecase (Self : Virtual_String'Class) return Virtual_String;
---   --  Convert string to titlecase form using default full case conversion.
---   --
---   --  See VSS.Locales.To_Titlecase for case conversions with tailoring by
---   --  the locale.
-
-   function To_Uppercase (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to uppercase form using default full case conversion.
-   --
-   --  See VSS.Locales.To_Uppercase for case conversions with tailoring by
-   --  the locale.
-
-   function To_Simple_Lowercase
-     (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to lowercase form using default simple case conversion.
-
---   function To_Simple_Titlecase
---     (Self : Virtual_String'Class) return Virtual_String;
---   --  Convert string to titlecase form using default simple case conversion.
-
-   function To_Simple_Uppercase
-     (Self : Virtual_String'Class) return Virtual_String;
-   --  Convert string to uppercase form using default simple case conversion.
-
-   function To_Normalized
-     (Self : Virtual_String'Class;
-      Form : Normalization_Form) return Virtual_String;
-   --  Convert string to given normalization form.
-
    procedure Put_Image
      (Buffer : in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class;
       Item   : Virtual_String);
+
+   function Transform
+     (Self        : Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class)
+      return Virtual_String;
+   --  Transform given text using given text transformer.
+
+   procedure Transform
+     (Self        : in out Virtual_String'Class;
+      Transformer : VSS.Transformers.Abstract_Transformer'Class);
+   --  Transform given text using given text transformer.
 
 private
 

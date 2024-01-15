@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -157,6 +157,32 @@ package body VSS.Command_Line is
          Is_Error => True);
       GNAT.OS_Lib.OS_Exit (1);
    end Report_Error;
+
+   --------------------
+   -- Report_Message --
+   --------------------
+
+   procedure Report_Message
+     (Message : VSS.Strings.Virtual_String) is
+   begin
+      Platform.Report_Message
+        (Message  => Message,
+         Is_Error => False);
+      GNAT.OS_Lib.OS_Exit (0);
+   end Report_Message;
+
+   --------------------
+   -- Report_Message --
+   --------------------
+
+   procedure Report_Message
+     (Message : VSS.String_Vectors.Virtual_String_Vector) is
+   begin
+      Platform.Report_Message
+        (Message  => Message,
+         Is_Error => False);
+      GNAT.OS_Lib.OS_Exit (0);
+   end Report_Message;
 
    -----------------
    -- Unique_Name --

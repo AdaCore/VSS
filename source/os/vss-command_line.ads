@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -80,13 +80,24 @@ package VSS.Command_Line is
      return VSS.String_Vectors.Virtual_String_Vector;
    --  Return list of positional arguments.
 
-   procedure Report_Error (Message : VSS.Strings.Virtual_String)
+   procedure Report_Error
+     (Message : VSS.Strings.Virtual_String)
      with No_Return;
-   --  Report error and terminate application.
+   --  Report error and terminate application with error status.
 
    procedure Report_Error (Message : VSS.String_Vectors.Virtual_String_Vector)
      with No_Return;
-   --  Report error and terminate application.
+   --  Report error and terminate application with error status.
+
+   procedure Report_Message
+     (Message : VSS.Strings.Virtual_String)
+     with No_Return;
+   --  Report message and terminate application with normal status.
+
+   procedure Report_Message
+     (Message : VSS.String_Vectors.Virtual_String_Vector)
+     with No_Return;
+   --  Report message and terminate application with normal status.
 
 private
 

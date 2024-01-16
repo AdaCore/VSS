@@ -7,6 +7,7 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Wide_Wide_Text_IO;
 
+with VSS.Characters;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
 
@@ -367,16 +368,18 @@ package body JSON_Schema.Writers is
    is
       use type VSS.Strings.Virtual_String;
    begin
-      if Name.Starts_With ("__") then
+      if Name.At_First_Character.Element not in 'A' .. 'Z' | 'a' .. 'z' then
+         --  Trim any non-alpha character at the begining of Name
          declare
+            Char   : VSS.Characters.Virtual_Character'Base;
             Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
               Name.At_First_Character;
          begin
-            if Cursor.Forward and then Cursor.Forward then
-               return Name.Slice (Cursor, Name.At_Last_Character);
-            else
-               raise Program_Error;
-            end if;
+            while Cursor.Forward (Char) loop
+               exit when Char in 'A' .. 'Z' | 'a' .. 'z';
+            end loop;
+
+            return Name.Slice (Cursor, Name.At_Last_Character);
          end;
       elsif not Reserved_Words.Contains (Name) then
          declare

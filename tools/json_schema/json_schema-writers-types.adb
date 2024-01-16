@@ -1,8 +1,10 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
+
+with VSS.Transformers.Casing;       use VSS.Transformers.Casing;
 
 with JSON_Schema.Writers.Inputs;
 with JSON_Schema.Writers.Outputs;
@@ -883,7 +885,9 @@ package body JSON_Schema.Writers.Types is
          return;
       elsif Is_Holder then
          Field_Type.Append ("_Holder");
-      elsif Field_Name.To_Lowercase = Field_Type.To_Lowercase then
+      elsif To_Lowercase.Transform (Field_Name)
+        = To_Lowercase.Transform (Field_Type)
+      then
          Field_Type.Prepend (".");
          Field_Type.Prepend (Root_Package);
       end if;

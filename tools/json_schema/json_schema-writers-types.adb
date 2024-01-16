@@ -603,7 +603,7 @@ package body JSON_Schema.Writers.Types is
       elsif not Schema.Enum.Is_Empty then
          Done.Insert (Name);
          Write_Enumeration_Type (Ref_To_Type_Name (Name), Schema);
-      elsif not Schema.Any_Of.Is_Empty then
+      elsif Is_Union_Type (Schema) then
          Done.Insert (Name);
          Write_Union_Type
            (Name, Map, Root_Package, Enum_Package, Holders,

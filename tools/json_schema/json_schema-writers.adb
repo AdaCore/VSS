@@ -315,9 +315,10 @@ package body JSON_Schema.Writers is
         (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
-         Optional : Boolean) is
+         Optional : Boolean)
+      is
       begin
-         if not Schema.Any_Of.Is_Empty then
+         if Is_Union_Type (Schema) then
             Action (Name, Property, Schema, Optional);
          end if;
 
@@ -554,6 +555,13 @@ package body JSON_Schema.Writers is
    begin
       return Holders.Contains (Name & ":" & Property);
    end Is_Holder_Field;
+
+   -------------------
+   -- Is_Union_Type --
+   -------------------
+
+   function Is_Union_Type (Schema : Schema_Access) return Boolean is
+     (not (for all S of Schema.Any_Of => S.Is_True and S.Ref.Is_Empty));
 
    --------------
    -- New_Line --

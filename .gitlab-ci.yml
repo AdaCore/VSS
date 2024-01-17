@@ -121,7 +121,7 @@ build_and_test_dev:
 
       # Build VSS and run tests
       ( eval $(anod printenv --sandbox-dir /it/wave gnatall) ;\
-        make COVERAGE_MODE=gcov build-libs-static check ;\
+        make COVERAGE_MODE=gcov build-libs-static check misc ;\
         make -C testsuite/json_schema ;\
         ENABLE_GCOV=y gcovr --print-summary --cobertura gcov.xml )
       make clean

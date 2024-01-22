@@ -29,6 +29,10 @@ package VSS.Command_Line is
       Name : VSS.Strings.Virtual_String;
    end record;
 
+   type Multivalue_Positional_Option is new Abstract_Option with record
+      Name : VSS.Strings.Virtual_String;
+   end record;
+
    type Named_Option is abstract new Abstract_Option with record
       Short_Name : VSS.Strings.Virtual_String;
       Long_Name  : VSS.Strings.Virtual_String;

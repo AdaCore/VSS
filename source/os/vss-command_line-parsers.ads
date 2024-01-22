@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -8,6 +8,7 @@
 
 private with Ada.Containers.Hashed_Maps;
 private with Ada.Containers.Indefinite_Hashed_Maps;
+private with Ada.Containers.Indefinite_Holders;
 private with Ada.Containers.Indefinite_Vectors;
 private with Ada.Containers.Hashed_Sets;
 
@@ -66,6 +67,12 @@ package VSS.Command_Line.Parsers is
    --  Return all name=value pairs of the given option specified in the
    --  command line.
 
+   function Values
+     (Self   : Command_Line_Parser'Class;
+      Option : Multivalue_Positional_Option'Class)
+      return VSS.String_Vectors.Virtual_String_Vector;
+   --  Return all values provided for given multivalued positional option.
+
    function Positional_Arguments
      (Self : Command_Line_Parser'Class)
       return VSS.String_Vectors.Virtual_String_Vector;
@@ -111,12 +118,17 @@ private
        (Index_Type   => Positive,
         Element_Type => Named_Option'Class);
 
+   package Multivalue_Positional_Option_Holders is
+     new Ada.Containers.Indefinite_Holders (Multivalue_Positional_Option);
+
    type Command_Line_Parser is tagged limited record
       Defined_Named_Options_List   : Named_Option_Vectors.Vector;
       Defined_Short_Options        : Name_Sets.Set;
       Defined_Long_Options         : Name_Sets.Set;
       Defined_Named_Options        : Named_Option_Maps.Map;
       Defined_Positional_Options   : Positional_Option_Vectors.Vector;
+      Defined_Multivalue_Option    :
+        Multivalue_Positional_Option_Holders.Holder;
 
       Error_Message                : VSS.Strings.Virtual_String;
       Only_Positional              : Boolean := False;

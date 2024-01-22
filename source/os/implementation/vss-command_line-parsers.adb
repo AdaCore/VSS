@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -73,6 +73,10 @@ package body VSS.Command_Line.Parsers is
               (Named_Option'Class (Option).Long_Name,
                Named_Option'Class (Option));
          end if;
+
+      elsif Option in Multivalue_Positional_Option'Class then
+         Self.Defined_Multivalue_Option.Replace_Element
+           (Multivalue_Positional_Option (Option));
 
       else
          Self.Defined_Positional_Options.Append
@@ -250,6 +254,12 @@ package body VSS.Command_Line.Parsers is
             Usage.Append (Option.Name);
          end loop;
 
+         if not Self.Defined_Multivalue_Option.Is_Empty then
+            Usage.Append (' ');
+            Usage.Append (Self.Defined_Multivalue_Option.Element.Name);
+            Usage.Append ('…');
+         end if;
+
          Result.Append (Usage);
       end;
 
@@ -285,10 +295,14 @@ package body VSS.Command_Line.Parsers is
          end loop;
       end if;
 
-      if not Self.Defined_Positional_Options.Is_Empty then
+      if not Self.Defined_Positional_Options.Is_Empty
+        or else not Self.Defined_Multivalue_Option.Is_Empty
+      then
          Result.Append (VSS.Strings.Empty_Virtual_String);
          Result.Append ("Arguments:");
+      end if;
 
+      if not Self.Defined_Positional_Options.Is_Empty then
          for Option of Self.Defined_Positional_Options loop
             Option_Text.Clear;
             Option_Text.Append ("  ");
@@ -296,6 +310,15 @@ package body VSS.Command_Line.Parsers is
 
             Append_Option_Description (Option_Text, Option.Description);
          end loop;
+      end if;
+
+      if not Self.Defined_Multivalue_Option.Is_Empty then
+         Option_Text.Clear;
+         Option_Text.Append ("  ");
+         Option_Text.Append (Self.Defined_Multivalue_Option.Element.Name);
+
+         Append_Option_Description
+           (Option_Text, Self.Defined_Multivalue_Option.Element.Description);
       end if;
 
       return Result;
@@ -313,6 +336,14 @@ package body VSS.Command_Line.Parsers is
          return
            Self.Known_Named_Options_Values.Contains
              (Named_Option'Class (Option).Unique_Name);
+
+      elsif Option in Multivalue_Positional_Option'Class then
+         return
+           not Self.Defined_Multivalue_Option.Is_Empty
+             and then Self.Defined_Multivalue_Option.Element
+                        = Multivalue_Positional_Option (Option)
+             and then Natural (Self.Defined_Positional_Options.Length)
+                        < Self.Positional_Options_Values.Length;
 
       else
          return
@@ -616,10 +647,24 @@ package body VSS.Command_Line.Parsers is
 
       else
          if Self.Defined_Positional_Options.Is_Empty then
-            Self.Error_Message := "unexpected positional argument";
-            Success            := False;
+            if Self.Defined_Multivalue_Option.Is_Empty then
+               Self.Error_Message := "unexpected positional argument";
+               Success            := False;
 
-            return;
+               return;
+            end if;
+
+         else
+            if Self.Positional_Options_Values.Length
+                 = Natural (Self.Defined_Positional_Options.Length)
+            then
+               if Self.Defined_Multivalue_Option.Is_Empty then
+                  Self.Error_Message := "unexpected positional argument";
+                  Success            := False;
+
+                  return;
+               end if;
+            end if;
          end if;
 
          Self.Positional_Options_Values.Append (Argument);
@@ -774,6 +819,23 @@ package body VSS.Command_Line.Parsers is
               (Result, Self.Unknown_Named_Options_Values (Option.Unique_Name));
          end if;
       end return;
+   end Values;
+
+   ------------
+   -- Values --
+   ------------
+
+   function Values
+     (Self   : Command_Line_Parser'Class;
+      Option : Multivalue_Positional_Option'Class)
+      return VSS.String_Vectors.Virtual_String_Vector is
+   begin
+      return
+        Self.Positional_Options_Values.Slice
+          (Natural (Self.Defined_Positional_Options.Length) + 1,
+           Self.Positional_Options_Values.Length);
+
+      return VSS.String_Vectors.Empty_Virtual_String_Vector;
    end Values;
 
 end VSS.Command_Line.Parsers;

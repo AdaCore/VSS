@@ -2271,8 +2271,8 @@ procedure Input_MapKeyType_name
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.MapKeyType_name;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-MapKeyType_name_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+MapKeyType_name_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.MapKeyType_name'Val (Index - 1);
@@ -2288,8 +2288,8 @@ procedure Input_EnumerationType_name
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.EnumerationType_name;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-EnumerationType_name_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+EnumerationType_name_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.EnumerationType_name'Val (Index - 1);
@@ -2305,8 +2305,8 @@ procedure Input_BaseTypes
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.BaseTypes;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-BaseTypes_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+BaseTypes_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.BaseTypes'Val (Index - 1);
@@ -2322,8 +2322,8 @@ procedure Input_TypeKind
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.TypeKind;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-TypeKind_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+TypeKind_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.TypeKind'Val (Index - 1);

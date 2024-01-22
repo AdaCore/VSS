@@ -121,9 +121,14 @@ package body JSON_Schema.Writers.Inputs is
       is
          pragma Unreferenced (Optional);
 
+         Pseudo_Enum : constant Boolean := Schema.X_Enum.Length > 1;
+
+         List : constant Definitions.String_Array :=
+           (if Pseudo_Enum then Schema.X_Enum else Schema.Enum);
+
          Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
       begin
-         if Schema.Enum.Length > 1 then
+         if List.Length > 1 then
             if not Property.Is_Empty then
                Type_Name.Append ("_");
                Type_Name.Append (Property);
@@ -133,12 +138,12 @@ package body JSON_Schema.Writers.Inputs is
             Put (Type_Name);
             Put ("_Minimal_Perfect_Hash is new Minimal_Perfect_Hash ([");
 
-            for Index in 1 .. Schema.Enum.Length loop
+            for Index in 1 .. List.Length loop
                if Index > 1 then
                   Put (", ");
                end if;
                Put ("""");
-               Put (Schema.Enum.Element (Index));
+               Put (List.Element (Index));
                Put ("""");
             end loop;
 
@@ -150,23 +155,43 @@ package body JSON_Schema.Writers.Inputs is
             Put (" is");
             New_Line;
             Put
-             ("Index : constant Natural := (if Reader.Is_String_Value then");
+             ("Index : constant Integer := (if Reader.Is_String_Value then");
             New_Line;
             Put (Type_Name);
             Put ("_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)");
-            Put ("else 0);");
-            New_Line;
-            Put ("begin");
-            New_Line;
-            Put ("if Index > 0 then");
-            New_Line;
-            Put ("Value := ");
-            Put (Enum_Prefix);
-            Put (Type_Name);
-            Put ("'Val (Index - 1);");
-            New_Line;
-            Put ("Reader.Read_Next;");
-            New_Line;
+            Put ("else -1);"); New_Line;
+            Put ("begin"); New_Line;
+            Put ("if Index > 0 then"); New_Line;
+
+            if Pseudo_Enum then
+               Put ("pragma Warnings (Off, ""redundant conversion"");");
+               New_Line;
+               Put ("Value := (Kind => ");
+               Put (Enum_Prefix);
+               Put (Type_Name);
+               Put ("_Predefined (");
+               Put (Enum_Prefix);
+               Put (Type_Name);
+               Put ("_Value'Val (Index - 1)));");
+               Put ("pragma Warnings (On, ""redundant conversion"");");
+               New_Line;
+            else
+               Put ("Value := ");
+               Put (Enum_Prefix);
+               Put (Type_Name);
+               Put ("'Val (Index - 1);"); New_Line;
+            end if;
+
+            Put ("Reader.Read_Next;"); New_Line;
+
+            if Pseudo_Enum then
+               Put ("elsif Index = 0 then"); New_Line;
+               Put ("Value := (");
+               Put (Enum_Prefix);
+               Put ("Custom_Value, Reader.String_Value);");
+               Put ("Reader.Read_Next;"); New_Line;
+            end if;
+
             Put ("else");
             New_Line;
             Put ("Success := False;");
@@ -196,7 +221,7 @@ package body JSON_Schema.Writers.Inputs is
 
          Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
       begin
-         if Schema.Enum.Length > 1 then
+         if Schema.Enum.Length > 1 or Schema.X_Enum.Length > 1  then
             if not Property.Is_Empty then
                Type_Name.Append ("_");
                Type_Name.Append (Property);
@@ -566,7 +591,7 @@ package body JSON_Schema.Writers.Inputs is
       end Hash_For_Anonymous_Schema;
 
    begin
-      if not Schema.Enum.Is_Empty then
+      if Is_Enum (Schema) then
          return;
       end if;
 

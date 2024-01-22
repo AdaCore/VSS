@@ -99,7 +99,7 @@ package body JSON_Schema.Writers is
          Schema   : Schema_Access;
          Optional : Boolean) is
       begin
-         if not Schema.Enum.Is_Empty then
+         if Is_Enum (Schema) then
             Action (Name, Property, Schema, Optional);
          end if;
 
@@ -453,7 +453,7 @@ package body JSON_Schema.Writers is
       if not Schema.Ref.Is_Empty then
          Result.Append (Ref_To_Type_Name (Schema.Ref));
 
-         if not Map (Schema.Ref).Enum.Is_Empty then
+         if Is_Enum (Map (Schema.Ref)) then
             Prefix := "Enum.";
          end if;
 
@@ -488,12 +488,14 @@ package body JSON_Schema.Writers is
             when Definitions.A_String =>
 
                if Required and
-                 (Schema.Enum.Length = 1 or not Schema.Const.Is_Empty)
+                 (Schema.Enum.Length = 1
+                  or Schema.X_Enum.Length = 1
+                  or not Schema.Const.Is_Empty)
                then
                   --  If string type redefined as an enum with just one literal
                   --  then skip this property by returning an empty type name.
                   Result := VSS.Strings.Empty_Virtual_String;
-               elsif Schema.Enum.Length > 1 then
+               elsif Is_Enum (Schema) then
                   Prefix := "Enum.";
                   Result.Append (Fallback);
                else

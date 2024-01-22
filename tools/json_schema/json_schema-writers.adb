@@ -7,6 +7,7 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Wide_Wide_Text_IO;
 
+with VSS.Characters;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
 
@@ -315,9 +316,10 @@ package body JSON_Schema.Writers is
         (Name     : Schema_Name;
          Property : VSS.Strings.Virtual_String;
          Schema   : Schema_Access;
-         Optional : Boolean) is
+         Optional : Boolean)
+      is
       begin
-         if not Schema.Any_Of.Is_Empty then
+         if Is_Union_Type (Schema) then
             Action (Name, Property, Schema, Optional);
          end if;
 
@@ -366,16 +368,18 @@ package body JSON_Schema.Writers is
    is
       use type VSS.Strings.Virtual_String;
    begin
-      if Name.Starts_With ("__") then
+      if Name.At_First_Character.Element not in 'A' .. 'Z' | 'a' .. 'z' then
+         --  Trim any non-alpha character at the begining of Name
          declare
+            Char   : VSS.Characters.Virtual_Character'Base;
             Cursor : VSS.Strings.Character_Iterators.Character_Iterator :=
               Name.At_First_Character;
          begin
-            if Cursor.Forward and then Cursor.Forward then
-               return Name.Slice (Cursor, Name.At_Last_Character);
-            else
-               raise Program_Error;
-            end if;
+            while Cursor.Forward (Char) loop
+               exit when Char in 'A' .. 'Z' | 'a' .. 'z';
+            end loop;
+
+            return Name.Slice (Cursor, Name.At_Last_Character);
          end;
       elsif not Reserved_Words.Contains (Name) then
          declare
@@ -554,6 +558,13 @@ package body JSON_Schema.Writers is
    begin
       return Holders.Contains (Name & ":" & Property);
    end Is_Holder_Field;
+
+   -------------------
+   -- Is_Union_Type --
+   -------------------
+
+   function Is_Union_Type (Schema : Schema_Access) return Boolean is
+     (not (for all S of Schema.Any_Of => S.Is_True and S.Ref.Is_Empty));
 
    --------------
    -- New_Line --

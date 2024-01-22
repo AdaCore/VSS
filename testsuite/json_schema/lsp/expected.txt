@@ -1,0 +1,3886 @@
+--  Copyright <YEAR> <COPYRIGHT HOLDER>
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a
+--  copy of this software and associated documentation files (the "Software"),
+--  to deal in the Software without restriction, including without limitation
+--  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+--  and/or sell copies of the Software, and to permit persons to whom the
+--  Software is furnished to do so, subject to the following conditions:
+--
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+--  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+--  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from metaModel.schema.json.
+
+with Ada.Containers.Doubly_Linked_Lists;
+with Ada.Finalization;
+with VSS.JSON.Streams;
+with VSS.Strings;
+with VSS.String_Vectors;
+
+package LSP_Gen.Entities is
+package JSON_Event_Lists is new Ada.Containers.Doubly_Linked_Lists
+(VSS.JSON.Streams.JSON_Stream_Element, VSS.JSON.Streams."=");
+
+type Any_Value is new JSON_Event_Lists.List with null record;
+type Any_Object is new Any_Value with null record;
+
+type Optional_Integer (Is_Set : Boolean := False) is record
+case Is_Set is
+when True => Value : Integer;
+when False => null;
+end case; end record;
+
+type Optional_Float (Is_Set : Boolean := False) is record
+case Is_Set is
+when True => Value : Float;
+when False => null;
+end case; end record;
+
+type Integer_Or_String (Is_String : Boolean := False) is record
+case Is_String is
+when False =>
+Integer : Standard.Integer;
+when True =>
+String : VSS.Strings.Virtual_String;
+end case;
+end record;
+
+type Optional_Integer_Or_String (Is_Set : Boolean := False) is record
+case Is_Set is
+when True => Value : Integer_Or_String;
+when False => null;
+end case; end record;
+
+
+type Property_Vector is tagged private
+with Variable_Indexing => Get_Property_Variable_Reference,
+Constant_Indexing => Get_Property_Constant_Reference;
+
+type Request_Vector is tagged private
+with Variable_Indexing => Get_Request_Variable_Reference,
+Constant_Indexing => Get_Request_Constant_Reference;
+
+type Integer_Vector is tagged private
+with Variable_Indexing => Get_Integer_Variable_Reference,
+Constant_Indexing => Get_Integer_Constant_Reference;
+
+type TypeAlias_Vector is tagged private
+with Variable_Indexing => Get_TypeAlias_Variable_Reference,
+Constant_Indexing => Get_TypeAlias_Constant_Reference;
+
+type Structure_Vector is tagged private
+with Variable_Indexing => Get_Structure_Variable_Reference,
+Constant_Indexing => Get_Structure_Constant_Reference;
+
+type Notification_Vector is tagged private
+with Variable_Indexing => Get_Notification_Variable_Reference,
+Constant_Indexing => Get_Notification_Constant_Reference;
+
+type EnumerationEntry_Vector is tagged private
+with Variable_Indexing => Get_EnumerationEntry_Variable_Reference,
+Constant_Indexing => Get_EnumerationEntry_Constant_Reference;
+
+type Enumeration_Vector is tagged private
+with Variable_Indexing => Get_Enumeration_Variable_Reference,
+Constant_Indexing => Get_Enumeration_Constant_Reference;
+
+type AType_Vector is tagged private
+with Variable_Indexing => Get_AType_Variable_Reference,
+Constant_Indexing => Get_AType_Constant_Reference;
+
+type AType_Holder is tagged private;
+
+
+package Enum is
+
+type MapKeyType_name is (Uri, DocumentUri, string, integer);
+
+type EnumerationType_name is (string, integer, uinteger);
+
+type BaseTypes is (Uri, DocumentUri, integer, uinteger, decimal, RegExp, string, a_boolean, a_null);
+
+type TypeKind is (base, reference, an_array, map, an_and, a_or, tuple, literal, stringLiteral, integerLiteral, booleanLiteral);
+
+type MapKeyType_Variant is (base, reference);
+
+type AType_Variant is (base, reference, an_array, map, an_and, a_or, tuple, literal, stringLiteral, integerLiteral, booleanLiteral);
+
+end Enum;
+
+type Structure is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation;
+extends : AType_Vector;
+      --  Structures extended from. This structures form a polymorphic type hierarchy.
+mixins : AType_Vector;
+      --  Structures to mix in. The properties of these structures are `copied` into this structure. Mixins don't form a polymorphic type hierarchy in LSP.
+name : VSS.Strings.Virtual_String;
+      --  The name of the structure.
+properties : Property_Vector;
+      --  The properties.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed structure. If omitted, the structure is final.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this structure is available. Is undefined if not known.
+end record;
+
+type BaseType is record
+name : Enum.BaseTypes;
+end record;
+
+type ReferenceType is record
+name : VSS.Strings.Virtual_String;
+end record;
+
+type ArrayType is record
+element : AType_Holder;
+end record;
+
+type MapKeyType_base is record
+name : Enum.MapKeyType_name;
+end record;
+
+type Optional_MapKeyType_base (Is_Set : Boolean := False) is record
+case Is_Set is
+when True => Value : MapKeyType_base;
+when False => null;
+end case; end record;
+
+type MapKeyType_Union (Kind : Enum.MapKeyType_Variant := Enum.MapKeyType_Variant'First) is record
+case Kind is
+when Enum.base =>
+base : MapKeyType_base;
+when Enum.reference =>
+reference : ReferenceType;
+end case;
+end record;
+
+type MapKeyType is record
+Union : MapKeyType_Union;
+end record;
+
+type MapType is record
+key : MapKeyType;
+value : AType_Holder;
+end record;
+
+type AndType is record
+items : AType_Vector;
+end record;
+
+type OrType is record
+items : AType_Vector;
+end record;
+
+type TupleType is record
+items : AType_Vector;
+end record;
+
+type StructureLiteral is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation.
+properties : Property_Vector;
+      --  The properties.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed structure. If omitted, the structure is final.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this structure is available. Is undefined if not known.
+end record;
+
+type StructureLiteralType is record
+value : StructureLiteral;
+end record;
+
+type StringLiteralType is record
+value : VSS.Strings.Virtual_String;
+end record;
+
+type IntegerLiteralType is record
+value : Float;
+end record;
+
+type BooleanLiteralType is record
+value : Boolean;
+end record;
+
+type AType_Union (Kind : Enum.AType_Variant := Enum.AType_Variant'First) is record
+case Kind is
+when Enum.base =>
+base : BaseType;
+when Enum.reference =>
+reference : ReferenceType;
+when Enum.an_array =>
+an_array : ArrayType;
+when Enum.map =>
+map : MapType;
+when Enum.an_and =>
+an_and : AndType;
+when Enum.a_or =>
+a_or : OrType;
+when Enum.tuple =>
+tuple : TupleType;
+when Enum.literal =>
+literal : StructureLiteralType;
+when Enum.stringLiteral =>
+stringLiteral : StringLiteralType;
+when Enum.integerLiteral =>
+integerLiteral : IntegerLiteralType;
+when Enum.booleanLiteral =>
+booleanLiteral : BooleanLiteralType;
+end case;
+end record;
+
+type AType is record
+Union : AType_Union;
+end record;
+
+type Optional_AType (Is_Set : Boolean := False) is record
+case Is_Set is
+when True => Value : AType;
+when False => null;
+end case; end record;
+
+type Property is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation.
+name : VSS.Strings.Virtual_String;
+      --  The property name;
+optional : Boolean := Boolean'First;
+      --  Whether the property is optional. If omitted, the property is mandatory.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed property. If omitted, the structure is final.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this property is available. Is undefined if not known.
+a_type : AType;
+      --  The type of the property
+end record;
+
+type EnumerationEntry is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation.
+name : VSS.Strings.Virtual_String;
+      --  The name of the enum item.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed enumeration entry. If omitted, the enumeration entry is final.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this enumeration entry is available. Is undefined if not known.
+value : Integer_Or_String;
+      --  The value.
+end record;
+
+type Notification is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation;
+method : VSS.Strings.Virtual_String;
+      --  The request's method name.
+params : Optional_AType;
+      --  The parameter type(s) if any.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed notification. If omitted the notification is final.
+registrationOptions : Optional_AType;
+      --  Optional registration options if the notification supports dynamic registration.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this notification is available. Is undefined if not known.
+end record;
+
+type EnumerationType is record
+name : Enum.EnumerationType_name;
+end record;
+
+type Enumeration is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation.
+name : VSS.Strings.Virtual_String;
+      --  The name of the enumeration.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed enumeration. If omitted, the enumeration is final.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this enumeration is available. Is undefined if not known.
+supportsCustomValues : Boolean := Boolean'First;
+      --  Whether the enumeration supports custom values (e.g. values which are not part of the set defined in `values`). If omitted no custom values are supported.
+a_type : EnumerationType;
+      --  The type of the elements.
+values : EnumerationEntry_Vector;
+      --  The enum values.
+end record;
+
+type MetaModel is record
+enumerations : Enumeration_Vector;
+      --  The enumerations.
+notifications : Notification_Vector;
+      --  The notifications.
+requests : Request_Vector;
+      --  The requests.
+structures : Structure_Vector;
+      --  The structures.
+typeAliases : TypeAlias_Vector;
+      --  The type aliases.
+end record;
+
+type TypeAlias is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation.
+name : VSS.Strings.Virtual_String;
+      --  The name of the type alias.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed type alias. If omitted, the type alias is final.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this structure is available. Is undefined if not known.
+a_type : AType;
+      --  The aliased type.
+end record;
+
+type Request is record
+documentation : VSS.Strings.Virtual_String;
+      --  An optional documentation;
+errorData : Optional_AType;
+      --  An optional error data type.
+method : VSS.Strings.Virtual_String;
+      --  The request's method name.
+params : Optional_AType;
+      --  The parameter type(s) if any.
+partialResult : Optional_AType;
+      --  Optional partial result type if the request supports partial result reporting.
+proposed : Boolean := Boolean'First;
+      --  Whether this is a proposed feature. If omitted the feature is final.
+registrationOptions : Optional_AType;
+      --  Optional registration options if the request supports dynamic registration.
+result : AType;
+      --  The result type.
+since : VSS.Strings.Virtual_String;
+      --  Since when (release number) this request is available. Is undefined if not known.
+end record;
+
+function Length (Self : Property_Vector) return Natural;
+
+procedure Clear (Self : in out Property_Vector);
+
+procedure Append
+(Self : in out Property_Vector;
+Value : Property);
+
+type Property_Variable_Reference
+(Element : not null access Property) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Property_Variable_Reference
+(Self : aliased in out Property_Vector;
+Index : Positive)
+return Property_Variable_Reference
+with Inline;
+
+type Property_Constant_Reference
+(Element : not null access constant Property) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Property_Constant_Reference
+(Self : aliased Property_Vector;
+Index : Positive)
+return Property_Constant_Reference
+with Inline;
+
+function Length (Self : Request_Vector) return Natural;
+
+procedure Clear (Self : in out Request_Vector);
+
+procedure Append
+(Self : in out Request_Vector;
+Value : Request);
+
+type Request_Variable_Reference
+(Element : not null access Request) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Request_Variable_Reference
+(Self : aliased in out Request_Vector;
+Index : Positive)
+return Request_Variable_Reference
+with Inline;
+
+type Request_Constant_Reference
+(Element : not null access constant Request) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Request_Constant_Reference
+(Self : aliased Request_Vector;
+Index : Positive)
+return Request_Constant_Reference
+with Inline;
+
+function Length (Self : Integer_Vector) return Natural;
+
+procedure Clear (Self : in out Integer_Vector);
+
+procedure Append
+(Self : in out Integer_Vector;
+Value : Integer);
+
+type Integer_Variable_Reference
+(Element : not null access Integer) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Integer_Variable_Reference
+(Self : aliased in out Integer_Vector;
+Index : Positive)
+return Integer_Variable_Reference
+with Inline;
+
+type Integer_Constant_Reference
+(Element : not null access constant Integer) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Integer_Constant_Reference
+(Self : aliased Integer_Vector;
+Index : Positive)
+return Integer_Constant_Reference
+with Inline;
+
+function Length (Self : TypeAlias_Vector) return Natural;
+
+procedure Clear (Self : in out TypeAlias_Vector);
+
+procedure Append
+(Self : in out TypeAlias_Vector;
+Value : TypeAlias);
+
+type TypeAlias_Variable_Reference
+(Element : not null access TypeAlias) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_TypeAlias_Variable_Reference
+(Self : aliased in out TypeAlias_Vector;
+Index : Positive)
+return TypeAlias_Variable_Reference
+with Inline;
+
+type TypeAlias_Constant_Reference
+(Element : not null access constant TypeAlias) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_TypeAlias_Constant_Reference
+(Self : aliased TypeAlias_Vector;
+Index : Positive)
+return TypeAlias_Constant_Reference
+with Inline;
+
+function Length (Self : Structure_Vector) return Natural;
+
+procedure Clear (Self : in out Structure_Vector);
+
+procedure Append
+(Self : in out Structure_Vector;
+Value : Structure);
+
+type Structure_Variable_Reference
+(Element : not null access Structure) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Structure_Variable_Reference
+(Self : aliased in out Structure_Vector;
+Index : Positive)
+return Structure_Variable_Reference
+with Inline;
+
+type Structure_Constant_Reference
+(Element : not null access constant Structure) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Structure_Constant_Reference
+(Self : aliased Structure_Vector;
+Index : Positive)
+return Structure_Constant_Reference
+with Inline;
+
+function Length (Self : Notification_Vector) return Natural;
+
+procedure Clear (Self : in out Notification_Vector);
+
+procedure Append
+(Self : in out Notification_Vector;
+Value : Notification);
+
+type Notification_Variable_Reference
+(Element : not null access Notification) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Notification_Variable_Reference
+(Self : aliased in out Notification_Vector;
+Index : Positive)
+return Notification_Variable_Reference
+with Inline;
+
+type Notification_Constant_Reference
+(Element : not null access constant Notification) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Notification_Constant_Reference
+(Self : aliased Notification_Vector;
+Index : Positive)
+return Notification_Constant_Reference
+with Inline;
+
+function Length (Self : EnumerationEntry_Vector) return Natural;
+
+procedure Clear (Self : in out EnumerationEntry_Vector);
+
+procedure Append
+(Self : in out EnumerationEntry_Vector;
+Value : EnumerationEntry);
+
+type EnumerationEntry_Variable_Reference
+(Element : not null access EnumerationEntry) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_EnumerationEntry_Variable_Reference
+(Self : aliased in out EnumerationEntry_Vector;
+Index : Positive)
+return EnumerationEntry_Variable_Reference
+with Inline;
+
+type EnumerationEntry_Constant_Reference
+(Element : not null access constant EnumerationEntry) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_EnumerationEntry_Constant_Reference
+(Self : aliased EnumerationEntry_Vector;
+Index : Positive)
+return EnumerationEntry_Constant_Reference
+with Inline;
+
+function Length (Self : Enumeration_Vector) return Natural;
+
+procedure Clear (Self : in out Enumeration_Vector);
+
+procedure Append
+(Self : in out Enumeration_Vector;
+Value : Enumeration);
+
+type Enumeration_Variable_Reference
+(Element : not null access Enumeration) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Enumeration_Variable_Reference
+(Self : aliased in out Enumeration_Vector;
+Index : Positive)
+return Enumeration_Variable_Reference
+with Inline;
+
+type Enumeration_Constant_Reference
+(Element : not null access constant Enumeration) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_Enumeration_Constant_Reference
+(Self : aliased Enumeration_Vector;
+Index : Positive)
+return Enumeration_Constant_Reference
+with Inline;
+
+function Length (Self : AType_Vector) return Natural;
+
+procedure Clear (Self : in out AType_Vector);
+
+procedure Append
+(Self : in out AType_Vector;
+Value : AType);
+
+type AType_Variable_Reference
+(Element : not null access AType) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_AType_Variable_Reference
+(Self : aliased in out AType_Vector;
+Index : Positive)
+return AType_Variable_Reference
+with Inline;
+
+type AType_Constant_Reference
+(Element : not null access constant AType) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_AType_Constant_Reference
+(Self : aliased AType_Vector;
+Index : Positive)
+return AType_Constant_Reference
+with Inline;
+
+not overriding function Element
+(Self  : aliased in out AType_Holder)
+ return AType_Variable_Reference with Inline;
+
+not overriding function Value
+(Self  : aliased AType_Holder)
+ return AType_Constant_Reference with Inline;
+
+private
+type Property_Array is array (Positive range <>) of aliased Property;
+type Property_Array_Access is access Property_Array;
+type Property_Vector is new Ada.Finalization.Controlled with record
+Data   : Property_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out Property_Vector);
+
+overriding procedure Finalize (Self : in out Property_Vector);
+
+type Request_Array is array (Positive range <>) of aliased Request;
+type Request_Array_Access is access Request_Array;
+type Request_Vector is new Ada.Finalization.Controlled with record
+Data   : Request_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out Request_Vector);
+
+overriding procedure Finalize (Self : in out Request_Vector);
+
+type Integer_Array is array (Positive range <>) of aliased Integer;
+type Integer_Array_Access is access Integer_Array;
+type Integer_Vector is new Ada.Finalization.Controlled with record
+Data   : Integer_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out Integer_Vector);
+
+overriding procedure Finalize (Self : in out Integer_Vector);
+
+type TypeAlias_Array is array (Positive range <>) of aliased TypeAlias;
+type TypeAlias_Array_Access is access TypeAlias_Array;
+type TypeAlias_Vector is new Ada.Finalization.Controlled with record
+Data   : TypeAlias_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out TypeAlias_Vector);
+
+overriding procedure Finalize (Self : in out TypeAlias_Vector);
+
+type Structure_Array is array (Positive range <>) of aliased Structure;
+type Structure_Array_Access is access Structure_Array;
+type Structure_Vector is new Ada.Finalization.Controlled with record
+Data   : Structure_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out Structure_Vector);
+
+overriding procedure Finalize (Self : in out Structure_Vector);
+
+type Notification_Array is array (Positive range <>) of aliased Notification;
+type Notification_Array_Access is access Notification_Array;
+type Notification_Vector is new Ada.Finalization.Controlled with record
+Data   : Notification_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out Notification_Vector);
+
+overriding procedure Finalize (Self : in out Notification_Vector);
+
+type EnumerationEntry_Array is array (Positive range <>) of aliased EnumerationEntry;
+type EnumerationEntry_Array_Access is access EnumerationEntry_Array;
+type EnumerationEntry_Vector is new Ada.Finalization.Controlled with record
+Data   : EnumerationEntry_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out EnumerationEntry_Vector);
+
+overriding procedure Finalize (Self : in out EnumerationEntry_Vector);
+
+type Enumeration_Array is array (Positive range <>) of aliased Enumeration;
+type Enumeration_Array_Access is access Enumeration_Array;
+type Enumeration_Vector is new Ada.Finalization.Controlled with record
+Data   : Enumeration_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out Enumeration_Vector);
+
+overriding procedure Finalize (Self : in out Enumeration_Vector);
+
+type AType_Array is array (Positive range <>) of aliased AType;
+type AType_Array_Access is access AType_Array;
+type AType_Vector is new Ada.Finalization.Controlled with record
+Data   : AType_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out AType_Vector);
+
+overriding procedure Finalize (Self : in out AType_Vector);
+
+type AType_Holder is new AType_Vector with null record;
+
+end LSP_Gen.Entities;
+--  Copyright <YEAR> <COPYRIGHT HOLDER>
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a
+--  copy of this software and associated documentation files (the "Software"),
+--  to deal in the Software without restriction, including without limitation
+--  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+--  and/or sell copies of the Software, and to permit persons to whom the
+--  Software is furnished to do so, subject to the following conditions:
+--
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+--  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+--  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from metaModel.schema.json.
+
+with Ada.Unchecked_Deallocation;
+
+package body LSP_Gen.Entities is
+procedure Free is new Ada.Unchecked_Deallocation
+(Property_Array, Property_Array_Access);
+
+overriding procedure Adjust (Self : in out Property_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new Property_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out Property_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : Property_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out Property_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out Property_Vector;
+Value : Property) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / Property'Size);
+Self_Data_Saved : Property_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new Property_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new Property_Array'(Self.Data.all
+ & Property_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_Property_Variable_Reference
+(Self : aliased in out Property_Vector;
+Index : Positive)
+return Property_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_Property_Constant_Reference
+(Self : aliased Property_Vector;
+Index : Positive)
+return Property_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(Request_Array, Request_Array_Access);
+
+overriding procedure Adjust (Self : in out Request_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new Request_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out Request_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : Request_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out Request_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out Request_Vector;
+Value : Request) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / Request'Size);
+Self_Data_Saved : Request_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new Request_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new Request_Array'(Self.Data.all
+ & Request_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_Request_Variable_Reference
+(Self : aliased in out Request_Vector;
+Index : Positive)
+return Request_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_Request_Constant_Reference
+(Self : aliased Request_Vector;
+Index : Positive)
+return Request_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(Integer_Array, Integer_Array_Access);
+
+overriding procedure Adjust (Self : in out Integer_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new Integer_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out Integer_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : Integer_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out Integer_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out Integer_Vector;
+Value : Integer) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / Integer'Size);
+Self_Data_Saved : Integer_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new Integer_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new Integer_Array'(Self.Data.all
+ & Integer_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_Integer_Variable_Reference
+(Self : aliased in out Integer_Vector;
+Index : Positive)
+return Integer_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_Integer_Constant_Reference
+(Self : aliased Integer_Vector;
+Index : Positive)
+return Integer_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(TypeAlias_Array, TypeAlias_Array_Access);
+
+overriding procedure Adjust (Self : in out TypeAlias_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new TypeAlias_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out TypeAlias_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : TypeAlias_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out TypeAlias_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out TypeAlias_Vector;
+Value : TypeAlias) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / TypeAlias'Size);
+Self_Data_Saved : TypeAlias_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new TypeAlias_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new TypeAlias_Array'(Self.Data.all
+ & TypeAlias_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_TypeAlias_Variable_Reference
+(Self : aliased in out TypeAlias_Vector;
+Index : Positive)
+return TypeAlias_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_TypeAlias_Constant_Reference
+(Self : aliased TypeAlias_Vector;
+Index : Positive)
+return TypeAlias_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(Structure_Array, Structure_Array_Access);
+
+overriding procedure Adjust (Self : in out Structure_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new Structure_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out Structure_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : Structure_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out Structure_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out Structure_Vector;
+Value : Structure) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / Structure'Size);
+Self_Data_Saved : Structure_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new Structure_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new Structure_Array'(Self.Data.all
+ & Structure_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_Structure_Variable_Reference
+(Self : aliased in out Structure_Vector;
+Index : Positive)
+return Structure_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_Structure_Constant_Reference
+(Self : aliased Structure_Vector;
+Index : Positive)
+return Structure_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(Notification_Array, Notification_Array_Access);
+
+overriding procedure Adjust (Self : in out Notification_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new Notification_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out Notification_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : Notification_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out Notification_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out Notification_Vector;
+Value : Notification) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / Notification'Size);
+Self_Data_Saved : Notification_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new Notification_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new Notification_Array'(Self.Data.all
+ & Notification_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_Notification_Variable_Reference
+(Self : aliased in out Notification_Vector;
+Index : Positive)
+return Notification_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_Notification_Constant_Reference
+(Self : aliased Notification_Vector;
+Index : Positive)
+return Notification_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(EnumerationEntry_Array, EnumerationEntry_Array_Access);
+
+overriding procedure Adjust (Self : in out EnumerationEntry_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new EnumerationEntry_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out EnumerationEntry_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : EnumerationEntry_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out EnumerationEntry_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out EnumerationEntry_Vector;
+Value : EnumerationEntry) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / EnumerationEntry'Size);
+Self_Data_Saved : EnumerationEntry_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new EnumerationEntry_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new EnumerationEntry_Array'(Self.Data.all
+ & EnumerationEntry_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_EnumerationEntry_Variable_Reference
+(Self : aliased in out EnumerationEntry_Vector;
+Index : Positive)
+return EnumerationEntry_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_EnumerationEntry_Constant_Reference
+(Self : aliased EnumerationEntry_Vector;
+Index : Positive)
+return EnumerationEntry_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(Enumeration_Array, Enumeration_Array_Access);
+
+overriding procedure Adjust (Self : in out Enumeration_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new Enumeration_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out Enumeration_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : Enumeration_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out Enumeration_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out Enumeration_Vector;
+Value : Enumeration) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / Enumeration'Size);
+Self_Data_Saved : Enumeration_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new Enumeration_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new Enumeration_Array'(Self.Data.all
+ & Enumeration_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_Enumeration_Variable_Reference
+(Self : aliased in out Enumeration_Vector;
+Index : Positive)
+return Enumeration_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_Enumeration_Constant_Reference
+(Self : aliased Enumeration_Vector;
+Index : Positive)
+return Enumeration_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
+(AType_Array, AType_Array_Access);
+
+overriding procedure Adjust (Self : in out AType_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new AType_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out AType_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : AType_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out AType_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out AType_Vector;
+Value : AType) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / AType'Size);
+Self_Data_Saved : AType_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new AType_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new AType_Array'(Self.Data.all
+ & AType_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_AType_Variable_Reference
+(Self : aliased in out AType_Vector;
+Index : Positive)
+return AType_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_AType_Constant_Reference
+(Self : aliased AType_Vector;
+Index : Positive)
+return AType_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Element
+(Self  : aliased in out AType_Holder)
+ return AType_Variable_Reference is
+begin
+if Self.Length = 0 then
+Self.Append ((others => <>));
+end if;
+return (Element => Self.Data (1)'Access);
+end Element;
+
+not overriding function Value
+(Self  : aliased AType_Holder)
+ return AType_Constant_Reference is (Element => Self.Data (1)'Access);
+
+end LSP_Gen.Entities;
+
+--  Copyright <YEAR> <COPYRIGHT HOLDER>
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a
+--  copy of this software and associated documentation files (the "Software"),
+--  to deal in the Software without restriction, including without limitation
+--  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+--  and/or sell copies of the Software, and to permit persons to whom the
+--  Software is furnished to do so, subject to the following conditions:
+--
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+--  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+--  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from metaModel.schema.json.
+
+with VSS.JSON.Content_Handlers;
+
+package LSP_Gen.Entities.Outputs is
+
+procedure Output_MapKeyType_name
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.MapKeyType_name);
+
+procedure Output_EnumerationType_name
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.EnumerationType_name);
+
+procedure Output_BaseTypes
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.BaseTypes);
+
+procedure Output_TypeKind
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.TypeKind);
+
+procedure Output_Structure
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Structure);
+
+procedure Output_Property
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Property);
+
+procedure Output_EnumerationEntry
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : EnumerationEntry);
+
+procedure Output_AndType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : AndType);
+
+procedure Output_Notification
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Notification);
+
+procedure Output_MapKeyType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : MapKeyType);
+
+procedure Output_Enumeration
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enumeration);
+
+procedure Output_OrType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : OrType);
+
+procedure Output_MetaModel
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : MetaModel);
+
+procedure Output_EnumerationType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : EnumerationType);
+
+procedure Output_StructureLiteral
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : StructureLiteral);
+
+procedure Output_TupleType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : TupleType);
+
+procedure Output_TypeAlias
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : TypeAlias);
+
+procedure Output_IntegerLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : IntegerLiteralType);
+
+procedure Output_Request
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Request);
+
+procedure Output_ArrayType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : ArrayType);
+
+procedure Output_ReferenceType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : ReferenceType);
+
+procedure Output_BooleanLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : BooleanLiteralType);
+
+procedure Output_BaseType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : BaseType);
+
+procedure Output_StructureLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : StructureLiteralType);
+
+procedure Output_StringLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : StringLiteralType);
+
+procedure Output_MapType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : MapType);
+
+procedure Output_AType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : AType);
+
+end LSP_Gen.Entities.Outputs;
+--  Copyright <YEAR> <COPYRIGHT HOLDER>
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a
+--  copy of this software and associated documentation files (the "Software"),
+--  to deal in the Software without restriction, including without limitation
+--  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+--  and/or sell copies of the Software, and to permit persons to whom the
+--  Software is furnished to do so, subject to the following conditions:
+--
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+--  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+--  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from metaModel.schema.json.
+
+with Interfaces;
+package body LSP_Gen.Entities.Outputs is
+pragma Style_Checks (Off);
+procedure Output_Any_Value
+  (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+   Value   : Any_Value'Class) is
+begin
+   for Item of Value loop
+      case Item.Kind is
+         when VSS.JSON.Streams.Start_Array =>
+            Handler.Start_Array;
+         when VSS.JSON.Streams.End_Array =>
+            Handler.End_Array;
+         when VSS.JSON.Streams.Start_Object =>
+            Handler.Start_Object;
+         when VSS.JSON.Streams.End_Object =>
+            Handler.End_Object;
+         when VSS.JSON.Streams.Key_Name =>
+            Handler.Key_Name (Item.Key_Name);
+         when VSS.JSON.Streams.String_Value =>
+            Handler.String_Value (Item.String_Value);
+         when VSS.JSON.Streams.Number_Value =>
+            Handler.Number_Value (Item.Number_Value);
+         when VSS.JSON.Streams.Boolean_Value =>
+            Handler.Boolean_Value (Item.Boolean_Value);
+         when VSS.JSON.Streams.Null_Value =>
+            Handler.Null_Value;
+         when VSS.JSON.Streams.None =>
+            null;
+         when VSS.JSON.Streams.Invalid =>
+            raise Program_Error;
+         when VSS.JSON.Streams.Start_Document =>
+            raise Program_Error;
+         when VSS.JSON.Streams.End_Document =>
+            raise Program_Error;
+         when VSS.JSON.Streams.Comment =>
+            raise Program_Error;
+      end case;
+   end loop;
+end Output_Any_Value;
+
+procedure Output_MapKeyType_name
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.MapKeyType_name) is
+begin
+case Value is
+when Enum.Uri =>
+Handler.String_Value ("Uri");
+when Enum.DocumentUri =>
+Handler.String_Value ("DocumentUri");
+when Enum.string =>
+Handler.String_Value ("string");
+when Enum.integer =>
+Handler.String_Value ("integer");
+end case;
+end Output_MapKeyType_name;
+
+procedure Output_EnumerationType_name
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.EnumerationType_name) is
+begin
+case Value is
+when Enum.string =>
+Handler.String_Value ("string");
+when Enum.integer =>
+Handler.String_Value ("integer");
+when Enum.uinteger =>
+Handler.String_Value ("uinteger");
+end case;
+end Output_EnumerationType_name;
+
+procedure Output_BaseTypes
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.BaseTypes) is
+begin
+case Value is
+when Enum.Uri =>
+Handler.String_Value ("Uri");
+when Enum.DocumentUri =>
+Handler.String_Value ("DocumentUri");
+when Enum.integer =>
+Handler.String_Value ("integer");
+when Enum.uinteger =>
+Handler.String_Value ("uinteger");
+when Enum.decimal =>
+Handler.String_Value ("decimal");
+when Enum.RegExp =>
+Handler.String_Value ("RegExp");
+when Enum.string =>
+Handler.String_Value ("string");
+when Enum.a_boolean =>
+Handler.String_Value ("boolean");
+when Enum.a_null =>
+Handler.String_Value ("null");
+end case;
+end Output_BaseTypes;
+
+procedure Output_TypeKind
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.TypeKind) is
+begin
+case Value is
+when Enum.base =>
+Handler.String_Value ("base");
+when Enum.reference =>
+Handler.String_Value ("reference");
+when Enum.an_array =>
+Handler.String_Value ("array");
+when Enum.map =>
+Handler.String_Value ("map");
+when Enum.an_and =>
+Handler.String_Value ("and");
+when Enum.a_or =>
+Handler.String_Value ("or");
+when Enum.tuple =>
+Handler.String_Value ("tuple");
+when Enum.literal =>
+Handler.String_Value ("literal");
+when Enum.stringLiteral =>
+Handler.String_Value ("stringLiteral");
+when Enum.integerLiteral =>
+Handler.String_Value ("integerLiteral");
+when Enum.booleanLiteral =>
+Handler.String_Value ("booleanLiteral");
+end case;
+end Output_TypeKind;
+
+procedure Output_Structure
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Structure) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+if Value.extends.Length > 0 then
+Handler.Key_Name ("extends");
+Handler.Start_Array;
+for J in 1 .. Value.extends.Length loop
+Output_AType (Handler, Value.extends (J));
+end loop;
+Handler.End_Array;
+end if;
+if Value.mixins.Length > 0 then
+Handler.Key_Name ("mixins");
+Handler.Start_Array;
+for J in 1 .. Value.mixins.Length loop
+Output_AType (Handler, Value.mixins (J));
+end loop;
+Handler.End_Array;
+end if;
+Handler.Key_Name ("name");
+Handler.String_Value (Value.name);
+Handler.Key_Name ("properties");
+Handler.Start_Array;
+for J in 1 .. Value.properties.Length loop
+Output_Property (Handler, Value.properties (J));
+end loop;
+Handler.End_Array;
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+Handler.End_Object;
+end Output_Structure;
+
+procedure Output_Property
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Property) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+Handler.Key_Name ("name");
+Handler.String_Value (Value.name);
+if Value.optional then
+Handler.Key_Name ("optional");
+Handler.Boolean_Value (Value.optional);
+end if;
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+Handler.Key_Name ("type");
+Output_AType (Handler, Value.a_type);
+Handler.End_Object;
+end Output_Property;
+
+procedure Output_EnumerationEntry
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : EnumerationEntry) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+Handler.Key_Name ("name");
+Handler.String_Value (Value.name);
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+Handler.Key_Name ("value");
+if Value.value.Is_String then
+Handler.String_Value (Value.value.String);
+else
+Handler.Integer_Value(Interfaces.Integer_64 (Integer'(Value.value.Integer)));
+end if;
+Handler.End_Object;
+end Output_EnumerationEntry;
+
+procedure Output_AndType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : AndType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("items");
+Handler.Start_Array;
+for J in 1 .. Value.items.Length loop
+Output_AType (Handler, Value.items (J));
+end loop;
+Handler.End_Array;
+Handler.Key_Name ("kind");Handler.String_Value ("and");
+Handler.End_Object;
+end Output_AndType;
+
+procedure Output_Notification
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Notification) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+Handler.Key_Name ("method");
+Handler.String_Value (Value.method);
+if Value.params.Is_Set then
+Handler.Key_Name ("params");
+Output_AType (Handler, Value.params.Value);
+end if;
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if Value.registrationOptions.Is_Set then
+Handler.Key_Name ("registrationOptions");
+Output_AType (Handler, Value.registrationOptions.Value);
+end if;
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+Handler.End_Object;
+end Output_Notification;
+
+procedure Output_MapKeyType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : MapKeyType) is
+procedure Output_MapKeyType_base
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : MapKeyType_base) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("base");
+Handler.Key_Name ("name");
+Output_MapKeyType_name (Handler, Value.name);
+Handler.End_Object;
+end Output_MapKeyType_base;
+
+begin
+case Value.Union.Kind is
+when Enum.base =>
+Output_MapKeyType_base (Handler, Value.Union.base);
+when Enum.reference =>
+Output_ReferenceType (Handler, Value.Union.reference);
+end case;
+end Output_MapKeyType;
+
+procedure Output_Enumeration
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enumeration) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+Handler.Key_Name ("name");
+Handler.String_Value (Value.name);
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+if Value.supportsCustomValues then
+Handler.Key_Name ("supportsCustomValues");
+Handler.Boolean_Value (Value.supportsCustomValues);
+end if;
+Handler.Key_Name ("type");
+Output_EnumerationType (Handler, Value.a_type);
+Handler.Key_Name ("values");
+Handler.Start_Array;
+for J in 1 .. Value.values.Length loop
+Output_EnumerationEntry (Handler, Value.values (J));
+end loop;
+Handler.End_Array;
+Handler.End_Object;
+end Output_Enumeration;
+
+procedure Output_OrType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : OrType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("items");
+Handler.Start_Array;
+for J in 1 .. Value.items.Length loop
+Output_AType (Handler, Value.items (J));
+end loop;
+Handler.End_Array;
+Handler.Key_Name ("kind");Handler.String_Value ("or");
+Handler.End_Object;
+end Output_OrType;
+
+procedure Output_MetaModel
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : MetaModel) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("enumerations");
+Handler.Start_Array;
+for J in 1 .. Value.enumerations.Length loop
+Output_Enumeration (Handler, Value.enumerations (J));
+end loop;
+Handler.End_Array;
+Handler.Key_Name ("notifications");
+Handler.Start_Array;
+for J in 1 .. Value.notifications.Length loop
+Output_Notification (Handler, Value.notifications (J));
+end loop;
+Handler.End_Array;
+Handler.Key_Name ("requests");
+Handler.Start_Array;
+for J in 1 .. Value.requests.Length loop
+Output_Request (Handler, Value.requests (J));
+end loop;
+Handler.End_Array;
+Handler.Key_Name ("structures");
+Handler.Start_Array;
+for J in 1 .. Value.structures.Length loop
+Output_Structure (Handler, Value.structures (J));
+end loop;
+Handler.End_Array;
+Handler.Key_Name ("typeAliases");
+Handler.Start_Array;
+for J in 1 .. Value.typeAliases.Length loop
+Output_TypeAlias (Handler, Value.typeAliases (J));
+end loop;
+Handler.End_Array;
+Handler.End_Object;
+end Output_MetaModel;
+
+procedure Output_EnumerationType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : EnumerationType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("base");
+Handler.Key_Name ("name");
+Output_EnumerationType_name (Handler, Value.name);
+Handler.End_Object;
+end Output_EnumerationType;
+
+procedure Output_StructureLiteral
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : StructureLiteral) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+Handler.Key_Name ("properties");
+Handler.Start_Array;
+for J in 1 .. Value.properties.Length loop
+Output_Property (Handler, Value.properties (J));
+end loop;
+Handler.End_Array;
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+Handler.End_Object;
+end Output_StructureLiteral;
+
+procedure Output_TupleType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : TupleType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("items");
+Handler.Start_Array;
+for J in 1 .. Value.items.Length loop
+Output_AType (Handler, Value.items (J));
+end loop;
+Handler.End_Array;
+Handler.Key_Name ("kind");Handler.String_Value ("tuple");
+Handler.End_Object;
+end Output_TupleType;
+
+procedure Output_TypeAlias
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : TypeAlias) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+Handler.Key_Name ("name");
+Handler.String_Value (Value.name);
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+Handler.Key_Name ("type");
+Output_AType (Handler, Value.a_type);
+Handler.End_Object;
+end Output_TypeAlias;
+
+procedure Output_IntegerLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : IntegerLiteralType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("integerLiteral");
+Handler.Key_Name ("value");
+Handler.Float_Value(Interfaces.IEEE_Float_64 (Value.value));
+Handler.End_Object;
+end Output_IntegerLiteralType;
+
+procedure Output_Request
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Request) is
+begin
+Handler.Start_Object;
+if not Value.documentation.Is_Null then
+Handler.Key_Name ("documentation");
+Handler.String_Value (Value.documentation);
+end if;
+if Value.errorData.Is_Set then
+Handler.Key_Name ("errorData");
+Output_AType (Handler, Value.errorData.Value);
+end if;
+Handler.Key_Name ("method");
+Handler.String_Value (Value.method);
+if Value.params.Is_Set then
+Handler.Key_Name ("params");
+Output_AType (Handler, Value.params.Value);
+end if;
+if Value.partialResult.Is_Set then
+Handler.Key_Name ("partialResult");
+Output_AType (Handler, Value.partialResult.Value);
+end if;
+if Value.proposed then
+Handler.Key_Name ("proposed");
+Handler.Boolean_Value (Value.proposed);
+end if;
+if Value.registrationOptions.Is_Set then
+Handler.Key_Name ("registrationOptions");
+Output_AType (Handler, Value.registrationOptions.Value);
+end if;
+Handler.Key_Name ("result");
+Output_AType (Handler, Value.result);
+if not Value.since.Is_Null then
+Handler.Key_Name ("since");
+Handler.String_Value (Value.since);
+end if;
+Handler.End_Object;
+end Output_Request;
+
+procedure Output_ArrayType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : ArrayType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("element");
+Output_AType (Handler, Value.element.Value);
+Handler.Key_Name ("kind");Handler.String_Value ("array");
+Handler.End_Object;
+end Output_ArrayType;
+
+procedure Output_ReferenceType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : ReferenceType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("reference");
+Handler.Key_Name ("name");
+Handler.String_Value (Value.name);
+Handler.End_Object;
+end Output_ReferenceType;
+
+procedure Output_BooleanLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : BooleanLiteralType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("booleanLiteral");
+Handler.Key_Name ("value");
+Handler.Boolean_Value (Value.value);
+Handler.End_Object;
+end Output_BooleanLiteralType;
+
+procedure Output_BaseType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : BaseType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("base");
+Handler.Key_Name ("name");
+Output_BaseTypes (Handler, Value.name);
+Handler.End_Object;
+end Output_BaseType;
+
+procedure Output_StructureLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : StructureLiteralType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("literal");
+Handler.Key_Name ("value");
+Output_StructureLiteral (Handler, Value.value);
+Handler.End_Object;
+end Output_StructureLiteralType;
+
+procedure Output_StringLiteralType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : StringLiteralType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("kind");Handler.String_Value ("stringLiteral");
+Handler.Key_Name ("value");
+Handler.String_Value (Value.value);
+Handler.End_Object;
+end Output_StringLiteralType;
+
+procedure Output_MapType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : MapType) is
+begin
+Handler.Start_Object;
+Handler.Key_Name ("key");
+Output_MapKeyType (Handler, Value.key);
+Handler.Key_Name ("kind");Handler.String_Value ("map");
+Handler.Key_Name ("value");
+Output_AType (Handler, Value.value.Value);
+Handler.End_Object;
+end Output_MapType;
+
+procedure Output_AType
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : AType) is
+begin
+case Value.Union.Kind is
+when Enum.base =>
+Output_BaseType (Handler, Value.Union.base);
+when Enum.reference =>
+Output_ReferenceType (Handler, Value.Union.reference);
+when Enum.an_array =>
+Output_ArrayType (Handler, Value.Union.an_array);
+when Enum.map =>
+Output_MapType (Handler, Value.Union.map);
+when Enum.an_and =>
+Output_AndType (Handler, Value.Union.an_and);
+when Enum.a_or =>
+Output_OrType (Handler, Value.Union.a_or);
+when Enum.tuple =>
+Output_TupleType (Handler, Value.Union.tuple);
+when Enum.literal =>
+Output_StructureLiteralType (Handler, Value.Union.literal);
+when Enum.stringLiteral =>
+Output_StringLiteralType (Handler, Value.Union.stringLiteral);
+when Enum.integerLiteral =>
+Output_IntegerLiteralType (Handler, Value.Union.integerLiteral);
+when Enum.booleanLiteral =>
+Output_BooleanLiteralType (Handler, Value.Union.booleanLiteral);
+end case;
+end Output_AType;
+
+end LSP_Gen.Entities.Outputs;
+--  Copyright <YEAR> <COPYRIGHT HOLDER>
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a
+--  copy of this software and associated documentation files (the "Software"),
+--  to deal in the Software without restriction, including without limitation
+--  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+--  and/or sell copies of the Software, and to permit persons to whom the
+--  Software is furnished to do so, subject to the following conditions:
+--
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+--  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+--  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from metaModel.schema.json.
+
+with VSS.JSON.Pull_Readers;
+
+package LSP_Gen.Entities.Inputs is
+
+procedure Input_MapKeyType_name
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.MapKeyType_name;
+Success : in out Boolean);
+
+procedure Input_EnumerationType_name
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.EnumerationType_name;
+Success : in out Boolean);
+
+procedure Input_BaseTypes
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.BaseTypes;
+Success : in out Boolean);
+
+procedure Input_TypeKind
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.TypeKind;
+Success : in out Boolean);
+
+procedure Input_Structure
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Structure;
+Success : in out Boolean);
+
+procedure Input_Property
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Property;
+Success : in out Boolean);
+
+procedure Input_EnumerationEntry
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out EnumerationEntry;
+Success : in out Boolean);
+
+procedure Input_AndType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out AndType;
+Success : in out Boolean);
+
+procedure Input_Notification
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Notification;
+Success : in out Boolean);
+
+procedure Input_MapKeyType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out MapKeyType;
+Success : in out Boolean);
+
+procedure Input_Enumeration
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enumeration;
+Success : in out Boolean);
+
+procedure Input_OrType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out OrType;
+Success : in out Boolean);
+
+procedure Input_MetaModel
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out MetaModel;
+Success : in out Boolean);
+
+procedure Input_EnumerationType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out EnumerationType;
+Success : in out Boolean);
+
+procedure Input_StructureLiteral
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out StructureLiteral;
+Success : in out Boolean);
+
+procedure Input_TupleType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out TupleType;
+Success : in out Boolean);
+
+procedure Input_TypeAlias
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out TypeAlias;
+Success : in out Boolean);
+
+procedure Input_IntegerLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out IntegerLiteralType;
+Success : in out Boolean);
+
+procedure Input_Request
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Request;
+Success : in out Boolean);
+
+procedure Input_ArrayType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out ArrayType;
+Success : in out Boolean);
+
+procedure Input_ReferenceType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out ReferenceType;
+Success : in out Boolean);
+
+procedure Input_BooleanLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out BooleanLiteralType;
+Success : in out Boolean);
+
+procedure Input_BaseType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out BaseType;
+Success : in out Boolean);
+
+procedure Input_StructureLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out StructureLiteralType;
+Success : in out Boolean);
+
+procedure Input_StringLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out StringLiteralType;
+Success : in out Boolean);
+
+procedure Input_MapType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out MapType;
+Success : in out Boolean);
+
+procedure Input_AType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out AType;
+Success : in out Boolean);
+
+end LSP_Gen.Entities.Inputs;
+--  Copyright <YEAR> <COPYRIGHT HOLDER>
+--
+--  Permission is hereby granted, free of charge, to any person obtaining a
+--  copy of this software and associated documentation files (the "Software"),
+--  to deal in the Software without restriction, including without limitation
+--  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+--  and/or sell copies of the Software, and to permit persons to whom the
+--  Software is furnished to do so, subject to the following conditions:
+--
+--  The above copyright notice and this permission notice shall be included in
+--  all copies or substantial portions of the Software.
+--
+--  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+--  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+--  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+--  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+--  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+--  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+--  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from metaModel.schema.json.
+
+pragma Ada_2022;
+with Minimal_Perfect_Hash;
+with VSS.JSON.Pull_Readers.Buffered;
+
+package body LSP_Gen.Entities.Inputs is
+pragma Style_Checks (Off);
+use type VSS.JSON.JSON_Number_Kind;
+use type VSS.Strings.Virtual_String;
+
+procedure Input_Any_Value
+  (Reader  : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+   Value   : out Any_Value'Class;
+   Success : in out Boolean) is
+use type VSS.JSON.Streams.JSON_Stream_Element_Kind;
+begin
+case Reader.Element_Kind is
+when VSS.JSON.Streams.Start_Array =>
+Value.Append ((Kind => VSS.JSON.Streams.Start_Array));
+Reader.Read_Next;
+while Success and Reader.Element_Kind /= VSS.JSON.Streams.End_Array loop
+Input_Any_Value (Reader, Value, Success);
+end loop;
+Value.Append ((Kind => VSS.JSON.Streams.End_Array));
+when VSS.JSON.Streams.Start_Object =>
+Value.Append ((Kind => VSS.JSON.Streams.Start_Object));
+Reader.Read_Next;
+while Success and Reader.Element_Kind = VSS.JSON.Streams.Key_Name loop
+Value.Append (Reader.Element);
+Reader.Read_Next;
+Input_Any_Value (Reader, Value, Success);
+end loop;
+Value.Append ((Kind => VSS.JSON.Streams.End_Object));
+when VSS.JSON.Streams.String_Value
+   | VSS.JSON.Streams.Number_Value
+   | VSS.JSON.Streams.Boolean_Value
+   | VSS.JSON.Streams.Null_Value
+=>
+Value.Append (Reader.Element);
+when others =>
+Success := False;
+end case;
+if Success then
+Reader.Read_Next;
+end if;
+end Input_Any_Value;
+
+package MapKeyType_name_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["Uri", "DocumentUri", "string", "integer"]);
+
+procedure Input_MapKeyType_name
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.MapKeyType_name;
+Success : in out Boolean) is
+Index : constant Natural := (if Reader.Is_String_Value then
+MapKeyType_name_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+begin
+if Index > 0 then
+Value := Enum.MapKeyType_name'Val (Index - 1);
+Reader.Read_Next;
+else
+Success := False;
+end if;
+end Input_MapKeyType_name;
+
+package EnumerationType_name_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["string", "integer", "uinteger"]);
+
+procedure Input_EnumerationType_name
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.EnumerationType_name;
+Success : in out Boolean) is
+Index : constant Natural := (if Reader.Is_String_Value then
+EnumerationType_name_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+begin
+if Index > 0 then
+Value := Enum.EnumerationType_name'Val (Index - 1);
+Reader.Read_Next;
+else
+Success := False;
+end if;
+end Input_EnumerationType_name;
+
+package BaseTypes_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["Uri", "DocumentUri", "integer", "uinteger", "decimal", "RegExp", "string", "boolean", "null"]);
+
+procedure Input_BaseTypes
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.BaseTypes;
+Success : in out Boolean) is
+Index : constant Natural := (if Reader.Is_String_Value then
+BaseTypes_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+begin
+if Index > 0 then
+Value := Enum.BaseTypes'Val (Index - 1);
+Reader.Read_Next;
+else
+Success := False;
+end if;
+end Input_BaseTypes;
+
+package TypeKind_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["base", "reference", "array", "map", "and", "or", "tuple", "literal", "stringLiteral", "integerLiteral", "booleanLiteral"]);
+
+procedure Input_TypeKind
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.TypeKind;
+Success : in out Boolean) is
+Index : constant Natural := (if Reader.Is_String_Value then
+TypeKind_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+begin
+if Index > 0 then
+Value := Enum.TypeKind'Val (Index - 1);
+Reader.Read_Next;
+else
+Success := False;
+end if;
+end Input_TypeKind;
+
+package MapKeyType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["base", "reference"]);
+
+package AType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["base", "reference", "array", "map", "and", "or", "tuple", "literal", "stringLiteral", "integerLiteral", "booleanLiteral"]);
+
+package Structure_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "extends", "mixins", "name", "properties", "proposed", "since"]);
+
+procedure Input_Structure
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Structure;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+Structure_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  extends
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : AType;
+begin
+Input_AType (Reader, Item, Success);
+Value.extends.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 3 =>  --  mixins
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : AType;
+begin
+Input_AType (Reader, Item, Success);
+Value.mixins.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 4 =>  --  name
+if Reader.Is_String_Value then
+Value.name := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 5 =>  --  properties
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : Property;
+begin
+Input_Property (Reader, Item, Success);
+Value.properties.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 6 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 7 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_Structure;
+
+package Property_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "name", "optional", "proposed", "since", "type"]);
+
+procedure Input_Property
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Property;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+Property_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+if Reader.Is_String_Value then
+Value.name := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 3 =>  --  optional
+if Reader.Is_Boolean_Value then
+Value.optional := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 4 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 5 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 6 =>  --  type
+Input_AType (Reader, Value.a_type, Success);
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_Property;
+
+package EnumerationEntry_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "name", "proposed", "since", "value"]);
+
+procedure Input_EnumerationEntry
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out EnumerationEntry;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+EnumerationEntry_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+if Reader.Is_String_Value then
+Value.name := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 3 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 4 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 5 =>  --  value
+Value.value := (False, Integer => <>);
+if Reader.Is_String_Value then
+Value.value := (True, Reader.String_Value);
+Reader.Read_Next;
+elsif Reader.Is_Number_Value and then Reader.Number_Value.Kind = VSS.JSON.JSON_Integer then
+Value.value.Integer := Integer (Reader.Number_Value.Integer_Value);
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_EnumerationEntry;
+
+package AndType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["items", "kind"]);
+
+procedure Input_AndType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out AndType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+AndType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  items
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : AType;
+begin
+Input_AType (Reader, Item, Success);
+Value.items.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 2 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "and" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_AndType;
+
+package Notification_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "method", "params", "proposed", "registrationOptions", "since"]);
+
+procedure Input_Notification
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Notification;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+Notification_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  method
+if Reader.Is_String_Value then
+Value.method := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 3 =>  --  params
+Value.params := (Is_Set => True, Value => <>);
+Input_AType (Reader, Value.params.Value, Success);
+   when 4 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 5 =>  --  registrationOptions
+Value.registrationOptions := (Is_Set => True, Value => <>);
+Input_AType (Reader, Value.registrationOptions.Value, Success);
+   when 6 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_Notification;
+
+package MapKeyType_base_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "name"]);
+
+procedure Input_MapKeyType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out MapKeyType;
+Success : in out Boolean) is
+procedure Input_MapKeyType_base
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out MapKeyType_base;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+MapKeyType_base_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "base" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+Input_MapKeyType_name (Reader, Value.name, Success);
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_MapKeyType_base;
+
+use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;
+
+Look_Ahead : VSS.JSON.Pull_Readers.Buffered.JSON_Buffered_Pull_Reader (Reader'Access);
+
+Variant_Key : constant VSS.Strings.Virtual_String := "kind";
+begin
+Look_Ahead.Mark;
+if Success and Look_Ahead.Is_Start_Object then
+Look_Ahead.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Look_Ahead.Is_End_Object loop
+if not Look_Ahead.Is_Key_Name then
+Success := False;
+elsif Look_Ahead.Key_Name /= Variant_Key then
+Look_Ahead.Skip_Current_Value;
+Success := not Look_Ahead.Is_End_Object;
+elsif Look_Ahead.Read_Next = String_Value then
+declare
+Index : constant Natural :=
+MapKeyType_Minimal_Perfect_Hash.Get_Index
+(Look_Ahead.String_Value);
+begin
+Look_Ahead.Reset;
+Look_Ahead.Unmark;
+
+case Index is
+when  1 =>  --  base
+Value.Union := (Kind => Enum.base, others => <>);
+Input_MapKeyType_base (Look_Ahead, Value.Union.base, Success);
+when  2 =>  --  reference
+Value.Union := (Kind => Enum.reference, others => <>);
+Input_ReferenceType (Look_Ahead, Value.Union.reference, Success);
+when others =>
+Success := False;
+end case;
+
+return;
+end;
+else
+Success := False;
+end if;
+end loop;
+
+if Success then
+Look_Ahead.Read_Next;  --  skip End_Object
+Success := False;
+end if;
+end Input_MapKeyType;
+
+package Enumeration_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "name", "proposed", "since", "supportsCustomValues", "type", "values"]);
+
+procedure Input_Enumeration
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enumeration;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+Enumeration_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+if Reader.Is_String_Value then
+Value.name := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 3 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 4 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 5 =>  --  supportsCustomValues
+if Reader.Is_Boolean_Value then
+Value.supportsCustomValues := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 6 =>  --  type
+Input_EnumerationType (Reader, Value.a_type, Success);
+   when 7 =>  --  values
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : EnumerationEntry;
+begin
+Input_EnumerationEntry (Reader, Item, Success);
+Value.values.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_Enumeration;
+
+package OrType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["items", "kind"]);
+
+procedure Input_OrType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out OrType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+OrType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  items
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : AType;
+begin
+Input_AType (Reader, Item, Success);
+Value.items.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 2 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "or" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_OrType;
+
+package MetaModel_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["enumerations", "notifications", "requests", "structures", "typeAliases"]);
+
+procedure Input_MetaModel
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out MetaModel;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+MetaModel_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  enumerations
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : Enumeration;
+begin
+Input_Enumeration (Reader, Item, Success);
+Value.enumerations.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 2 =>  --  notifications
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : Notification;
+begin
+Input_Notification (Reader, Item, Success);
+Value.notifications.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 3 =>  --  requests
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : Request;
+begin
+Input_Request (Reader, Item, Success);
+Value.requests.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 4 =>  --  structures
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : Structure;
+begin
+Input_Structure (Reader, Item, Success);
+Value.structures.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 5 =>  --  typeAliases
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : TypeAlias;
+begin
+Input_TypeAlias (Reader, Item, Success);
+Value.typeAliases.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_MetaModel;
+
+package EnumerationType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "name"]);
+
+procedure Input_EnumerationType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out EnumerationType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+EnumerationType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "base" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+Input_EnumerationType_name (Reader, Value.name, Success);
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_EnumerationType;
+
+package StructureLiteral_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "properties", "proposed", "since"]);
+
+procedure Input_StructureLiteral
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out StructureLiteral;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+StructureLiteral_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  properties
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : Property;
+begin
+Input_Property (Reader, Item, Success);
+Value.properties.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 3 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 4 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_StructureLiteral;
+
+package TupleType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["items", "kind"]);
+
+procedure Input_TupleType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out TupleType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+TupleType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  items
+if Success and Reader.Is_Start_Array then
+Reader.Read_Next;
+while Success and not Reader.Is_End_Array loop
+declare
+Item : AType;
+begin
+Input_AType (Reader, Item, Success);
+Value.items.Append (Item);
+end;
+end loop;
+if Success then
+Reader.Read_Next;  --  skip End_Array
+end if;
+else
+Success := False;
+end if;
+   when 2 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "tuple" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_TupleType;
+
+package TypeAlias_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "name", "proposed", "since", "type"]);
+
+procedure Input_TypeAlias
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out TypeAlias;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+TypeAlias_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+if Reader.Is_String_Value then
+Value.name := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 3 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 4 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 5 =>  --  type
+Input_AType (Reader, Value.a_type, Success);
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_TypeAlias;
+
+package IntegerLiteralType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "value"]);
+
+procedure Input_IntegerLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out IntegerLiteralType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+IntegerLiteralType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "integerLiteral" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  value
+if Reader.Is_Number_Value then
+if Reader.Number_Value.Kind = VSS.JSON.JSON_Integer then
+Value.value := Float (Reader.Number_Value.Integer_Value);
+elsif Reader.Number_Value.Kind = VSS.JSON.JSON_Float then
+Value.value := Float (Reader.Number_Value.Float_Value);
+else
+Success := False;
+end if;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_IntegerLiteralType;
+
+package Request_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["documentation", "errorData", "method", "params", "partialResult", "proposed", "registrationOptions", "result", "since"]);
+
+procedure Input_Request
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Request;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+Request_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  documentation
+if Reader.Is_String_Value then
+Value.documentation := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  errorData
+Value.errorData := (Is_Set => True, Value => <>);
+Input_AType (Reader, Value.errorData.Value, Success);
+   when 3 =>  --  method
+if Reader.Is_String_Value then
+Value.method := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 4 =>  --  params
+Value.params := (Is_Set => True, Value => <>);
+Input_AType (Reader, Value.params.Value, Success);
+   when 5 =>  --  partialResult
+Value.partialResult := (Is_Set => True, Value => <>);
+Input_AType (Reader, Value.partialResult.Value, Success);
+   when 6 =>  --  proposed
+if Reader.Is_Boolean_Value then
+Value.proposed := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 7 =>  --  registrationOptions
+Value.registrationOptions := (Is_Set => True, Value => <>);
+Input_AType (Reader, Value.registrationOptions.Value, Success);
+   when 8 =>  --  result
+Input_AType (Reader, Value.result, Success);
+   when 9 =>  --  since
+if Reader.Is_String_Value then
+Value.since := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_Request;
+
+package ArrayType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["element", "kind"]);
+
+procedure Input_ArrayType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out ArrayType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+ArrayType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  element
+Input_AType (Reader, Value.element.Element, Success);
+   when 2 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "array" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_ArrayType;
+
+package ReferenceType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "name"]);
+
+procedure Input_ReferenceType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out ReferenceType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+ReferenceType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "reference" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+if Reader.Is_String_Value then
+Value.name := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_ReferenceType;
+
+package BooleanLiteralType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "value"]);
+
+procedure Input_BooleanLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out BooleanLiteralType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+BooleanLiteralType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "booleanLiteral" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  value
+if Reader.Is_Boolean_Value then
+Value.value := Reader.Boolean_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_BooleanLiteralType;
+
+package BaseType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "name"]);
+
+procedure Input_BaseType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out BaseType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+BaseType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "base" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  name
+Input_BaseTypes (Reader, Value.name, Success);
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_BaseType;
+
+package StructureLiteralType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "value"]);
+
+procedure Input_StructureLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out StructureLiteralType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+StructureLiteralType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "literal" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  value
+Input_StructureLiteral (Reader, Value.value, Success);
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_StructureLiteralType;
+
+package StringLiteralType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["kind", "value"]);
+
+procedure Input_StringLiteralType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out StringLiteralType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+StringLiteralType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "stringLiteral" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 2 =>  --  value
+if Reader.Is_String_Value then
+Value.value := Reader.String_Value;
+Reader.Read_Next;
+else
+Success := False;
+end if;
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_StringLiteralType;
+
+package MapType_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["key", "kind", "value"]);
+
+procedure Input_MapType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out MapType;
+Success : in out Boolean) is
+begin
+if Success and Reader.Is_Start_Object then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Reader.Is_End_Object loop
+if Reader.Is_Key_Name then
+declare
+Index : constant Natural :=
+MapType_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);
+begin
+Reader.Read_Next;
+
+case Index is
+   when 1 =>  --  key
+Input_MapKeyType (Reader, Value.key, Success);
+   when 2 =>  --  kind
+if Reader.Is_String_Value and then Reader.String_Value = "map" then
+Reader.Read_Next;
+else
+Success := False;
+end if;
+   when 3 =>  --  value
+Input_AType (Reader, Value.value.Element, Success);
+when others =>
+Reader.Skip_Current_Value;
+end case;
+end;
+else
+   Success := False;
+end if;
+end loop;
+
+if Success then
+Reader.Read_Next;  --  skip End_Object
+end if;
+end Input_MapType;
+
+procedure Input_AType
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out AType;
+Success : in out Boolean) is
+use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;
+
+Look_Ahead : VSS.JSON.Pull_Readers.Buffered.JSON_Buffered_Pull_Reader (Reader'Access);
+
+Variant_Key : constant VSS.Strings.Virtual_String := "kind";
+begin
+Look_Ahead.Mark;
+if Success and Look_Ahead.Is_Start_Object then
+Look_Ahead.Read_Next;
+else
+Success := False;
+end if;
+
+while Success and not Look_Ahead.Is_End_Object loop
+if not Look_Ahead.Is_Key_Name then
+Success := False;
+elsif Look_Ahead.Key_Name /= Variant_Key then
+Look_Ahead.Skip_Current_Value;
+Success := not Look_Ahead.Is_End_Object;
+elsif Look_Ahead.Read_Next = String_Value then
+declare
+Index : constant Natural :=
+AType_Minimal_Perfect_Hash.Get_Index
+(Look_Ahead.String_Value);
+begin
+Look_Ahead.Reset;
+Look_Ahead.Unmark;
+
+case Index is
+when  1 =>  --  base
+Value.Union := (Kind => Enum.base, others => <>);
+Input_BaseType (Look_Ahead, Value.Union.base, Success);
+when  2 =>  --  reference
+Value.Union := (Kind => Enum.reference, others => <>);
+Input_ReferenceType (Look_Ahead, Value.Union.reference, Success);
+when  3 =>  --  an_array
+Value.Union := (Kind => Enum.an_array, others => <>);
+Input_ArrayType (Look_Ahead, Value.Union.an_array, Success);
+when  4 =>  --  map
+Value.Union := (Kind => Enum.map, others => <>);
+Input_MapType (Look_Ahead, Value.Union.map, Success);
+when  5 =>  --  an_and
+Value.Union := (Kind => Enum.an_and, others => <>);
+Input_AndType (Look_Ahead, Value.Union.an_and, Success);
+when  6 =>  --  a_or
+Value.Union := (Kind => Enum.a_or, others => <>);
+Input_OrType (Look_Ahead, Value.Union.a_or, Success);
+when  7 =>  --  tuple
+Value.Union := (Kind => Enum.tuple, others => <>);
+Input_TupleType (Look_Ahead, Value.Union.tuple, Success);
+when  8 =>  --  literal
+Value.Union := (Kind => Enum.literal, others => <>);
+Input_StructureLiteralType (Look_Ahead, Value.Union.literal, Success);
+when  9 =>  --  stringLiteral
+Value.Union := (Kind => Enum.stringLiteral, others => <>);
+Input_StringLiteralType (Look_Ahead, Value.Union.stringLiteral, Success);
+when  10 =>  --  integerLiteral
+Value.Union := (Kind => Enum.integerLiteral, others => <>);
+Input_IntegerLiteralType (Look_Ahead, Value.Union.integerLiteral, Success);
+when  11 =>  --  booleanLiteral
+Value.Union := (Kind => Enum.booleanLiteral, others => <>);
+Input_BooleanLiteralType (Look_Ahead, Value.Union.booleanLiteral, Success);
+when others =>
+Success := False;
+end case;
+
+return;
+end;
+else
+Success := False;
+end if;
+end loop;
+
+if Success then
+Look_Ahead.Read_Next;  --  skip End_Object
+Success := False;
+end if;
+end Input_AType;
+
+end LSP_Gen.Entities.Inputs;

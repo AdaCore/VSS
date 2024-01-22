@@ -127,4 +127,7 @@ package JSON_Schema.Writers is
    --  Check if given Property in the schema with Name should be presented as a
    --  holder type
 
+   function Is_Union_Type (Schema : Schema_Access) return Boolean;
+   --  Some of `anyOf` schema is not {} or has $ref
+
 end JSON_Schema.Writers;

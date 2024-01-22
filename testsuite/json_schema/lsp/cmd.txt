@@ -1,0 +1,5 @@
+--root-package LSP_Gen.Entities --enum-package Enum
+--header-file header.adt
+--holder #/definitions/ArrayType:element
+--holder #/definitions/MapType:value
+metaModel.schema.json

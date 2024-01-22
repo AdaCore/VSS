@@ -27,7 +27,7 @@
 --        Test_Support.Run_Testsuite (Testsuite'Access, "test of Boolean");
 --     end Test_Driver;
 --
---  Call of Assert with False contition terminates execution of the testcase.
+--  Call of Assert with False condition terminates execution of the testcase.
 --  Testcase execution can be terminated by the call of Fail subprogram, it
 --  means that testcase fails, or by the call of Skip subprogram, it means
 --  that testcase is not executed.

@@ -405,7 +405,7 @@ package body JSON_Schema.Writers.Outputs is
          Writers.Each_Property (Map, Name, Schema, On_Property'Access);
          Put ("Handler.End_Object;");
          New_Line;
-      elsif not Schema.Any_Of.Is_Empty then
+      elsif Is_Union_Type (Schema) then
          Put ("case Value.Union.Kind is"); New_Line;
 
          for Index in 1 .. Schema.Any_Of.Last_Index loop

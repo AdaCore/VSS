@@ -1,0 +1,4 @@
+--root-package DAP.Tools
+--enum-package Enum
+--header-file header.adt
+debugAdapterProtocol.json

@@ -590,7 +590,7 @@ package body JSON_Schema.Writers.Inputs is
       --  Write Input procedures for anonymous schemas
       Each_Anonymous_Schema (Map, Schema, Anonymous_Schema_Reader'Access);
 
-      if not Schema.Any_Of.Is_Empty then
+      if Is_Union_Type (Schema) then
          --  Declaration items for union type reader
          Put ("use all type VSS.JSON.Streams.JSON_Stream_Element_Kind;");
          New_Line;
@@ -613,7 +613,7 @@ package body JSON_Schema.Writers.Inputs is
 
       if not Schema.All_Of.Is_Empty or not Schema.Properties.Is_Empty then
          Write_Object_Reader (Map, Name, "", Schema, Holders);
-      elsif not Schema.Any_Of.Is_Empty then
+      elsif Is_Union_Type (Schema) then
          Write_Union_Reader (Map, Name, Enum_Package);
       else
          Put ("Input_Any_Value (Reader, Value, Success);");

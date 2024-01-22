@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -57,7 +57,7 @@ procedure Test_Command_Line_Parser is
    --  Test that "--subprojects=project.gpr" raise error
 
    procedure Test_Short_Binary_With_Equal_Sign_Error;
-   --  Test that "--S=" raise error
+   --  Test that "-S=" raise error
 
    procedure Test_Short_Binary_With_Value_Error;
    --  Test that "--S=project.gpr" raise error
@@ -69,6 +69,70 @@ procedure Test_Command_Line_Parser is
    procedure Test_Positional_Unspecified;
    --  Test processing of the positional arguments: some of defined positional
    --  argument is not specified in the command line.
+
+   procedure Test_Command_Line_Parser;
+   --  Run testcases of Command_Line_Parser.
+
+   ------------------------------
+   -- Test_Command_Line_Parser --
+   ------------------------------
+
+   procedure Test_Command_Line_Parser is
+   begin
+      Test_Support.Run_Testcase
+        (Test_Short_No_Separator'Access,
+         "short option with value without separator");
+      Test_Support.Run_Testcase
+        (Test_Short_Equal'Access,
+         "short option with value after equal separator");
+      Test_Support.Run_Testcase
+        (Test_Short_Next'Access,
+         "short option with value as following argument");
+      Test_Support.Run_Testcase
+        (Test_Long_Equal'Access,
+         "long option with value after equal separator");
+      Test_Support.Run_Testcase
+        (Test_Long_Next'Access,
+         "long option with value as following argument");
+      Test_Support.Run_Testcase
+        (Test_Multiple_Values_Mixed'Access,
+         "multiple values of different styles");
+      Test_Support.Run_Testcase
+        (Test_Name_Value_No_Separator'Access,
+         "name-value without separator");
+      Test_Support.Run_Testcase
+        (Test_Name_Value_Next'Access,
+         "name-value as following argument");
+      Test_Support.Run_Testcase
+        (Test_Name_Value_Mixed'Access,
+         "name-value with different styles");
+
+      Test_Support.Run_Testcase
+        (Test_Long_Binary'Access,
+         "long boolean option");
+      Test_Support.Run_Testcase
+        (Test_Short_Binary'Access,
+         "short boolean option");
+      Test_Support.Run_Testcase
+        (Test_Long_Binary_With_Equal_Sign_Error'Access,
+         "long boolean option with equal separator no value");
+      Test_Support.Run_Testcase
+        (Test_Long_Binary_With_Value_Error'Access,
+         "long boolean option with value after equal separator");
+      Test_Support.Run_Testcase
+        (Test_Short_Binary_With_Equal_Sign_Error'Access,
+         "short boolean option with equal separator no value");
+      Test_Support.Run_Testcase
+        (Test_Short_Binary_With_Value_Error'Access,
+         "short boolean option with value after equal separator");
+
+      Test_Support.Run_Testcase
+        (Test_Positional_Long_List'Access,
+         "single positional arguments");
+      Test_Support.Run_Testcase
+        (Test_Positional_Unspecified'Access,
+         "single positional arguments without value specified");
+   end Test_Command_Line_Parser;
 
    ----------------------
    -- Test_Long_Binary --
@@ -510,23 +574,6 @@ procedure Test_Command_Line_Parser is
    end Test_Short_No_Separator;
 
 begin
-   Test_Short_No_Separator;
-   Test_Short_Equal;
-   Test_Short_Next;
-   Test_Long_Equal;
-   Test_Long_Next;
-   Test_Multiple_Values_Mixed;
-   Test_Name_Value_No_Separator;
-   Test_Name_Value_Next;
-   Test_Name_Value_Mixed;
-
-   Test_Long_Binary;
-   Test_Short_Binary;
-   Test_Long_Binary_With_Equal_Sign_Error;
-   Test_Long_Binary_With_Value_Error;
-   Test_Short_Binary_With_Equal_Sign_Error;
-   Test_Short_Binary_With_Value_Error;
-
-   Test_Positional_Long_List;
-   Test_Positional_Unspecified;
+   Test_Support.Run_Testsuite
+     (Test_Command_Line_Parser'Access, "Command Line Parser");
 end Test_Command_Line_Parser;

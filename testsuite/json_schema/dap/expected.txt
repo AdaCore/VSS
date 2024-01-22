@@ -190,11 +190,68 @@ end case; end record;
 
 type ExceptionBreakMode is (never, always, unhandled, userUnhandled);
 
-type StoppedEvent_reason is (step, breakpoint, a_exception, pause, a_entry, a_goto, function_breakpoint, data_breakpoint, instruction_breakpoint);
+type StoppedEvent_reason_Value is (step, breakpoint, a_exception, pause, a_entry, a_goto, function_breakpoint, data_breakpoint, instruction_breakpoint, Custom_Value);
+
+subtype StoppedEvent_reason_Predefined is StoppedEvent_reason_Value range step .. instruction_breakpoint;
+
+type StoppedEvent_reason (Kind : StoppedEvent_reason_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when StoppedEvent_reason_Predefined =>
+      null;
+end case;
+end record;
+
+function step return StoppedEvent_reason is (Kind => step);
+
+function breakpoint return StoppedEvent_reason is (Kind => breakpoint);
+
+function a_exception return StoppedEvent_reason is (Kind => a_exception);
+
+function pause return StoppedEvent_reason is (Kind => pause);
+
+function a_entry return StoppedEvent_reason is (Kind => a_entry);
+
+function a_goto return StoppedEvent_reason is (Kind => a_goto);
+
+function function_breakpoint return StoppedEvent_reason is (Kind => function_breakpoint);
+
+function data_breakpoint return StoppedEvent_reason is (Kind => data_breakpoint);
+
+function instruction_breakpoint return StoppedEvent_reason is (Kind => instruction_breakpoint);
+
 
 type StartDebuggingRequestArguments_request is (launch, attach);
 
-type OutputEvent_category is (console, important, stdout, stderr, telemetry);
+type OutputEvent_category_Value is (console, important, stdout, stderr, telemetry, Custom_Value);
+
+subtype OutputEvent_category_Predefined is OutputEvent_category_Value range console .. telemetry;
+
+type OutputEvent_category (Kind : OutputEvent_category_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when OutputEvent_category_Predefined =>
+      null;
+end case;
+end record;
+
+function console return OutputEvent_category is (Kind => console);
+      --  Show the output in the client's default message UI, e.g. a 'debug console'. This category should only be used for informational output from the debugger (as opposed to the debuggee).
+
+function important return OutputEvent_category is (Kind => important);
+      --  A hint for the client to show the output in the client's UI for important and highly visible information, e.g. as a popup notification. This category should only be used for important messages from the debugger (as opposed to the debuggee). Since this category value is a hint, clients might ignore the hint and assume the `console` category.
+
+function stdout return OutputEvent_category is (Kind => stdout);
+      --  Show the output as normal program output from the debuggee.
+
+function stderr return OutputEvent_category is (Kind => stderr);
+      --  Show the output as error program output from the debuggee.
+
+function telemetry return OutputEvent_category is (Kind => telemetry);
+      --  Send the output to telemetry instead of showing it to the user.
+
 
 type Optional_OutputEvent_category (Is_Set : Boolean := False) is record
 case Is_Set is
@@ -220,7 +277,28 @@ when True => Value : ProcessEvent_startMethod;
 when False => null;
 end case; end record;
 
-type Scope_presentationHint is (arguments, locals, registers);
+type Scope_presentationHint_Value is (arguments, locals, registers, Custom_Value);
+
+subtype Scope_presentationHint_Predefined is Scope_presentationHint_Value range arguments .. registers;
+
+type Scope_presentationHint (Kind : Scope_presentationHint_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when Scope_presentationHint_Predefined =>
+      null;
+end case;
+end record;
+
+function arguments return Scope_presentationHint is (Kind => arguments);
+      --  Scope contains method arguments.
+
+function locals return Scope_presentationHint is (Kind => locals);
+      --  Scope contains local variables.
+
+function registers return Scope_presentationHint is (Kind => registers);
+      --  Scope contains registers. Only a single `registers` scope should be returned from a `scopes` request.
+
 
 type Optional_Scope_presentationHint (Is_Set : Boolean := False) is record
 case Is_Set is
@@ -228,7 +306,25 @@ when True => Value : Scope_presentationHint;
 when False => null;
 end case; end record;
 
-type Response_message is (cancelled, notStopped);
+type Response_message_Value is (cancelled, notStopped, Custom_Value);
+
+subtype Response_message_Predefined is Response_message_Value range cancelled .. notStopped;
+
+type Response_message (Kind : Response_message_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when Response_message_Predefined =>
+      null;
+end case;
+end record;
+
+function cancelled return Response_message is (Kind => cancelled);
+      --  the request was cancelled.
+
+function notStopped return Response_message is (Kind => notStopped);
+      --  the request may be retried once the adapter is in a 'stopped' state.
+
 
 type Optional_Response_message (Is_Set : Boolean := False) is record
 case Is_Set is
@@ -244,7 +340,31 @@ when True => Value : CompletionItemType;
 when False => null;
 end case; end record;
 
-type InvalidatedAreas is (an_all, stacks, threads, variables);
+type InvalidatedAreas_Value is (an_all, stacks, threads, variables, Custom_Value);
+
+subtype InvalidatedAreas_Predefined is InvalidatedAreas_Value range an_all .. variables;
+
+type InvalidatedAreas (Kind : InvalidatedAreas_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when InvalidatedAreas_Predefined =>
+      null;
+end case;
+end record;
+
+function an_all return InvalidatedAreas is (Kind => an_all);
+      --  All previously fetched data has become invalid and needs to be refetched.
+
+function stacks return InvalidatedAreas is (Kind => stacks);
+      --  Previously fetched stack related data has become invalid and needs to be refetched.
+
+function threads return InvalidatedAreas is (Kind => threads);
+      --  Previously fetched thread related data has become invalid and needs to be refetched.
+
+function variables return InvalidatedAreas is (Kind => variables);
+      --  Previously fetched variable data has become invalid and needs to be refetched.
+
 
 type Source_presentationHint is (normal, emphasize, deemphasize);
 
@@ -256,7 +376,25 @@ end case; end record;
 
 type LoadedSourceEvent_reason is (a_new, changed, removed);
 
-type ProtocolMessage_type is (request, response, event);
+type ProtocolMessage_type_Value is (request, response, event, Custom_Value);
+
+subtype ProtocolMessage_type_Predefined is ProtocolMessage_type_Value range request .. event;
+
+type ProtocolMessage_type (Kind : ProtocolMessage_type_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when ProtocolMessage_type_Predefined =>
+      null;
+end case;
+end record;
+
+function request return ProtocolMessage_type is (Kind => request);
+
+function response return ProtocolMessage_type is (Kind => response);
+
+function event return ProtocolMessage_type is (Kind => event);
+
 
 type RunInTerminalRequestArguments_kind is (integrated, external);
 
@@ -274,7 +412,52 @@ when True => Value : VariablesArguments_filter;
 when False => null;
 end case; end record;
 
-type VariablePresentationHint_kind is (property, method, class, data, event, baseClass, innerClass, an_interface, mostDerivedClass, virtual, dataBreakpoint);
+type VariablePresentationHint_kind_Value is (property, method, class, data, event, baseClass, innerClass, an_interface, mostDerivedClass, virtual, dataBreakpoint, Custom_Value);
+
+subtype VariablePresentationHint_kind_Predefined is VariablePresentationHint_kind_Value range property .. dataBreakpoint;
+
+type VariablePresentationHint_kind (Kind : VariablePresentationHint_kind_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when VariablePresentationHint_kind_Predefined =>
+      null;
+end case;
+end record;
+
+function property return VariablePresentationHint_kind is (Kind => property);
+      --  Indicates that the object is a property.
+
+function method return VariablePresentationHint_kind is (Kind => method);
+      --  Indicates that the object is a method.
+
+function class return VariablePresentationHint_kind is (Kind => class);
+      --  Indicates that the object is a class.
+
+function data return VariablePresentationHint_kind is (Kind => data);
+      --  Indicates that the object is data.
+
+function event return VariablePresentationHint_kind is (Kind => event);
+      --  Indicates that the object is an event.
+
+function baseClass return VariablePresentationHint_kind is (Kind => baseClass);
+      --  Indicates that the object is a base class.
+
+function innerClass return VariablePresentationHint_kind is (Kind => innerClass);
+      --  Indicates that the object is an inner class.
+
+function an_interface return VariablePresentationHint_kind is (Kind => an_interface);
+      --  Indicates that the object is an interface.
+
+function mostDerivedClass return VariablePresentationHint_kind is (Kind => mostDerivedClass);
+      --  Indicates that the object is the most derived class.
+
+function virtual return VariablePresentationHint_kind is (Kind => virtual);
+      --  Indicates that the object is virtual, that means it is a synthetic object introduced by the adapter for rendering purposes, e.g. an index range for large arrays.
+
+function dataBreakpoint return VariablePresentationHint_kind is (Kind => dataBreakpoint);
+      --  Deprecated: Indicates that a data breakpoint is registered for the object. The `hasDataBreakpoint` attribute should generally be used instead.
+
 
 type Optional_VariablePresentationHint_kind (Is_Set : Boolean := False) is record
 case Is_Set is
@@ -282,7 +465,29 @@ when True => Value : VariablePresentationHint_kind;
 when False => null;
 end case; end record;
 
-type VariablePresentationHint_visibility is (public, a_private, a_protected, internal, final);
+type VariablePresentationHint_visibility_Value is (public, a_private, a_protected, internal, final, Custom_Value);
+
+subtype VariablePresentationHint_visibility_Predefined is VariablePresentationHint_visibility_Value range public .. final;
+
+type VariablePresentationHint_visibility (Kind : VariablePresentationHint_visibility_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when VariablePresentationHint_visibility_Predefined =>
+      null;
+end case;
+end record;
+
+function public return VariablePresentationHint_visibility is (Kind => public);
+
+function a_private return VariablePresentationHint_visibility is (Kind => a_private);
+
+function a_protected return VariablePresentationHint_visibility is (Kind => a_protected);
+
+function internal return VariablePresentationHint_visibility is (Kind => internal);
+
+function final return VariablePresentationHint_visibility is (Kind => final);
+
 
 type Optional_VariablePresentationHint_visibility (Is_Set : Boolean := False) is record
 case Is_Set is
@@ -290,7 +495,23 @@ when True => Value : VariablePresentationHint_visibility;
 when False => null;
 end case; end record;
 
-type InitializeRequestArguments_pathFormat is (path, uri);
+type InitializeRequestArguments_pathFormat_Value is (path, uri, Custom_Value);
+
+subtype InitializeRequestArguments_pathFormat_Predefined is InitializeRequestArguments_pathFormat_Value range path .. uri;
+
+type InitializeRequestArguments_pathFormat (Kind : InitializeRequestArguments_pathFormat_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when InitializeRequestArguments_pathFormat_Predefined =>
+      null;
+end case;
+end record;
+
+function path return InitializeRequestArguments_pathFormat is (Kind => path);
+
+function uri return InitializeRequestArguments_pathFormat is (Kind => uri);
+
 
 type Optional_InitializeRequestArguments_pathFormat (Is_Set : Boolean := False) is record
 case Is_Set is
@@ -298,7 +519,23 @@ when True => Value : InitializeRequestArguments_pathFormat;
 when False => null;
 end case; end record;
 
-type ThreadEvent_reason is (started, exited);
+type ThreadEvent_reason_Value is (started, exited, Custom_Value);
+
+subtype ThreadEvent_reason_Predefined is ThreadEvent_reason_Value range started .. exited;
+
+type ThreadEvent_reason (Kind : ThreadEvent_reason_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when ThreadEvent_reason_Predefined =>
+      null;
+end case;
+end record;
+
+function started return ThreadEvent_reason is (Kind => started);
+
+function exited return ThreadEvent_reason is (Kind => exited);
+
 
 type DataBreakpointAccessType is (read, write, readWrite);
 
@@ -308,9 +545,56 @@ when True => Value : DataBreakpointAccessType;
 when False => null;
 end case; end record;
 
-type BreakpointEvent_reason is (changed, a_new, removed);
+type BreakpointEvent_reason_Value is (changed, a_new, removed, Custom_Value);
 
-type EvaluateArguments_context is (watch, repl, hover, clipboard, variables);
+subtype BreakpointEvent_reason_Predefined is BreakpointEvent_reason_Value range changed .. removed;
+
+type BreakpointEvent_reason (Kind : BreakpointEvent_reason_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when BreakpointEvent_reason_Predefined =>
+      null;
+end case;
+end record;
+
+function changed return BreakpointEvent_reason is (Kind => changed);
+
+function a_new return BreakpointEvent_reason is (Kind => a_new);
+
+function removed return BreakpointEvent_reason is (Kind => removed);
+
+
+type EvaluateArguments_context_Value is (watch, repl, hover, clipboard, variables, Custom_Value);
+
+subtype EvaluateArguments_context_Predefined is EvaluateArguments_context_Value range watch .. variables;
+
+type EvaluateArguments_context (Kind : EvaluateArguments_context_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when EvaluateArguments_context_Predefined =>
+      null;
+end case;
+end record;
+
+function watch return EvaluateArguments_context is (Kind => watch);
+      --  evaluate is called from a watch view context.
+
+function repl return EvaluateArguments_context is (Kind => repl);
+      --  evaluate is called from a REPL context.
+
+function hover return EvaluateArguments_context is (Kind => hover);
+      --  evaluate is called to generate the debug hover contents.
+      --  This value should only be used if the corresponding capability `supportsEvaluateForHovers` is true.
+
+function clipboard return EvaluateArguments_context is (Kind => clipboard);
+      --  evaluate is called to generate clipboard contents.
+      --  This value should only be used if the corresponding capability `supportsClipboardContext` is true.
+
+function variables return EvaluateArguments_context is (Kind => variables);
+      --  evaluate is called from a variables view context.
+
 
 type Optional_EvaluateArguments_context (Is_Set : Boolean := False) is record
 case Is_Set is
@@ -6765,7 +7049,10 @@ procedure Output_StoppedEvent_reason
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.StoppedEvent_reason) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.step =>
 Handler.String_Value ("step");
 when Enum.breakpoint =>
@@ -6803,7 +7090,10 @@ procedure Output_OutputEvent_category
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.OutputEvent_category) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.console =>
 Handler.String_Value ("console");
 when Enum.important =>
@@ -6865,7 +7155,10 @@ procedure Output_Scope_presentationHint
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.Scope_presentationHint) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.arguments =>
 Handler.String_Value ("arguments");
 when Enum.locals =>
@@ -6879,7 +7172,10 @@ procedure Output_Response_message
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.Response_message) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.cancelled =>
 Handler.String_Value ("cancelled");
 when Enum.notStopped =>
@@ -6937,7 +7233,10 @@ procedure Output_InvalidatedAreas
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.InvalidatedAreas) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.an_all =>
 Handler.String_Value ("all");
 when Enum.stacks =>
@@ -6981,7 +7280,10 @@ procedure Output_ProtocolMessage_type
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.ProtocolMessage_type) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.request =>
 Handler.String_Value ("request");
 when Enum.response =>
@@ -7019,7 +7321,10 @@ procedure Output_VariablePresentationHint_kind
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.VariablePresentationHint_kind) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.property =>
 Handler.String_Value ("property");
 when Enum.method =>
@@ -7049,7 +7354,10 @@ procedure Output_VariablePresentationHint_visibility
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.VariablePresentationHint_visibility) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.public =>
 Handler.String_Value ("public");
 when Enum.a_private =>
@@ -7067,7 +7375,10 @@ procedure Output_InitializeRequestArguments_pathFormat
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.InitializeRequestArguments_pathFormat) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.path =>
 Handler.String_Value ("path");
 when Enum.uri =>
@@ -7079,7 +7390,10 @@ procedure Output_ThreadEvent_reason
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.ThreadEvent_reason) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.started =>
 Handler.String_Value ("started");
 when Enum.exited =>
@@ -7105,7 +7419,10 @@ procedure Output_BreakpointEvent_reason
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.BreakpointEvent_reason) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.changed =>
 Handler.String_Value ("changed");
 when Enum.a_new =>
@@ -7119,7 +7436,10 @@ procedure Output_EvaluateArguments_context
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.EvaluateArguments_context) is
 begin
-case Value is
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
 when Enum.watch =>
 Handler.String_Value ("watch");
 when Enum.repl =>
@@ -12857,8 +13177,8 @@ procedure Input_ModuleEvent_reason
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.ModuleEvent_reason;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-ModuleEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+ModuleEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.ModuleEvent_reason'Val (Index - 1);
@@ -12874,8 +13194,8 @@ procedure Input_ColumnDescriptor_type
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.ColumnDescriptor_type;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-ColumnDescriptor_type_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+ColumnDescriptor_type_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.ColumnDescriptor_type'Val (Index - 1);
@@ -12891,8 +13211,8 @@ procedure Input_StackFrame_presentationHint
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.StackFrame_presentationHint;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-StackFrame_presentationHint_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+StackFrame_presentationHint_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.StackFrame_presentationHint'Val (Index - 1);
@@ -12908,8 +13228,8 @@ procedure Input_ExceptionBreakMode
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.ExceptionBreakMode;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-ExceptionBreakMode_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+ExceptionBreakMode_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.ExceptionBreakMode'Val (Index - 1);
@@ -12925,12 +13245,15 @@ procedure Input_StoppedEvent_reason
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.StoppedEvent_reason;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-StoppedEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+StoppedEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.StoppedEvent_reason'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.StoppedEvent_reason_Predefined (Enum.StoppedEvent_reason_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -12942,8 +13265,8 @@ procedure Input_StartDebuggingRequestArguments_request
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.StartDebuggingRequestArguments_request;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-StartDebuggingRequestArguments_request_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+StartDebuggingRequestArguments_request_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.StartDebuggingRequestArguments_request'Val (Index - 1);
@@ -12959,12 +13282,15 @@ procedure Input_OutputEvent_category
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.OutputEvent_category;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-OutputEvent_category_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+OutputEvent_category_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.OutputEvent_category'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.OutputEvent_category_Predefined (Enum.OutputEvent_category_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -12976,8 +13302,8 @@ procedure Input_OutputEvent_group
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.OutputEvent_group;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-OutputEvent_group_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+OutputEvent_group_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.OutputEvent_group'Val (Index - 1);
@@ -12993,8 +13319,8 @@ procedure Input_ChecksumAlgorithm
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.ChecksumAlgorithm;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-ChecksumAlgorithm_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+ChecksumAlgorithm_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.ChecksumAlgorithm'Val (Index - 1);
@@ -13010,8 +13336,8 @@ procedure Input_ProcessEvent_startMethod
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.ProcessEvent_startMethod;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-ProcessEvent_startMethod_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+ProcessEvent_startMethod_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.ProcessEvent_startMethod'Val (Index - 1);
@@ -13027,12 +13353,15 @@ procedure Input_Scope_presentationHint
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.Scope_presentationHint;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-Scope_presentationHint_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+Scope_presentationHint_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.Scope_presentationHint'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.Scope_presentationHint_Predefined (Enum.Scope_presentationHint_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13044,12 +13373,15 @@ procedure Input_Response_message
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.Response_message;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-Response_message_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+Response_message_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.Response_message'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.Response_message_Predefined (Enum.Response_message_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13061,8 +13393,8 @@ procedure Input_CompletionItemType
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.CompletionItemType;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-CompletionItemType_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+CompletionItemType_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.CompletionItemType'Val (Index - 1);
@@ -13078,12 +13410,15 @@ procedure Input_InvalidatedAreas
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.InvalidatedAreas;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-InvalidatedAreas_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+InvalidatedAreas_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.InvalidatedAreas'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.InvalidatedAreas_Predefined (Enum.InvalidatedAreas_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13095,8 +13430,8 @@ procedure Input_Source_presentationHint
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.Source_presentationHint;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-Source_presentationHint_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+Source_presentationHint_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.Source_presentationHint'Val (Index - 1);
@@ -13112,8 +13447,8 @@ procedure Input_LoadedSourceEvent_reason
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.LoadedSourceEvent_reason;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-LoadedSourceEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+LoadedSourceEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.LoadedSourceEvent_reason'Val (Index - 1);
@@ -13129,12 +13464,15 @@ procedure Input_ProtocolMessage_type
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.ProtocolMessage_type;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-ProtocolMessage_type_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+ProtocolMessage_type_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.ProtocolMessage_type'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.ProtocolMessage_type_Predefined (Enum.ProtocolMessage_type_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13146,8 +13484,8 @@ procedure Input_RunInTerminalRequestArguments_kind
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.RunInTerminalRequestArguments_kind;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-RunInTerminalRequestArguments_kind_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+RunInTerminalRequestArguments_kind_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.RunInTerminalRequestArguments_kind'Val (Index - 1);
@@ -13163,8 +13501,8 @@ procedure Input_VariablesArguments_filter
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.VariablesArguments_filter;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-VariablesArguments_filter_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+VariablesArguments_filter_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.VariablesArguments_filter'Val (Index - 1);
@@ -13180,12 +13518,15 @@ procedure Input_VariablePresentationHint_kind
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.VariablePresentationHint_kind;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-VariablePresentationHint_kind_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+VariablePresentationHint_kind_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.VariablePresentationHint_kind'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.VariablePresentationHint_kind_Predefined (Enum.VariablePresentationHint_kind_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13197,12 +13538,15 @@ procedure Input_VariablePresentationHint_visibility
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.VariablePresentationHint_visibility;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-VariablePresentationHint_visibility_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+VariablePresentationHint_visibility_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.VariablePresentationHint_visibility'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.VariablePresentationHint_visibility_Predefined (Enum.VariablePresentationHint_visibility_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13214,12 +13558,15 @@ procedure Input_InitializeRequestArguments_pathFormat
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.InitializeRequestArguments_pathFormat;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-InitializeRequestArguments_pathFormat_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+InitializeRequestArguments_pathFormat_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.InitializeRequestArguments_pathFormat'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.InitializeRequestArguments_pathFormat_Predefined (Enum.InitializeRequestArguments_pathFormat_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13231,12 +13578,15 @@ procedure Input_ThreadEvent_reason
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.ThreadEvent_reason;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-ThreadEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+ThreadEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.ThreadEvent_reason'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.ThreadEvent_reason_Predefined (Enum.ThreadEvent_reason_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13248,8 +13598,8 @@ procedure Input_DataBreakpointAccessType
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.DataBreakpointAccessType;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-DataBreakpointAccessType_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+DataBreakpointAccessType_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.DataBreakpointAccessType'Val (Index - 1);
@@ -13265,12 +13615,15 @@ procedure Input_BreakpointEvent_reason
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.BreakpointEvent_reason;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-BreakpointEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+BreakpointEvent_reason_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.BreakpointEvent_reason'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.BreakpointEvent_reason_Predefined (Enum.BreakpointEvent_reason_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13282,12 +13635,15 @@ procedure Input_EvaluateArguments_context
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.EvaluateArguments_context;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-EvaluateArguments_context_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+EvaluateArguments_context_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
-Value := Enum.EvaluateArguments_context'Val (Index - 1);
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.EvaluateArguments_context_Predefined (Enum.EvaluateArguments_context_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
 Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
 else
 Success := False;
 end if;
@@ -13299,8 +13655,8 @@ procedure Input_SteppingGranularity
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.SteppingGranularity;
 Success : in out Boolean) is
-Index : constant Natural := (if Reader.Is_String_Value then
-SteppingGranularity_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else 0);
+Index : constant Integer := (if Reader.Is_String_Value then
+SteppingGranularity_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
 begin
 if Index > 0 then
 Value := Enum.SteppingGranularity'Val (Index - 1);

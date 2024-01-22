@@ -29,6 +29,10 @@ package VSS.Command_Line is
       Name : VSS.Strings.Virtual_String;
    end record;
 
+   type Multivalue_Positional_Option is new Abstract_Option with record
+      Name : VSS.Strings.Virtual_String;
+   end record;
+
    type Named_Option is abstract new Abstract_Option with record
       Short_Name : VSS.Strings.Virtual_String;
       Long_Name  : VSS.Strings.Virtual_String;
@@ -68,6 +72,11 @@ package VSS.Command_Line is
 
    function Values
      (Option : Value_Option'Class)
+      return VSS.String_Vectors.Virtual_String_Vector;
+   --  Return all values of the given option specified in the command line.
+
+   function Values
+     (Option : Multivalue_Positional_Option'Class)
       return VSS.String_Vectors.Virtual_String_Vector;
    --  Return all values of the given option specified in the command line.
 

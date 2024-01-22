@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -402,6 +402,24 @@ package body VSS.String_Vectors is
             VSS.Strings.Internals.Data_Access_Constant (Item).all);
       end if;
    end Replace;
+
+   -----------
+   -- Slice --
+   -----------
+
+   function Slice
+     (Self : Virtual_String_Vector'Class;
+      From : Positive;
+      To   : Natural) return Virtual_String_Vector is
+   begin
+      return Result : Virtual_String_Vector do
+         for J in From .. To loop
+            exit when J > Self.Length;
+
+            Result.Append (Self (J));
+         end loop;
+      end return;
+   end Slice;
 
    -----------
    -- Write --

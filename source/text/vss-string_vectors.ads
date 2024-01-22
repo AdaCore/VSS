@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -48,6 +48,12 @@ package VSS.String_Vectors is
      (Self  : Virtual_String_Vector'Class;
       Index : Positive) return VSS.Strings.Virtual_String;
    --  Return given element. Return "null" string when index is out of bound.
+
+   function Slice
+     (Self : Virtual_String_Vector'Class;
+      From : Positive;
+      To   : Natural) return Virtual_String_Vector;
+   --  Return elements inside given range.
 
    function First_Element
      (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String;

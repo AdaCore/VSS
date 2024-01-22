@@ -293,7 +293,8 @@ package body JSON_Schema.Readers is
 
          elsif Key = "const" then
             Read_Any_JSON_Value (Reader, Value.Const);
-         elsif Key = "enum" or  Key = "_enum" then
+
+         elsif Key = "enum" then
             pragma Assert (Reader.Is_Start_Array);
 
             Reader.Read_Next;
@@ -306,6 +307,22 @@ package body JSON_Schema.Readers is
 
             pragma Assert (Reader.Is_End_Array);
             Reader.Read_Next;
+
+         elsif Key = "_enum" then
+            --  DAP's custom `_enum` property
+            pragma Assert (Reader.Is_Start_Array);
+
+            Reader.Read_Next;
+
+            while not Reader.At_End and then not Reader.Is_End_Array loop
+               pragma Assert (Reader.Is_String_Value);
+               Value.X_Enum.Append (Reader.String_Value);
+               Reader.Read_Next;
+            end loop;
+
+            pragma Assert (Reader.Is_End_Array);
+            Reader.Read_Next;
+
          elsif Key = "type" then
             pragma Assert (Reader.Is_Start_Array or Reader.Is_String_Value);
 
@@ -384,10 +401,23 @@ package body JSON_Schema.Readers is
             Value.Ref := Reader.String_Value;
             Reader.Read_Next;
 
-         elsif Key = "default"
-           or Key = "enumDescriptions"  --  what's enumDescriptions???
-         then
+         elsif Key = "default" then
             Reader.Skip_Current_Value;
+
+         elsif Key = "enumDescriptions" then
+            --  DAP's custom `enumDescriptions` property
+            pragma Assert (Reader.Is_Start_Array);
+
+            Reader.Read_Next;
+
+            while not Reader.At_End and then not Reader.Is_End_Array loop
+               pragma Assert (Reader.Is_String_Value);
+               Value.X_Enum_Descriptions.Append (Reader.String_Value);
+               Reader.Read_Next;
+            end loop;
+
+            pragma Assert (Reader.Is_End_Array);
+            Reader.Read_Next;
 
          else
             --  Any unknown object is a new schema namespace

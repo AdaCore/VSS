@@ -160,10 +160,6 @@ package body JSON_Schema.Writers.Types is
       Array_Types    : Readers.Schema_Map);
    --  Write package specification with type declarations
 
-   function Is_Enum (Schema : Schema_Access) return Boolean is
-     (not Schema.Enum.Is_Empty);
-   --  Check for enumeration schema
-
    function Field_Type
      (Map      : JSON_Schema.Readers.Schema_Map;
       Schema   : Schema_Access;
@@ -503,21 +499,85 @@ package body JSON_Schema.Writers.Types is
    procedure Write_Enumeration_Type
      (Name   : VSS.Strings.Virtual_String;
       Schema : Schema_Access) is
+
+      procedure Print_List (List : Definitions.String_Array);
+      --  Print list of enumeration literals
+
+      ----------------
+      -- Print_List --
+      ----------------
+
+      procedure Print_List (List : Definitions.String_Array) is
+      begin
+         for Index in 1 .. List.Length loop
+            if Index > 1 then
+               Put (", ");
+            end if;
+
+            Put (Escape_Keywords (List.Element (Index)));
+         end loop;
+      end Print_List;
+
    begin
       Put ("type ");
       Put (Name);
 
-      Put (" is (");
+      if not Schema.Enum.Is_Empty then
+         Put (" is (");
+         Print_List (Schema.Enum);
+         Put (");");
 
-      for Index in 1 .. Schema.Enum.Length loop
-         if Index > 1 then
-            Put (", ");
-         end if;
+      elsif not Schema.X_Enum.Is_Empty then
+         Put ("_Value is (");
+         Print_List (Schema.X_Enum);
+         Put (", Custom_Value);"); New_Line; New_Line;
+         Put ("subtype ");
+         Put (Name);
+         Put ("_Predefined is ");
+         Put (Name);
+         Put ("_Value range ");
+         Put (Escape_Keywords (Schema.X_Enum.Element (1)));
+         Put (" .. ");
+         Put (Escape_Keywords (Schema.X_Enum.Element (Schema.X_Enum.Length)));
+         Put (";"); New_Line; New_Line;
 
-         Put (Escape_Keywords (Schema.Enum.Element (Index)));
-      end loop;
+         Put ("type ");
+         Put (Name);
+         Put (" (Kind : ");
+         Put (Name);
+         Put ("_Value := Custom_Value) is record"); New_Line;
+         Put ("case Kind is"); New_Line;
+         Put ("   when Custom_Value =>"); New_Line;
+         Put ("      Custom_Value : VSS.Strings.Virtual_String;"); New_Line;
+         Put ("   when ");
+         Put (Name);
+         Put ("_Predefined =>"); New_Line;
+         Put ("      null;"); New_Line;
+         Put ("end case;"); New_Line;
+         Put ("end record;"); New_Line;
 
-      Put (");");
+         for Index in 1 .. Schema.X_Enum.Length loop
+            declare
+               Item : constant VSS.Strings.Virtual_String :=
+                 Escape_Keywords (Schema.X_Enum.Element (Index));
+            begin
+               New_Line;
+               Put ("function ");
+               Put (Item);
+               Put (" return ");
+               Put (Name);
+               Put (" is (Kind => ");
+               Put (Item);
+               Put (");"); New_Line;
+
+               if Index <= Schema.X_Enum_Descriptions.Length then
+                  Write_Comment
+                    (Schema.X_Enum_Descriptions.Element (Index), 6);
+               end if;
+            end;
+         end loop;
+      end if;
+
       New_Line;
       New_Line;
    end Write_Enumeration_Type;
@@ -1069,7 +1129,7 @@ package body JSON_Schema.Writers.Types is
                Done.Include (Name);
             end if;
 
-            if Schema.Enum.Length > 1 then
+            if Schema.Enum.Length > 1 or Schema.X_Enum.Length > 1 then
                if not Property.Is_Empty then
                   Type_Name.Append ("_");
                   Type_Name.Append (Property);

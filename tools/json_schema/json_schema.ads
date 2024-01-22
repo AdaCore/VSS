@@ -135,6 +135,12 @@ package JSON_Schema is
       Any_Of             : Definitions.Schema_Array;
       One_Of             : Definitions.Schema_Array;
       Negate             : Schema_Access;
+
+      --  Custom properties/extensions
+      X_Enum : Definitions.String_Array;  --  `_enum` prop of DAP
+
+      X_Enum_Descriptions : Definitions.String_Array;
+      --  enumDescriptions property of DAP
    end record;
    --  Default: `{}` or `True`
 

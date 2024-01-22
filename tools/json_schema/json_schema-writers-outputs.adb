@@ -81,8 +81,13 @@ package body JSON_Schema.Writers.Outputs is
          pragma Unreferenced (Optional);
 
          Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
+
+         Pseudo_Enum : constant Boolean := Schema.X_Enum.Length > 1;
+
+         List : constant Definitions.String_Array :=
+           (if Pseudo_Enum then Schema.X_Enum else Schema.Enum);
       begin
-         if Schema.Enum.Length > 1 then
+         if List.Length > 1 then
             if not Property.Is_Empty then
                Type_Name.Append ("_");
                Type_Name.Append (Property);
@@ -93,19 +98,35 @@ package body JSON_Schema.Writers.Outputs is
             New_Line;
             Put ("begin");
             New_Line;
-            Put ("case Value is");
-            New_Line;
-            for Index in 1 .. Schema.Enum.Length loop
+
+            if Pseudo_Enum then
+               Put ("case Value.Kind is"); New_Line;
                Put ("when ");
                Put (Enum_Prefix);
-               Put (Escape_Keywords (Schema.Enum.Element (Index)));
+               Put ("Custom_Value =>");
+               New_Line;
+               Put ("Handler.String_Value (Value.Custom_Value);");
+               New_Line;
+
+            else
+               Put ("case Value is");
+
+            end if;
+
+            New_Line;
+
+            for Index in 1 .. List.Length loop
+               Put ("when ");
+               Put (Enum_Prefix);
+               Put (Escape_Keywords (List.Element (Index)));
                Put (" =>");
                New_Line;
                Put ("Handler.String_Value (""");
-               Put (Schema.Enum.Element (Index));
+               Put (List.Element (Index));
                Put (""");");
                New_Line;
             end loop;
+
             Put ("end case;");
             New_Line;
 
@@ -131,7 +152,7 @@ package body JSON_Schema.Writers.Outputs is
 
          Type_Name : VSS.Strings.Virtual_String := Ref_To_Type_Name (Name);
       begin
-         if Schema.Enum.Length > 1 then
+         if Schema.Enum.Length > 1 or Schema.X_Enum.Length > 1 then
             if not Property.Is_Empty then
                Type_Name.Append ("_");
                Type_Name.Append (Property);
@@ -377,7 +398,7 @@ package body JSON_Schema.Writers.Outputs is
          Write_Record_Component (Enclosing, Map, Property, Required, Holders);
       end On_Property;
    begin
-      if not Schema.Enum.Is_Empty then
+      if Is_Enum (Schema) then
          return;
       end if;
 

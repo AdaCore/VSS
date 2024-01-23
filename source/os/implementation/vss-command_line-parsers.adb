@@ -289,6 +289,14 @@ package body VSS.Command_Line.Parsers is
                Option_Text.Append (" <");
                Option_Text.Append (Value_Option'Class (Option).Value_Name);
                Option_Text.Append (">");
+
+            elsif Option in Name_Value_Option'Class then
+               Option_Text.Append (" <");
+               Option_Text.Append (Name_Value_Option'Class (Option).Name_Name);
+               Option_Text.Append ("=");
+               Option_Text.Append
+                 (Name_Value_Option'Class (Option).Value_Name);
+               Option_Text.Append (">");
             end if;
 
             Append_Option_Description (Option_Text, Option.Description);

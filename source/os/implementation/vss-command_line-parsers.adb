@@ -838,12 +838,18 @@ package body VSS.Command_Line.Parsers is
       Option : Multivalue_Positional_Option'Class)
       return VSS.String_Vectors.Virtual_String_Vector is
    begin
-      return
-        Self.Positional_Options_Values.Slice
-          (Natural (Self.Defined_Positional_Options.Length) + 1,
-           Self.Positional_Options_Values.Length);
+      if not Self.Defined_Multivalue_Option.Is_Empty
+        and then Self.Defined_Multivalue_Option.Element
+                   = Multivalue_Positional_Option (Option)
+      then
+         return
+           Self.Positional_Options_Values.Slice
+             (Natural (Self.Defined_Positional_Options.Length) + 1,
+              Self.Positional_Options_Values.Length);
 
-      return VSS.String_Vectors.Empty_Virtual_String_Vector;
+      else
+         return VSS.String_Vectors.Empty_Virtual_String_Vector;
+      end if;
    end Values;
 
 end VSS.Command_Line.Parsers;

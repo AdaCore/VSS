@@ -107,8 +107,9 @@ package JSON_Schema.Writers is
    --  If type is defined in a package, then return package name in Prefix.
 
    procedure Get_Element_Type
-     (Map       : JSON_Schema.Readers.Schema_Map;
-      Schema    : Schema_Access;
+     (Name      : Schema_Name;
+      Map       : JSON_Schema.Readers.Schema_Map;
+      Prop      : Property;
       Type_Name : out VSS.Strings.Virtual_String;
       Prefix    : out VSS.Strings.Virtual_String);
 

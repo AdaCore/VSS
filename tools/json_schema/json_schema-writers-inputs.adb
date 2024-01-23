@@ -807,7 +807,7 @@ package body JSON_Schema.Writers.Inputs is
                Type_Prefix : VSS.Strings.Virtual_String;
             begin
                Get_Element_Type
-                 (Map, Property.Schema, Item_Type, Type_Prefix);
+                 (Name, Map, Property, Item_Type, Type_Prefix);
 
                Put ("if Success and Reader.Is_Start_Array then"); New_Line;
                Put ("Reader.Read_Next;"); New_Line;

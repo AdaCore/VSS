@@ -132,9 +132,9 @@ package body JSON_Schema.Writers.Types is
    --  optional properties.
 
    procedure Find_Array_Types
-     (Map    : JSON_Schema.Readers.Schema_Map;
-      Schema : Schema_Access;
-      Result : in out Readers.Schema_Map);
+     (Enclosing_Type : Schema_Name;
+      Map            : JSON_Schema.Readers.Schema_Map;
+      Result         : in out Readers.Schema_Map);
    --  Scan Schema recursively and find all types that are referenced as items
    --  in an array schema.
 
@@ -195,32 +195,60 @@ package body JSON_Schema.Writers.Types is
    ----------------------
 
    procedure Find_Array_Types
-     (Map    : JSON_Schema.Readers.Schema_Map;
-      Schema : Schema_Access;
-      Result : in out Readers.Schema_Map)
+     (Enclosing_Type : Schema_Name;
+      Map            : JSON_Schema.Readers.Schema_Map;
+      Result         : in out Readers.Schema_Map)
    is
       use type Definitions.Simple_Types;
 
-      Ref : Schema_Name;
-   begin
-      if Schema.Kind.Last_Index = 1
-        and then Schema.Kind (1) = Definitions.An_Array
-        and then not Schema.Items.First_Element.Ref.Is_Empty
-      then
-         pragma Assert (Schema.Items.Last_Index = 1);
-         Ref := Schema.Items.First_Element.Ref;
-         Result.Include (Ref_To_Type_Name (Ref), Map (Ref));
-      end if;
+      procedure Recursion
+        (Schema : Schema_Access;
+         Prop   : VSS.Strings.Virtual_String);
 
-      for Item of Schema.All_Of loop
-         if Item.Ref.Is_Empty then
-            Find_Array_Types (Map, Item, Result);
+      procedure Recursion
+        (Schema : Schema_Access;
+         Prop   : VSS.Strings.Virtual_String)
+      is
+         Ref : Schema_Name;
+      begin
+         if Schema.Kind.Last_Index = 1
+           and then Schema.Kind (1) = Definitions.An_Array
+         then
+            if not Schema.Items.First_Element.Ref.Is_Empty then
+               pragma Assert (Schema.Items.Last_Index = 1);
+               Ref := Schema.Items.First_Element.Ref;
+               Result.Include (Ref_To_Type_Name (Ref), Map (Ref));
+
+            elsif Is_Enum (Schema.Items.First_Element) then
+
+               declare
+                  Name : VSS.Strings.Virtual_String :=
+                    Ref_To_Type_Name (Enclosing_Type);
+               begin
+                  if not Prop.Is_Empty then
+                     Name.Append ("_");
+                     Name.Append (Prop);
+                  end if;
+
+                  Result.Insert (Name, Schema.Items.First_Element);
+               end;
+            end if;
          end if;
-      end loop;
 
-      for Property of Schema.Properties loop
-         Find_Array_Types (Map, Property.Schema, Result);
-      end loop;
+         for Item of Schema.All_Of loop
+            if Item.Ref.Is_Empty then
+               Recursion (Item, Prop);
+            end if;
+         end loop;
+
+         for Property of Schema.Properties loop
+            Recursion (Property.Schema, Property.Name);
+         end loop;
+      end Recursion;
+
+      Schema : constant Schema_Access := Map (Enclosing_Type);
+   begin
+      Recursion (Schema, "");
    end Find_Array_Types;
 
    -------------------------
@@ -274,9 +302,16 @@ package body JSON_Schema.Writers.Types is
       Optional_Types : String_Sets.Set;
       Array_Types    : Readers.Schema_Map;
    begin
-      for Schema of Map loop
-         Find_Optional_Types (Schema, Optional_Types);
-         Find_Array_Types (Map, Schema, Array_Types);
+      for Cursor in Map.Iterate loop
+         declare
+            Name : constant VSS.Strings.Virtual_String :=
+              JSON_Schema.Readers.Schema_Maps.Key (Cursor);
+            Schema : constant Schema_Access :=
+              JSON_Schema.Readers.Schema_Maps.Element (Cursor);
+         begin
+            Find_Optional_Types (Schema, Optional_Types);
+            Find_Array_Types (Name, Map, Array_Types);
+         end;
       end loop;
 
       Array_Types.Insert ("Integer", null);

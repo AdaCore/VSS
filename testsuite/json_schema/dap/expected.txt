@@ -123,6 +123,10 @@ type Source_Vector is tagged private
 with Variable_Indexing => Get_Source_Variable_Reference,
 Constant_Indexing => Get_Source_Constant_Reference;
 
+type VariablePresentationHint_attributes_Vector is tagged private
+with Variable_Indexing => Get_VariablePresentationHint_attributes_Variable_Reference,
+Constant_Indexing => Get_VariablePresentationHint_attributes_Constant_Reference;
+
 type SourceBreakpoint_Vector is tagged private
 with Variable_Indexing => Get_SourceBreakpoint_Variable_Reference,
 Constant_Indexing => Get_SourceBreakpoint_Constant_Reference;
@@ -464,6 +468,44 @@ case Is_Set is
 when True => Value : VariablePresentationHint_kind;
 when False => null;
 end case; end record;
+
+type VariablePresentationHint_attributes_Value is (static, a_constant, readOnly, rawString, hasObjectId, canHaveObjectId, hasSideEffects, hasDataBreakpoint, Custom_Value);
+
+subtype VariablePresentationHint_attributes_Predefined is VariablePresentationHint_attributes_Value range static .. hasDataBreakpoint;
+
+type VariablePresentationHint_attributes (Kind : VariablePresentationHint_attributes_Value := Custom_Value) is record
+case Kind is
+   when Custom_Value =>
+      Custom_Value : VSS.Strings.Virtual_String;
+   when VariablePresentationHint_attributes_Predefined =>
+      null;
+end case;
+end record;
+
+function static return VariablePresentationHint_attributes is (Kind => static);
+      --  Indicates that the object is static.
+
+function a_constant return VariablePresentationHint_attributes is (Kind => a_constant);
+      --  Indicates that the object is a constant.
+
+function readOnly return VariablePresentationHint_attributes is (Kind => readOnly);
+      --  Indicates that the object is read only.
+
+function rawString return VariablePresentationHint_attributes is (Kind => rawString);
+      --  Indicates that the object is a raw string.
+
+function hasObjectId return VariablePresentationHint_attributes is (Kind => hasObjectId);
+      --  Indicates that the object can have an Object ID created for it.
+
+function canHaveObjectId return VariablePresentationHint_attributes is (Kind => canHaveObjectId);
+      --  Indicates that the object has an Object ID associated with it.
+
+function hasSideEffects return VariablePresentationHint_attributes is (Kind => hasSideEffects);
+      --  Indicates that the evaluation had side effects.
+
+function hasDataBreakpoint return VariablePresentationHint_attributes is (Kind => hasDataBreakpoint);
+      --  Indicates that the object has its value tracked by a data breakpoint.
+
 
 type VariablePresentationHint_visibility_Value is (public, a_private, a_protected, internal, final, Custom_Value);
 
@@ -1347,7 +1389,7 @@ end record;
 type VariablePresentationHint is record
 kind : Enum.Optional_VariablePresentationHint_kind;
       --  The kind of variable. Before introducing additional values, try to use the listed values.
-attributes : VSS.String_Vectors.Virtual_String_Vector;
+attributes : VariablePresentationHint_attributes_Vector;
       --  Set of attributes represented as an array of strings. Before introducing additional values, try to use the listed values.
 visibility : Enum.Optional_VariablePresentationHint_visibility;
       --  Visibility of variable. Before introducing additional values, try to use the listed values.
@@ -3946,6 +3988,34 @@ Index : Positive)
 return Source_Constant_Reference
 with Inline;
 
+function Length (Self : VariablePresentationHint_attributes_Vector) return Natural;
+
+procedure Clear (Self : in out VariablePresentationHint_attributes_Vector);
+
+procedure Append
+(Self : in out VariablePresentationHint_attributes_Vector;
+Value : Enum.VariablePresentationHint_attributes);
+
+type VariablePresentationHint_attributes_Variable_Reference
+(Element : not null access Enum.VariablePresentationHint_attributes) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_VariablePresentationHint_attributes_Variable_Reference
+(Self : aliased in out VariablePresentationHint_attributes_Vector;
+Index : Positive)
+return VariablePresentationHint_attributes_Variable_Reference
+with Inline;
+
+type VariablePresentationHint_attributes_Constant_Reference
+(Element : not null access constant Enum.VariablePresentationHint_attributes) is null record
+with Implicit_Dereference => Element;
+
+not overriding function Get_VariablePresentationHint_attributes_Constant_Reference
+(Self : aliased VariablePresentationHint_attributes_Vector;
+Index : Positive)
+return VariablePresentationHint_attributes_Constant_Reference
+with Inline;
+
 function Length (Self : SourceBreakpoint_Vector) return Natural;
 
 procedure Clear (Self : in out SourceBreakpoint_Vector);
@@ -4430,6 +4500,17 @@ end record;
 overriding procedure Adjust (Self : in out Source_Vector);
 
 overriding procedure Finalize (Self : in out Source_Vector);
+
+type VariablePresentationHint_attributes_Array is array (Positive range <>) of aliased Enum.VariablePresentationHint_attributes;
+type VariablePresentationHint_attributes_Array_Access is access VariablePresentationHint_attributes_Array;
+type VariablePresentationHint_attributes_Vector is new Ada.Finalization.Controlled with record
+Data   : VariablePresentationHint_attributes_Array_Access;
+Length : Natural := 0;
+end record;
+
+overriding procedure Adjust (Self : in out VariablePresentationHint_attributes_Vector);
+
+overriding procedure Finalize (Self : in out VariablePresentationHint_attributes_Vector);
 
 type SourceBreakpoint_Array is array (Positive range <>) of aliased SourceBreakpoint;
 type SourceBreakpoint_Array_Access is access SourceBreakpoint_Array;
@@ -5457,6 +5538,61 @@ return Source_Constant_Reference
 is (Element => Self.Data (Index)'Access);
 
 procedure Free is new Ada.Unchecked_Deallocation
+(VariablePresentationHint_attributes_Array, VariablePresentationHint_attributes_Array_Access);
+
+overriding procedure Adjust (Self : in out VariablePresentationHint_attributes_Vector) is
+begin
+if Self.Length > 0 then
+Self.Data :=
+new VariablePresentationHint_attributes_Array'(Self.Data (1 .. Self.Length));
+end if;
+end Adjust;
+
+overriding procedure Finalize (Self : in out VariablePresentationHint_attributes_Vector) is
+begin
+Free (Self.Data);
+Self.Length := 0;
+end Finalize;
+
+function Length (Self : VariablePresentationHint_attributes_Vector) return Natural is (Self.Length);
+
+procedure Clear (Self : in out VariablePresentationHint_attributes_Vector) is
+begin
+   Self.Length := 0;
+end Clear;
+
+procedure Append
+(Self : in out VariablePresentationHint_attributes_Vector;
+Value : Enum.VariablePresentationHint_attributes) is
+Init_Length : constant Positive :=
+Positive'Max (1, 256 / Enum.VariablePresentationHint_attributes'Size);
+Self_Data_Saved : VariablePresentationHint_attributes_Array_Access := Self.Data;
+begin
+if Self.Length = 0 then
+Self.Data := new VariablePresentationHint_attributes_Array (1 .. Init_Length);
+elsif Self.Length = Self.Data'Last then
+Self.Data :=
+new VariablePresentationHint_attributes_Array'(Self.Data.all
+ & VariablePresentationHint_attributes_Array'(1 .. Self.Length => <>));
+Free (Self_Data_Saved);
+end if;
+Self.Length := Self.Length + 1;
+Self.Data (Self.Length) := Value;
+end Append;
+
+not overriding function Get_VariablePresentationHint_attributes_Variable_Reference
+(Self : aliased in out VariablePresentationHint_attributes_Vector;
+Index : Positive)
+return VariablePresentationHint_attributes_Variable_Reference
+is (Element => Self.Data (Index)'Access);
+
+not overriding function Get_VariablePresentationHint_attributes_Constant_Reference
+(Self : aliased VariablePresentationHint_attributes_Vector;
+Index : Positive)
+return VariablePresentationHint_attributes_Constant_Reference
+is (Element => Self.Data (Index)'Access);
+
+procedure Free is new Ada.Unchecked_Deallocation
 (SourceBreakpoint_Array, SourceBreakpoint_Array_Access);
 
 overriding procedure Adjust (Self : in out SourceBreakpoint_Vector) is
@@ -6166,6 +6302,10 @@ Value : Enum.VariablesArguments_filter);
 procedure Output_VariablePresentationHint_kind
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
 Value : Enum.VariablePresentationHint_kind);
+
+procedure Output_VariablePresentationHint_attributes
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.VariablePresentationHint_attributes);
 
 procedure Output_VariablePresentationHint_visibility
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
@@ -7349,6 +7489,33 @@ when Enum.dataBreakpoint =>
 Handler.String_Value ("dataBreakpoint");
 end case;
 end Output_VariablePresentationHint_kind;
+
+procedure Output_VariablePresentationHint_attributes
+(Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+Value : Enum.VariablePresentationHint_attributes) is
+begin
+case Value.Kind is
+when Enum.Custom_Value =>
+Handler.String_Value (Value.Custom_Value);
+
+when Enum.static =>
+Handler.String_Value ("static");
+when Enum.a_constant =>
+Handler.String_Value ("constant");
+when Enum.readOnly =>
+Handler.String_Value ("readOnly");
+when Enum.rawString =>
+Handler.String_Value ("rawString");
+when Enum.hasObjectId =>
+Handler.String_Value ("hasObjectId");
+when Enum.canHaveObjectId =>
+Handler.String_Value ("canHaveObjectId");
+when Enum.hasSideEffects =>
+Handler.String_Value ("hasSideEffects");
+when Enum.hasDataBreakpoint =>
+Handler.String_Value ("hasDataBreakpoint");
+end case;
+end Output_VariablePresentationHint_attributes;
 
 procedure Output_VariablePresentationHint_visibility
 (Handler : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
@@ -10612,11 +10779,11 @@ if Value.kind.Is_Set then
 Handler.Key_Name ("kind");
 Output_VariablePresentationHint_kind (Handler, Value.kind.Value);
 end if;
-if not Value.attributes.Is_Empty then
+if Value.attributes.Length > 0 then
 Handler.Key_Name ("attributes");
 Handler.Start_Array;
 for J in 1 .. Value.attributes.Length loop
-Handler.String_Value (Value.attributes (J));
+Output_VariablePresentationHint_attributes (Handler, Value.attributes (J));
 end loop;
 Handler.End_Array;
 end if;
@@ -12160,6 +12327,11 @@ procedure Input_VariablePresentationHint_kind
 Value : out Enum.VariablePresentationHint_kind;
 Success : in out Boolean);
 
+procedure Input_VariablePresentationHint_attributes
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.VariablePresentationHint_attributes;
+Success : in out Boolean);
+
 procedure Input_VariablePresentationHint_visibility
 (Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
 Value : out Enum.VariablePresentationHint_visibility;
@@ -13531,6 +13703,26 @@ else
 Success := False;
 end if;
 end Input_VariablePresentationHint_kind;
+
+package VariablePresentationHint_attributes_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["static", "constant", "readOnly", "rawString", "hasObjectId", "canHaveObjectId", "hasSideEffects", "hasDataBreakpoint"]);
+
+procedure Input_VariablePresentationHint_attributes
+(Reader : in out VSS.JSON.Pull_Readers.JSON_Pull_Reader'Class;
+Value : out Enum.VariablePresentationHint_attributes;
+Success : in out Boolean) is
+Index : constant Integer := (if Reader.Is_String_Value then
+VariablePresentationHint_attributes_Minimal_Perfect_Hash.Get_Index (Reader.String_Value)else -1);
+begin
+if Index > 0 then
+pragma Warnings (Off, "redundant conversion");
+Value := (Kind => Enum.VariablePresentationHint_attributes_Predefined (Enum.VariablePresentationHint_attributes_Value'Val (Index - 1)));pragma Warnings (On, "redundant conversion");
+Reader.Read_Next;
+elsif Index = 0 then
+Value := (Enum.Custom_Value, Reader.String_Value);Reader.Read_Next;
+else
+Success := False;
+end if;
+end Input_VariablePresentationHint_attributes;
 
 package VariablePresentationHint_visibility_Minimal_Perfect_Hash is new Minimal_Perfect_Hash (["public", "private", "protected", "internal", "final"]);
 
@@ -23472,14 +23664,9 @@ if Success and Reader.Is_Start_Array then
 Reader.Read_Next;
 while Success and not Reader.Is_End_Array loop
 declare
-Item : VSS.Strings.Virtual_String;
+Item : Enum.VariablePresentationHint_attributes;
 begin
-if Reader.Is_String_Value then
-Item := Reader.String_Value;
-Reader.Read_Next;
-else
-Success := False;
-end if;
+Input_VariablePresentationHint_attributes (Reader, Item, Success);
 Value.attributes.Append (Item);
 end;
 end loop;

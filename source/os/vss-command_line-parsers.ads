@@ -127,7 +127,7 @@ private
       Defined_Long_Options         : Name_Sets.Set;
       Defined_Named_Options        : Named_Option_Maps.Map;
       Defined_Positional_Options   : Positional_Option_Vectors.Vector;
-      Defined_Multivalue_Option    :
+      Defined_Multivalue_Positional_Option :
         Multivalue_Positional_Option_Holders.Holder;
 
       Error_Message                : VSS.Strings.Virtual_String;

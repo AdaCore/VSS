@@ -115,6 +115,12 @@ package body JSON_Schema.Writers is
             end if;
          end loop;
 
+         for Item of Schema.Items loop
+            if Item.Ref.Is_Empty then
+               Traverse_Nested_Schemas (Name, Property, Item, False);
+            end if;
+         end loop;
+
          for Property of Schema.Properties loop
             Traverse_Nested_Schemas
               (Name,
@@ -410,21 +416,33 @@ package body JSON_Schema.Writers is
    ----------------------
 
    procedure Get_Element_Type
-     (Map       : JSON_Schema.Readers.Schema_Map;
-      Schema    : Schema_Access;
+     (Name      : Schema_Name;
+      Map       : JSON_Schema.Readers.Schema_Map;
+      Prop      : Property;
       Type_Name : out VSS.Strings.Virtual_String;
-      Prefix    : out VSS.Strings.Virtual_String) is
+      Prefix    : out VSS.Strings.Virtual_String)
+   is
+      Schema : constant Schema_Access := Prop.Schema;
    begin
       if Schema.Kind.Last_Index = 1 then
          case Schema.Kind (1) is
             when Definitions.An_Array =>
-               Get_Field_Type
-                 (Map, Schema.Items.First_Element,
-                  True, "", Type_Name, Prefix);
 
-               if Type_Name.Is_Empty then
-                  Type_Name := "Virtual_String";
-                  Prefix := "VSS.Strings.";
+               if Is_Enum (Schema.Items.First_Element) then
+                  Type_Name := Ref_To_Type_Name (Name);
+                  Type_Name.Append ("_");
+                  Type_Name.Append (Prop.Name);
+                  Prefix := "Enum.";
+
+               else
+                  Get_Field_Type
+                    (Map, Schema.Items.First_Element,
+                     True, "", Type_Name, Prefix);
+
+                  if Type_Name.Is_Empty then
+                     Type_Name := "Virtual_String";
+                     Prefix := "VSS.Strings.";
+                  end if;
                end if;
             when others =>
                null;
@@ -514,6 +532,11 @@ package body JSON_Schema.Writers is
                   if not Item.Ref.Is_Empty then
                      Result := Ref_To_Type_Name (Item.Ref);
                      Result.Append ("_Vector");
+
+                  elsif Is_Enum (Item) then
+                     Result := Fallback;
+                     Result.Append ("_Vector");
+
                   else
                      case Item.Kind (1) is
                         when Definitions.A_Boolean =>
@@ -610,7 +633,7 @@ package body JSON_Schema.Writers is
       List : constant VSS.String_Vectors.Virtual_String_Vector :=
         Subschema.Split ('/');
    begin
-      return List.Element (List.Length);
+      return Escape_Keywords (List.Element (List.Length));
    end Ref_To_Type_Name;
 
    ------------------

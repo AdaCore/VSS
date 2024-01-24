@@ -559,7 +559,7 @@ package body JSON_Schema.Writers.Outputs is
                Type_Prefix : VSS.Strings.Virtual_String;
             begin
                Get_Element_Type
-                 (Map, Property.Schema, Item_Type, Type_Prefix);
+                 (Name, Map, Property, Item_Type, Type_Prefix);
 
                Put ("Handler.Start_Array;");
                New_Line;

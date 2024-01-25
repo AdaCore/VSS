@@ -17,7 +17,10 @@
 --  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 --  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 --  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from JSON Schema.
 
+pragma Style_Checks ("M99");  --  suppress style warning unitl gnatpp is fixed
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Finalization;
 with VSS.JSON.Streams;
@@ -4653,7 +4656,10 @@ end DAP.Tools;
 --  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 --  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 --  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from JSON Schema.
 
+pragma Style_Checks ("M99");  --  suppress style warning unitl gnatpp is fixed
 with Ada.Unchecked_Deallocation;
 
 package body DAP.Tools is
@@ -6218,6 +6224,8 @@ end DAP.Tools;
 --  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 --  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 --  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from JSON Schema.
 
 with VSS.JSON.Content_Handlers;
 
@@ -7083,6 +7091,8 @@ end DAP.Tools.Outputs;
 --  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 --  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 --  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from JSON Schema.
 
 with Interfaces;
 package body DAP.Tools.Outputs is
@@ -12222,6 +12232,8 @@ end DAP.Tools.Outputs;
 --  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 --  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 --  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from JSON Schema.
 
 with VSS.JSON.Pull_Readers;
 
@@ -13297,6 +13309,8 @@ end DAP.Tools.Inputs;
 --  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 --  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 --  DEALINGS IN THE SOFTWARE.
+--
+--  DON'T EDIT THIS FILE! It was generated from JSON Schema.
 
 pragma Ada_2022;
 with Minimal_Perfect_Hash;

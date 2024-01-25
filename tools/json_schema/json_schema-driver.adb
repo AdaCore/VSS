@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -39,6 +39,8 @@ procedure JSON_Schema.Driver is
    Holders      : VSS.String_Vectors.Virtual_String_Vector;
    --  Array of "holder" fields in form of "type:field" where a holder type
    --  should be used instead of type.
+   Root_Type    : VSS.Strings.Virtual_String;
+   --  Root type - Generate a type for root schema with given name
 
    ------------------------
    -- Parse_Command_Line --
@@ -50,6 +52,7 @@ procedure JSON_Schema.Driver is
       Is_Enum_Package : Boolean := False;
       Is_Header_File  : Boolean := False;
       Is_Holder       : Boolean := False;
+      Is_Root_Type    : Boolean := False;
    begin
       for Item of VSS.Application.Arguments loop
          if Is_Root_Package then
@@ -64,6 +67,9 @@ procedure JSON_Schema.Driver is
          elsif Is_Holder then
             Is_Holder := False;
             Holders.Append (Item);
+         elsif Is_Root_Type then
+            Is_Root_Type := False;
+            Root_Type := Item;
          elsif Item = "--root-package" then
             Is_Root_Package := True;
          elsif Item = "--enum-package" then
@@ -72,6 +78,8 @@ procedure JSON_Schema.Driver is
             Is_Header_File := True;
          elsif Item = "--holder" then
             Is_Holder := True;
+         elsif Item = "--root-type" then
+            Is_Root_Type := True;
          else
             Arg := Item;
          end if;
@@ -130,6 +138,8 @@ begin
       Ada.Wide_Wide_Text_IO.Put_Line
         ("  --holder <type:field>    - Use holder to break circular " &
          "dependency");
+      Ada.Wide_Wide_Text_IO.Put_Line
+        ("  --root-type <type> - A type for the root schema");
       return;
    end if;
 
@@ -162,6 +172,11 @@ begin
    Reader.Read_Next;
 
    JSON_Schema.Readers.Read (Reader, Schema, Other);
+
+   if not Root_Type.Is_Empty then
+      Other.Insert (Root_Type, Schema);
+   end if;
+
    JSON_Schema.Writers.Types.Write
      (Other, Root_Package, Enum_Package, Header, Holders);
 end JSON_Schema.Driver;

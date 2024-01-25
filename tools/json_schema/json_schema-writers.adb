@@ -475,6 +475,16 @@ package body JSON_Schema.Writers is
             Prefix := "Enum.";
          end if;
 
+      elsif Is_Enum (Schema) then
+
+         if Schema.Enum.Length = 1 then
+            Result := VSS.Strings.Empty_Virtual_String;
+
+         else
+            Result.Append (Fallback);
+            Prefix := "Enum.";
+         end if;
+
       elsif Schema.Additional_Properties /= null and then not
          Schema.Additional_Properties.Is_False
       then

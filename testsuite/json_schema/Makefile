@@ -1,4 +1,4 @@
-DIRECTORIES := dap lsp
+DIRECTORIES := dap lsp sarif
 JSON_GEN := $(abspath ../../.objs/tools/gen_json)
 GOT_FILE := $(shell mktemp -t got-XXXXXX.txt)
 

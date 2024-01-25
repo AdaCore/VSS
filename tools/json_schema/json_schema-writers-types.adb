@@ -1076,11 +1076,9 @@ package body JSON_Schema.Writers.Types is
    is
       Done : String_Sets.Set;
    begin
-      for Item of Header loop
-         Put (Item);
-         New_Line;
-      end loop;
-
+      Print_Vector (Header);
+      Put ("pragma Style_Checks (""M99"");");
+      Put ("  --  suppress style warning unitl gnatpp is fixed"); New_Line;
       Put ("with Ada.Containers.Doubly_Linked_Lists;");
       New_Line;
       Put ("with Ada.Finalization;");
@@ -1237,6 +1235,8 @@ package body JSON_Schema.Writers.Types is
       New_Line;
 
       Print_Vector (Header);
+      Put ("pragma Style_Checks (""M99"");");
+      Put ("  --  suppress style warning unitl gnatpp is fixed"); New_Line;
       Put ("with Ada.Unchecked_Deallocation;");
       New_Line;
       New_Line;

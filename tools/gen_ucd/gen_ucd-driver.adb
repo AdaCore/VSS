@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -12,8 +12,8 @@ with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 with UCD.Case_Folding_Loader;
 with UCD.Characters;
 with UCD.Derived_Core_Properties_Loader;
+with UCD.Derived_East_Asian_Width_Loader;
 with UCD.Derived_Normalization_Props_Loader;
-with UCD.East_Asian_Width_Loader;
 with UCD.Emoji_Data_Loader;
 with UCD.Grapheme_Break_Property_Loader;
 with UCD.Hangul_Syllable_Type_Loader;
@@ -54,7 +54,7 @@ begin
       UCD.Special_Casing_Loader.Load (UCD_Root);
       UCD.Case_Folding_Loader.Load (UCD_Root);
       UCD.Emoji_Data_Loader.Load (UCD_Root);
-      UCD.East_Asian_Width_Loader.Load (UCD_Root);
+      UCD.Derived_East_Asian_Width_Loader.Load (UCD_Root);
    end;
 
    Put_Line ("Processing...");

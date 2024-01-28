@@ -1,9 +1,10 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+with VSS.Implementation.Character_Codes;
 with VSS.Implementation.String_Handlers;
 with VSS.Implementation.UCD_Core;
 
@@ -491,6 +492,223 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    begin
       Abstract_Segment_Iterator (Self).Invalidate;
    end Invalidate;
+
+   --------------
+   -- Is_Emoji --
+   --------------
+
+   function Is_Emoji
+     (Self : Grapheme_Cluster_Iterator'Class) return Boolean
+   is
+      use type VSS.Unicode.Code_Point;
+
+      type Emoji_State is record
+         Is_Emoji                       : Boolean;
+         Is_Emoji_Presentation_Sequence : Boolean;
+         Is_Emoji_Modifier_Sequence     : Boolean;
+         Is_Emoji_Keycap_Sequence       : Boolean;
+         Is_Emoji_Flag_Sequence         : Boolean;
+      end record;
+
+      Data       : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Handler    : constant not null
+        VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Data);
+      Position   : VSS.Implementation.Strings.Cursor :=
+        Self.First_Position;
+      Code       : VSS.Unicode.Code_Point;
+      Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+
+      State      : Emoji_State := (others => False);
+
+      subtype Regional_Indicator_Range is VSS.Unicode.Code_Point
+        range 16#1F1E6# .. 16#1F1FF#;
+
+      subtype Tag_Spec_Range is VSS.Unicode.Code_Point
+        range 16#E0020# .. 16#E007E#;
+
+      Tag_End : constant := 16#E007F#;
+
+   begin
+      if Self.First_Position.Index not in 1 .. Handler.Length (Data) then
+         --  Iterator doesn't point to grapheme cluster.
+
+         return False;
+      end if;
+
+      Code := Handler.Element (Data, Position);
+
+      --  Outer loop parses `emoji_zwj_element` expression.
+
+      loop
+         --  First character of the `emoji_zwj_element` might be Emoji, '#',
+         --  '*', '0'..'9', `Emoji_Modifier_Base' or `Regional_Indicator`.
+         --
+         --  As of Unicode 15.1, characters '#', '*', '0'..'9',
+         --  `Emoji_Modifier_Base` and `Regional_Indicator` has
+         --  `Emoji` property.
+         --
+         --  Only `Emoji` complete emoji_zwj_element
+
+         Properties := Extract_Core_Data (Code);
+
+         if not Properties.Emoji then
+            --  Non-Emoji character can't start emoji seqeunce.
+
+            return False;
+         end if;
+
+         State.Is_Emoji                       := Properties.Emoji;
+         State.Is_Emoji_Presentation_Sequence := Properties.Emoji;
+         State.Is_Emoji_Modifier_Sequence     := Properties.EBase;
+         State.Is_Emoji_Keycap_Sequence       :=
+           Code in VSS.Implementation.Character_Codes.Digit_Zero
+                     .. VSS.Implementation.Character_Codes.Digit_Nine
+                   | VSS.Implementation.Character_Codes.Number_Sign
+                   | VSS.Implementation.Character_Codes.Asterisk;
+         State.Is_Emoji_Flag_Sequence         :=
+           Code in Regional_Indicator_Range;
+
+         --  Second character of the `emoji_zwj_element` might be U+FF0F,
+         --  `Emoji_Modifier`, or `Regional_Indicator`.
+         --
+         --  This charater can be `tag_spec` or ZWJ too.
+
+         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when Position.Index > Self.Last_Position.Index;
+
+         Properties := Extract_Core_Data (Code);
+
+         case Code is
+            when VSS.Implementation.Character_Codes.Zero_Width_Joiner =>
+               goto ZWJ;
+
+            when Tag_Spec_Range =>
+               goto TAG;
+
+            when VSS.Implementation.Character_Codes.Variation_Selector_16 =>
+               if State.Is_Emoji_Keycap_Sequence then
+                  --  Incomplete `emoji_keycap_sequence`. It match
+                  --  `emoji_presentation_sequence` too.
+
+                  null;
+                  --  State.Is_Emoji := False;
+
+               elsif State.Is_Emoji_Presentation_Sequence then
+                  --  Complete `emoji_presentation_sequence`
+
+                  null;
+
+               else
+                  return False;
+               end if;
+
+            when Regional_Indicator_Range =>
+               if not State.Is_Emoji_Flag_Sequence then
+                  return False;
+               end if;
+
+            when others =>
+               if not State.Is_Emoji_Modifier_Sequence
+                    or not Properties.EMod
+               then
+                  return False;
+               end if;
+
+               State.Is_Emoji_Keycap_Sequence := False;
+         end case;
+
+         --  Third character of the `emoji_zwj_element` might be U+20E3,
+         --  `tag_spec` or ZWJ.
+
+         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when Position.Index > Self.Last_Position.Index;
+
+         case Code is
+            when Tag_Spec_Range =>
+               if State.Is_Emoji_Flag_Sequence then
+                  --  `tag_spec` can't follow `emoji_flag_sequence`
+
+                  return False;
+               end if;
+
+               goto TAG;
+
+            when VSS.Implementation.Character_Codes.Zero_Width_Joiner =>
+               goto ZWJ;
+
+            when VSS.Implementation.Character_Codes
+                   .Combining_Enclosing_Keycap
+            =>
+               if not State.Is_Emoji_Keycap_Sequence then
+                  return False;
+               end if;
+
+            when others =>
+               return False;
+         end case;
+
+         --  Forth element, it can follow `emoji_keycap_sequence` only, and
+         --  might be ZWJ only
+
+         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when Position.Index > Self.Last_Position.Index;
+
+         if Code = VSS.Implementation.Character_Codes.Zero_Width_Joiner then
+            goto ZWJ;
+         end if;
+
+         return False;
+
+         <<TAG>>
+
+         pragma Assert (Code in Tag_Spec_Range);
+
+         State.Is_Emoji := False;
+
+         loop
+            exit when not Handler.Forward_Element (Data, Position, Code);
+            exit when Position.Index > Self.Last_Position.Index;
+
+            case Code is
+               when Tag_Spec_Range =>
+                  null;
+
+               when Tag_End =>
+                  State.Is_Emoji := True;
+
+                  exit;
+
+               when others =>
+                  return False;
+            end case;
+         end loop;
+
+         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when Position.Index > Self.Last_Position.Index;
+
+         if Code = VSS.Implementation.Character_Codes.Zero_Width_Joiner then
+            goto ZWJ;
+
+         else
+            raise Program_Error;
+         end if;
+
+         <<ZWJ>>
+
+         if not State.Is_Emoji then
+            return False;
+         end if;
+
+         State.Is_Emoji := False;
+
+         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when Position.Index > Self.Last_Position.Index;
+      end loop;
+
+      return State.Is_Emoji;
+   end Is_Emoji;
 
    ----------------------------------------
    -- Lookup_Grapheme_Cluster_Boundaries --

@@ -6,6 +6,7 @@
 
 with Ada.Command_Line;
 
+with VSS.Application;
 with VSS.String_Vectors;
 with VSS.Strings.Grapheme_Cluster_Iterators;
 
@@ -32,6 +33,14 @@ procedure Test_Grapheme_Cluster_Iterators is
    --  not initialized or points before the first character or after the last
    --  character of the string data.
 
+   procedure Test_UCD_Emoji_Test;
+   --  Test grapheme cluster iterator on cases provided by emoji-test.txt
+   --  file. It checks that each emoji sequence occupies single grapheme
+   --  cluser and detected as emoji.
+
+   Emoji_Root : constant VSS.Strings.Virtual_String :=
+     VSS.Application.Arguments.Element (2);
+
    -----------------------------------------
    -- Grapheme_Cluster_Iterator_Testsuite --
    -----------------------------------------
@@ -47,6 +56,9 @@ procedure Test_Grapheme_Cluster_Iterators is
       Test_Support.Run_Testcase
         (Test_V627_026_Empty_Segments'Access,
          "V627-026 indicies of the uninitialized iterator");
+
+      Test_Support.Run_Testcase
+        (Test_UCD_Emoji_Test'Access, "UCD emoji-test.txt");
    end Grapheme_Cluster_Iterator_Testsuite;
 
    -------------------
@@ -108,6 +120,12 @@ procedure Test_Grapheme_Cluster_Iterators is
         (VSS.Strings.Empty_Virtual_String,
          VSS.String_Vectors.Empty_Virtual_String_Vector);
    end Test_Empty_String;
+
+   -------------------------
+   -- Test_UCD_Emoji_Test --
+   -------------------------
+
+   procedure Test_UCD_Emoji_Test is separate;
 
    --------------------------------
    -- Test_UCD_GraphemeBreakTest --

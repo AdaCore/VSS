@@ -156,11 +156,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Backward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
-      Data             : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler          : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Data             : VSS.Implementation.Strings.String_Data;
+      Handler          : VSS.Implementation.Strings.String_Handler_Access;
       Right            : VSS.Implementation.Strings.Cursor;
       Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Left             : VSS.Implementation.Strings.Cursor;
@@ -169,6 +166,15 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Done             : Boolean := False;
 
    begin
+      if Self.Owner = null then
+         --  Uninitialized iterator.
+
+         return False;
+      end if;
+
+      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Handler := VSS.Implementation.Strings.Handler (Data);
+
       Self.Last_Position := Self.First_Position;
       Success := Handler.Backward (Data, Self.Last_Position);
 
@@ -306,27 +312,33 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    is
       use all type VSS.Implementation.UCD_Core.EA_Values;
 
-      Data       : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler    : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
-      Position   : VSS.Implementation.Strings.Cursor :=
-        Self.First_Position;
+      Data       : VSS.Implementation.Strings.String_Data;
+      Handler    : VSS.Implementation.Strings.String_Handler_Access;
+      Position   : VSS.Implementation.Strings.Cursor;
       Code       : VSS.Unicode.Code_Point;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success    : Boolean with Unreferenced;
 
    begin
-      --  Empty grapheme cluster.
+      if Self.Owner = null then
+         --  Uninitialized iterator.
 
-      if not Self.Has_Element then
+         return 0;
+      end if;
+
+      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Handler := VSS.Implementation.Strings.Handler (Data);
+
+      if Self.First_Position.Index not in 1 .. Handler.Length (Data) then
+         --  Iterator doesn't point to any grapheme cluster.
+
          return 0;
       end if;
 
       --  Lookup for the wide/fullwidth character in the grapheme cluster.
 
-      Code := Handler.Element (Data, Position);
+      Position := Self.First_Position;
+      Code     := Handler.Element (Data, Position);
 
       loop
          Properties := Extract_Core_Data (Code);
@@ -393,11 +405,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    overriding function Forward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
-      Data             : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler          : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Data             : VSS.Implementation.Strings.String_Data;
+      Handler          : VSS.Implementation.Strings.String_Handler_Access;
       Left             : VSS.Implementation.Strings.Cursor;
       Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
       Right            : VSS.Implementation.Strings.Cursor;
@@ -406,6 +415,15 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Done             : Boolean := False;
 
    begin
+      if Self.Owner = null then
+         --  Uninitialized iterator.
+
+         return False;
+      end if;
+
+      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Handler := VSS.Implementation.Strings.Handler (Data);
+
       Self.First_Position := Self.Last_Position;
       Success := Handler.Forward (Data, Self.First_Position);
 
@@ -539,15 +557,20 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    overriding function Has_Element
      (Self : Grapheme_Cluster_Iterator) return Boolean
    is
-      Data    : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Data    : VSS.Implementation.Strings.String_Data;
+      Handler : VSS.Implementation.Strings.String_Handler_Access;
 
    begin
-      return
-        Self.First_Position.Index in 1 .. Handler.Length (Data);
+      if Self.Owner = null then
+         --  Uninitialized iterator.
+
+         return False;
+      end if;
+
+      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Handler := VSS.Implementation.Strings.Handler (Data);
+
+      return Self.First_Position.Index in 1 .. Handler.Length (Data);
    end Has_Element;
 
    ----------------
@@ -576,11 +599,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          Is_Emoji_Flag_Sequence         : Boolean;
       end record;
 
-      Data       : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler    : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Data       : VSS.Implementation.Strings.String_Data;
+      Handler    : VSS.Implementation.Strings.String_Handler_Access;
       Position   : VSS.Implementation.Strings.Cursor :=
         Self.First_Position;
       Code       : VSS.Unicode.Code_Point;
@@ -597,6 +617,15 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Tag_End : constant := 16#E007F#;
 
    begin
+      if Self.Owner = null then
+         --  Uninitialized iterator.
+
+         return False;
+      end if;
+
+      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Handler := VSS.Implementation.Strings.Handler (Data);
+
       if Self.First_Position.Index not in 1 .. Handler.Length (Data) then
          --  Iterator doesn't point to grapheme cluster.
 

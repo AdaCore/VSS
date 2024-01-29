@@ -3,6 +3,8 @@ pragma Restrictions (No_Elaboration_Code);
 
 with Interfaces;
 
+with VSS.Unicode;
+
 package VSS.Implementation.UCD_Core is
 
    pragma Preelaborate;
@@ -173,6 +175,8 @@ package VSS.Implementation.UCD_Core is
       EA_Na => 4,
       EA_W => 5);
 
+   subtype Regional_Indicator_Range is VSS.Unicode.Code_Point
+     range 16#1F1E6# .. 16#1F1FF#;
    type Core_Index is range 0 .. 16#10FF#;
 
    Block_Size : constant := 16#100#;

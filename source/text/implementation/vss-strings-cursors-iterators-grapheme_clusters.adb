@@ -605,11 +605,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
         Self.First_Position;
       Code       : VSS.Unicode.Code_Point;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-
       State      : Emoji_State := (others => False);
-
-      subtype Regional_Indicator_Range is VSS.Unicode.Code_Point
-        range 16#1F1E6# .. 16#1F1FF#;
 
       subtype Tag_Spec_Range is VSS.Unicode.Code_Point
         range 16#E0020# .. 16#E007E#;
@@ -663,7 +659,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                    | VSS.Implementation.Character_Codes.Number_Sign
                    | VSS.Implementation.Character_Codes.Asterisk;
          State.Is_Emoji_Flag_Sequence         :=
-           Code in Regional_Indicator_Range;
+           Code in VSS.Implementation.UCD_Core.Regional_Indicator_Range;
 
          --  Second character of the `emoji_zwj_element` might be U+FF0F,
          --  `Emoji_Modifier`, or `Regional_Indicator`.
@@ -699,7 +695,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                   return False;
                end if;
 
-            when Regional_Indicator_Range =>
+            when VSS.Implementation.UCD_Core.Regional_Indicator_Range =>
                if not State.Is_Emoji_Flag_Sequence then
                   return False;
                end if;

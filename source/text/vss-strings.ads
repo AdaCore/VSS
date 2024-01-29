@@ -36,6 +36,14 @@ package VSS.Strings is
    type Line_Count is new Natural;
    subtype Line_Index is Line_Count range 1 .. Line_Count'Last;
 
+   type Display_Cell_Count is new Natural;
+   subtype Display_Cell_Index is
+     Display_Cell_Count range 1 .. Display_Cell_Count'Last;
+   --  Count of fixed pitch font cells, like cells in terminal.
+   --
+   --  Emoji and wide east asian characters occupies two cells, width of some
+   --  grapheme clusters depends from the context.
+
    type Column_Count is new Grapheme_Cluster_Count;
    subtype Column_Index is Column_Count range 1 .. Column_Count'Last;
 

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -10,7 +10,7 @@ with UCD.Characters;
 with UCD.Data_File_Loaders;
 with UCD.Properties;
 
-package body UCD.East_Asian_Width_Loader is
+package body UCD.Derived_East_Asian_Width_Loader is
 
    ----------
    -- Load --
@@ -25,7 +25,7 @@ package body UCD.East_Asian_Width_Loader is
       Loader       : UCD.Data_File_Loaders.File_Loader;
 
    begin
-      Loader.Open (UCD_Root, "EastAsianWidth.txt");
+      Loader.Open (UCD_Root, "extracted/DerivedEastAsianWidth.txt");
 
       while not Loader.End_Of_File loop
          declare
@@ -57,4 +57,4 @@ package body UCD.East_Asian_Width_Loader is
       end loop;
    end Load;
 
-end UCD.East_Asian_Width_Loader;
+end UCD.Derived_East_Asian_Width_Loader;

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -86,11 +86,15 @@ package VSS.Implementation.Character_Codes is
 
    No_Break_Space                           : constant := 16#00_00A0#;
 
+   Combining_Enclosing_Keycap               : constant := 16#00_20E3#;
+
    Zero_Width_Non_Joiner                    : constant := 16#00_200C#;
    Zero_Width_Joiner                        : constant := 16#00_200D#;
 
    Line_Separator                           : constant := 16#00_2028#;
    Paragraph_Separator                      : constant := 16#00_2029#;
+
+   Variation_Selector_16                    : constant := 16#00_FE0F#;
 
    Zero_Width_No_Break_Space                : constant := 16#00_FEFF#;
 

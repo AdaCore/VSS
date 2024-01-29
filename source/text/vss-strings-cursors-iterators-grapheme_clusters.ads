@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -10,6 +10,14 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    type Grapheme_Cluster_Iterator is
      new Abstract_Segment_Iterator with private;
+
+   function Is_Emoji (Self : Grapheme_Cluster_Iterator'Class) return Boolean;
+   --  Return True when grapheme cluster match Emoji definition.
+
+   function Display_Width
+     (Self : Grapheme_Cluster_Iterator'Class)
+      return VSS.Strings.Display_Cell_Count;
+   --  Returns length of the current grapheme cluster in terminal cells.
 
    procedure Set_Before_First
      (Self : in out Grapheme_Cluster_Iterator;

@@ -109,7 +109,7 @@ build_and_test_dev:
 
       # Fetch tests' data into `./data/`
       PACKAGE=vss-tests-data.tar.bz2
-      VERSION=4
+      VERSION=5
       VSS_URL=https://gitlab.adacore-it.com/api/v4/projects/129
       curl -L --header "JOB-TOKEN: $CI_JOB_TOKEN" \
         $VSS_URL/packages/generic/$PACKAGE/$VERSION/$PACKAGE |\

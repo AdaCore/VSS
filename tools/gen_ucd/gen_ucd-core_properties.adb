@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -47,6 +47,14 @@ package body Gen_UCD.Core_Properties is
 
       procedure Set_EA (Code : UCD.Code_Point; To : Gen_UCD.Unsigned_3);
 
+      procedure Set_Emoji (Code : UCD.Code_Point; To : Boolean);
+
+      procedure Set_EPres (Code : UCD.Code_Point; To : Boolean);
+
+      procedure Set_EBase (Code : UCD.Code_Point; To : Boolean);
+
+      procedure Set_EMod (Code : UCD.Code_Point; To : Boolean);
+
       function Uncompressed_Size return Positive;
 
       function Block_Size return Positive;
@@ -62,6 +70,11 @@ package body Gen_UCD.Core_Properties is
       function Data_Table_Element (Index : Natural) return Gen_UCD.Unsigned_32;
 
    end Database;
+
+   RI_First : UCD.Code_Point := 0;
+   RI_Last  : UCD.Code_Point := 0;
+   --  First and last character of the characters with Regional_Indicator
+   --  property.
 
    -----------
    -- Build --
@@ -92,6 +105,7 @@ package body Gen_UCD.Core_Properties is
 
       declare
          use type UCD.Properties.Property_Value_Access;
+         use type UCD.Code_Point;
 
          OLower_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OLower");
@@ -108,6 +122,31 @@ package body Gen_UCD.Core_Properties is
          ExtPict_Y        :
            constant not null UCD.Properties.Property_Value_Access :=
              UCD.Properties.Resolve (ExtPict_Property, "Y");
+         Emoji_Property   : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("Emoji");
+         Emoji_Y          :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (Emoji_Property, "Y");
+         EPres_Property   : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("EPres");
+         EPres_Y          :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (EPres_Property, "Y");
+         EBase_Property   : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("EBase");
+         EBase_Y          :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (EBase_Property, "Y");
+         EMod_Property    : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("EMod");
+         EMod_Y           :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (EMod_Property, "Y");
+         RI_Property      : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("RI");
+         RI_Y             :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (RI_Property, "Y");
 
       begin
          for Code in UCD.Code_Point loop
@@ -135,6 +174,34 @@ package body Gen_UCD.Core_Properties is
 
             Database.Set_EA
               (Code, Unsigned_3 (EA_Enumeration.Representation (Code)));
+
+            Database.Set_Emoji
+              (Code, UCD.Characters.Get (Code, Emoji_Property) = Emoji_Y);
+            Database.Set_EBase
+              (Code, UCD.Characters.Get (Code, EBase_Property) = EBase_Y);
+            Database.Set_EMod
+              (Code, UCD.Characters.Get (Code, EMod_Property) = EMod_Y);
+            Database.Set_EPres
+              (Code, UCD.Characters.Get (Code, EPres_Property) = EPres_Y);
+
+            --  Regional_Indicator is a property for continuous range of
+            --  the characters, subtype is generated to check value of
+            --  this property.
+
+            if UCD.Characters.Get (Code, RI_Property) = RI_Y then
+               if RI_First = 0 then
+                  RI_First := Code;
+
+               else
+                  if Code /= RI_Last + 1 then
+                     --  Interval should be continuous.
+
+                     raise Program_Error;
+                  end if;
+               end if;
+
+               RI_Last  := Code;
+            end if;
          end loop;
       end;
 
@@ -156,55 +223,66 @@ package body Gen_UCD.Core_Properties is
 
    package body Database is
 
-      --  GC, OLower, OUpper are used for character classification in public
-      --  API, and put into the first byte. One bit in this byte is reserved.
+      --  GC, OLower, and OUpper are used for character classification in
+      --  public API, and put into the first byte.
       --
-      --  GCB & ExtPict are used by grapheme cluster iterator and put into
-      --  second byte of the record. Three bits in this byte are reserved.
+      --  GCB, ExtPict, and InCB are used by grapheme cluster iterator and
+      --  put into second byte of the record.
       --
       --  WB & ExtPict (from second byte) are used by word iterator and put
-      --  into third byte. Three bits in this byte are reserved.
+      --  into third byte.
       --
-      --  Forth byte is reserved for alignment purposes.
+      --  EA, Emoji, EBase, EMod, EPres are used by terminal cells length
+      --  calculation and put into fourth byte.
 
-      --   31  |  30  |  29  |  28  |  27  |  26  |  25  |  24
-      --   --     --     --     --     --     --     --     --
+      --    31  |  30  |  29  |  28  |  27  |  26  |  25  |  24
+      --    --  | EPres| EMod | EBase| Emoji|         EA
       --
-      --   23  |  22  |  21  |  20  |  19  |  18  |  17  |  16
-      --          EA         |                WB
+      --    23  |  22  |  21  |  20  |  19  |  18  |  17  |  16
+      --    --     --     --  |                WB
       --
-      --   15  |  14  |  13  |  12  |  11  |  10  |  09  |  08
-      --   --  | EPic |     InCB    |            GCB
+      --    15  |  14  |  13  |  12  |  11  |  10  |  09  |  08
+      --    --  | EPic |     InCB    |            GCB
       --
-      --   07  |  06  |  05  |  04  |  03  |  02  |  01  |  00
-      --   --  | OUpp | OLow |                CG
+      --    07  |  06  |  05  |  04  |  03  |  02  |  01  |  00
+      --    --  | OUpp | OLow |                CG
 
       type Core_Data_Record is record
-         GC         : Gen_UCD.Unsigned_5 := 0;
-         OLower     : Gen_UCD.Unsigned_1 := 0;
-         OUpper     : Gen_UCD.Unsigned_1 := 0;
-         Reserved_1 : Gen_UCD.Unsigned_1 := 0;
-         GCB        : Gen_UCD.Unsigned_4 := 0;
-         InCB       : Gen_UCD.Unsigned_2 := 0;
-         ExtPict    : Gen_UCD.Unsigned_1 := 0;
-         Reserved_2 : Gen_UCD.Unsigned_1 := 0;
-         WB         : Gen_UCD.Unsigned_5 := 0;
-         EA         : Gen_UCD.Unsigned_3 := 0;
-         Reserved_3 : Gen_UCD.Unsigned_8 := 0;
+         GC             : Gen_UCD.Unsigned_5 := 0;
+         OLower         : Gen_UCD.Unsigned_1 := 0;
+         OUpper         : Gen_UCD.Unsigned_1 := 0;
+         Reserved_7_7   : Gen_UCD.Unsigned_1 := 0;
+         GCB            : Gen_UCD.Unsigned_4 := 0;
+         InCB           : Gen_UCD.Unsigned_2 := 0;
+         ExtPict        : Gen_UCD.Unsigned_1 := 0;
+         Reserved_15_15 : Gen_UCD.Unsigned_1 := 0;
+         WB             : Gen_UCD.Unsigned_5 := 0;
+         Reserved_21_23 : Gen_UCD.Unsigned_3 := 0;
+         EA             : Gen_UCD.Unsigned_3 := 0;
+         Emoji          : Gen_UCD.Unsigned_1 := 0;
+         EBase          : Gen_UCD.Unsigned_1 := 0;
+         EMod           : Gen_UCD.Unsigned_1 := 0;
+         EPres          : Gen_UCD.Unsigned_1 := 0;
+         Reserved_31_31 : Gen_UCD.Unsigned_1 := 0;
       end record;
       for Core_Data_Record'Size use 32;
       for Core_Data_Record use record
-         GC         at 0 range 0 .. 4;
-         OLower     at 0 range 5 .. 5;
-         OUpper     at 0 range 6 .. 6;
-         Reserved_1 at 0 range 7 .. 7;
-         GCB        at 0 range 8 .. 11;
-         InCB       at 0 range 12 .. 13;
-         ExtPict    at 0 range 14 .. 14;
-         Reserved_2 at 0 range 15 .. 15;
-         WB         at 0 range 16 .. 20;
-         EA         at 0 range 21 .. 23;
-         Reserved_3 at 0 range 24 .. 31;
+         GC             at 0 range 0 .. 4;
+         OLower         at 0 range 5 .. 5;
+         OUpper         at 0 range 6 .. 6;
+         Reserved_7_7   at 0 range 7 .. 7;
+         GCB            at 0 range 8 .. 11;
+         InCB           at 0 range 12 .. 13;
+         ExtPict        at 0 range 14 .. 14;
+         Reserved_15_15 at 0 range 15 .. 15;
+         WB             at 0 range 16 .. 20;
+         Reserved_21_23 at 0 range 21 .. 23;
+         EA             at 0 range 24 .. 26;
+         Emoji          at 0 range 27 .. 27;
+         EBase          at 0 range 28 .. 28;
+         EMod           at 0 range 29 .. 29;
+         EPres          at 0 range 30 .. 30;
+         Reserved_31_31 at 0 range 31 .. 31;
       end record;
 
       type Core_Data_Array is
@@ -464,6 +542,42 @@ package body Gen_UCD.Core_Properties is
          Raw (Gen_UCD.Unsigned_32 (Code)).EA := To;
       end Set_EA;
 
+      ---------------
+      -- Set_EBase --
+      ---------------
+
+      procedure Set_EBase (Code : UCD.Code_Point; To : Boolean) is
+      begin
+         Raw (Gen_UCD.Unsigned_32 (Code)).EBase := Boolean'Pos (To);
+      end Set_EBase;
+
+      --------------
+      -- Set_EMod --
+      --------------
+
+      procedure Set_EMod (Code : UCD.Code_Point; To : Boolean) is
+      begin
+         Raw (Gen_UCD.Unsigned_32 (Code)).EMod := Boolean'Pos (To);
+      end Set_EMod;
+
+      ---------------
+      -- Set_Emoji --
+      ---------------
+
+      procedure Set_Emoji (Code : UCD.Code_Point; To : Boolean) is
+      begin
+         Raw (Gen_UCD.Unsigned_32 (Code)).Emoji := Boolean'Pos (To);
+      end Set_Emoji;
+
+      ---------------
+      -- Set_EPres --
+      ---------------
+
+      procedure Set_EPres (Code : UCD.Code_Point; To : Boolean) is
+      begin
+         Raw (Gen_UCD.Unsigned_32 (Code)).EPres := Boolean'Pos (To);
+      end Set_EPres;
+
       -----------------
       -- Set_ExtPict --
       -----------------
@@ -553,6 +667,8 @@ package body Gen_UCD.Core_Properties is
 
       Put_Line (File, "with Interfaces;");
       New_Line (File);
+      Put_Line (File, "with VSS.Unicode;");
+      New_Line (File);
       Put_Line (File, "package VSS.Implementation.UCD_Core is");
       New_Line (File);
       Put_Line (File, "   pragma Preelaborate;");
@@ -577,6 +693,28 @@ package body Gen_UCD.Core_Properties is
       --  Generate EA_Values type
 
       EA_Enumeration.Generate_Type_Declaration (File);
+
+      --  Generate declaration of the Regional_Indicator_Range subtype.
+
+      declare
+         First_Image : Wide_Wide_String (1 .. 11);
+         Last_Image  : Wide_Wide_String (1 .. 11);
+
+      begin
+         Put (First_Image, Integer (RI_First), 16);
+         Put (Last_Image, Integer (RI_Last), 16);
+
+         Put_Line
+           (File,
+            "   subtype Regional_Indicator_Range is VSS.Unicode.Code_Point");
+         Put_Line
+           (File,
+            "     range "
+            & Trim (First_Image, Both)
+            & " .. "
+            & Trim (Last_Image, Both)
+            & ";");
+      end;
 
       --  Generate types for index and data tables.
 
@@ -618,6 +756,10 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "      ExtPict : Boolean;");
          Put_Line (File, "      WB      : WB_Values;");
          Put_Line (File, "      EA      : EA_Values;");
+         Put_Line (File, "      Emoji   : Boolean;");
+         Put_Line (File, "      EBase   : Boolean;");
+         Put_Line (File, "      EMod    : Boolean;");
+         Put_Line (File, "      EPres   : Boolean;");
          Put_Line (File, "   end record;");
          Put_Line (File, "   for Core_Data_Record'Size use 32;");
          Put_Line (File, "   for Core_Data_Record use record");
@@ -628,8 +770,13 @@ package body Gen_UCD.Core_Properties is
          Put_Line (File, "      InCB    at 0 range 12 .. 13;");
          Put_Line (File, "      ExtPict at 0 range 14 .. 14;");
          Put_Line (File, "      WB      at 0 range 16 .. 20;");
-         Put_Line (File, "      EA      at 0 range 21 .. 23;");
+         Put_Line (File, "      EA      at 0 range 24 .. 26;");
+         Put_Line (File, "      Emoji   at 0 range 27 .. 27;");
+         Put_Line (File, "      EBase   at 0 range 28 .. 28;");
+         Put_Line (File, "      EMod    at 0 range 29 .. 29;");
+         Put_Line (File, "      EPres   at 0 range 30 .. 30;");
          Put_Line (File, "   end record;");
+
          New_Line (File);
 
          Put_Line

@@ -15,6 +15,14 @@ with VSS.Unicode;
 separate (Test_Grapheme_Cluster_Iterators)
 procedure Test_UCD_Emoji_Test is
 
+   procedure Do_Test (Item : VSS.Strings.Virtual_String);
+   --  Execute single testcase
+
+   procedure Parse_Test_Case
+     (Buffer : Wide_Wide_String;
+      String : out VSS.Strings.Virtual_String);
+   --  Parse testcase data
+
    -------------
    -- Do_Test --
    -------------

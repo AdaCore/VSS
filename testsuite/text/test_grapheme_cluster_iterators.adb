@@ -5,6 +5,7 @@
 --
 
 with Ada.Command_Line;
+with GNAT.Source_Info;
 
 with VSS.Application;
 with VSS.String_Vectors;
@@ -38,6 +39,9 @@ procedure Test_Grapheme_Cluster_Iterators is
    --  file. It checks that each emoji sequence occupies single grapheme
    --  cluser and detected as emoji.
 
+   procedure Test_Display_Width;
+   --  Test cell width computation.
+
    Emoji_Root : constant VSS.Strings.Virtual_String :=
      VSS.Application.Arguments.Element (2);
 
@@ -59,6 +63,9 @@ procedure Test_Grapheme_Cluster_Iterators is
 
       Test_Support.Run_Testcase
         (Test_UCD_Emoji_Test'Access, "UCD emoji-test.txt");
+
+      Test_Support.Run_Testcase
+        (Test_Display_Width'Access, "display cell width");
    end Grapheme_Cluster_Iterator_Testsuite;
 
    -------------------
@@ -109,6 +116,87 @@ procedure Test_Grapheme_Cluster_Iterators is
       Test_Support.Assert (S = 1);
       Test_Support.Assert (not JB.Has_Element);
    end Run_Test_Case;
+
+   ------------------------
+   -- Test_Display_Width --
+   ------------------------
+
+   procedure Test_Display_Width is
+
+      use type VSS.Strings.Display_Cell_Count;
+
+      procedure Simple_Test
+        (Item     : VSS.Strings.Virtual_String;
+         Width    : VSS.Strings.Display_Cell_Count;
+         Message  : String;
+         Location : String := GNAT.Source_Info.Source_Location);
+
+      -----------------
+      -- Simple_Test --
+      -----------------
+
+      procedure Simple_Test
+        (Item     : VSS.Strings.Virtual_String;
+         Width    : VSS.Strings.Display_Cell_Count;
+         Message  : String;
+         Location : String := GNAT.Source_Info.Source_Location)
+      is
+         Iterator : VSS.Strings.Grapheme_Cluster_Iterators
+                      .Grapheme_Cluster_Iterator :=
+           Item.Before_First_Grapheme_Cluster;
+
+      begin
+         Test_Support.Assert
+           (Iterator.Display_Width = 0, Message & " at " & Location);
+         Test_Support.Assert (Iterator.Forward, Message & " at " & Location);
+         Test_Support.Assert
+           (Iterator.Display_Width = Width, Message & " at " & Location);
+         Test_Support.Assert
+           (not Iterator.Forward, Message & " at " & Location);
+         Test_Support.Assert
+           (Iterator.Display_Width = 0, Message & " at " & Location);
+      end Simple_Test;
+
+   begin
+      Simple_Test (" ", 1, "space character");
+      Simple_Test ("#", 1, "emoji with default text representation");
+      Simple_Test ("丐", 2, "wide character");
+      Simple_Test ("👩‍🔬", 2, "emoji sequence");
+
+      --  Test of the "null" string
+
+      declare
+         Item     : VSS.Strings.Virtual_String;
+         Iterator : constant VSS.Strings.Grapheme_Cluster_Iterators
+                      .Grapheme_Cluster_Iterator :=
+           Item.Before_First_Grapheme_Cluster;
+
+      begin
+         Test_Support.Assert (Iterator.Display_Width = 0);
+      end;
+
+      --  Test of the empty string
+
+      declare
+         Item     : constant VSS.Strings.Virtual_String := "";
+         Iterator : constant VSS.Strings.Grapheme_Cluster_Iterators
+                      .Grapheme_Cluster_Iterator :=
+           Item.Before_First_Grapheme_Cluster;
+
+      begin
+         Test_Support.Assert (Iterator.Display_Width = 0);
+      end;
+
+      --  Test of the uninitialized iterator
+
+      declare
+         Iterator : VSS.Strings.Grapheme_Cluster_Iterators
+                      .Grapheme_Cluster_Iterator;
+
+      begin
+         Test_Support.Assert (Iterator.Display_Width = 0);
+      end;
+   end Test_Display_Width;
 
    -----------------------
    -- Test_Empty_String --

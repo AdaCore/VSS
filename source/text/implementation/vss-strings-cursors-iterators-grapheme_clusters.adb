@@ -296,6 +296,72 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end if;
    end Backward;
 
+   -------------------
+   -- Display_Width --
+   -------------------
+
+   function Display_Width
+     (Self : Grapheme_Cluster_Iterator'Class)
+      return VSS.Strings.Display_Cell_Count
+   is
+      use all type VSS.Implementation.UCD_Core.EA_Values;
+
+      Data       : VSS.Implementation.Strings.String_Data
+        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Handler    : constant not null
+        VSS.Implementation.Strings.String_Handler_Access :=
+          VSS.Implementation.Strings.Handler (Data);
+      Position   : VSS.Implementation.Strings.Cursor :=
+        Self.First_Position;
+      Code       : VSS.Unicode.Code_Point;
+      Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+      Success    : Boolean with Unreferenced;
+
+   begin
+      --  Empty grapheme cluster.
+
+      if not Self.Has_Element then
+         return 0;
+      end if;
+
+      --  Lookup for the wide/fullwidth character in the grapheme cluster.
+
+      Code := Handler.Element (Data, Position);
+
+      loop
+         Properties := Extract_Core_Data (Code);
+
+         if Properties.EA in EA_W | EA_F then
+            return 2;
+         end if;
+
+         exit when not Handler.Forward_Element (Data, Position, Code);
+      end loop;
+
+      --  Emoji_Presentation characters has wide width, and has been processed
+      --  above. However, some combinations of non-Emoji_Presentation
+      --  characters forms emoji, thus occupy two cell.
+
+      if not Self.Is_Emoji then
+         return 1;
+      end if;
+
+      if Self.First_Position.Index = Self.Last_Position.Index then
+         --  Single emoji character without Emoji_Presenataion property has
+         --  default text representation and occupy single cell.
+
+         Position   := Self.First_Position;
+         Code       := Handler.Element (Data, Position);
+         Properties := Extract_Core_Data (Code);
+
+         if not Properties.EPres then
+            return 1;
+         end if;
+      end if;
+
+      return 2;
+   end Display_Width;
+
    -----------------------
    -- Extract_Core_Data --
    -----------------------

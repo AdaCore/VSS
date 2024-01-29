@@ -14,6 +14,11 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Is_Emoji (Self : Grapheme_Cluster_Iterator'Class) return Boolean;
    --  Return True when grapheme cluster match Emoji definition.
 
+   function Display_Width
+     (Self : Grapheme_Cluster_Iterator'Class)
+      return VSS.Strings.Display_Cell_Count;
+   --  Returns length of the current grapheme cluster in terminal cells.
+
    procedure Set_Before_First
      (Self : in out Grapheme_Cluster_Iterator;
       On   : VSS.Strings.Virtual_String'Class);

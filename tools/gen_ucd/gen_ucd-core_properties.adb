@@ -71,6 +71,11 @@ package body Gen_UCD.Core_Properties is
 
    end Database;
 
+   RI_First : UCD.Code_Point := 0;
+   RI_Last  : UCD.Code_Point := 0;
+   --  First and last character of the characters with Regional_Indicator
+   --  property.
+
    -----------
    -- Build --
    -----------
@@ -100,6 +105,7 @@ package body Gen_UCD.Core_Properties is
 
       declare
          use type UCD.Properties.Property_Value_Access;
+         use type UCD.Code_Point;
 
          OLower_Property  : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("OLower");
@@ -133,9 +139,14 @@ package body Gen_UCD.Core_Properties is
              UCD.Properties.Resolve (EBase_Property, "Y");
          EMod_Property    : constant not null UCD.Properties.Property_Access :=
            UCD.Properties.Resolve ("EMod");
-         EMod_Y          :
+         EMod_Y           :
            constant not null UCD.Properties.Property_Value_Access :=
              UCD.Properties.Resolve (EMod_Property, "Y");
+         RI_Property      : constant not null UCD.Properties.Property_Access :=
+           UCD.Properties.Resolve ("RI");
+         RI_Y             :
+           constant not null UCD.Properties.Property_Value_Access :=
+             UCD.Properties.Resolve (RI_Property, "Y");
 
       begin
          for Code in UCD.Code_Point loop
@@ -172,6 +183,25 @@ package body Gen_UCD.Core_Properties is
               (Code, UCD.Characters.Get (Code, EMod_Property) = EMod_Y);
             Database.Set_EPres
               (Code, UCD.Characters.Get (Code, EPres_Property) = EPres_Y);
+
+            --  Regional_Indicator is a property for continuous range of
+            --  the characters, subtype is generated to check value of
+            --  this property.
+
+            if UCD.Characters.Get (Code, RI_Property) = RI_Y then
+               if RI_First = 0 then
+                  RI_First := Code;
+
+               else
+                  if Code /= RI_Last + 1 then
+                     --  Interval should be continuous.
+
+                     raise Program_Error;
+                  end if;
+               end if;
+
+               RI_Last  := Code;
+            end if;
          end loop;
       end;
 
@@ -637,6 +667,8 @@ package body Gen_UCD.Core_Properties is
 
       Put_Line (File, "with Interfaces;");
       New_Line (File);
+      Put_Line (File, "with VSS.Unicode;");
+      New_Line (File);
       Put_Line (File, "package VSS.Implementation.UCD_Core is");
       New_Line (File);
       Put_Line (File, "   pragma Preelaborate;");
@@ -661,6 +693,28 @@ package body Gen_UCD.Core_Properties is
       --  Generate EA_Values type
 
       EA_Enumeration.Generate_Type_Declaration (File);
+
+      --  Generate declaration of the Regional_Indicator_Range subtype.
+
+      declare
+         First_Image : Wide_Wide_String (1 .. 11);
+         Last_Image  : Wide_Wide_String (1 .. 11);
+
+      begin
+         Put (First_Image, Integer (RI_First), 16);
+         Put (Last_Image, Integer (RI_Last), 16);
+
+         Put_Line
+           (File,
+            "   subtype Regional_Indicator_Range is VSS.Unicode.Code_Point");
+         Put_Line
+           (File,
+            "     range "
+            & Trim (First_Image, Both)
+            & " .. "
+            & Trim (Last_Image, Both)
+            & ";");
+      end;
 
       --  Generate types for index and data tables.
 

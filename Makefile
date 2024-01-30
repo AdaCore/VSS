@@ -8,8 +8,9 @@
 # VSS_CI_MODE | CI_MODE = none | on
 #
 # ADAFLAGS = ...
+# GPRFLAGS = ...
 
-GPRBUILD_FLAGS = -p -j0
+GPRBUILD_FLAGS = -p -j0 $(GPRFLAGS)
 
 PREFIX                 ?= /usr
 GPRDIR                 ?= $(PREFIX)/share/gpr
@@ -21,7 +22,7 @@ INSTALL_EXEC_DIR       ?= $(DESTDIR)$(BINDIR)
 INSTALL_LIBRARY_DIR    ?= $(DESTDIR)$(LIBDIR)
 INSTALL_ALI_DIR        ?= $(INSTALL_LIBRARY_DIR)/vss/$*
 
-GPRINSTALL_FLAGS = \
+GPRINSTALL_FLAGS = $(GPRFLAGS) \
     -XVSS_LIBRARY_TYPE=$* \
     --build-name=$* --build-var=LIBRARY_TYPE --build-var=VSS_LIBRARY_TYPE \
     --prefix=$(PREFIX) --exec-subdir=$(INSTALL_EXEC_DIR) \

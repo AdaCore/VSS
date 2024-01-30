@@ -848,7 +848,7 @@ package body Gen_UCD.Core_Properties is
             if J = 0 then
                Put (File, "     [");
 
-            elsif J mod 6 = 0 then
+            elsif J mod 5 = 0 then
                Put_Line (File, ",");
                Put (File, "      ");
 

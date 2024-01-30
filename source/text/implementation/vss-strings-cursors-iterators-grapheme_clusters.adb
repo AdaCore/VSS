@@ -348,6 +348,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          end if;
 
          exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when Position.Index > Self.Last_Position.Index;
       end loop;
 
       --  Emoji_Presentation characters has wide width, and has been processed

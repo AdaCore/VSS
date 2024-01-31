@@ -46,7 +46,7 @@ jobs:
           unzip UCD-15.1.0.zip -d vss/data/ucd
       - name: Get Emoji data
         run: |
-          mkdir emoji
+          mkdir vss/data/emoji
           curl -o vss/data/emoji/ReadMe.txt https://www.unicode.org/Public/emoji/15.1/ReadMe.txt
           curl -o vss/data/emoji/emoji-sequences.txt https://www.unicode.org/Public/emoji/15.1/emoji-sequences.txt
           curl -o vss/data/emoji/emoji-test.txt https://www.unicode.org/Public/emoji/15.1/emoji-test.txt

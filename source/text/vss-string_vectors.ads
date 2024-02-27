@@ -27,7 +27,7 @@ package VSS.String_Vectors is
        Constant_Indexing => Element,
        Default_Iterator  => Iterate,
        Iterator_Element  => VSS.Strings.Virtual_String,
-       Aggregate         => (Empty       => Empty_Virtual_String_Vector,
+       Aggregate         => (Empty       => Empty_Syntax_Sugar,
                              Add_Unnamed => Append_Syntax_Sugar),
        Preelaborable_Initialization;
 
@@ -163,6 +163,10 @@ package VSS.String_Vectors is
    --  Return an iterator over each element in the vector
 
    --  Syntax sugar for Ada 2022 aggregates
+
+   function Empty_Syntax_Sugar return Virtual_String_Vector is
+     (Empty_Virtual_String_Vector);
+   --  Return an empty string vector
 
    procedure Append_Syntax_Sugar
      (Self : in out Virtual_String_Vector;

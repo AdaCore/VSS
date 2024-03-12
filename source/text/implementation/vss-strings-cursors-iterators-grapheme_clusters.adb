@@ -52,8 +52,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    type GCB_Action is (Break, No_Break, Unspecified);
 
-   --  Table below encodes segmentation rules that depends from the value of
-   --  the GCB property only.
+   --  The table below encodes segmentation rules that depend only on the
+   --  value of the GCB property.
 
    Forward_GCB_Rules : constant array
      (VSS.Implementation.UCD_Core.GCB_Values,

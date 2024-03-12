@@ -411,6 +411,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Left             : VSS.Implementation.Strings.Cursor;
       Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
       Right            : VSS.Implementation.Strings.Cursor;
+      Right_Code       : VSS.Unicode.Code_Point'Base;
       Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success          : Boolean;
       Done             : Boolean := False;
@@ -426,7 +427,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Handler := VSS.Implementation.Strings.Handler (Data);
 
       Self.First_Position := Self.Last_Position;
-      Success := Handler.Forward (Data, Self.First_Position);
+      Success :=
+        Handler.Forward_Element (Data, Self.First_Position, Right_Code);
 
       if not Success then
          --  End of the string has been reached.
@@ -435,15 +437,14 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
 
       else
-         Right    := Self.First_Position;
-         Right_Properties :=
-           Extract_Core_Data (Handler.Element (Data, Right));
+         Right            := Self.First_Position;
+         Right_Properties := Extract_Core_Data (Right_Code);
 
          loop
             Left            := Right;
             Left_Properties := Right_Properties;
 
-            Success := Handler.Forward (Data, Right);
+            Success := Handler.Forward_Element (Data, Right, Right_Code);
 
             if not Success then
                --  End of line has been reached
@@ -454,8 +455,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                return True;
 
             else
-               Right_Properties :=
-                 Extract_Core_Data (Handler.Element (Data, Right));
+               Right_Properties := Extract_Core_Data (Right_Code);
 
                if Left_Properties.GCB = GCB_CR
                  and Right_Properties.GCB = GCB_LF

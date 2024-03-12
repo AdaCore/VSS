@@ -50,6 +50,60 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Is_Linker : Boolean) return Boolean;
    --  Scan string backward to check whether Rule GB9c should be applied.
 
+   type GCB_Action is (Break, No_Break, Unspecified);
+
+   --  The table below encodes segmentation rules that depend only on the
+   --  value of the GCB property.
+
+   Forward_GCB_Rules : constant array
+     (VSS.Implementation.UCD_Core.GCB_Values,
+      VSS.Implementation.UCD_Core.GCB_Values) of GCB_Action :=
+     (GCB_CN  => (others => Break),                     --  Rule GB4
+      GCB_CR  =>
+        (GCB_LF => No_Break,                            --  Rule GB3
+         others => Break),                              --  Rule GB4
+      GCB_L   =>
+        (GCB_CN | GCB_CR | GCB_LF         => Break,     --  Rule GB5
+         GCB_L | GCB_V | GCB_LV | GCB_LVT => No_Break,  --  Rule GB6
+         GCB_EX | GCB_ZWJ                 => No_Break,  --  Rule GB9
+         GCB_SM                           => No_Break,  --  Rule GB9a
+         others                           => Unspecified),
+      GCB_LF  => (others => Break),                     --  Rule GB4
+      GCB_LV  =>
+        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+         GCB_V | GCB_T            => No_Break,          --  Rule GB7
+         GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
+         GCB_SM                   => No_Break,          --  Rule GB9a
+         others                   => Unspecified),
+      GCB_LVT =>
+        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+         GCB_T                    => No_Break,          --  Rule GB8
+         GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
+         GCB_SM                   => No_Break,          --  Rule GB9a
+         others                   => Unspecified),
+      GCB_PP  =>
+        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+         GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
+         GCB_SM                   => No_Break,          --  Rule GB9a
+         others                   => No_Break),         --  Rule GB9b
+      GCB_T =>
+        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+         GCB_T                    => No_Break,          --  Rule GB8
+         GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
+         GCB_SM                   => No_Break,          --  Rule GB9a
+         others                   => Unspecified),
+      GCB_V   =>
+        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+         GCB_V | GCB_T            => No_Break,          --  Rule GB7
+         GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
+         GCB_SM                   => No_Break,          --  Rule GB9a
+         others                   => Unspecified),
+      GCB_EX | GCB_RI | GCB_SM | GCB_XX | GCB_ZWJ =>
+        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+         GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
+         GCB_SM                   => No_Break,          --  Rule GB9a
+         others                   => Unspecified));
+
    -------------------
    -- Apply_ExtPict --
    -------------------
@@ -411,6 +465,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Left             : VSS.Implementation.Strings.Cursor;
       Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
       Right            : VSS.Implementation.Strings.Cursor;
+      Right_Code       : VSS.Unicode.Code_Point'Base;
       Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success          : Boolean;
       Done             : Boolean := False;
@@ -426,92 +481,45 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Handler := VSS.Implementation.Strings.Handler (Data);
 
       Self.First_Position := Self.Last_Position;
-      Success := Handler.Forward (Data, Self.First_Position);
+      Success :=
+        Handler.Forward_Element (Data, Self.First_Position, Right_Code);
 
       if not Success then
          --  End of the string has been reached.
          --  XXX Should Last_Position be set to After_Last_Character?
 
          return False;
+      end if;
 
-      else
-         Right    := Self.First_Position;
-         Right_Properties :=
-           Extract_Core_Data (Handler.Element (Data, Right));
+      Right            := Self.First_Position;
+      Right_Properties := Extract_Core_Data (Right_Code);
 
-         loop
-            Left            := Right;
-            Left_Properties := Right_Properties;
+      loop
+         Left            := Right;
+         Left_Properties := Right_Properties;
 
-            Success := Handler.Forward (Data, Right);
+         Success := Handler.Forward_Element (Data, Right, Right_Code);
 
-            if not Success then
-               --  End of line has been reached
-               --  Rule GB2
+         if not Success then
+            --  End of line has been reached
+            --  Rule GB2
 
-               Self.Last_Position := Left;
+            Self.Last_Position := Left;
 
-               return True;
+            return True;
+         end if;
 
-            else
-               Right_Properties :=
-                 Extract_Core_Data (Handler.Element (Data, Right));
+         Right_Properties := Extract_Core_Data (Right_Code);
 
-               if Left_Properties.GCB = GCB_CR
-                 and Right_Properties.GCB = GCB_LF
-               then
-                  --  Rule GB3
+         case Forward_GCB_Rules (Left_Properties.GCB, Right_Properties.GCB) is
+            when Break =>
+               Done := True;
 
-                  null;
+            when No_Break =>
+               null;
 
-               elsif Left_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
-                  --  Rule GB4
-
-                  Done := True;
-
-               elsif Right_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
-                  --  Rule GB5
-
-                  Done := True;
-
-               elsif Left_Properties.GCB = GCB_L
-                 and then Right_Properties.GCB
-               in GCB_L | GCB_V | GCB_LV | GCB_LVT
-               then
-                  --  Rule GB6
-
-                  null;
-
-               elsif Left_Properties.GCB in GCB_LV | GCB_V
-                 and then Right_Properties.GCB in GCB_V | GCB_T
-               then
-                  --  Rule GB7
-
-                  null;
-
-               elsif Left_Properties.GCB in GCB_LVT | GCB_T
-                 and then Right_Properties.GCB = GCB_T
-               then
-                  --  Rule GB8
-
-                  null;
-
-               elsif Right_Properties.GCB in GCB_EX | GCB_ZWJ then
-                  --  Rule GB9
-
-                  null;
-
-               elsif Right_Properties.GCB = GCB_SM then
-                  --  Rule GB9a
-
-                  null;
-
-               elsif Left_Properties.GCB = GCB_PP then
-                  --  Rule GB9b
-
-                  null;
-
-               elsif Left_Properties.InCB in INCB_Linker | INCB_Extend
+            when Unspecified =>
+               if Left_Properties.InCB in INCB_Linker | INCB_Extend
                  and then Right_Properties.InCB = INCB_Consonant
                  and then Apply_InCB
                    (Handler, Data, Left, Left_Properties.InCB = INCB_Linker)
@@ -540,15 +548,14 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                else
                   Done := True;
                end if;
+         end case;
 
-               if Done then
-                  Self.Last_Position := Left;
+         if Done then
+            Self.Last_Position := Left;
 
-                  return True;
-               end if;
-            end if;
-         end loop;
-      end if;
+            return True;
+         end if;
+      end loop;
    end Forward;
 
    -----------------

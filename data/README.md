@@ -17,7 +17,7 @@ curl -o emoji/emoji-test.txt https://www.unicode.org/Public/emoji/15.1/emoji-tes
 curl -o emoji/emoji-zwj-sequences.txt https://www.unicode.org/Public/emoji/15.1/emoji-zwj-sequences.txt
 git clone https://github.com/nigeltao/parse-number-fxx-test-data
 rm -rf parse-number-fxx-test-data/.git
-git close https://github.com/json5/json5-tests.git
+git clone https://github.com/json5/json5-tests.git
 rm -rf json5-tests/.git
 curl -O https://raw.githubusercontent.com/Perl/perl5/blead/t/re/re_tests
 tar caf ../vss-tests-data.tar.bz2 .

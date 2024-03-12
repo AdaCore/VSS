@@ -7,7 +7,9 @@
 --  Generic implementation of the string which use UTF-8 encoding for data.
 
 with Ada.Unchecked_Deallocation;
+with Interfaces;
 
+with VSS.Implementation.GCC;
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.String_Configuration;
 
@@ -1832,44 +1834,34 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end if;
 
       declare
-         Code : constant VSS.Unicode.UTF8_Code_Unit :=
+         use type Interfaces.Integer_32;
+         use type VSS.Unicode.UTF8_Code_Unit;
+
+         --  This code is based on the fact that starting byte of the
+         --  multibyte sequence in UTF-8 has N most significant bits set to
+         --  one followed by zero bit. So, first byte is negated and number
+         --  of leading zero bits is counting.
+
+         Code   : constant VSS.Unicode.UTF8_Code_Unit :=
            Storage (Position.UTF8_Offset);
+         Length : constant Interfaces.Integer_32 :=
+           VSS.Implementation.GCC.clz (Interfaces.Unsigned_32 (not Code))
+             - 24;
 
       begin
-         case Code is
-            when 16#00# .. 16#7F# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 1;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
+         if Code <= 16#7F# then
+            Position.UTF8_Offset  := Position.UTF8_Offset + 1;
+            Position.UTF16_Offset := Position.UTF16_Offset + 1;
 
-            when 16#C2# .. 16#DF# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 2;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#E0# .. 16#EF# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 3;
-               Position.UTF16_Offset := Position.UTF16_Offset + 1;
-
-            when 16#F0# .. 16#F4# =>
-               Position.UTF8_Offset  := Position.UTF8_Offset + 4;
-               Position.UTF16_Offset := Position.UTF16_Offset + 2;
-
-            when others =>
-               raise Program_Error with "string data is corrupted";
-         end case;
+         else
+            Position.UTF8_Offset  :=
+              Position.UTF8_Offset
+                + VSS.Unicode.UTF8_Code_Unit_Offset (Length);
+            Position.UTF16_Offset :=
+              Position.UTF16_Offset
+                + VSS.Unicode.UTF16_Code_Unit_Offset (Length / 4 + 1);
+         end if;
       end;
-
-      --  XXX case statement above may be rewritten as below to avoid
-      --  use of branch instructions.
-      --
-      --  Position.UTF8_Offset  :=
-      --    Position.UTF8_Offset + 1
-      --      + (if (Code and 2#1000_0000#) = 2#1000_0000# then 1 else 0)
-      --      + (if (Code and 2#1110_0000#) = 2#1110_0000# then 1 else 0)
-      --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
-      --
-      --  Position.UTF16_Offset :=
-      --    Position.UTF16_Offset + 1
-      --      + (if (Code and 2#1111_0000#) = 2#1111_0000# then 1 else 0);
    end Unchecked_Forward;
 
    -----------------

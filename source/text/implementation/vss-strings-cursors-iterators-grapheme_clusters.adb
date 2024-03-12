@@ -435,120 +435,118 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --  XXX Should Last_Position be set to After_Last_Character?
 
          return False;
+      end if;
 
-      else
-         Right            := Self.First_Position;
+      Right            := Self.First_Position;
+      Right_Properties := Extract_Core_Data (Right_Code);
+
+      loop
+         Left            := Right;
+         Left_Properties := Right_Properties;
+
+         Success := Handler.Forward_Element (Data, Right, Right_Code);
+
+         if not Success then
+            --  End of line has been reached
+            --  Rule GB2
+
+            Self.Last_Position := Left;
+
+            return True;
+         end if;
+
          Right_Properties := Extract_Core_Data (Right_Code);
 
-         loop
-            Left            := Right;
-            Left_Properties := Right_Properties;
+         if Left_Properties.GCB = GCB_CR
+           and Right_Properties.GCB = GCB_LF
+         then
+            --  Rule GB3
 
-            Success := Handler.Forward_Element (Data, Right, Right_Code);
+            null;
 
-            if not Success then
-               --  End of line has been reached
-               --  Rule GB2
+         elsif Left_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+            --  Rule GB4
 
-               Self.Last_Position := Left;
+            Done := True;
 
-               return True;
+         elsif Right_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+            --  Rule GB5
 
-            else
-               Right_Properties := Extract_Core_Data (Right_Code);
+            Done := True;
 
-               if Left_Properties.GCB = GCB_CR
-                 and Right_Properties.GCB = GCB_LF
-               then
-                  --  Rule GB3
+         elsif Left_Properties.GCB = GCB_L
+           and then Right_Properties.GCB
+                      in GCB_L | GCB_V | GCB_LV | GCB_LVT
+         then
+            --  Rule GB6
 
-                  null;
+            null;
 
-               elsif Left_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
-                  --  Rule GB4
+         elsif Left_Properties.GCB in GCB_LV | GCB_V
+           and then Right_Properties.GCB in GCB_V | GCB_T
+         then
+            --  Rule GB7
 
-                  Done := True;
+            null;
 
-               elsif Right_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
-                  --  Rule GB5
+         elsif Left_Properties.GCB in GCB_LVT | GCB_T
+           and then Right_Properties.GCB = GCB_T
+         then
+            --  Rule GB8
 
-                  Done := True;
+            null;
 
-               elsif Left_Properties.GCB = GCB_L
-                 and then Right_Properties.GCB
-               in GCB_L | GCB_V | GCB_LV | GCB_LVT
-               then
-                  --  Rule GB6
+         elsif Right_Properties.GCB in GCB_EX | GCB_ZWJ then
+            --  Rule GB9
 
-                  null;
+            null;
 
-               elsif Left_Properties.GCB in GCB_LV | GCB_V
-                 and then Right_Properties.GCB in GCB_V | GCB_T
-               then
-                  --  Rule GB7
+         elsif Right_Properties.GCB = GCB_SM then
+            --  Rule GB9a
 
-                  null;
+            null;
 
-               elsif Left_Properties.GCB in GCB_LVT | GCB_T
-                 and then Right_Properties.GCB = GCB_T
-               then
-                  --  Rule GB8
+         elsif Left_Properties.GCB = GCB_PP then
+            --  Rule GB9b
 
-                  null;
+            null;
 
-               elsif Right_Properties.GCB in GCB_EX | GCB_ZWJ then
-                  --  Rule GB9
+         elsif Left_Properties.InCB in INCB_Linker | INCB_Extend
+           and then Right_Properties.InCB = INCB_Consonant
+           and then Apply_InCB
+             (Handler, Data, Left, Left_Properties.InCB = INCB_Linker)
+         then
+            --  Rule GB9c.
 
-                  null;
+            null;
 
-               elsif Right_Properties.GCB = GCB_SM then
-                  --  Rule GB9a
+         elsif Left_Properties.GCB = GCB_ZWJ
+           and then Right_Properties.ExtPict
+           and then Apply_ExtPict (Handler, Data, Left)
+         then
+            --  Rule GB11.
 
-                  null;
+            null;
 
-               elsif Left_Properties.GCB = GCB_PP then
-                  --  Rule GB9b
+         elsif Left_Properties.GCB = GCB_RI
+           and then Right_Properties.GCB = GCB_RI
+           and then Apply_RI (Handler, Data, Left)
+         then
+            --  Rule GB12.
+            --  Rule GB13.
 
-                  null;
+            null;
 
-               elsif Left_Properties.InCB in INCB_Linker | INCB_Extend
-                 and then Right_Properties.InCB = INCB_Consonant
-                 and then Apply_InCB
-                   (Handler, Data, Left, Left_Properties.InCB = INCB_Linker)
-               then
-                  --  Rule GB9c.
+         else
+            Done := True;
+         end if;
 
-                  null;
+         if Done then
+            Self.Last_Position := Left;
 
-               elsif Left_Properties.GCB = GCB_ZWJ
-                 and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Handler, Data, Left)
-               then
-                  --  Rule GB11.
-
-                  null;
-
-               elsif Left_Properties.GCB = GCB_RI
-                 and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Handler, Data, Left)
-               then
-                  --  Rule GB12.
-                  --  Rule GB13.
-
-                  null;
-
-               else
-                  Done := True;
-               end if;
-
-               if Done then
-                  Self.Last_Position := Left;
-
-                  return True;
-               end if;
-            end if;
-         end loop;
-      end if;
+            return True;
+         end if;
+      end loop;
    end Forward;
 
    -----------------

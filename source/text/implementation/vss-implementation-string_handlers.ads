@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -181,8 +181,11 @@ package VSS.Implementation.String_Handlers is
      (Self    : in out Abstract_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Data    : out VSS.Implementation.Strings.String_Data;
-      Success : out Boolean) is abstract;
-   --  Convert UTF_8_String into internal representation.
+      Success : out Boolean)
+     with Pre'Class => Item'Length /= 0;
+   --  Convert UTF_8_String into internal representation. Default
+   --  implementation decode text character-by-character and append decoded
+   --  characters to the result.
 
    not overriding function To_UTF_8_String
      (Self : Abstract_String_Handler;

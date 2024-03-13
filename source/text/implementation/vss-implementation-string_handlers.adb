@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -7,6 +7,7 @@
 with System.Storage_Elements;
 
 with VSS.Implementation.String_Configuration;
+with VSS.Implementation.UTF8_Encoding;
 with VSS.Strings;
 
 package body VSS.Implementation.String_Handlers is
@@ -228,6 +229,45 @@ package body VSS.Implementation.String_Handlers is
          return False;
       end if;
    end Forward_Element;
+
+   -----------------------
+   -- From_UTF_8_String --
+   -----------------------
+
+   not overriding procedure From_UTF_8_String
+     (Self    : in out Abstract_String_Handler;
+      Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Data    : out VSS.Implementation.Strings.String_Data;
+      Success : out Boolean)
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+      Handler    : Abstract_String_Handler'Class
+        renames Abstract_String_Handler'Class (Self);
+      UTF8_Data  : constant
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+          (0 .. VSS.Unicode.UTF8_Code_Unit_Offset (Item'Length - 1))
+        with Import, Address => Item'Address;
+      UTF8_Index : VSS.Unicode.UTF8_Code_Unit_Index := UTF8_Data'First;
+      Code       : VSS.Unicode.Code_Point'Base;
+      Error      : VSS.Implementation.UTF8_Encoding.UTF8_Decode_Error;
+      Offset     : VSS.Implementation.Strings.Cursor_Offset;
+
+   begin
+      Handler.Initialize (Data);
+      Success := True;
+
+      loop
+         exit when UTF8_Index > UTF8_Data'Last;
+
+         VSS.Implementation.UTF8_Encoding.Decode
+           (UTF8_Data, UTF8_Index, Code, Success, Error);
+
+         exit when not Success;
+
+         Handler.Append (Data, Code, Offset);
+      end loop;
+   end From_UTF_8_String;
 
    ----------
    -- Hash --

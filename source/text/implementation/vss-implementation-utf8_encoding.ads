@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -44,6 +44,15 @@ package VSS.Implementation.UTF8_Encoding is
       Invalid_2_Of_4,
       Invalid_3_Of_4,
       Invalid_4_Of_4);
+
+   procedure Decode
+     (Data    : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Index   : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point'Base;
+      Success : in out Boolean;
+      Error   : out UTF8_Decode_Error)
+      with Pre => Index in Data'Range;
+   --  Decode single Unicode character encoded with UTF-8 encoding.
 
    procedure Decode
      (Data    : VSS.Stream_Element_Vectors.Stream_Element_Vector;

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -106,6 +106,11 @@ package body VSS.Regular_Expressions.Pike_Engines is
       --  Active threads (for the current position) and threads to run in the
       --  next position.
 
+      type Thread_State_List_Pair_Access is access Thread_State_List_Pair;
+
+      procedure Free is new Ada.Unchecked_Deallocation
+        (Thread_State_List_Pair, Thread_State_List_Pair_Access);
+
       procedure Step_Backward
         (Text : VSS.Strings.Virtual_String'Class;
          Cursor : in out VSS.Implementation.Strings.Cursor);
@@ -134,7 +139,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
       procedure Append_One_State (Value : Thread_State);
       --  Append one Thread_State to next state list.
 
-      States     : Thread_State_List_Pair;
+      Heap_Chunk : Thread_State_List_Pair_Access := new Thread_State_List_Pair;
+      States     : Thread_State_List_Pair renames Heap_Chunk.all;
       Current    : Thread_State_List_Index := 0;
       --  Index of the current state list in States
       function Previous return Thread_State_List_Index is (1 - Current);
@@ -459,6 +465,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Result := new VSS.Regular_Expressions.Matches.Match (Length => 0);
          Result.Has_Match := False;
       end if;
+
+      Free (Heap_Chunk);
    end Match;
 
    ----------------

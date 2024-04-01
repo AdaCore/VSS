@@ -12,7 +12,7 @@
 with Ada.Strings.UTF_Encoding;
 
 with VSS.Implementation.FNV_Hash;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.String_Vectors;
 with VSS.Implementation.Strings;
 with VSS.Strings;
@@ -25,7 +25,7 @@ package VSS.Implementation.Null_String_Handlers is
    use type VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    type Null_String_Handler is
-     new VSS.Implementation.String_Handlers.Abstract_String_Handler
+     new VSS.Implementation.Text_Handlers.Abstract_String_Handler
        with null record;
 
    overriding procedure Reference
@@ -122,7 +122,7 @@ package VSS.Implementation.Null_String_Handlers is
      (Self           : Null_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
       Prefix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
       with Pre => not Data.In_Place and then Data.Handler = null;
 
@@ -130,7 +130,7 @@ package VSS.Implementation.Null_String_Handlers is
      (Self           : Null_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
       Suffix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
       with Pre => not Data.In_Place and then Data.Handler = null;
 

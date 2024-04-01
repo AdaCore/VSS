@@ -7,7 +7,7 @@
 pragma Ada_2022;
 
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package body VSS.Strings.Templates is

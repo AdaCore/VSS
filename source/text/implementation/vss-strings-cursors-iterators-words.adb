@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.UCD_Core;
 
 with VSS.Strings.Cursors.Markers;
@@ -30,49 +30,49 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB6
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB6 should be applied.
 
    function Apply_WB7
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7 should be applied.
 
    function Apply_WB7b
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB7b should be applied.
 
    function Apply_WB7c
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7c should be applied.
 
    function Apply_WB11
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7 should be applied.
 
    function Apply_WB12
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB12 should be applied.
 
    function Apply_WB15_WB16
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rules WB15, WB16 should be
@@ -83,8 +83,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB11
-     (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+     (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -110,8 +109,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB12
-     (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+     (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -137,8 +135,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ---------------------
 
    function Apply_WB15_WB16
-     (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+     (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -171,8 +168,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ---------------
 
    function Apply_WB6
-     (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+     (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -198,8 +194,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ---------------
 
    function Apply_WB7
-     (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+     (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -225,8 +220,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB7b
-     (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+     (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -252,8 +246,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB7c
-     (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+     (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is

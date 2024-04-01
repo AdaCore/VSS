@@ -19,7 +19,7 @@ with VSS.Implementation.String_Vectors;
 limited with VSS.Strings;
 with VSS.Unicode;
 
-package VSS.Implementation.String_Handlers is
+package VSS.Implementation.Text_Handlers is
 
    pragma Preelaborate;
 
@@ -313,4 +313,4 @@ package VSS.Implementation.String_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
-end VSS.Implementation.String_Handlers;
+end VSS.Implementation.Text_Handlers;

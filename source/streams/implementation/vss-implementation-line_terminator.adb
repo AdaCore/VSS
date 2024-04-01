@@ -6,7 +6,7 @@
 
 with VSS.Implementation.Character_Codes;
 with VSS.Implementation.Strings;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Internals;
 
 package body VSS.Implementation.Line_Terminator is

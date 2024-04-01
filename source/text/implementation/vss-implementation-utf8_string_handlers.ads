@@ -9,7 +9,7 @@
 with Ada.Strings.UTF_Encoding;
 with System.Atomic_Counters;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.String_Vectors;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UTF8_Encoding;
@@ -38,7 +38,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    type UTF8_String_Data_Access is access all UTF8_String_Data;
 
    type UTF8_String_Handler is
-     new VSS.Implementation.String_Handlers.Abstract_String_Handler
+     new VSS.Implementation.Text_Handlers.Abstract_String_Handler
        with null record;
 
    overriding procedure Reference
@@ -198,7 +198,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    end record;
 
    type UTF8_In_Place_String_Handler is
-     new VSS.Implementation.String_Handlers.Abstract_String_Handler
+     new VSS.Implementation.Text_Handlers.Abstract_String_Handler
        with null record;
 
    overriding procedure Reference

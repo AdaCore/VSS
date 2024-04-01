@@ -6,7 +6,7 @@
 
 with Interfaces;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 with VSS.Strings.Converters.Decoders.EUCJP.JIS0212;
 with VSS.Strings.Converters.Decoders.Index_JIS0208;

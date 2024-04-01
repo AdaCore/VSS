@@ -11,7 +11,7 @@ with Ada.Unchecked_Deallocation;
 
 with VSS.Characters.Latin;
 with VSS.Characters.Punctuations;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.Strings;
 with VSS.Regular_Expressions.ECMA_Parser;
 with VSS.Regular_Expressions.Matches;

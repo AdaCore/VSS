@@ -8,7 +8,7 @@ with VSS.Implementation.Character_Codes;
 with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.Line_Terminator;
 with VSS.Implementation.String_Configuration;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Cursors.Internals;
 with VSS.Strings.Cursors.Iterators.Characters;
 with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;

@@ -106,7 +106,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    procedure Split_Lines_Common
      (Handler         :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data            : VSS.Implementation.Strings.String_Data;
       Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Terminators     : VSS.Strings.Line_Terminator_Set;
@@ -236,8 +236,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Parent : VSS.Implementation.String_Handlers.Abstract_String_Handler
-        renames VSS.Implementation.String_Handlers.Abstract_String_Handler
+      Parent : VSS.Implementation.Text_Handlers.Abstract_String_Handler
+        renames VSS.Implementation.Text_Handlers.Abstract_String_Handler
                  (Self);
       Source         : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
@@ -381,8 +381,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Parent : VSS.Implementation.String_Handlers.Abstract_String_Handler
-        renames VSS.Implementation.String_Handlers.Abstract_String_Handler
+      Parent : VSS.Implementation.Text_Handlers.Abstract_String_Handler
+        renames VSS.Implementation.Text_Handlers.Abstract_String_Handler
                  (Self);
 
       Source         : UTF8_In_Place_Data
@@ -465,7 +465,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                   New_Size);
 
                --  Copy character by character
-               VSS.Implementation.String_Handlers.Abstract_String_Handler
+               VSS.Implementation.Text_Handlers.Abstract_String_Handler
                  (Global_UTF8_String_Handler).Append (Data, Suffix, Offset);
             end if;
          end;
@@ -1411,7 +1411,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
            (Target_Data, Source.Storage, From.UTF8_Offset, Size, Length, True);
 
       else
-         VSS.Implementation.String_Handlers.Abstract_String_Handler
+         VSS.Implementation.Text_Handlers.Abstract_String_Handler
            (Self).Slice (Source_Data, From, To, Target_Data);
       end if;
    end Slice;
@@ -1508,7 +1508,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    procedure Split_Lines_Common
      (Handler         :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data            : VSS.Implementation.Strings.String_Data;
       Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Terminators     : VSS.Strings.Line_Terminator_Set;

@@ -6,7 +6,7 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Core;
 with VSS.Implementation.UTF8_Casing;

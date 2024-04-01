@@ -10,7 +10,7 @@ with Ada.Unchecked_Deallocation;
 with System.Storage_Elements;
 
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package body VSS.Implementation.String_Vectors is
@@ -151,7 +151,7 @@ package body VSS.Implementation.String_Vectors is
       Item : VSS.Implementation.Strings.String_Data) return Boolean
    is
       Item_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
           renames VSS.Implementation.Strings.Constant_Handler (Item).all;
 
    begin
@@ -162,7 +162,7 @@ package body VSS.Implementation.String_Vectors is
       for J in Self.Data'First .. Self.Last loop
          declare
             Handler :
-              VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
+              VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
                 renames VSS.Implementation.Strings.Constant_Handler
                   (Self.Data (J)).all;
 

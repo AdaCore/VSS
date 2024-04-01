@@ -8,7 +8,7 @@ with Ada.Assertions;
 
 with VSS.Characters;
 with VSS.Implementation.Strings;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Internals;
 with VSS.Unicode;
 

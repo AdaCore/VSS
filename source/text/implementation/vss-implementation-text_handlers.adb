@@ -10,7 +10,7 @@ with VSS.Implementation.String_Configuration;
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Strings;
 
-package body VSS.Implementation.String_Handlers is
+package body VSS.Implementation.Text_Handlers is
 
    use type VSS.Unicode.Code_Point;
 
@@ -686,4 +686,4 @@ package body VSS.Implementation.String_Handlers is
       return True;
    end Starts_With;
 
-end VSS.Implementation.String_Handlers;
+end VSS.Implementation.Text_Handlers;

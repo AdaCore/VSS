@@ -6,7 +6,7 @@
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Converters.Encoders.UTF8;
 
 package body VSS.Strings.Converters.Encoders is

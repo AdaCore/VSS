@@ -122,7 +122,7 @@ package body VSS.Implementation.Null_String_Handlers is
      (Self           : Null_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
       Suffix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Suffix_Data    : VSS.Implementation.Strings.String_Data)
       return Boolean is
    begin
@@ -282,7 +282,7 @@ package body VSS.Implementation.Null_String_Handlers is
      (Self           : Null_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
       Prefix_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Prefix_Data    : VSS.Implementation.Strings.String_Data)
       return Boolean is
    begin

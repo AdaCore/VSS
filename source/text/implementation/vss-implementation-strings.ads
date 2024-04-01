@@ -6,7 +6,7 @@
 
 with System.Storage_Elements;
 
-limited with VSS.Implementation.String_Handlers;
+limited with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package VSS.Implementation.Strings is
@@ -27,10 +27,10 @@ package VSS.Implementation.Strings is
 
    type Constant_Text_Handler_Access is
      access constant
-       VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+       VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
    type Variable_Text_Handler_Access is
      access all
-       VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+       VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
 
    ------------
    -- Cursor --

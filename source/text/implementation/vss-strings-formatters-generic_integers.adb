@@ -10,7 +10,7 @@ with Interfaces;
 
 with VSS.Characters.Latin;
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package body VSS.Strings.Formatters.Generic_Integers is

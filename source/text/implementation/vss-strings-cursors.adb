@@ -6,7 +6,7 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Cursors.Markers.Internals;
 
 package body VSS.Strings.Cursors is

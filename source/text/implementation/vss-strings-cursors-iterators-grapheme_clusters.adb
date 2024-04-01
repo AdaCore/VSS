@@ -5,7 +5,7 @@
 --
 
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.UCD_Core;
 
 with VSS.Strings.Cursors.Markers;
@@ -32,7 +32,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    function Apply_RI
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rules GB12, GB13 should be
@@ -40,14 +40,14 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    function Apply_ExtPict
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule GB11 should be applied.
 
    function Apply_InCB
      (Handler   :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data      : VSS.Implementation.Strings.String_Data;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean;
@@ -113,7 +113,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    function Apply_ExtPict
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -146,7 +146,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    function Apply_InCB
      (Handler   :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data      : VSS.Implementation.Strings.String_Data;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean
@@ -185,7 +185,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    function Apply_RI
      (Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is

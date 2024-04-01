@@ -8,7 +8,7 @@ pragma Ada_2022;
 
 with Interfaces;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 with VSS.Strings.Converters.Decoders.GB18030.Indices;
 with VSS.Strings.Converters.Decoders.GB18030.Ranges;

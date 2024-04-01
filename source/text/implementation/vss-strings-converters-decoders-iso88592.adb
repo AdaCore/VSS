@@ -6,7 +6,7 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO88592 is
 

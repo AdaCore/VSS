@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -35,31 +35,31 @@ package body VSS.Strings.Converters.Decoders.ISO88599 is
 
          case Byte is
             when 16#D0# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#011E#, Offset);
 
             when 16#DD# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#0130#, Offset);
 
             when 16#DE# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#015E#, Offset);
 
             when 16#F0# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#011F#, Offset);
 
             when 16#FD# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#0131#, Offset);
 
             when 16#FE# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#015F#, Offset);
 
             when others =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, VSS.Unicode.Code_Point (Byte), Offset);
          end case;
 

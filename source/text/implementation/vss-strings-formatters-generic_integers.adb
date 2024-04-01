@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -220,9 +220,9 @@ package body VSS.Strings.Formatters.Generic_Integers is
       type States is
         (Initial, Zero_Width_Base_Group, Width, Base, Group, Error);
 
-      Handler  :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Format.Data);
+      Handler  : constant
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Format.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Code     : VSS.Unicode.Code_Point'Base;
       State    : States := Initial;

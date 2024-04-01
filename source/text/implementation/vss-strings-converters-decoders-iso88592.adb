@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -137,11 +137,11 @@ package body VSS.Strings.Converters.Decoders.ISO88592 is
 
          case Byte is
             when Mapping'Range =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, Mapping (Byte), Offset);
 
             when others =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, VSS.Unicode.Code_Point (Byte), Offset);
          end case;
 

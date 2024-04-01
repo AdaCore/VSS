@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -44,27 +44,27 @@ package body VSS.Strings.Converters.Decoders.ISO88597 is
                | 16#AB# .. 16#AD# | 16#B0# .. 16#B3# | 16#B7# | 16#BB#
                | 16#BD#
             =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, VSS.Unicode.Code_Point (Byte), Offset);
 
             when 16#A1# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#2018#, Offset);
 
             when 16#A2# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#2019#, Offset);
 
             when 16#A4# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#20AC#, Offset);
 
             when 16#A5# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#20AF#, Offset);
 
             when 16#AF# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#2015#, Offset);
 
             when 16#AE# | 16#D2# | 16#FF# =>
@@ -72,11 +72,11 @@ package body VSS.Strings.Converters.Decoders.ISO88597 is
 
                exit when Self.Flags (Stop_On_Error);
 
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, Replacement_Character, Offset);
 
             when others =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target,
                   VSS.Unicode.Code_Point (Byte) - 16#A0# + 16#0370#,
                   Offset);

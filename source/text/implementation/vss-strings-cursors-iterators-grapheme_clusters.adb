@@ -31,20 +31,23 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    --  Return core data record for the given character.
 
    function Apply_RI
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rules GB12, GB13 should be
    --  applied.
 
    function Apply_ExtPict
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule GB11 should be applied.
 
    function Apply_InCB
-     (Handler   : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler   :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data      : VSS.Implementation.Strings.String_Data;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean;
@@ -109,7 +112,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    -------------------
 
    function Apply_ExtPict
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -141,7 +145,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    ----------------
 
    function Apply_InCB
-     (Handler   : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler   :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data      : VSS.Implementation.Strings.String_Data;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean
@@ -179,7 +184,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    --------------
 
    function Apply_RI
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -211,7 +217,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
       Data             : VSS.Implementation.Strings.String_Data;
-      Handler          : VSS.Implementation.Strings.String_Handler_Access;
+      Handler          :
+        VSS.Implementation.Strings.Constant_Text_Handler_Access;
       Right            : VSS.Implementation.Strings.Cursor;
       Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Left             : VSS.Implementation.Strings.Cursor;
@@ -227,7 +234,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end if;
 
       Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Handler (Data);
+      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       Self.Last_Position := Self.First_Position;
       Success := Handler.Backward (Data, Self.Last_Position);
@@ -317,7 +324,10 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                elsif Left_Properties.InCB in INCB_Linker | INCB_Extend
                  and then Right_Properties.InCB = INCB_Consonant
                  and then Apply_InCB
-                   (Handler, Data, Left, Left_Properties.InCB = INCB_Linker)
+                   (Handler.all,
+                    Data,
+                    Left,
+                    Left_Properties.InCB = INCB_Linker)
                then
                   --  Rule 9c.
 
@@ -325,7 +335,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_ZWJ
                  and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Handler, Data, Left)
+                 and then Apply_ExtPict (Handler.all, Data, Left)
                then
                   --  Rule 11.
 
@@ -333,7 +343,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_RI
                  and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Handler, Data, Left)
+                 and then Apply_RI (Handler.all, Data, Left)
                then
                   --  Rule GB12.
                   --  Rule GB13.
@@ -367,7 +377,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       use all type VSS.Implementation.UCD_Core.EA_Values;
 
       Data       : VSS.Implementation.Strings.String_Data;
-      Handler    : VSS.Implementation.Strings.String_Handler_Access;
+      Handler    : VSS.Implementation.Strings.Constant_Text_Handler_Access;
       Position   : VSS.Implementation.Strings.Cursor;
       Code       : VSS.Unicode.Code_Point;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
@@ -381,7 +391,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end if;
 
       Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Handler (Data);
+      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       if Self.First_Position.Index not in 1 .. Handler.Length (Data) then
          --  Iterator doesn't point to any grapheme cluster.
@@ -461,7 +471,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
       Data             : VSS.Implementation.Strings.String_Data;
-      Handler          : VSS.Implementation.Strings.String_Handler_Access;
+      Handler          :
+        VSS.Implementation.Strings.Constant_Text_Handler_Access;
       Left             : VSS.Implementation.Strings.Cursor;
       Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
       Right            : VSS.Implementation.Strings.Cursor;
@@ -478,7 +489,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end if;
 
       Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Handler (Data);
+      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       Self.First_Position := Self.Last_Position;
       Success :=
@@ -522,7 +533,10 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                if Left_Properties.InCB in INCB_Linker | INCB_Extend
                  and then Right_Properties.InCB = INCB_Consonant
                  and then Apply_InCB
-                   (Handler, Data, Left, Left_Properties.InCB = INCB_Linker)
+                   (Handler.all,
+                    Data,
+                    Left,
+                    Left_Properties.InCB = INCB_Linker)
                then
                   --  Rule GB9c.
 
@@ -530,7 +544,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_ZWJ
                  and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Handler, Data, Left)
+                 and then Apply_ExtPict (Handler.all, Data, Left)
                then
                   --  Rule GB11.
 
@@ -538,7 +552,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_RI
                  and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Handler, Data, Left)
+                 and then Apply_RI (Handler.all, Data, Left)
                then
                   --  Rule GB12.
                   --  Rule GB13.
@@ -566,7 +580,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : Grapheme_Cluster_Iterator) return Boolean
    is
       Data    : VSS.Implementation.Strings.String_Data;
-      Handler : VSS.Implementation.Strings.String_Handler_Access;
+      Handler : VSS.Implementation.Strings.Constant_Text_Handler_Access;
 
    begin
       if Self.Owner = null then
@@ -576,7 +590,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end if;
 
       Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Handler (Data);
+      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       return Self.First_Position.Index in 1 .. Handler.Length (Data);
    end Has_Element;
@@ -608,7 +622,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end record;
 
       Data       : VSS.Implementation.Strings.String_Data;
-      Handler    : VSS.Implementation.Strings.String_Handler_Access;
+      Handler    : VSS.Implementation.Strings.Constant_Text_Handler_Access;
       Position   : VSS.Implementation.Strings.Cursor :=
         Self.First_Position;
       Code       : VSS.Unicode.Code_Point;
@@ -628,7 +642,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end if;
 
       Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Handler (Data);
+      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       if Self.First_Position.Index not in 1 .. Handler.Length (Data) then
          --  Iterator doesn't point to grapheme cluster.
@@ -820,8 +834,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
       Success : Boolean with Unreferenced;
 
    begin
@@ -865,9 +879,9 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin
@@ -909,9 +923,9 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
@@ -931,9 +945,9 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
@@ -953,9 +967,9 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin

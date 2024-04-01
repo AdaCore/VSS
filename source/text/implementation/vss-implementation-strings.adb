@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -21,9 +21,33 @@ package body VSS.Implementation.Strings is
       Right : String_Data) return Boolean is
    begin
       return
-        VSS.Implementation.Strings.Handler (Left).Is_Equal
-          (Left, VSS.Implementation.Strings.Handler (Right).all, Right);
+        VSS.Implementation.Strings.Constant_Handler (Left).Is_Equal
+          (Left,
+           VSS.Implementation.Strings.Constant_Handler (Right).all,
+           Right);
    end "=";
+
+   ----------------------
+   -- Constant_Handler --
+   ----------------------
+
+   function Constant_Handler
+     (Data : String_Data) return not null Constant_Text_Handler_Access is
+   begin
+      if Data.In_Place then
+         return
+           Constant_Text_Handler_Access
+             (VSS.Implementation.String_Configuration.In_Place_Handler);
+
+      elsif Data.Handler /= null then
+         return Constant_Text_Handler_Access (Data.Handler);
+
+      else
+         return
+           VSS.Implementation.Null_String_Handlers
+             .Global_Null_String_Handler'Access;
+      end if;
+   end Constant_Handler;
 
    ------------------
    -- Fixup_Delete --
@@ -118,27 +142,6 @@ package body VSS.Implementation.Strings is
       end if;
    end Fixup_Insert;
 
-   -------------
-   -- Handler --
-   -------------
-
-   function Handler
-     (Data : String_Data)
-      return not null VSS.Implementation.Strings.String_Handler_Access is
-   begin
-      if Data.In_Place then
-         return VSS.Implementation.String_Configuration.In_Place_Handler;
-
-      elsif Data.Handler /= null then
-         return Data.Handler;
-
-      else
-         return
-           VSS.Implementation.Null_String_Handlers
-             .Global_Null_String_Handler'Access;
-      end if;
-   end Handler;
-
    ----------------
    -- Is_Invalid --
    ----------------
@@ -157,7 +160,7 @@ package body VSS.Implementation.Strings is
 
    procedure Reference (Data : in out String_Data) is
    begin
-      VSS.Implementation.Strings.Handler (Data).Reference (Data);
+      VSS.Implementation.Strings.Variable_Handler (Data).Reference (Data);
    end Reference;
 
    -----------------
@@ -166,8 +169,29 @@ package body VSS.Implementation.Strings is
 
    procedure Unreference (Data : in out String_Data) is
    begin
-      VSS.Implementation.Strings.Handler (Data).Unreference (Data);
+      VSS.Implementation.Strings.Variable_Handler (Data).Unreference (Data);
       Data := Null_String_Data;
    end Unreference;
+
+   ----------------------
+   -- Variable_Handler --
+   ----------------------
+
+   function Variable_Handler
+     (Data : in out String_Data)
+      return not null Variable_Text_Handler_Access is
+   begin
+      if Data.In_Place then
+         return VSS.Implementation.String_Configuration.In_Place_Handler;
+
+      elsif Data.Handler /= null then
+         return Data.Handler;
+
+      else
+         return
+           VSS.Implementation.Null_String_Handlers
+             .Global_Null_String_Handler'Access;
+      end if;
+   end Variable_Handler;
 
 end VSS.Implementation.Strings;

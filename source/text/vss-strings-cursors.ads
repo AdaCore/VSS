@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -155,7 +155,7 @@ private
      abstract new VSS.Implementation.Referrers.Referal_Limited_Base
        and VSS.Strings.Cursors.Abstract_Character_Cursor with
    record
-      Handler  : VSS.Implementation.Strings.String_Handler_Access;
+      Handler  : VSS.Implementation.Strings.Constant_Text_Handler_Access;
       --  Cached value of the string data handler. Derived type is responsible
       --  to manage its consistency.
       Position : aliased VSS.Implementation.Strings.Cursor;

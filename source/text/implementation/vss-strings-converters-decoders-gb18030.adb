@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -68,7 +68,7 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  VSS.Implementation.Strings.Handler (Target).Append
+                  VSS.Implementation.Strings.Variable_Handler (Target).Append
                     (Target, Replacement_Character, Offset);
                end if;
             end if;
@@ -98,13 +98,14 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                            exit;
 
                         else
-                           VSS.Implementation.Strings.Handler (Target).Append
-                             (Target, Replacement_Character, Offset);
+                           VSS.Implementation.Strings.Variable_Handler
+                             (Target).Append
+                                (Target, Replacement_Character, Offset);
                         end if;
 
                      else
-                        VSS.Implementation.Strings.Handler (Target).Append
-                          (Target, Code, Offset);
+                        VSS.Implementation.Strings.Variable_Handler
+                          (Target).Append (Target, Code, Offset);
                      end if;
                   end;
 
@@ -124,8 +125,9 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                         exit;
 
                      else
-                        VSS.Implementation.Strings.Handler (Target).Append
-                          (Target, Replacement_Character, Offset);
+                        VSS.Implementation.Strings.Variable_Handler
+                          (Target).Append
+                             (Target, Replacement_Character, Offset);
                      end if;
 
                      Self.First  := First;
@@ -160,8 +162,9 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                         exit;
 
                      else
-                        VSS.Implementation.Strings.Handler (Target).Append
-                          (Target, Replacement_Character, Offset);
+                        VSS.Implementation.Strings.Variable_Handler
+                          (Target).Append
+                             (Target, Replacement_Character, Offset);
                      end if;
 
                      Self.First  := First;
@@ -190,8 +193,8 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                      First := 0;
 
                      if Code /= 0 then
-                        VSS.Implementation.Strings.Handler (Target).Append
-                          (Target, Code, Offset);
+                        VSS.Implementation.Strings.Variable_Handler
+                          (Target).Append (Target, Code, Offset);
 
                      else
                         if Byte in ASCII_Byte_Range then
@@ -204,8 +207,9 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                            exit;
 
                         else
-                           VSS.Implementation.Strings.Handler (Target).Append
-                             (Target, Replacement_Character, Offset);
+                           VSS.Implementation.Strings.Variable_Handler
+                             (Target).Append
+                                (Target, Replacement_Character, Offset);
                         end if;
                      end if;
                   end;
@@ -214,11 +218,11 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
          else
             case Byte is
                when ASCII_Byte_Range =>
-                  VSS.Implementation.Strings.Handler (Target).Append
+                  VSS.Implementation.Strings.Variable_Handler (Target).Append
                     (Target, VSS.Unicode.Code_Point (Byte), Offset);
 
                when 16#80# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
+                  VSS.Implementation.Strings.Variable_Handler (Target).Append
                     (Target, 16#20AC#, Offset);
 
                when 16#81# .. 16#FE# =>
@@ -231,8 +235,9 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                      exit;
 
                   else
-                     VSS.Implementation.Strings.Handler (Target).Append
-                       (Target, Replacement_Character, Offset);
+                     VSS.Implementation.Strings.Variable_Handler
+                       (Target).Append
+                          (Target, Replacement_Character, Offset);
                   end if;
             end case;
          end if;

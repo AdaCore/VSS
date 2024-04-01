@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -29,43 +29,50 @@ package body VSS.Strings.Cursors.Iterators.Words is
    --  Return core data record for the given character.
 
    function Apply_WB6
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB6 should be applied.
 
    function Apply_WB7
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7 should be applied.
 
    function Apply_WB7b
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB7b should be applied.
 
    function Apply_WB7c
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7c should be applied.
 
    function Apply_WB11
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7 should be applied.
 
    function Apply_WB12
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB12 should be applied.
 
    function Apply_WB15_WB16
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rules WB15, WB16 should be
@@ -76,7 +83,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB11
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -102,7 +110,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB12
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -128,7 +137,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ---------------------
 
    function Apply_WB15_WB16
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -161,7 +171,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ---------------
 
    function Apply_WB6
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -187,7 +198,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ---------------
 
    function Apply_WB7
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -213,7 +225,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB7b
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -239,7 +252,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
    ----------------
 
    function Apply_WB7c
-     (Handler : not null VSS.Implementation.Strings.String_Handler_Access;
+     (Handler :
+        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
       Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
@@ -302,8 +316,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Data               : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler            : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
       Left               : VSS.Implementation.Strings.Cursor;
       Left_Properties    : VSS.Implementation.UCD_Core.Core_Data_Record;
       Right              : VSS.Implementation.Strings.Cursor;
@@ -444,7 +458,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_LE | WB_HL
                 and Right_Properties.WB in WB_ML | WB_MB | WB_SQ)
-           and then Apply_WB6 (Handler, Data, Right)
+           and then Apply_WB6 (Handler.all, Data, Right)
          then
             --  Rule WB6
 
@@ -452,7 +466,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_ML | WB_MB | WB_SQ
                 and Right_Properties.WB in WB_LE | WB_HL)
-           and then Apply_WB7 (Handler, Data, Starter)
+           and then Apply_WB7 (Handler.all, Data, Starter)
          then
             --  Rule WB7
 
@@ -467,7 +481,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_HL
                 and Right_Properties.WB = WB_DQ)
-           and then Apply_WB7b (Handler, Data, Right)
+           and then Apply_WB7b (Handler.all, Data, Right)
          then
             --  Rule WB7b
 
@@ -475,7 +489,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_DQ
                 and Right_Properties.WB = WB_HL)
-           and then Apply_WB7c (Handler, Data, Starter)
+           and then Apply_WB7c (Handler.all, Data, Starter)
          then
             --  Rule WB7c
 
@@ -504,7 +518,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_MN | WB_MB | WB_SQ
                 and Right_Properties.WB = WB_NU)
-           and then Apply_WB11 (Handler, Data, Starter)
+           and then Apply_WB11 (Handler.all, Data, Starter)
          then
             --  Rule WB11
 
@@ -512,7 +526,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_NU
                 and Right_Properties.WB in WB_MN | WB_MB | WB_SQ)
-           and then Apply_WB12 (Handler, Data, Right)
+           and then Apply_WB12 (Handler.all, Data, Right)
          then
             --  Rule WB12
 
@@ -541,7 +555,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_RI
                 and Right_Properties.WB = WB_RI)
-           and then Apply_WB15_WB16 (Handler, Data, Starter)
+           and then Apply_WB15_WB16 (Handler.all, Data, Starter)
          then
             --  Rule WB15
             --  Rule WB16
@@ -570,8 +584,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
 
    begin
       return
@@ -598,8 +612,8 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Handler : constant not null
-        VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
       Success : Boolean with Unreferenced;
 
    begin
@@ -656,9 +670,9 @@ package body VSS.Strings.Cursors.Iterators.Words is
      (Self : in out Word_Iterator'Class;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin
@@ -700,9 +714,9 @@ package body VSS.Strings.Cursors.Iterators.Words is
      (Self : in out Word_Iterator'Class;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
@@ -722,9 +736,9 @@ package body VSS.Strings.Cursors.Iterators.Words is
      (Self : in out Word_Iterator'Class;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
@@ -744,9 +758,9 @@ package body VSS.Strings.Cursors.Iterators.Words is
      (Self : in out Word_Iterator'Class;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -23,7 +23,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    begin
       if Self.Owner /= null then
          return
-           VSS.Implementation.Strings.Handler
+           VSS.Implementation.Strings.Constant_Handler
              (Data).Backward (Data, Self.Position);
       end if;
 
@@ -45,7 +45,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       if Self.Owner /= null then
          return
            VSS.Characters.Virtual_Character'Base'Val
-             (VSS.Implementation.Strings.Handler
+             (VSS.Implementation.Strings.Constant_Handler
                 (Data).Element (Data, Self.Position));
       end if;
 
@@ -123,7 +123,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
       Self.Handler.After_Last_Character (On.Data, Self.Position);
    end Set_After_Last;
 
@@ -143,7 +143,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
       Self.Reconnect (Cursor_Owner);
       Self.Handler  :=
-        VSS.Implementation.Strings.Handler
+        VSS.Implementation.Strings.Constant_Handler
           (Virtual_String (Cursor_Owner.all).Data);
       Self.Position := Cursor_Position;
    end Set_At;
@@ -160,7 +160,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
       Self.Handler.Before_First_Character (On.Data, Self.Position);
       Dummy := Self.Handler.Forward (On.Data, Self.Position);
    end Set_At_First;
@@ -177,7 +177,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
       Self.Handler.After_Last_Character (On.Data, Self.Position);
       Dummy := Self.Handler.Backward (On.Data, Self.Position);
    end Set_At_Last;
@@ -191,7 +191,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
       Self.Handler.Before_First_Character (On.Data, Self.Position);
    end Set_Before_First;
 
@@ -211,7 +211,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
          VSS.Implementation.Strings.Fixup_Insert
            (Self.Position, Start, Inserted);
          Self.Handler :=
-           VSS.Implementation.Strings.Handler
+           VSS.Implementation.Strings.Constant_Handler
              (Virtual_String (Self.Owner.all).Data);
 
       else

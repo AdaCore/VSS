@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -152,7 +152,7 @@ package body VSS.Implementation.String_Vectors is
    is
       Item_Handler :
         VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-          renames VSS.Implementation.Strings.Handler (Item).all;
+          renames VSS.Implementation.Strings.Constant_Handler (Item).all;
 
    begin
       if Self = null then
@@ -163,7 +163,8 @@ package body VSS.Implementation.String_Vectors is
          declare
             Handler :
               VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-                renames VSS.Implementation.Strings.Handler (Self.Data (J)).all;
+                renames VSS.Implementation.Strings.Constant_Handler
+                  (Self.Data (J)).all;
 
          begin
             if Item_Handler.Is_Equal (Item, Handler, Self.Data (J)) then
@@ -218,15 +219,15 @@ package body VSS.Implementation.String_Vectors is
       Result := VSS.Implementation.Strings.Null_String_Data;
 
       for J in 1 .. Self.Last loop
-         VSS.Implementation.Strings.Handler (Result).Append
+         VSS.Implementation.Strings.Variable_Handler (Result).Append
            (Result, Self.Data (J), Offset);
 
          if J /= Self.Last or Terminate_Last then
-            VSS.Implementation.Strings.Handler (Result).Append
+            VSS.Implementation.Strings.Variable_Handler (Result).Append
               (Result, Line_Terminator_To_Code_Point (Terminator), Offset);
 
             if Terminator = VSS.Strings.CRLF then
-               VSS.Implementation.Strings.Handler (Result).Append
+               VSS.Implementation.Strings.Variable_Handler (Result).Append
                  (Result,
                   VSS.Implementation.Character_Codes.Line_Feed,
                   Offset);

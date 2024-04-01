@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -32,9 +32,9 @@ package body VSS.Implementation.Line_Iterators is
    is
       use type VSS.Unicode.Code_Point;
 
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
 
       Current_Position : VSS.Implementation.Strings.Cursor := Initial_Position;
       Aux_Position     : VSS.Implementation.Strings.Cursor;
@@ -312,9 +312,9 @@ package body VSS.Implementation.Line_Iterators is
       Terminator_Position : out VSS.Implementation.Strings.Cursor)
       return Boolean
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
 
       CR_Found : Boolean := False;
       Dummy    : Boolean;

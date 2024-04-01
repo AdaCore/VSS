@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -28,9 +28,9 @@ package body VSS.Strings.Conversions is
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : VSS.Implementation.Strings.Cursor;
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
@@ -87,9 +87,9 @@ package body VSS.Strings.Conversions is
       Last : out Natural;
       Into : out Ada.Strings.UTF_Encoding.UTF_8_String)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : VSS.Implementation.Strings.Cursor;
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
@@ -137,9 +137,9 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class;
       Into : out Wide_Wide_String)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin
@@ -182,9 +182,9 @@ package body VSS.Strings.Conversions is
       Last : out Natural;
       Into : out Wide_Wide_String)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin
@@ -216,9 +216,9 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class)
       return Ada.Strings.Unbounded.Unbounded_String
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Success  : Boolean;
 
@@ -309,7 +309,7 @@ package body VSS.Strings.Conversions is
       return Ada.Strings.UTF_Encoding.UTF_8_String is
    begin
       return
-        VSS.Implementation.Strings.Handler
+        VSS.Implementation.Strings.Constant_Handler
           (Item.Data).To_UTF_8_String (Item.Data);
    end To_UTF_8_String;
 

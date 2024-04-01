@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -241,9 +241,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
                  (Self);
       Source         : UTF8_String_Data_Access
         with Import, Convention => Ada, Address => Data.Pointer'Address;
-      Suffix_Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Suffix);
+      Suffix_Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Suffix);
 
    begin
       if Suffix_Handler.all in UTF8_In_Place_String_Handler then
@@ -387,9 +387,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       Source         : UTF8_In_Place_Data
         with Import, Convention => Ada, Address => Data'Address;
-      Suffix_Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Suffix);
+      Suffix_Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Suffix);
 
    begin
       if Suffix_Handler.all in UTF8_String_Handler then

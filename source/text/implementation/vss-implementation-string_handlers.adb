@@ -26,9 +26,9 @@ package body VSS.Implementation.String_Handlers is
    is
       Handler        : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Suffix_Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Suffix);
+      Suffix_Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Suffix);
       Position       : VSS.Implementation.Strings.Cursor;
       Code           : VSS.Unicode.Code_Point;
 
@@ -318,9 +318,9 @@ package body VSS.Implementation.String_Handlers is
       Item   : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Item_Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Item);
+      Item_Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Item);
       Item_Position : VSS.Implementation.Strings.Cursor;
       Position      : VSS.Implementation.Strings.Cursor := From;
       Code          : VSS.Unicode.Code_Point;
@@ -336,10 +336,11 @@ package body VSS.Implementation.String_Handlers is
       while Item_Handler.Forward (Item, Item_Position) loop
          Code := Item_Handler.Element (Item, Item_Position);
 
-         VSS.Implementation.Strings.Handler (Data).Insert
+         VSS.Implementation.Strings.Constant_Handler (Data).Insert
            (Data, Position, Code, Offset);
          Success :=
-           VSS.Implementation.Strings.Handler (Data).Forward (Data, Position);
+           VSS.Implementation.Strings.Constant_Handler
+             (Data).Forward (Data, Position);
       end loop;
    end Insert;
 
@@ -572,13 +573,13 @@ package body VSS.Implementation.String_Handlers is
            (Target);
          Current := From;
 
-         VSS.Implementation.Strings.Handler (Target).Append
+         VSS.Implementation.Strings.Constant_Handler (Target).Append
            (Target, Handler.Element (Source, Current), Offset);
 
          while Handler.Forward (Source, Current)
            and then Current.Index <= To.Index
          loop
-            VSS.Implementation.Strings.Handler (Target).Append
+            VSS.Implementation.Strings.Constant_Handler (Target).Append
               (Target, Handler.Element (Source, Current), Offset);
          end loop;
 

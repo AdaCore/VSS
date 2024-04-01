@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -35,39 +35,39 @@ package body VSS.Strings.Converters.Decoders.ISO885915 is
 
          case Byte is
             when 16#A4# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#20AC#, Offset);
 
             when 16#A6# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#0160#, Offset);
 
             when 16#A8# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#0161#, Offset);
 
             when 16#B4# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#017D#, Offset);
 
             when 16#B8# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#017E#, Offset);
 
             when 16#BC# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#0152#, Offset);
 
             when 16#BD# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#0153#, Offset);
 
             when 16#BE# =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, 16#0178#, Offset);
 
             when others =>
-               VSS.Implementation.Strings.Handler (Target).Append
+               VSS.Implementation.Strings.Variable_Handler (Target).Append
                  (Target, VSS.Unicode.Code_Point (Byte), Offset);
          end case;
 

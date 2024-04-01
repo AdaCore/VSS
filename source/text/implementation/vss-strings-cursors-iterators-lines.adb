@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -62,7 +62,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          return VSS.Strings.Empty_Virtual_String;
 
       else
-         VSS.Implementation.Strings.Handler
+         VSS.Implementation.Strings.Constant_Handler
            (VSS.Strings.Magic_String_Access (Self.Owner).Data).Slice
              (VSS.Strings.Magic_String_Access (Self.Owner).Data,
               First,
@@ -148,9 +148,9 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
       Current_Position    : VSS.Implementation.Strings.Cursor := Position;
       Dummy   : Boolean;
 
@@ -194,9 +194,9 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    is
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
 
       Last_Position       : VSS.Implementation.Strings.Cursor;
       Terminator_Position : VSS.Implementation.Strings.Cursor;
@@ -272,7 +272,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
       else
          Dummy :=
-           VSS.Implementation.Strings.Handler
+           VSS.Implementation.Strings.Constant_Handler
              (Data).Backward (Data, Terminator_Position);
 
          Self.Last_Position       := Terminator_Position;
@@ -317,9 +317,9 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean             := False)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
@@ -363,7 +363,8 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       else
          Position := Self.Last_Position;
          Success  :=
-           VSS.Implementation.Strings.Handler (Data).Forward (Data, Position);
+           VSS.Implementation.Strings.Constant_Handler
+             (Data).Forward (Data, Position);
       end if;
 
       return Position;
@@ -396,7 +397,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          else
             Position := Self.Last_Position;
             Success :=
-              VSS.Implementation.Strings.Handler
+              VSS.Implementation.Strings.Constant_Handler
                 (Data).Forward (Data, Position);
 
             return VSS.Strings.Character_Count (Position.Index);

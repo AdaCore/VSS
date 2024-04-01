@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -15,11 +15,11 @@ package VSS.Implementation.String_Configuration is
      VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
 
    Default_Handler  : not null
-     VSS.Implementation.Strings.String_Handler_Access :=
+     VSS.Implementation.Strings.Variable_Text_Handler_Access :=
        VSS.Implementation.UTF8_String_Handlers
          .Global_UTF8_String_Handler'Access;
    In_Place_Handler : not null
-     VSS.Implementation.Strings.String_Handler_Access :=
+     VSS.Implementation.Strings.Variable_Text_Handler_Access :=
        UTF8_In_Place_Handler'Access;
 
 end VSS.Implementation.String_Configuration;

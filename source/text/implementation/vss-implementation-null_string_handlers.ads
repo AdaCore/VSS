@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -22,7 +22,7 @@ package VSS.Implementation.Null_String_Handlers is
 
    pragma Preelaborate;
 
-   use type VSS.Implementation.Strings.String_Handler_Access;
+   use type VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    type Null_String_Handler is
      new VSS.Implementation.String_Handlers.Abstract_String_Handler

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -25,7 +25,10 @@ package VSS.Implementation.Strings is
      VSS.Unicode.Code_Point_Unit'Last;
    --  Special value to return when there is no character at given position.
 
-   type String_Handler_Access is
+   type Constant_Text_Handler_Access is
+     access constant
+       VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+   type Variable_Text_Handler_Access is
      access all
        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
 
@@ -117,7 +120,7 @@ package VSS.Implementation.Strings is
             Storage : System.Storage_Elements.Storage_Array (0 .. 19);
 
          when False =>
-            Handler : String_Handler_Access;
+            Handler : Variable_Text_Handler_Access;
             Pointer : System.Address;
       end case;
    end record;
@@ -144,10 +147,12 @@ package VSS.Implementation.Strings is
    --  default. Also, System.Null_Address is not static expression and can't be
    --  used here for initialization.
 
-   function Handler
-     (Data : String_Data)
-      return not null VSS.Implementation.Strings.String_Handler_Access
-      with Inline;
+   function Constant_Handler
+     (Data : String_Data) return not null Constant_Text_Handler_Access
+     with Inline;
+   function Variable_Handler
+     (Data : in out String_Data) return not null Variable_Text_Handler_Access
+     with Inline;
    --  Return string handler for given string data. Null handler is returned
    --  for null string.
 

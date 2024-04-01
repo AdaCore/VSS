@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -44,7 +44,8 @@ package body VSS.Implementation.Null_String_Handlers is
    begin
       VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
         (Data);
-      VSS.Implementation.Strings.Handler (Data).Append (Data, Code, Offset);
+      VSS.Implementation.Strings.Variable_Handler
+        (Data).Append (Data, Code, Offset);
    end Append;
 
    ------------
@@ -60,7 +61,7 @@ package body VSS.Implementation.Null_String_Handlers is
       --  Append to a null string, just copy data.
 
       Data := Suffix;
-      VSS.Implementation.Strings.Handler (Data).Reference (Data);
+      VSS.Implementation.Strings.Variable_Handler (Data).Reference (Data);
    end Append;
 
    --------------
@@ -213,7 +214,7 @@ package body VSS.Implementation.Null_String_Handlers is
    begin
       VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
         (Data);
-      VSS.Implementation.Strings.Handler
+      VSS.Implementation.Strings.Variable_Handler
         (Data).Insert (Data, From, Item, Offset);
    end Insert;
 

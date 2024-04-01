@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -85,9 +85,9 @@ package body VSS.Strings.Converters.Encoders is
       Source : VSS.Implementation.Strings.String_Data;
       Target : in out VSS.Stream_Element_Vectors.Stream_Element_Vector'Class)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access
-          := VSS.Implementation.Strings.Handler (Source);
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access
+          := VSS.Implementation.Strings.Constant_Handler (Source);
       Position : VSS.Implementation.Strings.Cursor;
 
    begin

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -308,8 +308,8 @@ package body VSS.JSON.Push_Writers is
             Data     : VSS.Implementation.Strings.String_Data
               renames VSS.Strings.Internals.Data_Access_Constant (Item).all;
             Handler  : constant not null
-              VSS.Implementation.Strings.String_Handler_Access :=
-                VSS.Implementation.Strings.Handler (Data);
+              VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+                VSS.Implementation.Strings.Constant_Handler (Data);
             Position : VSS.Implementation.Strings.Cursor;
             Code     : VSS.Unicode.Code_Point;
 

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -36,9 +36,9 @@ package body VSS.Strings.Templates is
 
       procedure Append_Parameter;
 
-      Handler          :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Template.Data);
+      Handler          : constant
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Self.Template.Data);
       Position         : VSS.Implementation.Strings.Cursor;
       Code             : VSS.Unicode.Code_Point'Base;
       Parameter        : Positive := 1;

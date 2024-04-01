@@ -42,12 +42,13 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
       use type Ada.Streams.Stream_Element_Offset;
       use type VSS.Unicode.Code_Point;
 
-      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
-      First  : Ada.Streams.Stream_Element        := Self.First;
-      Second : Ada.Streams.Stream_Element        := Self.Second;
-      Third  : Ada.Streams.Stream_Element        := Self.Third;
-      Byte   : Ada.Streams.Stream_Element;
-      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Index   : Ada.Streams.Stream_Element_Offset := Source'First;
+      First   : Ada.Streams.Stream_Element        := Self.First;
+      Second  : Ada.Streams.Stream_Element        := Self.Second;
+      Third   : Ada.Streams.Stream_Element        := Self.Third;
+      Byte    : Ada.Streams.Stream_Element;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -68,8 +69,9 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  VSS.Implementation.Strings.Variable_Handler (Target).Append
-                    (Target, Replacement_Character, Offset);
+                  Handler :=
+                    VSS.Implementation.Strings.Variable_Handler (Target);
+                  Handler.Append (Target, Replacement_Character, Offset);
                end if;
             end if;
 
@@ -98,14 +100,18 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                            exit;
 
                         else
-                           VSS.Implementation.Strings.Variable_Handler
-                             (Target).Append
-                                (Target, Replacement_Character, Offset);
+                           Handler :=
+                             VSS.Implementation.Strings.Variable_Handler
+                               (Target);
+                           Handler.Append
+                             (Target, Replacement_Character, Offset);
                         end if;
 
                      else
-                        VSS.Implementation.Strings.Variable_Handler
-                          (Target).Append (Target, Code, Offset);
+                        Handler :=
+                          VSS.Implementation.Strings.Variable_Handler
+                            (Target);
+                        Handler.Append (Target, Code, Offset);
                      end if;
                   end;
 
@@ -125,9 +131,10 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                         exit;
 
                      else
-                        VSS.Implementation.Strings.Variable_Handler
-                          (Target).Append
-                             (Target, Replacement_Character, Offset);
+                        Handler :=
+                          VSS.Implementation.Strings.Variable_Handler
+                            (Target);
+                        Handler.Append (Target, Replacement_Character, Offset);
                      end if;
 
                      Self.First  := First;
@@ -162,9 +169,10 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                         exit;
 
                      else
-                        VSS.Implementation.Strings.Variable_Handler
-                          (Target).Append
-                             (Target, Replacement_Character, Offset);
+                        Handler :=
+                          VSS.Implementation.Strings.Variable_Handler
+                            (Target);
+                        Handler.Append (Target, Replacement_Character, Offset);
                      end if;
 
                      Self.First  := First;
@@ -193,8 +201,10 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                      First := 0;
 
                      if Code /= 0 then
-                        VSS.Implementation.Strings.Variable_Handler
-                          (Target).Append (Target, Code, Offset);
+                        Handler :=
+                          VSS.Implementation.Strings.Variable_Handler
+                            (Target);
+                        Handler.Append (Target, Code, Offset);
 
                      else
                         if Byte in ASCII_Byte_Range then
@@ -207,9 +217,11 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                            exit;
 
                         else
-                           VSS.Implementation.Strings.Variable_Handler
-                             (Target).Append
-                                (Target, Replacement_Character, Offset);
+                           Handler :=
+                             VSS.Implementation.Strings.Variable_Handler
+                               (Target);
+                           Handler.Append
+                             (Target, Replacement_Character, Offset);
                         end if;
                      end if;
                   end;
@@ -218,12 +230,15 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
          else
             case Byte is
                when ASCII_Byte_Range =>
-                  VSS.Implementation.Strings.Variable_Handler (Target).Append
+                  Handler :=
+                    VSS.Implementation.Strings.Variable_Handler (Target);
+                  Handler.Append
                     (Target, VSS.Unicode.Code_Point (Byte), Offset);
 
                when 16#80# =>
-                  VSS.Implementation.Strings.Variable_Handler (Target).Append
-                    (Target, 16#20AC#, Offset);
+                  Handler :=
+                    VSS.Implementation.Strings.Variable_Handler (Target);
+                  Handler.Append (Target, 16#20AC#, Offset);
 
                when 16#81# .. 16#FE# =>
                   First := Byte;
@@ -235,9 +250,10 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                      exit;
 
                   else
-                     VSS.Implementation.Strings.Variable_Handler
-                       (Target).Append
-                          (Target, Replacement_Character, Offset);
+                     Handler :=
+                       VSS.Implementation.Strings.Variable_Handler (Target);
+                     Handler.Append
+                       (Target, Replacement_Character, Offset);
                   end if;
             end case;
          end if;

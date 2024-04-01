@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -42,13 +42,13 @@ package VSS.Implementation.UTF8_String_Handlers is
        with null record;
 
    overriding procedure Reference
-     (Self : UTF8_String_Handler;
+     (Self : in out UTF8_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data);
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    overriding procedure Unreference
-     (Self : UTF8_String_Handler;
+     (Self : in out UTF8_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data);
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
@@ -136,28 +136,28 @@ package VSS.Implementation.UTF8_String_Handlers is
       Target_Data : out VSS.Implementation.Strings.String_Data);
 
    overriding procedure Append
-     (Self   : UTF8_String_Handler;
+     (Self   : in out UTF8_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append single code point to the data.
 
    overriding procedure Append
-     (Self   : UTF8_String_Handler;
+     (Self   : in out UTF8_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append another string to the data.
 
    overriding procedure Insert
-     (Self   : UTF8_String_Handler;
+     (Self   : in out UTF8_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
    overriding procedure Delete
-     (Self : UTF8_String_Handler;
+     (Self : in out UTF8_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset);
@@ -202,13 +202,13 @@ package VSS.Implementation.UTF8_String_Handlers is
        with null record;
 
    overriding procedure Reference
-     (Self : UTF8_In_Place_String_Handler;
+     (Self : in out UTF8_In_Place_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data) is null;
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    overriding procedure Unreference
-     (Self : UTF8_In_Place_String_Handler;
+     (Self : in out UTF8_In_Place_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data) is null;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
@@ -296,28 +296,28 @@ package VSS.Implementation.UTF8_String_Handlers is
       Target_Data : out VSS.Implementation.Strings.String_Data);
 
    overriding procedure Append
-     (Self   : UTF8_In_Place_String_Handler;
+     (Self   : in out UTF8_In_Place_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append single code point to the data.
 
    overriding procedure Append
-     (Self   : UTF8_In_Place_String_Handler;
+     (Self   : in out UTF8_In_Place_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
    --  Append another string to the data.
 
    overriding procedure Insert
-     (Self   : UTF8_In_Place_String_Handler;
+     (Self   : in out UTF8_In_Place_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
    overriding procedure Delete
-     (Self : UTF8_In_Place_String_Handler;
+     (Self : in out UTF8_In_Place_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset);

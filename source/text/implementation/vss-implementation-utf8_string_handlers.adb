@@ -193,7 +193,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self   : UTF8_String_Handler;
+     (Self   : in out UTF8_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -231,7 +231,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self   : UTF8_String_Handler;
+     (Self   : in out UTF8_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -313,7 +313,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self   : UTF8_In_Place_String_Handler;
+     (Self   : in out UTF8_In_Place_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -376,7 +376,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self   : UTF8_In_Place_String_Handler;
+     (Self   : in out UTF8_In_Place_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -402,6 +402,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
               with Import,
                 Convention => Ada,
                 Address    => Suffix.Pointer'Address;
+            Handler     :
+              VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
          begin
             Copy_To_Heap
@@ -409,7 +411,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
                VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
                Source.Size + Suffix_Data.Size);
 
-            Suffix_Handler.Append (Data, Suffix, Offset);
+            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
+
+            Handler.Append (Data, Suffix, Offset);
          end;
 
       elsif Suffix_Handler.all not in UTF8_In_Place_String_Handler then
@@ -576,7 +580,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Delete
-     (Self : UTF8_String_Handler;
+     (Self : in out UTF8_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset)
@@ -603,7 +607,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Delete
-     (Self : UTF8_In_Place_String_Handler;
+     (Self : in out UTF8_In_Place_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset)
@@ -1111,7 +1115,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Insert
-     (Self   : UTF8_String_Handler;
+     (Self   : in out UTF8_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
@@ -1158,7 +1162,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding procedure Insert
-     (Self   : UTF8_In_Place_String_Handler;
+     (Self   : in out UTF8_In_Place_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
@@ -1349,7 +1353,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ---------------
 
    overriding procedure Reference
-     (Self : UTF8_String_Handler;
+     (Self : in out UTF8_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data)
    is
       Destination : UTF8_String_Data_Access
@@ -1889,7 +1893,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    -----------------
 
    overriding procedure Unreference
-     (Self : UTF8_String_Handler;
+     (Self : in out UTF8_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data)
    is
       Destination : UTF8_String_Data_Access

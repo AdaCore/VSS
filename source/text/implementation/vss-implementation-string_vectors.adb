@@ -207,7 +207,8 @@ package body VSS.Implementation.String_Vectors is
    is
       use type VSS.Strings.Line_Terminator;
 
-      Offset : VSS.Implementation.Strings.Cursor_Offset;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       VSS.Implementation.Strings.Unreference (Result);
@@ -219,15 +220,17 @@ package body VSS.Implementation.String_Vectors is
       Result := VSS.Implementation.Strings.Null_String_Data;
 
       for J in 1 .. Self.Last loop
-         VSS.Implementation.Strings.Variable_Handler (Result).Append
-           (Result, Self.Data (J), Offset);
+         Handler := VSS.Implementation.Strings.Variable_Handler (Result);
+         Handler.Append (Result, Self.Data (J), Offset);
 
          if J /= Self.Last or Terminate_Last then
-            VSS.Implementation.Strings.Variable_Handler (Result).Append
+            Handler := VSS.Implementation.Strings.Variable_Handler (Result);
+            Handler.Append
               (Result, Line_Terminator_To_Code_Point (Terminator), Offset);
 
             if Terminator = VSS.Strings.CRLF then
-               VSS.Implementation.Strings.Variable_Handler (Result).Append
+               Handler := VSS.Implementation.Strings.Variable_Handler (Result);
+               Handler.Append
                  (Result,
                   VSS.Implementation.Character_Codes.Line_Feed,
                   Offset);

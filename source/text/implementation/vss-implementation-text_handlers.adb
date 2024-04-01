@@ -19,7 +19,7 @@ package body VSS.Implementation.Text_Handlers is
    ------------
 
    procedure Append
-     (Self   : Abstract_String_Handler;
+     (Self   : in out Abstract_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -312,7 +312,7 @@ package body VSS.Implementation.Text_Handlers is
    ------------
 
    not overriding procedure Insert
-     (Self   : Abstract_String_Handler;
+     (Self   : in out Abstract_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Implementation.Strings.String_Data;
@@ -325,6 +325,7 @@ package body VSS.Implementation.Text_Handlers is
       Position      : VSS.Implementation.Strings.Cursor := From;
       Code          : VSS.Unicode.Code_Point;
       Success       : Boolean with Unreferenced;
+      Handler       : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       if Item_Handler.Is_Empty (Item) then
@@ -336,8 +337,8 @@ package body VSS.Implementation.Text_Handlers is
       while Item_Handler.Forward (Item, Item_Position) loop
          Code := Item_Handler.Element (Item, Item_Position);
 
-         VSS.Implementation.Strings.Constant_Handler (Data).Insert
-           (Data, Position, Code, Offset);
+         Handler := VSS.Implementation.Strings.Variable_Handler (Data);
+         Handler.Insert (Data, Position, Code, Offset);
          Success :=
            VSS.Implementation.Strings.Constant_Handler
              (Data).Forward (Data, Position);
@@ -562,10 +563,12 @@ package body VSS.Implementation.Text_Handlers is
       To     : VSS.Implementation.Strings.Cursor;
       Target : out VSS.Implementation.Strings.String_Data)
    is
-      Handler : Abstract_String_Handler'Class
+      Handler        : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Current : VSS.Implementation.Strings.Cursor;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Current        : VSS.Implementation.Strings.Cursor;
+      Offset         : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Target_Handler :
+        VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       if From.Index <= To.Index then
@@ -573,13 +576,17 @@ package body VSS.Implementation.Text_Handlers is
            (Target);
          Current := From;
 
-         VSS.Implementation.Strings.Constant_Handler (Target).Append
+         Target_Handler :=
+           VSS.Implementation.Strings.Variable_Handler (Target);
+         Target_Handler.Append
            (Target, Handler.Element (Source, Current), Offset);
 
          while Handler.Forward (Source, Current)
            and then Current.Index <= To.Index
          loop
-            VSS.Implementation.Strings.Constant_Handler (Target).Append
+            Target_Handler :=
+              VSS.Implementation.Strings.Variable_Handler (Target);
+            Target_Handler.Append
               (Target, Handler.Element (Source, Current), Offset);
          end loop;
 

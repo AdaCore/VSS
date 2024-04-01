@@ -606,7 +606,6 @@ package body VSS.Strings is
       Handler : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
-      Aux     : VSS.Implementation.Strings.String_Data;
       Offset  : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
@@ -614,14 +613,22 @@ package body VSS.Strings is
          return False;
 
       else
-         VSS.Implementation.Strings.Variable_Handler (Aux).Append
-           (Aux, VSS.Characters.Virtual_Character'Pos (Suffix), Offset);
+         declare
+            Aux         : VSS.Implementation.Strings.String_Data;
+            Aux_Handler :
+              VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
-         return
-           Handler.Ends_With
-             (Self.Data,
-              VSS.Implementation.Strings.Constant_Handler (Aux).all,
-              Aux);
+         begin
+            Aux_Handler := VSS.Implementation.Strings.Variable_Handler (Aux);
+            Aux_Handler.Append
+              (Aux, VSS.Characters.Virtual_Character'Pos (Suffix), Offset);
+
+            return
+              Handler.Ends_With
+                (Self.Data,
+                 VSS.Implementation.Strings.Constant_Handler (Aux).all,
+                 Aux);
+         end;
       end if;
    end Ends_With;
 

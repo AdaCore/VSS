@@ -37,15 +37,18 @@ package body VSS.Implementation.Null_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self   : Null_String_Handler;
+     (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
-      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+
    begin
       VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
         (Data);
-      VSS.Implementation.Strings.Variable_Handler
-        (Data).Append (Data, Code, Offset);
+      Handler := VSS.Implementation.Strings.Variable_Handler (Data);
+      Handler.Append (Data, Code, Offset);
    end Append;
 
    ------------
@@ -53,15 +56,19 @@ package body VSS.Implementation.Null_String_Handlers is
    ------------
 
    overriding procedure Append
-     (Self   : Null_String_Handler;
+     (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
-      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+
    begin
       --  Append to a null string, just copy data.
 
       Data := Suffix;
-      VSS.Implementation.Strings.Variable_Handler (Data).Reference (Data);
+      Handler := VSS.Implementation.Strings.Variable_Handler (Data);
+      Handler.Reference (Data);
    end Append;
 
    --------------
@@ -98,7 +105,7 @@ package body VSS.Implementation.Null_String_Handlers is
    ------------
 
    overriding procedure Delete
-     (Self : Null_String_Handler;
+     (Self : in out Null_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset) is null;
@@ -206,16 +213,19 @@ package body VSS.Implementation.Null_String_Handlers is
    ------------
 
    overriding procedure Insert
-     (Self   : Null_String_Handler;
+     (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
-      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+
    begin
       VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
         (Data);
-      VSS.Implementation.Strings.Variable_Handler
-        (Data).Insert (Data, From, Item, Offset);
+      Handler := VSS.Implementation.Strings.Variable_Handler (Data);
+      Handler.Insert (Data, From, Item, Offset);
    end Insert;
 
    ----------------
@@ -256,7 +266,7 @@ package body VSS.Implementation.Null_String_Handlers is
    ---------------
 
    overriding procedure Reference
-     (Self : Null_String_Handler;
+     (Self : in out Null_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data) is null;
 
    -----------------
@@ -303,7 +313,7 @@ package body VSS.Implementation.Null_String_Handlers is
    -----------------
 
    overriding procedure Unreference
-     (Self : Null_String_Handler;
+     (Self : in out Null_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data) is null;
 
 end VSS.Implementation.Null_String_Handlers;

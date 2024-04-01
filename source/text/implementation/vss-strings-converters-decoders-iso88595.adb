@@ -24,9 +24,10 @@ package body VSS.Strings.Converters.Decoders.ISO88595 is
       use type Ada.Streams.Stream_Element_Offset;
       use type VSS.Unicode.Code_Point;
 
-      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
-      Byte   : Ada.Streams.Stream_Element;
-      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Index   : Ada.Streams.Stream_Element_Offset := Source'First;
+      Byte    : Ada.Streams.Stream_Element;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       loop
@@ -36,19 +37,20 @@ package body VSS.Strings.Converters.Decoders.ISO88595 is
 
          case Byte is
             when 16#00# .. 16#A0# | 16#AD# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, VSS.Unicode.Code_Point (Byte), Offset);
 
             when 16#F0# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#2116#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#2116#, Offset);
 
             when 16#FD# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#00A7#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#00A7#, Offset);
 
             when others =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append
                  (Target,
                   VSS.Unicode.Code_Point (Byte) - 16#A0# + 16#0400#,
                   Offset);

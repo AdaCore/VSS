@@ -23,9 +23,10 @@ package body VSS.Strings.Converters.Decoders.ISO88596 is
       use type Ada.Streams.Stream_Element_Offset;
       use type VSS.Unicode.Code_Point;
 
-      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
-      Byte   : Ada.Streams.Stream_Element;
-      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Index   : Ada.Streams.Stream_Element_Offset := Source'First;
+      Byte    : Ada.Streams.Stream_Element;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -41,12 +42,12 @@ package body VSS.Strings.Converters.Decoders.ISO88596 is
 
          case Byte is
             when 16#00# .. 16#A0# | 16#A4# | 16#AD# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, VSS.Unicode.Code_Point (Byte), Offset);
 
             when 16#AC# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#060C#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#060C#, Offset);
 
             when 16#A1# .. 16#A3# | 16#A5# .. 16#AB# | 16#AE# .. 16#BA#
                | 16#BC# .. 16#BE# | 16#C0# | 16#DB# .. 16#DF#
@@ -56,11 +57,12 @@ package body VSS.Strings.Converters.Decoders.ISO88596 is
 
                exit when Self.Flags (Stop_On_Error);
 
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, Replacement_Character, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, Replacement_Character, Offset);
 
             when others =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append
                  (Target,
                   VSS.Unicode.Code_Point (Byte) - 16#B0# + 16#0610#,
                   Offset);

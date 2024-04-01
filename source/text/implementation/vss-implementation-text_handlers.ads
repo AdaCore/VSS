@@ -32,13 +32,13 @@ package VSS.Implementation.Text_Handlers is
    type Abstract_String_Handler is abstract tagged limited null record;
 
    not overriding procedure Reference
-     (Self : Abstract_String_Handler;
+     (Self : in out Abstract_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data) is abstract;
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    not overriding procedure Unreference
-     (Self : Abstract_String_Handler;
+     (Self : in out Abstract_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data) is abstract;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
@@ -47,6 +47,8 @@ package VSS.Implementation.Text_Handlers is
      (Self : Abstract_String_Handler;
       Data : out VSS.Implementation.Strings.String_Data) is abstract;
    --  Initialize Data to represent empty string.
+   --
+   --  XXX This subprogram will be removed on next step of the transition.
 
    not overriding function Is_Empty
      (Self : Abstract_String_Handler;
@@ -181,8 +183,7 @@ package VSS.Implementation.Text_Handlers is
      (Self    : in out Abstract_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Data    : out VSS.Implementation.Strings.String_Data;
-      Success : out Boolean)
-     with Pre'Class => Item'Length /= 0;
+      Success : out Boolean);
    --  Convert UTF_8_String into internal representation. Default
    --  implementation decode text character-by-character and append decoded
    --  characters to the result.
@@ -233,7 +234,7 @@ package VSS.Implementation.Text_Handlers is
    --  and positive values.
 
    not overriding procedure Append
-     (Self   : Abstract_String_Handler;
+     (Self   : in out Abstract_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is abstract
@@ -243,7 +244,7 @@ package VSS.Implementation.Text_Handlers is
    --  Implementation must increment value of the Offset.
 
    not overriding procedure Append
-     (Self   : Abstract_String_Handler;
+     (Self   : in out Abstract_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
@@ -254,7 +255,7 @@ package VSS.Implementation.Text_Handlers is
    --  Implementation must increment value of the Offset.
 
    not overriding procedure Insert
-     (Self   : Abstract_String_Handler;
+     (Self   : in out Abstract_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
@@ -264,7 +265,7 @@ package VSS.Implementation.Text_Handlers is
    --  Implementation must increment value of the Offset.
 
    not overriding procedure Insert
-     (Self   : Abstract_String_Handler;
+     (Self   : in out Abstract_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Implementation.Strings.String_Data;
@@ -274,7 +275,7 @@ package VSS.Implementation.Text_Handlers is
    --  Implementation must increment value of the Offset.
 
    not overriding procedure Delete
-     (Self : Abstract_String_Handler;
+     (Self : in out Abstract_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset) is abstract;

@@ -29,12 +29,12 @@ package VSS.Implementation.Null_String_Handlers is
        with null record;
 
    overriding procedure Reference
-     (Self : Null_String_Handler;
+     (Self : in out Null_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data)
       with Pre => not Data.In_Place and then Data.Handler = null;
 
    overriding procedure Unreference
-     (Self : Null_String_Handler;
+     (Self : in out Null_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data)
       with Pre => not Data.In_Place and then Data.Handler = null;
 
@@ -190,21 +190,21 @@ package VSS.Implementation.Null_String_Handlers is
    --  --  and positive values.
 
    overriding procedure Append
-     (Self   : Null_String_Handler;
+     (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
       with Pre => not Data.In_Place and then Data.Handler = null;
 
    overriding procedure Append
-     (Self   : Null_String_Handler;
+     (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
       with Pre => not Data.In_Place and then Data.Handler = null;
 
    overriding procedure Insert
-     (Self   : Null_String_Handler;
+     (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
@@ -222,7 +222,7 @@ package VSS.Implementation.Null_String_Handlers is
    --  --  Implementation must increment value of the Offset.
 
    overriding procedure Delete
-     (Self : Null_String_Handler;
+     (Self : in out Null_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset)

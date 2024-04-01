@@ -23,9 +23,10 @@ package body VSS.Strings.Converters.Decoders.ISO885915 is
 
       use type Ada.Streams.Stream_Element_Offset;
 
-      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
-      Byte   : Ada.Streams.Stream_Element;
-      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Index   : Ada.Streams.Stream_Element_Offset := Source'First;
+      Byte    : Ada.Streams.Stream_Element;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       loop
@@ -35,40 +36,40 @@ package body VSS.Strings.Converters.Decoders.ISO885915 is
 
          case Byte is
             when 16#A4# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#20AC#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#20AC#, Offset);
 
             when 16#A6# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#0160#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#0160#, Offset);
 
             when 16#A8# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#0161#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#0161#, Offset);
 
             when 16#B4# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#017D#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#017D#, Offset);
 
             when 16#B8# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#017E#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#017E#, Offset);
 
             when 16#BC# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#0152#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#0152#, Offset);
 
             when 16#BD# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#0153#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#0153#, Offset);
 
             when 16#BE# =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, 16#0178#, Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, 16#0178#, Offset);
 
             when others =>
-               VSS.Implementation.Strings.Variable_Handler (Target).Append
-                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+               Handler.Append (Target, VSS.Unicode.Code_Point (Byte), Offset);
          end case;
 
          Index := Index + 1;

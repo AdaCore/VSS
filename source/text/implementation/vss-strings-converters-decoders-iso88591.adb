@@ -23,9 +23,10 @@ package body VSS.Strings.Converters.Decoders.ISO88591 is
 
       use type Ada.Streams.Stream_Element_Offset;
 
-      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
-      Byte   : Ada.Streams.Stream_Element;
-      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Index   : Ada.Streams.Stream_Element_Offset := Source'First;
+      Byte    : Ada.Streams.Stream_Element;
+      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
       loop
@@ -33,8 +34,8 @@ package body VSS.Strings.Converters.Decoders.ISO88591 is
 
          Byte := Source (Index);
 
-         VSS.Implementation.Strings.Variable_Handler (Target).Append
-           (Target, VSS.Unicode.Code_Point (Byte), Offset);
+         Handler := VSS.Implementation.Strings.Variable_Handler (Target);
+         Handler.Append (Target, VSS.Unicode.Code_Point (Byte), Offset);
 
          Index := Index + 1;
       end loop;

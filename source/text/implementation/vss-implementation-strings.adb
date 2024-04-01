@@ -159,8 +159,10 @@ package body VSS.Implementation.Strings is
    ---------------
 
    procedure Reference (Data : in out String_Data) is
+      Handler : Variable_Text_Handler_Access := Variable_Handler (Data);
+
    begin
-      VSS.Implementation.Strings.Variable_Handler (Data).Reference (Data);
+      Handler.Reference (Data);
    end Reference;
 
    -----------------
@@ -168,8 +170,10 @@ package body VSS.Implementation.Strings is
    -----------------
 
    procedure Unreference (Data : in out String_Data) is
+      Handler : Variable_Text_Handler_Access := Variable_Handler (Data);
+
    begin
-      VSS.Implementation.Strings.Variable_Handler (Data).Unreference (Data);
+      Handler.Unreference (Data);
       Data := Null_String_Data;
    end Unreference;
 

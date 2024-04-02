@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.String_Configuration;
+with VSS.Implementation.UTF8_String_Handlers;
 
 package body VSS.Implementation.Null_String_Handlers is
 
@@ -45,8 +45,7 @@ package body VSS.Implementation.Null_String_Handlers is
       Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
-      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-        (Data);
+      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize (Self, 1, 0);
       Handler := VSS.Implementation.Strings.Variable_Handler (Data);
       Handler.Append (Data, Code, Offset);
    end Append;
@@ -222,19 +221,10 @@ package body VSS.Implementation.Null_String_Handlers is
       Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
-      VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-        (Data);
+      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize (Self, 1, 0);
       Handler := VSS.Implementation.Strings.Variable_Handler (Data);
       Handler.Insert (Data, From, Item, Offset);
    end Insert;
-
-   ----------------
-   -- Initialize --
-   ----------------
-
-   overriding procedure Initialize
-     (Self : Null_String_Handler;
-      Data : out VSS.Implementation.Strings.String_Data) is null;
 
    --------------
    -- Is_Empty --

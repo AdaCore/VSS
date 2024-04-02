@@ -6,6 +6,8 @@
 
 --  Generic implementation of the string which use UTF-8 encoding for data.
 
+pragma Ada_2022;
+
 with Ada.Strings.UTF_Encoding;
 with System.Atomic_Counters;
 
@@ -38,8 +40,10 @@ package VSS.Implementation.UTF8_String_Handlers is
    type UTF8_String_Data_Access is access all UTF8_String_Data;
 
    type UTF8_String_Handler is
-     new VSS.Implementation.Text_Handlers.Abstract_String_Handler
-       with null record;
+     new VSS.Implementation.Text_Handlers.Abstract_String_Handler with
+   record
+      Pointer : UTF8_String_Data_Access;
+   end record with Object_Size => 192;
 
    overriding procedure Reference
      (Self : in out UTF8_String_Handler;
@@ -52,10 +56,6 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data : in out VSS.Implementation.Strings.String_Data);
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
-
-   overriding procedure Initialize
-     (Self : UTF8_String_Handler;
-      Data : out VSS.Implementation.Strings.String_Data);
 
    overriding function Is_Empty
      (Self : UTF8_String_Handler;
@@ -173,7 +173,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
-   In_Place_Storage_Capacity : constant := 17;
+   In_Place_Storage_Capacity : constant := 16 - 2 - 1;
    --  Number of code units can be stored in place
 
    subtype In_Place_UTF8_Code_Unit_Count is
@@ -181,25 +181,19 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    subtype In_Place_Character_Count is
      VSS.Implementation.Strings.Character_Count
-   range 0
-     .. VSS.Implementation.Strings.Character_Count (In_Place_Storage_Capacity);
-
-   type UTF8_In_Place_Data is record
-      Storage :
-        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-          (0 .. In_Place_Storage_Capacity);
-      Size    : In_Place_UTF8_Code_Unit_Count;
-      Length  : In_Place_Character_Count;
-   end record;
-   for UTF8_In_Place_Data use record
-      Storage at 0 range 0 .. 8 * (In_Place_Storage_Capacity + 1) - 1;
-      Size    at In_Place_Storage_Capacity + 1 range 0 .. 7;
-      Length  at In_Place_Storage_Capacity + 1 range 8 .. 16;
-   end record;
+       range 0
+         .. VSS.Implementation.Strings.Character_Count
+              (In_Place_Storage_Capacity);
 
    type UTF8_In_Place_String_Handler is
-     new VSS.Implementation.Text_Handlers.Abstract_String_Handler
-       with null record;
+     new VSS.Implementation.Text_Handlers.Abstract_String_Handler with
+   record
+      Storage :
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+          (0 .. In_Place_Storage_Capacity) := [others => 0];
+      Size    : In_Place_UTF8_Code_Unit_Count := 0;
+      Length  : In_Place_Character_Count      := 0;
+   end record with Pack, Object_Size => 192;
 
    overriding procedure Reference
      (Self : in out UTF8_In_Place_String_Handler;
@@ -212,10 +206,6 @@ package VSS.Implementation.UTF8_String_Handlers is
       Data : in out VSS.Implementation.Strings.String_Data) is null;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
-
-   overriding procedure Initialize
-     (Self : UTF8_In_Place_String_Handler;
-      Data : out VSS.Implementation.Strings.String_Data);
 
    overriding function Is_Empty
      (Self : UTF8_In_Place_String_Handler;
@@ -340,15 +330,13 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  generic UTF8 fastpath string API, and some moved to the body after
    --  that.
 
-   procedure Copy_To_Heap
-     (Data     : in out VSS.Implementation.Strings.String_Data;
+   procedure Convert_To_Dynamic
+     (Text     : in out UTF8_In_Place_String_Handler;
       Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
-     with Pre => Data.In_Place,
-          Post => not Data.In_Place;
-   --  Turn "in place" string data into a heap allocated one.
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+   --  Convert static text data into a dynamically allocated one.
    --  Use expected Capacity and Size to allocate a storage block, then copy
-   --  string content to the allocated block.
+   --  text content to the allocated block.
 
    function Allocate
      (Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
@@ -373,5 +361,27 @@ package VSS.Implementation.UTF8_String_Handlers is
       Terminator  : Boolean := False);
    --  Append given slice of the data to the target. Convert target
    --  from in-place to heap based implementation when necessary.
+
+   procedure Unchecked_Append
+     (Target_Data : in out VSS.Implementation.Strings.String_Data;
+      Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;
+      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length      : VSS.Implementation.Strings.Character_Count;
+      Terminator  : Boolean := False);
+   --  Append given slice of the data to the target. Convert target
+   --  from in-place to heap based implementation when necessary.
+
+   procedure Unsafe_Initialize
+     (Text     : in out
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+      Capacity : VSS.Implementation.Strings.Character_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+   --  Initialize UTF-8 text storage. It is either static or dynamic,
+   --  depending from the requested capacity and/or size, which is larger.
+   --
+   --  Memory for Text object is used to initialize new object, thus any
+   --  content is destroyed, and "type" of the object will change.
 
 end VSS.Implementation.UTF8_String_Handlers;

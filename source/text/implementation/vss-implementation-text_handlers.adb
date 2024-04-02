@@ -254,19 +254,21 @@ package body VSS.Implementation.Text_Handlers is
       Offset     : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
-      Handler.Initialize (Data);
-      Success := True;
-
-      loop
-         exit when UTF8_Index > UTF8_Data'Last;
-
-         VSS.Implementation.UTF8_Encoding.Decode
-           (UTF8_Data, UTF8_Index, Code, Success, Error);
-
-         exit when not Success;
-
-         Handler.Append (Data, Code, Offset);
-      end loop;
+         raise Program_Error;
+         --  XXX VADIM
+      --  Handler.Initialize (Data);
+      --  Success := True;
+      --
+      --  loop
+      --     exit when UTF8_Index > UTF8_Data'Last;
+      --
+      --     VSS.Implementation.UTF8_Encoding.Decode
+      --       (UTF8_Data, UTF8_Index, Code, Success, Error);
+      --
+      --     exit when not Success;
+      --
+      --     Handler.Append (Data, Code, Offset);
+      --  end loop;
    end From_UTF_8_String;
 
    ----------
@@ -571,28 +573,30 @@ package body VSS.Implementation.Text_Handlers is
         VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
-      if From.Index <= To.Index then
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Target);
-         Current := From;
-
-         Target_Handler :=
-           VSS.Implementation.Strings.Variable_Handler (Target);
-         Target_Handler.Append
-           (Target, Handler.Element (Source, Current), Offset);
-
-         while Handler.Forward (Source, Current)
-           and then Current.Index <= To.Index
-         loop
-            Target_Handler :=
-              VSS.Implementation.Strings.Variable_Handler (Target);
-            Target_Handler.Append
-              (Target, Handler.Element (Source, Current), Offset);
-         end loop;
-
-      else
-         Target := VSS.Implementation.Strings.Null_String_Data;
-      end if;
+         raise Program_Error;
+         --  XXX VADIM
+      --  if From.Index <= To.Index then
+      --     VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
+      --       (Target);
+      --     Current := From;
+      --
+      --     Target_Handler :=
+      --       VSS.Implementation.Strings.Variable_Handler (Target);
+      --     Target_Handler.Append
+      --       (Target, Handler.Element (Source, Current), Offset);
+      --
+      --     while Handler.Forward (Source, Current)
+      --       and then Current.Index <= To.Index
+      --     loop
+      --        Target_Handler :=
+      --          VSS.Implementation.Strings.Variable_Handler (Target);
+      --        Target_Handler.Append
+      --          (Target, Handler.Element (Source, Current), Offset);
+      --     end loop;
+      --
+      --  else
+      --     Target := VSS.Implementation.Strings.Null_String_Data;
+      --  end if;
    end Slice;
 
    -----------

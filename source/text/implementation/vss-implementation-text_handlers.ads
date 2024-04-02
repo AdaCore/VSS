@@ -29,7 +29,7 @@ package VSS.Implementation.Text_Handlers is
    -- Abstract_String_Handler --
    -----------------------------
 
-   type Abstract_String_Handler is abstract tagged limited null record;
+   type Abstract_String_Handler is abstract tagged null record;
 
    not overriding procedure Reference
      (Self : in out Abstract_String_Handler;
@@ -42,13 +42,6 @@ package VSS.Implementation.Text_Handlers is
       Data : in out VSS.Implementation.Strings.String_Data) is abstract;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
-
-   not overriding procedure Initialize
-     (Self : Abstract_String_Handler;
-      Data : out VSS.Implementation.Strings.String_Data) is abstract;
-   --  Initialize Data to represent empty string.
-   --
-   --  XXX This subprogram will be removed on next step of the transition.
 
    not overriding function Is_Empty
      (Self : Abstract_String_Handler;

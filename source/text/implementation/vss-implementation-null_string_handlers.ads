@@ -30,77 +30,64 @@ package VSS.Implementation.Null_String_Handlers is
 
    overriding procedure Reference
      (Self : in out Null_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Data : in out VSS.Implementation.Strings.String_Data);
 
    overriding procedure Unreference
      (Self : in out Null_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Data : in out VSS.Implementation.Strings.String_Data);
 
-   overriding procedure Initialize
-     (Self : Null_String_Handler;
-      Data : out VSS.Implementation.Strings.String_Data)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+   --  overriding procedure Initialize
+   --    (Self : Null_String_Handler;
+   --     Data : out VSS.Implementation.Strings.String_Data);
 
    overriding function Is_Empty
      (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Data : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding function Is_Null
      (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Data : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding procedure Hash
      (Self      : Null_String_Handler;
       Data      : VSS.Implementation.Strings.String_Data;
-      Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator);
 
    overriding function Length
      (Self : Null_String_Handler;
       Data : VSS.Implementation.Strings.String_Data)
-      return VSS.Implementation.Strings.Character_Count
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
-      return VSS.Unicode.Code_Point'Base
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      return VSS.Unicode.Code_Point'Base;
 
    overriding function Has_Character
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor) return Boolean
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Position : VSS.Implementation.Strings.Cursor) return Boolean;
 
    overriding procedure Before_First_Character
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Position : in out VSS.Implementation.Strings.Cursor);
 
    overriding procedure After_Last_Character
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Position : in out VSS.Implementation.Strings.Cursor);
 
    overriding function Forward
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
 
    overriding function Backward
      (Self     : Null_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
 
    --  not overriding function Is_Equal
    --    (Self       : Abstract_String_Handler;
@@ -123,37 +110,32 @@ package VSS.Implementation.Null_String_Handlers is
       Data           : VSS.Implementation.Strings.String_Data;
       Prefix_Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding function Ends_With
      (Self           : Null_String_Handler;
       Data           : VSS.Implementation.Strings.String_Data;
       Suffix_Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding procedure From_Wide_Wide_String
      (Self    : in out Null_String_Handler;
       Item    : Wide_Wide_String;
       Data    : out VSS.Implementation.Strings.String_Data;
-      Success : out Boolean)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Success : out Boolean);
    --  Convert Wide_Wide_String into internal representation.
 
    overriding procedure From_UTF_8_String
      (Self    : in out Null_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Data    : out VSS.Implementation.Strings.String_Data;
-      Success : out Boolean)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Success : out Boolean);
 
    overriding function To_UTF_8_String
      (Self : Null_String_Handler;
       Data : VSS.Implementation.Strings.String_Data)
-      return Ada.Strings.UTF_Encoding.UTF_8_String
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      return Ada.Strings.UTF_Encoding.UTF_8_String;
 
    --  not overriding function First_UTF8_Offset
    --    (Self     : Abstract_String_Handler;
@@ -193,23 +175,20 @@ package VSS.Implementation.Null_String_Handlers is
      (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
-      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
    overriding procedure Append
      (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
-      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
    overriding procedure Insert
      (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
-      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
    --  not overriding procedure Insert
    --    (Self   : Abstract_String_Handler;
@@ -225,8 +204,7 @@ package VSS.Implementation.Null_String_Handlers is
      (Self : in out Null_String_Handler;
       Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
-      Size : VSS.Implementation.Strings.Cursor_Offset)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+      Size : VSS.Implementation.Strings.Cursor_Offset);
 
    --  not overriding procedure Slice
    --    (Self   : Abstract_String_Handler;
@@ -244,8 +222,7 @@ package VSS.Implementation.Null_String_Handlers is
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean;
       Lines           : in out
-        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
-      with Pre => not Data.In_Place and then Data.Handler = null;
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
    Global_Null_String_Handler : aliased Null_String_Handler;
 

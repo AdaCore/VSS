@@ -11,8 +11,8 @@ with Ada.Strings.Wide_Wide_Unbounded.Aux;
 with Ada.Strings.Wide_Wide_Unbounded.VSS_Aux;
 pragma Warnings (On, ".* is an internal GNAT unit");
 
-with VSS.Implementation.String_Configuration;
 with VSS.Implementation.Strings;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Unicode;
 
@@ -320,30 +320,32 @@ package body VSS.Strings.Conversions is
    function To_Virtual_String
      (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return Virtual_String
    is
-      Success : Boolean;
+      --  Success : Boolean;
 
    begin
       return Result : Virtual_String do
          --  First, attempt to place data in the storage inside the object of
          --  Magic_String type.
 
-         VSS.Implementation.String_Configuration.In_Place_Handler
-           .From_UTF_8_String
-             (Item, Result.Data, Success);
-
-         if not Success then
-            --  Operation may fail for two reasons: source data is not
-            --  well-formed UTF-8 or there is not enough memory to store
-            --  string in in-place storage.
-
-            VSS.Implementation.String_Configuration.Default_Handler
-              .From_UTF_8_String
-                (Item, Result.Data, Success);
-         end if;
-
-         if not Success then
-            raise Constraint_Error with "Ill-formed UTF-8 data";
-         end if;
+         raise Program_Error;
+         --  XXX VADIM
+         --  VSS.Implementation.String_Configuration.In_Place_Handler
+         --    .From_UTF_8_String
+         --      (Item, Result.Data, Success);
+         --
+         --  if not Success then
+         --     --  Operation may fail for two reasons: source data is not
+         --     --  well-formed UTF-8 or there is not enough memory to store
+         --     --  string in in-place storage.
+         --
+         --     VSS.Implementation.String_Configuration.Default_Handler
+         --       .From_UTF_8_String
+         --         (Item, Result.Data, Success);
+         --  end if;
+         --
+         --  if not Success then
+         --     raise Constraint_Error with "Ill-formed UTF-8 data";
+         --  end if;
       end return;
    end To_Virtual_String;
 
@@ -354,7 +356,7 @@ package body VSS.Strings.Conversions is
    function To_Virtual_String
      (Item : Ada.Strings.Unbounded.Unbounded_String) return Virtual_String
    is
-      Success : Boolean;
+      --  Success : Boolean;
       Data    : Ada.Strings.Unbounded.Aux.Big_String_Access;
       Last    : Natural;
 
@@ -364,28 +366,30 @@ package body VSS.Strings.Conversions is
 
          Ada.Strings.Unbounded.Aux.Get_String (Item, Data, Last);
 
-         if Last /= 0 then
-            --  First, attempt to place data in the storage inside the object
-            --  of Virtual_String type.
-
-            VSS.Implementation.String_Configuration.In_Place_Handler
-              .From_UTF_8_String
-                (Data (1 .. Last), Result.Data, Success);
-
-            if not Success then
-               --  Operation may fail for two reasons: source data is not
-               --  well-formed UTF-8 or there is not enough memory to store
-               --  string in in-place storage.
-
-               VSS.Implementation.String_Configuration.Default_Handler
-                 .From_UTF_8_String
-                   (Data (1 .. Last), Result.Data, Success);
-            end if;
-
-            if not Success then
-               raise Constraint_Error with "Ill-formed UTF-8 data";
-            end if;
-         end if;
+         raise Program_Error;
+         --  XXX VADIM
+         --  if Last /= 0 then
+         --     --  First, attempt to place data in the storage inside the object
+         --     --  of Virtual_String type.
+         --
+         --     VSS.Implementation.String_Configuration.In_Place_Handler
+         --       .From_UTF_8_String
+         --         (Data (1 .. Last), Result.Data, Success);
+         --
+         --     if not Success then
+         --        --  Operation may fail for two reasons: source data is not
+         --        --  well-formed UTF-8 or there is not enough memory to store
+         --        --  string in in-place storage.
+         --
+         --        VSS.Implementation.String_Configuration.Default_Handler
+         --          .From_UTF_8_String
+         --            (Data (1 .. Last), Result.Data, Success);
+         --     end if;
+         --
+         --     if not Success then
+         --        raise Constraint_Error with "Ill-formed UTF-8 data";
+         --     end if;
+         --  end if;
       end return;
    end To_Virtual_String;
 
@@ -397,7 +401,7 @@ package body VSS.Strings.Conversions is
      (Item : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String)
       return Virtual_String
    is
-      Success : Boolean;
+      --  Success : Boolean;
       Data    :
         Ada.Strings.Wide_Wide_Unbounded.Aux.Big_Wide_Wide_String_Access;
       Last    : Natural;
@@ -409,28 +413,30 @@ package body VSS.Strings.Conversions is
          Ada.Strings.Wide_Wide_Unbounded.Aux.Get_Wide_Wide_String
            (Item, Data, Last);
 
-         if Last /= 0 then
-            --  First, attempt to place data in the storage inside the object
-            --  of Virtual_String type.
-
-            VSS.Implementation.String_Configuration.In_Place_Handler
-              .From_Wide_Wide_String
-                (Data (1 .. Last), Result.Data, Success);
-
-            if not Success then
-               --  Operation may fail for two reasons: source data is not
-               --  well-formed UTF-8 or there is not enough memory to store
-               --  string in in-place storage.
-
-               VSS.Implementation.String_Configuration.Default_Handler
-                 .From_Wide_Wide_String
-                   (Data (1 .. Last), Result.Data, Success);
-            end if;
-
-            if not Success then
-               raise Constraint_Error with "Invalid UCS-4 data";
-            end if;
-         end if;
+         raise Program_Error;
+         --  XXX VADIM
+         --  if Last /= 0 then
+         --     --  First, attempt to place data in the storage inside the object
+         --     --  of Virtual_String type.
+         --
+         --     VSS.Implementation.String_Configuration.In_Place_Handler
+         --       .From_Wide_Wide_String
+         --         (Data (1 .. Last), Result.Data, Success);
+         --
+         --     if not Success then
+         --        --  Operation may fail for two reasons: source data is not
+         --        --  well-formed UTF-8 or there is not enough memory to store
+         --        --  string in in-place storage.
+         --
+         --        VSS.Implementation.String_Configuration.Default_Handler
+         --          .From_Wide_Wide_String
+         --            (Data (1 .. Last), Result.Data, Success);
+         --     end if;
+         --
+         --     if not Success then
+         --        raise Constraint_Error with "Invalid UCS-4 data";
+         --     end if;
+         --  end if;
       end return;
 
    end To_Virtual_String;

@@ -220,12 +220,14 @@ package body VSS.Implementation.Strings is
    procedure Unsafe_Initialize (Data : in out String_Data) is
    begin
       declare
-         Overlay : Null_String_Handlers.Null_String_Handler
-           with Import, Convention => Ada, Address => Data.Storage'Address;
+         pragma Warnings (Off, """others"" choice is redundant");
+         Overlay : Null_String_Handlers.Null_String_Handler := (others => <>)
+           with Address => Data.Storage'Address;
          pragma Assert (Data.Storage'Size = Overlay'Size);
+         pragma Warnings (On, """others"" choice is redundant");
 
       begin
-         Overlay := (null record);
+         null;
       end;
    end Unsafe_Initialize;
 

@@ -1771,28 +1771,25 @@ package body VSS.Implementation.UTF8_String_Handlers is
         and Size <= In_Place_Storage_Capacity
       then
          declare
-            Overlay : UTF8_In_Place_String_Handler
-              with Import,
-                   Convention => Ada,
-                   Address    => Text'Address;
+            pragma Warnings (Off, """Overlay"" overlays smaller object");
+            Overlay : UTF8_In_Place_String_Handler  := (others => <>)
+              with Address => Text'Address;
+            pragma Warnings (On, """Overlay"" overlays smaller object");
 
          begin
-            Overlay := (others => <>);
+            null;
          end;
 
       else
          declare
-            Overlay : UTF8_String_Handler
-              with Import,
-                   Convention => Ada,
-                   Address    => Text'Address;
+            pragma Warnings (Off, """Overlay"" overlays smaller object");
+            Overlay : UTF8_String_Handler := (others => <>)
+              with Address => Text'Address;
+            pragma Warnings (On, """Overlay"" overlays smaller object");
 
          begin
-            Overlay := (others => <>);
-
             Overlay.Pointer :=
-              Allocate
-                (VSS.Unicode.UTF8_Code_Unit_Count (Capacity) * 4, Size);
+              Allocate (VSS.Unicode.UTF8_Code_Unit_Count (Capacity) * 4, Size);
          end;
       end if;
    end Unsafe_Initialize;

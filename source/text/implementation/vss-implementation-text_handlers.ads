@@ -307,4 +307,13 @@ package VSS.Implementation.Text_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
+   function Unsafe_Capacity
+     (Self : Abstract_String_Handler'Class)
+      return VSS.Implementation.Strings.Character_Count;
+   --  Returns capacity of the text data, requested by the application for the
+   --  given text daya.
+   --
+   --  Implementation assume that given text data is inside of the String_Data
+   --  object.
+
 end VSS.Implementation.Text_Handlers;

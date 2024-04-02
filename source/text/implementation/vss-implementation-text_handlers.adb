@@ -697,4 +697,21 @@ package body VSS.Implementation.Text_Handlers is
       return True;
    end Starts_With;
 
+   ---------------------
+   -- Unsafe_Capacity --
+   ---------------------
+
+   function Unsafe_Capacity
+     (Self : Abstract_String_Handler'Class)
+      return VSS.Implementation.Strings.Character_Count
+   is
+      pragma Warnings (Off, """Data"" overlays smaller object");
+      Data : constant VSS.Implementation.Strings.String_Data
+        with Import, Convention => Ada, Address => Self'Address;
+      pragma Warnings (On, """Data"" overlays smaller object");
+
+   begin
+      return Data.Capacity;
+   end Unsafe_Capacity;
+
 end VSS.Implementation.Text_Handlers;

@@ -32,7 +32,9 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
       Lead    : Ada.Streams.Stream_Element        := Self.Lead;
       Byte    : Ada.Streams.Stream_Element;
       Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+      Text    : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -49,9 +51,7 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  Handler :=
-                    VSS.Implementation.Strings.Variable_Handler (Target);
-                  Handler.Append (Target, Replacement_Character, Offset);
+                  Text.Append (Replacement_Character, Offset);
                end if;
             end if;
 
@@ -63,11 +63,8 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
          if Lead = 16#8E# and Byte in 16#A1# .. 16#DF# then
             Lead := 0;
 
-            Handler := VSS.Implementation.Strings.Variable_Handler (Target);
-            Handler.Append
-              (Target,
-               16#FF61# - 16#A1# + VSS.Unicode.Code_Point (Byte),
-               Offset);
+            Text.Append
+              (16#FF61# - 16#A1# + VSS.Unicode.Code_Point (Byte), Offset);
 
          elsif Lead = 16#8F# and Byte in 16#A1# .. 16#FE# then
             JIS0212 := True;
@@ -102,9 +99,7 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                JIS0212 := False;
 
                if Code /= 0 then
-                  Handler :=
-                    VSS.Implementation.Strings.Variable_Handler (Target);
-                  Handler.Append (Target, Code, Offset);
+                  Text.Append (Code, Offset);
 
                else
                   if Byte in ASCII_Byte_Range then
@@ -117,9 +112,7 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                      exit;
 
                   else
-                     Handler :=
-                       VSS.Implementation.Strings.Variable_Handler (Target);
-                     Handler.Append (Target, Replacement_Character, Offset);
+                     Text.Append (Replacement_Character, Offset);
                   end if;
                end if;
             end;
@@ -131,20 +124,13 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
 
             case Byte is
                when 16#5C# =>
-                  Handler :=
-                    VSS.Implementation.Strings.Variable_Handler (Target);
-                  Handler.Append (Target, 16#A5#, Offset);
+                  Text.Append (16#A5#, Offset);
 
                when 16#7E# =>
-                  Handler :=
-                    VSS.Implementation.Strings.Variable_Handler (Target);
-                  Handler.Append (Target, 16#203E#, Offset);
+                  Text.Append (16#203E#, Offset);
 
                when others =>
-                  Handler :=
-                    VSS.Implementation.Strings.Variable_Handler (Target);
-                  Handler.Append
-                    (Target, VSS.Unicode.Code_Point (Byte), Offset);
+                  Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
             end case;
 
          elsif Byte in 16#8E# | 16#8F# | 16#A1# .. 16#FE# then
@@ -157,8 +143,7 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                exit;
 
             else
-               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
-               Handler.Append (Target, Replacement_Character, Offset);
+               Text.Append (Replacement_Character, Offset);
             end if;
          end if;
 

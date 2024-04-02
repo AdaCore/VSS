@@ -173,7 +173,6 @@ package VSS.Implementation.Null_String_Handlers is
 
    overriding procedure Append
      (Self   : in out Null_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 

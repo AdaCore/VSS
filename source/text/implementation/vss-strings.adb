@@ -56,8 +56,7 @@ package body VSS.Strings is
             Result.Data := Left.Data;
             VSS.Implementation.Strings.Reference (Result.Data);
             VSS.Implementation.Strings.Variable_Handler (Result.Data).Append
-              (Result.Data,
-               VSS.Characters.Virtual_Character'Pos (Right),
+              (VSS.Characters.Virtual_Character'Pos (Right),
                Offset);
          end;
       end return;
@@ -77,8 +76,7 @@ package body VSS.Strings is
 
          begin
             VSS.Implementation.Strings.Variable_Handler (Result.Data).Append
-              (Result.Data,
-               VSS.Characters.Virtual_Character'Pos (Left),
+              (VSS.Characters.Virtual_Character'Pos (Left),
                Offset);
             VSS.Implementation.Strings.Variable_Handler (Result.Data).Append
               (Result.Data, Right.Data, Offset);
@@ -251,8 +249,7 @@ package body VSS.Strings is
    begin
       Handler.After_Last_Character (Self.Data, Start);
 
-      Handler.Append
-        (Self.Data, VSS.Characters.Virtual_Character'Pos (Item), Offset);
+      Handler.Append (VSS.Characters.Virtual_Character'Pos (Item), Offset);
 
       Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Append;
@@ -621,7 +618,7 @@ package body VSS.Strings is
          begin
             Aux_Handler := VSS.Implementation.Strings.Variable_Handler (Aux);
             Aux_Handler.Append
-              (Aux, VSS.Characters.Virtual_Character'Pos (Suffix), Offset);
+              (VSS.Characters.Virtual_Character'Pos (Suffix), Offset);
 
             return
               Handler.Ends_With

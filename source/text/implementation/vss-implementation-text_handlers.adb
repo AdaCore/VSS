@@ -24,8 +24,6 @@ package body VSS.Implementation.Text_Handlers is
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Handler        : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
       Suffix_Handler : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Suffix);
@@ -37,7 +35,7 @@ package body VSS.Implementation.Text_Handlers is
 
       while Suffix_Handler.Forward (Suffix, Position) loop
          Code := Suffix_Handler.Element (Suffix, Position);
-         Handler.Append (Data, Code, Offset);
+         Abstract_String_Handler'Class (Self).Append (Code, Offset);
       end loop;
    end Append;
 

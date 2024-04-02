@@ -187,7 +187,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Append
      (Self   : in out UTF8_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
@@ -206,7 +205,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       Mutate
         (Self.Pointer,
-         VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
+         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
          Self.Pointer.Size + L);
 
       VSS.Implementation.UTF8_Encoding.Unchecked_Store
@@ -296,7 +295,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Append
      (Self   : in out UTF8_In_Place_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
@@ -328,22 +326,23 @@ package body VSS.Implementation.UTF8_String_Handlers is
          --  converted into dynamic storage.
          Convert_To_Dynamic
            (Self,
-            VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
+            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
             Self.Size + L);
 
          declare
-            Handler : UTF8_String_Handler
+            Dynamic : UTF8_String_Handler
               renames UTF8_String_Handler
-                (VSS.Implementation.Strings.Variable_Handler (Data).all);
+              (VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+                 (Self));
 
          begin
             VSS.Implementation.UTF8_Encoding.Unchecked_Store
-              (Handler.Pointer.Storage,
-               Handler.Pointer.Size, L, U1, U2, U3, U4);
+              (Dynamic.Pointer.Storage,
+               Dynamic.Pointer.Size, L, U1, U2, U3, U4);
 
-            Handler.Pointer.Size := Handler.Pointer.Size + L;
-            Handler.Pointer.Length := Handler.Pointer.Length + 1;
-            Handler.Pointer.Storage (Handler.Pointer.Size) := 16#00#;
+            Dynamic.Pointer.Size   := @ + L;
+            Dynamic.Pointer.Length := @ + 1;
+            Dynamic.Pointer.Storage (Dynamic.Pointer.Size) := 16#00#;
          end;
       end if;
    end Append;

@@ -23,15 +23,17 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF8_Code_Unit_Count;
 
-      Index   : Ada.Streams.Stream_Element_Offset := Source'First;
-      Code    : VSS.Unicode.Code_Point            := Self.Code;
-      Needed  : VSS.Unicode.UTF8_Code_Unit_Count  := Self.Needed;
-      Seen    : VSS.Unicode.UTF8_Code_Unit_Count  := Self.Seen;
-      Lower   : Ada.Streams.Stream_Element        := Self.Lower;
-      Upper   : Ada.Streams.Stream_Element        := Self.Upper;
-      Byte    : Ada.Streams.Stream_Element;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
+      Code   : VSS.Unicode.Code_Point            := Self.Code;
+      Needed : VSS.Unicode.UTF8_Code_Unit_Count  := Self.Needed;
+      Seen   : VSS.Unicode.UTF8_Code_Unit_Count  := Self.Seen;
+      Lower  : Ada.Streams.Stream_Element        := Self.Lower;
+      Upper  : Ada.Streams.Stream_Element        := Self.Upper;
+      Byte   : Ada.Streams.Stream_Element;
+      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Text   : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -48,9 +50,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  Handler :=
-                    VSS.Implementation.Strings.Variable_Handler (Target);
-                  Handler.Append (Target, Replacement_Character, Offset);
+                  Text.Append (Replacement_Character, Offset);
                end if;
             end if;
 
@@ -62,12 +62,8 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
          if Needed = 0 then
             case Byte is
                when 16#00# .. 16#7F# =>
-                  Handler :=
-                    VSS.Implementation.Strings.Variable_Handler (Target);
-                  Handler.Append
-                    (Target,
-                     VSS.Unicode.Code_Point (Byte and 16#7F#),
-                     Offset);
+                  Text.Append
+                    (VSS.Unicode.Code_Point (Byte and 16#7F#), Offset);
 
                when 16#C2# .. 16#DF# =>
                   Code := VSS.Unicode.Code_Point (Byte and 16#1F#);
@@ -102,10 +98,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                      exit;
 
                   else
-                     Handler :=
-                       VSS.Implementation.Strings.Variable_Handler
-                         (Target);
-                     Handler.Append (Target, Replacement_Character, Offset);
+                     Text.Append (Replacement_Character, Offset);
                   end if;
             end case;
 
@@ -126,8 +119,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                   end if;
                end if;
 
-               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
-               Handler.Append (Target, Code, Offset);
+               Text.Append (Code, Offset);
 
                <<Skip>>
 
@@ -148,8 +140,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                exit;
 
             else
-               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
-               Handler.Append (Target, Replacement_Character, Offset);
+               Text.Append (Replacement_Character, Offset);
             end if;
          end if;
 

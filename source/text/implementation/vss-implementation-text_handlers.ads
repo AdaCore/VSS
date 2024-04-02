@@ -228,11 +228,10 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Append
      (Self   : in out Abstract_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is abstract
      with Pre'Class => Code not in 16#D800# .. 16#DFFF#;
-   --  Append single code point to the data.
+   --  Append single character to the text data.
    --
    --  Implementation must increment value of the Offset.
 

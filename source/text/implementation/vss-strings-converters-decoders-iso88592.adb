@@ -125,10 +125,12 @@ package body VSS.Strings.Converters.Decoders.ISO88592 is
 
       use type Ada.Streams.Stream_Element_Offset;
 
-      Index   : Ada.Streams.Stream_Element_Offset := Source'First;
-      Byte    : Ada.Streams.Stream_Element;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+      Index  : Ada.Streams.Stream_Element_Offset := Source'First;
+      Byte   : Ada.Streams.Stream_Element;
+      Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Text   : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       loop
@@ -138,12 +140,10 @@ package body VSS.Strings.Converters.Decoders.ISO88592 is
 
          case Byte is
             when Mapping'Range =>
-               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
-               Handler.Append (Target, Mapping (Byte), Offset);
+               Text.Append (Mapping (Byte), Offset);
 
             when others =>
-               Handler := VSS.Implementation.Strings.Variable_Handler (Target);
-               Handler.Append (Target, VSS.Unicode.Code_Point (Byte), Offset);
+               Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
          end case;
 
          Index := Index + 1;

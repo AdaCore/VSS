@@ -19,78 +19,58 @@ package body VSS.Implementation.Line_Terminator is
      (Terminator : VSS.Strings.Line_Terminator)
       return VSS.Strings.Virtual_String
    is
-      Data    : VSS.Implementation.Strings.String_Data;
-      Offset  : VSS.Implementation.Strings.Cursor_Offset;
-      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+      Offset : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
-      case Terminator is
-         when VSS.Strings.CR =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Carriage_Return,
-               Offset);
+      return Result : VSS.Strings.Virtual_String do
+         declare
+            Text : constant not null
+              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+                VSS.Implementation.Strings.Variable_Handler
+                  (VSS.Strings.Internals.Data_Access_Variable (Result).all);
 
-         when VSS.Strings.LF =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Line_Feed,
-               Offset);
+         begin
+            case Terminator is
+               when VSS.Strings.CR =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Carriage_Return,
+                     Offset);
 
-         when VSS.Strings.CRLF =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Carriage_Return,
-               Offset);
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Line_Feed,
-               Offset);
+               when VSS.Strings.LF =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Line_Feed, Offset);
 
-         when VSS.Strings.NEL =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Next_Line,
-               Offset);
+               when VSS.Strings.CRLF =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Carriage_Return,
+                     Offset);
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Line_Feed, Offset);
 
-         when VSS.Strings.VT =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Line_Tabulation,
-               Offset);
+               when VSS.Strings.NEL =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Next_Line, Offset);
 
-         when VSS.Strings.FF =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Form_Feed,
-               Offset);
+               when VSS.Strings.VT =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Line_Tabulation,
+                     Offset);
 
-         when VSS.Strings.LS =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Line_Separator,
-               Offset);
+               when VSS.Strings.FF =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Form_Feed, Offset);
 
-         when VSS.Strings.PS =>
-            Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-            Handler.Append
-              (Data,
-               VSS.Implementation.Character_Codes.Paragraph_Separator,
-               Offset);
-      end case;
+               when VSS.Strings.LS =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Line_Separator,
+                     Offset);
 
-      return Result : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Internals.To_Virtual_String (Data)
-      do
-         VSS.Implementation.Strings.Unreference (Data);
+               when VSS.Strings.PS =>
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Paragraph_Separator,
+                     Offset);
+            end case;
+         end;
       end return;
    end Sequence;
 

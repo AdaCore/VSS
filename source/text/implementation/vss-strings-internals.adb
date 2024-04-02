@@ -17,6 +17,17 @@ package body VSS.Strings.Internals is
       return Self.Data'Unchecked_Access;
    end Data_Access_Constant;
 
+   --------------------------
+   -- Data_Access_Variable --
+   --------------------------
+
+   function Data_Access_Variable
+     (Self : in out VSS.Strings.Virtual_String'Class)
+      return not null VSS.Strings.Internals.String_Data_Variable_Access is
+   begin
+      return Self.Data'Unchecked_Access;
+   end Data_Access_Variable;
+
    -----------------
    -- Set_By_Move --
    -----------------

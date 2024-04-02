@@ -710,7 +710,7 @@ package body VSS.Strings is
          if VSS.Strings.Cursors.Internals.Is_Owner (Before, Self) then
             if Handler.Backward (Self.Data, Last_Position) then
                Handler.Before_First_Character (Self.Data, First_Position);
-               Success := Handler.Forward (Self.Data, First_Position);
+               Success := Handler.Forward (First_Position);
                Handler.Slice
                  (Self.Data, First_Position, Last_Position, Result.Data);
             end if;
@@ -858,7 +858,7 @@ package body VSS.Strings is
 
       Handler.Before_First_Character (Item.Data, Position);
 
-      while Handler.Forward (Item.Data, Position) loop
+      while Handler.Forward (Position) loop
          Aux (1) :=
            Wide_Wide_Character'Val
              (Handler.Element (Item.Data, Position));
@@ -1141,7 +1141,7 @@ package body VSS.Strings is
    begin
       return Result : Virtual_String do
          if VSS.Strings.Cursors.Internals.Is_Owner (After, Self) then
-            if Handler.Forward (Self.Data, First_Position) then
+            if Handler.Forward (First_Position) then
                Handler.After_Last_Character (Self.Data, Last_Position);
                Success := Handler.Backward (Self.Data, Last_Position);
                Handler.Slice

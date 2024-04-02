@@ -47,7 +47,7 @@ package body VSS.Strings.Conversions is
 
       Handler.Before_First_Character (Item.Data, Position);
 
-      while Handler.Forward (Item.Data, Position) loop
+      while Handler.Forward (Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
            (Handler.Element (Item.Data, Position),
             Length,
@@ -113,7 +113,7 @@ package body VSS.Strings.Conversions is
 
       Handler.Before_First_Character (Item.Data, Position);
 
-      while Handler.Forward (Item.Data, Position) loop
+      while Handler.Forward (Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
            (Handler.Element (Item.Data, Position),
             Length,
@@ -153,7 +153,7 @@ package body VSS.Strings.Conversions is
 
       Handler.Before_First_Character (Item.Data, Position);
 
-      while Handler.Forward (Item.Data, Position) loop
+      while Handler.Forward (Position) loop
          Into (Into'First + Integer (Position.Index) - 1) :=
            Wide_Wide_Character'Val
              (Handler.Element (Item.Data, Position));
@@ -200,7 +200,7 @@ package body VSS.Strings.Conversions is
 
       Handler.Before_First_Character (Item.Data, Position);
 
-      while Handler.Forward (Item.Data, Position) loop
+      while Handler.Forward (Position) loop
          Last := Last + 1;
          Into (Last) :=
            Wide_Wide_Character'Val
@@ -238,7 +238,7 @@ package body VSS.Strings.Conversions is
       begin
          Handler.Before_First_Character (Item.Data, Position);
 
-         while Handler.Forward (Item.Data, Position) loop
+         while Handler.Forward (Position) loop
             VSS.Implementation.UTF8_Encoding.Encode
               (Handler.Element (Item.Data, Position),
                Length,

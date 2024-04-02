@@ -59,17 +59,22 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    -------------
 
    overriding function Forward
-     (Self : in out Character_Iterator) return Boolean
-   is
-      Data : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-
+     (Self : in out Character_Iterator) return Boolean is
    begin
-      if Self.Owner /= null then
-         return Self.Handler.Forward (Data, Self.Position);
+      if Self.Owner = null then
+         return False;
       end if;
 
-      return False;
+      declare
+         use type VSS.Implementation.Strings.Constant_Text_Handler_Access;
+
+         pragma Suppress (Access_Check);
+
+      begin
+         pragma Assert (Self.Handler /= null);
+
+         return Self.Handler.Forward (Self.Position);
+      end;
    end Forward;
 
    -------------
@@ -162,7 +167,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Self.Reconnect (On'Unrestricted_Access);
       Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
       Self.Handler.Before_First_Character (On.Data, Self.Position);
-      Dummy := Self.Handler.Forward (On.Data, Self.Position);
+      Dummy := Self.Handler.Forward (Self.Position);
    end Set_At_First;
 
    -----------------

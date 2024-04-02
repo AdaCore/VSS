@@ -99,7 +99,7 @@ package body VSS.Strings.Converters.Encoders is
 
       Handler.Before_First_Character (Source, Position);
 
-      while Handler.Forward (Source, Position)
+      while Handler.Forward (Position)
         and not Abstract_Encoder'Class (Self).Has_Error
       loop
          Abstract_Encoder'Class (Self).Encode

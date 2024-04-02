@@ -118,7 +118,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       loop
-         if not Handler.Forward (Data, Position) then
+         if not Handler.Forward (Position) then
             return False;
          end if;
 
@@ -177,7 +177,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       loop
-         if not Handler.Forward (Data, Position) then
+         if not Handler.Forward (Position) then
             return False;
          end if;
 
@@ -229,7 +229,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       loop
-         if not Handler.Forward (Data, Position) then
+         if not Handler.Forward (Position) then
             return False;
          end if;
 
@@ -323,7 +323,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    begin
       Self.Kind := Text;
       Self.First_Position := Self.Last_Position;
-      Success := Handler.Forward (Data, Self.First_Position);
+      Success := Handler.Forward (Self.First_Position);
 
       if not Success then
          --  End of the string has been reached.
@@ -346,7 +346,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
          Left            := Right;
          Left_Properties := Right_Properties;
 
-         Success := Handler.Forward (Data, Right);
+         Success := Handler.Forward (Right);
 
          if not Success then
             --  End of line has been reached
@@ -410,7 +410,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
                Left            := Right;
                Left_Properties := Right_Properties;
 
-               Success := Handler.Forward (Data, Right);
+               Success := Handler.Forward (Right);
 
                if not Success then
                   --  End of the string is reached
@@ -717,7 +717,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Self.Reconnect (On'Unrestricted_Access);
 
       Handler.Before_First_Character (On.Data, Position);
-      Dummy := Handler.Forward (On.Data, Position);
+      Dummy := Handler.Forward (Position);
       Self.Lookup_Word_Boundaries (Position);
    end Set_At_First;
 

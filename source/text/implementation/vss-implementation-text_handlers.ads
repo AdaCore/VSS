@@ -96,10 +96,10 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function Forward
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor)
       return Boolean is abstract;
    --  Move cursor one character forward. Return True on success.
+
    not overriding function Backward
      (Self     : Abstract_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;

@@ -863,7 +863,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
          Self.Last_Position  := Position;
          Self.First_Position := Position;
-         Success := Handler.Forward (Data, Self.First_Position);
+         Success := Handler.Forward (Self.First_Position);
          Success := Self.Backward;
 
       else
@@ -933,7 +933,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Self.Reconnect (On'Unrestricted_Access);
 
       Handler.Before_First_Character (On.Data, Position);
-      Dummy := Handler.Forward (On.Data, Position);
+      Dummy := Handler.Forward (Position);
       Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Set_At_First;
 

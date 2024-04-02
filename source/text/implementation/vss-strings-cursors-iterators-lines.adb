@@ -161,10 +161,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       if Current_Position.Index /= 1 then
          --  Going backward till previous line terminator has been found.
 
-         Dummy :=
-           Handler.Forward
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Current_Position);
+         Dummy := Handler.Forward (Current_Position);
          Lookup_Previous_Line (Self, Current_Position);
          Current_Position := Self.First_Position;
          Dummy :=
@@ -327,7 +324,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Self.Reconnect (On'Unrestricted_Access);
 
       Handler.Before_First_Character (On.Data, Position);
-      Dummy := Handler.Forward (On.Data, Position);
+      Dummy := Handler.Forward (Position);
       Self.Lookup_Line_Boundaries (Position, Terminators, Keep_Terminator);
    end Set_At_First;
 
@@ -364,7 +361,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Position := Self.Last_Position;
          Success  :=
            VSS.Implementation.Strings.Constant_Handler
-             (Data).Forward (Data, Position);
+             (Data).Forward (Position);
       end if;
 
       return Position;
@@ -398,7 +395,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
             Position := Self.Last_Position;
             Success :=
               VSS.Implementation.Strings.Constant_Handler
-                (Data).Forward (Data, Position);
+                (Data).Forward (Position);
 
             return VSS.Strings.Character_Count (Position.Index);
          end if;

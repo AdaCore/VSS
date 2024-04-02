@@ -627,8 +627,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
+   is
+      pragma Suppress (Access_Check);
+
    begin
       if Position.Index > Self.Pointer.Length then
          return False;
@@ -646,7 +648,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
    begin
       if Position.Index > Self.Length then
@@ -1488,11 +1489,11 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          if VSS.Implementation.Strings.Is_Invalid (Terminator) then
             After_Last := At_Last;
-            Dummy      := Handler.Forward (Data, After_Last);
+            Dummy      := Handler.Forward (After_Last);
 
          elsif Keep_Terminator then
             After_Last := At_Last;
-            Dummy      := Handler.Forward (Data, After_Last);
+            Dummy      := Handler.Forward (After_Last);
 
          else
             After_Last := Terminator;

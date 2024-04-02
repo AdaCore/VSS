@@ -244,7 +244,7 @@ package body VSS.Implementation.Line_Iterators is
                when Next_Line =>
                   if Terminators (VSS.Strings.NEL) then
                      First_Position := Current_Position;
-                     D := Handler.Forward (Data, First_Position);
+                     D := Handler.Forward (First_Position);
 
                      exit;
 
@@ -324,14 +324,14 @@ package body VSS.Implementation.Line_Iterators is
       Last_Position       := Initial_Position;
       Terminator_Position := (others => <>);
 
-      if not Handler.Forward (Data, First_Position) then
+      if not Handler.Forward (First_Position) then
          Last_Position       := Initial_Position;
          Terminator_Position := (others => <>);
 
          return False;
       end if;
 
-      while Handler.Forward (Data, Last_Position) loop
+      while Handler.Forward (Last_Position) loop
          declare
             use type VSS.Unicode.Code_Point;
 

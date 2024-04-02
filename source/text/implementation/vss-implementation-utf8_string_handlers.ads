@@ -112,7 +112,6 @@ package VSS.Implementation.UTF8_String_Handlers is
    overriding procedure From_Wide_Wide_String
      (Self    : in out UTF8_String_Handler;
       Item    : Wide_Wide_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
 
    overriding procedure From_UTF_8_String
@@ -258,7 +257,6 @@ package VSS.Implementation.UTF8_String_Handlers is
    overriding procedure From_Wide_Wide_String
      (Self    : in out UTF8_In_Place_String_Handler;
       Item    : Wide_Wide_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
 
    overriding procedure From_UTF_8_String

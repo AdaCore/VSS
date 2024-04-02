@@ -1189,32 +1189,22 @@ package body VSS.Strings is
    function To_Virtual_String
      (Item : Wide_Wide_String) return Virtual_String
    is
-      --  Success : Boolean;
+      Success : Boolean;
 
    begin
       return Result : Virtual_String do
-         --  First, attempt to place data in the storage inside the object of
-         --  Magic_String type.
+         declare
+            Text : constant not null
+              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+                VSS.Implementation.Strings.Variable_Handler (Result.Data);
 
-         raise Program_Error;
-         --  XXX VADIM
-         --  VSS.Implementation.String_Configuration.In_Place_Handler
-         --    .From_Wide_Wide_String
-         --      (Item, Result.Data, Success);
-         --
-         --  if not Success then
-         --     --  Operation may fail for two reasons: source data is not
-         --     --  well-formed UTF-8 or there is not enough memory to store
-         --     --  string in in-place storage.
-         --
-         --     VSS.Implementation.String_Configuration.Default_Handler
-         --       .From_Wide_Wide_String
-         --         (Item, Result.Data, Success);
-         --  end if;
-         --
-         --  if not Success then
-         --     raise Constraint_Error with "Ill-formed UTF-8 data";
-         --  end if;
+         begin
+            Text.From_Wide_Wide_String (Item, Success);
+
+            if not Success then
+               raise Constraint_Error with "Ill-formed UTF-32 data";
+            end if;
+         end;
       end return;
    end To_Virtual_String;
 

@@ -170,16 +170,16 @@ package body VSS.Implementation.Null_String_Handlers is
    overriding procedure From_Wide_Wide_String
      (Self    : in out Null_String_Handler;
       Item    : Wide_Wide_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
-      Success : out Boolean)
-   is
-      pragma Unreferenced (Data);
-
+      Success : out Boolean) is
    begin
-      --  XXX Should this subprogram do string conversion usign both ip-place
-      --  and default string handlers?
+      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize
+        (Self, 0, Item'Length);
+      --  Request text data storage size enough to store ASCII text. Storage
+      --  will reallocated when necessary. It helps to use static storage when
+      --  possible.
 
-      Success := False;
+      VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+        (Self).From_Wide_Wide_String (Item, Success);
    end From_Wide_Wide_String;
 
    -------------------

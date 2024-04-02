@@ -168,9 +168,7 @@ package VSS.Implementation.Text_Handlers is
    not overriding procedure From_Wide_Wide_String
      (Self    : in out Abstract_String_Handler;
       Item    : Wide_Wide_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean) is abstract;
-   --  Convert Wide_Wide_String into internal representation.
 
    not overriding procedure From_UTF_8_String
      (Self    : in out Abstract_String_Handler;

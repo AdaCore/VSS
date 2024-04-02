@@ -122,9 +122,7 @@ package VSS.Implementation.Null_String_Handlers is
    overriding procedure From_Wide_Wide_String
      (Self    : in out Null_String_Handler;
       Item    : Wide_Wide_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
-   --  Convert Wide_Wide_String into internal representation.
 
    overriding procedure From_UTF_8_String
      (Self    : in out Null_String_Handler;

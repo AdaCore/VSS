@@ -118,9 +118,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
-   --  Convert UTF_8_String into internal representation.
 
    overriding function To_UTF_8_String
      (Self : UTF8_String_Handler;
@@ -266,9 +264,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_In_Place_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
-   --  Convert UTF_8_String into internal representation.
 
    overriding function To_UTF_8_String
      (Self : UTF8_In_Place_String_Handler;

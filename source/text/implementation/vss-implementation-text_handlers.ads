@@ -175,7 +175,6 @@ package VSS.Implementation.Text_Handlers is
    not overriding procedure From_UTF_8_String
      (Self    : in out Abstract_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
    --  Convert UTF_8_String into internal representation. Default
    --  implementation decode text character-by-character and append decoded

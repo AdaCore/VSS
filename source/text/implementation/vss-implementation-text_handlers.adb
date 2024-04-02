@@ -235,13 +235,10 @@ package body VSS.Implementation.Text_Handlers is
    not overriding procedure From_UTF_8_String
      (Self    : in out Abstract_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean)
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Handler    : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
       UTF8_Data  : constant
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
           (0 .. VSS.Unicode.UTF8_Code_Unit_Offset (Item'Length - 1))
@@ -252,21 +249,18 @@ package body VSS.Implementation.Text_Handlers is
       Offset     : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
-         raise Program_Error;
-         --  XXX VADIM
-      --  Handler.Initialize (Data);
-      --  Success := True;
-      --
-      --  loop
-      --     exit when UTF8_Index > UTF8_Data'Last;
-      --
-      --     VSS.Implementation.UTF8_Encoding.Decode
-      --       (UTF8_Data, UTF8_Index, Code, Success, Error);
-      --
-      --     exit when not Success;
-      --
-      --     Handler.Append (Data, Code, Offset);
-      --  end loop;
+      Success := True;
+
+      loop
+         exit when UTF8_Index > UTF8_Data'Last;
+
+         VSS.Implementation.UTF8_Encoding.Decode
+           (UTF8_Data, UTF8_Index, Code, Success, Error);
+
+         exit when not Success;
+
+         Abstract_String_Handler'Class (Self).Append (Code, Offset);
+      end loop;
    end From_UTF_8_String;
 
    ----------

@@ -26,7 +26,7 @@ package VSS.Implementation.Null_String_Handlers is
 
    type Null_String_Handler is
      new VSS.Implementation.Text_Handlers.Abstract_String_Handler
-       with null record;
+       with null record with Object_Size => 192;
 
    overriding procedure Reference
      (Self : in out Null_String_Handler;
@@ -129,7 +129,6 @@ package VSS.Implementation.Null_String_Handlers is
    overriding procedure From_UTF_8_String
      (Self    : in out Null_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean);
 
    overriding function To_UTF_8_String

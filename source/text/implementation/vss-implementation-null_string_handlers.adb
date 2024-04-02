@@ -154,16 +154,13 @@ package body VSS.Implementation.Null_String_Handlers is
    overriding procedure From_UTF_8_String
      (Self    : in out Null_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
-      Success : out Boolean)
-   is
-      pragma Unreferenced (Data);
-
+      Success : out Boolean) is
    begin
-      --  XXX Should this subprogram do string conversion usign both ip-place
-      --  and default string handlers?
+      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize
+        (Self, 0, Item'Length);
 
-      Success := False;
+      VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+        (Self).From_UTF_8_String (Item, Success);
    end From_UTF_8_String;
 
    ---------------------------

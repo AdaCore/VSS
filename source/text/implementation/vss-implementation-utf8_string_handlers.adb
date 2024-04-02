@@ -728,11 +728,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean)
    is
-      pragma Unreferenced (Data);
-
       Pointer : UTF8_String_Data_Access;
       Length  : VSS.Implementation.Strings.Character_Count := 0;
 
@@ -761,11 +758,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
    overriding procedure From_UTF_8_String
      (Self    : in out UTF8_In_Place_String_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Data    : out VSS.Implementation.Strings.String_Data;
       Success : out Boolean)
    is
-      pragma Unreferenced (Data);
-
       Length : VSS.Implementation.Strings.Character_Count;
 
    begin
@@ -1781,7 +1775,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
               with Import,
                    Convention => Ada,
                    Address    => Text'Address;
-            pragma Assert (Text'Size = Overlay'Size);
 
          begin
             Overlay := (others => <>);
@@ -1793,7 +1786,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
               with Import,
                    Convention => Ada,
                    Address    => Text'Address;
-            pragma Assert (Text'Size = Overlay'Size);
 
          begin
             Overlay := (others => <>);

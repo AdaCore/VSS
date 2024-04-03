@@ -855,9 +855,7 @@ package body VSS.Strings is
       Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
-         Aux (1) :=
-           Wide_Wide_Character'Val
-             (Handler.Element (Item.Data, Position));
+         Aux (1) := Wide_Wide_Character'Val (Handler.Element (Position));
 
          if Aux (1) =
            Wide_Wide_Character'Val

@@ -49,7 +49,7 @@ package body VSS.Strings.Conversions is
 
       while Handler.Forward (Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
-           (Handler.Element (Item.Data, Position),
+           (Handler.Element (Position),
             Length,
             U_Buffer (1),
             U_Buffer (2),
@@ -115,7 +115,7 @@ package body VSS.Strings.Conversions is
 
       while Handler.Forward (Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
-           (Handler.Element (Item.Data, Position),
+           (Handler.Element (Position),
             Length,
             U_Buffer (1),
             U_Buffer (2),
@@ -155,8 +155,7 @@ package body VSS.Strings.Conversions is
 
       while Handler.Forward (Position) loop
          Into (Into'First + Integer (Position.Index) - 1) :=
-           Wide_Wide_Character'Val
-             (Handler.Element (Item.Data, Position));
+           Wide_Wide_Character'Val (Handler.Element (Position));
       end loop;
    end Set_Wide_Wide_String;
 
@@ -203,8 +202,7 @@ package body VSS.Strings.Conversions is
       while Handler.Forward (Position) loop
          Last := Last + 1;
          Into (Last) :=
-           Wide_Wide_Character'Val
-             (Handler.Element (Item.Data, Position));
+           Wide_Wide_Character'Val (Handler.Element (Position));
       end loop;
    end Set_Wide_Wide_String;
 
@@ -240,7 +238,7 @@ package body VSS.Strings.Conversions is
 
          while Handler.Forward (Position) loop
             VSS.Implementation.UTF8_Encoding.Encode
-              (Handler.Element (Item.Data, Position),
+              (Handler.Element (Position),
                Length,
                U_Buffer (1),
                U_Buffer (2),

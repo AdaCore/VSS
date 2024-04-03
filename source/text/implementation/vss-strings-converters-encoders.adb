@@ -103,7 +103,7 @@ package body VSS.Strings.Converters.Encoders is
         and not Abstract_Encoder'Class (Self).Has_Error
       loop
          Abstract_Encoder'Class (Self).Encode
-           (Handler.Element (Source, Position), Target);
+           (Handler.Element (Position), Target);
       end loop;
    end Encode;
 

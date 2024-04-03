@@ -126,7 +126,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          if Properties.GCB = GCB_EX then
             null;
@@ -161,7 +161,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          case Properties.InCB is
             when INCB_Linker =>
@@ -198,7 +198,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             return Count mod 2 = 0;
          end if;
 
-         if Extract_Core_Data (Handler.Element (Data, Position)).GCB
+         if Extract_Core_Data (Handler.Element (Position)).GCB
               = GCB_RI
          then
             Count := Count + 1;
@@ -247,9 +247,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
 
       else
-         Left := Self.Last_Position;
-         Left_Properties :=
-           Extract_Core_Data (Handler.Element (Data, Left));
+         Left            := Self.Last_Position;
+         Left_Properties := Extract_Core_Data (Handler.Element (Left));
 
          loop
             Right            := Left;
@@ -265,8 +264,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                return True;
 
             else
-               Left_Properties :=
-                 Extract_Core_Data (Handler.Element (Data, Left));
+               Left_Properties := Extract_Core_Data (Handler.Element (Left));
 
                if Left_Properties.GCB = GCB_CR
                  and Right_Properties.GCB = GCB_LF
@@ -402,7 +400,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       --  Lookup for the wide/fullwidth character in the grapheme cluster.
 
       Position := Self.First_Position;
-      Code     := Handler.Element (Data, Position);
+      Code     := Handler.Element (Position);
 
       loop
          Properties := Extract_Core_Data (Code);
@@ -428,7 +426,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --  default text representation and occupy single cell.
 
          Position   := Self.First_Position;
-         Code       := Handler.Element (Data, Position);
+         Code       := Handler.Element (Position);
          Properties := Extract_Core_Data (Code);
 
          if not Properties.EPres then
@@ -650,7 +648,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
       end if;
 
-      Code := Handler.Element (Data, Position);
+      Code := Handler.Element (Position);
 
       --  Outer loop parses `emoji_zwj_element` expression.
 

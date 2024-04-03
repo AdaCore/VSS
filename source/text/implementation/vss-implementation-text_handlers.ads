@@ -64,7 +64,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function Element
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point'Base is abstract;
    --  Return character at given position or NUL if Position is not pointing

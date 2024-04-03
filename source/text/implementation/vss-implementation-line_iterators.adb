@@ -58,7 +58,7 @@ package body VSS.Implementation.Line_Iterators is
 
       declare
          C : constant VSS.Unicode.Code_Point :=
-           Handler.Element (Data, Current_Position);
+           Handler.Element (Current_Position);
 
       begin
          case C is
@@ -146,7 +146,7 @@ package body VSS.Implementation.Line_Iterators is
          Aux_Position := Current_Position;
 
          if Handler.Backward (Data, Aux_Position) then
-            if Handler.Element (Data, Aux_Position) = Carriage_Return then
+            if Handler.Element (Aux_Position) = Carriage_Return then
                Current_Position    := Aux_Position;
                First_Position      := Aux_Position;
                Terminator_Position := Aux_Position;
@@ -159,7 +159,7 @@ package body VSS.Implementation.Line_Iterators is
       while Handler.Backward (Data, Current_Position) loop
          declare
             C : constant VSS.Unicode.Code_Point :=
-              Handler.Element (Data, Current_Position);
+              Handler.Element (Current_Position);
             D : Boolean with Unreferenced;
 
          begin
@@ -336,7 +336,7 @@ package body VSS.Implementation.Line_Iterators is
             use type VSS.Unicode.Code_Point;
 
             C : constant VSS.Unicode.Code_Point :=
-              Handler.Element (Data, Last_Position);
+              Handler.Element (Last_Position);
 
          begin
             if CR_Found then

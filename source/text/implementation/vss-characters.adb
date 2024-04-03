@@ -191,7 +191,7 @@ package body VSS.Characters is
       return
         Virtual_Character'Val
           (VSS.Implementation.Strings.Constant_Handler
-             (Data).Element (Data, Position));
+             (Data).Element (Position));
    end Get_Simple_Lowercase_Mapping;
 
    ----------------------------------
@@ -219,7 +219,7 @@ package body VSS.Characters is
       return
         Virtual_Character'Val
           (VSS.Implementation.Strings.Constant_Handler
-             (Data).Element (Data, Position));
+             (Data).Element (Position));
    end Get_Simple_Titlecase_Mapping;
 
    ----------------------------------
@@ -247,7 +247,7 @@ package body VSS.Characters is
       return
         Virtual_Character'Val
           (VSS.Implementation.Strings.Constant_Handler
-             (Data).Element (Data, Position));
+             (Data).Element (Position));
    end Get_Simple_Uppercase_Mapping;
 
    ---------------------------

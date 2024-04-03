@@ -31,7 +31,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
    function Apply_WB6
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB6 should be applied.
 
@@ -45,7 +44,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
    function Apply_WB7b
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB7b should be applied.
 
@@ -66,7 +64,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
    function Apply_WB12
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string forward to check whether Rule WB12 should be applied.
 
@@ -96,7 +93,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          exit when Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
       end loop;
@@ -110,7 +107,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB12
      (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : aliased VSS.Implementation.Strings.Cursor := Right;
@@ -122,7 +118,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          exit when Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
       end loop;
@@ -149,7 +145,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return Count mod 2 = 0;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          if Properties.WB = WB_RI then
             Count := Count + 1;
@@ -169,7 +165,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB6
      (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : aliased VSS.Implementation.Strings.Cursor := Right;
@@ -181,7 +176,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          exit when Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
       end loop;
@@ -207,7 +202,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          exit when Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
       end loop;
@@ -221,7 +216,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB7b
      (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : aliased VSS.Implementation.Strings.Cursor := Right;
@@ -233,7 +227,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          exit when Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
       end loop;
@@ -259,7 +253,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Data, Position));
+         Properties := Extract_Core_Data (Handler.Element (Position));
 
          exit when Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
       end loop;
@@ -333,8 +327,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       end if;
 
       Right            := Self.First_Position;
-      Right_Properties :=
-        Extract_Core_Data (Handler.Element (Data, Right));
+      Right_Properties := Extract_Core_Data (Handler.Element (Right));
 
       Self.Kind :=
         (case Right_Properties.WB is
@@ -357,8 +350,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
             return True;
          end if;
 
-         Right_Properties :=
-           Extract_Core_Data (Handler.Element (Data, Right));
+         Right_Properties := Extract_Core_Data (Handler.Element (Right));
 
          if Left_Properties.WB = WB_CR
            and Right_Properties.WB = WB_LF
@@ -421,8 +413,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
                   goto Consumed;
                end if;
 
-               Right_Properties :=
-                 Extract_Core_Data (Handler.Element (Data, Right));
+               Right_Properties := Extract_Core_Data (Handler.Element (Right));
 
                exit when Right_Properties.WB not in WB_Extend | WB_FO | WB_ZWJ;
             end loop;
@@ -451,7 +442,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_LE | WB_HL
                 and Right_Properties.WB in WB_ML | WB_MB | WB_SQ)
-           and then Apply_WB6 (Handler.all, Data, Right)
+           and then Apply_WB6 (Handler.all, Right)
          then
             --  Rule WB6
 
@@ -474,7 +465,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_HL
                 and Right_Properties.WB = WB_DQ)
-           and then Apply_WB7b (Handler.all, Data, Right)
+           and then Apply_WB7b (Handler.all, Right)
          then
             --  Rule WB7b
 
@@ -519,7 +510,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_NU
                 and Right_Properties.WB in WB_MN | WB_MB | WB_SQ)
-           and then Apply_WB12 (Handler.all, Data, Right)
+           and then Apply_WB12 (Handler.all, Right)
          then
             --  Rule WB12
 

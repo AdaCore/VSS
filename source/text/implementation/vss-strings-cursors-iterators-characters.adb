@@ -46,7 +46,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
          return
            VSS.Characters.Virtual_Character'Base'Val
              (VSS.Implementation.Strings.Constant_Handler
-                (Data).Element (Data, Self.Position));
+                (Data).Element (Self.Position));
       end if;
 
       return

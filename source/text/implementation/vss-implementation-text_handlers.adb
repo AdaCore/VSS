@@ -34,7 +34,7 @@ package body VSS.Implementation.Text_Handlers is
       Suffix_Handler.Before_First_Character (Position);
 
       while Suffix_Handler.Forward (Position) loop
-         Code := Suffix_Handler.Element (Suffix, Position);
+         Code := Suffix_Handler.Element (Position);
          Abstract_String_Handler'Class (Self).Append (Code, Offset);
       end loop;
    end Append;
@@ -129,8 +129,8 @@ package body VSS.Implementation.Text_Handlers is
         Self_Handler.Backward (Self_Data, Self_Position)
           and Suffix_Handler.Backward (Suffix_Data, Suffix_Position)
       loop
-         if Self_Handler.Element (Self_Data, Self_Position)
-              /= Suffix_Handler.Element (Suffix_Data, Suffix_Position)
+         if Self_Handler.Element (Self_Position)
+              /= Suffix_Handler.Element (Suffix_Position)
          then
             return False;
          end if;
@@ -217,7 +217,7 @@ package body VSS.Implementation.Text_Handlers is
    begin
       if Abstract_String_Handler'Class (Self).Forward (Position) then
          Element :=
-           Abstract_String_Handler'Class (Self).Element (Data, Position);
+           Abstract_String_Handler'Class (Self).Element (Position);
 
          return True;
 
@@ -281,7 +281,7 @@ package body VSS.Implementation.Text_Handlers is
       Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
-         Code := Handler.Element (Data, Position);
+         Code := Handler.Element (Position);
 
          VSS.Implementation.FNV_Hash.Hash
            (Generator,
@@ -329,7 +329,7 @@ package body VSS.Implementation.Text_Handlers is
       Item_Handler.Before_First_Character (Item_Position);
 
       while Item_Handler.Forward (Item_Position) loop
-         Code := Item_Handler.Element (Item, Item_Position);
+         Code := Item_Handler.Element (Item_Position);
 
          Handler := VSS.Implementation.Strings.Variable_Handler (Data);
          Handler.Insert (Data, Position, Code, Offset);
@@ -369,8 +369,8 @@ package body VSS.Implementation.Text_Handlers is
         Left_Handler.Forward (Left_Position)
           and Right_Handler.Forward (Right_Position)
       loop
-         Left_Code  := Left_Handler.Element (Left_Data, Left_Position);
-         Right_Code := Right_Handler.Element (Right_Data, Right_Position);
+         Left_Code  := Left_Handler.Element (Left_Position);
+         Right_Code := Right_Handler.Element (Right_Position);
 
          if Left_Code /= Right_Code then
             return False;
@@ -394,7 +394,6 @@ package body VSS.Implementation.Text_Handlers is
    is
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Left_Data      : VSS.Implementation.Strings.String_Data renames Data;
       Right_Handler  : Abstract_String_Handler'Class renames Other;
       Right_Data     : VSS.Implementation.Strings.String_Data
         renames Other_Data;
@@ -412,8 +411,8 @@ package body VSS.Implementation.Text_Handlers is
         Left_Handler.Forward (Left_Position)
           and Right_Handler.Forward (Right_Position)
       loop
-         Left_Code  := Left_Handler.Element (Left_Data, Left_Position);
-         Right_Code := Right_Handler.Element (Right_Data, Right_Position);
+         Left_Code  := Left_Handler.Element (Left_Position);
+         Right_Code := Right_Handler.Element (Right_Position);
 
          if Left_Code /= Right_Code then
             return Left_Code < Right_Code;
@@ -453,8 +452,8 @@ package body VSS.Implementation.Text_Handlers is
         Left_Handler.Forward (Left_Position)
           and Right_Handler.Forward (Right_Position)
       loop
-         Left_Code  := Left_Handler.Element (Left_Data, Left_Position);
-         Right_Code := Right_Handler.Element (Right_Data, Right_Position);
+         Left_Code  := Left_Handler.Element (Left_Position);
+         Right_Code := Right_Handler.Element (Right_Position);
 
          if Left_Code /= Right_Code then
             return Left_Code < Right_Code;
@@ -640,7 +639,7 @@ package body VSS.Implementation.Text_Handlers is
       Previous := Current;
 
       while Handler.Forward (Current) loop
-         if Handler.Element (Data, Current) = Separator then
+         if Handler.Element (Current) = Separator then
             Append;
 
             From    := Current;
@@ -663,10 +662,8 @@ package body VSS.Implementation.Text_Handlers is
       Prefix_Handler : Abstract_String_Handler'Class;
       Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
    is
-      Self_Handler   : Abstract_String_Handler'Class
+      Self_Handler    : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Self_Data      : VSS.Implementation.Strings.String_Data renames Data;
-
       Self_Position   : aliased VSS.Implementation.Strings.Cursor;
       Prefix_Position : aliased VSS.Implementation.Strings.Cursor;
 
@@ -678,8 +675,8 @@ package body VSS.Implementation.Text_Handlers is
         Self_Handler.Forward (Self_Position)
           and Prefix_Handler.Forward (Prefix_Position)
       loop
-         if Self_Handler.Element (Self_Data, Self_Position)
-              /= Prefix_Handler.Element (Prefix_Data, Prefix_Position)
+         if Self_Handler.Element (Self_Position)
+              /= Prefix_Handler.Element (Prefix_Position)
          then
             return False;
          end if;

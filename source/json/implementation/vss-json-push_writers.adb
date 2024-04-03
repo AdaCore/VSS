@@ -317,7 +317,7 @@ package body VSS.JSON.Push_Writers is
             Handler.Before_First_Character (Position);
 
             while Handler.Forward (Position) loop
-               Code := Handler.Element (Data, Position);
+               Code := Handler.Element (Position);
 
                case Code is
                   when 16#00_0000# .. 16#00_0007#

@@ -562,7 +562,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Element
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point'Base is
    begin
@@ -583,7 +582,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Element
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point'Base is
    begin

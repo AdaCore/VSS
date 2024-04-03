@@ -1241,14 +1241,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       if Size <= In_Place_Storage_Capacity then
          declare
-            Static : UTF8_In_Place_String_Handler
-              with Import,
-                   Convention => Ada,
-                   Address    => Target_Data.Storage'Address;
+            Static : UTF8_In_Place_String_Handler := (others => <>)
+              with Address => Target_Data.Storage'Address;
 
          begin
-            Static := (others => <>);
-
             Static.Storage (0 .. Size - 1) :=
               Self.Pointer.Storage (From.UTF8_Offset .. After.UTF8_Offset - 1);
             Static.Size   := Size;
@@ -1259,14 +1255,10 @@ package body VSS.Implementation.UTF8_String_Handlers is
       else
          declare
             Pointer : UTF8_String_Data_Access;
-            Dynamic : UTF8_String_Handler
-              with Import,
-                   Convention => Ada,
-                   Address    => Target_Data.Storage'Address;
+            Dynamic : UTF8_String_Handler := (others => <>)
+              with Address => Target_Data.Storage'Address;
 
          begin
-            Dynamic := (others => <>);
-
             Pointer := Allocate (0, Size);
             Pointer.Storage (0 .. Size - 1) :=
               Self.Pointer.Storage (From.UTF8_Offset .. After.UTF8_Offset - 1);

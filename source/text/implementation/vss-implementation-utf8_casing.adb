@@ -14,14 +14,12 @@ package body VSS.Implementation.UTF8_Casing is
 
    procedure Convert_Case
      (Self    : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
 
    procedure Convert_Case
      (Self    :
         VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
 
@@ -45,7 +43,7 @@ package body VSS.Implementation.UTF8_Casing is
           VSS.Implementation.Strings.Constant_Handler (Data);
 
    begin
-      if Handler.Is_Empty (Data) then
+      if Handler.Is_Empty then
          --  String is empty, nothing to do.
 
          Result := VSS.Implementation.Strings.Null_String_Data;
@@ -56,7 +54,6 @@ package body VSS.Implementation.UTF8_Casing is
          Convert_Case
            (VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
               (Handler.all),
-            Data,
             Mapping,
             Result);
 
@@ -67,7 +64,6 @@ package body VSS.Implementation.UTF8_Casing is
          Convert_Case
            (VSS.Implementation.UTF8_String_Handlers
               .UTF8_In_Place_String_Handler (Handler.all),
-            Data,
             Mapping,
             Result);
 
@@ -82,11 +78,10 @@ package body VSS.Implementation.UTF8_Casing is
 
    procedure Convert_Case
      (Self    : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data) is
    begin
-      if Self.Is_Empty (Data) then
+      if Self.Is_Empty then
          --  Nothing to do for an empty string.
 
          Result := VSS.Implementation.Strings.Null_String_Data;
@@ -170,11 +165,10 @@ package body VSS.Implementation.UTF8_Casing is
    procedure Convert_Case
      (Self    :
         VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data) is
    begin
-      if Self.Is_Empty (Data) then
+      if Self.Is_Empty then
          --  Nothing to do for an empty string.
 
          Result := VSS.Implementation.Strings.Null_String_Data;

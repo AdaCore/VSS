@@ -32,13 +32,9 @@ package VSS.Implementation.Null_String_Handlers is
 
    overriding procedure Unreference (Self : in out Null_String_Handler);
 
-   overriding function Is_Empty
-     (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean;
+   overriding function Is_Empty (Self : Null_String_Handler) return Boolean;
 
-   overriding function Is_Null
-     (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean;
+   overriding function Is_Null (Self : Null_String_Handler) return Boolean;
 
    overriding procedure Hash
      (Self      : Null_String_Handler;

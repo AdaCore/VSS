@@ -123,7 +123,7 @@ package body VSS.Implementation.Null_String_Handlers is
       Suffix_Data    : VSS.Implementation.Strings.String_Data)
       return Boolean is
    begin
-      return Suffix_Handler.Is_Empty (Suffix_Data);
+      return Suffix_Handler.Is_Empty;
    end Ends_With;
 
    -------------
@@ -219,16 +219,14 @@ package body VSS.Implementation.Null_String_Handlers is
    --------------
 
    overriding function Is_Empty
-     (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean is (True);
+     (Self : Null_String_Handler) return Boolean is (True);
 
    -------------
    -- Is_Null --
    -------------
 
    overriding function Is_Null
-     (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean is (True);
+     (Self : Null_String_Handler) return Boolean is (True);
 
    ------------
    -- Length --
@@ -272,7 +270,7 @@ package body VSS.Implementation.Null_String_Handlers is
       Prefix_Data    : VSS.Implementation.Strings.String_Data)
       return Boolean is
    begin
-      return Prefix_Handler.Is_Empty (Prefix_Data);
+      return Prefix_Handler.Is_Empty;
    end Starts_With;
 
    ---------------------

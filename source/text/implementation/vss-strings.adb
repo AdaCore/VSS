@@ -606,7 +606,7 @@ package body VSS.Strings is
       Offset  : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
-      if Handler.Is_Empty (Self.Data) then
+      if Handler.Is_Empty then
          return False;
 
       else
@@ -777,9 +777,7 @@ package body VSS.Strings is
 
    function Is_Empty (Self : Virtual_String'Class) return Boolean is
    begin
-      return
-        VSS.Implementation.Strings.Constant_Handler
-          (Self.Data).Is_Empty (Self.Data);
+      return VSS.Implementation.Strings.Constant_Handler (Self.Data).Is_Empty;
    end Is_Empty;
 
    -------------
@@ -788,9 +786,7 @@ package body VSS.Strings is
 
    function Is_Null (Self : Virtual_String'Class) return Boolean is
    begin
-      return
-        VSS.Implementation.Strings.Constant_Handler
-          (Self.Data).Is_Null (Self.Data);
+      return VSS.Implementation.Strings.Constant_Handler (Self.Data).Is_Null;
    end Is_Null;
 
    -------------

@@ -54,9 +54,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 
-   overriding function Is_Empty
-     (Self : UTF8_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean;
+   overriding function Is_Empty (Self : UTF8_String_Handler) return Boolean;
 
    overriding function Length
      (Self : UTF8_String_Handler;
@@ -197,8 +195,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  release resources when necessary and reset Pointer to safe value.
 
    overriding function Is_Empty
-     (Self : UTF8_In_Place_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean;
+     (Self : UTF8_In_Place_String_Handler) return Boolean;
 
    overriding function Length
      (Self : UTF8_In_Place_String_Handler;

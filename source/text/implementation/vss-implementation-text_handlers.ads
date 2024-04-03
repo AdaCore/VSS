@@ -42,14 +42,11 @@ package VSS.Implementation.Text_Handlers is
    --  release resources when necessary and reset Pointer to safe value.
 
    not overriding function Is_Empty
-     (Self : Abstract_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
-      return Boolean is abstract;
+     (Self : Abstract_String_Handler) return Boolean is abstract;
    --  Return True when string is empty.
 
    not overriding function Is_Null
-     (Self : Abstract_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean;
+     (Self : Abstract_String_Handler) return Boolean;
    --  Return True when string is null.
 
    not overriding procedure Hash

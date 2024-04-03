@@ -17,14 +17,12 @@ package body VSS.Implementation.UTF8_Normalization is
 
    procedure Normalize
      (Self   : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
       Form   : VSS.Strings.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data);
 
    procedure Normalize
      (Self   :
         VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
       Form   : VSS.Strings.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data);
 
@@ -1968,7 +1966,7 @@ package body VSS.Implementation.UTF8_Normalization is
    begin
       Result := VSS.Implementation.Strings.Null_String_Data;
 
-      if Handler.Is_Empty (Data) then
+      if Handler.Is_Empty then
          --  Nothing to do for an empty string.
 
          return;
@@ -1980,7 +1978,6 @@ package body VSS.Implementation.UTF8_Normalization is
          Normalize
            (VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
               (Handler.all),
-            Data,
             Form,
             Result);
 
@@ -1991,7 +1988,6 @@ package body VSS.Implementation.UTF8_Normalization is
          Normalize
            (VSS.Implementation.UTF8_String_Handlers
               .UTF8_In_Place_String_Handler (Handler.all),
-            Data,
             Form,
             Result);
 
@@ -2006,14 +2002,10 @@ package body VSS.Implementation.UTF8_Normalization is
 
    procedure Normalize
      (Self   : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
       Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data)
-   is
-      use type VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access;
-
+      Result : out VSS.Implementation.Strings.String_Data) is
    begin
-      if Self.Is_Empty (Data) then
+      if Self.Is_Empty then
          return;
       end if;
 
@@ -2067,11 +2059,10 @@ package body VSS.Implementation.UTF8_Normalization is
    procedure Normalize
      (Self   :
         VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
       Form   : VSS.Strings.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data) is
    begin
-      if Self.Is_Empty (Data) then
+      if Self.Is_Empty then
          return;
       end if;
 

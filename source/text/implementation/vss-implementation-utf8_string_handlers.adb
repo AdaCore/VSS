@@ -1101,9 +1101,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    -- Is_Empty --
    --------------
 
-   overriding function Is_Empty
-     (Self : UTF8_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean is
+   overriding function Is_Empty (Self : UTF8_String_Handler) return Boolean is
    begin
       return Self.Pointer.Length = 0;
    end Is_Empty;
@@ -1113,8 +1111,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    --------------
 
    overriding function Is_Empty
-     (Self : UTF8_In_Place_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean is
+     (Self : UTF8_In_Place_String_Handler) return Boolean is
    begin
       return Self.Length = 0;
    end Is_Empty;

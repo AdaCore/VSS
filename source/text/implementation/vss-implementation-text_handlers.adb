@@ -322,7 +322,7 @@ package body VSS.Implementation.Text_Handlers is
       Handler       : VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
    begin
-      if Item_Handler.Is_Empty (Item) then
+      if Item_Handler.Is_Empty then
          return;
       end if;
 
@@ -471,8 +471,7 @@ package body VSS.Implementation.Text_Handlers is
    -------------
 
    not overriding function Is_Null
-     (Self : Abstract_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data) return Boolean is (False);
+     (Self : Abstract_String_Handler) return Boolean is (False);
 
    -----------------------
    -- Last_UTF16_Offset --

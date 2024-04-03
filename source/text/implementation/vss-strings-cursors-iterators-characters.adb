@@ -106,14 +106,10 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    -----------------
 
    overriding function Has_Element
-     (Self : Character_Iterator) return Boolean
-   is
-      Data : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-
+     (Self : Character_Iterator) return Boolean is
    begin
       if Self.Owner /= null then
-         return Self.Handler.Has_Character (Data, Self.Position);
+         return Self.Handler.Has_Character (Self.Position);
       end if;
 
       return False;

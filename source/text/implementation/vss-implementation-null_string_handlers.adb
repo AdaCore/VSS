@@ -182,7 +182,6 @@ package body VSS.Implementation.Null_String_Handlers is
 
    overriding function Has_Character
      (Self     : Null_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor) return Boolean is (False);
 
    ----------

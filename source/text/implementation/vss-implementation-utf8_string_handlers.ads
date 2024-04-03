@@ -70,7 +70,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Has_Character
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor) return Boolean;
 
    overriding procedure Before_First_Character
@@ -210,7 +209,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Has_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor) return Boolean;
 
    overriding procedure Before_First_Character

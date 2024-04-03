@@ -71,7 +71,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function Has_Character
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor) return Boolean is abstract;
    --  Return True when position points to the character.
 

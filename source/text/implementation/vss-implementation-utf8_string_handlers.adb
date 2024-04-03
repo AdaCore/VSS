@@ -883,7 +883,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Has_Character
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor) return Boolean is
    begin
       return Position.Index in 1 .. Self.Pointer.Length;
@@ -895,7 +894,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Has_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor) return Boolean is
    begin
       return Position.Index in 1 .. Self.Length;

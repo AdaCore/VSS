@@ -351,10 +351,7 @@ package body VSS.Implementation.Text_Handlers is
    is
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Left_Data      : VSS.Implementation.Strings.String_Data renames Data;
       Right_Handler  : Abstract_String_Handler'Class renames Other;
-      Right_Data     : VSS.Implementation.Strings.String_Data
-        renames Other_Data;
 
       Left_Position  : aliased VSS.Implementation.Strings.Cursor;
       Right_Position : aliased VSS.Implementation.Strings.Cursor;
@@ -378,8 +375,8 @@ package body VSS.Implementation.Text_Handlers is
       end loop;
 
       return
-        not Left_Handler.Has_Character (Left_Data, Left_Position)
-          and not Right_Handler.Has_Character (Right_Data, Right_Position);
+        not Left_Handler.Has_Character (Left_Position)
+          and not Right_Handler.Has_Character (Right_Position);
    end Is_Equal;
 
    -------------
@@ -395,8 +392,6 @@ package body VSS.Implementation.Text_Handlers is
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
       Right_Handler  : Abstract_String_Handler'Class renames Other;
-      Right_Data     : VSS.Implementation.Strings.String_Data
-        renames Other_Data;
 
       Left_Position  : aliased VSS.Implementation.Strings.Cursor;
       Right_Position : aliased VSS.Implementation.Strings.Cursor;
@@ -419,7 +414,7 @@ package body VSS.Implementation.Text_Handlers is
          end if;
       end loop;
 
-      return Right_Handler.Has_Character (Right_Data, Right_Position);
+      return Right_Handler.Has_Character (Right_Position);
    end Is_Less;
 
    ----------------------
@@ -434,10 +429,7 @@ package body VSS.Implementation.Text_Handlers is
    is
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Left_Data      : VSS.Implementation.Strings.String_Data renames Data;
       Right_Handler  : Abstract_String_Handler'Class renames Other;
-      Right_Data     : VSS.Implementation.Strings.String_Data
-        renames Other_Data;
 
       Left_Position  : aliased VSS.Implementation.Strings.Cursor;
       Right_Position : aliased VSS.Implementation.Strings.Cursor;
@@ -461,8 +453,8 @@ package body VSS.Implementation.Text_Handlers is
       end loop;
 
       return
-        Right_Handler.Has_Character (Right_Data, Right_Position)
-          or not Left_Handler.Has_Character (Left_Data, Left_Position);
+        Right_Handler.Has_Character (Right_Position)
+          or not Left_Handler.Has_Character (Left_Position);
    end Is_Less_Or_Equal;
 
    -------------

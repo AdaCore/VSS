@@ -71,7 +71,6 @@ package VSS.Implementation.Null_String_Handlers is
 
    overriding function Backward
      (Self     : Null_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
 
    --  not overriding function Is_Equal

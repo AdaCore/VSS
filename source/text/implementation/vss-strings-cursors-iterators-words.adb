@@ -37,7 +37,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
    function Apply_WB7
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7 should be applied.
 
@@ -50,14 +49,12 @@ package body VSS.Strings.Cursors.Iterators.Words is
    function Apply_WB7c
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7c should be applied.
 
    function Apply_WB11
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule WB7 should be applied.
 
@@ -70,7 +67,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
    function Apply_WB15_WB16
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rules WB15, WB16 should be
    --  applied.
@@ -81,7 +77,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB11
      (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : VSS.Implementation.Strings.Cursor := Left;
@@ -89,7 +84,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       loop
-         if not Handler.Backward (Data, Position) then
+         if not Handler.Backward (Position) then
             return False;
          end if;
 
@@ -132,7 +127,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB15_WB16
      (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : VSS.Implementation.Strings.Cursor := Left;
@@ -141,7 +135,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       loop
-         if not Handler.Backward (Data, Position) then
+         if not Handler.Backward (Position) then
             return Count mod 2 = 0;
          end if;
 
@@ -190,7 +184,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB7
      (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : VSS.Implementation.Strings.Cursor := Left;
@@ -198,7 +191,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       loop
-         if not Handler.Backward (Data, Position) then
+         if not Handler.Backward (Position) then
             return False;
          end if;
 
@@ -241,7 +234,6 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    function Apply_WB7c
      (Handler : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : VSS.Implementation.Strings.Cursor := Left;
@@ -249,7 +241,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
    begin
       loop
-         if not Handler.Backward (Data, Position) then
+         if not Handler.Backward (Position) then
             return False;
          end if;
 
@@ -450,7 +442,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_ML | WB_MB | WB_SQ
                 and Right_Properties.WB in WB_LE | WB_HL)
-           and then Apply_WB7 (Handler.all, Data, Starter)
+           and then Apply_WB7 (Handler.all, Starter)
          then
             --  Rule WB7
 
@@ -473,7 +465,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_DQ
                 and Right_Properties.WB = WB_HL)
-           and then Apply_WB7c (Handler.all, Data, Starter)
+           and then Apply_WB7c (Handler.all, Starter)
          then
             --  Rule WB7c
 
@@ -502,7 +494,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB in WB_MN | WB_MB | WB_SQ
                 and Right_Properties.WB = WB_NU)
-           and then Apply_WB11 (Handler.all, Data, Starter)
+           and then Apply_WB11 (Handler.all, Starter)
          then
             --  Rule WB11
 
@@ -539,7 +531,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
 
          elsif (Starter_Properties.WB = WB_RI
                 and Right_Properties.WB = WB_RI)
-           and then Apply_WB15_WB16 (Handler.all, Data, Starter)
+           and then Apply_WB15_WB16 (Handler.all, Starter)
          then
             --  Rule WB15
             --  Rule WB16
@@ -730,7 +722,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Self.Reconnect (On'Unrestricted_Access);
 
       Handler.After_Last_Character (On.Data, Position);
-      Dummy := Handler.Backward (On.Data, Position);
+      Dummy := Handler.Backward (Position);
       Self.Lookup_Word_Boundaries (Position);
    end Set_At_Last;
 

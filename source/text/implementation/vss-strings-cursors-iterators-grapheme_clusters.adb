@@ -33,7 +33,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Apply_RI
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rules GB12, GB13 should be
    --  applied.
@@ -41,14 +40,12 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Apply_ExtPict
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule GB11 should be applied.
 
    function Apply_InCB
      (Handler   :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data      : VSS.Implementation.Strings.String_Data;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean;
    --  Scan string backward to check whether Rule GB9c should be applied.
@@ -114,7 +111,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Apply_ExtPict
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : VSS.Implementation.Strings.Cursor := Left;
@@ -122,7 +118,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    begin
       loop
-         if not Handler.Backward (Data, Position) then
+         if not Handler.Backward (Position) then
             return False;
          end if;
 
@@ -147,7 +143,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Apply_InCB
      (Handler   :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data      : VSS.Implementation.Strings.String_Data;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean
    is
@@ -157,7 +152,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    begin
       loop
-         if not Handler.Backward (Data, Position) then
+         if not Handler.Backward (Position) then
             return False;
          end if;
 
@@ -186,7 +181,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    function Apply_RI
      (Handler :
         VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Data    : VSS.Implementation.Strings.String_Data;
       Left    : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position : VSS.Implementation.Strings.Cursor := Left;
@@ -194,7 +188,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    begin
       loop
-         if not Handler.Backward (Data, Position) then
+         if not Handler.Backward (Position) then
             return Count mod 2 = 0;
          end if;
 
@@ -237,7 +231,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       Self.Last_Position := Self.First_Position;
-      Success := Handler.Backward (Data, Self.Last_Position);
+      Success := Handler.Backward (Self.Last_Position);
 
       if not Success then
          --  Start of the line has been reached.
@@ -254,7 +248,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             Right            := Left;
             Right_Properties := Left_Properties;
 
-            Success := Handler.Backward (Data, Left);
+            Success := Handler.Backward (Left);
 
             if not Success then
                --  Start of the string has been reached.
@@ -322,10 +316,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                elsif Left_Properties.InCB in INCB_Linker | INCB_Extend
                  and then Right_Properties.InCB = INCB_Consonant
                  and then Apply_InCB
-                   (Handler.all,
-                    Data,
-                    Left,
-                    Left_Properties.InCB = INCB_Linker)
+                   (Handler.all, Left, Left_Properties.InCB = INCB_Linker)
                then
                   --  Rule 9c.
 
@@ -333,7 +324,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_ZWJ
                  and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Handler.all, Data, Left)
+                 and then Apply_ExtPict (Handler.all, Left)
                then
                   --  Rule 11.
 
@@ -341,7 +332,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_RI
                  and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Handler.all, Data, Left)
+                 and then Apply_RI (Handler.all, Left)
                then
                   --  Rule GB12.
                   --  Rule GB13.
@@ -531,10 +522,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
                if Left_Properties.InCB in INCB_Linker | INCB_Extend
                  and then Right_Properties.InCB = INCB_Consonant
                  and then Apply_InCB
-                   (Handler.all,
-                    Data,
-                    Left,
-                    Left_Properties.InCB = INCB_Linker)
+                   (Handler.all, Left, Left_Properties.InCB = INCB_Linker)
                then
                   --  Rule GB9c.
 
@@ -542,7 +530,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_ZWJ
                  and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Handler.all, Data, Left)
+                 and then Apply_ExtPict (Handler.all, Left)
                then
                   --  Rule GB11.
 
@@ -550,7 +538,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
                elsif Left_Properties.GCB = GCB_RI
                  and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Handler.all, Data, Left)
+                 and then Apply_RI (Handler.all, Left)
                then
                   --  Rule GB12.
                   --  Rule GB13.
@@ -953,7 +941,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Self.Reconnect (On'Unrestricted_Access);
 
       Handler.After_Last_Character (On.Data, Position);
-      Dummy := Handler.Backward (On.Data, Position);
+      Dummy := Handler.Backward (Position);
       Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Set_At_Last;
 

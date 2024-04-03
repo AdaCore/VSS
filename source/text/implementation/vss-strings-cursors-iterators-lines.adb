@@ -164,18 +164,12 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Dummy := Handler.Forward (Current_Position);
          Lookup_Previous_Line (Self, Current_Position);
          Current_Position := Self.First_Position;
-         Dummy :=
-           Handler.Backward
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Current_Position);
+         Dummy := Handler.Backward (Current_Position);
 
       else
          --  Rewind to previous character.
 
-         Dummy :=
-           Handler.Backward
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Current_Position);
+         Dummy := Handler.Backward (Current_Position);
       end if;
 
       Lookup_Next_Line (Self, Current_Position);
@@ -226,7 +220,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Self.Terminator_Position := Terminator_Position;
 
       else
-         Dummy := Handler.Backward (Data, Terminator_Position);
+         Dummy := Handler.Backward (Terminator_Position);
 
          Self.Last_Position       := Terminator_Position;
          Self.Terminator_Position := Last_Position;
@@ -270,7 +264,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       else
          Dummy :=
            VSS.Implementation.Strings.Constant_Handler
-             (Data).Backward (Data, Terminator_Position);
+             (Data).Backward (Terminator_Position);
 
          Self.Last_Position       := Terminator_Position;
          Self.Terminator_Position := Last_Position;

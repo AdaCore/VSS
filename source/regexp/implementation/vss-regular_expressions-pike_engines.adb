@@ -381,7 +381,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
             null;
 
          else
-            Ignore := Handler.Backward (Data.all, Cursor);
+            Ignore := Handler.Backward (Cursor);
          end if;
       end Step_Backward;
 

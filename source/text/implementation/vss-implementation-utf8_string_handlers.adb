@@ -451,7 +451,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Backward
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
    begin
       if Position.Index = 0 then
@@ -470,7 +469,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Backward
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
    begin
       if Position.Index = 0 then

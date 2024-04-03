@@ -42,7 +42,7 @@ package body VSS.Implementation.Line_Iterators is
       Dummy            : Boolean;
 
    begin
-      if not Handler.Backward (Data, Current_Position) then
+      if not Handler.Backward (Current_Position) then
          --  There is no any characters before initial position.
 
          First_Position      := (others => <>);
@@ -145,7 +145,7 @@ package body VSS.Implementation.Line_Iterators is
       if LF_Found then
          Aux_Position := Current_Position;
 
-         if Handler.Backward (Data, Aux_Position) then
+         if Handler.Backward (Aux_Position) then
             if Handler.Element (Aux_Position) = Carriage_Return then
                Current_Position    := Aux_Position;
                First_Position      := Aux_Position;
@@ -156,7 +156,7 @@ package body VSS.Implementation.Line_Iterators is
 
       LF_Found := False;
 
-      while Handler.Backward (Data, Current_Position) loop
+      while Handler.Backward (Current_Position) loop
          declare
             C : constant VSS.Unicode.Code_Point :=
               Handler.Element (Current_Position);
@@ -345,7 +345,7 @@ package body VSS.Implementation.Line_Iterators is
                   --  CRLF are allowed.
 
                   CR_Found := False;
-                  Dummy    := Handler.Backward (Data, Last_Position);
+                  Dummy    := Handler.Backward (Last_Position);
 
                   exit;
                end if;
@@ -421,7 +421,7 @@ package body VSS.Implementation.Line_Iterators is
             --  It is special case to handle single CR at the end of string
             --  when both CR and CRLF are allowed.
 
-            Dummy := Handler.Backward (Data, Last_Position);
+            Dummy := Handler.Backward (Last_Position);
 
          else
             --  CR at the end of the string is not a line terminator sequence.
@@ -436,7 +436,7 @@ package body VSS.Implementation.Line_Iterators is
          --  to the character after last character of the string. Thus, it
          --  should be moved one character backward.
 
-         Dummy := Handler.Backward (Data, Last_Position);
+         Dummy := Handler.Backward (Last_Position);
       end if;
 
       return True;

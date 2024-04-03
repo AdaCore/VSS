@@ -94,7 +94,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function Backward
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor)
       return Boolean is abstract;
    --  Move cursor one character backward. Return True on success.

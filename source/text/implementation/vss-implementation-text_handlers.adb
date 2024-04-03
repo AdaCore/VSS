@@ -126,8 +126,8 @@ package body VSS.Implementation.Text_Handlers is
       Suffix_Handler.After_Last_Character (Suffix_Data, Suffix_Position);
 
       while
-        Self_Handler.Backward (Self_Data, Self_Position)
-          and Suffix_Handler.Backward (Suffix_Data, Suffix_Position)
+        Self_Handler.Backward (Self_Position)
+          and Suffix_Handler.Backward (Suffix_Position)
       loop
          if Self_Handler.Element (Self_Position)
               /= Suffix_Handler.Element (Suffix_Position)

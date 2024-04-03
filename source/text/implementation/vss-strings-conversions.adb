@@ -256,7 +256,7 @@ package body VSS.Strings.Conversions is
 
    begin
       Handler.After_Last_Character (Item.Data, Position);
-      Success := Handler.Backward (Item.Data, Position);
+      Success := Handler.Backward (Position);
 
       return Result : Ada.Strings.Unbounded.Unbounded_String do
          if Success then

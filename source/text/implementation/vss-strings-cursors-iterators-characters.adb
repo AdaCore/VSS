@@ -24,7 +24,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       if Self.Owner /= null then
          return
            VSS.Implementation.Strings.Constant_Handler
-             (Data).Backward (Data, Self.Position);
+             (Data).Backward (Self.Position);
       end if;
 
       return False;
@@ -180,7 +180,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Self.Reconnect (On'Unrestricted_Access);
       Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
       Self.Handler.After_Last_Character (On.Data, Self.Position);
-      Dummy := Self.Handler.Backward (On.Data, Self.Position);
+      Dummy := Self.Handler.Backward (Self.Position);
    end Set_At_Last;
 
    ----------------------

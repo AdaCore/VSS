@@ -137,7 +137,8 @@ package body VSS.Implementation.Null_String_Handlers is
 
    overriding function Forward
      (Self     : Null_String_Handler;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean is
    begin
       if Position = Before_First_Character_Cursor then
          Position := After_Last_Character_Cursor;

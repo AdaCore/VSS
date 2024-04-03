@@ -174,7 +174,7 @@ package body VSS.Characters is
      (Self : Virtual_Character) return Virtual_Character
    is
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -202,7 +202,7 @@ package body VSS.Characters is
      (Self : Virtual_Character) return Virtual_Character
    is
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -230,7 +230,7 @@ package body VSS.Characters is
      (Self : Virtual_Character) return Virtual_Character
    is
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin

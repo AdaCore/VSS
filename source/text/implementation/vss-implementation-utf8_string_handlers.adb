@@ -627,7 +627,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward
      (Self     : UTF8_String_Handler;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean
    is
       pragma Suppress (Access_Check);
 
@@ -648,7 +649,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward
      (Self     : UTF8_In_Place_String_Handler;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean is
    begin
       if Position.Index > Self.Length then
          return False;
@@ -667,7 +669,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    overriding function Forward_Element
      (Self     : UTF8_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor;
+      Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean
    is
       Code   : VSS.Unicode.Code_Point'Base :=
@@ -698,7 +700,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    overriding function Forward_Element
      (Self     : UTF8_In_Place_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor;
+      Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean
    is
       Code   : VSS.Unicode.Code_Point'Base :=
@@ -1466,9 +1468,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
       end Append;
 
       Initial    : VSS.Implementation.Strings.Cursor;
-      At_First   : VSS.Implementation.Strings.Cursor;
-      At_Last    : VSS.Implementation.Strings.Cursor;
-      After_Last : VSS.Implementation.Strings.Cursor;
+      At_First   : aliased VSS.Implementation.Strings.Cursor;
+      At_Last    : aliased VSS.Implementation.Strings.Cursor;
+      After_Last : aliased VSS.Implementation.Strings.Cursor;
       Terminator : VSS.Implementation.Strings.Cursor;
       Dummy      : Boolean;
 

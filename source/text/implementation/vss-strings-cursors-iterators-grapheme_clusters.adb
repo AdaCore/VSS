@@ -378,7 +378,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
       Data       : VSS.Implementation.Strings.String_Data;
       Handler    : VSS.Implementation.Strings.Constant_Text_Handler_Access;
-      Position   : VSS.Implementation.Strings.Cursor;
+      Position   : aliased VSS.Implementation.Strings.Cursor;
       Code       : VSS.Unicode.Code_Point;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success    : Boolean with Unreferenced;
@@ -475,7 +475,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
         VSS.Implementation.Strings.Constant_Text_Handler_Access;
       Left             : VSS.Implementation.Strings.Cursor;
       Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Right            : VSS.Implementation.Strings.Cursor;
+      Right            : aliased VSS.Implementation.Strings.Cursor;
       Right_Code       : VSS.Unicode.Code_Point'Base;
       Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success          : Boolean;
@@ -623,7 +623,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
       Data       : VSS.Implementation.Strings.String_Data;
       Handler    : VSS.Implementation.Strings.Constant_Text_Handler_Access;
-      Position   : VSS.Implementation.Strings.Cursor :=
+      Position   : aliased VSS.Implementation.Strings.Cursor :=
         Self.First_Position;
       Code       : VSS.Unicode.Code_Point;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
@@ -926,7 +926,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (On.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
    begin

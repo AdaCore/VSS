@@ -88,7 +88,7 @@ package body VSS.Strings.Converters.Encoders is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access
           := VSS.Implementation.Strings.Constant_Handler (Source);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       if not Self.BOM_Written then

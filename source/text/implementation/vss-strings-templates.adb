@@ -39,7 +39,7 @@ package body VSS.Strings.Templates is
       Handler          : constant
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Template.Data);
-      Position         : VSS.Implementation.Strings.Cursor;
+      Position         : aliased VSS.Implementation.Strings.Cursor;
       Code             : VSS.Unicode.Code_Point'Base;
       Parameter        : Positive := 1;
       State            : States   := Initial;

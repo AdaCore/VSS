@@ -151,7 +151,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Handler : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Data);
-      Current_Position    : VSS.Implementation.Strings.Cursor := Position;
+      Current_Position : aliased VSS.Implementation.Strings.Cursor := Position;
       Dummy   : Boolean;
 
    begin
@@ -195,7 +195,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Data);
 
-      Last_Position       : VSS.Implementation.Strings.Cursor;
+      Last_Position       : aliased VSS.Implementation.Strings.Cursor;
       Terminator_Position : VSS.Implementation.Strings.Cursor;
       Dummy               : Boolean;
 
@@ -317,7 +317,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (On.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
    begin
@@ -350,7 +350,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    is
       Data     : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -379,7 +379,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
         renames VSS.Strings.Magic_String_Access (Self.Owner);
       Data     : VSS.Implementation.Strings.String_Data
         renames Owner.Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin

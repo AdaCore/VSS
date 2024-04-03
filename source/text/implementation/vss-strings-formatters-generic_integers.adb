@@ -223,7 +223,7 @@ package body VSS.Strings.Formatters.Generic_Integers is
       Handler  : constant
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Format.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Code     : VSS.Unicode.Code_Point'Base;
       State    : States := Initial;
 

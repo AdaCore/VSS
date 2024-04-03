@@ -113,7 +113,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
-      Position   : VSS.Implementation.Strings.Cursor := Right;
+      Position   : aliased VSS.Implementation.Strings.Cursor := Right;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
 
    begin
@@ -172,7 +172,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
-      Position   : VSS.Implementation.Strings.Cursor := Right;
+      Position   : aliased VSS.Implementation.Strings.Cursor := Right;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
 
    begin
@@ -224,7 +224,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Data    : VSS.Implementation.Strings.String_Data;
       Right   : VSS.Implementation.Strings.Cursor) return Boolean
    is
-      Position   : VSS.Implementation.Strings.Cursor := Right;
+      Position   : aliased VSS.Implementation.Strings.Cursor := Right;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
 
    begin
@@ -313,7 +313,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
           VSS.Implementation.Strings.Constant_Handler (Data);
       Left               : VSS.Implementation.Strings.Cursor;
       Left_Properties    : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Right              : VSS.Implementation.Strings.Cursor;
+      Right              : aliased VSS.Implementation.Strings.Cursor;
       Right_Properties   : VSS.Implementation.UCD_Core.Core_Data_Record;
       Starter            : VSS.Implementation.Strings.Cursor;
       Starter_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
@@ -710,7 +710,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (On.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
    begin

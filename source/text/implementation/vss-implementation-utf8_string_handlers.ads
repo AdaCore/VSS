@@ -93,13 +93,14 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward
      (Self     : UTF8_String_Handler;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean
      with Pre => Self.Pointer /= null;
 
    overriding function Forward_Element
      (Self     : UTF8_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor;
+      Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean;
 
    overriding function Backward
@@ -237,12 +238,13 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward
      (Self     : UTF8_In_Place_String_Handler;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean;
 
    overriding function Forward_Element
      (Self     : UTF8_In_Place_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor;
+      Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean;
 
    overriding function Backward

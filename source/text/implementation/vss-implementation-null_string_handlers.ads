@@ -81,7 +81,8 @@ package VSS.Implementation.Null_String_Handlers is
 
    overriding function Forward
      (Self     : Null_String_Handler;
-      Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean;
 
    overriding function Backward
      (Self     : Null_String_Handler;

@@ -31,7 +31,7 @@ package body VSS.Strings.Conversions is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
       S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
@@ -90,7 +90,7 @@ package body VSS.Strings.Conversions is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
       S_Buffer : String (1 .. 4) with Address => U_Buffer'Address;
@@ -140,7 +140,7 @@ package body VSS.Strings.Conversions is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       if Item.Character_Length /= Into'Length then
@@ -185,7 +185,7 @@ package body VSS.Strings.Conversions is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       Last := From - 1;
@@ -219,7 +219,7 @@ package body VSS.Strings.Conversions is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean;
 
       procedure Set (S : out String);

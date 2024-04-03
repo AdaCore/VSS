@@ -96,7 +96,7 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function Forward
      (Self     : Abstract_String_Handler;
-      Position : in out VSS.Implementation.Strings.Cursor)
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
       return Boolean is abstract;
    --  Move cursor one character forward. Return True on success.
 
@@ -110,7 +110,7 @@ package VSS.Implementation.Text_Handlers is
    not overriding function Forward_Element
      (Self     : Abstract_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor;
+      Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean;
    --  Move cursor one character forward. Return True on success. Sets Element
    --  to the character at new position, or to No_Character.

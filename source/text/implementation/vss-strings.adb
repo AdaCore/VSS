@@ -699,7 +699,7 @@ package body VSS.Strings is
       Handler        : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
-      First_Position : VSS.Implementation.Strings.Cursor;
+      First_Position : aliased VSS.Implementation.Strings.Cursor;
       Last_Position  : VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant
           (Before).all;
@@ -851,7 +851,7 @@ package body VSS.Strings is
       Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Item.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       Buffer.Wide_Wide_Put ("""");
@@ -1133,7 +1133,7 @@ package body VSS.Strings is
       Handler        : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
-      First_Position : VSS.Implementation.Strings.Cursor :=
+      First_Position : aliased VSS.Implementation.Strings.Cursor :=
         VSS.Strings.Cursors.Internals.First_Cursor_Access_Constant (After).all;
       Last_Position  : VSS.Implementation.Strings.Cursor;
       Success        : Boolean with Unreferenced;

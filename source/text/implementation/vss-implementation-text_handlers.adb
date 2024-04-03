@@ -27,7 +27,7 @@ package body VSS.Implementation.Text_Handlers is
       Suffix_Handler : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Suffix);
-      Position       : VSS.Implementation.Strings.Cursor;
+      Position       : aliased VSS.Implementation.Strings.Cursor;
       Code           : VSS.Unicode.Code_Point;
 
    begin
@@ -55,8 +55,8 @@ package body VSS.Implementation.Text_Handlers is
 
       Handler       : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      From_Position : VSS.Implementation.Strings.Cursor;
-      To_Position   : VSS.Implementation.Strings.Cursor;
+      From_Position : aliased VSS.Implementation.Strings.Cursor;
+      To_Position   : aliased VSS.Implementation.Strings.Cursor;
       Success       : Boolean with Unreferenced;
 
    begin
@@ -153,7 +153,7 @@ package body VSS.Implementation.Text_Handlers is
 
       Handler : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : VSS.Implementation.Strings.Cursor;
+      Aux     : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       if Position.UTF16_Offset >= 0 then
@@ -186,7 +186,7 @@ package body VSS.Implementation.Text_Handlers is
 
       Handler : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : VSS.Implementation.Strings.Cursor;
+      Aux     : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       if Position.UTF8_Offset >= 0 then
@@ -212,7 +212,7 @@ package body VSS.Implementation.Text_Handlers is
    not overriding function Forward_Element
      (Self     : Abstract_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : in out VSS.Implementation.Strings.Cursor;
+      Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean is
    begin
       if Abstract_String_Handler'Class (Self).Forward (Position) then
@@ -274,7 +274,7 @@ package body VSS.Implementation.Text_Handlers is
    is
       Handler  : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Code     : VSS.Unicode.Code_Point;
 
    begin
@@ -315,8 +315,8 @@ package body VSS.Implementation.Text_Handlers is
       Item_Handler  : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Item);
-      Item_Position : VSS.Implementation.Strings.Cursor;
-      Position      : VSS.Implementation.Strings.Cursor := From;
+      Item_Position : aliased VSS.Implementation.Strings.Cursor;
+      Position      : aliased VSS.Implementation.Strings.Cursor := From;
       Code          : VSS.Unicode.Code_Point;
       Success       : Boolean with Unreferenced;
       Handler       : VSS.Implementation.Strings.Variable_Text_Handler_Access;
@@ -356,8 +356,8 @@ package body VSS.Implementation.Text_Handlers is
       Right_Data     : VSS.Implementation.Strings.String_Data
         renames Other_Data;
 
-      Left_Position  : VSS.Implementation.Strings.Cursor;
-      Right_Position : VSS.Implementation.Strings.Cursor;
+      Left_Position  : aliased VSS.Implementation.Strings.Cursor;
+      Right_Position : aliased VSS.Implementation.Strings.Cursor;
       Left_Code      : VSS.Unicode.Code_Point;
       Right_Code     : VSS.Unicode.Code_Point;
 
@@ -399,8 +399,8 @@ package body VSS.Implementation.Text_Handlers is
       Right_Data     : VSS.Implementation.Strings.String_Data
         renames Other_Data;
 
-      Left_Position  : VSS.Implementation.Strings.Cursor;
-      Right_Position : VSS.Implementation.Strings.Cursor;
+      Left_Position  : aliased VSS.Implementation.Strings.Cursor;
+      Right_Position : aliased VSS.Implementation.Strings.Cursor;
       Left_Code      : VSS.Unicode.Code_Point;
       Right_Code     : VSS.Unicode.Code_Point;
 
@@ -440,8 +440,8 @@ package body VSS.Implementation.Text_Handlers is
       Right_Data     : VSS.Implementation.Strings.String_Data
         renames Other_Data;
 
-      Left_Position  : VSS.Implementation.Strings.Cursor;
-      Right_Position : VSS.Implementation.Strings.Cursor;
+      Left_Position  : aliased VSS.Implementation.Strings.Cursor;
+      Right_Position : aliased VSS.Implementation.Strings.Cursor;
       Left_Code      : VSS.Unicode.Code_Point;
       Right_Code     : VSS.Unicode.Code_Point;
 
@@ -488,7 +488,7 @@ package body VSS.Implementation.Text_Handlers is
 
       Handler : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : VSS.Implementation.Strings.Cursor;
+      Aux     : aliased VSS.Implementation.Strings.Cursor;
       Dummy   : Boolean;
 
    begin
@@ -524,7 +524,7 @@ package body VSS.Implementation.Text_Handlers is
 
       Handler : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : VSS.Implementation.Strings.Cursor;
+      Aux     : aliased VSS.Implementation.Strings.Cursor;
       Dummy   : Boolean;
 
    begin
@@ -609,9 +609,9 @@ package body VSS.Implementation.Text_Handlers is
 
       Handler  : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Current  : VSS.Implementation.Strings.Cursor;
+      Current  : aliased VSS.Implementation.Strings.Cursor;
       Previous : VSS.Implementation.Strings.Cursor;
-      From     : VSS.Implementation.Strings.Cursor;
+      From     : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
       ------------
@@ -668,8 +668,8 @@ package body VSS.Implementation.Text_Handlers is
         renames Abstract_String_Handler'Class (Self);
       Self_Data      : VSS.Implementation.Strings.String_Data renames Data;
 
-      Self_Position   : VSS.Implementation.Strings.Cursor;
-      Prefix_Position : VSS.Implementation.Strings.Cursor;
+      Self_Position   : aliased VSS.Implementation.Strings.Cursor;
+      Prefix_Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       Self_Handler.Before_First_Character (Self_Data, Self_Position);

@@ -114,7 +114,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Suffix_Length  : VSS.Implementation.Strings.Character_Count;
       Suffix_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
       Offset         : in out VSS.Implementation.Strings.Cursor_Offset)
-     with Pre => Storage'Last > Size + Suffix_Size;
+     with Pre => Storage'Last >= Size + Suffix_Size;
    --  Append one storage to another.
 
    --------------------------

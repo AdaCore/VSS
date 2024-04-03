@@ -1,11 +1,13 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with VSS.String_Vectors;
 with VSS.Strings;
+
+with Test_Support;
 
 procedure Test_String_Split_Lines is
 
@@ -54,51 +56,24 @@ begin
         Source.Split_Lines;
 
    begin
-      if Result.Length /= 9 then
-         raise Program_Error;
-      end if;
-
-      if Result (1) /= VSS.Strings.To_Virtual_String ("a") then
-         raise Program_Error;
-      end if;
-
-      if Result (2) /= VSS.Strings.Empty_Virtual_String then
-         raise Program_Error;
-      end if;
-
-      if Result (3)
-        /= VSS.Strings.To_Virtual_String ("b" & VT & VT & "c" & FF & FF & "d")
-      then
-         raise Program_Error;
-      end if;
-
-      if Result (4) /= VSS.Strings.Empty_Virtual_String then
-         raise Program_Error;
-      end if;
-
-      if Result (5)
-        /= VSS.Strings.To_Virtual_String ("e it is intentionaly long line")
-      then
-         raise Program_Error;
-      end if;
-
-      if Result (6) /= VSS.Strings.Empty_Virtual_String then
-         raise Program_Error;
-      end if;
-
-      if Result (7) /= VSS.Strings.To_Virtual_String ("f") then
-         raise Program_Error;
-      end if;
-
-      if Result (8) /= VSS.Strings.Empty_Virtual_String then
-         raise Program_Error;
-      end if;
-
-      if Result (9)
-        /= VSS.Strings.To_Virtual_String ("g" & LS & LS & "h" & PS & PS & "z")
-      then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (Result.Length = 9);
+      Test_Support.Assert (Result (1) = VSS.Strings.To_Virtual_String ("a"));
+      Test_Support.Assert (Result (2) = VSS.Strings.Empty_Virtual_String);
+      Test_Support.Assert
+        (Result (3)
+           = VSS.Strings.To_Virtual_String
+                ("b" & VT & VT & "c" & FF & FF & "d"));
+      Test_Support.Assert (Result (4) = VSS.Strings.Empty_Virtual_String);
+      Test_Support.Assert
+        (Result (5)
+           = VSS.Strings.To_Virtual_String ("e it is intentionaly long line"));
+      Test_Support.Assert (Result (6) = VSS.Strings.Empty_Virtual_String);
+      Test_Support.Assert (Result (7) = VSS.Strings.To_Virtual_String ("f"));
+      Test_Support.Assert (Result (8) = VSS.Strings.Empty_Virtual_String);
+      Test_Support.Assert
+        (Result (9)
+           = VSS.Strings.To_Virtual_String
+               ("g" & LS & LS & "h" & PS & PS & "z"));
    end;
 
    --  Check split lines with default set of line terminators and with
@@ -111,55 +86,31 @@ begin
         Source.Split_Lines (Keep_Terminator => True);
 
    begin
-      if Result.Length /= 9 then
-         raise Program_Error;
-      end if;
-
-      if Result (1) /= VSS.Strings.To_Virtual_String ("a" & LF) then
-         raise Program_Error;
-      end if;
-
-      if Result (2) /= VSS.Strings.To_Virtual_String ([1 => LF]) then
-         raise Program_Error;
-      end if;
-
-      if Result (3)
-        /= VSS.Strings.To_Virtual_String
-             ("b" & VT & VT & "c" & FF & FF & "d" & CR)
-      then
-         raise Program_Error;
-      end if;
-
-      if Result (4) /= VSS.Strings.To_Virtual_String ([1 => CR]) then
-         raise Program_Error;
-      end if;
-
-      if Result (5) /=
-        VSS.Strings.To_Virtual_String
-          ("e it is intentionaly long line" & CR & LF)
-      then
-         raise Program_Error;
-      end if;
-
-      if Result (6) /= VSS.Strings.To_Virtual_String (CR & LF) then
-         raise Program_Error;
-      end if;
-
-      if Result (7)
-        /= VSS.Strings.To_Virtual_String ("f" & NEL)
-      then
-         raise Program_Error;
-      end if;
-
-      if Result (8) /= VSS.Strings.To_Virtual_String ([1 => NEL]) then
-         raise Program_Error;
-      end if;
-
-      if Result (9)
-        /= VSS.Strings.To_Virtual_String ("g" & LS & LS & "h" & PS & PS & "z")
-      then
-         raise Program_Error;
-      end if;
+      Test_Support.Assert (Result.Length = 9);
+      Test_Support.Assert
+        (Result (1) = VSS.Strings.To_Virtual_String ("a" & LF));
+      Test_Support.Assert
+        (Result (2) = VSS.Strings.To_Virtual_String ([1 => LF]));
+      Test_Support.Assert
+        (Result (3)
+           = VSS.Strings.To_Virtual_String
+               ("b" & VT & VT & "c" & FF & FF & "d" & CR));
+      Test_Support.Assert
+        (Result (4) = VSS.Strings.To_Virtual_String ([1 => CR]));
+      Test_Support.Assert
+        (Result (5)
+           = VSS.Strings.To_Virtual_String
+               ("e it is intentionaly long line" & CR & LF));
+      Test_Support.Assert
+        (Result (6) = VSS.Strings.To_Virtual_String (CR & LF));
+      Test_Support.Assert
+        (Result (7) = VSS.Strings.To_Virtual_String ("f" & NEL));
+      Test_Support.Assert
+        (Result (8) = VSS.Strings.To_Virtual_String ([1 => NEL]));
+      Test_Support.Assert
+        (Result (9)
+           = VSS.Strings.To_Virtual_String
+               ("g" & LS & LS & "h" & PS & PS & "z"));
    end;
 
    --  Check split lines with full set of line terminators and with strip out

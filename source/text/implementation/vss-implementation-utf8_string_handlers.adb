@@ -515,15 +515,19 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Size     : VSS.Unicode.UTF8_Code_Unit_Count)
    is
       Pointer : constant UTF8_String_Data_Access := Allocate (Capacity, Size);
-      Overlay : UTF8_String_Handler
-        with Import, Convention => Ada, Address => Text'Address;
 
    begin
       Pointer.Storage (0 .. Text.Size) := Text.Storage (0 .. Text.Size);
       Pointer.Length                   := Text.Length;
       Pointer.Size                     := Text.Size;
 
-      Overlay := (Pointer => Pointer);
+      declare
+         Overlay : UTF8_String_Handler := (others => <>)
+           with Address => Text'Address;
+
+      begin
+         Overlay := (Pointer => Pointer);
+      end;
    end Convert_To_Dynamic;
 
    ------------

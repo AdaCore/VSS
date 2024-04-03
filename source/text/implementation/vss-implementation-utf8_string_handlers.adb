@@ -1203,7 +1203,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Slice
      (Self        : UTF8_String_Handler;
-      Source_Data : VSS.Implementation.Strings.String_Data;
       From        : VSS.Implementation.Strings.Cursor;
       To          : VSS.Implementation.Strings.Cursor;
       Target_Data : out VSS.Implementation.Strings.String_Data)
@@ -1262,7 +1261,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Slice
      (Self        : UTF8_In_Place_String_Handler;
-      Source_Data : VSS.Implementation.Strings.String_Data;
       From        : VSS.Implementation.Strings.Cursor;
       To          : VSS.Implementation.Strings.Cursor;
       Target_Data : out VSS.Implementation.Strings.String_Data)

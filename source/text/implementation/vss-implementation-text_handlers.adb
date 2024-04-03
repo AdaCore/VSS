@@ -535,43 +535,30 @@ package body VSS.Implementation.Text_Handlers is
 
    not overriding procedure Slice
      (Self   : Abstract_String_Handler;
-      Source : VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       To     : VSS.Implementation.Strings.Cursor;
       Target : out VSS.Implementation.Strings.String_Data)
    is
-      Handler        : Abstract_String_Handler'Class
+      Source_Text : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Current        : VSS.Implementation.Strings.Cursor;
-      Offset         : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Target_Handler :
-        VSS.Implementation.Strings.Variable_Text_Handler_Access;
+      Current     : aliased VSS.Implementation.Strings.Cursor;
+      Offset      : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Result_Text : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
-         raise Program_Error;
-         --  XXX VADIM
-      --  if From.Index <= To.Index then
-      --     VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-      --       (Target);
-      --     Current := From;
-      --
-      --     Target_Handler :=
-      --       VSS.Implementation.Strings.Variable_Handler (Target);
-      --     Target_Handler.Append
-      --       (Target, Handler.Element (Source, Current), Offset);
-      --
-      --     while Handler.Forward (Source, Current)
-      --       and then Current.Index <= To.Index
-      --     loop
-      --        Target_Handler :=
-      --          VSS.Implementation.Strings.Variable_Handler (Target);
-      --        Target_Handler.Append
-      --          (Target, Handler.Element (Source, Current), Offset);
-      --     end loop;
-      --
-      --  else
-      --     Target := VSS.Implementation.Strings.Null_String_Data;
-      --  end if;
+      if From.Index <= To.Index then
+         Current := From;
+
+         Result_Text.Append (Source_Text.Element (Current), Offset);
+
+         while Source_Text.Forward (Current)
+           and then Current.Index <= To.Index
+         loop
+            Result_Text.Append (Source_Text.Element (Current), Offset);
+         end loop;
+      end if;
    end Slice;
 
    -----------
@@ -606,7 +593,7 @@ package body VSS.Implementation.Text_Handlers is
 
       begin
          if Current.Index /= From.Index then
-            Handler.Slice (Data, From, Previous, Item);
+            Handler.Slice (From, Previous, Item);
             VSS.Implementation.String_Vectors.Append (Items, Item);
             VSS.Implementation.Strings.Unreference (Item);
 

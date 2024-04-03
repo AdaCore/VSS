@@ -256,7 +256,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Slice
      (Self   : Abstract_String_Handler;
-      Source : VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       To     : VSS.Implementation.Strings.Cursor;
       Target : out VSS.Implementation.Strings.String_Data);

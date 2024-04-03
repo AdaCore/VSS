@@ -703,8 +703,7 @@ package body VSS.Strings is
             if Handler.Backward (Last_Position) then
                Handler.Before_First_Character (First_Position);
                Success := Handler.Forward (First_Position);
-               Handler.Slice
-                 (Self.Data, First_Position, Last_Position, Result.Data);
+               Handler.Slice (First_Position, Last_Position, Result.Data);
             end if;
          end if;
       end return;
@@ -983,10 +982,7 @@ package body VSS.Strings is
            and then VSS.Strings.Cursors.Internals.Is_Owner (To, Self)
          then
             VSS.Implementation.Strings.Constant_Handler (Self.Data).Slice
-              (Self.Data,
-               First_Position.all,
-               Last_Position.all,
-               Result.Data);
+              (First_Position.all, Last_Position.all, Result.Data);
          end if;
       end return;
    end Slice;
@@ -1011,8 +1007,7 @@ package body VSS.Strings is
       return Result : Virtual_String do
          if VSS.Strings.Cursors.Internals.Is_Owner (Segment, Self) then
             VSS.Implementation.Strings.Constant_Handler (Self.Data).Slice
-              (Self.Data,
-               First_Position.all,
+              (First_Position.all,
                Last_Position.all,
                Result.Data);
          end if;
@@ -1130,8 +1125,7 @@ package body VSS.Strings is
             if Handler.Forward (First_Position) then
                Handler.After_Last_Character (Self.Data, Last_Position);
                Success := Handler.Backward (Last_Position);
-               Handler.Slice
-                 (Self.Data, First_Position, Last_Position, Result.Data);
+               Handler.Slice (First_Position, Last_Position, Result.Data);
             end if;
          end if;
       end return;
@@ -1159,11 +1153,7 @@ package body VSS.Strings is
          if VSS.Strings.Cursors.Internals.Is_Owner (From, Self) then
             Handler.After_Last_Character (Self.Data, Last_Position);
             Success := Handler.Backward (Last_Position);
-            Handler.Slice
-              (Self.Data,
-               From_Position.all,
-               Last_Position,
-               Result.Data);
+            Handler.Slice (From_Position.all, Last_Position, Result.Data);
          end if;
       end return;
    end Tail_From;

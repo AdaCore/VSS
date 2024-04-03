@@ -64,8 +64,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       else
          VSS.Implementation.Strings.Constant_Handler
            (VSS.Strings.Magic_String_Access (Self.Owner).Data).Slice
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              First,
+             (First,
               Last,
               Terminator);
 

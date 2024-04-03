@@ -77,10 +77,7 @@ package body VSS.Strings.Cursors is
       return Result : VSS.Strings.Virtual_String do
          if Self.Owner /= null then
             VSS.Implementation.Strings.Constant_Handler (Owner.Data).Slice
-              (Owner.Data,
-               Self.First_Position,
-               Self.Last_Position,
-               Result.Data);
+              (Self.First_Position, Self.Last_Position, Result.Data);
          end if;
       end return;
    end Element;
@@ -99,10 +96,7 @@ package body VSS.Strings.Cursors is
       return Result : VSS.Strings.Virtual_String do
          if Self.Owner /= null then
             VSS.Implementation.Strings.Constant_Handler (Owner.Data).Slice
-              (Owner.Data,
-               Self.First_Position,
-               Self.Last_Position,
-               Result.Data);
+              (Self.First_Position, Self.Last_Position, Result.Data);
          end if;
       end return;
    end Element;

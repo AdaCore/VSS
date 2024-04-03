@@ -310,13 +310,13 @@ package body VSS.JSON.Push_Writers is
             Handler  : constant not null
               VSS.Implementation.Strings.Constant_Text_Handler_Access :=
                 VSS.Implementation.Strings.Constant_Handler (Data);
-            Position : VSS.Implementation.Strings.Cursor;
+            Position : aliased VSS.Implementation.Strings.Cursor;
             Code     : VSS.Unicode.Code_Point;
 
          begin
-            Handler.Before_First_Character (Data, Position);
+            Handler.Before_First_Character (Position);
 
-            while Handler.Forward (Data, Position) loop
+            while Handler.Forward (Position) loop
                Code := Handler.Element (Data, Position);
 
                case Code is

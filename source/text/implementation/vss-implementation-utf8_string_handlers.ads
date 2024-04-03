@@ -317,7 +317,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  generic UTF8 fastpath string API, and some moved to the body after
    --  that.
 
-   procedure Convert_To_Dynamic
+   procedure Unsafe_Convert_To_Dynamic
      (Text     : in out UTF8_In_Place_String_Handler;
       Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
       Size     : VSS.Unicode.UTF8_Code_Unit_Count);

@@ -324,7 +324,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
       else
          --  Data can't be stored in the static storage and need to be
          --  converted into dynamic storage.
-         Convert_To_Dynamic
+         Unsafe_Convert_To_Dynamic
            (Self,
             VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
             Self.Size + L);
@@ -394,7 +394,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                --  current text into dynamic storage, and call handler of
                --  the dynamic storage to append text.
 
-               Convert_To_Dynamic
+               Unsafe_Convert_To_Dynamic
                  (Self,
                   VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
                   Self.Size + Suffix_Dynamic.Pointer.Size);
@@ -428,7 +428,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                --  Data can't be stored in static text storage and need to be
                --  converted into a dynamic text storage.
 
-               Convert_To_Dynamic
+               Unsafe_Convert_To_Dynamic
                  (Self,
                   VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
                   Self.Size + Suffix_Static.Size);
@@ -504,31 +504,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
    end Before_First_Character;
-
-   ------------------------
-   -- Convert_To_Dynamic --
-   ------------------------
-
-   procedure Convert_To_Dynamic
-     (Text     : in out UTF8_In_Place_String_Handler;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
-   is
-      Pointer : constant UTF8_String_Data_Access := Allocate (Capacity, Size);
-
-   begin
-      Pointer.Storage (0 .. Text.Size) := Text.Storage (0 .. Text.Size);
-      Pointer.Length                   := Text.Length;
-      Pointer.Size                     := Text.Size;
-
-      declare
-         Overlay : UTF8_String_Handler := (others => <>)
-           with Address => Text'Address;
-
-      begin
-         Overlay := (Pointer => Pointer);
-      end;
-   end Convert_To_Dynamic;
 
    ------------
    -- Delete --
@@ -1055,7 +1030,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
          --  Data can't be stored "in place" and need to be converted into
          --  shared data.
 
-         Convert_To_Dynamic
+         Unsafe_Convert_To_Dynamic
            (Self,
             VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
             Self.Size + L);
@@ -1590,7 +1565,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
                return;
 
             else
-               Convert_To_Dynamic (Target, 0, Target.Size + Size);
+               Unsafe_Convert_To_Dynamic (Target, 0, Target.Size + Size);
             end if;
          end;
       end if;
@@ -1761,6 +1736,31 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       Unreference (Self.Pointer);
    end Unreference;
+
+   -------------------------------
+   -- Unsafe_Convert_To_Dynamic --
+   -------------------------------
+
+   procedure Unsafe_Convert_To_Dynamic
+     (Text     : in out UTF8_In_Place_String_Handler;
+      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
+      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+   is
+      Pointer : constant UTF8_String_Data_Access := Allocate (Capacity, Size);
+
+   begin
+      Pointer.Storage (0 .. Text.Size) := Text.Storage (0 .. Text.Size);
+      Pointer.Length                   := Text.Length;
+      Pointer.Size                     := Text.Size;
+
+      declare
+         Overlay : UTF8_String_Handler := (others => <>)
+           with Address => Text'Address;
+
+      begin
+         Overlay := (Pointer => Pointer);
+      end;
+   end Unsafe_Convert_To_Dynamic;
 
    -----------------------
    -- Unsafe_Initialize --

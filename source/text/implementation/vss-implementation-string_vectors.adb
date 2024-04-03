@@ -203,15 +203,7 @@ package body VSS.Implementation.String_Vectors is
      (Self           : String_Vector_Data_Access;
       Result         : in out VSS.Implementation.Strings.String_Data;
       Terminator     : VSS.Strings.Line_Terminator;
-      Terminate_Last : Boolean)
-   is
-      use type VSS.Strings.Line_Terminator;
-
-      Offset : VSS.Implementation.Strings.Cursor_Offset;
-      Text   : constant not null
-        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-          VSS.Implementation.Strings.Variable_Handler (Result);
-
+      Terminate_Last : Boolean) is
    begin
       VSS.Implementation.Strings.Unreference (Result);
 
@@ -219,20 +211,28 @@ package body VSS.Implementation.String_Vectors is
          return;
       end if;
 
-      Result := VSS.Implementation.Strings.Null_String_Data;
+      declare
+         use type VSS.Strings.Line_Terminator;
 
-      for J in 1 .. Self.Last loop
-         Text.Append (Result, Self.Data (J), Offset);
+         Offset : VSS.Implementation.Strings.Cursor_Offset;
+         Text   : constant not null
+           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+             VSS.Implementation.Strings.Variable_Handler (Result);
 
-         if J /= Self.Last or Terminate_Last then
-            Text.Append (Line_Terminator_To_Code_Point (Terminator), Offset);
+      begin
+         for J in 1 .. Self.Last loop
+            Text.Append (Result, Self.Data (J), Offset);
 
-            if Terminator = VSS.Strings.CRLF then
-               Text.Append
-                 (VSS.Implementation.Character_Codes.Line_Feed, Offset);
+            if J /= Self.Last or Terminate_Last then
+               Text.Append (Line_Terminator_To_Code_Point (Terminator), Offset);
+
+               if Terminator = VSS.Strings.CRLF then
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Line_Feed, Offset);
+               end if;
             end if;
-         end if;
-      end loop;
+         end loop;
+      end;
    end Join_Lines;
 
    ------------

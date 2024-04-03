@@ -1688,11 +1688,11 @@ package body VSS.Implementation.UTF8_String_Handlers is
       --  are impossible, or modify something to make them impossible.
 
    begin
-      Position.Index := Position.Index + 1;
+      Position.Index := @ + 1;
 
       if Position.Index = 1 then
-         Position.UTF8_Offset  := Position.UTF8_Offset + 1;
-         Position.UTF16_Offset := Position.UTF16_Offset + 1;
+         Position.UTF8_Offset  := 0;
+         Position.UTF16_Offset := 0;
 
          return;
       end if;
@@ -1714,16 +1714,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       begin
          if Code <= 16#7F# then
-            Position.UTF8_Offset  := Position.UTF8_Offset + 1;
-            Position.UTF16_Offset := Position.UTF16_Offset + 1;
+            Position.UTF8_Offset  := @ + 1;
+            Position.UTF16_Offset := @ + 1;
 
          else
             Position.UTF8_Offset  :=
-              Position.UTF8_Offset
-                + VSS.Unicode.UTF8_Code_Unit_Offset (Length);
+              @ + VSS.Unicode.UTF8_Code_Unit_Offset (Length);
             Position.UTF16_Offset :=
-              Position.UTF16_Offset
-                + VSS.Unicode.UTF16_Code_Unit_Offset (Length / 4 + 1);
+              @ + VSS.Unicode.UTF16_Code_Unit_Offset (Length / 4 + 1);
          end if;
       end;
    end Unchecked_Forward;

@@ -346,7 +346,7 @@ package body VSS.Strings.Conversions is
    function To_Virtual_String
      (Item : Ada.Strings.Unbounded.Unbounded_String) return Virtual_String
    is
-      --  Success : Boolean;
+      Success : Boolean;
       Data    : Ada.Strings.Unbounded.Aux.Big_String_Access;
       Last    : Natural;
 
@@ -356,30 +356,18 @@ package body VSS.Strings.Conversions is
 
          Ada.Strings.Unbounded.Aux.Get_String (Item, Data, Last);
 
-         raise Program_Error;
-         --  XXX VADIM
-         --  if Last /= 0 then
-         --     --  First, attempt to place data in the storage inside the object
-         --     --  of Virtual_String type.
-         --
-         --     VSS.Implementation.String_Configuration.In_Place_Handler
-         --       .From_UTF_8_String
-         --         (Data (1 .. Last), Result.Data, Success);
-         --
-         --     if not Success then
-         --        --  Operation may fail for two reasons: source data is not
-         --        --  well-formed UTF-8 or there is not enough memory to store
-         --        --  string in in-place storage.
-         --
-         --        VSS.Implementation.String_Configuration.Default_Handler
-         --          .From_UTF_8_String
-         --            (Data (1 .. Last), Result.Data, Success);
-         --     end if;
-         --
-         --     if not Success then
-         --        raise Constraint_Error with "Ill-formed UTF-8 data";
-         --     end if;
-         --  end if;
+         declare
+            Text : constant not null
+              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+                VSS.Implementation.Strings.Variable_Handler (Result.Data);
+
+         begin
+            Text.From_UTF_8_String (Data (1 .. Last), Success);
+
+            if not Success then
+               raise Constraint_Error with "Ill-formed UTF-8 data";
+            end if;
+         end;
       end return;
    end To_Virtual_String;
 

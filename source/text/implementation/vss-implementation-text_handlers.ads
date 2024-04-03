@@ -83,9 +83,8 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Before_First_Character
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is abstract;
-   --  Initialize iterator to point to first character.
+
    not overriding procedure After_Last_Character
      (Self     : Abstract_String_Handler;
       Data     : VSS.Implementation.Strings.String_Data;

@@ -64,7 +64,7 @@ package body VSS.Strings.Templates is
       end Append_Parameter;
 
    begin
-      Handler.Before_First_Character (Self.Template.Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward_Element (Self.Template.Data, Position, Code) loop
          case State is

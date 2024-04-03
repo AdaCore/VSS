@@ -97,7 +97,7 @@ package body VSS.Strings.Converters.Encoders is
            (Zero_Width_No_Break_Space_Character, Target);
       end if;
 
-      Handler.Before_First_Character (Source, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position)
         and not Abstract_Encoder'Class (Self).Has_Error

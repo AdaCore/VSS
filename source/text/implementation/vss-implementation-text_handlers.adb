@@ -31,7 +31,7 @@ package body VSS.Implementation.Text_Handlers is
       Code           : VSS.Unicode.Code_Point;
 
    begin
-      Suffix_Handler.Before_First_Character (Suffix, Position);
+      Suffix_Handler.Before_First_Character (Position);
 
       while Suffix_Handler.Forward (Position) loop
          Code := Suffix_Handler.Element (Suffix, Position);
@@ -67,7 +67,7 @@ package body VSS.Implementation.Text_Handlers is
          if From.UTF8_Offset < 0 or From.UTF16_Offset < 0 then
             --  Some of UTF* offset of From must be resolved first.
 
-            Handler.Before_First_Character (Data, From_Position);
+            Handler.Before_First_Character (From_Position);
 
             while From_Position.Index /= From.Index
               and then Handler.Forward (From_Position)
@@ -160,7 +160,7 @@ package body VSS.Implementation.Text_Handlers is
          return Position.UTF16_Offset;
 
       else
-         Handler.Before_First_Character (Data, Aux);
+         Handler.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
            and then Handler.Forward (Aux)
@@ -193,7 +193,7 @@ package body VSS.Implementation.Text_Handlers is
          return Position.UTF8_Offset;
 
       else
-         Handler.Before_First_Character (Data, Aux);
+         Handler.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
            and then Handler.Forward (Aux)
@@ -278,7 +278,7 @@ package body VSS.Implementation.Text_Handlers is
       Code     : VSS.Unicode.Code_Point;
 
    begin
-      Handler.Before_First_Character (Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
          Code := Handler.Element (Data, Position);
@@ -326,7 +326,7 @@ package body VSS.Implementation.Text_Handlers is
          return;
       end if;
 
-      Item_Handler.Before_First_Character (Item, Item_Position);
+      Item_Handler.Before_First_Character (Item_Position);
 
       while Item_Handler.Forward (Item_Position) loop
          Code := Item_Handler.Element (Item, Item_Position);
@@ -362,8 +362,8 @@ package body VSS.Implementation.Text_Handlers is
       Right_Code     : VSS.Unicode.Code_Point;
 
    begin
-      Left_Handler.Before_First_Character (Left_Data, Left_Position);
-      Right_Handler.Before_First_Character (Right_Data, Right_Position);
+      Left_Handler.Before_First_Character (Left_Position);
+      Right_Handler.Before_First_Character (Right_Position);
 
       while
         Left_Handler.Forward (Left_Position)
@@ -405,8 +405,8 @@ package body VSS.Implementation.Text_Handlers is
       Right_Code     : VSS.Unicode.Code_Point;
 
    begin
-      Left_Handler.Before_First_Character (Left_Data, Left_Position);
-      Right_Handler.Before_First_Character (Right_Data, Right_Position);
+      Left_Handler.Before_First_Character (Left_Position);
+      Right_Handler.Before_First_Character (Right_Position);
 
       while
         Left_Handler.Forward (Left_Position)
@@ -446,8 +446,8 @@ package body VSS.Implementation.Text_Handlers is
       Right_Code     : VSS.Unicode.Code_Point;
 
    begin
-      Left_Handler.Before_First_Character (Left_Data, Left_Position);
-      Right_Handler.Before_First_Character (Right_Data, Right_Position);
+      Left_Handler.Before_First_Character (Left_Position);
+      Right_Handler.Before_First_Character (Right_Position);
 
       while
         Left_Handler.Forward (Left_Position)
@@ -496,7 +496,7 @@ package body VSS.Implementation.Text_Handlers is
          Aux := Position;
 
       else
-         Handler.Before_First_Character (Data, Aux);
+         Handler.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
            and then Handler.Forward (Aux)
@@ -532,7 +532,7 @@ package body VSS.Implementation.Text_Handlers is
          Aux := Position;
 
       else
-         Handler.Before_First_Character (Data, Aux);
+         Handler.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
            and then Handler.Forward (Aux)
@@ -634,10 +634,10 @@ package body VSS.Implementation.Text_Handlers is
       end Append;
 
    begin
-      Handler.Before_First_Character (Data, From);
+      Handler.Before_First_Character (From);
       Success := Handler.Forward (From);
 
-      Handler.Before_First_Character (Data, Current);
+      Handler.Before_First_Character (Current);
       Previous := Current;
 
       while Handler.Forward (Current) loop
@@ -672,8 +672,8 @@ package body VSS.Implementation.Text_Handlers is
       Prefix_Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
-      Self_Handler.Before_First_Character (Self_Data, Self_Position);
-      Prefix_Handler.Before_First_Character (Prefix_Data, Prefix_Position);
+      Self_Handler.Before_First_Character (Self_Position);
+      Prefix_Handler.Before_First_Character (Prefix_Position);
 
       while
         Self_Handler.Forward (Self_Position)

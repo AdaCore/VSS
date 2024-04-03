@@ -184,7 +184,7 @@ package body VSS.Characters is
          Data);
 
       VSS.Implementation.Strings.Constant_Handler
-        (Data).Before_First_Character (Data, Position);
+        (Data).Before_First_Character (Position);
       Success :=
         VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
 
@@ -212,7 +212,7 @@ package body VSS.Characters is
          Data);
 
       VSS.Implementation.Strings.Constant_Handler
-        (Data).Before_First_Character (Data, Position);
+        (Data).Before_First_Character (Position);
       Success :=
         VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
 
@@ -240,7 +240,7 @@ package body VSS.Characters is
          Data);
 
       VSS.Implementation.Strings.Constant_Handler
-        (Data).Before_First_Character (Data, Position);
+        (Data).Before_First_Character (Position);
       Success :=
         VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
 

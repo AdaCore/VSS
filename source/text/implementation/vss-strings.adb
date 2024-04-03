@@ -709,7 +709,7 @@ package body VSS.Strings is
       return Result : Virtual_String do
          if VSS.Strings.Cursors.Internals.Is_Owner (Before, Self) then
             if Handler.Backward (Self.Data, Last_Position) then
-               Handler.Before_First_Character (Self.Data, First_Position);
+               Handler.Before_First_Character (First_Position);
                Success := Handler.Forward (First_Position);
                Handler.Slice
                  (Self.Data, First_Position, Last_Position, Result.Data);
@@ -856,7 +856,7 @@ package body VSS.Strings is
    begin
       Buffer.Wide_Wide_Put ("""");
 
-      Handler.Before_First_Character (Item.Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
          Aux (1) :=

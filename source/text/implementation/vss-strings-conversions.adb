@@ -45,7 +45,7 @@ package body VSS.Strings.Conversions is
          raise Constraint_Error;
       end if;
 
-      Handler.Before_First_Character (Item.Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
@@ -111,7 +111,7 @@ package body VSS.Strings.Conversions is
          raise Constraint_Error;
       end if;
 
-      Handler.Before_First_Character (Item.Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
@@ -151,7 +151,7 @@ package body VSS.Strings.Conversions is
          return;
       end if;
 
-      Handler.Before_First_Character (Item.Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
          Into (Into'First + Integer (Position.Index) - 1) :=
@@ -198,7 +198,7 @@ package body VSS.Strings.Conversions is
          raise Constraint_Error;
       end if;
 
-      Handler.Before_First_Character (Item.Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward (Position) loop
          Last := Last + 1;
@@ -236,7 +236,7 @@ package body VSS.Strings.Conversions is
          Last     : Natural := 0;
 
       begin
-         Handler.Before_First_Character (Item.Data, Position);
+         Handler.Before_First_Character (Position);
 
          while Handler.Forward (Position) loop
             VSS.Implementation.UTF8_Encoding.Encode

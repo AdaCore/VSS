@@ -323,7 +323,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    begin
       Self.Reconnect (On'Unrestricted_Access);
 
-      Handler.Before_First_Character (On.Data, Position);
+      Handler.Before_First_Character (Position);
       Dummy := Handler.Forward (Position);
       Self.Lookup_Line_Boundaries (Position, Terminators, Keep_Terminator);
    end Set_At_First;

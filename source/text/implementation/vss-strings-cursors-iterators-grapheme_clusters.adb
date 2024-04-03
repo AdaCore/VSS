@@ -854,8 +854,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       elsif Position.Index = 1 then
          --  First character of the string, it starts first grapheme cluster.
 
-         Handler.Before_First_Character (Data, Self.First_Position);
-         Handler.Before_First_Character (Data, Self.Last_Position);
+         Handler.Before_First_Character (Self.First_Position);
+         Handler.Before_First_Character (Self.Last_Position);
          Success := Self.Forward;
 
       elsif Position.Index = Handler.Length (Data) then
@@ -932,7 +932,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    begin
       Self.Reconnect (On'Unrestricted_Access);
 
-      Handler.Before_First_Character (On.Data, Position);
+      Handler.Before_First_Character (Position);
       Dummy := Handler.Forward (Position);
       Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Set_At_First;
@@ -975,7 +975,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    begin
       Self.Reconnect (On'Unrestricted_Access);
 
-      Handler.Before_First_Character (On.Data, Position);
+      Handler.Before_First_Character (Position);
       Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Set_Before_First;
 

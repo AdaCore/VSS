@@ -489,7 +489,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Before_First_Character
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
       Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
@@ -501,7 +500,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Before_First_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
       Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
@@ -1477,7 +1475,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    begin
       VSS.Implementation.String_Vectors.Unreference (Lines);
 
-      Handler.Before_First_Character (Data, Initial);
+      Handler.Before_First_Character (Initial);
 
       while VSS.Implementation.Line_Iterators.Forward
         (Data,

@@ -81,7 +81,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Before_First_Character
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor);
    --  Initialize iterator to point to first character.
 
@@ -226,7 +225,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Before_First_Character
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor);
    --  Initialize iterator to point to first character.
 

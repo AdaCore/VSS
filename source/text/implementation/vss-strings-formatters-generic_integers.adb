@@ -228,7 +228,7 @@ package body VSS.Strings.Formatters.Generic_Integers is
       State    : States := Initial;
 
    begin
-      Handler.Before_First_Character (Format.Data, Position);
+      Handler.Before_First_Character (Position);
 
       while Handler.Forward_Element (Format.Data, Position, Code) loop
          case State is

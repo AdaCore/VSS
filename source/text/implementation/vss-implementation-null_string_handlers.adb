@@ -88,7 +88,6 @@ package body VSS.Implementation.Null_String_Handlers is
 
    overriding procedure Before_First_Character
      (Self     : Null_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor)
    is
    begin

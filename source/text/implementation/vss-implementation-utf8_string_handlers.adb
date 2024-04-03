@@ -1399,10 +1399,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
             --  Static storage can be used.
 
             declare
-               Static : UTF8_In_Place_String_Handler
-                 with Import,
-                      Convention => Ada,
-                      Address    => Data.Storage'Address;
+               Static : UTF8_In_Place_String_Handler := (others => <>)
+                 with Address => Data.Storage'Address;
 
             begin
                Static.Storage (0 .. Size - 1) :=
@@ -1416,10 +1414,8 @@ package body VSS.Implementation.UTF8_String_Handlers is
          else
             declare
                Pointer : UTF8_String_Data_Access;
-               Dynamic : UTF8_String_Handler
-                 with Import,
-                      Convention => Ada,
-                      Address    => Data.Storage'Address;
+               Dynamic : UTF8_String_Handler := (others => <>)
+                 with Address => Data.Storage'Address;
 
             begin
                Pointer := Allocate (0, Size);

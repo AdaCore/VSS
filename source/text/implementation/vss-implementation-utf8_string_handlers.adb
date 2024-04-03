@@ -883,9 +883,12 @@ package body VSS.Implementation.UTF8_String_Handlers is
             VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
             if Self.Storage'Last < Self.Size + L then
-               Success := False;
+               Unsafe_Initialize (Self, 0, Self.Size + L);
 
-               exit;
+               VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+                 (Self).From_Wide_Wide_String (Item, Success);
+
+               return;
             end if;
 
             VSS.Implementation.UTF8_Encoding.Unchecked_Store

@@ -391,7 +391,7 @@ package body VSS.Strings.Conversions is
      (Item : Ada.Strings.Wide_Wide_Unbounded.Unbounded_Wide_Wide_String)
       return Virtual_String
    is
-      --  Success : Boolean;
+      Success : Boolean;
       Data    :
         Ada.Strings.Wide_Wide_Unbounded.Aux.Big_Wide_Wide_String_Access;
       Last    : Natural;
@@ -403,32 +403,19 @@ package body VSS.Strings.Conversions is
          Ada.Strings.Wide_Wide_Unbounded.Aux.Get_Wide_Wide_String
            (Item, Data, Last);
 
-         raise Program_Error;
-         --  XXX VADIM
-         --  if Last /= 0 then
-         --     --  First, attempt to place data in the storage inside the object
-         --     --  of Virtual_String type.
-         --
-         --     VSS.Implementation.String_Configuration.In_Place_Handler
-         --       .From_Wide_Wide_String
-         --         (Data (1 .. Last), Result.Data, Success);
-         --
-         --     if not Success then
-         --        --  Operation may fail for two reasons: source data is not
-         --        --  well-formed UTF-8 or there is not enough memory to store
-         --        --  string in in-place storage.
-         --
-         --        VSS.Implementation.String_Configuration.Default_Handler
-         --          .From_Wide_Wide_String
-         --            (Data (1 .. Last), Result.Data, Success);
-         --     end if;
-         --
-         --     if not Success then
-         --        raise Constraint_Error with "Invalid UCS-4 data";
-         --     end if;
-         --  end if;
-      end return;
+         declare
+            Text : constant not null
+              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+                VSS.Implementation.Strings.Variable_Handler (Result.Data);
 
+         begin
+            Text.From_Wide_Wide_String (Data (1 .. Last), Success);
+
+            if not Success then
+               raise Constraint_Error with "Ill-formed UTF-32 data";
+            end if;
+         end;
+      end return;
    end To_Virtual_String;
 
    -------------------------

@@ -190,7 +190,7 @@ package body VSS.Implementation.Strings is
               Variable_Handler (Data);
 
          begin
-            Text.Reference (Data);
+            Text.Reference;
          end;
       end if;
    end Reference;
@@ -202,14 +202,8 @@ package body VSS.Implementation.Strings is
    procedure Unreference (Data : in out String_Data) is
    begin
       if Is_Initialized (Data) then
-         declare
-            Text : constant Variable_Text_Handler_Access :=
-              Variable_Handler (Data);
-
-         begin
-            Text.Unreference (Data);
-            Data := Null_String_Data;
-         end;
+         Variable_Handler (Data).Unreference;
+         Data := Null_String_Data;
       end if;
    end Unreference;
 

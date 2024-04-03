@@ -1203,13 +1203,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
    -- Reference --
    ---------------
 
-   overriding procedure Reference
-     (Self : in out UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is
+   overriding procedure Reference (Self : in out UTF8_String_Handler) is
    begin
-      --  if Self.Pointer /= null then
       System.Atomic_Counters.Increment (Self.Pointer.Counter);
-      --  end if;
    end Reference;
 
    -----------
@@ -1718,9 +1714,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    -- Unreference --
    -----------------
 
-   overriding procedure Unreference
-     (Self : in out UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is
+   overriding procedure Unreference (Self : in out UTF8_String_Handler) is
    begin
       Unreference (Self.Pointer);
    end Unreference;

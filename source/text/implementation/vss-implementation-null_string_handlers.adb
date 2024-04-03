@@ -54,16 +54,12 @@ package body VSS.Implementation.Null_String_Handlers is
      (Self   : in out Null_String_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
-      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
-   is
-      Handler : VSS.Implementation.Strings.Variable_Text_Handler_Access;
-
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
    begin
       --  Append to a null string, just copy data.
 
       Data := Suffix;
-      Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-      Handler.Reference (Data);
+      VSS.Implementation.Strings.Variable_Handler (Data).Reference;
    end Append;
 
    --------------
@@ -247,9 +243,7 @@ package body VSS.Implementation.Null_String_Handlers is
    -- Reference --
    ---------------
 
-   overriding procedure Reference
-     (Self : in out Null_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is null;
+   overriding procedure Reference (Self : in out Null_String_Handler) is null;
 
    -----------------
    -- Split_Lines --
@@ -295,7 +289,6 @@ package body VSS.Implementation.Null_String_Handlers is
    -----------------
 
    overriding procedure Unreference
-     (Self : in out Null_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is null;
+     (Self : in out Null_String_Handler) is null;
 
 end VSS.Implementation.Null_String_Handlers;

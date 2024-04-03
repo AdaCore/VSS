@@ -32,14 +32,12 @@ package VSS.Implementation.Text_Handlers is
    type Abstract_String_Handler is abstract tagged null record;
 
    not overriding procedure Reference
-     (Self : in out Abstract_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is abstract;
+     (Self : in out Abstract_String_Handler) is abstract;
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    not overriding procedure Unreference
-     (Self : in out Abstract_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is abstract;
+     (Self : in out Abstract_String_Handler) is abstract;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 

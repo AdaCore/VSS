@@ -28,17 +28,9 @@ package VSS.Implementation.Null_String_Handlers is
      new VSS.Implementation.Text_Handlers.Abstract_String_Handler
        with null record with Object_Size => 192;
 
-   overriding procedure Reference
-     (Self : in out Null_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data);
+   overriding procedure Reference (Self : in out Null_String_Handler);
 
-   overriding procedure Unreference
-     (Self : in out Null_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data);
-
-   --  overriding procedure Initialize
-   --    (Self : Null_String_Handler;
-   --     Data : out VSS.Implementation.Strings.String_Data);
+   overriding procedure Unreference (Self : in out Null_String_Handler);
 
    overriding function Is_Empty
      (Self : Null_String_Handler;

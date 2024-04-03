@@ -45,15 +45,12 @@ package VSS.Implementation.UTF8_String_Handlers is
       Pointer : UTF8_String_Data_Access;
    end record with Object_Size => 192;
 
-   overriding procedure Reference
-     (Self : in out UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data);
+   overriding procedure Reference (Self : in out UTF8_String_Handler)
+     with Pre => Self.Pointer /= null;
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
-   overriding procedure Unreference
-     (Self : in out UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data);
+   overriding procedure Unreference (Self : in out UTF8_String_Handler);
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 
@@ -190,14 +187,12 @@ package VSS.Implementation.UTF8_String_Handlers is
    end record with Pack, Object_Size => 192;
 
    overriding procedure Reference
-     (Self : in out UTF8_In_Place_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is null;
+     (Self : in out UTF8_In_Place_String_Handler) is null;
    --  Called when new copy of the string is created. It should update pointer
    --  if necessary.
 
    overriding procedure Unreference
-     (Self : in out UTF8_In_Place_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data) is null;
+     (Self : in out UTF8_In_Place_String_Handler) is null;
    --  Called when some copy of the string is not longer needed. It should
    --  release resources when necessary and reset Pointer to safe value.
 

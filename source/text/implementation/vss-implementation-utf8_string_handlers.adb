@@ -1679,7 +1679,14 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    procedure Unchecked_Forward
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Position : in out VSS.Implementation.Strings.Cursor) is
+      Position : in out VSS.Implementation.Strings.Cursor)
+   is
+      pragma Suppress (Overflow_Check);
+      pragma Suppress (Range_Check);
+      --  These checks slowdown execution, but can happen on large text
+      --  data or invalid input only. Would be nice to verify that they
+      --  are impossible, or modify something to make them impossible.
+
    begin
       Position.Index := Position.Index + 1;
 
@@ -1695,9 +1702,9 @@ package body VSS.Implementation.UTF8_String_Handlers is
          use type VSS.Unicode.UTF8_Code_Unit;
 
          --  This code is based on the fact that starting byte of the
-         --  multibyte sequence in UTF-8 has N most significant bits set to
-         --  one followed by zero bit. So, first byte is negated and number
-         --  of leading zero bits is counting.
+         --  multibyte sequence in UTF-8 has N most significant bits set
+         --  to one followed by zero bit. So, first byte of the sequence
+         --  is negated and number of leading zero bits is counting.
 
          Code   : constant VSS.Unicode.UTF8_Code_Unit :=
            Storage (Position.UTF8_Offset);

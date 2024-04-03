@@ -343,10 +343,8 @@ package body VSS.Implementation.Text_Handlers is
    --------------
 
    not overriding function Is_Equal
-     (Self       : Abstract_String_Handler;
-      Data       : VSS.Implementation.Strings.String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : VSS.Implementation.Strings.String_Data) return Boolean
+     (Self  : Abstract_String_Handler;
+      Other : Abstract_String_Handler'Class) return Boolean
    is
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
@@ -383,10 +381,8 @@ package body VSS.Implementation.Text_Handlers is
    -------------
 
    not overriding function Is_Less
-     (Self       : Abstract_String_Handler;
-      Data       : VSS.Implementation.Strings.String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : VSS.Implementation.Strings.String_Data) return Boolean
+     (Self  : Abstract_String_Handler;
+      Other : Abstract_String_Handler'Class) return Boolean
    is
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
@@ -421,10 +417,8 @@ package body VSS.Implementation.Text_Handlers is
    ----------------------
 
    not overriding function Is_Less_Or_Equal
-     (Self       : Abstract_String_Handler;
-      Data       : VSS.Implementation.Strings.String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : VSS.Implementation.Strings.String_Data) return Boolean
+     (Self  : Abstract_String_Handler;
+      Other : Abstract_String_Handler'Class) return Boolean
    is
       Left_Handler   : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);

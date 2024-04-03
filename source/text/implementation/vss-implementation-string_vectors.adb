@@ -160,17 +160,11 @@ package body VSS.Implementation.String_Vectors is
       end if;
 
       for J in Self.Data'First .. Self.Last loop
-         declare
-            Handler :
-              VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
-                renames VSS.Implementation.Strings.Constant_Handler
-                  (Self.Data (J)).all;
-
-         begin
-            if Item_Handler.Is_Equal (Item, Handler, Self.Data (J)) then
-               return True;
-            end if;
-         end;
+         if Item_Handler.Is_Equal
+              (VSS.Implementation.Strings.Constant_Handler (Self.Data (J)).all)
+         then
+            return True;
+         end if;
       end loop;
 
       return False;

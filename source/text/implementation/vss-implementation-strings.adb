@@ -37,8 +37,7 @@ package body VSS.Implementation.Strings is
    begin
       return
         VSS.Implementation.Strings.Constant_Handler (Left).Is_Equal
-          (Left,
-           VSS.Implementation.Strings.Constant_Handler (Right).all, Right);
+          (VSS.Implementation.Strings.Constant_Handler (Right).all);
    end "=";
 
    ----------------------

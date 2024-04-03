@@ -111,9 +111,7 @@ package body VSS.Strings is
    begin
       return
         VSS.Implementation.Strings.Constant_Handler (Left.Data).Is_Less
-          (Left.Data,
-           VSS.Implementation.Strings.Constant_Handler (Right.Data).all,
-           Right.Data);
+          (VSS.Implementation.Strings.Constant_Handler (Right.Data).all);
    end "<";
 
    ----------
@@ -127,9 +125,7 @@ package body VSS.Strings is
       return
         VSS.Implementation.Strings.Constant_Handler
           (Left.Data).Is_Less_Or_Equal
-             (Left.Data,
-              VSS.Implementation.Strings.Constant_Handler (Right.Data).all,
-              Right.Data);
+             (VSS.Implementation.Strings.Constant_Handler (Right.Data).all);
    end "<=";
 
    ---------
@@ -154,9 +150,7 @@ package body VSS.Strings is
       return
         not VSS.Implementation.Strings.Constant_Handler
           (Left.Data).Is_Less_Or_Equal
-             (Left.Data,
-              VSS.Implementation.Strings.Constant_Handler (Right.Data).all,
-              Right.Data);
+             (VSS.Implementation.Strings.Constant_Handler (Right.Data).all);
    end ">";
 
    ----------
@@ -169,9 +163,7 @@ package body VSS.Strings is
    begin
       return
         not VSS.Implementation.Strings.Constant_Handler (Left.Data).Is_Less
-          (Left.Data,
-           VSS.Implementation.Strings.Constant_Handler (Right.Data).all,
-           Right.Data);
+          (VSS.Implementation.Strings.Constant_Handler (Right.Data).all);
    end ">=";
 
    ------------

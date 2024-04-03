@@ -106,20 +106,14 @@ package VSS.Implementation.Text_Handlers is
    --  to the character at new position, or to No_Character.
 
    not overriding function Is_Equal
-     (Self       : Abstract_String_Handler;
-      Data       : VSS.Implementation.Strings.String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : VSS.Implementation.Strings.String_Data) return Boolean;
+     (Self  : Abstract_String_Handler;
+      Other : Abstract_String_Handler'Class) return Boolean;
    not overriding function Is_Less
-     (Self       : Abstract_String_Handler;
-      Data       : VSS.Implementation.Strings.String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : VSS.Implementation.Strings.String_Data) return Boolean;
+     (Self  : Abstract_String_Handler;
+      Other : Abstract_String_Handler'Class) return Boolean;
    not overriding function Is_Less_Or_Equal
-     (Self       : Abstract_String_Handler;
-      Data       : VSS.Implementation.Strings.String_Data;
-      Other      : Abstract_String_Handler'Class;
-      Other_Data : VSS.Implementation.Strings.String_Data) return Boolean;
+     (Self  : Abstract_String_Handler;
+      Other : Abstract_String_Handler'Class) return Boolean;
    --  Compare two strings for binary equivalence/less/greater of code point
    --  sequences. These subprograms provides generic implementation and can
    --  work with any string handlers in cost of performance. Derived types may

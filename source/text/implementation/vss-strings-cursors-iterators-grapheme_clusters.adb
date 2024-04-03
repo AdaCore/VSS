@@ -400,7 +400,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             return 2;
          end if;
 
-         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when not Handler.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
       end loop;
 
@@ -481,8 +481,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       Self.First_Position := Self.Last_Position;
-      Success :=
-        Handler.Forward_Element (Data, Self.First_Position, Right_Code);
+      Success := Handler.Forward_Element (Self.First_Position, Right_Code);
 
       if not Success then
          --  End of the string has been reached.
@@ -498,7 +497,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          Left            := Right;
          Left_Properties := Right_Properties;
 
-         Success := Handler.Forward_Element (Data, Right, Right_Code);
+         Success := Handler.Forward_Element (Right, Right_Code);
 
          if not Success then
             --  End of line has been reached
@@ -674,7 +673,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --
          --  This charater can be `tag_spec` or ZWJ too.
 
-         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when not Handler.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          Properties := Extract_Core_Data (Code);
@@ -721,7 +720,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --  Third character of the `emoji_zwj_element` might be U+20E3,
          --  `tag_spec` or ZWJ.
 
-         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when not Handler.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          case Code is
@@ -751,7 +750,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --  Forth element, it can follow `emoji_keycap_sequence` only, and
          --  might be ZWJ only
 
-         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when not Handler.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          if Code = VSS.Implementation.Character_Codes.Zero_Width_Joiner then
@@ -767,7 +766,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          State.Is_Emoji := False;
 
          loop
-            exit when not Handler.Forward_Element (Data, Position, Code);
+            exit when not Handler.Forward_Element (Position, Code);
             exit when Position.Index > Self.Last_Position.Index;
 
             case Code is
@@ -784,7 +783,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             end case;
          end loop;
 
-         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when not Handler.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          if Code = VSS.Implementation.Character_Codes.Zero_Width_Joiner then
@@ -802,7 +801,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
          State.Is_Emoji := False;
 
-         exit when not Handler.Forward_Element (Data, Position, Code);
+         exit when not Handler.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
       end loop;
 

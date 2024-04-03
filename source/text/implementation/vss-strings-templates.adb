@@ -66,7 +66,7 @@ package body VSS.Strings.Templates is
    begin
       Handler.Before_First_Character (Position);
 
-      while Handler.Forward_Element (Self.Template.Data, Position, Code) loop
+      while Handler.Forward_Element (Position, Code) loop
          case State is
             when Initial =>
                case Code is

@@ -224,7 +224,8 @@ package body VSS.Implementation.String_Vectors is
             Text.Append (Result, Self.Data (J), Offset);
 
             if J /= Self.Last or Terminate_Last then
-               Text.Append (Line_Terminator_To_Code_Point (Terminator), Offset);
+               Text.Append
+                 (Line_Terminator_To_Code_Point (Terminator), Offset);
 
                if Terminator = VSS.Strings.CRLF then
                   Text.Append

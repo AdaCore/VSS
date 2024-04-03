@@ -85,15 +85,13 @@ package body VSS.Strings.Cursors.Iterators.Characters is
      (Self    : in out Character_Iterator;
       Element : out VSS.Characters.Virtual_Character'Base) return Boolean
    is
-      Data   : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Code   : VSS.Unicode.Code_Point'Base :=
         VSS.Implementation.Strings.No_Character;
       Result : Boolean := False;
 
    begin
       if Self.Owner /= null then
-         Result := Self.Handler.Forward_Element (Data, Self.Position, Code);
+         Result := Self.Handler.Forward_Element (Self.Position, Code);
       end if;
 
       Element := VSS.Characters.Virtual_Character'Base'Val (Code);

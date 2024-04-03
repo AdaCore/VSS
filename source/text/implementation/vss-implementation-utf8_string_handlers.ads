@@ -91,7 +91,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward_Element
      (Self     : UTF8_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean;
 
@@ -228,7 +227,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding function Forward_Element
      (Self     : UTF8_In_Place_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean;
 

@@ -935,7 +935,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Insert
      (Self   : in out UTF8_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -959,7 +958,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
       Mutate
         (Self.Pointer,
-         VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
+         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
          Self.Pointer.Size + L);
 
       Self.Pointer.Storage
@@ -980,7 +979,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Insert
      (Self   : in out UTF8_In_Place_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -1022,26 +1020,24 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
          Unsafe_Convert_To_Dynamic
            (Self,
-            VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
+            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
             Self.Size + L);
 
          declare
-            Handler : UTF8_String_Handler
-              renames UTF8_String_Handler
-                (VSS.Implementation.Strings.Variable_Handler (Data).all);
+            Text : UTF8_String_Handler
+              with Import, Convention => Ada, Address => Self'Address;
 
          begin
-            Handler.Pointer.Storage
-              (From.UTF8_Offset + L .. Handler.Pointer.Size + L) :=
-                 Handler.Pointer.Storage
-                   (From.UTF8_Offset .. Handler.Pointer.Size);
+            Text.Pointer.Storage
+              (From.UTF8_Offset + L .. Text.Pointer.Size + L) :=
+                 Text.Pointer.Storage (From.UTF8_Offset .. Text.Pointer.Size);
 
             VSS.Implementation.UTF8_Encoding.Unchecked_Store
-              (Handler.Pointer.Storage, From.UTF8_Offset, L, U1, U2, U3, U4);
+              (Text.Pointer.Storage, From.UTF8_Offset, L, U1, U2, U3, U4);
 
-            Handler.Pointer.Size   := @ + L;
-            Handler.Pointer.Length := @ + 1;
-            Handler.Pointer.Storage (Handler.Pointer.Size) := 16#00#;
+            Text.Pointer.Size   := @ + L;
+            Text.Pointer.Length := @ + 1;
+            Text.Pointer.Storage (Text.Pointer.Size) := 16#00#;
          end;
       end if;
    end Insert;

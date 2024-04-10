@@ -132,7 +132,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Insert
      (Self   : in out UTF8_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
@@ -264,7 +263,6 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Insert
      (Self   : in out UTF8_In_Place_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);

@@ -214,7 +214,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Insert
      (Self   : in out Abstract_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is abstract;
@@ -224,7 +223,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Insert
      (Self   : in out Abstract_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);

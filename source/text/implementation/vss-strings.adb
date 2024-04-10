@@ -719,10 +719,7 @@ package body VSS.Strings is
       end if;
 
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
-        (Self.Data,
-         Start,
-         VSS.Characters.Virtual_Character'Pos (Item),
-         Offset);
+        (Start, VSS.Characters.Virtual_Character'Pos (Item), Offset);
 
       Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Insert;
@@ -747,7 +744,7 @@ package body VSS.Strings is
       end if;
 
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
-        (Self.Data, Start, Item.Data, Offset);
+        (Start, Item.Data, Offset);
 
       Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Insert;
@@ -782,8 +779,7 @@ package body VSS.Strings is
 
    begin
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
-        (Self.Data,
-         (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
+        ((Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
          VSS.Characters.Virtual_Character'Pos (Item),
          Offset);
 
@@ -805,8 +801,7 @@ package body VSS.Strings is
 
    begin
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
-        (Self.Data,
-         (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
+        ((Index => 1, UTF8_Offset => 0, UTF16_Offset => 0),
          Item.Data,
          Offset);
 
@@ -899,10 +894,7 @@ package body VSS.Strings is
       end if;
 
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
-        (Self.Data,
-         From_Cursor,
-         VSS.Characters.Virtual_Character'Pos (By),
-         Inserted);
+        (From_Cursor, VSS.Characters.Virtual_Character'Pos (By), Inserted);
 
       Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
    end Replace;
@@ -944,7 +936,7 @@ package body VSS.Strings is
       end if;
 
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
-        (Self.Data, From_Cursor, By.Data, Inserted);
+        (From_Cursor, By.Data, Inserted);
 
       Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
    end Replace;

@@ -296,7 +296,6 @@ package body VSS.Implementation.Text_Handlers is
 
    not overriding procedure Insert
      (Self   : in out Abstract_String_Handler;
-      Data   : in out VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -308,7 +307,10 @@ package body VSS.Implementation.Text_Handlers is
       Position      : aliased VSS.Implementation.Strings.Cursor := From;
       Code          : VSS.Unicode.Code_Point;
       Success       : Boolean with Unreferenced;
-      Handler       : VSS.Implementation.Strings.Variable_Text_Handler_Access;
+      Text          :
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+         renames VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+           (Self);
 
    begin
       if Item_Handler.Is_Empty then
@@ -320,11 +322,8 @@ package body VSS.Implementation.Text_Handlers is
       while Item_Handler.Forward (Item_Position) loop
          Code := Item_Handler.Element (Item_Position);
 
-         Handler := VSS.Implementation.Strings.Variable_Handler (Data);
-         Handler.Insert (Data, Position, Code, Offset);
-         Success :=
-           VSS.Implementation.Strings.Constant_Handler
-             (Data).Forward (Position);
+         Text.Insert (Position, Code, Offset);
+         Success := Text.Forward (Position);
       end loop;
    end Insert;
 

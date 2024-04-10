@@ -51,7 +51,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Hash
      (Self      : Abstract_String_Handler;
-      Data      : VSS.Implementation.Strings.String_Data;
       Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator);
    --  Compute hash value of the string as little-endian UTF-32 encoded
    --  character sequence.

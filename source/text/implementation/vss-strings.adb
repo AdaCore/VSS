@@ -672,8 +672,7 @@ package body VSS.Strings is
       Generator : VSS.Implementation.FNV_Hash.FNV_1a_Generator;
 
    begin
-      VSS.Implementation.Strings.Constant_Handler
-        (Self.Data).Hash (Self.Data, Generator);
+      VSS.Implementation.Strings.Constant_Handler (Self.Data).Hash (Generator);
 
       return
         VSS.Strings.Hash_Type (VSS.Implementation.FNV_Hash.Value (Generator));

@@ -38,7 +38,6 @@ package VSS.Implementation.Null_String_Handlers is
 
    overriding procedure Hash
      (Self      : Null_String_Handler;
-      Data      : VSS.Implementation.Strings.String_Data;
       Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator);
 
    overriding function Length

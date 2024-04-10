@@ -87,18 +87,14 @@ package VSS.Implementation.Null_String_Handlers is
    --     Other_Data : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding function Starts_With
-     (Self           : Null_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Prefix_Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean;
+     (Self   : Null_String_Handler;
+      Prefix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
+      return Boolean;
 
    overriding function Ends_With
-     (Self           : Null_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Suffix_Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean;
+     (Self   : Null_String_Handler;
+      Suffix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
+      return Boolean;
 
    overriding procedure From_Wide_Wide_String
      (Self    : in out Null_String_Handler;

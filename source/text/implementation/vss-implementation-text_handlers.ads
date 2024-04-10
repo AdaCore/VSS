@@ -122,24 +122,18 @@ package VSS.Implementation.Text_Handlers is
    --  call to Length must be dispatched to actual implementation.
 
    not overriding function Starts_With
-     (Self           : Abstract_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Prefix_Handler : Abstract_String_Handler'Class;
-      Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
+     (Self   : Abstract_String_Handler;
+      Prefix : Abstract_String_Handler'Class) return Boolean
      with Pre'Class =>
-       Abstract_String_Handler'Class (Self).Length
-         >= Prefix_Handler.Length;
+       Abstract_String_Handler'Class (Self).Length >= Prefix.Length;
    --  Return True when string starts with given prefix. This subprogram
    --  provides generic implementation and can work with any string handlers
    --  in cost of performance.
    not overriding function Ends_With
-     (Self           : Abstract_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Suffix_Handler : Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
+     (Self   : Abstract_String_Handler;
+      Suffix : Abstract_String_Handler'Class) return Boolean
      with Pre'Class =>
-       Abstract_String_Handler'Class (Self).Length
-         >= Suffix_Handler.Length;
+       Abstract_String_Handler'Class (Self).Length >= Suffix.Length;
    --  Return True when string ends with given suffix. This subprogram
    --  provides generic implementation and can work with any string handlers
    --  in cost of performance.

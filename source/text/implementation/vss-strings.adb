@@ -561,7 +561,7 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Count;
 
-      Self_Text   : constant not null
+      Text        : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
       Suffix_Text : constant not null
@@ -569,11 +569,11 @@ package body VSS.Strings is
           VSS.Implementation.Strings.Constant_Handler (Suffix.Data);
 
    begin
-      if Self_Text.Length < Suffix_Text.Length then
+      if Text.Length < Suffix_Text.Length then
          return False;
 
       else
-         return Self_Text.Ends_With (Self.Data, Suffix_Text.all, Suffix.Data);
+         return Text.Ends_With (Suffix_Text.all);
       end if;
    end Ends_With;
 
@@ -585,31 +585,29 @@ package body VSS.Strings is
      (Self   : Virtual_String'Class;
       Suffix : VSS.Characters.Virtual_Character) return Boolean
    is
-      Handler : constant not null
+      Text   : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
-      Offset  : VSS.Implementation.Strings.Cursor_Offset;
+      Offset : VSS.Implementation.Strings.Cursor_Offset;
 
    begin
-      if Handler.Is_Empty then
+      if Text.Is_Empty then
          return False;
 
       else
          declare
-            Aux         : VSS.Implementation.Strings.String_Data;
-            Aux_Handler :
+            Aux      : VSS.Implementation.Strings.String_Data;
+            Aux_Text :
               VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
          begin
-            Aux_Handler := VSS.Implementation.Strings.Variable_Handler (Aux);
-            Aux_Handler.Append
+            Aux_Text := VSS.Implementation.Strings.Variable_Handler (Aux);
+            Aux_Text.Append
               (VSS.Characters.Virtual_Character'Pos (Suffix), Offset);
 
             return
-              Handler.Ends_With
-                (Self.Data,
-                 VSS.Implementation.Strings.Constant_Handler (Aux).all,
-                 Aux);
+              Text.Ends_With
+                (VSS.Implementation.Strings.Constant_Handler (Aux).all);
          end;
       end if;
    end Ends_With;
@@ -1068,7 +1066,7 @@ package body VSS.Strings is
          return False;
 
       else
-         return Text.Starts_With (Self.Data, Prefix_Text.all, Prefix.Data);
+         return Text.Starts_With (Prefix_Text.all);
       end if;
    end Starts_With;
 

@@ -109,28 +109,23 @@ package body VSS.Implementation.Text_Handlers is
    ---------------
 
    not overriding function Ends_With
-     (Self           : Abstract_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Suffix_Handler : Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
+     (Self   : Abstract_String_Handler;
+      Suffix : Abstract_String_Handler'Class) return Boolean
    is
-      Text    : Abstract_String_Handler'Class
+      Text            : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-
       Position        : VSS.Implementation.Strings.Cursor;
       Suffix_Position : VSS.Implementation.Strings.Cursor;
 
    begin
       Text.After_Last_Character (Position);
-      Suffix_Handler.After_Last_Character (Suffix_Position);
+      Suffix.After_Last_Character (Suffix_Position);
 
       while
         Text.Backward (Position)
-          and Suffix_Handler.Backward (Suffix_Position)
+          and Suffix.Backward (Suffix_Position)
       loop
-         if Text.Element (Position)
-              /= Suffix_Handler.Element (Suffix_Position)
-         then
+         if Text.Element (Position) /= Suffix.Element (Suffix_Position) then
             return False;
          end if;
       end loop;
@@ -627,27 +622,23 @@ package body VSS.Implementation.Text_Handlers is
    -----------------
 
    not overriding function Starts_With
-     (Self           : Abstract_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Prefix_Handler : Abstract_String_Handler'Class;
-      Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
+     (Self   : Abstract_String_Handler;
+      Prefix : Abstract_String_Handler'Class) return Boolean
    is
-      Self_Handler    : Abstract_String_Handler'Class
+      Text            : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Self_Position   : aliased VSS.Implementation.Strings.Cursor;
+      Position        : aliased VSS.Implementation.Strings.Cursor;
       Prefix_Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
-      Self_Handler.Before_First_Character (Self_Position);
-      Prefix_Handler.Before_First_Character (Prefix_Position);
+      Text.Before_First_Character (Position);
+      Prefix.Before_First_Character (Prefix_Position);
 
       while
-        Self_Handler.Forward (Self_Position)
-          and Prefix_Handler.Forward (Prefix_Position)
+        Text.Forward (Position)
+          and Prefix.Forward (Prefix_Position)
       loop
-         if Self_Handler.Element (Self_Position)
-              /= Prefix_Handler.Element (Prefix_Position)
-         then
+         if Text.Element (Position) /= Prefix.Element (Prefix_Position) then
             return False;
          end if;
       end loop;

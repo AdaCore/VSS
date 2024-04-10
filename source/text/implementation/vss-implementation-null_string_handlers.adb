@@ -113,14 +113,11 @@ package body VSS.Implementation.Null_String_Handlers is
    ---------------
 
    overriding function Ends_With
-     (Self           : Null_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Suffix_Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Suffix_Data    : VSS.Implementation.Strings.String_Data)
+     (Self   : Null_String_Handler;
+      Suffix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
       return Boolean is
    begin
-      return Suffix_Handler.Is_Empty;
+      return Suffix.Is_Empty;
    end Ends_With;
 
    -------------
@@ -257,14 +254,11 @@ package body VSS.Implementation.Null_String_Handlers is
    -----------------
 
    overriding function Starts_With
-     (Self           : Null_String_Handler;
-      Data           : VSS.Implementation.Strings.String_Data;
-      Prefix_Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Prefix_Data    : VSS.Implementation.Strings.String_Data)
+     (Self   : Null_String_Handler;
+      Prefix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
       return Boolean is
    begin
-      return Prefix_Handler.Is_Empty;
+      return Prefix.Is_Empty;
    end Starts_With;
 
    ---------------------

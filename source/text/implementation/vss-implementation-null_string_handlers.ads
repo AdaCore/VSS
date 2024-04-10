@@ -173,7 +173,6 @@ package VSS.Implementation.Null_String_Handlers is
 
    overriding procedure Delete
      (Self : in out Null_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset);
 

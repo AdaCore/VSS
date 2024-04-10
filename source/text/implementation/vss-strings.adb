@@ -545,7 +545,7 @@ package body VSS.Strings is
       Text.Compute_Size (From_Cursor, To_Cursor, Size);
 
       if Size.Index_Offset /= 0 then
-         Text.Delete (Self.Data, From_Cursor, Size);
+         Text.Delete (From_Cursor, Size);
 
          Self.Notify_String_Modified (From_Cursor, Size, (0, 0, 0));
       end if;
@@ -890,7 +890,7 @@ package body VSS.Strings is
 
       if Deleted.Index_Offset /= 0 then
          VSS.Implementation.Strings.Variable_Handler (Self.Data).Delete
-           (Self.Data, From_Cursor, Deleted);
+           (From_Cursor, Deleted);
       end if;
 
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
@@ -919,6 +919,9 @@ package body VSS.Strings is
           (To).all;
       Deleted     : VSS.Implementation.Strings.Cursor_Offset;
       Inserted    : VSS.Implementation.Strings.Cursor_Offset;
+      Text        :
+        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+          renames VSS.Implementation.Strings.Variable_Handler (Self.Data).all;
 
    begin
       if not VSS.Strings.Cursors.Internals.Is_Owner (From, Self)
@@ -927,16 +930,13 @@ package body VSS.Strings is
          return;
       end if;
 
-      VSS.Implementation.Strings.Variable_Handler (Self.Data).Compute_Size
-        (From_Cursor, To_Cursor, Deleted);
+      Text.Compute_Size (From_Cursor, To_Cursor, Deleted);
 
       if Deleted.Index_Offset /= 0 then
-         VSS.Implementation.Strings.Variable_Handler (Self.Data).Delete
-           (Self.Data, From_Cursor, Deleted);
+         Text.Delete (From_Cursor, Deleted);
       end if;
 
-      VSS.Implementation.Strings.Variable_Handler (Self.Data).Insert
-        (From_Cursor, By.Data, Inserted);
+      Text.Insert (From_Cursor, By.Data, Inserted);
 
       Self.Notify_String_Modified (From_Cursor, Deleted, Inserted);
    end Replace;

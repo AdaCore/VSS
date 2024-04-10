@@ -507,7 +507,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Delete
      (Self : in out UTF8_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset)
    is
@@ -533,7 +532,6 @@ package body VSS.Implementation.UTF8_String_Handlers is
 
    overriding procedure Delete
      (Self : in out UTF8_In_Place_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset)
    is

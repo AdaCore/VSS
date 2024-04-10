@@ -232,7 +232,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Delete
      (Self : in out Abstract_String_Handler;
-      Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset) is abstract;
    --  Delete segment of given size starting from given position.

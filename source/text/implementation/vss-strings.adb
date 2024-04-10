@@ -232,16 +232,15 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : VSS.Characters.Virtual_Character)
    is
-      Handler : constant not null
+      Text : constant not null
         VSS.Implementation.Strings.Variable_Text_Handler_Access :=
           VSS.Implementation.Strings.Variable_Handler (Self.Data);
       Start   : VSS.Implementation.Strings.Cursor;
       Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
 
    begin
-      Handler.After_Last_Character (Self.Data, Start);
-
-      Handler.Append (VSS.Characters.Virtual_Character'Pos (Item), Offset);
+      Text.After_Last_Character (Start);
+      Text.Append (VSS.Characters.Virtual_Character'Pos (Item), Offset);
 
       Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Append;
@@ -254,7 +253,7 @@ package body VSS.Strings is
      (Self : in out Virtual_String'Class;
       Item : Virtual_String'Class)
    is
-      Handler : constant not null
+      Text    : constant not null
         VSS.Implementation.Strings.Variable_Text_Handler_Access :=
           VSS.Implementation.Strings.Variable_Handler (Self.Data);
       Start   : VSS.Implementation.Strings.Cursor;
@@ -265,9 +264,8 @@ package body VSS.Strings is
          return;
       end if;
 
-      Handler.After_Last_Character (Self.Data, Start);
-
-      Handler.Append (Self.Data, Item.Data, Offset);
+      Text.After_Last_Character (Start);
+      Text.Append (Self.Data, Item.Data, Offset);
 
       Self.Notify_String_Modified (Start, (0, 0, 0), Offset);
    end Append;
@@ -1101,7 +1099,7 @@ package body VSS.Strings is
      (Self  : Virtual_String'Class;
       After : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String
    is
-      Handler        : constant not null
+      Text           : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
       First_Position : aliased VSS.Implementation.Strings.Cursor :=
@@ -1112,10 +1110,10 @@ package body VSS.Strings is
    begin
       return Result : Virtual_String do
          if VSS.Strings.Cursors.Internals.Is_Owner (After, Self) then
-            if Handler.Forward (First_Position) then
-               Handler.After_Last_Character (Self.Data, Last_Position);
-               Success := Handler.Backward (Last_Position);
-               Handler.Slice (First_Position, Last_Position, Result.Data);
+            if Text.Forward (First_Position) then
+               Text.After_Last_Character (Last_Position);
+               Success := Text.Backward (Last_Position);
+               Text.Slice (First_Position, Last_Position, Result.Data);
             end if;
          end if;
       end return;
@@ -1129,7 +1127,7 @@ package body VSS.Strings is
      (Self : Virtual_String'Class;
       From : VSS.Strings.Cursors.Abstract_Cursor'Class) return Virtual_String
    is
-      Handler       : constant not null
+      Text          : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
       From_Position :
@@ -1141,9 +1139,9 @@ package body VSS.Strings is
    begin
       return Result : Virtual_String do
          if VSS.Strings.Cursors.Internals.Is_Owner (From, Self) then
-            Handler.After_Last_Character (Self.Data, Last_Position);
-            Success := Handler.Backward (Last_Position);
-            Handler.Slice (From_Position.all, Last_Position, Result.Data);
+            Text.After_Last_Character (Last_Position);
+            Success := Text.Backward (Last_Position);
+            Text.Slice (From_Position.all, Last_Position, Result.Data);
          end if;
       end return;
    end Tail_From;

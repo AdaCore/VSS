@@ -864,7 +864,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  : constant not null
+      Text     : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
@@ -872,7 +872,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    begin
       Self.Reconnect (On'Unrestricted_Access);
 
-      Handler.After_Last_Character (On.Data, Position);
+      Text.After_Last_Character (Position);
       Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Set_After_Last;
 
@@ -930,7 +930,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
      (Self : in out Grapheme_Cluster_Iterator;
       On   : VSS.Strings.Virtual_String'Class)
    is
-      Handler  : constant not null
+      Text     : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (On.Data);
       Position : VSS.Implementation.Strings.Cursor;
@@ -939,8 +939,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    begin
       Self.Reconnect (On'Unrestricted_Access);
 
-      Handler.After_Last_Character (On.Data, Position);
-      Dummy := Handler.Backward (Position);
+      Text.After_Last_Character (Position);
+      Dummy := Text.Backward (Position);
       Self.Lookup_Grapheme_Cluster_Boundaries (Position);
    end Set_At_Last;
 

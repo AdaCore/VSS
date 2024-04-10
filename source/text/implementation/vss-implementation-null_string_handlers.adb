@@ -26,7 +26,6 @@ package body VSS.Implementation.Null_String_Handlers is
 
    overriding procedure After_Last_Character
      (Self     : Null_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
       Position := After_Last_Character_Cursor;

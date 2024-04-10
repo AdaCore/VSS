@@ -114,22 +114,21 @@ package body VSS.Implementation.Text_Handlers is
       Suffix_Handler : Abstract_String_Handler'Class;
       Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
    is
-      Self_Handler   : Abstract_String_Handler'Class
+      Text    : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Self_Data      : VSS.Implementation.Strings.String_Data renames Data;
 
-      Self_Position   : VSS.Implementation.Strings.Cursor;
+      Position        : VSS.Implementation.Strings.Cursor;
       Suffix_Position : VSS.Implementation.Strings.Cursor;
 
    begin
-      Self_Handler.After_Last_Character (Self_Data, Self_Position);
-      Suffix_Handler.After_Last_Character (Suffix_Data, Suffix_Position);
+      Text.After_Last_Character (Position);
+      Suffix_Handler.After_Last_Character (Suffix_Position);
 
       while
-        Self_Handler.Backward (Self_Position)
+        Text.Backward (Position)
           and Suffix_Handler.Backward (Suffix_Position)
       loop
-         if Self_Handler.Element (Self_Position)
+         if Text.Element (Position)
               /= Suffix_Handler.Element (Suffix_Position)
          then
             return False;

@@ -123,7 +123,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    begin
       Self.Reconnect (On'Unrestricted_Access);
       Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
-      Self.Handler.After_Last_Character (On.Data, Self.Position);
+      Self.Handler.After_Last_Character (Self.Position);
    end Set_After_Last;
 
    ------------
@@ -177,7 +177,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    begin
       Self.Reconnect (On'Unrestricted_Access);
       Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
-      Self.Handler.After_Last_Character (On.Data, Self.Position);
+      Self.Handler.After_Last_Character (Self.Position);
       Dummy := Self.Handler.Backward (Self.Position);
    end Set_At_Last;
 

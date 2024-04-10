@@ -161,7 +161,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function First_UTF8_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF8_Code_Unit_Index;
    --  Return UTF-8 offset at the given position, when corresponding member
@@ -169,14 +168,12 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function Last_UTF8_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF8_Code_Unit_Index;
    --  Return offset of the last UTF-8 code unit at the given position.
 
    not overriding function First_UTF16_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Return UTF-16 offset at the given position, when corresponding member
@@ -184,7 +181,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding function Last_UTF16_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF16_Code_Unit_Index;
    --  Return offset of the last UTF-16 code unit at the given position.

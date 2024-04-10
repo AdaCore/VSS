@@ -139,25 +139,24 @@ package body VSS.Implementation.Text_Handlers is
 
    not overriding function First_UTF16_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF16_Code_Unit_Index
    is
       use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
-      Handler : Abstract_String_Handler'Class
+      Text : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : aliased VSS.Implementation.Strings.Cursor;
+      Aux  : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       if Position.UTF16_Offset >= 0 then
          return Position.UTF16_Offset;
 
       else
-         Handler.Before_First_Character (Aux);
+         Text.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
-           and then Handler.Forward (Aux)
+           and then Text.Forward (Aux)
          loop
             null;
          end loop;
@@ -172,25 +171,24 @@ package body VSS.Implementation.Text_Handlers is
 
    not overriding function First_UTF8_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF8_Code_Unit_Index
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Handler : Abstract_String_Handler'Class
+      Text : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : aliased VSS.Implementation.Strings.Cursor;
+      Aux  : aliased VSS.Implementation.Strings.Cursor;
 
    begin
       if Position.UTF8_Offset >= 0 then
          return Position.UTF8_Offset;
 
       else
-         Handler.Before_First_Character (Aux);
+         Text.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
-           and then Handler.Forward (Aux)
+           and then Text.Forward (Aux)
          loop
             null;
          end loop;
@@ -456,32 +454,31 @@ package body VSS.Implementation.Text_Handlers is
 
    not overriding function Last_UTF16_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF16_Code_Unit_Index
    is
       use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
-      Handler : Abstract_String_Handler'Class
+      Text  : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : aliased VSS.Implementation.Strings.Cursor;
-      Dummy   : Boolean;
+      Aux   : aliased VSS.Implementation.Strings.Cursor;
+      Dummy : Boolean;
 
    begin
       if Position.UTF16_Offset >= 0 then
          Aux := Position;
 
       else
-         Handler.Before_First_Character (Aux);
+         Text.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
-           and then Handler.Forward (Aux)
+           and then Text.Forward (Aux)
          loop
             null;
          end loop;
       end if;
 
-      Dummy := Handler.Forward (Aux);
+      Dummy := Text.Forward (Aux);
 
       return Aux.UTF16_Offset - 1;
    end Last_UTF16_Offset;
@@ -492,32 +489,31 @@ package body VSS.Implementation.Text_Handlers is
 
    not overriding function Last_UTF8_Offset
      (Self     : Abstract_String_Handler;
-      Data     : VSS.Implementation.Strings.String_Data;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF8_Code_Unit_Index
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Handler : Abstract_String_Handler'Class
+      Text  : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
-      Aux     : aliased VSS.Implementation.Strings.Cursor;
-      Dummy   : Boolean;
+      Aux   : aliased VSS.Implementation.Strings.Cursor;
+      Dummy : Boolean;
 
    begin
       if Position.UTF8_Offset >= 0 then
          Aux := Position;
 
       else
-         Handler.Before_First_Character (Aux);
+         Text.Before_First_Character (Aux);
 
          while Aux.Index /= Position.Index
-           and then Handler.Forward (Aux)
+           and then Text.Forward (Aux)
          loop
             null;
          end loop;
       end if;
 
-      Dummy := Handler.Forward (Aux);
+      Dummy := Text.Forward (Aux);
 
       return Aux.UTF8_Offset - 1;
    end Last_UTF8_Offset;

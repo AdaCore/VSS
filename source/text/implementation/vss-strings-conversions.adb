@@ -41,7 +41,7 @@ package body VSS.Strings.Conversions is
    begin
       Text.After_Last_Character (Position);
 
-      if Into'Length /= Text.First_UTF8_Offset (Item.Data, Position) then
+      if Into'Length /= Text.First_UTF8_Offset (Position) then
          raise Constraint_Error;
       end if;
 
@@ -105,7 +105,7 @@ package body VSS.Strings.Conversions is
 
       Text.After_Last_Character (Position);
 
-      if Natural (Text.First_UTF8_Offset (Item.Data, Position))
+      if Natural (Text.First_UTF8_Offset (Position))
            > Into'Last - From + 1
       then
          raise Constraint_Error;
@@ -262,7 +262,7 @@ package body VSS.Strings.Conversions is
          if Success then
             Ada.Strings.Unbounded.VSS_Aux.Set_String
               (Result,
-               Natural (Text.Last_UTF8_Offset (Item.Data, Position)) + 1,
+               Natural (Text.Last_UTF8_Offset (Position)) + 1,
                Set'Access);
          end if;
       end return;

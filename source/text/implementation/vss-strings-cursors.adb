@@ -214,7 +214,7 @@ package body VSS.Strings.Cursors is
       else
          return
            VSS.Implementation.Strings.Constant_Handler
-             (String.Data).First_UTF16_Offset (String.Data, Position);
+             (String.Data).First_UTF16_Offset (Position);
       end if;
    end First_UTF16_Offset;
 
@@ -287,7 +287,7 @@ package body VSS.Strings.Cursors is
       else
          return
            VSS.Implementation.Strings.Constant_Handler
-             (String.Data).First_UTF8_Offset (String.Data, Position);
+             (String.Data).First_UTF8_Offset (Position);
       end if;
    end First_UTF8_Offset;
 
@@ -524,7 +524,7 @@ package body VSS.Strings.Cursors is
    begin
       return
         VSS.Implementation.Strings.Constant_Handler
-          (String.Data).Last_UTF16_Offset (String.Data, Position);
+          (String.Data).Last_UTF16_Offset (Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -588,7 +588,7 @@ package body VSS.Strings.Cursors is
    begin
       return
         VSS.Implementation.Strings.Constant_Handler
-          (String.Data).Last_UTF8_Offset (String.Data, Position);
+          (String.Data).Last_UTF8_Offset (Position);
    end Last_UTF8_Offset;
 
    ----------------------

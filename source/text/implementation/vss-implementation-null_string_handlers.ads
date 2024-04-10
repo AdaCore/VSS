@@ -41,8 +41,7 @@ package VSS.Implementation.Null_String_Handlers is
       Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator);
 
    overriding function Length
-     (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : Null_String_Handler)
       return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element

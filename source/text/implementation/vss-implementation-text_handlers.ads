@@ -56,8 +56,7 @@ package VSS.Implementation.Text_Handlers is
    --  character sequence.
 
    not overriding function Length
-     (Self : Abstract_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : Abstract_String_Handler)
       return VSS.Implementation.Strings.Character_Count is abstract;
    --  Return number of characters in the text
 
@@ -129,8 +128,8 @@ package VSS.Implementation.Text_Handlers is
       Prefix_Handler : Abstract_String_Handler'Class;
       Prefix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
      with Pre'Class =>
-       Abstract_String_Handler'Class (Self).Length (Data)
-         >= Prefix_Handler.Length (Prefix_Data);
+       Abstract_String_Handler'Class (Self).Length
+         >= Prefix_Handler.Length;
    --  Return True when string starts with given prefix. This subprogram
    --  provides generic implementation and can work with any string handlers
    --  in cost of performance.
@@ -140,8 +139,8 @@ package VSS.Implementation.Text_Handlers is
       Suffix_Handler : Abstract_String_Handler'Class;
       Suffix_Data    : VSS.Implementation.Strings.String_Data) return Boolean
      with Pre'Class =>
-       Abstract_String_Handler'Class (Self).Length (Data)
-         >= Suffix_Handler.Length (Suffix_Data);
+       Abstract_String_Handler'Class (Self).Length
+         >= Suffix_Handler.Length;
    --  Return True when string ends with given suffix. This subprogram
    --  provides generic implementation and can work with any string handlers
    --  in cost of performance.

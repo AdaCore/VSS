@@ -503,8 +503,7 @@ package body VSS.Strings is
    begin
       return
         Character_Count
-          (VSS.Implementation.Strings.Constant_Handler
-             (Self.Data).Length (Self.Data));
+          (VSS.Implementation.Strings.Constant_Handler (Self.Data).Length);
    end Character_Length;
 
    -----------
@@ -564,23 +563,19 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Count;
 
-      Self_Handler   : constant not null
+      Self_Text   : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
-      Suffix_Handler : constant not null
+      Suffix_Text : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Suffix.Data);
 
    begin
-      if Self_Handler.Length (Self.Data)
-           < Suffix_Handler.Length (Suffix.Data)
-      then
+      if Self_Text.Length < Suffix_Text.Length then
          return False;
 
       else
-         return
-           Self_Handler.Ends_With
-             (Self.Data, Suffix_Handler.all, Suffix.Data);
+         return Self_Text.Ends_With (Self.Data, Suffix_Text.all, Suffix.Data);
       end if;
    end Ends_With;
 
@@ -1063,23 +1058,19 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Count;
 
-      Self_Handler   : constant not null
+      Text        : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Self.Data);
-      Prefix_Handler : constant not null
+      Prefix_Text : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Prefix.Data);
 
    begin
-      if Self_Handler.Length (Self.Data)
-           < Prefix_Handler.Length (Prefix.Data)
-      then
+      if Text.Length < Prefix_Text.Length then
          return False;
 
       else
-         return
-           Self_Handler.Starts_With
-             (Self.Data, Prefix_Handler.all, Prefix.Data);
+         return Text.Starts_With (Self.Data, Prefix_Text.all, Prefix.Data);
       end if;
    end Starts_With;
 

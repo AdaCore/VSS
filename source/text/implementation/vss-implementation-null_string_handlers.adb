@@ -229,8 +229,7 @@ package body VSS.Implementation.Null_String_Handlers is
    ------------
 
    overriding function Length
-     (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : Null_String_Handler)
       return VSS.Implementation.Strings.Character_Count is (0);
 
    ---------------

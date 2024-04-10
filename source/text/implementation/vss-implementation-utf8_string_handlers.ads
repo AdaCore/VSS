@@ -57,8 +57,7 @@ package VSS.Implementation.UTF8_String_Handlers is
    overriding function Is_Empty (Self : UTF8_String_Handler) return Boolean;
 
    overriding function Length
-     (Self : UTF8_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : UTF8_String_Handler)
       return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element
@@ -193,8 +192,7 @@ package VSS.Implementation.UTF8_String_Handlers is
      (Self : UTF8_In_Place_String_Handler) return Boolean;
 
    overriding function Length
-     (Self : UTF8_In_Place_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : UTF8_In_Place_String_Handler)
       return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element

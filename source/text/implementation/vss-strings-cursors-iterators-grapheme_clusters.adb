@@ -366,7 +366,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       use all type VSS.Implementation.UCD_Core.EA_Values;
 
       Data       : VSS.Implementation.Strings.String_Data;
-      Handler    : VSS.Implementation.Strings.Constant_Text_Handler_Access;
+      Text       : VSS.Implementation.Strings.Constant_Text_Handler_Access;
       Position   : aliased VSS.Implementation.Strings.Cursor;
       Code       : VSS.Unicode.Code_Point;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
@@ -379,10 +379,10 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return 0;
       end if;
 
-      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
+      Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Text := VSS.Implementation.Strings.Constant_Handler (Data);
 
-      if Self.First_Position.Index not in 1 .. Handler.Length (Data) then
+      if Self.First_Position.Index not in 1 .. Text.Length then
          --  Iterator doesn't point to any grapheme cluster.
 
          return 0;
@@ -391,7 +391,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       --  Lookup for the wide/fullwidth character in the grapheme cluster.
 
       Position := Self.First_Position;
-      Code     := Handler.Element (Position);
+      Code     := Text.Element (Position);
 
       loop
          Properties := Extract_Core_Data (Code);
@@ -400,7 +400,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             return 2;
          end if;
 
-         exit when not Handler.Forward_Element (Position, Code);
+         exit when not Text.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
       end loop;
 
@@ -417,7 +417,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --  default text representation and occupy single cell.
 
          Position   := Self.First_Position;
-         Code       := Handler.Element (Position);
+         Code       := Text.Element (Position);
          Properties := Extract_Core_Data (Code);
 
          if not Properties.EPres then
@@ -564,8 +564,8 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    overriding function Has_Element
      (Self : Grapheme_Cluster_Iterator) return Boolean
    is
-      Data    : VSS.Implementation.Strings.String_Data;
-      Handler : VSS.Implementation.Strings.Constant_Text_Handler_Access;
+      Data : VSS.Implementation.Strings.String_Data;
+      Text : VSS.Implementation.Strings.Constant_Text_Handler_Access;
 
    begin
       if Self.Owner = null then
@@ -574,10 +574,10 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
       end if;
 
-      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
+      Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Text := VSS.Implementation.Strings.Constant_Handler (Data);
 
-      return Self.First_Position.Index in 1 .. Handler.Length (Data);
+      return Self.First_Position.Index in 1 .. Text.Length;
    end Has_Element;
 
    ----------------
@@ -607,7 +607,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       end record;
 
       Data       : VSS.Implementation.Strings.String_Data;
-      Handler    : VSS.Implementation.Strings.Constant_Text_Handler_Access;
+      Text       : VSS.Implementation.Strings.Constant_Text_Handler_Access;
       Position   : aliased VSS.Implementation.Strings.Cursor :=
         Self.First_Position;
       Code       : VSS.Unicode.Code_Point;
@@ -626,16 +626,16 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
       end if;
 
-      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler := VSS.Implementation.Strings.Constant_Handler (Data);
+      Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Text := VSS.Implementation.Strings.Constant_Handler (Data);
 
-      if Self.First_Position.Index not in 1 .. Handler.Length (Data) then
+      if Self.First_Position.Index not in 1 .. Text.Length then
          --  Iterator doesn't point to grapheme cluster.
 
          return False;
       end if;
 
-      Code := Handler.Element (Position);
+      Code := Text.Element (Position);
 
       --  Outer loop parses `emoji_zwj_element` expression.
 
@@ -673,7 +673,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --
          --  This charater can be `tag_spec` or ZWJ too.
 
-         exit when not Handler.Forward_Element (Position, Code);
+         exit when not Text.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          Properties := Extract_Core_Data (Code);
@@ -720,7 +720,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --  Third character of the `emoji_zwj_element` might be U+20E3,
          --  `tag_spec` or ZWJ.
 
-         exit when not Handler.Forward_Element (Position, Code);
+         exit when not Text.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          case Code is
@@ -750,7 +750,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          --  Forth element, it can follow `emoji_keycap_sequence` only, and
          --  might be ZWJ only
 
-         exit when not Handler.Forward_Element (Position, Code);
+         exit when not Text.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          if Code = VSS.Implementation.Character_Codes.Zero_Width_Joiner then
@@ -766,7 +766,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          State.Is_Emoji := False;
 
          loop
-            exit when not Handler.Forward_Element (Position, Code);
+            exit when not Text.Forward_Element (Position, Code);
             exit when Position.Index > Self.Last_Position.Index;
 
             case Code is
@@ -783,7 +783,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
             end case;
          end loop;
 
-         exit when not Handler.Forward_Element (Position, Code);
+         exit when not Text.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
 
          if Code = VSS.Implementation.Character_Codes.Zero_Width_Joiner then
@@ -801,7 +801,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
          State.Is_Emoji := False;
 
-         exit when not Handler.Forward_Element (Position, Code);
+         exit when not Text.Forward_Element (Position, Code);
          exit when Position.Index > Self.Last_Position.Index;
       end loop;
 
@@ -818,7 +818,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    is
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler : constant not null
+      Text    : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Data);
       Success : Boolean with Unreferenced;
@@ -830,7 +830,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          Self.First_Position := Position;
          Self.Last_Position  := Position;
 
-      elsif Position.Index > Handler.Length (Data) then
+      elsif Position.Index > Text.Length then
          --  After last character of the string.
 
          Self.First_Position := Position;
@@ -839,16 +839,16 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       elsif Position.Index = 1 then
          --  First character of the string, it starts first grapheme cluster.
 
-         Handler.Before_First_Character (Self.First_Position);
-         Handler.Before_First_Character (Self.Last_Position);
+         Text.Before_First_Character (Self.First_Position);
+         Text.Before_First_Character (Self.Last_Position);
          Success := Self.Forward;
 
-      elsif Position.Index = Handler.Length (Data) then
+      elsif Position.Index = Text.Length then
          --  Last character of the string, it ends last grapheme cluster.
 
          Self.Last_Position  := Position;
          Self.First_Position := Position;
-         Success := Handler.Forward (Self.First_Position);
+         Success := Text.Forward (Self.First_Position);
          Success := Self.Backward;
 
       else

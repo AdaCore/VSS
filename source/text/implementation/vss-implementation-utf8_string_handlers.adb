@@ -1113,8 +1113,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding function Length
-     (Self : UTF8_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : UTF8_String_Handler)
       return VSS.Implementation.Strings.Character_Count is
    begin
       return Self.Pointer.Length;
@@ -1125,8 +1124,7 @@ package body VSS.Implementation.UTF8_String_Handlers is
    ------------
 
    overriding function Length
-     (Self : UTF8_In_Place_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : UTF8_In_Place_String_Handler)
       return VSS.Implementation.Strings.Character_Count is
    begin
       return Self.Length;

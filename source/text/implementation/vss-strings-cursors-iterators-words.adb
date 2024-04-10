@@ -557,15 +557,14 @@ package body VSS.Strings.Cursors.Iterators.Words is
    -----------------
 
    overriding function Has_Element (Self : Word_Iterator) return Boolean is
-      Data    : VSS.Implementation.Strings.String_Data
+      Data : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler : constant not null
+      Text : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Data);
 
    begin
-      return
-        Self.First_Position.Index in 1 .. Handler.Length (Data);
+      return Self.First_Position.Index in 1 .. Text.Length;
    end Has_Element;
 
    ----------------
@@ -587,7 +586,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    is
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler : constant not null
+      Text    : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
           VSS.Implementation.Strings.Constant_Handler (Data);
       Success : Boolean with Unreferenced;
@@ -599,7 +598,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
          Self.First_Position := Position;
          Self.Last_Position  := Position;
 
-      elsif Position.Index > Handler.Length (Data) then
+      elsif Position.Index > Text.Length then
          --  After last character of the string.
 
          Self.First_Position := Position;
@@ -608,11 +607,11 @@ package body VSS.Strings.Cursors.Iterators.Words is
       elsif Position.Index = 1 then
          --  First character of the string, it starts first grapheme cluster.
 
-         Handler.Before_First_Character (Self.First_Position);
-         Handler.Before_First_Character (Self.Last_Position);
+         Text.Before_First_Character (Self.First_Position);
+         Text.Before_First_Character (Self.Last_Position);
          Success := Self.Forward;
 
-      elsif Position.Index = Handler.Length (Data) then
+      elsif Position.Index = Text.Length then
          raise Program_Error;
 
       else

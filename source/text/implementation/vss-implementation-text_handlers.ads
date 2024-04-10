@@ -154,8 +154,7 @@ package VSS.Implementation.Text_Handlers is
    --  characters to the result.
 
    not overriding function To_UTF_8_String
-     (Self : Abstract_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : Abstract_String_Handler)
       return Ada.Strings.UTF_Encoding.UTF_8_String is abstract;
    --  Converts string data into standard UTF_8_String.
 

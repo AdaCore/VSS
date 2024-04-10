@@ -308,7 +308,7 @@ package body VSS.Strings.Conversions is
    begin
       return
         VSS.Implementation.Strings.Constant_Handler
-          (Item.Data).To_UTF_8_String (Item.Data);
+          (Item.Data).To_UTF_8_String;
    end To_UTF_8_String;
 
    -----------------------

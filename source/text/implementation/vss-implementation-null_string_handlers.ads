@@ -107,8 +107,7 @@ package VSS.Implementation.Null_String_Handlers is
       Success : out Boolean);
 
    overriding function To_UTF_8_String
-     (Self : Null_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : Null_String_Handler)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
 
    --  not overriding function First_UTF8_Offset

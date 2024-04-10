@@ -108,8 +108,7 @@ package VSS.Implementation.UTF8_String_Handlers is
       Success : out Boolean);
 
    overriding function To_UTF_8_String
-     (Self : UTF8_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : UTF8_String_Handler)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
    --  Converts string data into standard UTF_8_String.
 
@@ -241,8 +240,7 @@ package VSS.Implementation.UTF8_String_Handlers is
       Success : out Boolean);
 
    overriding function To_UTF_8_String
-     (Self : UTF8_In_Place_String_Handler;
-      Data : VSS.Implementation.Strings.String_Data)
+     (Self : UTF8_In_Place_String_Handler)
       return Ada.Strings.UTF_Encoding.UTF_8_String;
    --  Converts string data into standard UTF_8_String.
 

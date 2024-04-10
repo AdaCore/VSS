@@ -524,7 +524,7 @@ package body VSS.Strings is
    is
       use type VSS.Implementation.Strings.Character_Offset;
 
-      Handler     : constant not null
+      Text        : constant not null
         VSS.Implementation.Strings.Variable_Text_Handler_Access :=
           VSS.Implementation.Strings.Variable_Handler (Self.Data);
       From_Cursor : constant VSS.Implementation.Strings.Cursor :=
@@ -542,10 +542,10 @@ package body VSS.Strings is
          return;
       end if;
 
-      Handler.Compute_Size (Self.Data, From_Cursor, To_Cursor, Size);
+      Text.Compute_Size (From_Cursor, To_Cursor, Size);
 
       if Size.Index_Offset /= 0 then
-         Handler.Delete (Self.Data, From_Cursor, Size);
+         Text.Delete (Self.Data, From_Cursor, Size);
 
          Self.Notify_String_Modified (From_Cursor, Size, (0, 0, 0));
       end if;
@@ -891,7 +891,7 @@ package body VSS.Strings is
       end if;
 
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Compute_Size
-        (Self.Data, From_Cursor, To_Cursor, Deleted);
+        (From_Cursor, To_Cursor, Deleted);
 
       if Deleted.Index_Offset /= 0 then
          VSS.Implementation.Strings.Variable_Handler (Self.Data).Delete
@@ -936,7 +936,7 @@ package body VSS.Strings is
       end if;
 
       VSS.Implementation.Strings.Variable_Handler (Self.Data).Compute_Size
-        (Self.Data, From_Cursor, To_Cursor, Deleted);
+        (From_Cursor, To_Cursor, Deleted);
 
       if Deleted.Index_Offset /= 0 then
          VSS.Implementation.Strings.Variable_Handler (Self.Data).Delete

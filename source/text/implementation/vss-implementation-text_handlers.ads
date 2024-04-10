@@ -186,7 +186,6 @@ package VSS.Implementation.Text_Handlers is
 
    not overriding procedure Compute_Size
      (Self   : Abstract_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       To     : VSS.Implementation.Strings.Cursor;
       Size   : out VSS.Implementation.Strings.Cursor_Offset);

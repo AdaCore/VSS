@@ -45,7 +45,6 @@ package body VSS.Implementation.Text_Handlers is
 
    not overriding procedure Compute_Size
      (Self   : Abstract_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
       From   : VSS.Implementation.Strings.Cursor;
       To     : VSS.Implementation.Strings.Cursor;
       Size   : out VSS.Implementation.Strings.Cursor_Offset)
@@ -53,7 +52,7 @@ package body VSS.Implementation.Text_Handlers is
       use type VSS.Unicode.UTF16_Code_Unit_Offset;
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Handler       : Abstract_String_Handler'Class
+      Text          : Abstract_String_Handler'Class
         renames Abstract_String_Handler'Class (Self);
       From_Position : aliased VSS.Implementation.Strings.Cursor;
       To_Position   : aliased VSS.Implementation.Strings.Cursor;
@@ -67,10 +66,10 @@ package body VSS.Implementation.Text_Handlers is
          if From.UTF8_Offset < 0 or From.UTF16_Offset < 0 then
             --  Some of UTF* offset of From must be resolved first.
 
-            Handler.Before_First_Character (From_Position);
+            Text.Before_First_Character (From_Position);
 
             while From_Position.Index /= From.Index
-              and then Handler.Forward (From_Position)
+              and then Text.Forward (From_Position)
             loop
                null;
             end loop;
@@ -85,7 +84,7 @@ package body VSS.Implementation.Text_Handlers is
             To_Position := From_Position;
 
             while To_Position.Index /= To.Index
-              and then Handler.Forward (To_Position)
+              and then Text.Forward (To_Position)
             loop
                null;
             end loop;
@@ -94,7 +93,7 @@ package body VSS.Implementation.Text_Handlers is
             To_Position := To;
          end if;
 
-         Success := Handler.Forward (To_Position);
+         Success := Text.Forward (To_Position);
 
          Size.Index_Offset := To_Position.Index - From_Position.Index;
          Size.UTF8_Offset  :=

@@ -83,6 +83,7 @@ variables:
 stages:
   - build_and_test
   - build_dependent
+  - run_downstream_ci
 
 #########
 # BUILD #
@@ -310,6 +311,8 @@ build_lsif:
 .run_ci_common: &run_ci_common
   stage: build_dependent
   rules:
+    - if: $CI_PIPELINE_SOURCE == 'push'
+      when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
       allow_failure: true
@@ -320,6 +323,7 @@ build_lsif:
   variables:
     ACI_UPSTREAM_PROJECT_ID: $CI_PROJECT_ID
     ACI_UPSTREAM_MERGE_REQUEST_IID: $CI_MERGE_REQUEST_IID
+    ACI_TRACK_QUALIFIER: edge
 
 run_als_ci:
   <<: *run_ci_common

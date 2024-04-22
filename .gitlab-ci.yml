@@ -323,7 +323,7 @@ build_lsif:
   variables:
     ACI_UPSTREAM_PROJECT_ID: $CI_PROJECT_ID
     ACI_UPSTREAM_MERGE_REQUEST_IID: $CI_MERGE_REQUEST_IID
-    ACI_TRACK_QUALIFIER: edge
+    ACI_TRACK: edge
 
 run_als_ci:
   <<: *run_ci_common

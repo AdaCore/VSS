@@ -6,60 +6,59 @@
 
 --  Special case of string handler to process null strings.
 --
---  All subprograms of String_Handler must be overridden and all necessary
+--  All subprograms of the Text_Handler must be overridden and all necessary
 --  preconditions is added.
 
 package VSS.Implementation.Text_Handlers.Nul is
 
    pragma Preelaborate;
 
-   pragma Warnings (Off, "bits of ""Null_String_Handler"" unused");
+   pragma Warnings (Off, "bits of ""Null_Handler"" unused");
    --  Size of the text handler object is fixed.
 
-   type Null_String_Handler is
+   type Null_Handler is
      new VSS.Implementation.Text_Handlers.Abstract_String_Handler
        with null record with Object_Size => 192;
 
-   overriding procedure Reference (Self : in out Null_String_Handler);
+   overriding procedure Reference (Self : in out Null_Handler);
 
-   overriding procedure Unreference (Self : in out Null_String_Handler);
+   overriding procedure Unreference (Self : in out Null_Handler);
 
-   overriding function Is_Empty (Self : Null_String_Handler) return Boolean;
+   overriding function Is_Empty (Self : Null_Handler) return Boolean;
 
-   overriding function Is_Null (Self : Null_String_Handler) return Boolean;
+   overriding function Is_Null (Self : Null_Handler) return Boolean;
 
    overriding procedure Hash
-     (Self      : Null_String_Handler;
+     (Self      : Null_Handler;
       Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator);
 
    overriding function Length
-     (Self : Null_String_Handler)
-      return VSS.Implementation.Strings.Character_Count;
+     (Self : Null_Handler) return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point'Base;
 
    overriding function Has_Character
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : VSS.Implementation.Strings.Cursor) return Boolean;
 
    overriding procedure Before_First_Character
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : in out VSS.Implementation.Strings.Cursor);
 
    overriding procedure After_Last_Character
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : in out VSS.Implementation.Strings.Cursor);
 
    overriding function Forward
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : aliased in out VSS.Implementation.Strings.Cursor)
       return Boolean;
 
    overriding function Backward
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean;
 
    --  not overriding function Is_Equal
@@ -79,28 +78,27 @@ package VSS.Implementation.Text_Handlers.Nul is
    --     Other_Data : VSS.Implementation.Strings.String_Data) return Boolean;
 
    overriding function Starts_With
-     (Self   : Null_String_Handler;
+     (Self   : Null_Handler;
       Prefix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
       return Boolean;
 
    overriding function Ends_With
-     (Self   : Null_String_Handler;
+     (Self   : Null_Handler;
       Suffix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
       return Boolean;
 
    overriding procedure From_Wide_Wide_String
-     (Self    : in out Null_String_Handler;
+     (Self    : in out Null_Handler;
       Item    : Wide_Wide_String;
       Success : out Boolean);
 
    overriding procedure From_UTF_8_String
-     (Self    : in out Null_String_Handler;
+     (Self    : in out Null_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Success : out Boolean);
 
    overriding function To_UTF_8_String
-     (Self : Null_String_Handler)
-      return Ada.Strings.UTF_Encoding.UTF_8_String;
+     (Self : Null_Handler) return Ada.Strings.UTF_Encoding.UTF_8_String;
 
    --  not overriding function First_UTF8_Offset
    --    (Self     : Abstract_String_Handler;
@@ -137,18 +135,18 @@ package VSS.Implementation.Text_Handlers.Nul is
    --  --  and positive values.
 
    overriding procedure Append
-     (Self   : in out Null_String_Handler;
+     (Self   : in out Null_Handler;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
    overriding procedure Append
-     (Self   : in out Null_String_Handler;
+     (Self   : in out Null_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
    overriding procedure Insert
-     (Self   : in out Null_String_Handler;
+     (Self   : in out Null_Handler;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
@@ -164,7 +162,7 @@ package VSS.Implementation.Text_Handlers.Nul is
    --  --  Implementation must increment value of the Offset.
 
    overriding procedure Delete
-     (Self : in out Null_String_Handler;
+     (Self : in out Null_Handler;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset);
 
@@ -179,7 +177,7 @@ package VSS.Implementation.Text_Handlers.Nul is
    --  --  characters.
 
    overriding procedure Split_Lines
-     (Self            : Null_String_Handler;
+     (Self            : Null_Handler;
       Data            : VSS.Implementation.Strings.String_Data;
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean;

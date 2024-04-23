@@ -27,8 +27,8 @@ package body VSS.Implementation.Strings is
      with Pre => not Is_Initialized (Data);
    --  Initialize object to be null text.
 
-   Global_Null_Text_Handler : aliased
-     VSS.Implementation.Text_Handlers.Nul.Null_String_Handler;
+   Global_Null_Handler : aliased
+     VSS.Implementation.Text_Handlers.Nul.Null_Handler;
    --  Global null text handler object to be used to process uninitialized
    --  string data.
 
@@ -53,7 +53,7 @@ package body VSS.Implementation.Strings is
      (Data : String_Data) return not null Constant_Text_Handler_Access is
    begin
       if not Is_Initialized (Data) then
-         return Global_Null_Text_Handler'Access;
+         return Global_Null_Handler'Access;
 
       else
          return
@@ -217,7 +217,7 @@ package body VSS.Implementation.Strings is
    begin
       declare
          pragma Warnings (Off, """others"" choice is redundant");
-         Overlay : Text_Handlers.Nul.Null_String_Handler := (others => <>)
+         Overlay : Text_Handlers.Nul.Null_Handler := (others => <>)
            with Address => Data.Storage'Address;
          pragma Assert (Data.Storage'Size = Overlay'Size);
          pragma Warnings (On, """others"" choice is redundant");

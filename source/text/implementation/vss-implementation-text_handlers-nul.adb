@@ -4,6 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+--  This version of the package "convert" text handler object into the UTF-8
+--  encoded text on modification operations and redispatch operation.
+
 with VSS.Implementation.Text_Handlers.UTF8;
 with VSS.Strings;
 
@@ -26,7 +29,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    --------------------------
 
    overriding procedure After_Last_Character
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : in out VSS.Implementation.Strings.Cursor) is
    begin
       Position := After_Last_Character_Cursor;
@@ -37,12 +40,11 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ------------
 
    overriding procedure Append
-     (Self   : in out Null_String_Handler;
+     (Self   : in out Null_Handler;
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
    begin
-      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
-        (Self, 1, 0);
+      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize (Self, 1, 0);
       VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
         (Self).Append (Code, Offset);
    end Append;
@@ -52,7 +54,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ------------
 
    overriding procedure Append
-     (Self   : in out Null_String_Handler;
+     (Self   : in out Null_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
@@ -68,7 +70,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    --------------
 
    overriding function Backward
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
    begin
       if Position = After_Last_Character_Cursor then
@@ -83,7 +85,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ----------------------------
 
    overriding procedure Before_First_Character
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : in out VSS.Implementation.Strings.Cursor)
    is
    begin
@@ -95,7 +97,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ------------
 
    overriding procedure Delete
-     (Self : in out Null_String_Handler;
+     (Self : in out Null_Handler;
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset) is null;
 
@@ -104,7 +106,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    -------------
 
    overriding function Element
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.Code_Point'Base is
         (VSS.Implementation.Strings.No_Character);
@@ -114,7 +116,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ---------------
 
    overriding function Ends_With
-     (Self   : Null_String_Handler;
+     (Self   : Null_Handler;
       Suffix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
       return Boolean is
    begin
@@ -126,7 +128,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    -------------
 
    overriding function Forward
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : aliased in out VSS.Implementation.Strings.Cursor)
       return Boolean is
    begin
@@ -142,7 +144,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    -----------------------
 
    overriding procedure From_UTF_8_String
-     (Self    : in out Null_String_Handler;
+     (Self    : in out Null_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Success : out Boolean) is
    begin
@@ -158,7 +160,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ---------------------------
 
    overriding procedure From_Wide_Wide_String
-     (Self    : in out Null_String_Handler;
+     (Self    : in out Null_Handler;
       Item    : Wide_Wide_String;
       Success : out Boolean) is
    begin
@@ -177,7 +179,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    -------------------
 
    overriding function Has_Character
-     (Self     : Null_String_Handler;
+     (Self     : Null_Handler;
       Position : VSS.Implementation.Strings.Cursor) return Boolean is (False);
 
    ----------
@@ -185,7 +187,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ----------
 
    overriding procedure Hash
-     (Self      : Null_String_Handler;
+     (Self      : Null_Handler;
       Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator) is null;
 
    ------------
@@ -193,7 +195,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ------------
 
    overriding procedure Insert
-     (Self   : in out Null_String_Handler;
+     (Self   : in out Null_Handler;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -211,36 +213,34 @@ package body VSS.Implementation.Text_Handlers.Nul is
    -- Is_Empty --
    --------------
 
-   overriding function Is_Empty
-     (Self : Null_String_Handler) return Boolean is (True);
+   overriding function Is_Empty (Self : Null_Handler) return Boolean is (True);
 
    -------------
    -- Is_Null --
    -------------
 
-   overriding function Is_Null
-     (Self : Null_String_Handler) return Boolean is (True);
+   overriding function Is_Null (Self : Null_Handler) return Boolean is (True);
 
    ------------
    -- Length --
    ------------
 
    overriding function Length
-     (Self : Null_String_Handler)
-      return VSS.Implementation.Strings.Character_Count is (0);
+     (Self : Null_Handler) return VSS.Implementation.Strings.Character_Count is
+        (0);
 
    ---------------
    -- Reference --
    ---------------
 
-   overriding procedure Reference (Self : in out Null_String_Handler) is null;
+   overriding procedure Reference (Self : in out Null_Handler) is null;
 
    -----------------
    -- Split_Lines --
    -----------------
 
    overriding procedure Split_Lines
-     (Self            : Null_String_Handler;
+     (Self            : Null_Handler;
       Data            : VSS.Implementation.Strings.String_Data;
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean;
@@ -255,7 +255,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
    -----------------
 
    overriding function Starts_With
-     (Self   : Null_String_Handler;
+     (Self   : Null_Handler;
       Prefix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
       return Boolean is
    begin
@@ -267,14 +267,13 @@ package body VSS.Implementation.Text_Handlers.Nul is
    ---------------------
 
    overriding function To_UTF_8_String
-     (Self : Null_String_Handler)
-      return Ada.Strings.UTF_Encoding.UTF_8_String is ("");
+     (Self : Null_Handler) return Ada.Strings.UTF_Encoding.UTF_8_String is
+        ("");
 
    -----------------
    -- Unreference --
    -----------------
 
-   overriding procedure Unreference
-     (Self : in out Null_String_Handler) is null;
+   overriding procedure Unreference (Self : in out Null_Handler) is null;
 
 end VSS.Implementation.Text_Handlers.Nul;

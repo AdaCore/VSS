@@ -6,7 +6,6 @@
 
 with System.Storage_Elements;
 
-with VSS.Implementation.String_Configuration;
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Strings;
 

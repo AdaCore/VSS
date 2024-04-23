@@ -15,8 +15,8 @@ package VSS.Implementation.Line_Iterators is
      (Data                : VSS.Implementation.Strings.String_Data;
       Terminators         : VSS.Strings.Line_Terminator_Set;
       Initial_Position    : VSS.Implementation.Strings.Cursor;
-      First_Position      : out VSS.Implementation.Strings.Cursor;
-      Last_Position       : out VSS.Implementation.Strings.Cursor;
+      First_Position      : aliased out VSS.Implementation.Strings.Cursor;
+      Last_Position       : aliased out VSS.Implementation.Strings.Cursor;
       Terminator_Position : out VSS.Implementation.Strings.Cursor)
       return Boolean;
    --  Lookup next line terminator sequence. Initial_Position is cursor at
@@ -31,7 +31,7 @@ package VSS.Implementation.Line_Iterators is
      (Data                : VSS.Implementation.Strings.String_Data;
       Terminators         : VSS.Strings.Line_Terminator_Set;
       Initial_Position    : VSS.Implementation.Strings.Cursor;
-      First_Position      : out VSS.Implementation.Strings.Cursor;
+      First_Position      : aliased out VSS.Implementation.Strings.Cursor;
       Last_Position       : out VSS.Implementation.Strings.Cursor;
       Terminator_Position : out VSS.Implementation.Strings.Cursor)
       return Boolean;

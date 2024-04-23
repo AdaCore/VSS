@@ -83,6 +83,7 @@ variables:
 stages:
   - build_and_test
   - build_dependent
+  - run_downstream_ci
 
 #########
 # BUILD #
@@ -189,78 +190,6 @@ build_gnatdoc:
       # Build the ALS as a test
       anod build gnatdoc4 --qualifier=$ACI_ANOD_QUALIFIER
 
-build_als:
-  services:
-     - image:sandbox
-     - cpu:8
-     - mem:16
-  stage: build_dependent
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-  script:
-    - !reference [.basic-setup]
-    - !reference [.detect-branches]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/markdown
-    - ACI_SUBPROJECT_NAME=markdown
-    - !reference [.checkout-subproject]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
-    - ACI_SUBPROJECT_NAME=gnatdoc$ACI_REPOSITORY_NAME_EDGE_SUFFIX
-    - !reference [.checkout-subproject]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/ada_language_server
-    - ACI_SUBPROJECT_NAME=ada_language_server$ACI_REPOSITORY_NAME_EDGE_SUFFIX
-    - !reference [.checkout-subproject]
-
-    - |
-      cd /it/wave
-
-      # Tell the anod sandbox to use our repository
-      anod vcs --add-repo vss $CI_PROJECT_DIR
-
-      # Build the ALS as a test
-      anod build als --qualifier=$ACI_ANOD_QUALIFIER
-
-build_gs:
-  services:
-     - image:gtk-deps
-     - cpu:8
-     - mem:16
-  stage: build_dependent
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-  script:
-    - !reference [.basic-setup]
-    - !reference [.detect-branches]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/markdown
-    - ACI_SUBPROJECT_NAME=markdown
-    - !reference [.checkout-subproject]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
-    - ACI_SUBPROJECT_NAME=gnatdoc$ACI_REPOSITORY_NAME_EDGE_SUFFIX
-    - !reference [.checkout-subproject]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/ada_language_server
-    - ACI_SUBPROJECT_NAME=ada_language_server$ACI_REPOSITORY_NAME_EDGE_SUFFIX
-    - !reference [.checkout-subproject]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatstudio
-    - ACI_SUBPROJECT_NAME=gnatstudio$ACI_REPOSITORY_NAME_EDGE_SUFFIX
-    - !reference [.checkout-subproject]
-
-    - |
-      cd /it/wave
-
-      # Tell the anod sandbox to use our repository
-      anod vcs --add-repo vss $CI_PROJECT_DIR
-
-      # Build the ALS as a test
-      anod build gps --qualifier=$ACI_ANOD_QUALIFIER
-
 build_lsif:
   services:
      - image:sandbox
@@ -310,6 +239,8 @@ build_lsif:
 .run_ci_common: &run_ci_common
   stage: build_dependent
   rules:
+    - if: $CI_PIPELINE_SOURCE == 'push'
+      when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
       allow_failure: true
@@ -320,6 +251,7 @@ build_lsif:
   variables:
     ACI_UPSTREAM_PROJECT_ID: $CI_PROJECT_ID
     ACI_UPSTREAM_MERGE_REQUEST_IID: $CI_MERGE_REQUEST_IID
+    ACI_TRACK: edge
 
 run_als_ci:
   <<: *run_ci_common

@@ -1,16 +1,36 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.String_Configuration;
-with VSS.Implementation.Null_String_Handlers;
+with System.Address_To_Access_Conversions;
+
+with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.Text_Handlers.Nul;
 
 package body VSS.Implementation.Strings is
 
+   use type System.Storage_Elements.Integer_Address;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+   package Address_To_Text_Handler_Conversions is
+     new System.Address_To_Access_Conversions
+       (VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class);
+
+   function Is_Initialized (Data : String_Data) return Boolean
+     with Inline_Always;
+   --  Return True when text data is initialized, and False overwise.
+
+   procedure Unsafe_Initialize (Data : in out String_Data)
+     with Pre => not Is_Initialized (Data);
+   --  Initialize object to be null text.
+
+   Global_Null_Handler : aliased
+     VSS.Implementation.Text_Handlers.Nul.Null_Handler;
+   --  Global null text handler object to be used to process uninitialized
+   --  string data.
 
    ---------
    -- "=" --
@@ -21,9 +41,27 @@ package body VSS.Implementation.Strings is
       Right : String_Data) return Boolean is
    begin
       return
-        VSS.Implementation.Strings.Handler (Left).Is_Equal
-          (Left, VSS.Implementation.Strings.Handler (Right).all, Right);
+        VSS.Implementation.Strings.Constant_Handler (Left).Is_Equal
+          (VSS.Implementation.Strings.Constant_Handler (Right).all);
    end "=";
+
+   ----------------------
+   -- Constant_Handler --
+   ----------------------
+
+   function Constant_Handler
+     (Data : String_Data) return not null Constant_Text_Handler_Access is
+   begin
+      if not Is_Initialized (Data) then
+         return Global_Null_Handler'Access;
+
+      else
+         return
+           Constant_Text_Handler_Access
+             (Address_To_Text_Handler_Conversions.To_Pointer
+                (Data.Storage'Address));
+      end if;
+   end Constant_Handler;
 
    ------------------
    -- Fixup_Delete --
@@ -118,26 +156,17 @@ package body VSS.Implementation.Strings is
       end if;
    end Fixup_Insert;
 
-   -------------
-   -- Handler --
-   -------------
+   --------------------
+   -- Is_Initialized --
+   --------------------
 
-   function Handler
-     (Data : String_Data)
-      return not null VSS.Implementation.Strings.String_Handler_Access is
+   function Is_Initialized (Data : String_Data) return Boolean is
+      Tag : System.Storage_Elements.Integer_Address
+        with Import, Convention => Ada, Address => Data.Storage'Address;
+
    begin
-      if Data.In_Place then
-         return VSS.Implementation.String_Configuration.In_Place_Handler;
-
-      elsif Data.Handler /= null then
-         return Data.Handler;
-
-      else
-         return
-           VSS.Implementation.Null_String_Handlers
-             .Global_Null_String_Handler'Access;
-      end if;
-   end Handler;
+      return Tag /= 0;
+   end Is_Initialized;
 
    ----------------
    -- Is_Invalid --
@@ -157,7 +186,15 @@ package body VSS.Implementation.Strings is
 
    procedure Reference (Data : in out String_Data) is
    begin
-      VSS.Implementation.Strings.Handler (Data).Reference (Data);
+      if Is_Initialized (Data) then
+         declare
+            Text : constant Variable_Text_Handler_Access :=
+              Variable_Handler (Data);
+
+         begin
+            Text.Reference;
+         end;
+      end if;
    end Reference;
 
    -----------------
@@ -166,8 +203,46 @@ package body VSS.Implementation.Strings is
 
    procedure Unreference (Data : in out String_Data) is
    begin
-      VSS.Implementation.Strings.Handler (Data).Unreference (Data);
-      Data := Null_String_Data;
+      if Is_Initialized (Data) then
+         Variable_Handler (Data).Unreference;
+         Data := Null_String_Data;
+      end if;
    end Unreference;
+
+   -----------------------
+   -- Unsafe_Initialize --
+   -----------------------
+
+   procedure Unsafe_Initialize (Data : in out String_Data) is
+   begin
+      declare
+         pragma Warnings (Off, """others"" choice is redundant");
+         Overlay : Text_Handlers.Nul.Null_Handler := (others => <>)
+           with Address => Data.Storage'Address;
+         pragma Assert (Data.Storage'Size = Overlay'Size);
+         pragma Warnings (On, """others"" choice is redundant");
+
+      begin
+         null;
+      end;
+   end Unsafe_Initialize;
+
+   ----------------------
+   -- Variable_Handler --
+   ----------------------
+
+   function Variable_Handler
+     (Data : in out String_Data)
+      return not null Variable_Text_Handler_Access is
+   begin
+      if not Is_Initialized (Data) then
+         Unsafe_Initialize (Data);
+      end if;
+
+      return
+        Variable_Text_Handler_Access
+          (Address_To_Text_Handler_Conversions.To_Pointer
+             (Data.Storage'Address));
+   end Variable_Handler;
 
 end VSS.Implementation.Strings;

@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 pragma Ada_2022;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Core;
 with VSS.Implementation.UTF8_Casing;
@@ -174,7 +174,7 @@ package body VSS.Characters is
      (Self : Virtual_Character) return Virtual_Character
    is
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -183,15 +183,15 @@ package body VSS.Characters is
          VSS.Implementation.UTF8_Casing.Simple_Lowercase,
          Data);
 
-      VSS.Implementation.Strings.Handler
-        (Data).Before_First_Character (Data, Position);
-      Success := VSS.Implementation.Strings.Handler
-        (Data).Forward (Data, Position);
+      VSS.Implementation.Strings.Constant_Handler
+        (Data).Before_First_Character (Position);
+      Success :=
+        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
 
       return
         Virtual_Character'Val
-          (VSS.Implementation.Strings.Handler
-             (Data).Element (Data, Position));
+          (VSS.Implementation.Strings.Constant_Handler
+             (Data).Element (Position));
    end Get_Simple_Lowercase_Mapping;
 
    ----------------------------------
@@ -202,7 +202,7 @@ package body VSS.Characters is
      (Self : Virtual_Character) return Virtual_Character
    is
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -211,15 +211,15 @@ package body VSS.Characters is
          VSS.Implementation.UTF8_Casing.Simple_Titlecase,
          Data);
 
-      VSS.Implementation.Strings.Handler
-        (Data).Before_First_Character (Data, Position);
-      Success := VSS.Implementation.Strings.Handler
-        (Data).Forward (Data, Position);
+      VSS.Implementation.Strings.Constant_Handler
+        (Data).Before_First_Character (Position);
+      Success :=
+        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
 
       return
         Virtual_Character'Val
-          (VSS.Implementation.Strings.Handler
-             (Data).Element (Data, Position));
+          (VSS.Implementation.Strings.Constant_Handler
+             (Data).Element (Position));
    end Get_Simple_Titlecase_Mapping;
 
    ----------------------------------
@@ -230,7 +230,7 @@ package body VSS.Characters is
      (Self : Virtual_Character) return Virtual_Character
    is
       Data     : VSS.Implementation.Strings.String_Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -239,15 +239,15 @@ package body VSS.Characters is
          VSS.Implementation.UTF8_Casing.Simple_Uppercase,
          Data);
 
-      VSS.Implementation.Strings.Handler
-        (Data).Before_First_Character (Data, Position);
-      Success := VSS.Implementation.Strings.Handler
-        (Data).Forward (Data, Position);
+      VSS.Implementation.Strings.Constant_Handler
+        (Data).Before_First_Character (Position);
+      Success :=
+        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
 
       return
         Virtual_Character'Val
-          (VSS.Implementation.Strings.Handler
-             (Data).Element (Data, Position));
+          (VSS.Implementation.Strings.Constant_Handler
+             (Data).Element (Position));
    end Get_Simple_Uppercase_Mapping;
 
    ---------------------------

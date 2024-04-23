@@ -11,7 +11,7 @@ with Ada.Unchecked_Deallocation;
 
 with VSS.Characters.Latin;
 with VSS.Characters.Punctuations;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.Strings;
 with VSS.Regular_Expressions.ECMA_Parser;
 with VSS.Regular_Expressions.Matches;
@@ -373,22 +373,21 @@ package body VSS.Regular_Expressions.Pike_Engines is
         (Text   : VSS.Strings.Virtual_String'Class;
          Cursor : in out VSS.Implementation.Strings.Cursor)
       is
-         use type VSS.Implementation.Strings.String_Handler_Access;
+         Ignore  : Boolean;
 
-         Ignore : Boolean;
+         Data    : constant
+           VSS.Strings.Internals.String_Data_Constant_Access :=
+             VSS.Strings.Internals.Data_Access_Constant (Text);
+         Handler : constant
+           VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+             VSS.Implementation.Strings.Constant_Handler (Data.all);
 
-         Data   : constant VSS.Strings.Internals.String_Data_Constant_Access :=
-           VSS.Strings.Internals.Data_Access_Constant (Text);
-
-         Handler : constant VSS.Implementation.Strings.String_Handler_Access :=
-           VSS.Implementation.Strings.Handler (Data.all);
       begin
          if VSS.Implementation.Strings.Is_Invalid (Cursor) then
             null;
-         elsif Handler = null then
-            Cursor := (others => <>);  --  Make it invalid
+
          else
-            Ignore := Handler.Backward (Data.all, Cursor);
+            Ignore := Handler.Backward (Cursor);
          end if;
       end Step_Backward;
 

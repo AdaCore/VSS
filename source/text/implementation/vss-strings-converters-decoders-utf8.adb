@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 package body VSS.Strings.Converters.Decoders.UTF8 is
 
@@ -31,6 +31,9 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
       Upper  : Ada.Streams.Stream_Element        := Self.Upper;
       Byte   : Ada.Streams.Stream_Element;
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Text   : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -47,8 +50,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Replacement_Character, Offset);
+                  Text.Append (Replacement_Character, Offset);
                end if;
             end if;
 
@@ -60,10 +62,8 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
          if Needed = 0 then
             case Byte is
                when 16#00# .. 16#7F# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target,
-                     VSS.Unicode.Code_Point (Byte and 16#7F#),
-                     Offset);
+                  Text.Append
+                    (VSS.Unicode.Code_Point (Byte and 16#7F#), Offset);
 
                when 16#C2# .. 16#DF# =>
                   Code := VSS.Unicode.Code_Point (Byte and 16#1F#);
@@ -98,8 +98,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                      exit;
 
                   else
-                     VSS.Implementation.Strings.Handler (Target).Append
-                       (Target, Replacement_Character, Offset);
+                     Text.Append (Replacement_Character, Offset);
                   end if;
             end case;
 
@@ -120,8 +119,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                   end if;
                end if;
 
-               VSS.Implementation.Strings.Handler (Target).Append
-                 (Target, Code, Offset);
+               Text.Append (Code, Offset);
 
                <<Skip>>
 
@@ -142,8 +140,7 @@ package body VSS.Strings.Converters.Decoders.UTF8 is
                exit;
 
             else
-               VSS.Implementation.Strings.Handler (Target).Append
-                 (Target, Replacement_Character, Offset);
+               Text.Append (Replacement_Character, Offset);
             end if;
          end if;
 

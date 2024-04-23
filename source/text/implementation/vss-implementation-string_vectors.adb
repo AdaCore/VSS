@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -10,7 +10,7 @@ with Ada.Unchecked_Deallocation;
 with System.Storage_Elements;
 
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package body VSS.Implementation.String_Vectors is
@@ -150,9 +150,8 @@ package body VSS.Implementation.String_Vectors is
      (Self : String_Vector_Data_Access;
       Item : VSS.Implementation.Strings.String_Data) return Boolean
    is
-      Item_Handler :
-        VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-          renames VSS.Implementation.Strings.Handler (Item).all;
+      Item_Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
+        renames VSS.Implementation.Strings.Constant_Handler (Item).all;
 
    begin
       if Self = null then
@@ -160,16 +159,11 @@ package body VSS.Implementation.String_Vectors is
       end if;
 
       for J in Self.Data'First .. Self.Last loop
-         declare
-            Handler :
-              VSS.Implementation.String_Handlers.Abstract_String_Handler'Class
-                renames VSS.Implementation.Strings.Handler (Self.Data (J)).all;
-
-         begin
-            if Item_Handler.Is_Equal (Item, Handler, Self.Data (J)) then
-               return True;
-            end if;
-         end;
+         if Item_Text.Is_Equal
+              (VSS.Implementation.Strings.Constant_Handler (Self.Data (J)).all)
+         then
+            return True;
+         end if;
       end loop;
 
       return False;
@@ -202,12 +196,7 @@ package body VSS.Implementation.String_Vectors is
      (Self           : String_Vector_Data_Access;
       Result         : in out VSS.Implementation.Strings.String_Data;
       Terminator     : VSS.Strings.Line_Terminator;
-      Terminate_Last : Boolean)
-   is
-      use type VSS.Strings.Line_Terminator;
-
-      Offset : VSS.Implementation.Strings.Cursor_Offset;
-
+      Terminate_Last : Boolean) is
    begin
       VSS.Implementation.Strings.Unreference (Result);
 
@@ -215,24 +204,29 @@ package body VSS.Implementation.String_Vectors is
          return;
       end if;
 
-      Result := VSS.Implementation.Strings.Null_String_Data;
+      declare
+         use type VSS.Strings.Line_Terminator;
 
-      for J in 1 .. Self.Last loop
-         VSS.Implementation.Strings.Handler (Result).Append
-           (Result, Self.Data (J), Offset);
+         Offset : VSS.Implementation.Strings.Cursor_Offset;
+         Text   : constant not null
+           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+             VSS.Implementation.Strings.Variable_Handler (Result);
 
-         if J /= Self.Last or Terminate_Last then
-            VSS.Implementation.Strings.Handler (Result).Append
-              (Result, Line_Terminator_To_Code_Point (Terminator), Offset);
+      begin
+         for J in 1 .. Self.Last loop
+            Text.Append (Result, Self.Data (J), Offset);
 
-            if Terminator = VSS.Strings.CRLF then
-               VSS.Implementation.Strings.Handler (Result).Append
-                 (Result,
-                  VSS.Implementation.Character_Codes.Line_Feed,
-                  Offset);
+            if J /= Self.Last or Terminate_Last then
+               Text.Append
+                 (Line_Terminator_To_Code_Point (Terminator), Offset);
+
+               if Terminator = VSS.Strings.CRLF then
+                  Text.Append
+                    (VSS.Implementation.Character_Codes.Line_Feed, Offset);
+               end if;
             end if;
-         end if;
-      end loop;
+         end loop;
+      end;
    end Join_Lines;
 
    ------------

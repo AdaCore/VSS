@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO88591 is
 
@@ -26,6 +26,9 @@ package body VSS.Strings.Converters.Decoders.ISO88591 is
       Index  : Ada.Streams.Stream_Element_Offset := Source'First;
       Byte   : Ada.Streams.Stream_Element;
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Text   : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       loop
@@ -33,8 +36,7 @@ package body VSS.Strings.Converters.Decoders.ISO88591 is
 
          Byte := Source (Index);
 
-         VSS.Implementation.Strings.Handler (Target).Append
-           (Target, VSS.Unicode.Code_Point (Byte), Offset);
+         Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
 
          Index := Index + 1;
       end loop;

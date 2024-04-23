@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 package body VSS.Strings.Cursors.Iterators.Characters is
 
@@ -23,8 +23,8 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    begin
       if Self.Owner /= null then
          return
-           VSS.Implementation.Strings.Handler
-             (Data).Backward (Data, Self.Position);
+           VSS.Implementation.Strings.Constant_Handler
+             (Data).Backward (Self.Position);
       end if;
 
       return False;
@@ -45,8 +45,8 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       if Self.Owner /= null then
          return
            VSS.Characters.Virtual_Character'Base'Val
-             (VSS.Implementation.Strings.Handler
-                (Data).Element (Data, Self.Position));
+             (VSS.Implementation.Strings.Constant_Handler
+                (Data).Element (Self.Position));
       end if;
 
       return
@@ -59,17 +59,22 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    -------------
 
    overriding function Forward
-     (Self : in out Character_Iterator) return Boolean
-   is
-      Data : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-
+     (Self : in out Character_Iterator) return Boolean is
    begin
-      if Self.Owner /= null then
-         return Self.Handler.Forward (Data, Self.Position);
+      if Self.Owner = null then
+         return False;
       end if;
 
-      return False;
+      declare
+         use type VSS.Implementation.Strings.Constant_Text_Handler_Access;
+
+         pragma Suppress (Access_Check);
+
+      begin
+         pragma Assert (Self.Handler /= null);
+
+         return Self.Handler.Forward (Self.Position);
+      end;
    end Forward;
 
    -------------
@@ -80,15 +85,13 @@ package body VSS.Strings.Cursors.Iterators.Characters is
      (Self    : in out Character_Iterator;
       Element : out VSS.Characters.Virtual_Character'Base) return Boolean
    is
-      Data   : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Code   : VSS.Unicode.Code_Point'Base :=
         VSS.Implementation.Strings.No_Character;
       Result : Boolean := False;
 
    begin
       if Self.Owner /= null then
-         Result := Self.Handler.Forward_Element (Data, Self.Position, Code);
+         Result := Self.Handler.Forward_Element (Self.Position, Code);
       end if;
 
       Element := VSS.Characters.Virtual_Character'Base'Val (Code);
@@ -101,14 +104,10 @@ package body VSS.Strings.Cursors.Iterators.Characters is
    -----------------
 
    overriding function Has_Element
-     (Self : Character_Iterator) return Boolean
-   is
-      Data : VSS.Implementation.Strings.String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-
+     (Self : Character_Iterator) return Boolean is
    begin
       if Self.Owner /= null then
-         return Self.Handler.Has_Character (Data, Self.Position);
+         return Self.Handler.Has_Character (Self.Position);
       end if;
 
       return False;
@@ -123,8 +122,8 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
-      Self.Handler.After_Last_Character (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
+      Self.Handler.After_Last_Character (Self.Position);
    end Set_After_Last;
 
    ------------
@@ -143,7 +142,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
       Self.Reconnect (Cursor_Owner);
       Self.Handler  :=
-        VSS.Implementation.Strings.Handler
+        VSS.Implementation.Strings.Constant_Handler
           (Virtual_String (Cursor_Owner.all).Data);
       Self.Position := Cursor_Position;
    end Set_At;
@@ -160,9 +159,9 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
-      Self.Handler.Before_First_Character (On.Data, Self.Position);
-      Dummy := Self.Handler.Forward (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
+      Self.Handler.Before_First_Character (Self.Position);
+      Dummy := Self.Handler.Forward (Self.Position);
    end Set_At_First;
 
    -----------------
@@ -177,9 +176,9 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
-      Self.Handler.After_Last_Character (On.Data, Self.Position);
-      Dummy := Self.Handler.Backward (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
+      Self.Handler.After_Last_Character (Self.Position);
+      Dummy := Self.Handler.Backward (Self.Position);
    end Set_At_Last;
 
    ----------------------
@@ -191,8 +190,8 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
-      Self.Handler := VSS.Implementation.Strings.Handler (On.Data);
-      Self.Handler.Before_First_Character (On.Data, Self.Position);
+      Self.Handler := VSS.Implementation.Strings.Constant_Handler (On.Data);
+      Self.Handler.Before_First_Character (Self.Position);
    end Set_Before_First;
 
    ---------------------
@@ -211,7 +210,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
          VSS.Implementation.Strings.Fixup_Insert
            (Self.Position, Start, Inserted);
          Self.Handler :=
-           VSS.Implementation.Strings.Handler
+           VSS.Implementation.Strings.Constant_Handler
              (Virtual_String (Self.Owner.all).Data);
 
       else

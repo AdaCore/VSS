@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -8,7 +8,7 @@ with Ada.Assertions;
 
 with VSS.Characters;
 with VSS.Implementation.Strings;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Internals;
 with VSS.Unicode;
 
@@ -308,16 +308,16 @@ package body VSS.JSON.Push_Writers is
             Data     : VSS.Implementation.Strings.String_Data
               renames VSS.Strings.Internals.Data_Access_Constant (Item).all;
             Handler  : constant not null
-              VSS.Implementation.Strings.String_Handler_Access :=
-                VSS.Implementation.Strings.Handler (Data);
-            Position : VSS.Implementation.Strings.Cursor;
+              VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+                VSS.Implementation.Strings.Constant_Handler (Data);
+            Position : aliased VSS.Implementation.Strings.Cursor;
             Code     : VSS.Unicode.Code_Point;
 
          begin
-            Handler.Before_First_Character (Data, Position);
+            Handler.Before_First_Character (Position);
 
-            while Handler.Forward (Data, Position) loop
-               Code := Handler.Element (Data, Position);
+            while Handler.Forward (Position) loop
+               Code := Handler.Element (Position);
 
                case Code is
                   when 16#00_0000# .. 16#00_0007#

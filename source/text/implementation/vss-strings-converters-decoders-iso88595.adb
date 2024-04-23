@@ -1,10 +1,10 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 package body VSS.Strings.Converters.Decoders.ISO88595 is
 
@@ -27,6 +27,9 @@ package body VSS.Strings.Converters.Decoders.ISO88595 is
       Index  : Ada.Streams.Stream_Element_Offset := Source'First;
       Byte   : Ada.Streams.Stream_Element;
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Text   : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       loop
@@ -36,22 +39,17 @@ package body VSS.Strings.Converters.Decoders.ISO88595 is
 
          case Byte is
             when 16#00# .. 16#A0# | 16#AD# =>
-               VSS.Implementation.Strings.Handler (Target).Append
-                 (Target, VSS.Unicode.Code_Point (Byte), Offset);
+               Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
 
             when 16#F0# =>
-               VSS.Implementation.Strings.Handler (Target).Append
-                 (Target, 16#2116#, Offset);
+               Text.Append (16#2116#, Offset);
 
             when 16#FD# =>
-               VSS.Implementation.Strings.Handler (Target).Append
-                 (Target, 16#00A7#, Offset);
+               Text.Append (16#00A7#, Offset);
 
             when others =>
-               VSS.Implementation.Strings.Handler (Target).Append
-                 (Target,
-                  VSS.Unicode.Code_Point (Byte) - 16#A0# + 16#0400#,
-                  Offset);
+               Text.Append
+                 (VSS.Unicode.Code_Point (Byte) - 16#A0# + 16#0400#, Offset);
          end case;
 
          Index := Index + 1;

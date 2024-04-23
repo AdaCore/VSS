@@ -1,12 +1,14 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Ada_2022;
+
 with System.Storage_Elements;
 
-limited with VSS.Implementation.String_Handlers;
+limited with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package VSS.Implementation.Strings is
@@ -25,9 +27,11 @@ package VSS.Implementation.Strings is
      VSS.Unicode.Code_Point_Unit'Last;
    --  Special value to return when there is no character at given position.
 
-   type String_Handler_Access is
-     access all
-       VSS.Implementation.String_Handlers.Abstract_String_Handler'Class;
+   type Variable_Text_Handler_Access is
+     access all VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+   type Constant_Text_Handler_Access is
+     access constant
+       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
 
    ------------
    -- Cursor --
@@ -95,39 +99,23 @@ package VSS.Implementation.Strings is
    -- String_Data --
    -----------------
 
-   --  String_Data is a pair of Handler and pointer to the associated data.
-   --  It is not defined how particular implementation of the String_Handler
-   --  use pointer.
-   --
-   --  However, there is one exception: when In_Place Flag is set it means
-   --  that special predefined handler is used to process Storage.
+   --  String_Data is an raw storage for the associated text data.
+   --  Storage contains an instance of the one of types derived from
+   --  the Abstract_Text_Handler type.
    --
    --  Note: data layout is optimized for x86-64 CPU.
-   --  Note: Storage has 4 bytes alignment.
+   --  Note: Storage has 8 bytes alignment.
 
-   type String_Data (In_Place : Boolean := False) is record
+   type String_Data is record
+      Storage  : System.Storage_Elements.Storage_Array (0 .. 23) :=
+        [others => 0];
       Capacity : Character_Count := 0;
-
-      Padding  : Boolean := False;
-      --  This padding bit is not used in the code, but here for the benefit
-      --  of dynamic memory analysis tools such as valgrind.
-
-      case In_Place is
-         when True =>
-            Storage : System.Storage_Elements.Storage_Array (0 .. 19);
-
-         when False =>
-            Handler : String_Handler_Access;
-            Pointer : System.Address;
-      end case;
-   end record;
+   end record
+     with Alignment   => 8,
+          Object_Size => 256;
    for String_Data use record
-      Storage  at 0  range  0 .. 159;
-      Handler  at 0  range  0 ..  63;
-      Pointer  at 8  range  0 ..  63;
-      Capacity at 20 range  0 ..  29;
-      Padding  at 20 range 30 ..  30;
-      In_Place at 20 range 31 ..  31;
+      Storage  at 0  range  0 .. 191;
+      Capacity at 24 range  0 ..  31;
    end record;
 
    overriding function "="
@@ -144,12 +132,16 @@ package VSS.Implementation.Strings is
    --  default. Also, System.Null_Address is not static expression and can't be
    --  used here for initialization.
 
-   function Handler
-     (Data : String_Data)
-      return not null VSS.Implementation.Strings.String_Handler_Access
-      with Inline;
-   --  Return string handler for given string data. Null handler is returned
-   --  for null string.
+   function Variable_Handler
+     (Data : in out String_Data) return not null Variable_Text_Handler_Access
+        with Inline_Always;
+   function Constant_Handler
+     (Data : String_Data) return not null Constant_Text_Handler_Access
+        with Inline_Always;
+   --  Return string handler for given string data.
+   --
+   --  Call of Variable_Handler initializes string data when it is not
+   --  initialized.
 
    procedure Reference (Data : in out String_Data) with Inline;
    --  Reference given string data. It is wrapper around Handler and call of

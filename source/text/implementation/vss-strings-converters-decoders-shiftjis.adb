@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with Interfaces;
 
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 
 with VSS.Strings.Converters.Decoders.Index_JIS0208;
 
@@ -30,6 +30,9 @@ package body VSS.Strings.Converters.Decoders.ShiftJIS is
       Lead   : Ada.Streams.Stream_Element        := Self.Lead;
       Byte   : Ada.Streams.Stream_Element;
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+      Text   : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -46,8 +49,7 @@ package body VSS.Strings.Converters.Decoders.ShiftJIS is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Replacement_Character, Offset);
+                  Text.Append (Replacement_Character, Offset);
                end if;
             end if;
 
@@ -86,8 +88,7 @@ package body VSS.Strings.Converters.Decoders.ShiftJIS is
                Lead := 0;
 
                if Code /= 0 then
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, Code, Offset);
+                  Text.Append (Code, Offset);
 
                else
                   if Byte in ASCII_Byte_Range then
@@ -100,8 +101,7 @@ package body VSS.Strings.Converters.Decoders.ShiftJIS is
                      exit;
 
                   else
-                     VSS.Implementation.Strings.Handler (Target).Append
-                       (Target, Replacement_Character, Offset);
+                     Text.Append (Replacement_Character, Offset);
                   end if;
                end if;
             end;
@@ -113,23 +113,18 @@ package body VSS.Strings.Converters.Decoders.ShiftJIS is
 
             case Byte is
                when 16#5C# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#A5#, Offset);
+                  Text.Append (16#A5#, Offset);
 
                when 16#7E# =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, 16#203E#, Offset);
+                  Text.Append (16#203E#, Offset);
 
                when others =>
-                  VSS.Implementation.Strings.Handler (Target).Append
-                    (Target, VSS.Unicode.Code_Point (Byte), Offset);
+                  Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
             end case;
 
          elsif Byte in 16#A1# .. 16#DF# then
-            VSS.Implementation.Strings.Handler (Target).Append
-              (Target,
-               16#FF61# + VSS.Unicode.Code_Point (Byte - 16#A1#),
-               Offset);
+            Text.Append
+              (16#FF61# + VSS.Unicode.Code_Point (Byte - 16#A1#), Offset);
 
          elsif Byte in 16#81# .. 16#9F# | 16#E0# .. 16#FC# then
             Lead := Byte;
@@ -141,8 +136,7 @@ package body VSS.Strings.Converters.Decoders.ShiftJIS is
                exit;
 
             else
-               VSS.Implementation.Strings.Handler (Target).Append
-                 (Target, Replacement_Character, Offset);
+               Text.Append (Replacement_Character, Offset);
             end if;
          end if;
 

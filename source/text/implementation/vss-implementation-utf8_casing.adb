@@ -1,39 +1,36 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 pragma Ada_2022;
 
-with VSS.Implementation.Null_String_Handlers;
-with VSS.Implementation.String_Configuration;
 with VSS.Implementation.UCD_Casing;
-with VSS.Implementation.UTF8_String_Handlers;
+with VSS.Implementation.Text_Handlers.UTF8.Dynamic;
+with VSS.Implementation.Text_Handlers.UTF8.Static;
 
 package body VSS.Implementation.UTF8_Casing is
 
    procedure Convert_Case
-     (Self    : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
+     (Self    :
+        VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
 
    procedure Convert_Case
      (Self    :
-        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
+        VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data);
 
    procedure Get_Case_Mapping
-     (Self    :
-        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
+     (Code    : VSS.Unicode.Code_Point;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data);
+      Text    : out
+        VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler);
 
-   ------------------
+   --  ------------------
    -- Convert_Case --
    ------------------
 
@@ -42,36 +39,33 @@ package body VSS.Implementation.UTF8_Casing is
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Result  : out VSS.Implementation.Strings.String_Data)
    is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
 
    begin
-      if Handler.all
-           in VSS.Implementation.Null_String_Handlers.Null_String_Handler
-      then
+      if Handler.Is_Empty then
          --  String is empty, nothing to do.
 
-         Handler.Initialize (Result);
+         Result := VSS.Implementation.Strings.Null_String_Data;
 
       elsif Handler.all
-              in VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
+              in VSS.Implementation.Text_Handlers.UTF8.Dynamic
+                   .Dynamic_UTF8_Handler
       then
          Convert_Case
-           (VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
+           (VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler
               (Handler.all),
-            Data,
             Mapping,
             Result);
 
       elsif Handler.all
-              in VSS.Implementation.UTF8_String_Handlers
-                   .UTF8_In_Place_String_Handler
+              in VSS.Implementation.Text_Handlers.UTF8.Static
+                   .Static_UTF8_Handler
       then
          Convert_Case
-           (VSS.Implementation.UTF8_String_Handlers
-              .UTF8_In_Place_String_Handler (Handler.all),
-            Data,
+           (VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+              (Handler.all),
             Mapping,
             Result);
 
@@ -85,42 +79,34 @@ package body VSS.Implementation.UTF8_Casing is
    ------------------
 
    procedure Convert_Case
-     (Self    : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
+     (Self    :
+        VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data)
-   is
-      use type VSS.Unicode.UTF8_Code_Unit_Offset;
-
-      Source : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Data.Pointer'Address;
-
+      Result  : out VSS.Implementation.Strings.String_Data) is
    begin
-      Self.Initialize (Result);
-
-      if Self.Is_Empty (Data) then
+      if Self.Is_Empty then
          --  Nothing to do for an empty string.
+
+         Result := VSS.Implementation.Strings.Null_String_Data;
 
          return;
       end if;
 
       declare
-         Target :
-           VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-             with Import, Convention => Ada, Address => Result.Pointer'Address;
+         Handler : constant not null
+           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+             VSS.Implementation.Strings.Variable_Handler (Result);
 
       begin
-         Target :=
-           VSS.Implementation.UTF8_String_Handlers.Allocate
-             (VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
-              Source.Size);
+         VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
+           (Handler.all, 0, Self.Pointer.Size);
       end;
 
       case Mapping is
          when Simple_Lowercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
                Result);
 
@@ -135,22 +121,22 @@ package body VSS.Implementation.UTF8_Casing is
 
          when Simple_Uppercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
                Result);
 
          when NFKC_Casefold =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
                VSS.Implementation.UCD_Casing_UTF8.NFKC_Casefold_Index,
                Result);
 
          when Lowercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Full
-              (Source.Storage,
-               Source.Size,
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
                True,
                Result);
@@ -167,8 +153,8 @@ package body VSS.Implementation.UTF8_Casing is
 
          when Uppercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Full
-              (Source.Storage,
-               Source.Size,
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
                False,
                Result);
@@ -181,22 +167,33 @@ package body VSS.Implementation.UTF8_Casing is
 
    procedure Convert_Case
      (Self    :
-        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data    : VSS.Implementation.Strings.String_Data;
+        VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data)
-   is
-      Source : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-        with Import, Convention => Ada, Address => Data'Address;
-
+      Result  : out VSS.Implementation.Strings.String_Data) is
    begin
-      Self.Initialize (Result);
+      if Self.Is_Empty then
+         --  Nothing to do for an empty string.
+
+         Result := VSS.Implementation.Strings.Null_String_Data;
+
+         return;
+      end if;
+
+      declare
+         Handler : constant not null
+           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+             VSS.Implementation.Strings.Variable_Handler (Result);
+
+      begin
+         VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
+           (Handler.all, 0, Self.Size);
+      end;
 
       case Mapping is
          when Simple_Lowercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
+              (Self.Storage,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
                Result);
 
@@ -211,22 +208,22 @@ package body VSS.Implementation.UTF8_Casing is
 
          when Simple_Uppercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
+              (Self.Storage,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
                Result);
 
          when NFKC_Casefold =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
-              (Source.Storage,
-               Source.Size,
+              (Self.Storage,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.NFKC_Casefold_Index,
                Result);
 
          when Lowercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Full
-              (Source.Storage,
-               Source.Size,
+              (Self.Storage,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
                True,
                Result);
@@ -243,8 +240,8 @@ package body VSS.Implementation.UTF8_Casing is
 
          when Uppercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Full
-              (Source.Storage,
-               Source.Size,
+              (Self.Storage,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
                False,
                Result);
@@ -313,7 +310,7 @@ package body VSS.Implementation.UTF8_Casing is
                   if not Match then
                      --  Replace by 03C2
 
-                     VSS.Implementation.UTF8_String_Handlers.Unchecked_Append
+                     VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                        (Result_Data, [16#CF#, 16#82#], 0, 2, 1);
                      Skip := True;
                   end if;
@@ -324,7 +321,7 @@ package body VSS.Implementation.UTF8_Casing is
 
             if not Skip then
                if Info.Changes then
-                  VSS.Implementation.UTF8_String_Handlers.Unchecked_Append
+                  VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                     (Result_Data,
                      VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
                      Info.Offset,
@@ -332,7 +329,7 @@ package body VSS.Implementation.UTF8_Casing is
                      Info.Length);
 
                else
-                  VSS.Implementation.UTF8_String_Handlers.Unchecked_Append
+                  VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                     (Result_Data, Source_Storage, Start, Offset - Start, 1);
                end if;
             end if;
@@ -370,7 +367,7 @@ package body VSS.Implementation.UTF8_Casing is
 
          begin
             if Info.Changes then
-               VSS.Implementation.UTF8_String_Handlers.Unchecked_Append
+               VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                  (Result_Data,
                   VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table,
                   Info.Offset,
@@ -378,7 +375,7 @@ package body VSS.Implementation.UTF8_Casing is
                   Info.Length);
 
             else
-               VSS.Implementation.UTF8_String_Handlers.Unchecked_Append
+               VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                  (Result_Data, Source_Storage, Start, Offset - Start, 1);
             end if;
          end;
@@ -394,12 +391,21 @@ package body VSS.Implementation.UTF8_Casing is
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
       Data    : out VSS.Implementation.Strings.String_Data) is
    begin
-      Get_Case_Mapping
-        (VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler
-           (VSS.Implementation.String_Configuration.In_Place_Handler.all),
-         Code,
-         Mapping,
-         Data);
+      declare
+         Text : constant not null
+           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+             VSS.Implementation.Strings.Variable_Handler (Data);
+
+      begin
+         VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
+           (Text.all, 0, 0);
+
+         Get_Case_Mapping
+           (Code,
+            Mapping,
+            VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+              (Text.all));
+      end;
    end Get_Case_Mapping;
 
    ----------------------
@@ -407,11 +413,10 @@ package body VSS.Implementation.UTF8_Casing is
    ----------------------
 
    procedure Get_Case_Mapping
-     (Self    :
-        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Code    : VSS.Unicode.Code_Point;
+     (Code    : VSS.Unicode.Code_Point;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data)
+      Text    : out
+        VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler)
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
@@ -420,12 +425,7 @@ package body VSS.Implementation.UTF8_Casing is
       Offset  : VSS.Unicode.UTF8_Code_Unit_Offset;
       Size    : VSS.Unicode.UTF8_Code_Unit_Count;
 
-      Target : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-        with Import, Convention => Ada, Address => Data'Address;
-
    begin
-      Self.Initialize (Data);
-
       --  Amount of the data that might be stored in in-place object is know
       --  to be larger that largest case mapping, thus all checks for this case
       --  are omitted to don't have useless code.
@@ -559,13 +559,13 @@ package body VSS.Implementation.UTF8_Casing is
       end case;
 
       if Changes then
-         Target.Storage (0 .. Size - 1) :=
+         Text.Storage (0 .. Size - 1) :=
            VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
              (VSS.Implementation.UCD_Casing_UTF8.UTF8_Data_Table
                 (Offset .. Offset + Size - 1));
-         Target.Length := Length;
-         Target.Size   := Size;
-         Target.Storage (Target.Size) := 16#00#;
+         Text.Length := Length;
+         Text.Size   := Size;
+         Text.Storage (Text.Size) := 16#00#;
 
       else
          declare
@@ -579,11 +579,11 @@ package body VSS.Implementation.UTF8_Casing is
             VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
             VSS.Implementation.UTF8_Encoding.Unchecked_Store
-              (Target.Storage, 0, L, U1, U2, U3, U4);
+              (Text.Storage, 0, L, U1, U2, U3, U4);
 
-            Target.Size   := L;
-            Target.Length := 1;
-            Target.Storage (Target.Size) := 16#00#;
+            Text.Size   := L;
+            Text.Length := 1;
+            Text.Storage (Text.Size) := 16#00#;
          end;
       end if;
    end Get_Case_Mapping;

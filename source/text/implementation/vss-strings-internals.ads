@@ -17,6 +17,8 @@ package VSS.Strings.Internals is
 
    type String_Data_Constant_Access is
      access constant VSS.Implementation.Strings.String_Data;
+   type String_Data_Variable_Access is
+     access all VSS.Implementation.Strings.String_Data;
    --  This type intended to be used for "hack" code only to use internal
    --  low level string processing API to improve performance of critical
    --  part of the code. It was initially defined to avoid performance penalty
@@ -31,6 +33,9 @@ package VSS.Strings.Internals is
    function Data_Access_Constant
      (Self : VSS.Strings.Virtual_String'Class)
       return not null VSS.Strings.Internals.String_Data_Constant_Access;
+   function Data_Access_Variable
+     (Self : in out VSS.Strings.Virtual_String'Class)
+      return not null VSS.Strings.Internals.String_Data_Variable_Access;
    --  Return access to string data member of the Virtual_String.
 
    procedure Set_By_Move

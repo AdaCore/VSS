@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -7,7 +7,7 @@
 pragma Ada_2022;
 
 with VSS.Implementation.Line_Iterators;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Cursors.Markers.Internals;
 with VSS.Strings.Internals;
 
@@ -62,10 +62,9 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          return VSS.Strings.Empty_Virtual_String;
 
       else
-         VSS.Implementation.Strings.Handler
+         VSS.Implementation.Strings.Constant_Handler
            (VSS.Strings.Magic_String_Access (Self.Owner).Data).Slice
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              First,
+             (First,
               Last,
               Terminator);
 
@@ -148,10 +147,10 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
-      Current_Position    : VSS.Implementation.Strings.Cursor := Position;
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
+      Current_Position : aliased VSS.Implementation.Strings.Cursor := Position;
       Dummy   : Boolean;
 
    begin
@@ -161,24 +160,15 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       if Current_Position.Index /= 1 then
          --  Going backward till previous line terminator has been found.
 
-         Dummy :=
-           Handler.Forward
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Current_Position);
+         Dummy := Handler.Forward (Current_Position);
          Lookup_Previous_Line (Self, Current_Position);
          Current_Position := Self.First_Position;
-         Dummy :=
-           Handler.Backward
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Current_Position);
+         Dummy := Handler.Backward (Current_Position);
 
       else
          --  Rewind to previous character.
 
-         Dummy :=
-           Handler.Backward
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Current_Position);
+         Dummy := Handler.Backward (Current_Position);
       end if;
 
       Lookup_Next_Line (Self, Current_Position);
@@ -194,11 +184,11 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    is
       Data    : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
 
-      Last_Position       : VSS.Implementation.Strings.Cursor;
+      Last_Position       : aliased VSS.Implementation.Strings.Cursor;
       Terminator_Position : VSS.Implementation.Strings.Cursor;
       Dummy               : Boolean;
 
@@ -229,7 +219,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Self.Terminator_Position := Terminator_Position;
 
       else
-         Dummy := Handler.Backward (Data, Terminator_Position);
+         Dummy := Handler.Backward (Terminator_Position);
 
          Self.Last_Position       := Terminator_Position;
          Self.Terminator_Position := Last_Position;
@@ -272,8 +262,8 @@ package body VSS.Strings.Cursors.Iterators.Lines is
 
       else
          Dummy :=
-           VSS.Implementation.Strings.Handler
-             (Data).Backward (Data, Terminator_Position);
+           VSS.Implementation.Strings.Constant_Handler
+             (Data).Backward (Terminator_Position);
 
          Self.Last_Position       := Terminator_Position;
          Self.Terminator_Position := Last_Position;
@@ -317,17 +307,17 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Terminators     : Line_Terminator_Set := New_Line_Function;
       Keep_Terminator : Boolean             := False)
    is
-      Handler  :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (On.Data);
-      Position : VSS.Implementation.Strings.Cursor;
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Dummy    : Boolean;
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
 
-      Handler.Before_First_Character (On.Data, Position);
-      Dummy := Handler.Forward (On.Data, Position);
+      Handler.Before_First_Character (Position);
+      Dummy := Handler.Forward (Position);
       Self.Lookup_Line_Boundaries (Position, Terminators, Keep_Terminator);
    end Set_At_First;
 
@@ -353,7 +343,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    is
       Data     : VSS.Implementation.Strings.String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -363,7 +353,8 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       else
          Position := Self.Last_Position;
          Success  :=
-           VSS.Implementation.Strings.Handler (Data).Forward (Data, Position);
+           VSS.Implementation.Strings.Constant_Handler
+             (Data).Forward (Position);
       end if;
 
       return Position;
@@ -381,7 +372,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
         renames VSS.Strings.Magic_String_Access (Self.Owner);
       Data     : VSS.Implementation.Strings.String_Data
         renames Owner.Data;
-      Position : VSS.Implementation.Strings.Cursor;
+      Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
    begin
@@ -396,8 +387,8 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          else
             Position := Self.Last_Position;
             Success :=
-              VSS.Implementation.Strings.Handler
-                (Data).Forward (Data, Position);
+              VSS.Implementation.Strings.Constant_Handler
+                (Data).Forward (Position);
 
             return VSS.Strings.Character_Count (Position.Index);
          end if;

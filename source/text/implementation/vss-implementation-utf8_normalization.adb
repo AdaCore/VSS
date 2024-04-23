@@ -1,13 +1,14 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.Null_String_Handlers;
-with VSS.Implementation.String_Configuration;
+pragma Ada_2022;
+
 with VSS.Implementation.UCD_Normalization_Common;
-with VSS.Implementation.UTF8_String_Handlers;
+with VSS.Implementation.Text_Handlers.UTF8.Dynamic;
+with VSS.Implementation.Text_Handlers.UTF8.Static;
 
 package body VSS.Implementation.UTF8_Normalization is
 
@@ -15,15 +16,14 @@ package body VSS.Implementation.UTF8_Normalization is
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
    procedure Normalize
-     (Self   : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
+     (Self   :
+        VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler;
       Form   : VSS.Strings.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data);
 
    procedure Normalize
      (Self   :
-        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
+        VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler;
       Form   : VSS.Strings.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data);
 
@@ -68,19 +68,6 @@ package body VSS.Implementation.UTF8_Normalization is
       Code    : out VSS.Unicode.Code_Point);
    --  Change offset to the point of the previous character and decode
    --  character at this position.
-
-   procedure Unchecked_Append
-     (Target_Data : in out VSS.Implementation.Strings.String_Data;
-      Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;
-      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      From        : VSS.Unicode.UTF8_Code_Unit_Index;
-      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
-      Length      : VSS.Implementation.Strings.Character_Count;
-      Terminator  : Boolean := False);
-   --  Append given slice of the data to the target. Convert target
-   --  from in-place to heap based implementation when necessary.
-   --
-   --  XXX Duplicate with subprogram in UTF8_String_Handlers
 
    procedure Unchecked_Insert
      (Target_Data : in out VSS.Implementation.Strings.String_Data;
@@ -356,7 +343,7 @@ package body VSS.Implementation.UTF8_Normalization is
          --  Copy found normalized data if any
 
          if Start /= Out_Start then
-            Unchecked_Append
+            VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
               (Result_Data,
                Result_Size,
                Source_Storage,
@@ -436,7 +423,7 @@ package body VSS.Implementation.UTF8_Normalization is
                     16#80# or VSS.Unicode.UTF8_Code_Unit (V_Part mod 16#40#);
 
                   if T_Index = 0 then
-                     Unchecked_Append
+                     VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                        (Result_Data,
                         Result_Size,
                         Aux,
@@ -454,7 +441,7 @@ package body VSS.Implementation.UTF8_Normalization is
                        16#80#
                          or VSS.Unicode.UTF8_Code_Unit (T_Part mod 16#40#);
 
-                     Unchecked_Append
+                     VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                        (Result_Data,
                         Result_Size,
                         Aux,
@@ -482,7 +469,7 @@ package body VSS.Implementation.UTF8_Normalization is
                   Info.Size);
 
             else
-               Unchecked_Append
+               VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                  (Result_Data,
                   Result_Size,
                   VSS.Implementation.UCD_Normalization_UTF8.UTF8_Data_Table,
@@ -1205,7 +1192,7 @@ package body VSS.Implementation.UTF8_Normalization is
          --  Copy found normalized data
 
          if Source_Copy_Offset /= Source_Current_Offset then
-            Unchecked_Append
+            VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
               (Result_Data,
                Result_Size,
                Source_Storage,
@@ -1239,7 +1226,7 @@ package body VSS.Implementation.UTF8_Normalization is
                   begin
                      Starter_Offset := Result_Size;
 
-                     Unchecked_Append
+                     VSS.Implementation.Text_Handlers.UTF8.Unchecked_Append
                        (Result_Data,
                         Result_Size,
                         VSS.Implementation.UCD_Normalization_UTF8
@@ -1333,13 +1320,15 @@ package body VSS.Implementation.UTF8_Normalization is
                --
                --           else
                               if Last_CCC <= Source_Info.CCC then
-                                 Unchecked_Append
-                                   (Result_Data,
-                                    Result_Size,
-                                    Source_Storage,
-                                    Source_Current_Offset,
-                                    Source_Next_Offset - Source_Current_Offset,
-                                    1);
+                                 VSS.Implementation.Text_Handlers.UTF8
+                                   .Unchecked_Append
+                                     (Result_Data,
+                                      Result_Size,
+                                      Source_Storage,
+                                      Source_Current_Offset,
+                                      Source_Next_Offset
+                                        - Source_Current_Offset,
+                                      1);
                                  Last_CCC := Source_Info.CCC;
 
                               else
@@ -1437,27 +1426,29 @@ package body VSS.Implementation.UTF8_Normalization is
                      loop
                         if Has_Decomposition (Source_Info) then
                            if Starter_Info.First_CCC = CCC_NR then
-                              Unchecked_Append
-                                (Result_Data,
-                                 Result_Size,
-                                 VSS.Implementation.UCD_Normalization_UTF8
-                                   .UTF8_Data_Table,
-                                 Source_Info.Offset,
-                                 Source_Info.Size,
-                                 Source_Info.Length);
+                              VSS.Implementation.Text_Handlers.UTF8
+                                .Unchecked_Append
+                                  (Result_Data,
+                                   Result_Size,
+                                   VSS.Implementation.UCD_Normalization_UTF8
+                                     .UTF8_Data_Table,
+                                   Source_Info.Offset,
+                                   Source_Info.Size,
+                                   Source_Info.Length);
                               Last_CCC := Source_Info.Last_CCC;
 
                               exit;
 
                            elsif Last_CCC <= Source_Info.First_CCC then
-                              Unchecked_Append
-                                (Result_Data,
-                                 Result_Size,
-                                 VSS.Implementation.UCD_Normalization_UTF8
-                                   .UTF8_Data_Table,
-                                 Source_Info.Offset,
-                                 Source_Info.Size,
-                                 Source_Info.Length);
+                              VSS.Implementation.Text_Handlers.UTF8
+                                .Unchecked_Append
+                                  (Result_Data,
+                                   Result_Size,
+                                   VSS.Implementation.UCD_Normalization_UTF8
+                                     .UTF8_Data_Table,
+                                   Source_Info.Offset,
+                                   Source_Info.Size,
+                                   Source_Info.Length);
                               Last_CCC := Source_Info.Last_CCC;
 
                            else
@@ -1469,13 +1460,14 @@ package body VSS.Implementation.UTF8_Normalization is
                               raise Program_Error;
 
                            elsif Last_CCC <= Source_Info.CCC then
-                              Unchecked_Append
-                                (Result_Data,
-                                 Result_Size,
-                                 Source_Storage,
-                                 Source_Current_Offset,
-                                 Source_Next_Offset - Source_Current_Offset,
-                                 1);
+                              VSS.Implementation.Text_Handlers.UTF8
+                                .Unchecked_Append
+                                  (Result_Data,
+                                   Result_Size,
+                                   Source_Storage,
+                                   Source_Current_Offset,
+                                   Source_Next_Offset - Source_Current_Offset,
+                                   1);
                               Last_CCC := Source_Info.CCC;
 
                            else
@@ -1595,13 +1587,14 @@ package body VSS.Implementation.UTF8_Normalization is
                            --  to the result and reset canonical combining
                            --  class of the last character.
 
-                           Unchecked_Append
-                             (Result_Data,
-                              Result_Size,
-                              Source_Storage,
-                              Source_Current_Offset,
-                              Source_Next_Offset - Source_Current_Offset,
-                              1);
+                           VSS.Implementation.Text_Handlers.UTF8
+                             .Unchecked_Append
+                               (Result_Data,
+                                Result_Size,
+                                Source_Storage,
+                                Source_Current_Offset,
+                                Source_Next_Offset - Source_Current_Offset,
+                                1);
 
                            Last_CCC := CCC_NR;
                         end if;
@@ -1674,13 +1667,14 @@ package body VSS.Implementation.UTF8_Normalization is
                            --  to the result and reset canonical combining
                            --  class of the last character.
 
-                           Unchecked_Append
-                             (Result_Data,
-                              Result_Size,
-                              Source_Storage,
-                              Source_Current_Offset,
-                              Source_Next_Offset - Source_Current_Offset,
-                              1);
+                           VSS.Implementation.Text_Handlers.UTF8
+                             .Unchecked_Append
+                               (Result_Data,
+                                Result_Size,
+                                Source_Storage,
+                                Source_Current_Offset,
+                                Source_Next_Offset - Source_Current_Offset,
+                                1);
 
                            Last_CCC := CCC_NR;
                         end if;
@@ -1718,13 +1712,14 @@ package body VSS.Implementation.UTF8_Normalization is
                            if Starter_Info.First_Index /= 0 then
                               Starter_Size := Result_Size - Starter_Offset;
 
-                              Unchecked_Append
-                                (Result_Data,
-                                 Result_Size,
-                                 Source_Storage,
-                                 Source_Current_Offset,
-                                 Source_Next_Offset - Source_Current_Offset,
-                                 1);
+                              VSS.Implementation.Text_Handlers.UTF8
+                                .Unchecked_Append
+                                  (Result_Data,
+                                   Result_Size,
+                                   Source_Storage,
+                                   Source_Current_Offset,
+                                   Source_Next_Offset - Source_Current_Offset,
+                                   1);
 
                               Apply_Canonical_Composition
                                 (Result_Data,
@@ -1736,13 +1731,14 @@ package body VSS.Implementation.UTF8_Normalization is
                            end if;
 
                         else
-                           Unchecked_Append
-                             (Result_Data,
-                              Result_Size,
-                              Source_Storage,
-                              Source_Current_Offset,
-                              Source_Next_Offset - Source_Current_Offset,
-                              1);
+                           VSS.Implementation.Text_Handlers.UTF8
+                             .Unchecked_Append
+                               (Result_Data,
+                                Result_Size,
+                                Source_Storage,
+                                Source_Current_Offset,
+                                Source_Next_Offset - Source_Current_Offset,
+                                1);
 
                            Last_CCC := CCC_NR;
                         end if;
@@ -1834,25 +1830,27 @@ package body VSS.Implementation.UTF8_Normalization is
 
                         else
                            if Source_Info.CCC = CCC_NR then
-                              Unchecked_Append
-                                (Result_Data,
-                                 Result_Size,
-                                 Source_Storage,
-                                 Source_Current_Offset,
-                                 Source_Next_Offset - Source_Current_Offset,
-                                 1);
+                              VSS.Implementation.Text_Handlers.UTF8
+                                .Unchecked_Append
+                                  (Result_Data,
+                                   Result_Size,
+                                   Source_Storage,
+                                   Source_Current_Offset,
+                                   Source_Next_Offset - Source_Current_Offset,
+                                   1);
                               Last_CCC := Source_Info.CCC;
 
                               exit;
 
                            elsif Last_CCC <= Source_Info.CCC then
-                              Unchecked_Append
-                                (Result_Data,
-                                 Result_Size,
-                                 Source_Storage,
-                                 Source_Current_Offset,
-                                 Source_Next_Offset - Source_Current_Offset,
-                                 1);
+                              VSS.Implementation.Text_Handlers.UTF8
+                                .Unchecked_Append
+                                  (Result_Data,
+                                   Result_Size,
+                                   Source_Storage,
+                                   Source_Current_Offset,
+                                   Source_Next_Offset - Source_Current_Offset,
+                                   1);
                               Last_CCC := Source_Info.CCC;
 
                            else
@@ -1962,36 +1960,36 @@ package body VSS.Implementation.UTF8_Normalization is
       Form   : VSS.Strings.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data)
    is
-      Handler :
-        constant not null VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Data);
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Data);
 
    begin
+      Result := VSS.Implementation.Strings.Null_String_Data;
+
+      if Handler.Is_Empty then
+         --  Nothing to do for an empty string.
+
+         return;
+      end if;
+
       if Handler.all
-           in VSS.Implementation.Null_String_Handlers.Null_String_Handler
-      then
-         --  String is empty, nothing to do.
-
-         Handler.Initialize (Result);
-
-      elsif Handler.all
-              in VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
+           in VSS.Implementation.Text_Handlers.UTF8.Dynamic
+                .Dynamic_UTF8_Handler
       then
          Normalize
-           (VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler
+           (VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler
               (Handler.all),
-            Data,
             Form,
             Result);
 
       elsif Handler.all
-              in VSS.Implementation.UTF8_String_Handlers
-                   .UTF8_In_Place_String_Handler
+              in VSS.Implementation.Text_Handlers.UTF8.Static
+                   .Static_UTF8_Handler
       then
          Normalize
-           (VSS.Implementation.UTF8_String_Handlers
-              .UTF8_In_Place_String_Handler (Handler.all),
-            Data,
+           (VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+              (Handler.all),
             Form,
             Result);
 
@@ -2005,56 +2003,56 @@ package body VSS.Implementation.UTF8_Normalization is
    ---------------
 
    procedure Normalize
-     (Self   : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
+     (Self   :
+        VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler;
       Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data)
-   is
-      use type VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access;
-
-      Source : VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-        with Import, Convention => Ada, Address => Data.Pointer'Address;
-
+      Result : out VSS.Implementation.Strings.String_Data) is
    begin
-      if Source = null or else Source.Length = 0 then
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Result);
-
-      else
-         Self.Initialize (Result);
-
-         case Form is
-            when VSS.Strings.Normalization_Form_D =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_C =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KD =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KC =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-         end case;
+      if Self.Is_Empty then
+         return;
       end if;
+
+      declare
+         Result_Text : constant not null
+           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+             VSS.Implementation.Strings.Variable_Handler (Result);
+
+      begin
+         VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
+           (Result_Text.all, 0, Self.Pointer.Size);
+      end;
+
+      case Form is
+         when VSS.Strings.Normalization_Form_D =>
+            VSS.Implementation.UTF8_Normalization.Decompose
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
+               VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
+               Result);
+
+         when VSS.Strings.Normalization_Form_C =>
+            VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
+               VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
+               Result);
+
+         when VSS.Strings.Normalization_Form_KD =>
+            VSS.Implementation.UTF8_Normalization.Decompose
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
+               VSS.Implementation.UCD_Normalization_UTF8
+               .Compatibility_Index,
+               Result);
+
+         when VSS.Strings.Normalization_Form_KC =>
+            VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
+               VSS.Implementation.UCD_Normalization_UTF8
+               .Compatibility_Index,
+               Result);
+      end case;
    end Normalize;
 
    ---------------
@@ -2063,130 +2061,56 @@ package body VSS.Implementation.UTF8_Normalization is
 
    procedure Normalize
      (Self   :
-        VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_String_Handler;
-      Data   : VSS.Implementation.Strings.String_Data;
+        VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler;
       Form   : VSS.Strings.Normalization_Form;
-      Result : out VSS.Implementation.Strings.String_Data)
-   is
-      Source : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-        with Import, Convention => Ada, Address => Data'Address;
-
+      Result : out VSS.Implementation.Strings.String_Data) is
    begin
-      if Source.Length = 0 then
-         VSS.Implementation.String_Configuration.In_Place_Handler.Initialize
-           (Result);
-
-      else
-         Self.Initialize (Result);
-
-         case Form is
-            when VSS.Strings.Normalization_Form_D =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_C =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KD =>
-               VSS.Implementation.UTF8_Normalization.Decompose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-
-            when VSS.Strings.Normalization_Form_KC =>
-               VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
-                 (Source.Storage,
-                  Source.Size,
-                  VSS.Implementation.UCD_Normalization_UTF8
-                    .Compatibility_Index,
-                  Result);
-         end case;
-      end if;
-   end Normalize;
-
-   ----------------------
-   -- Unchecked_Append --
-   ----------------------
-
-   procedure Unchecked_Append
-     (Target_Data : in out VSS.Implementation.Strings.String_Data;
-      Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;
-      Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      From        : VSS.Unicode.UTF8_Code_Unit_Index;
-      Size        : VSS.Unicode.UTF8_Code_Unit_Count;
-      Length      : VSS.Implementation.Strings.Character_Count;
-      Terminator  : Boolean := False)
-   is
-      use type VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access;
-
-   begin
-      if Target_Data.In_Place then
-         declare
-            Target : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Target_Data'Address;
-
-         begin
-            if Target.Size + Size
-              <= VSS.Implementation.UTF8_String_Handlers
-                   .In_Place_Storage_Capacity
-            then
-               Target.Storage (Target.Size .. Target.Size + Size - 1) :=
-                 Storage (From .. From + Size - 1);
-               Target.Size   := Target.Size + Size;
-               Target.Length := Target.Length + Length;
-
-               if Terminator then
-                  Target.Storage (Target.Size) := 16#00#;
-               end if;
-
-               Target_Size   := Target.Size;
-
-               return;
-
-            else
-               VSS.Implementation.UTF8_String_Handlers.Copy_To_Heap
-                 (Target_Data, 0, Target.Size + Size);
-            end if;
-         end;
+      if Self.Is_Empty then
+         return;
       end if;
 
       declare
-         Target :
-           VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-             with Import, Convention => Ada,
-                  Address => Target_Data.Pointer'Address;
+         Result_Text : constant not null
+           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+             VSS.Implementation.Strings.Variable_Handler (Result);
 
       begin
-         if Target = null then
-            Target :=
-              VSS.Implementation.UTF8_String_Handlers.Allocate (0, Size);
-
-         elsif Target.Size + Size > Target.Bulk then
-            VSS.Implementation.UTF8_String_Handlers.Reallocate
-              (Target, 0, Target.Size + Size);
-         end if;
-
-         Target.Storage (Target.Size .. Target.Size + Size - 1) :=
-           Storage (From .. From + Size - 1);
-         Target.Size   := Target.Size + Size;
-         Target.Length := Target.Length + Length;
-
-         if Terminator then
-            Target.Storage (Target.Size) := 16#00#;
-         end if;
-
-         Target_Size   := Target.Size;
+         VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
+           (Result_Text.all, 0, Self.Size);
       end;
-   end Unchecked_Append;
+
+      case Form is
+         when VSS.Strings.Normalization_Form_D =>
+            VSS.Implementation.UTF8_Normalization.Decompose
+              (Self.Storage,
+               Self.Size,
+               VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
+               Result);
+
+         when VSS.Strings.Normalization_Form_C =>
+            VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
+              (Self.Storage,
+               Self.Size,
+               VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
+               Result);
+
+         when VSS.Strings.Normalization_Form_KD =>
+            VSS.Implementation.UTF8_Normalization.Decompose
+              (Self.Storage,
+               Self.Size,
+               VSS.Implementation.UCD_Normalization_UTF8
+               .Compatibility_Index,
+               Result);
+
+         when VSS.Strings.Normalization_Form_KC =>
+            VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
+              (Self.Storage,
+               Self.Size,
+               VSS.Implementation.UCD_Normalization_UTF8
+               .Compatibility_Index,
+               Result);
+      end case;
+   end Normalize;
 
    -------------------------------
    -- Unchecked_Backward_Decode --
@@ -2195,12 +2119,21 @@ package body VSS.Implementation.UTF8_Normalization is
    procedure Unchecked_Backward_Decode
      (Source_Data : VSS.Implementation.Strings.String_Data;
       Offset      : in out VSS.Unicode.UTF8_Code_Unit_Index;
-      Code        : out VSS.Unicode.Code_Point) is
+      Code        : out VSS.Unicode.Code_Point)
+   is
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Source_Data);
+
    begin
-      if Source_Data.In_Place then
+      if Handler.all
+        in VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+      then
          declare
-            Source : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Source_Data'Address;
+            Source :
+              VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+            renames VSS.Implementation.Text_Handlers.UTF8.Static
+              .Static_UTF8_Handler (Handler.all);
 
          begin
             Unchecked_Backward_Decode (Source.Storage, Offset, Code);
@@ -2209,12 +2142,13 @@ package body VSS.Implementation.UTF8_Normalization is
       else
          declare
             Source :
-              VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-                with Import, Convention => Ada,
-                     Address => Source_Data.Pointer'Address;
+              VSS.Implementation.Text_Handlers.UTF8.Dynamic
+                .Dynamic_UTF8_Handler
+              renames VSS.Implementation.Text_Handlers.UTF8.Dynamic
+                .Dynamic_UTF8_Handler (Handler.all);
 
          begin
-            Unchecked_Backward_Decode (Source.Storage, Offset, Code);
+            Unchecked_Backward_Decode (Source.Pointer.Storage, Offset, Code);
          end;
       end if;
    end Unchecked_Backward_Decode;
@@ -2265,12 +2199,21 @@ package body VSS.Implementation.UTF8_Normalization is
    procedure Unchecked_Decode_Forward
      (Source_Data : VSS.Implementation.Strings.String_Data;
       Offset      : in out VSS.Unicode.UTF8_Code_Unit_Index;
-      Code        : out VSS.Unicode.Code_Point) is
+      Code        : out VSS.Unicode.Code_Point)
+   is
+      Handler : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Source_Data);
+
    begin
-      if Source_Data.In_Place then
+      if Handler.all
+        in VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+      then
          declare
-            Source : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Source_Data'Address;
+            Source :
+              VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+              renames VSS.Implementation.Text_Handlers.UTF8.Static
+                .Static_UTF8_Handler (Handler.all);
 
          begin
             VSS.Implementation.UTF8_Encoding.Unchecked_Decode_Forward
@@ -2280,13 +2223,14 @@ package body VSS.Implementation.UTF8_Normalization is
       else
          declare
             Source :
-              VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-                with Import, Convention => Ada,
-                     Address => Source_Data.Pointer'Address;
+              VSS.Implementation.Text_Handlers.UTF8.Dynamic
+                .Dynamic_UTF8_Handler
+            renames VSS.Implementation.Text_Handlers.UTF8.Dynamic
+              .Dynamic_UTF8_Handler (Handler.all);
 
          begin
             VSS.Implementation.UTF8_Encoding.Unchecked_Decode_Forward
-              (Source.Storage, Offset, Code);
+              (Source.Pointer.Storage, Offset, Code);
          end;
       end if;
    end Unchecked_Decode_Forward;
@@ -2300,12 +2244,22 @@ package body VSS.Implementation.UTF8_Normalization is
       Target_Size   : out VSS.Unicode.UTF8_Code_Unit_Count;
       Delete_From   : VSS.Unicode.UTF8_Code_Unit_Index;
       Delete_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
-      Delete_Length : VSS.Implementation.Strings.Character_Count) is
+      Delete_Length : VSS.Implementation.Strings.Character_Count)
+   is
+      Handler : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target_Data);
+
    begin
-      if Target_Data.In_Place then
+      if Handler.all
+        in VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+      then
          declare
-            Target : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Target_Data'Address;
+            Target :
+            VSS.Implementation.Text_Handlers.UTF8.Static
+              .Static_UTF8_Handler
+            renames VSS.Implementation.Text_Handlers.UTF8.Static
+              .Static_UTF8_Handler (Handler.all);
 
          begin
             if Delete_Size = 0 then
@@ -2315,8 +2269,8 @@ package body VSS.Implementation.UTF8_Normalization is
                --  End of string is deleted, no data moved, update size and
                --  length only.
 
-               Target.Size   := Target.Size - Delete_Size;
-               Target.Length := Target.Length - Delete_Length;
+               Target.Size   := @ - Delete_Size;
+               Target.Length := @ - Delete_Length;
 
                Target_Size   := Target.Size;
 
@@ -2326,8 +2280,8 @@ package body VSS.Implementation.UTF8_Normalization is
                    Target.Storage
                      (Delete_From + Delete_Size .. Target.Size - 1);
 
-               Target.Size   := Target.Size - Delete_Size;
-               Target.Length := Target.Length - Delete_Length;
+               Target.Size   := @ - Delete_Size;
+               Target.Length := @ - Delete_Length;
 
                Target_Size   := Target.Size;
             end if;
@@ -2336,33 +2290,34 @@ package body VSS.Implementation.UTF8_Normalization is
       else
          declare
             Target :
-              VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-                with Import, Convention => Ada,
-                     Address => Target_Data.Pointer'Address;
+              VSS.Implementation.Text_Handlers.UTF8.Dynamic
+                .Dynamic_UTF8_Handler
+            renames VSS.Implementation.Text_Handlers.UTF8.Dynamic
+              .Dynamic_UTF8_Handler (Handler.all);
 
          begin
             if Delete_Size = 0 then
-               Target_Size := Target.Size;
+               Target_Size := Target.Pointer.Size;
 
-            elsif Delete_From + Delete_Size = Target.Size then
+            elsif Delete_From + Delete_Size = Target.Pointer.Size then
                --  End of string is deleted, no data moved, update size and
                --  length only.
 
-               Target.Size   := Target.Size - Delete_Size;
-               Target.Length := Target.Length - Delete_Length;
+               Target.Pointer.Size   := @ - Delete_Size;
+               Target.Pointer.Length := @ - Delete_Length;
 
-               Target_Size   := Target.Size;
+               Target_Size := Target.Pointer.Size;
 
             else
-               Target.Storage
-                 (Delete_From .. Target.Size - Delete_Size - 1) :=
-                   Target.Storage
-                     (Delete_From + Delete_Size .. Target.Size - 1);
+               Target.Pointer.Storage
+                 (Delete_From .. Target.Pointer.Size - Delete_Size - 1) :=
+                   Target.Pointer.Storage
+                     (Delete_From + Delete_Size .. Target.Pointer.Size - 1);
 
-               Target.Size   := Target.Size - Delete_Size;
-               Target.Length := Target.Length - Delete_Length;
+               Target.Pointer.Size   := @ - Delete_Size;
+               Target.Pointer.Length := @ - Delete_Length;
 
-               Target_Size   := Target.Size;
+               Target_Size := Target.Pointer.Size;
             end if;
          end;
       end if;
@@ -2381,25 +2336,31 @@ package body VSS.Implementation.UTF8_Normalization is
       Size        : VSS.Unicode.UTF8_Code_Unit_Count;
       Length      : VSS.Implementation.Strings.Character_Count)
    is
-      use type VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access;
+      Handler : constant not null
+        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+          VSS.Implementation.Strings.Variable_Handler (Target_Data);
 
    begin
-      if Target_Data.In_Place then
+      if Handler.all
+        in VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+      then
          declare
-            Target : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Target_Data'Address;
+            Target :
+              VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
+            renames VSS.Implementation.Text_Handlers.UTF8.Static
+              .Static_UTF8_Handler (Handler.all);
 
          begin
             if Target.Size + Size
-              <= VSS.Implementation.UTF8_String_Handlers
+              <= VSS.Implementation.Text_Handlers.UTF8.Static
                    .In_Place_Storage_Capacity
             then
                Target.Storage (Into + Size .. Target.Size + Size - 1) :=
                  Target.Storage (Into .. Target.Size - 1);
                Target.Storage (Into .. Into + Size - 1) :=
                  Storage (From .. From + Size - 1);
-               Target.Size   := Target.Size + Size;
-               Target.Length := Target.Length + Length;
+               Target.Size   := @ + Size;
+               Target.Length := @ + Length;
 
                Target_Size   := Target.Size;
 
@@ -2411,19 +2372,19 @@ package body VSS.Implementation.UTF8_Normalization is
       else
          declare
             Target :
-              VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-                with Import, Convention => Ada,
-                     Address => Target_Data.Pointer'Address;
+              VSS.Implementation.Text_Handlers.UTF8.Dynamic
+                .Dynamic_UTF8_Handler
+            renames VSS.Implementation.Text_Handlers.UTF8.Dynamic
+              .Dynamic_UTF8_Handler (Handler.all);
 
          begin
-            if Target = null then
-               Target :=
-                 VSS.Implementation.UTF8_String_Handlers.Allocate (0, Size);
+            Target.Pointer :=
+              VSS.Implementation.Text_Handlers.UTF8.Dynamic.Allocate (0, Size);
 
-            elsif Target.Size + Size > Target.Bulk then
-               --  Reallocate (Target, 0, Target.Size + Size);
-               raise Program_Error;
-            end if;
+            --  elsif Target.Size + Size > Target.Bulk then
+            --     --  Reallocate (Target, 0, Target.Size + Size);
+            --     raise Program_Error;
+            --  end if;
 
             raise Program_Error;
             --  Target.Storage (Target.Size .. Target.Size + Size - 1) :=
@@ -2444,34 +2405,34 @@ package body VSS.Implementation.UTF8_Normalization is
       Size : VSS.Unicode.UTF8_Code_Unit_Count;
       Into : VSS.Unicode.UTF8_Code_Unit_Index) is
    begin
-      if From = Into then
-         return;
-      end if;
-
-      if Data.In_Place then
-         if From < Into then
-            raise Program_Error;
-         end if;
-
-         declare
-            Target    :
-              VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-                with Import, Convention => Ada, Address => Data'Address;
-            Buffer    : constant
-              VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                (0 .. Size - 1) := Target.Storage (From .. From + Size - 1);
-            Move_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
-              From - Into;
-
-         begin
-            Target.Storage (Into + Size .. Into + Size + Move_Size - 1) :=
-              Target.Storage (Into .. Into + Move_Size - 1);
-            Target.Storage (Into .. Into + Size - 1) := Buffer;
-         end;
-
-      else
+      --  if From = Into then
+      --     return;
+      --  end if;
+      --
+      --  if Data.In_Place then
+      --     if From < Into then
+      --        raise Program_Error;
+      --     end if;
+      --
+      --     declare
+      --        Target    :
+      --          VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
+      --            with Import, Convention => Ada, Address => Data'Address;
+      --        Buffer    : constant
+      --          VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+      --            (0 .. Size - 1) := Target.Storage (From .. From + Size - 1);
+      --        Move_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
+      --          From - Into;
+      --
+      --     begin
+      --        Target.Storage (Into + Size .. Into + Size + Move_Size - 1) :=
+      --          Target.Storage (Into .. Into + Move_Size - 1);
+      --        Target.Storage (Into .. Into + Size - 1) := Buffer;
+      --     end;
+      --
+      --  else
          raise Program_Error;
-      end if;
+      --  end if;
    end Unchecked_Move_Slice;
 
    -----------------------
@@ -2489,75 +2450,75 @@ package body VSS.Implementation.UTF8_Normalization is
       Insert_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
       Insert_Length  : VSS.Implementation.Strings.Character_Count) is
    begin
-      if Target_Data.In_Place then
-         declare
-            Target : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-              with Import, Convention => Ada, Address => Target_Data'Address;
-
-         begin
-            if Target.Size - Replace_Size + Insert_Size
-              <= VSS.Implementation.UTF8_String_Handlers
-                   .In_Place_Storage_Capacity
-            then
-               if Replace_From + Replace_Size = Target.Size then
-                  --  Replace of string suffix, just overwrite it
-                  --  XXX May be check for overwrite????
-
-                  Target.Storage
-                    (Replace_From .. Replace_From + Insert_Size - 1) :=
-                    Storage (Insert_From .. Insert_From + Insert_Size - 1);
-
-                  Target.Size := Target.Size + Insert_Size - Replace_Size;
-                  Target.Length :=
-                    Target.Length + Insert_Length - Replace_Length;
-
-                  Target_Size := Target.Size;
-
-               else
-                  Target.Storage
-                    (Replace_From + Insert_Size
-                       .. Target.Size - Replace_Size + Insert_Size - 1) :=
-                      Target.Storage
-                        (Replace_From + Replace_Size .. Target.Size - 1);
-
-                  Target.Storage
-                    (Replace_From .. Replace_From + Insert_Size - 1) :=
-                    Storage (Insert_From .. Insert_From + Insert_Size - 1);
-
-                  Target.Size := Target.Size + Insert_Size - Replace_Size;
-                  Target.Length :=
-                    Target.Length + Insert_Length - Replace_Length;
-
-                  Target_Size := Target.Size;
-               end if;
-
-            else
+      --  if Target_Data.In_Place then
+      --     declare
+      --        Target : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
+      --          with Import, Convention => Ada, Address => Target_Data'Address;
+      --
+      --     begin
+      --        if Target.Size - Replace_Size + Insert_Size
+      --          <= VSS.Implementation.UTF8_String_Handlers
+      --               .In_Place_Storage_Capacity
+      --        then
+      --           if Replace_From + Replace_Size = Target.Size then
+      --              --  Replace of string suffix, just overwrite it
+      --              --  XXX May be check for overwrite????
+      --
+      --              Target.Storage
+      --                (Replace_From .. Replace_From + Insert_Size - 1) :=
+      --                Storage (Insert_From .. Insert_From + Insert_Size - 1);
+      --
+      --              Target.Size := Target.Size + Insert_Size - Replace_Size;
+      --              Target.Length :=
+      --                Target.Length + Insert_Length - Replace_Length;
+      --
+      --              Target_Size := Target.Size;
+      --
+      --           else
+      --              Target.Storage
+      --                (Replace_From + Insert_Size
+      --                   .. Target.Size - Replace_Size + Insert_Size - 1) :=
+      --                  Target.Storage
+      --                    (Replace_From + Replace_Size .. Target.Size - 1);
+      --
+      --              Target.Storage
+      --                (Replace_From .. Replace_From + Insert_Size - 1) :=
+      --                Storage (Insert_From .. Insert_From + Insert_Size - 1);
+      --
+      --              Target.Size := Target.Size + Insert_Size - Replace_Size;
+      --              Target.Length :=
+      --                Target.Length + Insert_Length - Replace_Length;
+      --
+      --              Target_Size := Target.Size;
+      --           end if;
+      --
+      --        else
                raise Program_Error;
-            end if;
-         end;
-
-      else
-         declare
-            Target :
-              VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-                with Import, Convention => Ada,
-                     Address => Target_Data.Pointer'Address;
-
-         begin
-            if Replace_Size = Insert_Size then
-               Target.Storage
-                 (Replace_From .. Replace_From + Insert_Size - 1) :=
-                    Storage (Insert_From .. Insert_From + Insert_Size - 1);
-
-               Target.Length := Target.Length + Insert_Length - Replace_Length;
-
-               Target_Size := Target.Size;
-
-            else
-               raise Program_Error;
-            end if;
-         end;
-      end if;
+      --        end if;
+      --     end;
+      --
+      --  else
+      --     declare
+      --        Target :
+      --          VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
+      --            with Import, Convention => Ada,
+      --                 Address => Target_Data.Pointer'Address;
+      --
+      --     begin
+      --        if Replace_Size = Insert_Size then
+      --           Target.Storage
+      --             (Replace_From .. Replace_From + Insert_Size - 1) :=
+      --                Storage (Insert_From .. Insert_From + Insert_Size - 1);
+      --
+      --           Target.Length := Target.Length + Insert_Length - Replace_Length;
+      --
+      --           Target_Size := Target.Size;
+      --
+      --        else
+      --           raise Program_Error;
+      --        end if;
+      --     end;
+      --  end if;
    end Unchecked_Replace;
 
 end VSS.Implementation.UTF8_Normalization;

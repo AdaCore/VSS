@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -7,7 +7,7 @@
 pragma Ada_2022;
 
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.String_Handlers;
+with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package body VSS.Strings.Templates is
@@ -36,10 +36,10 @@ package body VSS.Strings.Templates is
 
       procedure Append_Parameter;
 
-      Handler          :
-        constant VSS.Implementation.Strings.String_Handler_Access :=
-          VSS.Implementation.Strings.Handler (Self.Template.Data);
-      Position         : VSS.Implementation.Strings.Cursor;
+      Handler          : constant
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Self.Template.Data);
+      Position         : aliased VSS.Implementation.Strings.Cursor;
       Code             : VSS.Unicode.Code_Point'Base;
       Parameter        : Positive := 1;
       State            : States   := Initial;
@@ -64,9 +64,9 @@ package body VSS.Strings.Templates is
       end Append_Parameter;
 
    begin
-      Handler.Before_First_Character (Self.Template.Data, Position);
+      Handler.Before_First_Character (Position);
 
-      while Handler.Forward_Element (Self.Template.Data, Position, Code) loop
+      while Handler.Forward_Element (Position, Code) loop
          case State is
             when Initial =>
                case Code is

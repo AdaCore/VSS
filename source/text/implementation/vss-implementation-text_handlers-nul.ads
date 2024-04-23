@@ -9,15 +9,6 @@
 --  All subprograms of String_Handler must be overridden and all necessary
 --  preconditions is added.
 
-with Ada.Strings.UTF_Encoding;
-
-with VSS.Implementation.FNV_Hash;
-with VSS.Implementation.Text_Handlers;
-with VSS.Implementation.String_Vectors;
-with VSS.Implementation.Strings;
-with VSS.Strings;
-with VSS.Unicode;
-
 package VSS.Implementation.Text_Handlers.Nul is
 
    pragma Preelaborate;

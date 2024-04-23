@@ -27,6 +27,11 @@ package body VSS.Implementation.Strings is
      with Pre => not Is_Initialized (Data);
    --  Initialize object to be null text.
 
+   Global_Null_Text_Handler : aliased
+     VSS.Implementation.Null_String_Handlers.Null_String_Handler;
+   --  Global null text handler object to be used to process uninitialized
+   --  string data.
+
    ---------
    -- "=" --
    ---------
@@ -48,9 +53,7 @@ package body VSS.Implementation.Strings is
      (Data : String_Data) return not null Constant_Text_Handler_Access is
    begin
       if not Is_Initialized (Data) then
-         return
-           VSS.Implementation.Null_String_Handlers
-             .Global_Null_String_Handler'Access;
+         return Global_Null_Text_Handler'Access;
 
       else
          return

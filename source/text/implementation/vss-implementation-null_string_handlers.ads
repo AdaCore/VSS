@@ -195,6 +195,4 @@ package VSS.Implementation.Null_String_Handlers is
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
-   Global_Null_String_Handler : aliased Null_String_Handler;
-
 end VSS.Implementation.Null_String_Handlers;

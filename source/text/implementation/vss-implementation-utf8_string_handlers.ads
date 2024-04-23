@@ -285,9 +285,6 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
-   Global_UTF8_String_Handler   : aliased
-     VSS.Implementation.UTF8_String_Handlers.UTF8_String_Handler;
-
    --  Subprograms to help code refactoring, some of the will be moved to
    --  generic UTF8 fastpath string API, and some moved to the body after
    --  that.

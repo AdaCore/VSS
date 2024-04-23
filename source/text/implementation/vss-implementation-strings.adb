@@ -7,7 +7,7 @@
 with System.Address_To_Access_Conversions;
 
 with VSS.Implementation.Text_Handlers;
-with VSS.Implementation.Null_String_Handlers;
+with VSS.Implementation.Text_Handlers.Nul;
 
 package body VSS.Implementation.Strings is
 
@@ -28,7 +28,7 @@ package body VSS.Implementation.Strings is
    --  Initialize object to be null text.
 
    Global_Null_Text_Handler : aliased
-     VSS.Implementation.Null_String_Handlers.Null_String_Handler;
+     VSS.Implementation.Text_Handlers.Nul.Null_String_Handler;
    --  Global null text handler object to be used to process uninitialized
    --  string data.
 
@@ -217,7 +217,7 @@ package body VSS.Implementation.Strings is
    begin
       declare
          pragma Warnings (Off, """others"" choice is redundant");
-         Overlay : Null_String_Handlers.Null_String_Handler := (others => <>)
+         Overlay : Text_Handlers.Nul.Null_String_Handler := (others => <>)
            with Address => Data.Storage'Address;
          pragma Assert (Data.Storage'Size = Overlay'Size);
          pragma Warnings (On, """others"" choice is redundant");

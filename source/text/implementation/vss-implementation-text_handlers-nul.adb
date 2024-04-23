@@ -6,7 +6,7 @@
 
 with VSS.Implementation.UTF8_String_Handlers;
 
-package body VSS.Implementation.Null_String_Handlers is
+package body VSS.Implementation.Text_Handlers.Nul is
 
    use type VSS.Implementation.Strings.Cursor;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
@@ -275,4 +275,4 @@ package body VSS.Implementation.Null_String_Handlers is
    overriding procedure Unreference
      (Self : in out Null_String_Handler) is null;
 
-end VSS.Implementation.Null_String_Handlers;
+end VSS.Implementation.Text_Handlers.Nul;

@@ -18,7 +18,7 @@ with VSS.Implementation.Strings;
 with VSS.Strings;
 with VSS.Unicode;
 
-package VSS.Implementation.Null_String_Handlers is
+package VSS.Implementation.Text_Handlers.Nul is
 
    pragma Preelaborate;
 
@@ -195,4 +195,4 @@ package VSS.Implementation.Null_String_Handlers is
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
-end VSS.Implementation.Null_String_Handlers;
+end VSS.Implementation.Text_Handlers.Nul;

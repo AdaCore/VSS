@@ -22,7 +22,8 @@ package VSS.Implementation.Null_String_Handlers is
 
    pragma Preelaborate;
 
-   use type VSS.Implementation.Strings.Variable_Text_Handler_Access;
+   pragma Warnings (Off, "bits of ""Null_String_Handler"" unused");
+   --  Size of the text handler object is fixed.
 
    type Null_String_Handler is
      new VSS.Implementation.Text_Handlers.Abstract_String_Handler

@@ -39,6 +39,9 @@ package VSS.Implementation.UTF8_String_Handlers is
 
    type UTF8_String_Data_Access is access all UTF8_String_Data;
 
+   pragma Warnings (Off, "bits of ""UTF8_String_Handler"" unused");
+   --  Size of the text handler object is fixed.
+
    type UTF8_String_Handler is
      new VSS.Implementation.Text_Handlers.Abstract_String_Handler with
    record

@@ -18,7 +18,7 @@ with VSS.Implementation.UTF8_Encoding;
 with VSS.Strings;
 with VSS.Unicode;
 
-package VSS.Implementation.UTF8_String_Handlers is
+package VSS.Implementation.Text_Handlers.UTF8_Dynamic is
 
    pragma Preelaborate;
 
@@ -343,4 +343,4 @@ package VSS.Implementation.UTF8_String_Handlers is
    --  Memory for Text object is used to initialize new object, thus any
    --  content is destroyed, and "type" of the object will change.
 
-end VSS.Implementation.UTF8_String_Handlers;
+end VSS.Implementation.Text_Handlers.UTF8_Dynamic;

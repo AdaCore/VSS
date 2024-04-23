@@ -4,7 +4,7 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.UTF8_String_Handlers;
+with VSS.Implementation.Text_Handlers.UTF8_Dynamic;
 
 package body VSS.Implementation.Text_Handlers.Nul is
 
@@ -40,7 +40,8 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
    begin
-      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize (Self, 1, 0);
+      VSS.Implementation.Text_Handlers.UTF8_Dynamic.Unsafe_Initialize
+        (Self, 1, 0);
       VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
         (Self).Append (Code, Offset);
    end Append;
@@ -144,7 +145,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Success : out Boolean) is
    begin
-      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize
+      VSS.Implementation.Text_Handlers.UTF8_Dynamic.Unsafe_Initialize
         (Self, 0, Item'Length);
 
       VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
@@ -160,7 +161,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Item    : Wide_Wide_String;
       Success : out Boolean) is
    begin
-      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize
+      VSS.Implementation.Text_Handlers.UTF8_Dynamic.Unsafe_Initialize
         (Self, 0, Item'Length);
       --  Request text data storage size enough to store ASCII text. Storage
       --  will reallocated when necessary. It helps to use static storage when
@@ -201,7 +202,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
                   (Self);
 
    begin
-      VSS.Implementation.UTF8_String_Handlers.Unsafe_Initialize (Self, 1, 0);
+      VSS.Implementation.Text_Handlers.UTF8_Dynamic.Unsafe_Initialize (Self, 1, 0);
       Text.Insert (From, Item, Offset);
    end Insert;
 

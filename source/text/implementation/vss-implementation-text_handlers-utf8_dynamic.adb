@@ -14,7 +14,7 @@ with Interfaces;
 with VSS.Implementation.GCC;
 with VSS.Implementation.Line_Iterators;
 
-package body VSS.Implementation.UTF8_String_Handlers is
+package body VSS.Implementation.Text_Handlers.UTF8_Dynamic is
 
    use type VSS.Implementation.Strings.Character_Count;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
@@ -1885,4 +1885,4 @@ package body VSS.Implementation.UTF8_String_Handlers is
       Success := State = Initial;
    end Validate_And_Copy;
 
-end VSS.Implementation.UTF8_String_Handlers;
+end VSS.Implementation.Text_Handlers.UTF8_Dynamic;

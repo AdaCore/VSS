@@ -23,7 +23,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Static is
        range 0 .. In_Place_Storage_Capacity;
 
    type Static_UTF8_Handler is
-     new VSS.Implementation.Text_Handlers.Abstract_String_Handler with
+     new VSS.Implementation.Text_Handlers.Abstract_Text_Handler with
    record
       Storage :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array

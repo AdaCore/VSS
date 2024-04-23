@@ -28,10 +28,10 @@ package VSS.Implementation.Strings is
    --  Special value to return when there is no character at given position.
 
    type Variable_Text_Handler_Access is
-     access all VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+     access all VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
    type Constant_Text_Handler_Access is
      access constant
-       VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
 
    ------------
    -- Cursor --

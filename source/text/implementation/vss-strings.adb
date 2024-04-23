@@ -919,7 +919,7 @@ package body VSS.Strings is
       Deleted     : VSS.Implementation.Strings.Cursor_Offset;
       Inserted    : VSS.Implementation.Strings.Cursor_Offset;
       Text        :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
           renames VSS.Implementation.Strings.Variable_Handler (Self.Data).all;
 
    begin

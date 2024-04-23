@@ -17,7 +17,7 @@ package VSS.Implementation.Text_Handlers.Nul is
    --  Size of the text handler object is fixed.
 
    type Null_Handler is
-     new VSS.Implementation.Text_Handlers.Abstract_String_Handler
+     new VSS.Implementation.Text_Handlers.Abstract_Text_Handler
        with null record with Object_Size => 192;
 
    overriding procedure Reference (Self : in out Null_Handler);
@@ -79,12 +79,12 @@ package VSS.Implementation.Text_Handlers.Nul is
 
    overriding function Starts_With
      (Self   : Null_Handler;
-      Prefix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
+      Prefix : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class)
       return Boolean;
 
    overriding function Ends_With
      (Self   : Null_Handler;
-      Suffix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
+      Suffix : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class)
       return Boolean;
 
    overriding procedure From_Wide_Wide_String

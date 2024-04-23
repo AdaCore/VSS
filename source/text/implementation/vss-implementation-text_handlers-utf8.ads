@@ -16,7 +16,7 @@ is
 
    procedure Unsafe_Initialize
      (Text     : in out
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
       Capacity : VSS.Implementation.Strings.Character_Count;
       Size     : VSS.Unicode.UTF8_Code_Unit_Count);
    --  Initialize UTF-8 text storage. It is either static or dynamic,
@@ -76,8 +76,8 @@ private
    --  Append one storage to another.
 
    procedure Split_Lines_Common
-     (Handler         :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+     (Text            :
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
       Data            : VSS.Implementation.Strings.String_Data;
       Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Terminators     : VSS.Strings.Line_Terminator_Set;

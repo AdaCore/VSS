@@ -45,7 +45,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
    begin
       VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize (Self, 1, 0);
-      VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+      VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).Append (Code, Offset);
    end Append;
 
@@ -117,7 +117,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
 
    overriding function Ends_With
      (Self   : Null_Handler;
-      Suffix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
+      Suffix : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class)
       return Boolean is
    begin
       return Suffix.Is_Empty;
@@ -151,7 +151,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
         (Self, 0, Item'Length);
 
-      VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+      VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).From_UTF_8_String (Item, Success);
    end From_UTF_8_String;
 
@@ -170,7 +170,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       --  will reallocated when necessary. It helps to use static storage when
       --  possible.
 
-      VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+      VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).From_Wide_Wide_String (Item, Success);
    end From_Wide_Wide_String;
 
@@ -200,8 +200,8 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Text : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
-        renames VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+      Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
+        renames VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
                   (Self);
 
    begin
@@ -256,7 +256,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
 
    overriding function Starts_With
      (Self   : Null_Handler;
-      Prefix : VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class)
+      Prefix : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class)
       return Boolean is
    begin
       return Prefix.Is_Empty;

@@ -33,7 +33,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    --  Size of the text handler object is fixed.
 
    type Dynamic_UTF8_Handler is
-     new VSS.Implementation.Text_Handlers.Abstract_String_Handler with
+     new VSS.Implementation.Text_Handlers.Abstract_Text_Handler with
    record
       Pointer : UTF8_String_Data_Access;
    end record with Object_Size => 192;

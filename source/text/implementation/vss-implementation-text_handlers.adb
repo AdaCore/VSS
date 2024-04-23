@@ -18,7 +18,7 @@ package body VSS.Implementation.Text_Handlers is
    ------------
 
    procedure Append
-     (Self   : in out Abstract_String_Handler;
+     (Self   : in out Abstract_Text_Handler;
       Data   : in out VSS.Implementation.Strings.String_Data;
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -34,7 +34,7 @@ package body VSS.Implementation.Text_Handlers is
 
       while Suffix_Handler.Forward (Position) loop
          Code := Suffix_Handler.Element (Position);
-         Abstract_String_Handler'Class (Self).Append (Code, Offset);
+         Abstract_Text_Handler'Class (Self).Append (Code, Offset);
       end loop;
    end Append;
 
@@ -43,7 +43,7 @@ package body VSS.Implementation.Text_Handlers is
    ------------------
 
    not overriding procedure Compute_Size
-     (Self   : Abstract_String_Handler;
+     (Self   : Abstract_Text_Handler;
       From   : VSS.Implementation.Strings.Cursor;
       To     : VSS.Implementation.Strings.Cursor;
       Size   : out VSS.Implementation.Strings.Cursor_Offset)
@@ -51,8 +51,8 @@ package body VSS.Implementation.Text_Handlers is
       use type VSS.Unicode.UTF16_Code_Unit_Offset;
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Text          : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Text          : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       From_Position : aliased VSS.Implementation.Strings.Cursor;
       To_Position   : aliased VSS.Implementation.Strings.Cursor;
       Success       : Boolean with Unreferenced;
@@ -107,11 +107,11 @@ package body VSS.Implementation.Text_Handlers is
    ---------------
 
    not overriding function Ends_With
-     (Self   : Abstract_String_Handler;
-      Suffix : Abstract_String_Handler'Class) return Boolean
+     (Self   : Abstract_Text_Handler;
+      Suffix : Abstract_Text_Handler'Class) return Boolean
    is
-      Text            : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Text            : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Position        : VSS.Implementation.Strings.Cursor;
       Suffix_Position : VSS.Implementation.Strings.Cursor;
 
@@ -136,14 +136,14 @@ package body VSS.Implementation.Text_Handlers is
    ------------------------
 
    not overriding function First_UTF16_Offset
-     (Self     : Abstract_String_Handler;
+     (Self     : Abstract_Text_Handler;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF16_Code_Unit_Index
    is
       use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
-      Text : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Text : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Aux  : aliased VSS.Implementation.Strings.Cursor;
 
    begin
@@ -168,14 +168,14 @@ package body VSS.Implementation.Text_Handlers is
    -----------------------
 
    not overriding function First_UTF8_Offset
-     (Self     : Abstract_String_Handler;
+     (Self     : Abstract_Text_Handler;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF8_Code_Unit_Index
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Text : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Text : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Aux  : aliased VSS.Implementation.Strings.Cursor;
 
    begin
@@ -200,13 +200,12 @@ package body VSS.Implementation.Text_Handlers is
    ---------------------
 
    not overriding function Forward_Element
-     (Self     : Abstract_String_Handler;
+     (Self     : Abstract_Text_Handler;
       Position : aliased in out VSS.Implementation.Strings.Cursor;
       Element  : out VSS.Unicode.Code_Point'Base) return Boolean is
    begin
-      if Abstract_String_Handler'Class (Self).Forward (Position) then
-         Element :=
-           Abstract_String_Handler'Class (Self).Element (Position);
+      if Abstract_Text_Handler'Class (Self).Forward (Position) then
+         Element := Abstract_Text_Handler'Class (Self).Element (Position);
 
          return True;
 
@@ -222,7 +221,7 @@ package body VSS.Implementation.Text_Handlers is
    -----------------------
 
    not overriding procedure From_UTF_8_String
-     (Self    : in out Abstract_String_Handler;
+     (Self    : in out Abstract_Text_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Success : out Boolean)
    is
@@ -248,7 +247,7 @@ package body VSS.Implementation.Text_Handlers is
 
          exit when not Success;
 
-         Abstract_String_Handler'Class (Self).Append (Code, Offset);
+         Abstract_Text_Handler'Class (Self).Append (Code, Offset);
       end loop;
    end From_UTF_8_String;
 
@@ -257,11 +256,11 @@ package body VSS.Implementation.Text_Handlers is
    ----------
 
    not overriding procedure Hash
-     (Self      : Abstract_String_Handler;
+     (Self      : Abstract_Text_Handler;
       Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator)
    is
-      Handler  : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Handler  : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Position : aliased VSS.Implementation.Strings.Cursor;
       Code     : VSS.Unicode.Code_Point;
 
@@ -294,7 +293,7 @@ package body VSS.Implementation.Text_Handlers is
    ------------
 
    not overriding procedure Insert
-     (Self   : in out Abstract_String_Handler;
+     (Self   : in out Abstract_Text_Handler;
       From   : VSS.Implementation.Strings.Cursor;
       Item   : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
@@ -307,8 +306,8 @@ package body VSS.Implementation.Text_Handlers is
       Code          : VSS.Unicode.Code_Point;
       Success       : Boolean with Unreferenced;
       Text          :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
-         renames VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
+         renames VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
            (Self);
 
    begin
@@ -331,12 +330,12 @@ package body VSS.Implementation.Text_Handlers is
    --------------
 
    not overriding function Is_Equal
-     (Self  : Abstract_String_Handler;
-      Other : Abstract_String_Handler'Class) return Boolean
+     (Self  : Abstract_Text_Handler;
+      Other : Abstract_Text_Handler'Class) return Boolean
    is
-      Left_Handler   : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
-      Right_Handler  : Abstract_String_Handler'Class renames Other;
+      Left_Handler   : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
+      Right_Handler  : Abstract_Text_Handler'Class renames Other;
 
       Left_Position  : aliased VSS.Implementation.Strings.Cursor;
       Right_Position : aliased VSS.Implementation.Strings.Cursor;
@@ -369,12 +368,12 @@ package body VSS.Implementation.Text_Handlers is
    -------------
 
    not overriding function Is_Less
-     (Self  : Abstract_String_Handler;
-      Other : Abstract_String_Handler'Class) return Boolean
+     (Self  : Abstract_Text_Handler;
+      Other : Abstract_Text_Handler'Class) return Boolean
    is
-      Left_Handler   : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
-      Right_Handler  : Abstract_String_Handler'Class renames Other;
+      Left_Handler   : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
+      Right_Handler  : Abstract_Text_Handler'Class renames Other;
 
       Left_Position  : aliased VSS.Implementation.Strings.Cursor;
       Right_Position : aliased VSS.Implementation.Strings.Cursor;
@@ -405,12 +404,12 @@ package body VSS.Implementation.Text_Handlers is
    ----------------------
 
    not overriding function Is_Less_Or_Equal
-     (Self  : Abstract_String_Handler;
-      Other : Abstract_String_Handler'Class) return Boolean
+     (Self  : Abstract_Text_Handler;
+      Other : Abstract_Text_Handler'Class) return Boolean
    is
-      Left_Handler   : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
-      Right_Handler  : Abstract_String_Handler'Class renames Other;
+      Left_Handler   : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
+      Right_Handler  : Abstract_Text_Handler'Class renames Other;
 
       Left_Position  : aliased VSS.Implementation.Strings.Cursor;
       Right_Position : aliased VSS.Implementation.Strings.Cursor;
@@ -443,21 +442,21 @@ package body VSS.Implementation.Text_Handlers is
    -------------
 
    not overriding function Is_Null
-     (Self : Abstract_String_Handler) return Boolean is (False);
+     (Self : Abstract_Text_Handler) return Boolean is (False);
 
    -----------------------
    -- Last_UTF16_Offset --
    -----------------------
 
    not overriding function Last_UTF16_Offset
-     (Self     : Abstract_String_Handler;
+     (Self     : Abstract_Text_Handler;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF16_Code_Unit_Index
    is
       use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
-      Text  : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Text  : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Aux   : aliased VSS.Implementation.Strings.Cursor;
       Dummy : Boolean;
 
@@ -485,14 +484,14 @@ package body VSS.Implementation.Text_Handlers is
    ----------------------
 
    not overriding function Last_UTF8_Offset
-     (Self     : Abstract_String_Handler;
+     (Self     : Abstract_Text_Handler;
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF8_Code_Unit_Index
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Text  : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Text  : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Aux   : aliased VSS.Implementation.Strings.Cursor;
       Dummy : Boolean;
 
@@ -520,13 +519,13 @@ package body VSS.Implementation.Text_Handlers is
    -----------
 
    not overriding procedure Slice
-     (Self   : Abstract_String_Handler;
+     (Self   : Abstract_Text_Handler;
       From   : VSS.Implementation.Strings.Cursor;
       To     : VSS.Implementation.Strings.Cursor;
       Target : out VSS.Implementation.Strings.String_Data)
    is
-      Source_Text : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Source_Text : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Current     : aliased VSS.Implementation.Strings.Cursor;
       Offset      : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
       Result_Text : constant not null
@@ -552,7 +551,7 @@ package body VSS.Implementation.Text_Handlers is
    -----------
 
    not overriding procedure Split
-     (Self             : Abstract_String_Handler;
+     (Self             : Abstract_Text_Handler;
       Data             : VSS.Implementation.Strings.String_Data;
       Separator        : VSS.Unicode.Code_Point;
       Keep_Empty_Parts : Boolean;
@@ -563,8 +562,8 @@ package body VSS.Implementation.Text_Handlers is
       procedure Append;
       --  Append found substring to the results
 
-      Handler  : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Handler  : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Current  : aliased VSS.Implementation.Strings.Cursor;
       Previous : VSS.Implementation.Strings.Cursor;
       From     : aliased VSS.Implementation.Strings.Cursor;
@@ -615,11 +614,11 @@ package body VSS.Implementation.Text_Handlers is
    -----------------
 
    not overriding function Starts_With
-     (Self   : Abstract_String_Handler;
-      Prefix : Abstract_String_Handler'Class) return Boolean
+     (Self   : Abstract_Text_Handler;
+      Prefix : Abstract_Text_Handler'Class) return Boolean
    is
-      Text            : Abstract_String_Handler'Class
-        renames Abstract_String_Handler'Class (Self);
+      Text            : Abstract_Text_Handler'Class
+        renames Abstract_Text_Handler'Class (Self);
       Position        : aliased VSS.Implementation.Strings.Cursor;
       Prefix_Position : aliased VSS.Implementation.Strings.Cursor;
 
@@ -644,7 +643,7 @@ package body VSS.Implementation.Text_Handlers is
    ---------------------
 
    function Unsafe_Capacity
-     (Self : Abstract_String_Handler'Class)
+     (Self : Abstract_Text_Handler'Class)
       return VSS.Implementation.Strings.Character_Count
    is
       pragma Warnings (Off, """Data"" overlays smaller object");

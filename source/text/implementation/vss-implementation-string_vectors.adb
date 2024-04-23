@@ -150,9 +150,8 @@ package body VSS.Implementation.String_Vectors is
      (Self : String_Vector_Data_Access;
       Item : VSS.Implementation.Strings.String_Data) return Boolean
    is
-      Item_Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class
-          renames VSS.Implementation.Strings.Constant_Handler (Item).all;
+      Item_Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
+        renames VSS.Implementation.Strings.Constant_Handler (Item).all;
 
    begin
       if Self = null then
@@ -160,7 +159,7 @@ package body VSS.Implementation.String_Vectors is
       end if;
 
       for J in Self.Data'First .. Self.Last loop
-         if Item_Handler.Is_Equal
+         if Item_Text.Is_Equal
               (VSS.Implementation.Strings.Constant_Handler (Self.Data (J)).all)
          then
             return True;

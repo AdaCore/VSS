@@ -31,21 +31,18 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    --  Return core data record for the given character.
 
    function Apply_RI
-     (Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Left    : VSS.Implementation.Strings.Cursor) return Boolean;
+     (Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+      Left : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rules GB12, GB13 should be
    --  applied.
 
    function Apply_ExtPict
-     (Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Left    : VSS.Implementation.Strings.Cursor) return Boolean;
+     (Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+      Left : VSS.Implementation.Strings.Cursor) return Boolean;
    --  Scan string backward to check whether Rule GB11 should be applied.
 
    function Apply_InCB
-     (Handler   :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+     (Text      : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean;
    --  Scan string backward to check whether Rule GB9c should be applied.
@@ -109,20 +106,19 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    -------------------
 
    function Apply_ExtPict
-     (Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Left    : VSS.Implementation.Strings.Cursor) return Boolean
+     (Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+      Left : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position   : VSS.Implementation.Strings.Cursor := Left;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
 
    begin
       loop
-         if not Handler.Backward (Position) then
+         if not Text.Backward (Position) then
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Position));
+         Properties := Extract_Core_Data (Text.Element (Position));
 
          if Properties.GCB = GCB_EX then
             null;
@@ -141,8 +137,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    ----------------
 
    function Apply_InCB
-     (Handler   :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+     (Text      : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
       Left      : VSS.Implementation.Strings.Cursor;
       Is_Linker : Boolean) return Boolean
    is
@@ -152,11 +147,11 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    begin
       loop
-         if not Handler.Backward (Position) then
+         if not Text.Backward (Position) then
             return False;
          end if;
 
-         Properties := Extract_Core_Data (Handler.Element (Position));
+         Properties := Extract_Core_Data (Text.Element (Position));
 
          case Properties.InCB is
             when INCB_Linker =>
@@ -179,20 +174,19 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    --------------
 
    function Apply_RI
-     (Handler :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
-      Left    : VSS.Implementation.Strings.Cursor) return Boolean
+     (Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+      Left : VSS.Implementation.Strings.Cursor) return Boolean
    is
       Position : VSS.Implementation.Strings.Cursor := Left;
       Count    : Natural := 0;
 
    begin
       loop
-         if not Handler.Backward (Position) then
+         if not Text.Backward (Position) then
             return Count mod 2 = 0;
          end if;
 
-         if Extract_Core_Data (Handler.Element (Position)).GCB
+         if Extract_Core_Data (Text.Element (Position)).GCB
               = GCB_RI
          then
             Count := Count + 1;

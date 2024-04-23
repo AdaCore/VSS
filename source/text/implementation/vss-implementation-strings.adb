@@ -15,9 +15,9 @@ package body VSS.Implementation.Strings is
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-   package Address_To_String_Handler_Conversions is
+   package Address_To_Text_Handler_Conversions is
      new System.Address_To_Access_Conversions
-       (VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class);
+       (VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class);
 
    function Is_Initialized (Data : String_Data) return Boolean
      with Inline_Always;
@@ -58,7 +58,7 @@ package body VSS.Implementation.Strings is
       else
          return
            Constant_Text_Handler_Access
-             (Address_To_String_Handler_Conversions.To_Pointer
+             (Address_To_Text_Handler_Conversions.To_Pointer
                 (Data.Storage'Address));
       end if;
    end Constant_Handler;
@@ -241,7 +241,7 @@ package body VSS.Implementation.Strings is
 
       return
         Variable_Text_Handler_Access
-          (Address_To_String_Handler_Conversions.To_Pointer
+          (Address_To_Text_Handler_Conversions.To_Pointer
              (Data.Storage'Address));
    end Variable_Handler;
 

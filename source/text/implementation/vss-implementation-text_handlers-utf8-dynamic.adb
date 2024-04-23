@@ -141,9 +141,8 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       Suffix : VSS.Implementation.Strings.String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      Parent : VSS.Implementation.Text_Handlers.Abstract_String_Handler
-        renames VSS.Implementation.Text_Handlers.Abstract_String_Handler
-                  (Self);
+      Parent : VSS.Implementation.Text_Handlers.Abstract_Text_Handler
+        renames VSS.Implementation.Text_Handlers.Abstract_Text_Handler (Self);
 
       Suffix_Handler : constant not null
         VSS.Implementation.Strings.Constant_Text_Handler_Access :=
@@ -633,7 +632,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
         VSS.Implementation.String_Vectors.String_Vector_Data_Access) is
    begin
       Split_Lines_Common
-        (Handler         => Self,
+        (Text            => Self,
          Data            => Data,
          Storage         => Self.Pointer.Storage,
          Terminators     => Terminators,

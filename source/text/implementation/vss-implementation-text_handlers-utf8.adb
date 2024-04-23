@@ -86,8 +86,8 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
    ------------------------
 
    procedure Split_Lines_Common
-     (Handler         :
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+     (Text            :
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
       Data            : VSS.Implementation.Strings.String_Data;
       Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Terminators     : VSS.Strings.Line_Terminator_Set;
@@ -169,7 +169,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
    begin
       VSS.Implementation.String_Vectors.Unreference (Lines);
 
-      Handler.Before_First_Character (Initial);
+      Text.Before_First_Character (Initial);
 
       while VSS.Implementation.Line_Iterators.Forward
         (Data,
@@ -183,11 +183,11 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
 
          if VSS.Implementation.Strings.Is_Invalid (Terminator) then
             After_Last := At_Last;
-            Dummy      := Handler.Forward (After_Last);
+            Dummy      := Text.Forward (After_Last);
 
          elsif Keep_Terminator then
             After_Last := At_Last;
-            Dummy      := Handler.Forward (After_Last);
+            Dummy      := Text.Forward (After_Last);
 
          else
             After_Last := Terminator;
@@ -410,7 +410,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
 
    procedure Unsafe_Initialize
      (Text     : in out
-        VSS.Implementation.Text_Handlers.Abstract_String_Handler'Class;
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
       Capacity : VSS.Implementation.Strings.Character_Count;
       Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
    begin

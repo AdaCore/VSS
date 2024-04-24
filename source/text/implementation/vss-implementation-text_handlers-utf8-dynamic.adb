@@ -338,12 +338,10 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Success : out Boolean)
    is
-      Pointer : UTF8_String_Data_Access;
+      Pointer : UTF8_String_Data_Access renames Self.Pointer;
       Length  : VSS.Implementation.Strings.Character_Count := 0;
 
    begin
-      Pointer := Allocate (0, Item'Length);
-
       Validate_And_Copy (Item, Pointer.Storage, Length, Success);
 
       if Success then
@@ -352,7 +350,6 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
          --  GNAT 20240327: compiler crash without type conversion.
          Pointer.Length := Length;
          Pointer.Size   := Item'Length;
-         Self.Pointer   := Pointer;
 
       else
          Unreference (Pointer);
@@ -371,7 +368,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       Success := True;
 
       declare
-         Pointer : UTF8_String_Data_Access;
+         Pointer : UTF8_String_Data_Access renames Self.Pointer;
          Code    : VSS.Unicode.Code_Point;
          L       : VSS.Unicode.Scalar_Value_UTF8_Code_Unit_Length;
          U1      : VSS.Unicode.UTF8_Code_Unit;
@@ -380,8 +377,6 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
          U4      : VSS.Unicode.UTF8_Code_Unit;
 
       begin
-         Pointer := Allocate (0, Item'Length);
-
          for C of Item loop
             if Wide_Wide_Character'Pos (C) not in VSS.Unicode.Code_Point
               or else Wide_Wide_Character'Pos (C) in 16#D800# .. 16#DFFF#
@@ -412,7 +407,6 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
          if Success then
             Pointer.Storage (Pointer.Size) := 16#00#;
             Pointer.Length := Item'Length;
-            Self.Pointer   := Pointer;
 
          else
             Unreference (Pointer);

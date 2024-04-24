@@ -253,6 +253,11 @@ build_lsif:
     ACI_UPSTREAM_MERGE_REQUEST_IID: $CI_MERGE_REQUEST_IID
     ACI_TRACK: edge
 
+run_lal_ci:
+  <<: *run_ci_common
+  trigger:
+    project: eng/libadalang/libadalang
+
 run_als_ci:
   <<: *run_ci_common
   trigger:

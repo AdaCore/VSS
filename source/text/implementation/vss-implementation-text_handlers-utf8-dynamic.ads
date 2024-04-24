@@ -93,12 +93,14 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    overriding procedure From_Wide_Wide_String
      (Self    : in out Dynamic_UTF8_Handler;
       Item    : Wide_Wide_String;
-      Success : out Boolean);
+      Success : out Boolean)
+     with Pre => Self.Pointer /= null;
 
    overriding procedure From_UTF_8_String
      (Self    : in out Dynamic_UTF8_Handler;
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
-      Success : out Boolean);
+      Success : out Boolean)
+     with Pre => Self.Pointer /= null;
 
    overriding function To_UTF_8_String
      (Self : Dynamic_UTF8_Handler)

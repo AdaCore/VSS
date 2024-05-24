@@ -93,7 +93,8 @@ private
 
    procedure Unchecked_Forward
      (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Position : in out VSS.Implementation.Strings.Cursor);
+      Position : in out VSS.Implementation.Strings.Cursor)
+        with Inline_Always;
    --  Move cursor to position of the next character
 
    procedure Validate_And_Copy

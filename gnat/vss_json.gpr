@@ -22,7 +22,14 @@ project VSS_JSON is
      ("../source/json",
       "../source/json/implementation");
 
-   package Compiler renames VSS_Common.Compiler;
+   package Compiler is
+      for Switches ("Ada") use VSS_Common.Ada_Compiler_Switches;
+
+      --  XXX GNAT 20240411 workaround
+      for Switches ("vss-json-implementation-numbers-tables.ads")
+        use VSS_Common.Ada_Compiler_Switches & ("-gnaty-t");
+      --  XXX GNAT 20240411 workaround
+   end Compiler;
 
    package Linker renames VSS_Common.Linker;
 

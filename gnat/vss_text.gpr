@@ -50,7 +50,18 @@ library project VSS_Text is
       "../source/text/implementation",
       "../source/text/ucd") & OS_Source_Dirs;
 
-   package Compiler renames VSS_Common.Compiler;
+   package Compiler is
+      for Switches ("Ada") use VSS_Common.Ada_Compiler_Switches;
+
+      --  XXX GNAT 20240411 workaround
+      for Switches ("vss-implementation-ucd_normalization_common.ads")
+        use VSS_Common.Ada_Compiler_Switches & ("-gnaty-t");
+      for Switches ("vss-strings-converters-decoders.adb")
+        use VSS_Common.Ada_Compiler_Switches & ("-gnaty-t");
+      for Switches ("vss-strings-converters-decoders-gb18030-ranges.ads")
+        use VSS_Common.Ada_Compiler_Switches & ("-gnaty-t");
+      --  XXX GNAT 20240411 workaround
+   end Compiler;
 
    package Linker renames VSS_Common.Linker;
 

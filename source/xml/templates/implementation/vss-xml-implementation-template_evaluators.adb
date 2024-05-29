@@ -225,9 +225,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
                elsif Self.Current.Exists then
                   Skip :=
-                    not (Proxy /= null
-                         and then Proxy.all
-                           not in VSS.XML.Templates.Proxies.Error_Proxy'Class);
+                    Proxy.all in VSS.XML.Templates.Proxies.Error_Proxy'Class;
 
                else
                   Skip := not Evaluate_Condition (Proxy);

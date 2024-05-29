@@ -5,6 +5,7 @@
 --
 
 pragma Ada_2022;
+pragma Style_Checks ("M131");  --  Temporary
 
 with VSS.Implementation.UCD_Normalization_Common;
 with VSS.Implementation.Text_Handlers.UTF8.Dynamic;

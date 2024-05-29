@@ -215,6 +215,9 @@ package body VSS.Implementation.Referrers is
    is
       use type Ada.Exceptions.Exception_Id;
 
+      pragma Warnings
+        (Off, """Occurrence"" may be referenced before it has a value");
+      --  Variable can be initialized explicitly.
       Occurrence : Ada.Exceptions.Exception_Occurrence;
 
    begin

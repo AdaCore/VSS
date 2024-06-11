@@ -178,13 +178,13 @@ install: install-libs-relocatable
 install-all-libs: install-libs-static install-libs-static-pic install-libs-relocatable
 
 install-libs-%:
-	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/text -f -p -P gnat/vss_text.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/json -f -p -P gnat/vss_json.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/regexp -f -p -P gnat/vss_regexp.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/xml -f -p -P gnat/vss_xml.gpr
-	gprinstall $(GPRINSTALL_FLAGS)/xml_templates -f -p -P gnat/vss_xml_templates.gpr
-	gprinstall -XXMLADA_BUILD=$* $(GPRINSTALL_FLAGS)/xml_xmlada -f -p -P gnat/vss_xml_xmlada.gpr
+	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr --install-name=vss_gnat
+	gprinstall $(GPRINSTALL_FLAGS)/text -f -p -P gnat/vss_text.gpr --install-name=vss_text
+	gprinstall $(GPRINSTALL_FLAGS)/json -f -p -P gnat/vss_json.gpr --install-name=vss_json
+	gprinstall $(GPRINSTALL_FLAGS)/regexp -f -p -P gnat/vss_regexp.gpr --install-name=vss_regexp
+	gprinstall $(GPRINSTALL_FLAGS)/xml -f -p -P gnat/vss_xml.gpr --install-name=vss_xml
+	gprinstall $(GPRINSTALL_FLAGS)/xml_templates -f -p -P gnat/vss_xml_templates.gpr --install-name=vss_xml_templates
+	gprinstall -XXMLADA_BUILD=$* $(GPRINSTALL_FLAGS)/xml_xmlada -f -p -P gnat/vss_xml_xmlada.gpr --install-name=vss_xml_xmlada
 
 misc: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr

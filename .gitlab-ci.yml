@@ -144,20 +144,19 @@ build_and_test_dev:
 
 build_and_test:
   services:
-     - image:sandbox
+     - image:pe-base
      - cpu:8
      - mem:16
   stage: build_and_test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_PIPELINE_SOURCE == 'pipeline'
   script:
-    - !reference [.basic-setup]
-    - !reference [.detect-branches]
-
+    - generic_anod_ci
+    - . /tmp/ci_env.sh
     # Build & test using anod
     - anod build vss $ACI_TRACK_QUALIFIER --latest
     - anod test vss $ACI_TRACK_QUALIFIER --latest
+    - testsuite_reports
 
 
 build_gnatdoc:

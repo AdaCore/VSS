@@ -20,5 +20,6 @@ rm -rf parse-number-fxx-test-data/.git
 git clone https://github.com/json5/json5-tests.git
 rm -rf json5-tests/.git
 curl -O https://raw.githubusercontent.com/Perl/perl5/blead/t/re/re_tests
-tar caf ../vss-tests-data.tar.bz2 .
+cd ..
+tar caf vss-tests-data-`date +%Y%m%d`.tar.bz2 data
 ```

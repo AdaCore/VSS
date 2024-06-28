@@ -1,10 +1,12 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 pragma Ada_2022;
+
+with VSS.JSON.Implementation.Arithmetic_64;
 
 package body VSS.JSON.Implementation.Big_Integers is
 
@@ -16,15 +18,6 @@ package body VSS.JSON.Implementation.Big_Integers is
       Result   : aliased out Interfaces.Unsigned_64;
       Overflow : out Interfaces.Unsigned_64);
    --  Add of two 64-bit unsigned integers. Return result and overflow.
-
-   procedure Scalar_Multiply
-     (Left     : Interfaces.Unsigned_64;
-      Right    : Interfaces.Unsigned_64;
-      Result   : out Interfaces.Unsigned_64;
-      Overflow : in out Interfaces.Unsigned_64);
-   --  Multiplication of two 64-bit unsigned integers into 128-bit values,
-   --  add of carry. Result is splitted into high and low 64-bit unsigned
-   --  integers. On x86_64 it is optimized into few instructions.
 
    procedure Add
      (Self  : in out Big_Integer;
@@ -262,7 +255,8 @@ package body VSS.JSON.Implementation.Big_Integers is
 
    begin
       for J in Self.Data'First .. Self.Last loop
-         Scalar_Multiply (Self.Data (J), Value, Self.Data (J), Carry);
+         VSS.JSON.Implementation.Arithmetic_64.Multiply_Add
+           (Self.Data (J), Value, Self.Data (J), Carry);
       end loop;
 
       if Carry /= 0 then
@@ -450,27 +444,6 @@ package body VSS.JSON.Implementation.Big_Integers is
    begin
       Overflow := (if Add (Left, Right, Result'Access) then 1 else 0);
    end Scalar_Add;
-
-   ---------------------
-   -- Scalar_Multiply --
-   ---------------------
-
-   procedure Scalar_Multiply
-     (Left     : Interfaces.Unsigned_64;
-      Right    : Interfaces.Unsigned_64;
-      Result   : out Interfaces.Unsigned_64;
-      Overflow : in out Interfaces.Unsigned_64)
-   is
-      use type Interfaces.Unsigned_128;
-
-      R : constant Interfaces.Unsigned_128 :=
-        Interfaces.Unsigned_128 (Left) * Interfaces.Unsigned_128 (Right)
-          + Interfaces.Unsigned_128 (Overflow);
-
-   begin
-      Result   := Interfaces.Unsigned_64 (R mod 2 ** 64);
-      Overflow := Interfaces.Unsigned_64 (R / 2 ** 64);
-   end Scalar_Multiply;
 
    ---------
    -- Set --

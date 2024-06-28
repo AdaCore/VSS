@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -8,6 +8,7 @@ pragma Ada_2022;
 
 with Ada.Unchecked_Conversion;
 
+with VSS.JSON.Implementation.Arithmetic_64;
 with VSS.JSON.Implementation.Numbers.Tables;
 
 package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
@@ -30,15 +31,6 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
      with Import,
           Convention    => Intrinsic,
           External_Name => "__builtin_clzll";
-
-   procedure Multiply
-     (A : Interfaces.Unsigned_64;
-      B : Interfaces.Unsigned_64;
-      L : out Interfaces.Unsigned_64;
-      H : out Interfaces.Unsigned_64);
-   --  Multiplication of two 64-bit unsigned integers into 128-bit values,
-   --  splitted into high and low 64-bit unsigned integers. On x86_64 it is
-   --  optimized into single instruction.
 
    procedure Compute_Product_Approximation
      (W       : Interfaces.Unsigned_64;
@@ -164,7 +156,8 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       --  For small values of q, e.g., q in [0,27], the answer is always exact
       --  because the first call of Multiply gives the exact answer.
 
-      Multiply (W, Tables.Powers_Of_Five (Q).L, FL, FH);
+      VSS.JSON.Implementation.Arithmetic_64.Multiply
+        (W, Tables.Powers_Of_Five (Q).L, FL, FH);
 
       if (FH and Precision_Mask) = Precision_Mask then
          --  could further guard with  (lower + w < lower)
@@ -173,7 +166,8 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
          --  expectation is that the compiler will optimize this extra
          --  work away if needed.
 
-         Multiply (W, Tables.Powers_Of_Five (Q).H, SL, SH);
+         VSS.JSON.Implementation.Arithmetic_64.Multiply
+           (W, Tables.Powers_Of_Five (Q).H, SL, SH);
          FL := @ + SH;
 
          if SH > FL then
@@ -559,26 +553,6 @@ package body VSS.JSON.Implementation.Numbers.Eisel_Lemire is
       Number.Significand := @ + 1;
       Number.Power       := @ - 1;
    end Halfway;
-
-   --------------
-   -- Multiply --
-   --------------
-
-   procedure Multiply
-     (A : Interfaces.Unsigned_64;
-      B : Interfaces.Unsigned_64;
-      L : out Interfaces.Unsigned_64;
-      H : out Interfaces.Unsigned_64)
-   is
-      use type Interfaces.Unsigned_128;
-
-      R : constant Interfaces.Unsigned_128 :=
-        Interfaces.Unsigned_128 (A) * Interfaces.Unsigned_128 (B);
-
-   begin
-      L := Interfaces.Unsigned_64 (R mod 2 ** 64);
-      H := Interfaces.Unsigned_64 (R / 2 ** 64);
-   end Multiply;
 
    --------------------
    -- Scale_Negative --

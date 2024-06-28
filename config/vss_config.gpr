@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -105,6 +105,10 @@ abstract project Vss_Config is
            ,"-fdata-sections" -- Separate ELF section for each variable
            ,"-gnat2012" -- Ada 2012 Mode, see comment.
           );
+
+   type Max_Supported_Integer_Size_Kind is ("128", "64");
+   Max_Supported_Integer_Size : Max_Supported_Integer_Size_Kind :=
+     external ("VSS_MAX_SUPPORTED_INTEGER_SIZE", "128");
 
    type Build_Profile_Kind is ("release", "validation", "development");
    Build_Profile : Build_Profile_Kind :=

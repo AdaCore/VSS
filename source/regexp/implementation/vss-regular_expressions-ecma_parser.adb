@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -107,7 +107,8 @@ package body VSS.Regular_Expressions.ECMA_Parser is
         (Value : out Node_Or_Class; Ok : in out Boolean);
 
       procedure Character_Escape
-        (Value : out VSS.Characters.Virtual_Character; Ok : in out Boolean)
+        (Value : out VSS.Characters.Virtual_Character'Base;
+         Ok    : in out Boolean)
           with Pre => Ok;
 
       Next_Group : Positive := 1;  --  Group counter
@@ -163,8 +164,13 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
       end Alternative;
 
+      -----------------
+      -- Atom_Escape --
+      -----------------
+
       procedure Atom_Escape (Value : out Node_Or_Class; Ok : in out Boolean) is
-         Character : VSS.Characters.Virtual_Character;
+         Character : VSS.Characters.Virtual_Character'Base;
+
       begin
          if not Cursor.Has_Element then
             if Error.Is_Empty then
@@ -383,9 +389,16 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          end if;
       end Character_Class_Escape;
 
+      ----------------------
+      -- Character_Escape --
+      ----------------------
+
       procedure Character_Escape
-        (Value : out VSS.Characters.Virtual_Character; Ok : in out Boolean) is
+        (Value : out VSS.Characters.Virtual_Character'Base;
+         Ok    : in out Boolean) is
       begin
+         Value := VSS.Characters.Virtual_Character'Base'Last;
+
          case Cursor.Element is
             when '^' | '$' | '\' | '.' | '*' | '+' | '?' |
                '(' | ')' | '[' | ']' | '{' | '}' | '|'

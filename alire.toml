@@ -1,6 +1,6 @@
 name = "vss"
 description = "Advanced string and text manipulation with Unicode support"
-version = "22.0.0-20210830"
+version = "25.0.0-dev"
 tags = ["unicode", "json", "text"]
 
 authors = ["AdaCore"]
@@ -14,6 +14,9 @@ project-files = ["gnat/vss_text.gpr", "gnat/vss_json.gpr"]
 [configuration]
 generate_ada = false
 generate_c = false
+
+[configuration.variables]
+Max_Supported_Integer_Size = {type = "Enum", values = ["128", "64"], default = "128"}
 
 [build-switches]
 "*".ada_version = "Ada2022"

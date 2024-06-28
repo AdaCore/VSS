@@ -1,11 +1,12 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 --  VSS: JSON processing subproject
 
+with "../config/vss_config";
 with "vss_common";
 with "vss_text";
 
@@ -32,5 +33,10 @@ project VSS_JSON is
    end Compiler;
 
    package Linker renames VSS_Common.Linker;
+
+   package Naming is
+      for Implementation ("VSS.JSON.Implementation.Arithmetic_64")
+        use "vss-json-implementation-arithmetic_64__" & Vss_Config.Max_Supported_Integer_Size & ".adb";
+   end Naming;
 
 end VSS_JSON;

@@ -97,6 +97,7 @@ build_and_test_dev:
   stage: build_and_test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
     - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TITLE =~ /Merge branch.*/
     - if: $CI_COMMIT_BRANCH == 'edge' && $CI_COMMIT_TITLE =~ /Merge branch.*/
   script:

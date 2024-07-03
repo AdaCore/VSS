@@ -1,0 +1,6 @@
+"standard string"
+"unbounded string"
+
+short text
+very long text that should not be stored in-place
+Привет! Это тоже длинная строка

@@ -97,7 +97,7 @@ check_text:
 	.objs/tests/test_word_iterators data/ucd
 	.objs/tests/test_standard_paths
 ifeq ($(OS),Windows_NT)
-	cmd.exe /c "testsuite\\run_test_application_arguments.cmd"
+	cmd.exe \/c "testsuite\\run_test_application_arguments.bat"
 else
 	.objs/tests/test_application_arguments hello привет გამარჯობა 👋
 endif

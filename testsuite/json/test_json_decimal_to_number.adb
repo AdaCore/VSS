@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -53,6 +53,13 @@ procedure Test_JSON_Decimal_To_Number is
       Last      : Natural;
 
    begin
+      if File_Name = "/dev/null" then
+         --  There is no /dev/null file on Windows, so don't attempt to open it
+         --  to avoid unexpected test failure on Windows.
+
+         return;
+      end if;
+
       Ada.Text_IO.Open (File, Ada.Text_IO.In_File, File_Name);
 
       while not Ada.Text_IO.End_Of_File (File) loop

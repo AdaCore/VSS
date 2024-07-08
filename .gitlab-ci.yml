@@ -1,3 +1,6 @@
+include:
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/windows-ci@main
+
 variables:
    # The common part of the URL for cloning from within a CI
    GIT_CLONE_BASE: https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}
@@ -143,11 +146,7 @@ build_and_test_dev:
       junit: .xunit-logs/*.xml
 
 
-build_and_test:
-  services:
-     - image:pe-base
-     - cpu:8
-     - mem:16
+.build_and_test:
   stage: build_and_test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -159,6 +158,34 @@ build_and_test:
     - anod test vss $ACI_TRACK_QUALIFIER --latest
     - testsuite_reports
 
+build_and_test_linux:
+  extends: .build_and_test
+  services:
+     - image:pe-base
+     - cpu:8
+     - mem:16
+
+build_and_test_windows:
+  extends: .build_and_test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+  before_script:
+    - export CYGWIN=nodosfilewarning  # Remove confusing Cygwin warning
+    - set -o igncr                    # Remove trailing ^M in Cygwin
+    - export SHELLOPTS
+    - export PYTHONIOENCODING=utf-8:surrogateescape
+  services:
+     - image:e3-windows-core-2022
+     - cpu:8
+     - platform:x86_64-windows-2022
+
+build_and_test_linux:
+  extends: .build_and_test
+  services:
+    - image:pe-base
+    - cpu:8
+    - mem:16
 
 build_gnatdoc:
   services:

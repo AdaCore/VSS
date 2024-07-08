@@ -62,8 +62,10 @@ class Virtual_String_Printer:
 
         if text.type == utf8static_type:
             # GDB is unable to resolve "storage" component of the record,
-            # so skip first implicit component of 8 bytes and decode.
-            return decode_utf8(text.bytes[8:], text["size"])
+            # so skip first implicit component of System.Address and decode.
+            return decode_utf8(
+                text.bytes[gdb.lookup_type("system.address").sizeof :], text["size"]
+            )
 
         elif text.type == utf8dynamic_type:
             data = text["pointer"].dereference()

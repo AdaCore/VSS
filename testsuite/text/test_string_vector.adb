@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -22,6 +22,12 @@ procedure Test_String_Vector is
    NEL : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_0085#);
    LS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2028#);
    PS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2029#);
+
+   --  Testsuites
+
+   procedure Test_Virtual_String_Vector;
+
+   --  Testcases
 
    procedure Test_Legacy_Tests;
    procedure Test_Join_Lines;
@@ -378,13 +384,24 @@ procedure Test_String_Vector is
       Test_Support.Assert (V (3) = "a");
    end Test_Prepend;
 
+   --------------------------------
+   -- Test_Virtual_String_Vector --
+   --------------------------------
+
+   procedure Test_Virtual_String_Vector is
+   begin
+      Test_Support.Run_Testcase
+        (Test_Legacy_Tests'Access, "Various legacy tests");
+      Test_Support.Run_Testcase (Test_Join_Lines'Access, "Join_Lines");
+      Test_Support.Run_Testcase (Test_Is_Empty'Access, "Is_Empty");
+      Test_Support.Run_Testcase (Test_Append_Vector'Access, "Append (Vector)");
+      Test_Support.Run_Testcase (Test_Clear'Access, "Clear");
+      Test_Support.Run_Testcase (Test_Contains'Access, "Contains");
+      Test_Support.Run_Testcase (Test_Delete'Access, "Delete");
+      Test_Support.Run_Testcase (Test_Prepend'Access, "Prepend");
+   end Test_Virtual_String_Vector;
+
 begin
-   Test_Legacy_Tests;
-   Test_Join_Lines;
-   Test_Is_Empty;
-   Test_Append_Vector;
-   Test_Clear;
-   Test_Contains;
-   Test_Delete;
-   Test_Prepend;
+   Test_Support.Run_Testsuite
+     (Test_Virtual_String_Vector'Access, "Virtual_String_Vector");
 end Test_String_Vector;

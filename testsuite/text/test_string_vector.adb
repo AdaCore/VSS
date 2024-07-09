@@ -48,15 +48,32 @@ procedure Test_String_Vector is
       V3 : VSS.String_Vectors.Virtual_String_Vector;
 
    begin
+      Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (V1.First = 1);
+      Test_Support.Assert (V1.Last = 0);
+      Test_Support.Assert (V1.Length = 0);
+
       V1.Append ("line 1.1");
       V1.Append ("line 1.2");
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First = 1);
+      Test_Support.Assert (V1.Last = 2);
+      Test_Support.Assert (V1.Length = 2);
 
       V2.Append ("line 2.1");
       V2.Append ("line 2.2");
       V2.Append ("line 2.3");
+      Test_Support.Assert (not V2.Is_Empty);
+      Test_Support.Assert (V2.First = 1);
+      Test_Support.Assert (V2.Last = 3);
+      Test_Support.Assert (V2.Length = 3);
 
       V3.Append (V1);
       V3.Append (V2);
+      Test_Support.Assert (not V3.Is_Empty);
+      Test_Support.Assert (V3.First = 1);
+      Test_Support.Assert (V3.Last = 5);
+      Test_Support.Assert (V3.Length = 5);
 
       Test_Support.Assert (V3.Element (1) = "line 1.1");
       Test_Support.Assert (V3.Element (2) = "line 1.2");
@@ -75,13 +92,26 @@ procedure Test_String_Vector is
 
    begin
       V1.Append ("line 1");
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First = 1);
+      Test_Support.Assert (V1.Last = 1);
+      Test_Support.Assert (V1.Length = 1);
 
       V2 := V1;
+      Test_Support.Assert (not V2.Is_Empty);
+      Test_Support.Assert (V2.First = 1);
+      Test_Support.Assert (V2.Last = 1);
+      Test_Support.Assert (V2.Length = 1);
 
       V1.Clear;
-
       Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (V1.First = 1);
+      Test_Support.Assert (V1.Last = 0);
+      Test_Support.Assert (V1.Length = 0);
       Test_Support.Assert (not V2.Is_Empty);
+      Test_Support.Assert (V2.First = 1);
+      Test_Support.Assert (V2.Last = 1);
+      Test_Support.Assert (V2.Length = 1);
    end Test_Clear;
 
    -------------------
@@ -118,14 +148,25 @@ procedure Test_String_Vector is
       V1.Append ("def");
 
       V1.Delete (2);
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First = 1);
+      Test_Support.Assert (V1.Last = 2);
+      Test_Support.Assert (V1.Length = 2);
       Test_Support.Assert (V1 (1) = "abc");
       Test_Support.Assert (V1 (2) = "def");
 
       V1.Delete_Last;
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First = 1);
+      Test_Support.Assert (V1.Last = 1);
+      Test_Support.Assert (V1.Length = 1);
       Test_Support.Assert (V1 (1) = "abc");
 
       V1.Delete_Last;
       Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (V1.First = 1);
+      Test_Support.Assert (V1.Last = 0);
+      Test_Support.Assert (V1.Length = 0);
    end Test_Delete;
 
    -------------------
@@ -378,6 +419,9 @@ procedure Test_String_Vector is
       V.Prepend ("b");
       V.Prepend ("c");
 
+      Test_Support.Assert (not V.Is_Empty);
+      Test_Support.Assert (V.First = 1);
+      Test_Support.Assert (V.Last = 3);
       Test_Support.Assert (V.Length = 3);
       Test_Support.Assert (V (1) = "c");
       Test_Support.Assert (V (2) = "b");

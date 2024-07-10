@@ -174,14 +174,14 @@ build_and_test_dev:
     - anod test vss $ACI_TRACK_QUALIFIER --latest
     - testsuite_reports
 
-build_and_test_linux:
+build_and_test:linux:
   extends: .build_and_test
   services:
      - image:pe-base
      - cpu:8
      - mem:16
 
-build_and_test_windows:
+build_and_test:windows:
   extends: .build_and_test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -274,6 +274,7 @@ build_lsif:
 
 .run_ci_common: &run_ci_common
   stage: build_dependent
+  needs: ["build_and_test:linux"]
   rules:
     - if: $CI_PIPELINE_SOURCE == 'push'
       when: never

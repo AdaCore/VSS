@@ -186,11 +186,6 @@ build_and_test_windows:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
-  before_script:
-    - export CYGWIN=nodosfilewarning  # Remove confusing Cygwin warning
-    - set -o igncr                    # Remove trailing ^M in Cygwin
-    - export SHELLOPTS
-    - export PYTHONIOENCODING=utf-8:surrogateescape
   services:
      - image:e3-windows-core-2022
      - cpu:8

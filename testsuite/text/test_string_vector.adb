@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -23,6 +23,13 @@ procedure Test_String_Vector is
    LS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2028#);
    PS  : constant Wide_Wide_Character := Wide_Wide_Character'Val (16#00_2029#);
 
+   --  Testsuites
+
+   procedure Test_Virtual_String_Vector;
+
+   --  Testcases
+
+   procedure Test_Legacy_Tests;
    procedure Test_Join_Lines;
    procedure Test_Is_Empty;
    procedure Test_Append_Vector;
@@ -41,15 +48,32 @@ procedure Test_String_Vector is
       V3 : VSS.String_Vectors.Virtual_String_Vector;
 
    begin
+      Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (V1.First_Index = 1);
+      Test_Support.Assert (V1.Last_Index = 0);
+      Test_Support.Assert (V1.Length = 0);
+
       V1.Append ("line 1.1");
       V1.Append ("line 1.2");
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First_Index = 1);
+      Test_Support.Assert (V1.Last_Index = 2);
+      Test_Support.Assert (V1.Length = 2);
 
       V2.Append ("line 2.1");
       V2.Append ("line 2.2");
       V2.Append ("line 2.3");
+      Test_Support.Assert (not V2.Is_Empty);
+      Test_Support.Assert (V2.First_Index = 1);
+      Test_Support.Assert (V2.Last_Index = 3);
+      Test_Support.Assert (V2.Length = 3);
 
       V3.Append (V1);
       V3.Append (V2);
+      Test_Support.Assert (not V3.Is_Empty);
+      Test_Support.Assert (V3.First_Index = 1);
+      Test_Support.Assert (V3.Last_Index = 5);
+      Test_Support.Assert (V3.Length = 5);
 
       Test_Support.Assert (V3.Element (1) = "line 1.1");
       Test_Support.Assert (V3.Element (2) = "line 1.2");
@@ -68,13 +92,26 @@ procedure Test_String_Vector is
 
    begin
       V1.Append ("line 1");
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First_Index = 1);
+      Test_Support.Assert (V1.Last_Index = 1);
+      Test_Support.Assert (V1.Length = 1);
 
       V2 := V1;
+      Test_Support.Assert (not V2.Is_Empty);
+      Test_Support.Assert (V2.First_Index = 1);
+      Test_Support.Assert (V2.Last_Index = 1);
+      Test_Support.Assert (V2.Length = 1);
 
       V1.Clear;
-
       Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (V1.First_Index = 1);
+      Test_Support.Assert (V1.Last_Index = 0);
+      Test_Support.Assert (V1.Length = 0);
       Test_Support.Assert (not V2.Is_Empty);
+      Test_Support.Assert (V2.First_Index = 1);
+      Test_Support.Assert (V2.Last_Index = 1);
+      Test_Support.Assert (V2.Length = 1);
    end Test_Clear;
 
    -------------------
@@ -111,14 +148,25 @@ procedure Test_String_Vector is
       V1.Append ("def");
 
       V1.Delete (2);
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First_Index = 1);
+      Test_Support.Assert (V1.Last_Index = 2);
+      Test_Support.Assert (V1.Length = 2);
       Test_Support.Assert (V1 (1) = "abc");
       Test_Support.Assert (V1 (2) = "def");
 
       V1.Delete_Last;
+      Test_Support.Assert (not V1.Is_Empty);
+      Test_Support.Assert (V1.First_Index = 1);
+      Test_Support.Assert (V1.Last_Index = 1);
+      Test_Support.Assert (V1.Length = 1);
       Test_Support.Assert (V1 (1) = "abc");
 
       V1.Delete_Last;
       Test_Support.Assert (V1.Is_Empty);
+      Test_Support.Assert (V1.First_Index = 1);
+      Test_Support.Assert (V1.Last_Index = 0);
+      Test_Support.Assert (V1.Length = 0);
    end Test_Delete;
 
    -------------------
@@ -257,6 +305,108 @@ procedure Test_String_Vector is
       end;
    end Test_Join_Lines;
 
+   -----------------------
+   -- Test_Legacy_Tests --
+   -----------------------
+
+   procedure Test_Legacy_Tests is
+      S1 : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.To_Virtual_String ("a");
+      S2 : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.To_Virtual_String ("b");
+      S3 : constant VSS.Strings.Virtual_String :=
+        VSS.Strings.To_Virtual_String ("c");
+
+      V1 : VSS.String_Vectors.Virtual_String_Vector;
+      V2 : VSS.String_Vectors.Virtual_String_Vector;
+
+      Revert : VSS.Strings.Virtual_String;
+
+   begin
+      --  Construct vector and check its content
+
+      V1.Append (S1);
+      V1.Append (VSS.Strings.Empty_Virtual_String);
+      V1.Append (S2);
+
+      Test_Support.Assert (V1.Length = 3);
+
+      Test_Support.Assert (V1 (1) = S1);
+      Test_Support.Assert (V1 (2).Is_Empty);
+      Test_Support.Assert (V1 (3) = S2);
+
+      Test_Support.Assert (V1.Last_Element = S2);
+
+      --  Copy vector and append more data
+
+      V2 := V1;
+
+      V2.Append (S3);
+
+      Test_Support.Assert (V2.Length = 4);
+
+      Test_Support.Assert (V2 (1) = S1);
+      Test_Support.Assert (V2 (2).Is_Empty);
+      Test_Support.Assert (V2 (3) = S2);
+      Test_Support.Assert (V2 (4) = S3);
+
+      Test_Support.Assert (V2.Last_Element = S3);
+
+      --  Check that first vector was not modified.
+
+      if V1.Length /= 3 then
+         raise Program_Error;
+      end if;
+
+      if V1 (1) /= S1 then
+         raise Program_Error;
+      end if;
+
+      if not V1 (2).Is_Empty then
+         raise Program_Error;
+      end if;
+
+      if V1 (3) /= S2 then
+         raise Program_Error;
+      end if;
+
+      for Item of V2 loop
+         if not Item.Is_Empty then
+            Revert.Append (Item.At_First_Character.Element);
+         end if;
+      end loop;
+
+      for Item of reverse V2 loop
+         if not Item.Is_Empty then
+            Revert.Append (Item.At_First_Character.Element);
+         end if;
+      end loop;
+
+      if Revert /= VSS.Strings.To_Virtual_String ("abccba") then
+         raise Program_Error;
+      end if;
+
+      --  Check vector "=" operator
+
+      if V1 = V2 then  --  Case with V1.Length /= V2.Length
+         raise Program_Error;
+      end if;
+
+      V1.Append (VSS.Strings.Empty_Virtual_String);
+
+      if V1 = V2 then  --  Case with V1.Length = V2.Length
+         raise Program_Error;
+      end if;
+
+      --  Check replace in a vector
+
+      V1.Replace (4, S3);
+
+      if V1 /= V2 then
+         raise Program_Error;
+      end if;
+   end Test_Legacy_Tests;
+
    ------------------
    -- Test_Prepend --
    ------------------
@@ -269,112 +419,33 @@ procedure Test_String_Vector is
       V.Prepend ("b");
       V.Prepend ("c");
 
+      Test_Support.Assert (not V.Is_Empty);
+      Test_Support.Assert (V.First_Index = 1);
+      Test_Support.Assert (V.Last_Index = 3);
       Test_Support.Assert (V.Length = 3);
       Test_Support.Assert (V (1) = "c");
       Test_Support.Assert (V (2) = "b");
       Test_Support.Assert (V (3) = "a");
    end Test_Prepend;
 
-   S1 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ("a");
-   S2 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ("b");
-   S3 : constant VSS.Strings.Virtual_String :=
-     VSS.Strings.To_Virtual_String ("c");
+   --------------------------------
+   -- Test_Virtual_String_Vector --
+   --------------------------------
 
-   V1 : VSS.String_Vectors.Virtual_String_Vector;
-   V2 : VSS.String_Vectors.Virtual_String_Vector;
+   procedure Test_Virtual_String_Vector is
+   begin
+      Test_Support.Run_Testcase
+        (Test_Legacy_Tests'Access, "Various legacy tests");
+      Test_Support.Run_Testcase (Test_Join_Lines'Access, "Join_Lines");
+      Test_Support.Run_Testcase (Test_Is_Empty'Access, "Is_Empty");
+      Test_Support.Run_Testcase (Test_Append_Vector'Access, "Append (Vector)");
+      Test_Support.Run_Testcase (Test_Clear'Access, "Clear");
+      Test_Support.Run_Testcase (Test_Contains'Access, "Contains");
+      Test_Support.Run_Testcase (Test_Delete'Access, "Delete");
+      Test_Support.Run_Testcase (Test_Prepend'Access, "Prepend");
+   end Test_Virtual_String_Vector;
 
-   Revert : VSS.Strings.Virtual_String;
 begin
-   --  Construct vector and check its content
-
-   V1.Append (S1);
-   V1.Append (VSS.Strings.Empty_Virtual_String);
-   V1.Append (S2);
-
-   Test_Support.Assert (V1.Length = 3);
-
-   Test_Support.Assert (V1 (1) = S1);
-   Test_Support.Assert (V1 (2).Is_Empty);
-   Test_Support.Assert (V1 (3) = S2);
-
-   Test_Support.Assert (V1.Last_Element = S2);
-
-   --  Copy vector and append more data
-
-   V2 := V1;
-
-   V2.Append (S3);
-
-   Test_Support.Assert (V2.Length = 4);
-
-   Test_Support.Assert (V2 (1) = S1);
-   Test_Support.Assert (V2 (2).Is_Empty);
-   Test_Support.Assert (V2 (3) = S2);
-   Test_Support.Assert (V2 (4) = S3);
-
-   Test_Support.Assert (V2.Last_Element = S3);
-
-   --  Check that first vector was not modified.
-
-   if V1.Length /= 3 then
-      raise Program_Error;
-   end if;
-
-   if V1 (1) /= S1 then
-      raise Program_Error;
-   end if;
-
-   if not V1 (2).Is_Empty then
-      raise Program_Error;
-   end if;
-
-   if V1 (3) /= S2 then
-      raise Program_Error;
-   end if;
-
-   for Item of V2 loop
-      if not Item.Is_Empty then
-         Revert.Append (Item.At_First_Character.Element);
-      end if;
-   end loop;
-
-   for Item of reverse V2 loop
-      if not Item.Is_Empty then
-         Revert.Append (Item.At_First_Character.Element);
-      end if;
-   end loop;
-
-   if Revert /= VSS.Strings.To_Virtual_String ("abccba") then
-      raise Program_Error;
-   end if;
-
-   --  Check vector "=" operator
-
-   if V1 = V2 then  --  Case with V1.Length /= V2.Length
-      raise Program_Error;
-   end if;
-
-   V1.Append (VSS.Strings.Empty_Virtual_String);
-
-   if V1 = V2 then  --  Case with V1.Length = V2.Length
-      raise Program_Error;
-   end if;
-
-   --  Check replace in a vector
-
-   V1.Replace (4, S3);
-
-   if V1 /= V2 then
-      raise Program_Error;
-   end if;
-
-   Test_Join_Lines;
-   Test_Is_Empty;
-   Test_Append_Vector;
-   Test_Clear;
-   Test_Contains;
-   Test_Delete;
-   Test_Prepend;
+   Test_Support.Run_Testsuite
+     (Test_Virtual_String_Vector'Access, "Virtual_String_Vector");
 end Test_String_Vector;

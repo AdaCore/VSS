@@ -55,6 +55,13 @@ package VSS.String_Vectors is
       To   : Natural) return Virtual_String_Vector;
    --  Return elements inside given range.
 
+   function First_Index (Self : Virtual_String_Vector'Class) return Positive;
+   --  Return index of the first element in the vector. It is always '1'.
+
+   function Last_Index (Self : Virtual_String_Vector'Class) return Natural;
+   --  Return index of the last element in the vector. For an empty vector it
+   --  is '0'.
+
    function First_Element
      (Self : Virtual_String_Vector'Class) return VSS.Strings.Virtual_String;
    --  Return first element of the vector.
@@ -205,5 +212,11 @@ private
    end record;
 
    function Has_Element (Self : Cursor) return Boolean is (Self.Index > 0);
+
+   function First_Index
+     (Self : Virtual_String_Vector'Class) return Positive is (1);
+
+   function Last_Index (Self : Virtual_String_Vector'Class) return Natural
+     renames Length;
 
 end VSS.String_Vectors;

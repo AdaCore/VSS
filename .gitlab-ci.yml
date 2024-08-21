@@ -1,5 +1,3 @@
-include:
-  - component: $CI_SERVER_FQDN/eng/gitlab-templates/windows-ci@main
 
 variables:
    # The common part of the URL for cloning from within a CI

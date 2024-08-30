@@ -13,16 +13,16 @@ jobs:
           sudo apt remove -y gcc binutils
           sudo apt autoremove -y
           sudo apt install -y libc6-dev-arm64-cross linux-libc-dev-arm64-cross binutils-aarch64-linux-gnu libc6-dev texinfo bison m4 flex
-          curl -L https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-14.1.0-3/gnat-x86_64-linux-14.1.0-3.tar.gz | tar xzf -
-          curl -L https://ftp.gwdg.de/pub/misc/gcc/releases/gcc-14.1.0/gcc-14.1.0.tar.xz |tar xJf -
-          export PATH=$PWD/gnat-x86_64-linux-14.1.0-3/bin:$PATH
-          cd gcc-14.1.0
+          curl -L https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-14.2.0-1/gnat-x86_64-linux-14.2.0-1.tar.gz | tar xzf -
+          curl -L https://ftp.gwdg.de/pub/misc/gcc/releases/gcc-14.2.0/gcc-14.2.0.tar.xz |tar xJf -
+          export PATH=$PWD/gnat-x86_64-linux-14.2.0-1/bin:$PATH
+          cd gcc-14.2.0
           echo '--ipv4' >> ~/.curlrc
           ./contrib/download_prerequisites
           mkdir ../build
           cd ../build
           CC="x86_64-pc-linux-gnu-gcc" CXX="x86_64-pc-linux-gnu-g++" \
-          ../gcc-14.1.0/configure \
+          ../gcc-14.2.0/configure \
             --prefix=/usr \
             --enable-languages=c,ada,c++ \
             --enable-libstdcxx --enable-libstdcxx-threads --enable-libada --disable-nls \
@@ -34,17 +34,17 @@ jobs:
           make -j4 all
           make install-strip DESTDIR=$PWD/../destdir
           # missing files required to rebuild RTS
-          cp -v gcc/ada/rts/*.{c,h,gpr,lst} ../gcc-14.1.0/libgcc/unwind-pe.h \
-             ../destdir/usr/lib/gcc/aarch64-linux-gnu/14.1.0/adainclude/
+          cp -v gcc/ada/rts/*.{c,h,gpr,lst} ../gcc-14.2.0/libgcc/unwind-pe.h \
+             ../destdir/usr/lib/gcc/aarch64-linux-gnu/14.2.0/adainclude/
           cd ..
-          tar cavf aarch64-Linux-gcc-14.1.tar.bz2 -C destdir .
+          tar cavf aarch64-Linux-gcc-14.2.tar.bz2 -C destdir .
           rm -rf destdir
 
       - name: Build GMP
         run: |
-          export PATH=$PWD/gnat-x86_64-linux-14.1.0-3/bin:$PATH
-          sudo tar xjf aarch64-Linux-gcc-14.1.tar.bz2 -C /
-          cd gcc-14.1.0/gmp
+          export PATH=$PWD/gnat-x86_64-linux-14.2.0-1/bin:$PATH
+          sudo tar xjf aarch64-Linux-gcc-14.2.tar.bz2 -C /
+          cd gcc-14.2.0/gmp
           ./configure --host=aarch64-linux-gnu --build=x86_64-pc-linux-gnu --prefix=/usr/aarch64-linux-gnu
           make -j4 all
           make install DESTDIR=$PWD/../../destdir
@@ -56,7 +56,7 @@ jobs:
         with:
           name: aarch64-${{ runner.os }}-gnat-14
           path: |
-            aarch64-Linux-gcc-14.1.tar.bz2
+            aarch64-Linux-gcc-14.2.tar.bz2
             aarch64-Linux-gmp-6.2.1.tar.bz2
 
       - name: AWS S3 upload

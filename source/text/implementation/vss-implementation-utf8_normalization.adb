@@ -19,13 +19,13 @@ package body VSS.Implementation.UTF8_Normalization is
    procedure Normalize
      (Self   :
         VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler;
-      Form   : VSS.Strings.Normalization_Form;
+      Form   : VSS.Implementation.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data);
 
    procedure Normalize
      (Self   :
         VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler;
-      Form   : VSS.Strings.Normalization_Form;
+      Form   : VSS.Implementation.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data);
 
    procedure Append_Reordered
@@ -1958,7 +1958,7 @@ package body VSS.Implementation.UTF8_Normalization is
 
    procedure Normalize
      (Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
+      Form   : VSS.Implementation.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data)
    is
       Handler : constant not null
@@ -2006,7 +2006,7 @@ package body VSS.Implementation.UTF8_Normalization is
    procedure Normalize
      (Self   :
         VSS.Implementation.Text_Handlers.UTF8.Dynamic.Dynamic_UTF8_Handler;
-      Form   : VSS.Strings.Normalization_Form;
+      Form   : VSS.Implementation.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data) is
    begin
       if Self.Is_Empty then
@@ -2024,21 +2024,21 @@ package body VSS.Implementation.UTF8_Normalization is
       end;
 
       case Form is
-         when VSS.Strings.Normalization_Form_D =>
+         when VSS.Implementation.Normalization_Form_D =>
             VSS.Implementation.UTF8_Normalization.Decompose
               (Self.Pointer.Storage,
                Self.Pointer.Size,
                VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
                Result);
 
-         when VSS.Strings.Normalization_Form_C =>
+         when VSS.Implementation.Normalization_Form_C =>
             VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
               (Self.Pointer.Storage,
                Self.Pointer.Size,
                VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
                Result);
 
-         when VSS.Strings.Normalization_Form_KD =>
+         when VSS.Implementation.Normalization_Form_KD =>
             VSS.Implementation.UTF8_Normalization.Decompose
               (Self.Pointer.Storage,
                Self.Pointer.Size,
@@ -2046,7 +2046,7 @@ package body VSS.Implementation.UTF8_Normalization is
                .Compatibility_Index,
                Result);
 
-         when VSS.Strings.Normalization_Form_KC =>
+         when VSS.Implementation.Normalization_Form_KC =>
             VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
               (Self.Pointer.Storage,
                Self.Pointer.Size,
@@ -2063,7 +2063,7 @@ package body VSS.Implementation.UTF8_Normalization is
    procedure Normalize
      (Self   :
         VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler;
-      Form   : VSS.Strings.Normalization_Form;
+      Form   : VSS.Implementation.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data) is
    begin
       if Self.Is_Empty then
@@ -2081,21 +2081,21 @@ package body VSS.Implementation.UTF8_Normalization is
       end;
 
       case Form is
-         when VSS.Strings.Normalization_Form_D =>
+         when VSS.Implementation.Normalization_Form_D =>
             VSS.Implementation.UTF8_Normalization.Decompose
               (Self.Storage,
                Self.Size,
                VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
                Result);
 
-         when VSS.Strings.Normalization_Form_C =>
+         when VSS.Implementation.Normalization_Form_C =>
             VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
               (Self.Storage,
                Self.Size,
                VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
                Result);
 
-         when VSS.Strings.Normalization_Form_KD =>
+         when VSS.Implementation.Normalization_Form_KD =>
             VSS.Implementation.UTF8_Normalization.Decompose
               (Self.Storage,
                Self.Size,
@@ -2103,7 +2103,7 @@ package body VSS.Implementation.UTF8_Normalization is
                .Compatibility_Index,
                Result);
 
-         when VSS.Strings.Normalization_Form_KC =>
+         when VSS.Implementation.Normalization_Form_KC =>
             VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
               (Self.Storage,
                Self.Size,

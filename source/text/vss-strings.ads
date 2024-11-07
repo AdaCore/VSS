@@ -60,12 +60,6 @@ package VSS.Strings is
       --  with Default_Ignorable_Code_Point property set to True. Suitable to
       --  compare identifiers.
 
-   type Normalization_Form is
-     (Normalization_Form_D,
-      Normalization_Form_C,
-      Normalization_Form_KD,
-      Normalization_Form_KC);
-
    type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
 
    type Line_Terminator_Set is array (Line_Terminator) of Boolean

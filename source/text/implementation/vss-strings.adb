@@ -15,6 +15,7 @@ with VSS.Strings.Cursors.Iterators.Lines;
 with VSS.Strings.Cursors.Iterators.Words;
 with VSS.String_Vectors.Internals;
 with VSS.Transformers;
+with VSS.Unicode;
 
 package body VSS.Strings is
 
@@ -548,6 +549,44 @@ package body VSS.Strings is
 
          Self.Notify_String_Modified (From_Cursor, Size, (0, 0, 0));
       end if;
+   end Delete;
+
+   ------------
+   -- Delete --
+   ------------
+
+   function Delete
+     (Self    : Virtual_String'Class;
+      Pattern : VSS.Characters.Virtual_Character) return Virtual_String
+   is
+      use type VSS.Unicode.Code_Point;
+
+      Source    : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Self.Data);
+      Character : VSS.Unicode.Code_Point'Base;
+      Position  : aliased VSS.Implementation.Strings.Cursor;
+      Offset    : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+
+   begin
+      Source.Before_First_Character (Position);
+
+      return Result : Virtual_String do
+         declare
+            Target : constant not null
+              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+                VSS.Implementation.Strings.Variable_Handler (Result.Data);
+
+         begin
+            while Source.Forward_Element (Position, Character) loop
+               if Character
+                    /= VSS.Characters.Virtual_Character'Pos (Pattern)
+               then
+                  Target.Append (Character, Offset);
+               end if;
+            end loop;
+         end;
+      end return;
    end Delete;
 
    ---------------

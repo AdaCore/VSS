@@ -302,6 +302,11 @@ package VSS.Strings is
    --  --  Removes characters from of the string starting from given position
    --  --  to given position and returns result.
 
+   function Delete
+     (Self    : Virtual_String'Class;
+      Pattern : VSS.Characters.Virtual_Character) return Virtual_String;
+   --  Removes every occurrence of the given character in the string.
+
    procedure Replace
      (Self : in out Virtual_String'Class;
       From : VSS.Strings.Cursors.Abstract_Cursor'Class;

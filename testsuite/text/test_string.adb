@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -10,6 +10,9 @@ with VSS.String_Vectors;
 with Test_Support;
 
 procedure Test_String is
+
+   procedure Test_Virtual_String;
+   --  Run Virtual_String testsuite
 
    procedure Test_Ampersand_Character;
    procedure Test_Asterisk_Character;
@@ -206,14 +209,25 @@ procedure Test_String is
       R := V.Join_Lines (VSS.Strings.LF);
    end Test_V705_011;
 
-begin
-   Test_Ampersand_Character;
-   Test_Asterisk_Character;
-   Test_Ends_With;
-   Test_Prepend;
-   Test_Put_Image;
-   Test_Replace;
-   Test_Tail;
+   -------------------------
+   -- Test_Virtual_String --
+   -------------------------
 
-   Test_V705_011;
+   procedure Test_Virtual_String is
+   begin
+      Test_Support.Run_Testcase
+        (Test_Ampersand_Character'Access, "& Virtual_Character");
+      Test_Support.Run_Testcase
+        (Test_Asterisk_Character'Access, "Natural * Virtual_Character");
+      Test_Support.Run_Testcase (Test_Ends_With'Access, "Ends_With");
+      Test_Support.Run_Testcase (Test_Prepend'Access, "Prepend");
+      Test_Support.Run_Testcase (Test_Put_Image'Access, "Put_Image");
+      Test_Support.Run_Testcase (Test_Replace'Access, "Replace");
+      Test_Support.Run_Testcase (Test_Tail'Access, "Tail");
+
+      Test_Support.Run_Testcase (Test_V705_011'Access, "V705_011 TN");
+   end Test_Virtual_String;
+
+begin
+   Test_Support.Run_Testsuite (Test_Virtual_String'Access, "Virtual_String");
 end Test_String;

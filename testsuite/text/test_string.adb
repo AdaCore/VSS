@@ -16,6 +16,7 @@ procedure Test_String is
 
    procedure Test_Ampersand_Character;
    procedure Test_Asterisk_Character;
+   procedure Test_Delete_Pattern_Character;
    procedure Test_Ends_With;
    procedure Test_Prepend;
    procedure Test_Put_Image;
@@ -31,6 +32,8 @@ procedure Test_String is
    procedure Test_Ampersand_Character is separate;
 
    procedure Test_Asterisk_Character is separate;
+
+   procedure Test_Delete_Pattern_Character is separate;
 
    procedure Test_Ends_With is separate;
 
@@ -219,6 +222,9 @@ procedure Test_String is
         (Test_Ampersand_Character'Access, "& Virtual_Character");
       Test_Support.Run_Testcase
         (Test_Asterisk_Character'Access, "Natural * Virtual_Character");
+      Test_Support.Run_Testcase
+        (Test_Delete_Pattern_Character'Access,
+         "Delete Virtual_Character Pattern");
       Test_Support.Run_Testcase (Test_Ends_With'Access, "Ends_With");
       Test_Support.Run_Testcase (Test_Prepend'Access, "Prepend");
       Test_Support.Run_Testcase (Test_Put_Image'Access, "Put_Image");

@@ -49,17 +49,6 @@ package VSS.Strings is
 
    type Hash_Type is mod 2**64;
 
-   type Case_Sensitivity is
-     (Case_Sensitive,          --  Simple binary search.
-      Default_Caseless,        --  Full case folding without normalization.
-      Canonical_Caseless,      --  Full case folding & canonical decomposition.
-      Compatibility_Caseless,
-      --  Full case folding & compatibility decomposition.
-      Identifier_Caseless);
-      --  Full case folding, compatibility composition & ignore any characters
-      --  with Default_Ignorable_Code_Point property set to True. Suitable to
-      --  compare identifiers.
-
    type Line_Terminator is (CR, LF, CRLF, NEL, VT, FF, LS, PS);
 
    type Line_Terminator_Set is array (Line_Terminator) of Boolean
@@ -421,8 +410,7 @@ package VSS.Strings is
    function Split
      (Self                : Virtual_String'Class;
       Separator           : VSS.Characters.Virtual_Character;
-      Keep_Empty_Segments : Boolean                      := True;
-      Case_Sensitivity    : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      Keep_Empty_Segments : Boolean := True)
       return VSS.String_Vectors.Virtual_String_Vector;
    --  Split the string into substrings where separator occurs and return list
    --  of those strings.

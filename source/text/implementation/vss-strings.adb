@@ -1002,8 +1002,7 @@ package body VSS.Strings is
    function Split
      (Self                : Virtual_String'Class;
       Separator           : VSS.Characters.Virtual_Character;
-      Keep_Empty_Segments : Boolean                      := True;
-      Case_Sensitivity    : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      Keep_Empty_Segments : Boolean := True)
       return VSS.String_Vectors.Virtual_String_Vector is
    begin
       return Result : VSS.String_Vectors.Virtual_String_Vector do
@@ -1011,7 +1010,6 @@ package body VSS.Strings is
            (Self.Data,
             VSS.Characters.Virtual_Character'Pos (Separator),
             Keep_Empty_Segments,
-            Case_Sensitivity,
             VSS.String_Vectors.Internals.Data_Access (Result).all);
       end return;
    end Split;

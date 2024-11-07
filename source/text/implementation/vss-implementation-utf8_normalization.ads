@@ -9,7 +9,6 @@
 with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Normalization_UTF8;
 with VSS.Implementation.UTF8_Encoding;
-with VSS.Strings;
 with VSS.Unicode;
 
 package VSS.Implementation.UTF8_Normalization is

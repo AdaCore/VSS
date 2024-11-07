@@ -250,7 +250,6 @@ package VSS.Implementation.Text_Handlers is
       Data             : VSS.Implementation.Strings.String_Data;
       Separator        : VSS.Unicode.Code_Point;
       Keep_Empty_Parts : Boolean;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity;
       Items            : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
    --  Split the string into substrings where separator occurs and return

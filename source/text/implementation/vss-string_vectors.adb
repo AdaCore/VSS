@@ -98,19 +98,9 @@ package body VSS.String_Vectors is
    --------------
 
    function Contains
-     (Self             : Virtual_String_Vector'Class;
-      Item             : VSS.Strings.Virtual_String;
-      Case_Sensitivity : VSS.Strings.Case_Sensitivity :=
-        VSS.Strings.Case_Sensitive)
-      return Boolean
-   is
-      use type VSS.Strings.Case_Sensitivity;
-
+     (Self : Virtual_String_Vector'Class;
+      Item : VSS.Strings.Virtual_String) return Boolean is
    begin
-      if Case_Sensitivity /= VSS.Strings.Case_Sensitive then
-         raise Program_Error;
-      end if;
-
       return
         VSS.Implementation.String_Vectors.Contains
           (Self.Data,

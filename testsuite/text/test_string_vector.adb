@@ -30,6 +30,7 @@ procedure Test_String_Vector is
    --  Testcases
 
    procedure Test_Legacy_Tests;
+   procedure Test_Join_String;
    procedure Test_Join_Lines;
    procedure Test_Is_Empty;
    procedure Test_Append_Vector;
@@ -305,6 +306,41 @@ procedure Test_String_Vector is
       end;
    end Test_Join_Lines;
 
+   ----------------------
+   -- Test_Join_String --
+   ----------------------
+
+   procedure Test_Join_String is
+   begin
+      --  Usual case
+
+      declare
+         V : constant VSS.String_Vectors.Virtual_String_Vector :=
+           ["ABC", "DEF", "GHI"];
+
+      begin
+         Test_Support.Assert (V.Join ("") = "ABCDEFGHI");
+         Test_Support.Assert (V.Join (",") = "ABC,DEF,GHI");
+         Test_Support.Assert (V.Join ("=>") = "ABC=>DEF=>GHI");
+      end;
+
+      --  Empty vector
+
+      declare
+         VE : VSS.String_Vectors.Virtual_String_Vector;
+
+      begin
+         Test_Support.Assert (VE.Join ("").Is_Empty);
+         Test_Support.Assert (VE.Join ("").Is_Null);
+
+         Test_Support.Assert (VE.Join (",").Is_Empty);
+         Test_Support.Assert (VE.Join (",").Is_Null);
+
+         Test_Support.Assert (VE.Join ("=>").Is_Empty);
+         Test_Support.Assert (VE.Join ("=>").Is_Null);
+      end;
+   end Test_Join_String;
+
    -----------------------
    -- Test_Legacy_Tests --
    -----------------------
@@ -436,6 +472,8 @@ procedure Test_String_Vector is
    begin
       Test_Support.Run_Testcase
         (Test_Legacy_Tests'Access, "Various legacy tests");
+      Test_Support.Run_Testcase
+        (Test_Join_String'Access, "Join String Separator");
       Test_Support.Run_Testcase (Test_Join_Lines'Access, "Join_Lines");
       Test_Support.Run_Testcase (Test_Is_Empty'Access, "Is_Empty");
       Test_Support.Run_Testcase (Test_Append_Vector'Access, "Append (Vector)");

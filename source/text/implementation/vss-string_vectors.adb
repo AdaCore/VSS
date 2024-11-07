@@ -268,6 +268,32 @@ package body VSS.String_Vectors is
       end return;
    end Join;
 
+   ----------
+   -- Join --
+   ----------
+
+   function Join
+     (Self      : Virtual_String_Vector'Class;
+      Separator : VSS.Strings.Virtual_String)
+      return VSS.Strings.Virtual_String
+   is
+      First_Segment : Boolean := True;
+
+   begin
+      return Result : VSS.Strings.Virtual_String do
+         for Item of Self loop
+            if First_Segment then
+               First_Segment := False;
+
+            else
+               Result.Append (Separator);
+            end if;
+
+            Result.Append (Item);
+         end loop;
+      end return;
+   end Join;
+
    ----------------
    -- Join_Lines --
    ----------------

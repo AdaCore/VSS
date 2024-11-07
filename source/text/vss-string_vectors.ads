@@ -119,6 +119,10 @@ package VSS.String_Vectors is
      (Self      : Virtual_String_Vector'Class;
       Separator : VSS.Characters.Virtual_Character)
       return VSS.Strings.Virtual_String;
+   function Join
+     (Self      : Virtual_String_Vector'Class;
+      Separator : VSS.Strings.Virtual_String)
+      return VSS.Strings.Virtual_String;
    --  Join all strings in the string vector into single string with each
    --  element separated by the given separator.
 

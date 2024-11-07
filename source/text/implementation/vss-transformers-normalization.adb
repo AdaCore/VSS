@@ -24,7 +24,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_C,
+         VSS.Implementation.Normalization_Form_C,
          Aux);
 
       return Result : constant VSS.Strings.Virtual_String :=
@@ -47,7 +47,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_C,
+         VSS.Implementation.Normalization_Form_C,
          Aux);
 
       VSS.Strings.Internals.Set_By_Move (Item, Aux);
@@ -67,7 +67,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_D,
+         VSS.Implementation.Normalization_Form_D,
          Aux);
 
       return Result : constant VSS.Strings.Virtual_String :=
@@ -90,7 +90,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_D,
+         VSS.Implementation.Normalization_Form_D,
          Aux);
 
       VSS.Strings.Internals.Set_By_Move (Item, Aux);
@@ -110,7 +110,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_KC,
+         VSS.Implementation.Normalization_Form_KC,
          Aux);
 
       return Result : constant VSS.Strings.Virtual_String :=
@@ -133,7 +133,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_KC,
+         VSS.Implementation.Normalization_Form_KC,
          Aux);
 
       VSS.Strings.Internals.Set_By_Move (Item, Aux);
@@ -153,7 +153,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_KD,
+         VSS.Implementation.Normalization_Form_KD,
          Aux);
 
       return Result : constant VSS.Strings.Virtual_String :=
@@ -176,7 +176,7 @@ package body VSS.Transformers.Normalization is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_KD,
+         VSS.Implementation.Normalization_Form_KD,
          Aux);
 
       VSS.Strings.Internals.Set_By_Move (Item, Aux);

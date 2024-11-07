@@ -27,7 +27,7 @@ package body VSS.Transformers.Caseless is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_D,
+         VSS.Implementation.Normalization_Form_D,
          Aux_NFD);
       VSS.Implementation.UTF8_Casing.Convert_Case
         (Aux_NFD,
@@ -35,7 +35,7 @@ package body VSS.Transformers.Caseless is
          Aux_CF_Mapped);
       VSS.Implementation.UTF8_Normalization.Normalize
         (Aux_CF_Mapped,
-         VSS.Strings.Normalization_Form_C,
+         VSS.Implementation.Normalization_Form_C,
          Aux_CF_NFC);
 
       return Result : constant VSS.Strings.Virtual_String :=
@@ -62,7 +62,7 @@ package body VSS.Transformers.Caseless is
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
         (VSS.Strings.Internals.Data_Access_Constant (Item).all,
-         VSS.Strings.Normalization_Form_D,
+         VSS.Implementation.Normalization_Form_D,
          Aux_NFD);
       VSS.Implementation.UTF8_Casing.Convert_Case
         (Aux_NFD,
@@ -70,7 +70,7 @@ package body VSS.Transformers.Caseless is
          Aux_CF_Mapped);
       VSS.Implementation.UTF8_Normalization.Normalize
         (Aux_CF_Mapped,
-         VSS.Strings.Normalization_Form_C,
+         VSS.Implementation.Normalization_Form_C,
          Aux_CF_NFC);
 
       VSS.Implementation.Strings.Unreference (Aux_NFD);

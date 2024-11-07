@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -9,7 +9,6 @@
 with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Normalization_UTF8;
 with VSS.Implementation.UTF8_Encoding;
-with VSS.Strings;
 with VSS.Unicode;
 
 package VSS.Implementation.UTF8_Normalization is
@@ -18,7 +17,7 @@ package VSS.Implementation.UTF8_Normalization is
 
    procedure Normalize
      (Data   : VSS.Implementation.Strings.String_Data;
-      Form   : VSS.Strings.Normalization_Form;
+      Form   : VSS.Implementation.Normalization_Form;
       Result : out VSS.Implementation.Strings.String_Data);
    --  Do normalization of the string to the given normalization form.
 

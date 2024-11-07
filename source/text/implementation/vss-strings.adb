@@ -15,6 +15,7 @@ with VSS.Strings.Cursors.Iterators.Lines;
 with VSS.Strings.Cursors.Iterators.Words;
 with VSS.String_Vectors.Internals;
 with VSS.Transformers;
+with VSS.Unicode;
 
 package body VSS.Strings is
 
@@ -550,6 +551,44 @@ package body VSS.Strings is
       end if;
    end Delete;
 
+   ------------
+   -- Delete --
+   ------------
+
+   function Delete
+     (Self    : Virtual_String'Class;
+      Pattern : VSS.Characters.Virtual_Character) return Virtual_String
+   is
+      use type VSS.Unicode.Code_Point;
+
+      Source    : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (Self.Data);
+      Character : VSS.Unicode.Code_Point'Base;
+      Position  : aliased VSS.Implementation.Strings.Cursor;
+      Offset    : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
+
+   begin
+      Source.Before_First_Character (Position);
+
+      return Result : Virtual_String do
+         declare
+            Target : constant not null
+              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
+                VSS.Implementation.Strings.Variable_Handler (Result.Data);
+
+         begin
+            while Source.Forward_Element (Position, Character) loop
+               if Character
+                    /= VSS.Characters.Virtual_Character'Pos (Pattern)
+               then
+                  Target.Append (Character, Offset);
+               end if;
+            end loop;
+         end;
+      end return;
+   end Delete;
+
    ---------------
    -- Ends_With --
    ---------------
@@ -1002,8 +1041,7 @@ package body VSS.Strings is
    function Split
      (Self                : Virtual_String'Class;
       Separator           : VSS.Characters.Virtual_Character;
-      Keep_Empty_Segments : Boolean                      := True;
-      Case_Sensitivity    : VSS.Strings.Case_Sensitivity := Case_Sensitive)
+      Keep_Empty_Segments : Boolean := True)
       return VSS.String_Vectors.Virtual_String_Vector is
    begin
       return Result : VSS.String_Vectors.Virtual_String_Vector do
@@ -1011,7 +1049,6 @@ package body VSS.Strings is
            (Self.Data,
             VSS.Characters.Virtual_Character'Pos (Separator),
             Keep_Empty_Segments,
-            Case_Sensitivity,
             VSS.String_Vectors.Internals.Data_Access (Result).all);
       end return;
    end Split;

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -13,5 +13,11 @@
 package VSS.Implementation is
 
    pragma Pure;
+
+   type Normalization_Form is
+     (Normalization_Form_D,
+      Normalization_Form_C,
+      Normalization_Form_KD,
+      Normalization_Form_KC);
 
 end VSS.Implementation;

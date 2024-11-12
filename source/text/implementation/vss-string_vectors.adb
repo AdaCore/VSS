@@ -12,21 +12,6 @@ package body VSS.String_Vectors is
    use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
 
    ---------
-   -- "*" --
-   ---------
-
-   function "*"
-     (Left  : Natural;
-      Right : VSS.Strings.Virtual_String) return Virtual_String_Vector is
-   begin
-      return Result : Virtual_String_Vector do
-         for J in 1 .. Left loop
-            Result.Append (Right);
-         end loop;
-      end return;
-   end "*";
-
-   ---------
    -- "=" --
    ---------
 

@@ -38,6 +38,11 @@ package VSS.String_Vectors is
       Right : Virtual_String_Vector) return Boolean;
    --  Compare two string vectors.
 
+   function "*"
+     (Left  : Natural;
+      Right : VSS.Strings.Virtual_String) return Virtual_String_Vector;
+   --  Returns vector with given number of given strings.
+
    function Is_Empty (Self : Virtual_String_Vector'Class) return Boolean;
    --  Return True when string vector is empty.
 

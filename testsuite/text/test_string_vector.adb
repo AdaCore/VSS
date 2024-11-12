@@ -30,6 +30,7 @@ procedure Test_String_Vector is
    --  Testcases
 
    procedure Test_Legacy_Tests;
+   procedure Test_Multiply_Operator;
    procedure Test_Join_String;
    procedure Test_Join_Lines;
    procedure Test_Is_Empty;
@@ -443,6 +444,63 @@ procedure Test_String_Vector is
       end if;
    end Test_Legacy_Tests;
 
+   ----------------------------
+   -- Test_Multiply_Operator --
+   ----------------------------
+
+   procedure Test_Multiply_Operator is
+   begin
+      declare
+         V : constant VSS.String_Vectors.Virtual_String_Vector := 0 * "";
+
+      begin
+         Test_Support.Assert (V.Is_Empty);
+      end;
+
+      declare
+         V : constant VSS.String_Vectors.Virtual_String_Vector := 0 * "ABC";
+
+      begin
+         Test_Support.Assert (V.Is_Empty);
+      end;
+
+      declare
+         V : constant VSS.String_Vectors.Virtual_String_Vector := 1 * "";
+
+      begin
+         Test_Support.Assert (not V.Is_Empty);
+         Test_Support.Assert (V.Length = 1);
+         Test_Support.Assert (V.First_Element.Is_Empty);
+      end;
+
+      declare
+         V : constant VSS.String_Vectors.Virtual_String_Vector := 1 * "ABC";
+
+      begin
+         Test_Support.Assert (not V.Is_Empty);
+         Test_Support.Assert (V.Length = 1);
+         Test_Support.Assert (V.First_Element = "ABC");
+      end;
+
+      declare
+         V : constant VSS.String_Vectors.Virtual_String_Vector := 3 * "";
+
+      begin
+         Test_Support.Assert (not V.Is_Empty);
+         Test_Support.Assert (V.Length = 3);
+         Test_Support.Assert (for all J in 1 .. 3 => V (J).Is_Empty);
+      end;
+
+      declare
+         V : constant VSS.String_Vectors.Virtual_String_Vector := 3 * "ABC";
+
+      begin
+         Test_Support.Assert (not V.Is_Empty);
+         Test_Support.Assert (V.Length = 3);
+         Test_Support.Assert (for all J in 1 .. 3 => V (J) = "ABC");
+      end;
+   end Test_Multiply_Operator;
+
    ------------------
    -- Test_Prepend --
    ------------------
@@ -476,6 +534,8 @@ procedure Test_String_Vector is
         (Test_Join_String'Access, "Join String Separator");
       Test_Support.Run_Testcase (Test_Join_Lines'Access, "Join_Lines");
       Test_Support.Run_Testcase (Test_Is_Empty'Access, "Is_Empty");
+      Test_Support.Run_Testcase
+        (Test_Multiply_Operator'Access, "Natural * Virtual_String");
       Test_Support.Run_Testcase (Test_Append_Vector'Access, "Append (Vector)");
       Test_Support.Run_Testcase (Test_Clear'Access, "Clear");
       Test_Support.Run_Testcase (Test_Contains'Access, "Contains");

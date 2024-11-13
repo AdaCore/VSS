@@ -576,7 +576,9 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
          return;
       end if;
 
-      Unchecked_Forward (Self.Pointer.Storage, After);
+      if To.Index <= Self.Length then
+         Unchecked_Forward (Self.Pointer.Storage, After);
+      end if;
 
       Size   := After.UTF8_Offset - From.UTF8_Offset;
       Length := After.Index - From.Index;

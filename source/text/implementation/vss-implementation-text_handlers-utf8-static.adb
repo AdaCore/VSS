@@ -515,7 +515,9 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
          return;
       end if;
 
-      Unchecked_Forward (Self.Storage, After);
+      if To.Index <= Self.Length then
+         Unchecked_Forward (Self.Storage, After);
+      end if;
 
       Size   := After.UTF8_Offset - From.UTF8_Offset;
       Length := After.Index - From.Index;

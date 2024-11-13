@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -14,9 +14,8 @@
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Line_Iterators;
 
-with Test_Support;
-
-procedure Test_String_Slice is
+separate (Test_String)
+procedure Test_Slice is
    use type VSS.Strings.Virtual_String;
 
    S  : constant VSS.Strings.Virtual_String :=
@@ -157,4 +156,4 @@ begin
       R := S1.Slice (JLV, JLV);
       Test_Support.Assert (R.Is_Null);
    end;
-end Test_String_Slice;
+end Test_Slice;

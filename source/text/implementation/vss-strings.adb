@@ -102,6 +102,22 @@ package body VSS.Strings is
    end "*";
 
    ---------
+   -- "*" --
+   ---------
+
+   function "*"
+     (Left  : Natural;
+      Right : Virtual_String)
+      return VSS.String_Vectors.Virtual_String_Vector is
+   begin
+      return Result : VSS.String_Vectors.Virtual_String_Vector do
+         for J in 1 .. Left loop
+            Result.Append (Right);
+         end loop;
+      end return;
+   end "*";
+
+   ---------
    -- "<" --
    ---------
 

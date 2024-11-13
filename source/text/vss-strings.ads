@@ -219,6 +219,11 @@ package VSS.Strings is
       Right : VSS.Characters.Virtual_Character) return Virtual_String;
    --  Create string by repeating given number of given character.
 
+   function "*"
+     (Left  : Natural;
+      Right : Virtual_String) return VSS.String_Vectors.Virtual_String_Vector;
+   --  Returns vector with given number of given string.
+
    procedure Clear (Self : in out Virtual_String'Class);
    --  Remove all data.
 

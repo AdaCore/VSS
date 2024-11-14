@@ -1,6 +1,12 @@
 import gdb
 from gnatdbg.tagged import reinterpret_tagged
 
+# Use the tag class if it is available.
+if hasattr(gdb, "ValuePrinter"):
+    base = gdb.ValuePrinter
+else:
+    base = object
+
 
 def decode_utf8(bytes, size):
     result = ""
@@ -37,9 +43,9 @@ def decode_utf8(bytes, size):
     return result
 
 
-class Virtual_String_Printer:
+class Virtual_String_Printer(base):
     def __init__(self, val):
-        self.val = val
+        self._val = val
 
     def to_string(self):
         text_type = gdb.lookup_type(
@@ -52,7 +58,7 @@ class Virtual_String_Printer:
             "vss.implementation.text_handlers.utf8.dynamic.dynamic_utf8_handler"
         )
 
-        storage = self.val["data"]["storage"]
+        storage = self._val["data"]["storage"]
 
         if all(byte == 0 for byte in storage.bytes):
             # "null" string

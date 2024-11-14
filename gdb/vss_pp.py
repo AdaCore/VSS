@@ -1,3 +1,4 @@
+import gdb
 from gnatdbg.tagged import reinterpret_tagged
 
 

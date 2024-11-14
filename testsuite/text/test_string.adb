@@ -5,7 +5,6 @@
 --
 
 with VSS.Strings.Character_Iterators;
-with VSS.Strings.Line_Iterators;
 with VSS.String_Vectors;
 
 with Test_Support;
@@ -22,7 +21,6 @@ procedure Test_String is
    procedure Test_Prepend;
    procedure Test_Put_Image;
    procedure Test_Replace;
-   procedure Test_Slice;
    procedure Test_Tail;
 
    procedure Test_V705_011;
@@ -156,12 +154,6 @@ procedure Test_String is
       end;
    end Test_Replace;
 
-   ----------------
-   -- Test_Slice --
-   ----------------
-
-   procedure Test_Slice is separate;
-
    ---------------
    -- Test_Tail --
    ---------------
@@ -237,7 +229,6 @@ procedure Test_String is
       Test_Support.Run_Testcase (Test_Prepend'Access, "Prepend");
       Test_Support.Run_Testcase (Test_Put_Image'Access, "Put_Image");
       Test_Support.Run_Testcase (Test_Replace'Access, "Replace");
-      Test_Support.Run_Testcase (Test_Slice'Access, "Slice");
       Test_Support.Run_Testcase (Test_Tail'Access, "Tail");
 
       Test_Support.Run_Testcase (Test_V705_011'Access, "V705_011 TN");

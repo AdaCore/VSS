@@ -9,41 +9,6 @@ else:
     base = object
 
 
-def decode_utf8(bytes, size):
-    result = ""
-    i = 0
-
-    while i < size:
-        if bytes[i] <= 0x7F:
-            c = bytes[i]
-            i = i + 1
-
-        elif bytes[i] <= 0xDF:
-            u1 = (bytes[i] & 0x1F) << 6
-            u2 = bytes[i + 1] & 0x3F
-            c = u1 | u2
-            i = i + 2
-
-        elif bytes[i] <= 0xEF:
-            u1 = (bytes[i] & 0x1F) << 12
-            u2 = (bytes[i + 1] & 0x3F) << 6
-            u3 = bytes[i + 2] & 0x3F
-            c = u1 | u2 | u3
-            i = i + 3
-
-        elif bytes[i] <= 0xF4:
-            u1 = (bytes[i] & 0x1F) << 18
-            u2 = (bytes[i + 1] & 0x3F) << 12
-            u3 = (bytes[i + 2] & 0x3F) << 6
-            u4 = bytes[i + 3] & 0x3F
-            c = u1 | u2 | u3 | u4
-            i = i + 4
-
-        result += chr(c)
-
-    return result
-
-
 class Virtual_String_Printer(base):
     def __init__(self, val):
         self._val = val
@@ -63,30 +28,22 @@ class Virtual_String_Printer(base):
 
         if all(byte == 0 for byte in storage.bytes):
             # "null" string
-
-            return None
+            return ""
 
         text = reinterpret_tagged(storage.cast(text_type))
 
         if text.type == utf8static_type:
-            # GDB is unable to resolve "storage" component of the record,
-            # so skip first implicit component of System.Address and decode.
-            return decode_utf8(
-                text.bytes[gdb.lookup_type("system.address").sizeof :], text["size"]
-            )
+            return text["storage"].lazy_string(encoding="utf-8", length=text["size"])
 
         elif text.type == utf8dynamic_type:
             data = text["pointer"].dereference()
-            return decode_utf8(data["storage"].bytes, data["size"])
+            return data["storage"].lazy_string(encoding="utf-8", length=data["size"])
 
         else:
             raise TypeError("<UNKNOWN TYPE>")
 
-        return None
-
-
-#    def display_hint(self):
-#        return "string"
+    def display_hint(self):
+        return "string"
 
 
 class VSSPrinter(gdb.printing.PrettyPrinter):

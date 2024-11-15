@@ -80,7 +80,7 @@ class Virtual_String_Printer(base):
             return decode_utf8(data["storage"].bytes, data["size"])
 
         else:
-            print("<UNKNOWN TYPE>")
+            raise TypeError("<UNKNOWN TYPE>")
 
         return None
 

@@ -1,4 +1,5 @@
 import gdb
+import gdb.printing
 from gnatdbg.tagged import reinterpret_tagged
 
 # Use the tag class if it is available.
@@ -88,9 +89,15 @@ class Virtual_String_Printer(base):
 #        return "string"
 
 
-def vss_pp_func(val):
-    if str(val.type) == "vss.strings.virtual_string":
-        return Virtual_String_Printer(val)
+class VSSPrinter(gdb.printing.PrettyPrinter):
+    """Pretty-print VSS strings."""
+
+    def __init__(self):
+        super().__init__("VSS")
+
+    def __call__(self, val):
+        if str(val.type) == "vss.strings.virtual_string":
+            return Virtual_String_Printer(val)
 
 
-gdb.pretty_printers.append(vss_pp_func)
+gdb.printing.register_pretty_printer(None, VSSPrinter())

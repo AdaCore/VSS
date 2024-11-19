@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2024, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -14,9 +14,8 @@
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Line_Iterators;
 
-with Test_Support;
-
-procedure Test_String_Slice is
+separate (Test_String)
+procedure Test_Slice is
    use type VSS.Strings.Virtual_String;
 
    S  : constant VSS.Strings.Virtual_String :=
@@ -157,4 +156,33 @@ begin
       R := S1.Slice (JLV, JLV);
       Test_Support.Assert (R.Is_Null);
    end;
-end Test_String_Slice;
+
+   --  Slice of string with last marker pointing to end of string.
+   --
+   --  It was reported under eng/ide/VSS#256
+
+   declare
+      use type VSS.Strings.Character_Count;
+
+      SS : VSS.Strings.Virtual_String := "body ";
+      --  Static storage
+      SR : VSS.Strings.Virtual_String := "package body ";
+      --  Reported case: static storage of max size on 64bit platform
+      SD : VSS.Strings.Virtual_String := "package body Name ";
+      --  Dynamic storage
+      R  : VSS.Strings.Virtual_String;
+
+   begin
+      R := SS.Slice (SS.At_First_Character, SS.After_Last_Character);
+      Test_Support.Assert (R.Character_Length = SS.Character_Length);
+      Test_Support.Assert (R = SS);
+
+      R := SR.Slice (SR.At_First_Character, SR.After_Last_Character);
+      Test_Support.Assert (R.Character_Length = SR.Character_Length);
+      Test_Support.Assert (R = SR);
+
+      R := SD.Slice (SD.At_First_Character, SD.After_Last_Character);
+      Test_Support.Assert (R.Character_Length = SD.Character_Length);
+      Test_Support.Assert (R = SD);
+   end;
+end Test_Slice;

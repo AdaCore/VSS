@@ -602,7 +602,27 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
          Self.Length := @ + Length;
 
       else
-         raise Program_Error;
+         --  Size of the current static storge is not enough, move current text
+         --  into dynamic storage, and call handler of the dynamic storage to
+         --  complete operation.
+
+         Unsafe_Convert_To_Dynamic
+           (Self,
+            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
+            Self.Size + Size);
+
+         declare
+            Text : Dynamic.Dynamic_UTF8_Handler
+              with Import, Convention => Ada, Address => Self'Address;
+
+         begin
+            Text.UTF8_Insert_Slice
+              (Into    => Into,
+               Storage => Storage,
+               From    => From,
+               Size    => Size,
+               Length  => Length);
+         end;
       end if;
    end UTF8_Insert_Slice;
 
@@ -664,7 +684,29 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
          Self.Length := @ + By_Length - Replace_Length;
 
       else
-         raise Program_Error;
+         --  Size of the current static storge is not enough, move current text
+         --  into dynamic storage, and call handler of the dynamic storage to
+         --  complete operation.
+
+         Unsafe_Convert_To_Dynamic
+           (Self,
+            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
+            Self.Size - Replace_Size + By_Size);
+
+         declare
+            Text : Dynamic.Dynamic_UTF8_Handler
+              with Import, Convention => Ada, Address => Self'Address;
+
+         begin
+            Text.UTF8_Replace_Slice
+              (Replace_From   => Replace_From,
+               Replace_Size   => Replace_Size,
+               Replace_Length => Replace_Length,
+               By_Storage     => By_Storage,
+               By_From        => By_From,
+               By_Size        => By_Size,
+               By_Length      => By_Length);
+         end;
       end if;
    end UTF8_Replace_Slice;
 

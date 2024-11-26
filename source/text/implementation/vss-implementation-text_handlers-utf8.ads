@@ -14,6 +14,62 @@ package VSS.Implementation.Text_Handlers.UTF8
   with Preelaborate
 is
 
+   type Abstract_UTF8_Text is
+     abstract new VSS.Implementation.Text_Handlers.Abstract_Text_Handler
+       with null record;
+
+   not overriding procedure UTF8_Replace_Slice
+     (Self           : in out Abstract_UTF8_Text;
+      Replace_From   : VSS.Unicode.UTF8_Code_Unit_Index;
+      Replace_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Replace_Length : VSS.Implementation.Strings.Character_Count;
+      By_Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      By_From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      By_Length      : VSS.Implementation.Strings.Character_Count) is abstract;
+   --  Replace slice of the text by slice of the storage.
+   --
+   --  @param Self            Text object to be modified
+   --  @param Replace_From    Index of the first code unit to replace
+   --  @param Replace_Size    Number of code units to replace
+   --  @param Replace_Length  Number of characters to be replaced
+   --  @param By_Storage      Storage of the replacement data
+   --  @param By_From         Index of the first code unit in replcement data
+   --  @param By_Size         Number of code units in replacement data
+   --  @param by_Length       Number of character in replacement data
+
+   not overriding function UTF8_Size
+     (Self : Abstract_UTF8_Text) return VSS.Unicode.UTF8_Code_Unit_Count
+        is abstract;
+   --  Return number of code units in the given text
+
+   not overriding procedure UTF8_Insert_Slice
+     (Self    : in out Abstract_UTF8_Text;
+      Into    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length  : VSS.Implementation.Strings.Character_Count) is abstract;
+   --  Insert slice of the storage into the text starting from the given
+   --  position.
+   --
+   --  @param Self     Text object to be modified
+   --  @param Into     Index of the code unit to insert
+   --  @param Storage  Storeage of inserted data
+   --  @param From     Index of the first code unit in inserted storage
+   --  @param Size     Number of code units to insert
+   --  @param Length   Number of character to insert
+
+   not overriding procedure UTF8_Move
+     (Self : in out Abstract_UTF8_Text;
+      From : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count;
+      Into : VSS.Unicode.UTF8_Code_Unit_Index) is abstract;
+   --  Move given slice of the give size of the data starting from the given
+   --  position. From and Into positions must be valid positions in UTF-8
+   --  encoded data, thus size and length of the string is not changed by
+   --  this operation.
+
    procedure Unsafe_Initialize
      (Text     : in out
         VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;

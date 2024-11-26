@@ -33,7 +33,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    --  Size of the text handler object is fixed.
 
    type Dynamic_UTF8_Handler is
-     new VSS.Implementation.Text_Handlers.Abstract_Text_Handler with
+     new VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text with
    record
       Pointer : UTF8_String_Data_Access;
    end record with Object_Size => 192;
@@ -148,6 +148,33 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access)
      with Pre => Self.Pointer /= null;
+
+   overriding procedure UTF8_Insert_Slice
+     (Self    : in out Dynamic_UTF8_Handler;
+      Into    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length  : VSS.Implementation.Strings.Character_Count);
+
+   overriding procedure UTF8_Move
+     (Self : in out Dynamic_UTF8_Handler;
+      From : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count;
+      Into : VSS.Unicode.UTF8_Code_Unit_Index);
+
+   overriding procedure UTF8_Replace_Slice
+     (Self           : in out Dynamic_UTF8_Handler;
+      Replace_From   : VSS.Unicode.UTF8_Code_Unit_Index;
+      Replace_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Replace_Length : VSS.Implementation.Strings.Character_Count;
+      By_Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      By_From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      By_Length      : VSS.Implementation.Strings.Character_Count);
+
+   overriding function UTF8_Size
+     (Self : Dynamic_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count;
 
    --  Subprograms to help code refactoring, some of the will be moved to
    --  generic UTF8 fastpath string API, and some moved to the body after

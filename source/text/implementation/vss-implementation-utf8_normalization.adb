@@ -5,7 +5,6 @@
 --
 
 pragma Ada_2022;
-pragma Style_Checks ("M131");  --  Temporary
 
 with VSS.Implementation.UCD_Normalization_Common;
 with VSS.Implementation.Text_Handlers.UTF8.Dynamic;
@@ -2337,63 +2336,19 @@ package body VSS.Implementation.UTF8_Normalization is
       Size        : VSS.Unicode.UTF8_Code_Unit_Count;
       Length      : VSS.Implementation.Strings.Character_Count)
    is
-      Handler : constant not null
-        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-          VSS.Implementation.Strings.Variable_Handler (Target_Data);
+      Target_Text :
+        VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text'Class
+        renames VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text'Class
+          (VSS.Implementation.Strings.Variable_Handler (Target_Data).all);
 
    begin
-      if Handler.all
-        in VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
-      then
-         declare
-            Target :
-              VSS.Implementation.Text_Handlers.UTF8.Static.Static_UTF8_Handler
-            renames VSS.Implementation.Text_Handlers.UTF8.Static
-              .Static_UTF8_Handler (Handler.all);
-
-         begin
-            if Target.Size + Size
-              <= VSS.Implementation.Text_Handlers.UTF8.Static
-                   .In_Place_Storage_Capacity
-            then
-               Target.Storage (Into + Size .. Target.Size + Size - 1) :=
-                 Target.Storage (Into .. Target.Size - 1);
-               Target.Storage (Into .. Into + Size - 1) :=
-                 Storage (From .. From + Size - 1);
-               Target.Size   := @ + Size;
-               Target.Length := @ + Length;
-
-               Target_Size   := Target.Size;
-
-            else
-               raise Program_Error;
-            end if;
-         end;
-
-      else
-         declare
-            Target :
-              VSS.Implementation.Text_Handlers.UTF8.Dynamic
-                .Dynamic_UTF8_Handler
-            renames VSS.Implementation.Text_Handlers.UTF8.Dynamic
-              .Dynamic_UTF8_Handler (Handler.all);
-
-         begin
-            Target.Pointer :=
-              VSS.Implementation.Text_Handlers.UTF8.Dynamic.Allocate (0, Size);
-
-            --  elsif Target.Size + Size > Target.Bulk then
-            --     --  Reallocate (Target, 0, Target.Size + Size);
-            --     raise Program_Error;
-            --  end if;
-
-            raise Program_Error;
-            --  Target.Storage (Target.Size .. Target.Size + Size - 1) :=
-            --    Storage (From .. From + Size - 1);
-            --  Target.Size := Target.Size + Size;
-            --  Target.Length := Target.Length + Length;
-         end;
-      end if;
+      Target_Text.UTF8_Insert_Slice
+        (Into    => Into,
+         Storage => Storage,
+         From    => From,
+         Size    => Size,
+         Length  => Length);
+      Target_Size := Target_Text.UTF8_Size;
    end Unchecked_Insert;
 
    --------------------------
@@ -2404,36 +2359,18 @@ package body VSS.Implementation.UTF8_Normalization is
      (Data : in out VSS.Implementation.Strings.String_Data;
       From : VSS.Unicode.UTF8_Code_Unit_Index;
       Size : VSS.Unicode.UTF8_Code_Unit_Count;
-      Into : VSS.Unicode.UTF8_Code_Unit_Index) is
+      Into : VSS.Unicode.UTF8_Code_Unit_Index)
+   is
+      Target_Text :
+        VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text'Class
+        renames VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text'Class
+          (VSS.Implementation.Strings.Variable_Handler (Data).all);
+
    begin
-      --  if From = Into then
-      --     return;
-      --  end if;
-      --
-      --  if Data.In_Place then
-      --     if From < Into then
-      --        raise Program_Error;
-      --     end if;
-      --
-      --     declare
-      --        Target    :
-      --          VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-      --            with Import, Convention => Ada, Address => Data'Address;
-      --        Buffer    : constant
-      --          VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-      --            (0 .. Size - 1) := Target.Storage (From .. From + Size - 1);
-      --        Move_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
-      --          From - Into;
-      --
-      --     begin
-      --        Target.Storage (Into + Size .. Into + Size + Move_Size - 1) :=
-      --          Target.Storage (Into .. Into + Move_Size - 1);
-      --        Target.Storage (Into .. Into + Size - 1) := Buffer;
-      --     end;
-      --
-      --  else
-         raise Program_Error;
-      --  end if;
+      Target_Text.UTF8_Move
+        (From => From,
+         Size => Size,
+         Into => Into);
    end Unchecked_Move_Slice;
 
    -----------------------
@@ -2449,77 +2386,23 @@ package body VSS.Implementation.UTF8_Normalization is
       Storage        : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Insert_From    : VSS.Unicode.UTF8_Code_Unit_Index;
       Insert_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
-      Insert_Length  : VSS.Implementation.Strings.Character_Count) is
+      Insert_Length  : VSS.Implementation.Strings.Character_Count)
+   is
+      Target_Text :
+        VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text'Class
+        renames VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text'Class
+          (VSS.Implementation.Strings.Variable_Handler (Target_Data).all);
+
    begin
-      --  if Target_Data.In_Place then
-      --     declare
-      --        Target : VSS.Implementation.UTF8_String_Handlers.UTF8_In_Place_Data
-      --          with Import, Convention => Ada, Address => Target_Data'Address;
-      --
-      --     begin
-      --        if Target.Size - Replace_Size + Insert_Size
-      --          <= VSS.Implementation.UTF8_String_Handlers
-      --               .In_Place_Storage_Capacity
-      --        then
-      --           if Replace_From + Replace_Size = Target.Size then
-      --              --  Replace of string suffix, just overwrite it
-      --              --  XXX May be check for overwrite????
-      --
-      --              Target.Storage
-      --                (Replace_From .. Replace_From + Insert_Size - 1) :=
-      --                Storage (Insert_From .. Insert_From + Insert_Size - 1);
-      --
-      --              Target.Size := Target.Size + Insert_Size - Replace_Size;
-      --              Target.Length :=
-      --                Target.Length + Insert_Length - Replace_Length;
-      --
-      --              Target_Size := Target.Size;
-      --
-      --           else
-      --              Target.Storage
-      --                (Replace_From + Insert_Size
-      --                   .. Target.Size - Replace_Size + Insert_Size - 1) :=
-      --                  Target.Storage
-      --                    (Replace_From + Replace_Size .. Target.Size - 1);
-      --
-      --              Target.Storage
-      --                (Replace_From .. Replace_From + Insert_Size - 1) :=
-      --                Storage (Insert_From .. Insert_From + Insert_Size - 1);
-      --
-      --              Target.Size := Target.Size + Insert_Size - Replace_Size;
-      --              Target.Length :=
-      --                Target.Length + Insert_Length - Replace_Length;
-      --
-      --              Target_Size := Target.Size;
-      --           end if;
-      --
-      --        else
-               raise Program_Error;
-      --        end if;
-      --     end;
-      --
-      --  else
-      --     declare
-      --        Target :
-      --          VSS.Implementation.UTF8_String_Handlers.UTF8_String_Data_Access
-      --            with Import, Convention => Ada,
-      --                 Address => Target_Data.Pointer'Address;
-      --
-      --     begin
-      --        if Replace_Size = Insert_Size then
-      --           Target.Storage
-      --             (Replace_From .. Replace_From + Insert_Size - 1) :=
-      --                Storage (Insert_From .. Insert_From + Insert_Size - 1);
-      --
-      --           Target.Length := Target.Length + Insert_Length - Replace_Length;
-      --
-      --           Target_Size := Target.Size;
-      --
-      --        else
-      --           raise Program_Error;
-      --        end if;
-      --     end;
-      --  end if;
+      Target_Text.UTF8_Replace_Slice
+        (Replace_From   => Replace_From,
+         Replace_Size   => Replace_Size,
+         Replace_Length => Replace_Length,
+         By_Storage     => Storage,
+         By_From        => Insert_From,
+         By_Size        => Insert_Size,
+         By_Length      => Insert_Length);
+      Target_Size := Target_Text.UTF8_Size;
    end Unchecked_Replace;
 
 end VSS.Implementation.UTF8_Normalization;

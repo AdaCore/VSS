@@ -579,4 +579,145 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
       end return;
    end To_UTF_8_String;
 
+   -----------------------
+   -- UTF8_Insert_Slice --
+   -----------------------
+
+   overriding procedure UTF8_Insert_Slice
+     (Self    : in out Static_UTF8_Handler;
+      Into    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length  : VSS.Implementation.Strings.Character_Count) is
+   begin
+      if Self.Size + Size <= In_Place_Storage_Capacity then
+         Self.Storage (Into + Size .. Self.Size + Size) :=
+           Self.Storage (Into .. Self.Size);
+         --  Move NUL terminator too.
+         Self.Storage (Into .. Into + Size - 1) :=
+           Storage (From .. From + Size - 1);
+
+         Self.Size   := @ + Size;
+         Self.Length := @ + Length;
+
+      else
+         --  Size of the current static storge is not enough, move current text
+         --  into dynamic storage, and call handler of the dynamic storage to
+         --  complete operation.
+
+         Unsafe_Convert_To_Dynamic
+           (Self,
+            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
+            Self.Size + Size);
+
+         declare
+            Text : Dynamic.Dynamic_UTF8_Handler
+              with Import, Convention => Ada, Address => Self'Address;
+
+         begin
+            Text.UTF8_Insert_Slice
+              (Into    => Into,
+               Storage => Storage,
+               From    => From,
+               Size    => Size,
+               Length  => Length);
+         end;
+      end if;
+   end UTF8_Insert_Slice;
+
+   ---------------
+   -- UTF8_Move --
+   ---------------
+
+   overriding procedure UTF8_Move
+     (Self : in out Static_UTF8_Handler;
+      From : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count;
+      Into : VSS.Unicode.UTF8_Code_Unit_Index) is
+   begin
+      if From < Into then
+         raise Program_Error;
+
+      elsif Into < From then
+         declare
+            Buffer    : constant
+              VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                (0 .. Size - 1) := Self.Storage (From .. From + Size - 1);
+            Move_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
+              From - Into;
+
+         begin
+            Self.Storage (Into + Size .. Into + Size + Move_Size - 1) :=
+              Self.Storage (Into .. Into + Move_Size - 1);
+            Self.Storage (Into .. Into + Size - 1) := Buffer;
+         end;
+
+      else
+         null;
+      end if;
+   end UTF8_Move;
+
+   ------------------------
+   -- UTF8_Replace_Slice --
+   ------------------------
+
+   overriding procedure UTF8_Replace_Slice
+     (Self           : in out Static_UTF8_Handler;
+      Replace_From   : VSS.Unicode.UTF8_Code_Unit_Index;
+      Replace_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Replace_Length : VSS.Implementation.Strings.Character_Count;
+      By_Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      By_From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      By_Length      : VSS.Implementation.Strings.Character_Count) is
+   begin
+      if Self.Size - Replace_Size + By_Size <= In_Place_Storage_Capacity then
+         Self.Storage
+           (Replace_From + By_Size .. Self.Size - Replace_Size + By_Size) :=
+              Self.Storage (Replace_From + Replace_Size .. Self.Size);
+         --  Move NUL terminator too.
+         Self.Storage (Replace_From .. Replace_From + By_Size - 1) :=
+           By_Storage (By_From .. By_From + By_Size - 1);
+
+         Self.Size   := @ + By_Size - Replace_Size;
+         Self.Length := @ + By_Length - Replace_Length;
+
+      else
+         --  Size of the current static storge is not enough, move current text
+         --  into dynamic storage, and call handler of the dynamic storage to
+         --  complete operation.
+
+         Unsafe_Convert_To_Dynamic
+           (Self,
+            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
+            Self.Size - Replace_Size + By_Size);
+
+         declare
+            Text : Dynamic.Dynamic_UTF8_Handler
+              with Import, Convention => Ada, Address => Self'Address;
+
+         begin
+            Text.UTF8_Replace_Slice
+              (Replace_From   => Replace_From,
+               Replace_Size   => Replace_Size,
+               Replace_Length => Replace_Length,
+               By_Storage     => By_Storage,
+               By_From        => By_From,
+               By_Size        => By_Size,
+               By_Length      => By_Length);
+         end;
+      end if;
+   end UTF8_Replace_Slice;
+
+   ---------------
+   -- UTF8_Size --
+   ---------------
+
+   overriding function UTF8_Size
+     (Self : Static_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count is
+   begin
+      return Self.Size;
+   end UTF8_Size;
+
 end VSS.Implementation.Text_Handlers.UTF8.Static;

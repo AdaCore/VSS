@@ -23,7 +23,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Static is
        range 0 .. In_Place_Storage_Capacity;
 
    type Static_UTF8_Handler is
-     new VSS.Implementation.Text_Handlers.Abstract_Text_Handler with
+     new VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text with
    record
       Storage :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
@@ -125,5 +125,32 @@ package VSS.Implementation.Text_Handlers.UTF8.Static is
       Keep_Terminator : Boolean;
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+
+   overriding procedure UTF8_Insert_Slice
+     (Self    : in out Static_UTF8_Handler;
+      Into    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length  : VSS.Implementation.Strings.Character_Count);
+
+   overriding procedure UTF8_Move
+     (Self : in out Static_UTF8_Handler;
+      From : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count;
+      Into : VSS.Unicode.UTF8_Code_Unit_Index);
+
+   overriding procedure UTF8_Replace_Slice
+     (Self           : in out Static_UTF8_Handler;
+      Replace_From   : VSS.Unicode.UTF8_Code_Unit_Index;
+      Replace_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Replace_Length : VSS.Implementation.Strings.Character_Count;
+      By_Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      By_From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      By_Length      : VSS.Implementation.Strings.Character_Count);
+
+   overriding function UTF8_Size
+     (Self : Static_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count;
 
 end VSS.Implementation.Text_Handlers.UTF8.Static;

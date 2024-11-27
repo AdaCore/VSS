@@ -467,6 +467,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       Self.Pointer.Size   := @ + L;
       Self.Pointer.Length := @ + 1;
       Self.Pointer.Storage (Self.Pointer.Size) := 16#00#;
+      --  XXX Is it necessary? NUL is copied by move of storage data
    end Insert;
 
    --------------
@@ -684,5 +685,89 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    begin
       Unreference (Self.Pointer);
    end Unreference;
+
+   -----------------------
+   -- UTF8_Insert_Slice --
+   -----------------------
+
+   overriding procedure UTF8_Insert_Slice
+     (Self    : in out Dynamic_UTF8_Handler;
+      Into    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      From    : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length  : VSS.Implementation.Strings.Character_Count) is
+   begin
+      Mutate
+        (Self.Pointer,
+         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
+         Self.Pointer.Size + Size);
+
+      Self.Pointer.Storage (Into + Size .. Self.Pointer.Size + Size) :=
+        Self.Pointer.Storage (Into .. Self.Pointer.Size);
+      --  Move NUL terminator too.
+      Self.Pointer.Storage (Into .. Into + Size - 1) :=
+        Storage (From .. From + Size - 1);
+
+      Self.Pointer.Size   := @ + Size;
+      Self.Pointer.Length := @ + Length;
+   end UTF8_Insert_Slice;
+
+   ---------------
+   -- UTF8_Move --
+   ---------------
+
+   overriding procedure UTF8_Move
+     (Self : in out Dynamic_UTF8_Handler;
+      From : VSS.Unicode.UTF8_Code_Unit_Index;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count;
+      Into : VSS.Unicode.UTF8_Code_Unit_Index) is
+   begin
+      raise Program_Error;
+   end UTF8_Move;
+
+   ------------------------
+   -- UTF8_Replace_Slice --
+   ------------------------
+
+   overriding procedure UTF8_Replace_Slice
+     (Self           : in out Dynamic_UTF8_Handler;
+      Replace_From   : VSS.Unicode.UTF8_Code_Unit_Index;
+      Replace_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
+      Replace_Length : VSS.Implementation.Strings.Character_Count;
+      By_Storage     : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      By_From        : VSS.Unicode.UTF8_Code_Unit_Index;
+      By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
+      By_Length      : VSS.Implementation.Strings.Character_Count)
+   is
+      New_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+        Self.Pointer.Size + By_Size - Replace_Size;
+
+   begin
+      Mutate
+        (Self.Pointer,
+         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
+         New_Size);
+
+      Self.Pointer.Storage (Replace_From + By_Size .. New_Size) :=
+        Self.Pointer.Storage
+          (Replace_From + Replace_Size .. Self.Pointer.Size);
+      --  Move NUL terminator too.
+      Self.Pointer.Storage (Replace_From .. Replace_From + By_Size - 1) :=
+        By_Storage (By_From .. By_From + By_Size - 1);
+
+      Self.Pointer.Size   := New_Size;
+      Self.Pointer.Length := @ + By_Length - Replace_Length;
+   end UTF8_Replace_Slice;
+
+   ---------------
+   -- UTF8_Size --
+   ---------------
+
+   overriding function UTF8_Size
+     (Self : Dynamic_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count is
+   begin
+      return Self.Pointer.Size;
+   end UTF8_Size;
 
 end VSS.Implementation.Text_Handlers.UTF8.Dynamic;

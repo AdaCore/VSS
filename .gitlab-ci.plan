@@ -15,6 +15,11 @@ def test_edge():
         anod_install("vss")
         anod_test("vss")
 
+def build_edge_prettier_ada():
+    with defaults(qualifier="edge"):
+        anod_build("vss")
+    anod_build("prettier-ada")
+
 def build_edge_als():
     with defaults(qualifier="edge"):
         anod_build("vss")
@@ -24,6 +29,10 @@ def build_edge_gs():
     with defaults(qualifier="edge"):
         anod_build("vss")
         anod_build("gps")
+
+def test_edge_prettier_ada():
+    anod_install("prettier-ada")
+    anod_test("prettier-ada")
 
 def test_edge_als():
     with defaults(qualifier="edge"):

@@ -68,6 +68,18 @@ include:
     inputs:
       stage: downstream:build
       needs: ["build:edge:linux"]
+      job-name: build:edge:linux:prettier-ada
+      anod-args: run build_edge_prettier_ada
+      cpus: 16
+      rules:
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+          when: manual
+      save-component: true
+
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+    inputs:
+      stage: downstream:build
+      needs: ["build:edge:linux"]
       job-name: build:edge:linux:als
       anod-args: run build_edge_als
       cpus: 16
@@ -89,6 +101,14 @@ include:
       save-component: true
 
 # Downstream testing
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      stage: downstream:test
+      needs: ["build:edge:linux:prettier-ada"]
+      job-name: test:edge:linux:prettier-ada
+      anod-args: run test_edge_prettier_ada
+      cpus: 16
+
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
       stage: downstream:test

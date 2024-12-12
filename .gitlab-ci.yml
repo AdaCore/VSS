@@ -1,166 +1,116 @@
-
-variables:
-   # The common part of the URL for cloning from within a CI
-   GIT_CLONE_BASE: https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}
-
-.basic-setup:
-    # Use generic_anod_ci here.
-    - generic_anod_ci
-         --add-dep eng/ide/gnatstudio-internal
-
-    - cat /tmp/ci_env.sh
-    - . /tmp/ci_env.sh
-
-.basic-setup-dev:
-  - |
-    set -x
-    export PATH=/it/e3/bin:$PATH
-
-.detect-branches:
-  #  Version 1.
-  #  Detects source and target branches. Checkout necessary branch for
-  #  repository when run downstream pipeline is detected.
-  #    ACI_SOURCE_BRANCH is set to source branch (merge request, pull)
-  #    ACI_TARGET_BRANCH is set to target branch of merge request, or 'master'/'edge' for pull
-  #    ACI_REPOSITORY_NAME_EDGE_SUFFIX is set to '-edge' when target repository is 'edge'
-  #    ACI_ANOD_QUALIFIER is set to 'edge' when target repository is 'edge'
-  #    ACI_SUBPROJECTS_ROOT is set to '/tmp' and may be overritten by script
-  - |
-      if [[ -n "$ACI_UPSTREAM_SOURCE_BRANCH" ]]; then
-        ACI_SOURCE_BRANCH="$ACI_UPSTREAM_SOURCE_BRANCH";
-      elif [[ -n "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" ]]; then
-        ACI_SOURCE_BRANCH="$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME";
-      else
-        ACI_SOURCE_BRANCH="$CI_COMMIT_BRANCH";
-      fi;
-      if [[ -n "$ACI_UPSTREAM_TARGET_BRANCH" ]]; then
-        ACI_TARGET_BRANCH=$ACI_UPSTREAM_TARGET_BRANCH;
-      elif [[ -n "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" ]]; then
-        ACI_TARGET_BRANCH="$CI_MERGE_REQUEST_TARGET_BRANCH_NAME";
-      elif [[ "x$CI_COMMIT_BRANCH" == "xedge" ]]; then
-        ACI_TARGET_BRANCH="edge";
-      else
-        ACI_TARGET_BRANCH="master";
-      fi;
-      if [[ "$ACI_TARGET_BRANCH" == "edge" ]]; then
-        ACI_REPOSITORY_NAME_EDGE_SUFFIX="-edge";
-        ACI_ANOD_QUALIFIER="edge"
-      else
-        ACI_REPOSITORY_NAME_EDGE_SUFFIX="";
-        ACI_ANOD_QUALIFIER=""
-      fi
-      ACI_SUBPROJECTS_ROOT=/tmp
-      echo "Source branch: $ACI_SOURCE_BRANCH"
-      echo "Target branch: $ACI_TARGET_BRANCH"
-      echo "Name suffix:   $ACI_REPOSITORY_NAME_EDGE_SUFFIX"
-      echo "Qualifier:     $ACI_ANOD_QUALIFIER"
-      echo "Subprojects:   $ACI_SUBPROJECTS_ROOT"
-
-  #  On downstream pipeline checkout the necessary branch
-  - if [[ "$CI_PIPELINE_SOURCE" == 'pipeline' ]]; then
-       if `git -C $CI_PROJECT_DIR show-ref $ACI_SOURCE_BRANCH > /dev/null`; then
-        git -C $CI_PROJECT_DIR checkout $ACI_SOURCE_BRANCH;
-      elif `git -C $CI_PROJECT_DIR show-ref $ACI_TARGET_BRANCH > /dev/null`; then
-        git -C $CI_PROJECT_DIR checkout $ACI_TARGET_BRANCH;
-      fi
-    fi
-
-.checkout-subproject:
-  #  Version 1.
-  #  Input variables:
-  #    ACI_SUBPROJECTS_ROOT  - root directory to checkout repositories.
-  #    ACI_SUBPROJECT_REPOSITORY_URL_PATH - path component of the repository's URL.
-  #    ACI_SUBPROJECT_NAME - name of the directory for subproject.
-  - |
-    git -C $ACI_SUBPROJECTS_ROOT clone $GIT_CLONE_BASE/$ACI_SUBPROJECT_REPOSITORY_URL_PATH $ACI_SUBPROJECT_NAME
-    if `git -C $ACI_SUBPROJECTS_ROOT -C $ACI_SUBPROJECT_NAME show-ref $ACI_SOURCE_BRANCH > /dev/null`; then
-      git -C $ACI_SUBPROJECTS_ROOT -C $ACI_SUBPROJECT_NAME checkout $ACI_SOURCE_BRANCH;
-    elif `git -C $ACI_SUBPROJECTS_ROOT -C $ACI_SUBPROJECT_NAME show-ref $ACI_TARGET_BRANCH > /dev/null`; then
-      git -C $ACI_SUBPROJECTS_ROOT -C $ACI_SUBPROJECT_NAME checkout $ACI_TARGET_BRANCH;
-    fi
-    anod vcs --sandbox-dir /it/wave --add-repo $ACI_SUBPROJECT_NAME $ACI_SUBPROJECTS_ROOT/$ACI_SUBPROJECT_NAME
+# This specification is in transition to `gitlab-templates`. Some required
+# features are not implemented yet, so relevant jobs are commented-out. In
+# particular:
+#  - Windows CI
+#  - separate `build` of LangKit/LAL/ALS/GS
+#  - testing of GNATdoc/LSIF-Ada/GNATformat/etc
 
 stages:
-  - build_and_test
-  - build_dependent
-  - run_downstream_ci
+  - build
+  - test
+  - check
+  - downstream:build
+  - downstream:test
 
-###############
-# ISSUE CHECK #
-###############
+include:
+# Issue check
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/check-issue@~latest
 
-issue-check:
-  services:
-    - image:e3
-  stage: build_and_test
-  interruptible: true  # Cancel job if the branch is pushed
-  variables: # do not checkout the git repository, not needed
-    GIT_STRATEGY: none
-  rules: # Launch only on merge requests
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-  script:
-    - require_issue # launch the verification
+# Build (stable & edge)
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+    inputs:
+      job-name: build:stable:linux
+      anod-args: run build_stable --latest
+      save-component: true
 
-#########
-# BUILD #
-#########
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+    inputs:
+      job-name: build:edge:linux
+      anod-args: run build_edge --latest
+      save-component: true
 
-build_and_test_dev:
-  services:
-     - image:sandbox
-     - cpu:8
-     - mem:16
-  stage: build_and_test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-    - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TITLE =~ /Merge branch.*/
-    - if: $CI_COMMIT_BRANCH == 'edge' && $CI_COMMIT_TITLE =~ /Merge branch.*/
-  script:
-    - !reference [.basic-setup-dev]
-    - !reference [.detect-branches]
+#  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+#    inputs:
+#      job-name: build:edge:windows
+#      anod-args: run build_edge --latest
+#      cpu:8
+#      image: e3-windows-core-2022
+#      save-component: true
+#        #    variables:
+#        #      ACI_TRACK: edge
+#    services:
+#      - platform:x86_64-windows-2022
+#      - image:e3-windows-core-2022
 
-    - |
-      # Install GNAT (with gcov) and gcovr
-      anod install --sandbox-dir /it/wave gnatall
-      python3 -m pip install gcovr
+# Testing (stable & edge)
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      job-name: test:stable:linux
+      needs: ["build:stable:linux"]
+      cpus: 2
+      # --latest should not be used here because it causes Anod to re-download
+      # components from Cathod instead of using the ones built in this pipeline
+      # by the build job.
+      anod-args: run test_stable
 
-      # Fetch tests' data into `./data/`
-      PACKAGE=vss-tests-data.tar.bz2
-      VERSION=5
-      VSS_URL=https://gitlab.adacore-it.com/api/v4/projects/129
-      curl -L --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        $VSS_URL/packages/generic/$PACKAGE/$VERSION/$PACKAGE |\
-        tar xjf - -C ./data
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      job-name: test:edge:linux
+      needs: ["build:edge:linux"]
+      cpus: 2
+      # --latest should not be used here because it causes Anod to re-download
+      # components from Cathod instead of using the ones built in this pipeline
+      # by the build job.
+      anod-args: run test_edge
 
-      # Make directory for XUnit test reports
-      export XUNIT_XML_PATH=.xunit-logs/
-      mkdir -p $XUNIT_XML_PATH
+# Downstream build
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+    inputs:
+      stage: downstream:build
+      needs: ["build:edge:linux"]
+      job-name: build:edge:linux:als
+      anod-args: run build_edge_als
+      cpus: 16
+      rules:
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+          when: manual
+      save-component: true
 
-      # Build VSS and run tests
-      ( eval $(anod printenv --sandbox-dir /it/wave gnatall) ;\
-        make COVERAGE_MODE=gcov build-libs-static check misc ;\
-        make -C testsuite/json_schema ;\
-        ENABLE_GCOV=y gcovr --print-summary --cobertura gcov.xml )
-      make clean
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+    inputs:
+      stage: downstream:build
+      needs: ["build:edge:linux:als"]
+      job-name: build:edge:linux:gs
+      anod-args: run build_edge_gs
+      cpus: 16
+      rules:
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+          when: manual
+      save-component: true
 
-    # Run spell checker
-    - make spellcheck_json
+# Downstream testing
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      stage: downstream:test
+      needs: ["build:edge:linux:als"]
+      job-name: test:edge:linux:als
+      anod-args: run test_edge_als
+      cpus: 16
 
-  coverage: /^\s*lines:\s*\d+.\d+\%/
-  artifacts:
-    when: always
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: gcov.xml
-      codequality:
-        - spellcheck.json
-      junit: .xunit-logs/*.xml
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      stage: downstream:test
+      needs: ["build:edge:linux:gs"]
+      job-name: test:edge:linux:gs
+      anod-args: run test_edge_gs
+      cpus: 16
 
+###########################
+# LEGACY BUILD ON WINDOWS #
+###########################
 
 .build_and_test:
-  stage: build_and_test
+  stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   script:
@@ -171,13 +121,6 @@ build_and_test_dev:
     - anod test vss $ACI_TRACK_QUALIFIER --latest
     - testsuite_reports
 
-build_and_test:linux:
-  extends: .build_and_test
-  services:
-     - image:pe-base
-     - cpu:8
-     - mem:16
-
 build_and_test:windows:
   extends: .build_and_test
   rules:
@@ -187,122 +130,3 @@ build_and_test:windows:
      - image:e3-windows-core-2022
      - cpu:8
      - platform:x86_64-windows-2022
-
-build_gnatdoc:
-  services:
-     - image:sandbox
-     - cpu:8
-     - mem:16
-  stage: build_dependent
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-  script:
-    - !reference [.basic-setup]
-    - !reference [.detect-branches]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/markdown
-    - ACI_SUBPROJECT_NAME=markdown
-    - !reference [.checkout-subproject]
-
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
-    - ACI_SUBPROJECT_NAME=gnatdoc$ACI_REPOSITORY_NAME_EDGE_SUFFIX
-    - !reference [.checkout-subproject]
-
-    - |
-      cd /it/wave
-
-      # Tell the anod sandbox to use our repository
-      anod vcs --add-repo vss $CI_PROJECT_DIR
-
-      # Build the ALS as a test
-      anod build gnatdoc4 --qualifier=$ACI_ANOD_QUALIFIER
-
-build_lsif:
-  services:
-     - image:sandbox
-     - cpu:8
-     - mem:16
-  stage: build_dependent
-  allow_failure: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_BRANCH
-    - if: $CI_COMMIT_TAG
-  script:
-    - !reference [.basic-setup]
-    - !reference [.detect-branches]
-
-    - |
-      export GPR_PROJECT_PATH=`pwd`/gnat:$GPR_PROJECT_PATH
-      mkdir subprojects
-      ACI_SUBPROJECTS_ROOT=`pwd`/subprojects
-
-    - export GPR_PROJECT_PATH=`pwd`/subprojects/gnatdoc/gnat:$GPR_PROJECT_PATH
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/gnatdoc
-    - ACI_SUBPROJECT_NAME=gnatdoc
-    - !reference [.checkout-subproject]
-
-    - export GPR_PROJECT_PATH=`pwd`/subprojects/lsif-ada/gnat:$GPR_PROJECT_PATH
-    - ACI_SUBPROJECT_REPOSITORY_URL_PATH=/eng/ide/lsif-ada
-    - ACI_SUBPROJECT_NAME=lsif-ada
-    - !reference [.checkout-subproject]
-
-    - |
-      anod install --sandbox-dir /it/wave stable-gnatall
-      anod install --sandbox-dir /it/wave stable-langkit_support
-      anod install --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare
-      anod install --sandbox-dir /it/wave stable-libadalang
-      ( eval $(anod printenv --sandbox-dir /it/wave stable-gnatall) ;\
-        eval $(anod printenv --sandbox-dir /it/wave stable-langkit_support) ;\
-        eval $(anod printenv --sandbox-dir /it/wave stable-libgpr2 --qualifier=bare) ;\
-        eval $(anod printenv --sandbox-dir /it/wave stable-libadalang) ;\
-        make -C subprojects/lsif-ada; \
-        ./subprojects/lsif-ada/bin/lsif-ada vss_documentation.gpr > dump.lsif)
-
-  artifacts:
-    reports:
-      lsif: dump.lsif
-
-.run_ci_common: &run_ci_common
-  stage: build_dependent
-  needs: ["build_and_test:linux"]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'push'
-      when: never
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-      allow_failure: true
-  trigger:
-    strategy: depend
-  inherit:
-    variables: false
-  variables:
-    ACI_UPSTREAM_PROJECT_ID: $CI_PROJECT_ID
-    ACI_UPSTREAM_MERGE_REQUEST_IID: $CI_MERGE_REQUEST_IID
-    ACI_TRACK: edge
-
-run_lal_ci:
-  <<: *run_ci_common
-  trigger:
-    project: eng/libadalang/libadalang
-
-run_als_ci:
-  <<: *run_ci_common
-  trigger:
-    project: eng/ide/ada_language_server
-
-run_gnatdoc_ci:
-  <<: *run_ci_common
-  trigger:
-    project: eng/ide/gnatdoc
-
-run_gs_ci:
-  <<: *run_ci_common
-  trigger:
-    project: eng/ide/gnatstudio
-
-run_lsif_ci:
-  <<: *run_ci_common
-  trigger:
-    project: eng/ide/lsif-ada

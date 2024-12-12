@@ -1,0 +1,36 @@
+
+def build_stable():
+    anod_build("vss")
+
+def test_stable():
+    anod_install("vss")
+    anod_test("vss")
+
+def build_edge():
+    with defaults(qualifier="edge"):
+        anod_build("vss")
+
+def test_edge():
+    with defaults(qualifier="edge"):
+        anod_install("vss")
+        anod_test("vss")
+
+def build_edge_als():
+    with defaults(qualifier="edge"):
+        anod_build("vss")
+        anod_build("als")
+
+def build_edge_gs():
+    with defaults(qualifier="edge"):
+        anod_build("vss")
+        anod_build("gps")
+
+def test_edge_als():
+    with defaults(qualifier="edge"):
+        anod_install("als")
+        anod_test("als")
+
+def test_edge_gs():
+    with defaults(qualifier="edge"):
+        anod_install("gps")
+        anod_test("gps")

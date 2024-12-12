@@ -20,6 +20,11 @@ def build_edge_prettier_ada():
         anod_build("vss")
     anod_build("prettier-ada")
 
+def build_edge_gnatdoc():
+    with defaults(qualifier="edge"):
+        anod_build("vss")
+        anod_build("gnatdoc4")
+
 def build_edge_als():
     with defaults(qualifier="edge"):
         anod_build("vss")
@@ -33,6 +38,11 @@ def build_edge_gs():
 def test_edge_prettier_ada():
     anod_install("prettier-ada")
     anod_test("prettier-ada")
+
+def test_edge_gnatdoc():
+    with defaults(qualifier="edge"):
+        anod_install("gnatdoc4")
+        anod_test("gnatdoc4")
 
 def test_edge_als():
     with defaults(qualifier="edge"):

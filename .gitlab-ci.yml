@@ -106,6 +106,7 @@ include:
       needs: ["build:edge:linux:als"]
       job-name: build:edge:linux:gs
       anod-args: run build_edge_gs
+      image: systemgtk
       cpus: 16
       rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -143,6 +144,7 @@ include:
       needs: ["build:edge:linux:gs"]
       job-name: test:edge:linux:gs
       anod-args: run test_edge_gs
+      image: systemgtk
       cpus: 16
 
 ###########################

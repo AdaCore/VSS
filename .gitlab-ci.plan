@@ -1,0 +1,76 @@
+
+def build_stable():
+    anod_build("vss")
+
+def test_stable():
+    anod_install("vss")
+    anod_test("vss")
+
+def build_edge():
+    with defaults(qualifier="edge"):
+        anod_build("vss")
+
+def test_edge():
+    with defaults(qualifier="edge"):
+        anod_install("vss")
+        anod_test("vss")
+
+def build_edge_prettier_ada():
+    with defaults(qualifier="edge"):
+        anod_install("vss")
+    anod_build("prettier-ada")
+
+def install_common_dependencies():
+    with defaults(qualifier="edge"):
+        anod_install("vss")
+    # Explicitly install LAL & dependencies
+    anod_install("prettier-ada")
+    anod_install("langkit")
+    anod_install("langkit_support")
+    anod_install("libadalang")
+
+def build_edge_gnatdoc():
+    with defaults(qualifier="edge"):
+        anod_install("vss")
+        anod_build("gnatdoc4")
+
+    # Explicitly build LAL & dependencies
+    anod_install("prettier-ada")
+    anod_build("langkit")
+    anod_build("langkit_support")
+    anod_build("libadalang")
+
+def build_edge_als():
+    install_common_dependencies()
+    with defaults(qualifier="edge"):
+        anod_build("als")
+
+def build_edge_gs():
+    install_common_dependencies()
+    with defaults(qualifier="edge"):
+        anod_install("als")
+        anod_build("gps")
+
+def test_edge_prettier_ada():
+    with defaults(qualifier="edge"):
+        anod_install("vss")
+    anod_install("prettier-ada")
+    anod_test("prettier-ada")
+
+def test_edge_gnatdoc():
+    install_common_dependencies()
+    with defaults(qualifier="edge"):
+        anod_install("gnatdoc4")
+        anod_test("gnatdoc4")
+
+def test_edge_als():
+    install_common_dependencies()
+    with defaults(qualifier="edge"):
+        anod_install("als")
+        anod_test("als")
+
+def test_edge_gs():
+    install_common_dependencies()
+    with defaults(qualifier="edge"):
+        anod_install("gps")
+        anod_test("gps")

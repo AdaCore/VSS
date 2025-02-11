@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -17,7 +17,7 @@ package VSS.Implementation.UTF8_Encoding is
 
    type UTF8_Code_Unit_Array is
      array (VSS.Unicode.UTF8_Code_Unit_Count range <>)
-     of VSS.Unicode.UTF8_Code_Unit;
+       of aliased VSS.Unicode.UTF8_Code_Unit with Pack;
 
    pragma Warnings (Off, "aspect ""PRE"" not enforced on inlined subprogram");
    procedure Encode

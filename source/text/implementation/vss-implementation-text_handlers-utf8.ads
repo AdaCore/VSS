@@ -1,11 +1,12 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 --  Generic implementation of the string which use UTF-8 encoding for data.
 
+with VSS.Implementation.Interfaces_C;
 with VSS.Implementation.UTF8_Encoding;
 
 limited private with VSS.Implementation.Text_Handlers.UTF8.Static;
@@ -105,6 +106,15 @@ is
       Terminator  : Boolean := False);
    --  Append given slice of the data to the target. Convert target
    --  from in-place to heap based implementation when necessary.
+
+   function UTF8_Storage_Constant_Poiner
+     (Self : Abstract_UTF8_Text)
+      return not null
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
+          is abstract;
+   --  Returns pointer to the first element in the text data storage.
+   --
+   --  This subprogram is intended to be used for interfacing with C.
 
 private
 

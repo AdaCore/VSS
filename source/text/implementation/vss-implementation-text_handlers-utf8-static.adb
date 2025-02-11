@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -719,5 +719,17 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
    begin
       return Self.Size;
    end UTF8_Size;
+
+   ----------------------------------
+   -- UTF8_Storage_Constant_Poiner --
+   ----------------------------------
+
+   overriding function UTF8_Storage_Constant_Poiner
+     (Self : Static_UTF8_Handler)
+      return not null
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access is
+   begin
+      return Self.Storage (Self.Storage'First)'Unchecked_Access;
+   end UTF8_Storage_Constant_Poiner;
 
 end VSS.Implementation.Text_Handlers.UTF8.Static;

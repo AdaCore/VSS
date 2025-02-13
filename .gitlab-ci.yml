@@ -19,13 +19,13 @@ include:
 # Build (stable & edge)
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
-      job-name: build:stable:linux
+      job-name: build:stable
       anod-args: run build_stable --latest
       save-component: true
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
-      job-name: build:edge:linux
+      job-name: build:edge
       anod-args: run build_edge --latest
       save-component: true
 
@@ -45,7 +45,7 @@ include:
 # Testing (stable & edge)
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
-      job-name: test:stable:linux
+      job-name: test:stable
       needs: ["build:stable:linux"]
       cpus: 2
       # --latest should not be used here because it causes Anod to re-download
@@ -55,7 +55,7 @@ include:
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
-      job-name: test:edge:linux
+      job-name: test:edge
       needs: ["build:edge:linux"]
       cpus: 2
       # --latest should not be used here because it causes Anod to re-download
@@ -67,8 +67,8 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
       stage: downstream:build
+      job-name: build:edge:prettier-ada
       needs: ["build:edge:linux"]
-      job-name: build:edge:linux:prettier-ada
       anod-args: run build_edge_prettier_ada
       cpus: 16
       rules:
@@ -79,8 +79,8 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
       stage: downstream:build
-      needs: ["build:edge:linux:prettier-ada"]
-      job-name: build:edge:linux:gnatdoc
+      job-name: build:edge:gnatdoc
+      needs: ["build:edge:prettier-ada:linux"]
       anod-args: run build_edge_gnatdoc
       cpus: 16
       rules:
@@ -91,8 +91,8 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
       stage: downstream:build
-      needs: ["build:edge:linux:gnatdoc"]
-      job-name: build:edge:linux:als
+      job-name: build:edge:als
+      needs: ["build:edge:gnatdoc:linux"]
       anod-args: run build_edge_als
       cpus: 16
       rules:
@@ -103,8 +103,8 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
       stage: downstream:build
-      needs: ["build:edge:linux:als"]
-      job-name: build:edge:linux:gs
+      job-name: build:edge:gs
+      needs: ["build:edge:als:linux"]
       anod-args: run build_edge_gs
       image: systemgtk
       cpus: 16
@@ -117,32 +117,32 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
       stage: downstream:test
-      needs: ["build:edge:linux:prettier-ada"]
-      job-name: test:edge:linux:prettier-ada
+      job-name: test:edge:prettier-ada
+      needs: ["build:edge:prettier-ada:linux"]
       anod-args: run test_edge_prettier_ada
       cpus: 16
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
       stage: downstream:test
-      needs: ["build:edge:linux:gnatdoc"]
-      job-name: test:edge:linux:gnatdoc
+      job-name: test:edge:gnatdoc
+      needs: ["build:edge:gnatdoc:linux"]
       anod-args: run test_edge_gnatdoc
       cpus: 16
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
       stage: downstream:test
-      needs: ["build:edge:linux:als"]
-      job-name: test:edge:linux:als
+      job-name: test:edge:als
+      needs: ["build:edge:als:linux"]
       anod-args: run test_edge_als
       cpus: 16
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
       stage: downstream:test
-      needs: ["build:edge:linux:gs"]
-      job-name: test:edge:linux:gs
+      job-name: test:edge:gs
+      needs: ["build:edge:gs:linux"]
       anod-args: run test_edge_gs
       image: systemgtk
       cpus: 16

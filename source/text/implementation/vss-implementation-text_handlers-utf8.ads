@@ -67,4 +67,15 @@ private
         with Inline_Always;
    --  Move cursor to position of the next character
 
+   procedure Split_Lines_Common
+     (Text            :
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+      Data            : VSS.Implementation.Strings.String_Data;
+      Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean;
+      Lines           : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access);
+   --  Common code of Split_Lines subprogram for on heap and inline handlers.
+
 end VSS.Implementation.Text_Handlers.UTF8;

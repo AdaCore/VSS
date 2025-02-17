@@ -579,6 +579,32 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
       end return;
    end To_UTF_8_String;
 
+   ------------------------------------
+   -- UTF8_Constant_Storage_And_Size --
+   ------------------------------------
+
+   overriding procedure UTF8_Constant_Storage_And_Size
+     (Self    : Static_UTF8_Handler;
+      Pointer : out
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+      Size    : out VSS.Unicode.UTF8_Code_Unit_Count) is
+   begin
+      Pointer := Self.Storage (Self.Storage'First)'Unchecked_Access;
+      Size    := Self.Size;
+   end UTF8_Constant_Storage_And_Size;
+
+   ----------------------------------
+   -- UTF8_Constant_Storage_Poiner --
+   ----------------------------------
+
+   overriding function UTF8_Constant_Storage_Poiner
+     (Self : Static_UTF8_Handler)
+      return not null
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access is
+   begin
+      return Self.Storage (Self.Storage'First)'Unchecked_Access;
+   end UTF8_Constant_Storage_Poiner;
+
    -----------------------
    -- UTF8_Insert_Slice --
    -----------------------
@@ -719,17 +745,5 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
    begin
       return Self.Size;
    end UTF8_Size;
-
-   ----------------------------------
-   -- UTF8_Storage_Constant_Poiner --
-   ----------------------------------
-
-   overriding function UTF8_Storage_Constant_Poiner
-     (Self : Static_UTF8_Handler)
-      return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access is
-   begin
-      return Self.Storage (Self.Storage'First)'Unchecked_Access;
-   end UTF8_Storage_Constant_Poiner;
 
 end VSS.Implementation.Text_Handlers.UTF8.Static;

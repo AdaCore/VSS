@@ -18,22 +18,29 @@ is
    type Interface_UTF8_Text is
      abstract new VSS.Implementation.Text_Handlers.Abstract_Text_Handler
        with null record;
-   --  This type provides direct access to size and underlying text storage.
-   --  It is useful for interfacing with other languages.
+   --  This type provides direct access to underlying text storage and its
+   --  size. It implements some operations that doesn't require modifications
+   --  of the text.
 
    not overriding function UTF8_Size
      (Self : Interface_UTF8_Text) return VSS.Unicode.UTF8_Code_Unit_Count
         is abstract;
    --  Return number of code units in the given text
 
-   not overriding function UTF8_Storage_Constant_Poiner
+   not overriding function UTF8_Constant_Storage_Poiner
      (Self : Interface_UTF8_Text)
       return not null
         VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
           is abstract;
    --  Returns pointer to the first element in the text data storage.
-   --
-   --  This subprogram is intended to be used for interfacing with C.
+
+   not overriding procedure UTF8_Constant_Storage_And_Size
+     (Self    : Interface_UTF8_Text;
+      Pointer : out
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+      Size    : out VSS.Unicode.UTF8_Code_Unit_Count) is abstract;
+   --  Returns pointer to the first element of the text storage and size of the
+   --  storage.
 
    type Abstract_UTF8_Text is
      abstract new Interface_UTF8_Text with null record;

@@ -6,10 +6,8 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;
 with VSS.Implementation.Text_Handlers.UTF8.Variable.Static;
-with VSS.Strings;
 
 package body VSS.Implementation.Text_Handlers.UTF8.Variable is
 
@@ -77,123 +75,6 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
 
       Storage (Size) := 16#00#;
    end Internal_Append;
-
-   ------------------------
-   -- Split_Lines_Common --
-   ------------------------
-
-   procedure Split_Lines_Common
-     (Text            :
-        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
-      Data            : VSS.Implementation.Strings.String_Data;
-      Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Terminators     : VSS.Strings.Line_Terminator_Set;
-      Keep_Terminator : Boolean;
-      Lines           : in out
-        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
-   is
-      procedure Append
-        (Source_Storage :
-           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         First          : VSS.Implementation.Strings.Cursor;
-         After_Last     : VSS.Implementation.Strings.Cursor);
-
-      ------------
-      -- Append --
-      ------------
-
-      procedure Append
-        (Source_Storage :
-           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         First          : VSS.Implementation.Strings.Cursor;
-         After_Last     : VSS.Implementation.Strings.Cursor)
-      is
-         Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-           After_Last.UTF8_Offset - First.UTF8_Offset;
-         Data : VSS.Implementation.Strings.String_Data;
-
-      begin
-         if Size = 0 then
-            null;
-
-         elsif Size <= Static.In_Place_Storage_Capacity then
-            --  Static storage can be used.
-
-            declare
-               Static : Variable.Static.Static_UTF8_Handler := (others => <>)
-                 with Address => Data.Storage'Address;
-
-            begin
-               Static.Storage (0 .. Size - 1) :=
-                 Source_Storage
-                   (First.UTF8_Offset .. After_Last.UTF8_Offset - 1);
-               Static.Storage (Size) := 0;
-               Static.Size   := Size;
-               Static.Length := After_Last.Index - First.Index;
-            end;
-
-         else
-            declare
-               Pointer : Variable.Dynamic.UTF8_String_Data_Access;
-               Dynamic : Variable.Dynamic.Dynamic_UTF8_Handler :=
-                 (others => <>)
-                 with Address => Data.Storage'Address;
-
-            begin
-               Pointer := UTF8.Variable.Dynamic.Allocate (0, Size);
-
-               Pointer.Storage (0 .. Size - 1) :=
-                 Source_Storage
-                   (First.UTF8_Offset .. After_Last.UTF8_Offset - 1);
-               Pointer.Size   := Size;
-               Pointer.Length := After_Last.Index - First.Index;
-               Pointer.Storage (Pointer.Size) := 16#00#;
-
-               Dynamic.Pointer := Pointer;
-            end;
-         end if;
-
-         VSS.Implementation.String_Vectors.Append_And_Move_Ownership
-           (Lines, Data);
-      end Append;
-
-      Initial    : VSS.Implementation.Strings.Cursor;
-      At_First   : aliased VSS.Implementation.Strings.Cursor;
-      At_Last    : aliased VSS.Implementation.Strings.Cursor;
-      After_Last : aliased VSS.Implementation.Strings.Cursor;
-      Terminator : VSS.Implementation.Strings.Cursor;
-      Dummy      : Boolean;
-
-   begin
-      VSS.Implementation.String_Vectors.Unreference (Lines);
-
-      Text.Before_First_Character (Initial);
-
-      while VSS.Implementation.Line_Iterators.Forward
-        (Data,
-         Terminators,
-         Initial,
-         At_First,
-         At_Last,
-         Terminator)
-      loop
-         Initial := At_Last;
-
-         if VSS.Implementation.Strings.Is_Invalid (Terminator) then
-            After_Last := At_Last;
-            Dummy      := Text.Forward (After_Last);
-
-         elsif Keep_Terminator then
-            After_Last := At_Last;
-            Dummy      := Text.Forward (After_Last);
-
-         else
-            After_Last := Terminator;
-         end if;
-
-         Append (Storage, At_First, After_Last);
-      end loop;
-   end Split_Lines_Common;
 
    ----------------------
    -- Unchecked_Append --

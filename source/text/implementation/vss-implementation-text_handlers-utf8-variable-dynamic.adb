@@ -8,10 +8,10 @@ pragma Ada_2022;
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.Implementation.Text_Handlers.UTF8.Static;
+with VSS.Implementation.Text_Handlers.UTF8.Variable.Static;
 with VSS.Strings;
 
-package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
+package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
 
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
@@ -586,7 +586,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
 
       if Size <= Static.In_Place_Storage_Capacity then
          declare
-            Static : UTF8.Static.Static_UTF8_Handler := (others => <>)
+            Static : Variable.Static.Static_UTF8_Handler := (others => <>)
               with Address => Target_Data.Storage'Address;
 
          begin
@@ -686,6 +686,32 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       Unreference (Self.Pointer);
    end Unreference;
 
+   ------------------------------------
+   -- UTF8_Constant_Storage_And_Size --
+   ------------------------------------
+
+   overriding procedure UTF8_Constant_Storage_And_Size
+     (Self    : Dynamic_UTF8_Handler;
+      Pointer : out
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+      Size    : out VSS.Unicode.UTF8_Code_Unit_Count) is
+   begin
+      Pointer := Self.Pointer.Storage (Self.Pointer.Storage'First)'Access;
+      Size    := Self.Pointer.Size;
+   end UTF8_Constant_Storage_And_Size;
+
+   ----------------------------------
+   -- UTF8_Constant_Storage_Poiner --
+   ----------------------------------
+
+   overriding function UTF8_Constant_Storage_Poiner
+     (Self : Dynamic_UTF8_Handler)
+      return not null
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access is
+   begin
+      return Self.Pointer.Storage (Self.Pointer.Storage'First)'Access;
+   end UTF8_Constant_Storage_Poiner;
+
    -----------------------
    -- UTF8_Insert_Slice --
    -----------------------
@@ -770,16 +796,4 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       return Self.Pointer.Size;
    end UTF8_Size;
 
-   ----------------------------------
-   -- UTF8_Storage_Constant_Poiner --
-   ----------------------------------
-
-   overriding function UTF8_Storage_Constant_Poiner
-     (Self : Dynamic_UTF8_Handler)
-      return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access is
-   begin
-      return Self.Pointer.Storage (Self.Pointer.Storage'First)'Access;
-   end UTF8_Storage_Constant_Poiner;
-
-end VSS.Implementation.Text_Handlers.UTF8.Dynamic;
+end VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;

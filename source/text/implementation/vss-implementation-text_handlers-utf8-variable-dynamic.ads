@@ -8,7 +8,7 @@
 
 with System.Atomic_Counters;
 
-package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
+package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
 
    pragma Preelaborate;
 
@@ -32,9 +32,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    pragma Warnings (Off, "bits of ""Dynamic_UTF8_Handler"" unused");
    --  Size of the text handler object is fixed.
 
-   type Dynamic_UTF8_Handler is
-     new VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text with
-   record
+   type Dynamic_UTF8_Handler is new Variable_UTF8_Text with record
       Pointer : UTF8_String_Data_Access;
    end record with Object_Size => 192;
 
@@ -176,10 +174,16 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    overriding function UTF8_Size
      (Self : Dynamic_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count;
 
-   overriding function UTF8_Storage_Constant_Poiner
+   overriding function UTF8_Constant_Storage_Poiner
      (Self : Dynamic_UTF8_Handler)
       return not null
         VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+
+   overriding procedure UTF8_Constant_Storage_And_Size
+     (Self    : Dynamic_UTF8_Handler;
+      Pointer : out
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+      Size    : out VSS.Unicode.UTF8_Code_Unit_Count);
 
    --  Subprograms to help code refactoring, some of the will be moved to
    --  generic UTF8 fastpath string API, and some moved to the body after
@@ -199,4 +203,4 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    --  Content of the data will be copied, and old storage block will be
    --  unreferenced (and deallocated if it is no longer used).
 
-end VSS.Implementation.Text_Handlers.UTF8.Dynamic;
+end VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;

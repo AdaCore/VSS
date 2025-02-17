@@ -2349,9 +2349,9 @@ package body VSS.Implementation.UTF8_Normalization is
       Length      : VSS.Implementation.Strings.Character_Count)
    is
       Target_Text :
-        VSS.Implementation.Text_Handlers.UTF8.Variable.Abstract_UTF8_Text'Class
+        VSS.Implementation.Text_Handlers.UTF8.Variable.Variable_UTF8_Text'Class
           renames VSS.Implementation.Text_Handlers.UTF8.Variable
-                    .Abstract_UTF8_Text'Class
+                    .Variable_UTF8_Text'Class
                       (VSS.Implementation.Strings.Variable_Handler
                         (Target_Data).all);
 
@@ -2376,9 +2376,9 @@ package body VSS.Implementation.UTF8_Normalization is
       Into : VSS.Unicode.UTF8_Code_Unit_Index)
    is
       Target_Text :
-        VSS.Implementation.Text_Handlers.UTF8.Variable.Abstract_UTF8_Text'Class
+        VSS.Implementation.Text_Handlers.UTF8.Variable.Variable_UTF8_Text'Class
           renames VSS.Implementation.Text_Handlers.UTF8.Variable
-                    .Abstract_UTF8_Text'Class
+                    .Variable_UTF8_Text'Class
                       (VSS.Implementation.Strings.Variable_Handler
                         (Data).all);
 
@@ -2405,9 +2405,9 @@ package body VSS.Implementation.UTF8_Normalization is
       Insert_Length  : VSS.Implementation.Strings.Character_Count)
    is
       Target_Text :
-        VSS.Implementation.Text_Handlers.UTF8.Variable.Abstract_UTF8_Text'Class
+        VSS.Implementation.Text_Handlers.UTF8.Variable.Variable_UTF8_Text'Class
           renames VSS.Implementation.Text_Handlers.UTF8.Variable
-                    .Abstract_UTF8_Text'Class
+                    .Variable_UTF8_Text'Class
                       (VSS.Implementation.Strings.Variable_Handler
                         (Target_Data).all);
 

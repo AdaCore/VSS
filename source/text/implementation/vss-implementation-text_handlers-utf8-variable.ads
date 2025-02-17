@@ -14,11 +14,11 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable
   with Preelaborate
 is
 
-   type Abstract_UTF8_Text is
-     abstract new Interface_UTF8_Text with null record;
+   type Variable_UTF8_Text is
+     abstract new Abstract_UTF8_Text with null record;
 
    not overriding procedure UTF8_Replace_Slice
-     (Self           : in out Abstract_UTF8_Text;
+     (Self           : in out Variable_UTF8_Text;
       Replace_From   : VSS.Unicode.UTF8_Code_Unit_Index;
       Replace_Size   : VSS.Unicode.UTF8_Code_Unit_Count;
       Replace_Length : VSS.Implementation.Strings.Character_Count;
@@ -38,7 +38,7 @@ is
    --  @param by_Length       Number of character in replacement data
 
    not overriding procedure UTF8_Insert_Slice
-     (Self    : in out Abstract_UTF8_Text;
+     (Self    : in out Variable_UTF8_Text;
       Into    : VSS.Unicode.UTF8_Code_Unit_Index;
       Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       From    : VSS.Unicode.UTF8_Code_Unit_Index;
@@ -55,7 +55,7 @@ is
    --  @param Length   Number of character to insert
 
    not overriding procedure UTF8_Move
-     (Self : in out Abstract_UTF8_Text;
+     (Self : in out Variable_UTF8_Text;
       From : VSS.Unicode.UTF8_Code_Unit_Index;
       Size : VSS.Unicode.UTF8_Code_Unit_Count;
       Into : VSS.Unicode.UTF8_Code_Unit_Index) is abstract;

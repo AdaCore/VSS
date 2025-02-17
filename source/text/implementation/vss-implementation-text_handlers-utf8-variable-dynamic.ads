@@ -32,7 +32,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    pragma Warnings (Off, "bits of ""Dynamic_UTF8_Handler"" unused");
    --  Size of the text handler object is fixed.
 
-   type Dynamic_UTF8_Handler is new Abstract_UTF8_Text with record
+   type Dynamic_UTF8_Handler is new Variable_UTF8_Text with record
       Pointer : UTF8_String_Data_Access;
    end record with Object_Size => 192;
 

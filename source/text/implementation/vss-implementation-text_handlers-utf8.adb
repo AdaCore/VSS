@@ -14,6 +14,148 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
 
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
+   use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+
+   --------------
+   -- Is_Equal --
+   --------------
+
+   overriding function Is_Equal
+     (Self  : Abstract_UTF8_Text;
+      Other : Abstract_Text_Handler'Class) return Boolean is
+   begin
+      if Other in Abstract_UTF8_Text'Class then
+         declare
+            Self_Pointer  :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+            Self_Size     : VSS.Unicode.UTF8_Code_Unit_Count;
+            Other_Pointer :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+            Other_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+
+         begin
+            Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_And_Size
+              (Self_Pointer, Self_Size);
+            Abstract_UTF8_Text'Class (Other).UTF8_Constant_Storage_And_Size
+              (Other_Pointer, Other_Size);
+
+            declare
+               Self_Storage  : constant
+                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                   (0 .. Self_Size - 1)
+                 with Import,
+                      Convention => Ada,
+                      Address => Self_Pointer.all'Address;
+               Other_Storage : constant
+                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                   (0 .. Other_Size - 1)
+                 with Import,
+                      Convention => Ada,
+                      Address => Other_Pointer.all'Address;
+
+            begin
+               return Self_Storage = Other_Storage;
+            end;
+         end;
+
+      else
+         return Abstract_Text_Handler (Self).Is_Equal (Other);
+      end if;
+   end Is_Equal;
+
+   -------------
+   -- Is_Less --
+   -------------
+
+   overriding function Is_Less
+     (Self  : Abstract_UTF8_Text;
+      Other : Abstract_Text_Handler'Class) return Boolean is
+   begin
+      if Other in Abstract_UTF8_Text'Class then
+         declare
+            Self_Pointer  :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+            Self_Size     : VSS.Unicode.UTF8_Code_Unit_Count;
+            Other_Pointer :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+            Other_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+
+         begin
+            Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_And_Size
+              (Self_Pointer, Self_Size);
+            Abstract_UTF8_Text'Class (Other).UTF8_Constant_Storage_And_Size
+              (Other_Pointer, Other_Size);
+
+            declare
+               Self_Storage  : constant
+                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                   (0 .. Self_Size - 1)
+                 with Import,
+                      Convention => Ada,
+                      Address => Self_Pointer.all'Address;
+               Other_Storage : constant
+                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                   (0 .. Other_Size - 1)
+                 with Import,
+                      Convention => Ada,
+                      Address => Other_Pointer.all'Address;
+
+            begin
+               return Self_Storage < Other_Storage;
+            end;
+         end;
+
+      else
+         return Abstract_Text_Handler (Self).Is_Less (Other);
+      end if;
+   end Is_Less;
+
+   ----------------------
+   -- Is_Less_Or_Equal --
+   ----------------------
+
+   overriding function Is_Less_Or_Equal
+     (Self  : Abstract_UTF8_Text;
+      Other : Abstract_Text_Handler'Class) return Boolean is
+   begin
+      if Other in Abstract_UTF8_Text'Class then
+         declare
+            Self_Pointer  :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+            Self_Size     : VSS.Unicode.UTF8_Code_Unit_Count;
+            Other_Pointer :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+            Other_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+
+         begin
+            Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_And_Size
+              (Self_Pointer, Self_Size);
+            Abstract_UTF8_Text'Class (Other).UTF8_Constant_Storage_And_Size
+              (Other_Pointer, Other_Size);
+
+            declare
+               Self_Storage  : constant
+                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                   (0 .. Self_Size - 1)
+                 with Import,
+                      Convention => Ada,
+                      Address => Self_Pointer.all'Address;
+               Other_Storage : constant
+                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                   (0 .. Other_Size - 1)
+                 with Import,
+                      Convention => Ada,
+                      Address => Other_Pointer.all'Address;
+
+            begin
+               return Self_Storage <= Other_Storage;
+            end;
+         end;
+
+      else
+         return Abstract_Text_Handler (Self).Is_Less_Or_Equal (Other);
+      end if;
+   end Is_Less_Or_Equal;
 
    ------------------------
    -- Unchecked_Backward --

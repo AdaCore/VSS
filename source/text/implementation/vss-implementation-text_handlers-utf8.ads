@@ -19,6 +19,10 @@ is
    --  This type provides direct access to underlying text storage and its
    --  size. It implements some operations that doesn't require modifications
    --  of the text.
+   --
+   --  Note, UTF8 encoded text must be valid (shortest encoding form, no
+   --  surrogates), otherwise optimized compare operations will return
+   --  incorrect result.
 
    not overriding function UTF8_Size
      (Self : Abstract_UTF8_Text) return VSS.Unicode.UTF8_Code_Unit_Count
@@ -39,6 +43,16 @@ is
       Size    : out VSS.Unicode.UTF8_Code_Unit_Count) is abstract;
    --  Returns pointer to the first element of the text storage and size of the
    --  storage.
+
+   overriding function Is_Equal
+     (Self  : Abstract_UTF8_Text;
+      Other : Abstract_Text_Handler'Class) return Boolean;
+   overriding function Is_Less
+     (Self  : Abstract_UTF8_Text;
+      Other : Abstract_Text_Handler'Class) return Boolean;
+   overriding function Is_Less_Or_Equal
+     (Self  : Abstract_UTF8_Text;
+      Other : Abstract_Text_Handler'Class) return Boolean;
 
 private
 

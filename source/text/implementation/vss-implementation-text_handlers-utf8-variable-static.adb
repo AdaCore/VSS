@@ -6,10 +6,10 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.Text_Handlers.UTF8.Dynamic;
+with VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;
 with VSS.Strings;
 
-package body VSS.Implementation.Text_Handlers.UTF8.Static is
+package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
 
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
@@ -68,11 +68,11 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
             Self.Size + L);
 
          declare
-            Overlay : Dynamic.Dynamic_UTF8_Handler
-              renames Dynamic.Dynamic_UTF8_Handler
+            Overlay : Variable.Dynamic.Dynamic_UTF8_Handler
+              renames Variable.Dynamic.Dynamic_UTF8_Handler
               (VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
                  (Self));
-            Pointer : Dynamic.UTF8_String_Data_Access
+            Pointer : Variable.Dynamic.UTF8_String_Data_Access
               renames Overlay.Pointer;
 
          begin
@@ -106,13 +106,14 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
           VSS.Implementation.Strings.Constant_Handler (Suffix);
 
    begin
-      if Suffix_Handler.all in Dynamic.Dynamic_UTF8_Handler then
+      if Suffix_Handler.all in Variable.Dynamic.Dynamic_UTF8_Handler then
          --  The suffix use dynamic storage. However, in some cases, result
          --  might be stored in the current static storage.
 
          declare
-            Suffix_Dynamic : Dynamic.Dynamic_UTF8_Handler
-              renames Dynamic.Dynamic_UTF8_Handler (Suffix_Handler.all);
+            Suffix_Dynamic : Variable.Dynamic.Dynamic_UTF8_Handler
+              renames Variable.Dynamic.Dynamic_UTF8_Handler
+                        (Suffix_Handler.all);
             Handler        :
               VSS.Implementation.Strings.Variable_Text_Handler_Access;
 
@@ -456,7 +457,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
             Self.Size + L);
 
          declare
-            Text : Dynamic.Dynamic_UTF8_Handler
+            Text : Variable.Dynamic.Dynamic_UTF8_Handler
               with Import, Convention => Ada, Address => Self'Address;
 
          begin
@@ -638,7 +639,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
             Self.Size + Size);
 
          declare
-            Text : Dynamic.Dynamic_UTF8_Handler
+            Text : Variable.Dynamic.Dynamic_UTF8_Handler
               with Import, Convention => Ada, Address => Self'Address;
 
          begin
@@ -720,7 +721,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
             Self.Size - Replace_Size + By_Size);
 
          declare
-            Text : Dynamic.Dynamic_UTF8_Handler
+            Text : Variable.Dynamic.Dynamic_UTF8_Handler
               with Import, Convention => Ada, Address => Self'Address;
 
          begin
@@ -746,4 +747,4 @@ package body VSS.Implementation.Text_Handlers.UTF8.Static is
       return Self.Size;
    end UTF8_Size;
 
-end VSS.Implementation.Text_Handlers.UTF8.Static;
+end VSS.Implementation.Text_Handlers.UTF8.Variable.Static;

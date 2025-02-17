@@ -8,10 +8,10 @@ pragma Ada_2022;
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.Implementation.Text_Handlers.UTF8.Static;
+with VSS.Implementation.Text_Handlers.UTF8.Variable.Static;
 with VSS.Strings;
 
-package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
+package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
 
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
@@ -586,7 +586,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
 
       if Size <= Static.In_Place_Storage_Capacity then
          declare
-            Static : UTF8.Static.Static_UTF8_Handler := (others => <>)
+            Static : Variable.Static.Static_UTF8_Handler := (others => <>)
               with Address => Target_Data.Storage'Address;
 
          begin
@@ -796,4 +796,4 @@ package body VSS.Implementation.Text_Handlers.UTF8.Dynamic is
       return Self.Pointer.Size;
    end UTF8_Size;
 
-end VSS.Implementation.Text_Handlers.UTF8.Dynamic;
+end VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;

@@ -8,7 +8,7 @@
 
 pragma Ada_2022;
 
-package VSS.Implementation.Text_Handlers.UTF8.Static is
+package VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
 
    pragma Preelaborate;
 
@@ -22,9 +22,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Static is
      VSS.Implementation.Strings.Character_Count
        range 0 .. In_Place_Storage_Capacity;
 
-   type Static_UTF8_Handler is
-     new VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text with
-   record
+   type Static_UTF8_Handler is new Abstract_UTF8_Text with record
       Storage :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
           (0 .. In_Place_Storage_Capacity) := [others => 0];
@@ -164,4 +162,4 @@ package VSS.Implementation.Text_Handlers.UTF8.Static is
         VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
       Size    : out VSS.Unicode.UTF8_Code_Unit_Count);
 
-end VSS.Implementation.Text_Handlers.UTF8.Static;
+end VSS.Implementation.Text_Handlers.UTF8.Variable.Static;

@@ -8,7 +8,7 @@
 
 with System.Atomic_Counters;
 
-package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
+package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
 
    pragma Preelaborate;
 
@@ -32,9 +32,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    pragma Warnings (Off, "bits of ""Dynamic_UTF8_Handler"" unused");
    --  Size of the text handler object is fixed.
 
-   type Dynamic_UTF8_Handler is
-     new VSS.Implementation.Text_Handlers.UTF8.Abstract_UTF8_Text with
-   record
+   type Dynamic_UTF8_Handler is new Abstract_UTF8_Text with record
       Pointer : UTF8_String_Data_Access;
    end record with Object_Size => 192;
 
@@ -205,4 +203,4 @@ package VSS.Implementation.Text_Handlers.UTF8.Dynamic is
    --  Content of the data will be copied, and old storage block will be
    --  unreferenced (and deallocated if it is no longer used).
 
-end VSS.Implementation.Text_Handlers.UTF8.Dynamic;
+end VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;

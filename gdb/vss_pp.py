@@ -18,10 +18,10 @@ class Virtual_String_Printer(base):
             "vss.implementation.text_handlers.abstract_text_handler"
         )
         utf8static_type = gdb.lookup_type(
-            "vss.implementation.text_handlers.utf8.static.static_utf8_handler"
+            "vss.implementation.text_handlers.utf8.variable.static.static_utf8_handler"
         )
         utf8dynamic_type = gdb.lookup_type(
-            "vss.implementation.text_handlers.utf8.dynamic.dynamic_utf8_handler"
+            "vss.implementation.text_handlers.utf8.variable.dynamic.dynamic_utf8_handler"
         )
 
         storage = self._val["data"]["storage"]

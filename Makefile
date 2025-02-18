@@ -124,7 +124,8 @@ check_json:
 	         `find data/json5-tests -name '*.js'` \
 	         `find data/json5-tests -name '*.txt'` \
 		 testsuite/json/JSONTestSuite/test_parsing/*.json \
-		 testsuite/json/JSON_checker/test/*.json; \
+		 testsuite/json/JSON_checker/test/*.json \
+		 testsuite/json/AdaCore/test/*.json; \
 		do echo -n "`basename $$f` (JSON): "; \
 		testsuite/run_json_reader_test $$f || touch .objs/tests/.fails; \
 		echo -n "`basename $$f` (JSON5): "; \

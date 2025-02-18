@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,6 +11,8 @@ with Interfaces.C;
 
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
+with VSS.Strings.Formatters.Strings;
+with VSS.Strings.Templates;
 
 package body VSS.Text_Streams.File_Input is
 
@@ -187,7 +189,16 @@ package body VSS.Text_Streams.File_Input is
            C_R_Mode (C_R_Mode'First)'Address);
 
       if Self.Stream = Interfaces.C_Streams.NULL_Stream then
-         Self.Error := "Unable to open file";
+         declare
+            Template : constant
+              VSS.Strings.Templates.Virtual_String_Template :=
+                "Unable to open file '{}'";
+
+         begin
+            Self.Error :=
+              Template.Format
+                (VSS.Strings.Formatters.Strings.Image (Name));
+         end;
 
       elsif not Self.Decoder.Is_Valid then
          Self.Decoder.Initialize ("utf-8");

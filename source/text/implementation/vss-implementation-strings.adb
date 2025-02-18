@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -31,6 +31,11 @@ package body VSS.Implementation.Strings is
      VSS.Implementation.Text_Handlers.Nul.Null_Handler;
    --  Global null text handler object to be used to process uninitialized
    --  string data.
+
+   function Internal_Variable_Handler
+     (Data : in out String_Data) return not null Variable_Text_Handler_Access
+        with Inline_Always;
+   --  Like `Variable_Handler`, but storage must be initialized.
 
    ---------
    -- "=" --
@@ -156,6 +161,20 @@ package body VSS.Implementation.Strings is
       end if;
    end Fixup_Insert;
 
+   -------------------------------
+   -- Internal_Variable_Handler --
+   -------------------------------
+
+   function Internal_Variable_Handler
+     (Data : in out String_Data)
+      return not null Variable_Text_Handler_Access is
+   begin
+      return
+        Variable_Text_Handler_Access
+          (Address_To_Text_Handler_Conversions.To_Pointer
+             (Data.Storage'Address));
+   end Internal_Variable_Handler;
+
    --------------------
    -- Is_Initialized --
    --------------------
@@ -187,13 +206,7 @@ package body VSS.Implementation.Strings is
    procedure Reference (Data : in out String_Data) is
    begin
       if Is_Initialized (Data) then
-         declare
-            Text : constant Variable_Text_Handler_Access :=
-              Variable_Handler (Data);
-
-         begin
-            Text.Reference;
-         end;
+         Internal_Variable_Handler (Data).Reference;
       end if;
    end Reference;
 
@@ -204,7 +217,7 @@ package body VSS.Implementation.Strings is
    procedure Unreference (Data : in out String_Data) is
    begin
       if Is_Initialized (Data) then
-         Variable_Handler (Data).Unreference;
+         Internal_Variable_Handler (Data).Unreference;
          Data := Null_String_Data;
       end if;
    end Unreference;
@@ -239,10 +252,7 @@ package body VSS.Implementation.Strings is
          Unsafe_Initialize (Data);
       end if;
 
-      return
-        Variable_Text_Handler_Access
-          (Address_To_Text_Handler_Conversions.To_Pointer
-             (Data.Storage'Address));
+      return Internal_Variable_Handler (Data);
    end Variable_Handler;
 
 end VSS.Implementation.Strings;

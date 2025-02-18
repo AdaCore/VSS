@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -325,7 +325,11 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      null;
 
                   when Solidus =>
-                     raise Program_Error;
+                     if not Parse_Comment (Self) then
+                        return
+                          Self.Push
+                            (Parse_Array'Access, Array_State'Pos (State));
+                     end if;
 
                   when Begin_Array
                      | Begin_Object
@@ -1350,7 +1354,11 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      null;
 
                   when Solidus =>
-                     raise Program_Error;
+                     if not Parse_Comment (Self) then
+                        return
+                          Self.Push
+                            (Parse_Object'Access, Object_State'Pos (State));
+                     end if;
 
                   when Name_Separator =>
                      State := Member_Value;
@@ -1380,7 +1388,11 @@ package body VSS.JSON.Implementation.Parsers.JSON5 is
                      null;
 
                   when Solidus =>
-                     raise Program_Error;
+                     if not Parse_Comment (Self) then
+                        return
+                          Self.Push
+                            (Parse_Object'Access, Object_State'Pos (State));
+                     end if;
 
                   when Value_Separator =>
                      State := Member_Or_End_Object;

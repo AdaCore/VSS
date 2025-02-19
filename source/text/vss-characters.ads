@@ -82,7 +82,7 @@ package VSS.Characters is
    function Is_Valid_Virtual_Character
      (Self : Virtual_Character'Base) return Boolean;
    --  Returns True when given character is inside the range of the allowed
-   --  characters and outside of the range of the
+   --  characters and outside of the range of the surrogates.
 
    function Get_General_Category
      (Self : Virtual_Character'Base) return General_Category;

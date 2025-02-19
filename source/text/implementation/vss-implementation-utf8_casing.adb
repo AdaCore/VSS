@@ -130,6 +130,13 @@ package body VSS.Implementation.UTF8_Casing is
                VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
                Result);
 
+         when Simple_Case_Folding =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Self.Pointer.Storage,
+               Self.Pointer.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Case_Folding_Index,
+               Result);
+
          when NFKC_Casefold =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
               (Self.Pointer.Storage,
@@ -216,6 +223,13 @@ package body VSS.Implementation.UTF8_Casing is
               (Self.Storage,
                Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
+               Result);
+
+         when Simple_Case_Folding =>
+            VSS.Implementation.UTF8_Casing.Convert_Case_Simple
+              (Self.Storage,
+               Self.Size,
+               VSS.Implementation.UCD_Casing_UTF8.Simple_Case_Folding_Index,
                Result);
 
          when NFKC_Casefold =>
@@ -485,6 +499,24 @@ package body VSS.Implementation.UTF8_Casing is
                        .Get_Simplified_Case_Mapping_Information
                          (VSS.Implementation.UCD_Casing_UTF8
                             .Simple_Uppercase_Index,
+                          Code);
+
+            begin
+               Changes := Info.Changes;
+               Length  := Info.Length;
+               Offset  := Info.Offset;
+               Size    := Info.Count;
+            end;
+
+         when Simple_Case_Folding =>
+            declare
+               Info : constant
+                 VSS.Implementation.UCD_Casing_UTF8
+                   .Simplified_Mapping_Information :=
+                     VSS.Implementation.UTF8_Casing.
+                       Get_Simplified_Case_Mapping_Information
+                         (VSS.Implementation.UCD_Casing_UTF8
+                            .Simple_Case_Folding_Index,
                           Code);
 
             begin

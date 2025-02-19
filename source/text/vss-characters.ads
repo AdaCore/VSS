@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -149,6 +149,10 @@ package VSS.Characters is
    function Get_Simple_Uppercase_Mapping
      (Self : Virtual_Character) return Virtual_Character;
    --  Return value of the Simple_Uppercase_Mapping property of the character.
+
+   function Get_Simple_Case_Folding
+     (Self : Virtual_Character) return Virtual_Character;
+   --  Return value of the Simple_Case_Folding property of the character.
 
    function Is_Graphic (Self : Virtual_Character) return Boolean;
    --  Return True when character belong to Graphic type, which includes

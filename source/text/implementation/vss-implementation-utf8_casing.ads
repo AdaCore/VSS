@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -19,6 +19,7 @@ package VSS.Implementation.UTF8_Casing is
      (Simple_Lowercase,
       Simple_Titlecase,
       Simple_Uppercase,
+      Simple_Case_Folding,
       NFKC_Casefold,
       Lowercase,
       Titlecase,

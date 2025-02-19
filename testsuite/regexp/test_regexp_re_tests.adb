@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -66,6 +66,40 @@ procedure Test_RegExp_RE_Tests is
    function Expand_Sample (Value : VSS.Strings.Virtual_String)
      return VSS.Strings.Virtual_String
    is
+      procedure Argument
+        (Item  : VSS.Strings.Virtual_String;
+         Value : out VSS.Strings.Virtual_String;
+         Rest  : out VSS.Strings.Virtual_String);
+      --  If Item containis `?{aaa}bbb` return Value=aaa and Rest=bbb.
+
+      function Char (Pos : Positive) return VSS.Characters.Virtual_Character is
+        (VSS.Characters.Virtual_Character'Val (Pos));
+
+      --------------
+      -- Argument --
+      --------------
+
+      procedure Argument
+        (Item  : VSS.Strings.Virtual_String;
+         Value : out VSS.Strings.Virtual_String;
+         Rest  : out VSS.Strings.Virtual_String)
+      is
+         use type VSS.Characters.Virtual_Character;
+
+         X : VSS.Strings.Character_Iterators.Character_Iterator :=
+           Item.At_First_Character;
+      begin
+         if X.Forward then --  Skip x
+            while X.Forward and then X.Element /= '}' loop
+               Value.Append (X.Element);
+            end loop;
+
+            if X.Forward then --  Skip }
+               Rest.Append (Item.Slice (X, Item.At_Last_Character));
+            end if;
+         end if;
+      end Argument;
+
       List : constant VSS.String_Vectors.Virtual_String_Vector :=
         Value.Split ('\');
 
@@ -75,28 +109,36 @@ procedure Test_RegExp_RE_Tests is
       for J in 2 .. List.Length loop
          if List (J).Starts_With ("x{") then
             declare
-               use type VSS.Characters.Virtual_Character;
-
-               Item  : constant VSS.Strings.Virtual_String := List (J);
                Value : VSS.Strings.Virtual_String;
-               X     : VSS.Strings.Character_Iterators.Character_Iterator :=
-                 Item.At_First_Character;
             begin
-               if X.Forward then --  Skip x
-                  while X.Forward and then X.Element /= '}' loop
-                     Value.Append (X.Element);
-                  end loop;
+               Argument (List (J), Value, Result);
 
-                  Result.Append
-                    (VSS.Characters.Virtual_Character'Val
-                      (Positive'Value
-                        ("16#" &
-                         VSS.Strings.Conversions.To_UTF_8_String (Value) &
-                         "#")));
+               Result.Prepend
+                 (Char
+                   (Positive'Value
+                     ("16#" &
+                      VSS.Strings.Conversions.To_UTF_8_String (Value) &
+                      "#")));
+            end;
+         elsif List (J).Starts_With ("N{") then
+            declare
+               use type VSS.Strings.Virtual_String;
+               Value : VSS.Strings.Virtual_String;
+            begin
+               Argument (List (J), Value, Result);
 
-                  if X.Forward then --  Skip }
-                     Result.Append (Item.Slice (X, Item.At_Last_Character));
-                  end if;
+               if Value = "KELVIN SIGN" then
+                  Result.Prepend (Char (16#212A#));
+               elsif Value = "LATIN SMALL LIGATURE ST" then
+                  Result.Prepend (Char (16#FB06#));
+               elsif Value = "LATIN SMALL LIGATURE LONG S T" then
+                  Result.Prepend (Char (16#FB05#));
+               elsif Value = "LATIN SMALL LETTER LONG S" then
+                  Result.Prepend (Char (16#017F#));
+               elsif Value = "SPACE" then
+                  Result.Prepend (Char (16#20#));
+               else
+                  Result.Prepend ("\N{" & Value & "}");
                end if;
             end;
          elsif List (J).Starts_With ("n") then
@@ -187,8 +229,7 @@ procedure Test_RegExp_RE_Tests is
          end;
       end if;
 
-      Sample := List (2);
-      Sample := Expand_Sample (Sample);
+      Sample := Expand_Sample (List (2));
 
       declare
          Status : constant VSS.Strings.Virtual_String := List (3);

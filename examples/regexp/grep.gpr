@@ -1,4 +1,4 @@
-
+with "vss_common";
 with "vss_regexp.gpr";
 
 project Grep is
@@ -8,7 +8,7 @@ project Grep is
 
    package Compiler is
       for Switches ("Ada") use ("-g", "-gnatW8") &
-        VSS_RegExp.Compiler'Switches ("Ada");
+        VSS_Common.Compiler'Switches ("Ada");
    end Compiler;
 
 end Grep;

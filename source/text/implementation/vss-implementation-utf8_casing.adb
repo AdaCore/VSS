@@ -33,7 +33,7 @@ package body VSS.Implementation.UTF8_Casing is
         VSS.Implementation.Text_Handlers.UTF8.Variable.Static
           .Static_UTF8_Handler);
 
-   --  ------------------
+   ------------------
    -- Convert_Case --
    ------------------
 

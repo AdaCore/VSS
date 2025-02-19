@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -302,7 +302,9 @@ package body VSS.Regular_Expressions.Pike_Engines is
          loop
             declare
                Char : constant VSS.Characters.Virtual_Character :=
-                 Cursor.Element;
+                 (if Self.Caseless
+                  then VSS.Characters.Get_Simple_Case_Folding (Cursor.Element)
+                  else Cursor.Element);
 
                --  Shift Cursor, so it points to the next character after Char
                Again : constant Boolean := Cursor.Forward;
@@ -491,6 +493,13 @@ package body VSS.Regular_Expressions.Pike_Engines is
    is
       use type Instruction_Vectors.Vector;
 
+      function Fix_Case (Value : VSS.Characters.Virtual_Character)
+        return VSS.Characters.Virtual_Character is
+          (if Options (Case_Insensitive)
+           then VSS.Characters.Get_Simple_Case_Folding (Value)
+           else Value);
+      --  Convert character case if we have Case_Insensitive flag.
+
       --  For each AST subtree we generate a piece of program.
       --  Some instructions in the piece are left unlinked.
       --  They should be patched to link them to instructions in other pieces.
@@ -639,7 +648,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Code : constant Instruction :=
            (Kind      => Character,
             Next      => To_Be_Patched,
-            Character => Value);
+            Character => Fix_Case (Value));
       begin
          return
            (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
@@ -652,8 +661,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
          Code : constant Instruction :=
            (Kind => Class,
             Next => To_Be_Patched,
-            From => From,
-            To   => To);
+            From => Fix_Case (From),
+            To   => Fix_Case (To));
       begin
          return
            (Program => Instruction_Vectors.To_Vector (Code, Length => 1),
@@ -870,6 +879,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
         Pattern.At_First_Character;
 
    begin
+      Self.Caseless := Options (Case_Insensitive);
       Self.Last_Tag := 2;
 
       Parser.Parse_Pattern

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -85,6 +85,7 @@ private
       Max_Threads : Positive;    --  Threads required to execute
       Program     : Instruction_Array_Access;
       --  The program executes starting from program address = 1
+      Caseless    : Boolean;
    end record;
 
    overriding procedure Parse

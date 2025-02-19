@@ -1,12 +1,14 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with Ada.Command_Line;
+with Ada.Containers;
 with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
+with UCD.Case_Folding_Loader;
 with UCD.Characters;
 with UCD.Derived_Core_Properties_Loader;
 with UCD.Derived_General_Category_Loader;
@@ -59,6 +61,8 @@ procedure Test_Characters is
          UCD.Property_Value_Aliases_Loader.Load_Missing (UCD_Root);
          UCD.Derived_General_Category_Loader.Load (UCD_Root);
          UCD.Derived_Core_Properties_Loader.Load (UCD_Root);
+
+         UCD.Case_Folding_Loader.Load (UCD_Root);
 
          UCD_Loaded := True;
       end;
@@ -170,6 +174,10 @@ procedure Test_Characters is
          Cased_N            : constant UCD.Properties.Property_Value_Access :=
            UCD.Properties.Resolve (Cased_Property, "N");
 
+         Simple_Case_Folding_Property : constant
+           UCD.Properties.Property_Access :=
+             UCD.Properties.Resolve ("Simple_Case_Folding");
+
       begin
          for Character in VSS.Characters.Virtual_Character'First_Valid
                             .. VSS.Characters.Virtual_Character'Last_Valid
@@ -232,6 +240,35 @@ procedure Test_Characters is
                     (VSS.Characters.Virtual_Character'Pos (Character),
                      Cased_Property) = Cased_N);
             end if;
+
+            --  Simple case folding
+
+            if VSS.Characters.Is_Valid_Virtual_Character (Character) then
+               declare
+                  use type Ada.Containers.Count_Type;
+                  use type VSS.Characters.Virtual_Character;
+
+                  V : constant UCD.Properties.Property_Value_Access :=
+                    UCD.Characters.Get
+                      (VSS.Characters.Virtual_Character'Pos (Character),
+                       Simple_Case_Folding_Property);
+                  M : constant VSS.Characters.Virtual_Character :=
+                    VSS.Characters.Get_Simple_Case_Folding (Character);
+
+               begin
+                  if V = null then
+                     --  No specific mapping defined, character maps to itself
+
+                     Test_Support.Assert (Character = M);
+
+                  else
+                     Test_Support.Assert (V.String.Length = 1);
+                     Test_Support.Assert
+                       (VSS.Characters.Virtual_Character'Val (V.String (1))
+                          = M);
+                  end if;
+               end;
+            end if;
          end loop;
       end;
    end Test_Properties;
@@ -286,6 +323,14 @@ procedure Test_Characters is
         (VSS.Characters.Get_Simple_Uppercase_Mapping
            (VSS.Characters.Virtual_Character'Val (16#61#))
          = VSS.Characters.Virtual_Character'Val (16#41#));
+      Test_Support.Assert
+        (VSS.Characters.Get_Simple_Case_Folding
+           (VSS.Characters.Virtual_Character'Val (16#61#))
+         = VSS.Characters.Virtual_Character'Val (16#61#));
+      Test_Support.Assert
+        (VSS.Characters.Get_Simple_Case_Folding
+           (VSS.Characters.Virtual_Character'Val (16#41#))
+         = VSS.Characters.Virtual_Character'Val (16#61#));
 
       Test_Support.Assert
         (VSS.Characters.Get_Lowercase_Mapping ('А') = "а");

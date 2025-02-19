@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2024, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -165,6 +165,34 @@ package body VSS.Characters is
          VSS.Implementation.Strings.Unreference (Data);
       end return;
    end Get_Lowercase_Mapping;
+
+   -----------------------------
+   -- Get_Simple_Case_Folding --
+   -----------------------------
+
+   function Get_Simple_Case_Folding
+     (Self : Virtual_Character) return Virtual_Character
+   is
+      Data     : VSS.Implementation.Strings.String_Data;
+      Position : aliased VSS.Implementation.Strings.Cursor;
+      Success  : Boolean with Unreferenced;
+
+   begin
+      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
+        (Virtual_Character'Pos (Self),
+         VSS.Implementation.UTF8_Casing.Simple_Case_Folding,
+         Data);
+
+      VSS.Implementation.Strings.Constant_Handler
+        (Data).Before_First_Character (Position);
+      Success :=
+        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
+
+      return
+        Virtual_Character'Val
+          (VSS.Implementation.Strings.Constant_Handler
+             (Data).Element (Position));
+   end Get_Simple_Case_Folding;
 
    ----------------------------------
    -- Get_Simple_Lowercase_Mapping --

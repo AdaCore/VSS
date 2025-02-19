@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -58,13 +58,15 @@ package VSS.Unicode is
    --  Limits possible values to the range of the Unicode Code Points: any code
    --  with value in range 16#00_0000# .. 16#10_FFFF#.
 
+   subtype Surrogate_Character is Code_Point_Character
+     range Code_Point_Character'Val (16#D800#)
+             .. Code_Point_Character'Val (16#DFFF#);
+   --  Range of the surrogate range (16#00_D800# .. 16#DFFF#).
+
    subtype Scalar_Value_Character is Code_Point_Character
      with Static_Predicate =>
-       Scalar_Value_Character
-         not in Code_Point_Character'Val (16#D800#)
-                  .. Code_Point_Character'Val (16#DF00#);
+       Scalar_Value_Character not in Surrogate_Character;
    --  Limits possible values to the range of the Unicode Scalar Values: any
-   --  Unicode code points outside of the surrogate range (16#00_D800# ..
-   --  16#DFFF#).
+   --  Unicode code points outside of the surrogate range.
 
 end VSS.Unicode;

@@ -41,6 +41,17 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    --  Lookup for previous line. Position points to the first character of
    --  the line of the current line.
 
+   --------------
+   -- Backward --
+   --------------
+
+   overriding function Backward (Self : in out Line_Iterator) return Boolean is
+   begin
+      Lookup_Previous_Line (Self, Self.First_Position);
+
+      return VSS.Strings.Character_Count (Self.First_Position.Index) /= 0;
+   end Backward;
+
    ------------------------
    -- Element_Terminator --
    ------------------------
@@ -101,15 +112,20 @@ package body VSS.Strings.Cursors.Iterators.Lines is
    -----------------
 
    overriding function Has_Element (Self : Line_Iterator) return Boolean is
-      use type VSS.Implementation.Strings.Character_Count;
+      Data : VSS.Implementation.Strings.String_Data;
+      Text : VSS.Implementation.Strings.Constant_Text_Handler_Access;
 
    begin
-      return
-        not VSS.Implementation.Strings.Is_Invalid (Self.First_Position)
-          and then Self.First_Position.Index
-                     <= VSS.Implementation.Strings.Character_Count
-                          (VSS.Strings.Magic_String_Access
-                             (Self.Owner).Character_Length);
+      if Self.Owner = null then
+         --  Uninitialized iterator.
+
+         return False;
+      end if;
+
+      Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Text := VSS.Implementation.Strings.Constant_Handler (Data);
+
+      return Self.First_Position.Index in 1 .. Text.Length;
    end Has_Element;
 
    -------------------------
@@ -157,7 +173,17 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Self.Terminators     := Terminators;
       Self.Keep_Terminator := Keep_Terminator;
 
-      if Current_Position.Index /= 1 then
+      if Position.Index = 0 then
+         --  Before first character
+
+         Self.First_Position :=
+           VSS.Implementation.Strings.Position_Before_First_Character;
+         Self.Last_Position  :=
+           VSS.Implementation.Strings.Position_Before_First_Character;
+
+         return;
+
+      elsif Current_Position.Index /= 1 then
          --  Going backward till previous line terminator has been found.
 
          Dummy := Handler.Forward (Current_Position);
@@ -249,7 +275,7 @@ package body VSS.Strings.Cursors.Iterators.Lines is
          Last_Position,
          Terminator_Position)
       then
-         raise Program_Error;
+         null;
       end if;
 
       if VSS.Implementation.Strings.Is_Invalid (Terminator_Position) then

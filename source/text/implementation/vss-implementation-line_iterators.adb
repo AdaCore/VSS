@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2024, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -45,8 +45,10 @@ package body VSS.Implementation.Line_Iterators is
       if not Handler.Backward (Current_Position) then
          --  There is no any characters before initial position.
 
-         First_Position      := (others => <>);
-         Last_Position       := (others => <>);
+         First_Position      :=
+           VSS.Implementation.Strings.Position_Before_First_Character;
+         Last_Position       :=
+           VSS.Implementation.Strings.Position_Before_First_Character;
          Terminator_Position := (others => <>);
 
          return False;
@@ -154,8 +156,6 @@ package body VSS.Implementation.Line_Iterators is
          end if;
       end if;
 
-      LF_Found := False;
-
       while Handler.Backward (Current_Position) loop
          declare
             C : constant VSS.Unicode.Code_Point :=
@@ -166,135 +166,48 @@ package body VSS.Implementation.Line_Iterators is
             case C is
                when Line_Feed =>
                   if Terminators (VSS.Strings.LF) then
-                     --  ??? Commented-out code
-                     --  LF_Found := True;
-                     --  First_Position := Current_Position;
-                     --  D := Handler.Forward (Data, First_Position);
-
                      exit;
 
                   elsif Terminators (VSS.Strings.CRLF) then
-                     raise Program_Error;
+                     Aux_Position := Current_Position;
+
+                     if Handler.Backward (Aux_Position) then
+                        if Handler.Element (Aux_Position)
+                             = Carriage_Return
+                        then
+                           exit;
+                        end if;
+                     end if;
 
                   else
                      raise Program_Error;
                   end if;
-
-                  --  ??? Commented-out code
-
-                  --  if Terminators (VSS.Strings.CRLF) then
-                  --     LF_Found := True;
-                  --     First_Position := Current_Position;
-                  --     D := Handler.Forward (Data, First_Position);
-                  --
-                  --  elsif Terminators (VSS.Strings.LF) then
-                  --     raise Program_Error;
-                  --  else
-                  --     raise Program_Error;
-                  --  end if;
 
                when Line_Tabulation =>
-                  if Terminators (VSS.Strings.VT) then
-                     --  ??? Commented-out code
-
-                     --  First_Position := Current_Position;
-                     --  D := Handler.Forward (Data, First_Position);
-                     --
-                     --  return True;
-                     exit;
-
-                  else
-                     --  ??? Commented-out code
-                     --  LF_Found := False;
-
-                     --  CodePeer reports here that LF_Found is always false
-                     --  (same for the 4 other occurrences of LF_Found below)
-                     if LF_Found then
-                        raise Program_Error;
-                     end if;
-                  end if;
+                  exit when Terminators (VSS.Strings.VT);
 
                when Form_Feed =>
-                  if Terminators (VSS.Strings.FF) then
-                     --  ??? Commented-out code
-                  --     First_Position := Current_Position;
-                  --     D := Handler.Forward (Data, First_Position);
-                  --
-                  --     --  return True;
-                     exit;
-                  else
-                     if LF_Found then
-                        raise Program_Error;
-                     end if;
-                  end if;
+                  exit when Terminators (VSS.Strings.FF);
 
                when Carriage_Return =>
-                  if Terminators (VSS.Strings.CR) then
-                     --  ??? Commented-out code
-                     --  First_Position := Current_Position;
-                     --  D := Handler.Forward (Data, First_Position);
-                     --
-                     --  return True;
-                     exit;
-
-                  else
-                     raise Program_Error;
-                  end if;
+                  exit when Terminators (VSS.Strings.CR);
 
                when Next_Line =>
-                  if Terminators (VSS.Strings.NEL) then
-                     First_Position := Current_Position;
-                     D := Handler.Forward (First_Position);
-
-                     exit;
-
-                  else
-                     raise Program_Error;
-                  end if;
+                  exit when Terminators (VSS.Strings.NEL);
 
                when Line_Separator =>
-                  if Terminators (VSS.Strings.LS) then
-                     --  ??? Commented-out code
-                     --  First_Position := Current_Position;
-                     --  D := Handler.Forward (Data, First_Position);
-                     --
-                     exit;
-
-                  else
-                     if LF_Found then
-                        raise Program_Error;
-                     end if;
-                  end if;
+                  exit when Terminators (VSS.Strings.LS);
 
                when Paragraph_Separator =>
-                  if Terminators (VSS.Strings.PS) then
-                     --  ??? Commented-out code
-                     --  First_Position := Current_Position;
-                     --  D := Handler.Forward (Data, First_Position);
-                     --
-                     exit;
-
-                  else
-                     raise Program_Error;
-                  end if;
+                  exit when Terminators (VSS.Strings.PS);
 
                when others =>
-                  if LF_Found then
-                     raise Program_Error;
-                  end if;
-                     --  ??? Commented-out code
-                  --  if LF_Found then
-                  --     return True;
-                  --  end if;
+                  null;
             end case;
 
             First_Position := Current_Position;
          end;
       end loop;
-
-      if LF_Found then
-         raise Program_Error;
-      end if;
 
       return True;
    end Backward;

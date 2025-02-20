@@ -54,6 +54,7 @@ For use JSON streaming API:
 ## Documentation
 
 * [API Reference](https://adacore.github.io/VSS/)
+* [Tips & Tricks](docs/Tips_and_Tricks.md)
 
 ## Maintainers
 

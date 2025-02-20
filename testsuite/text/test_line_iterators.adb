@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -153,11 +153,26 @@ procedure Test_Line_Iterators is
    Expected_3 : constant Expected_Array :=
      [1 => (1, 16, 16, 16, True, LF_String)];
 
+   procedure Test_Forward_Backward
+     (Source_String   : VSS.Strings.Virtual_String;
+      Expected_Result : Expected_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean);
+   --  Run `Test_Forward` and `Test_Backward`
+
    procedure Test_Forward
      (Source_String   : VSS.Strings.Virtual_String;
       Expected_Result : Expected_Array;
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean);
+   --  Check forward iteration.
+
+   procedure Test_Backward
+     (Source_String   : VSS.Strings.Virtual_String;
+      Expected_Result : Expected_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean);
+   --  Check backward iteration.
 
    procedure Test_Forward_Restart
      (Source_String   : VSS.Strings.Virtual_String;
@@ -169,6 +184,55 @@ procedure Test_Line_Iterators is
    procedure Test_U902_007;
    --  Run test of line terminator sequence for single line without line
    --  terminator.
+
+   -------------------
+   -- Test_Backward --
+   -------------------
+
+   procedure Test_Backward
+     (Source_String   : VSS.Strings.Virtual_String;
+      Expected_Result : Expected_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean)
+   is
+      use type VSS.Strings.Virtual_String;
+
+      J : VSS.Strings.Line_Iterators.Line_Iterator :=
+        Source_String.At_Last_Line (Terminators, Keep_Terminator);
+      C : Natural := Expected_Result'Last;
+
+   begin
+      loop
+         Test_Support.Assert (J.Has_Element);
+         Test_Support.Assert
+           (J.First_Character_Index
+              = Expected_Result (C).Line_First_Character);
+         Test_Support.Assert
+           (J.Last_Character_Index = Expected_Result (C).Line_Last_Character);
+         Test_Support.Assert
+           (J.Terminator_First_Character_Index
+              = Expected_Result (C).Terminator_First_Character);
+         Test_Support.Assert
+           (J.Terminator_Last_Character_Index
+              = Expected_Result (C).Terminator_Last_Character);
+         Test_Support.Assert
+           (J.Has_Line_Terminator = Expected_Result (C).Has_Line_Terminator);
+         Test_Support.Assert
+           (J.Element_Terminator = Expected_Result (C).Terminator_String);
+
+         C := C - 1;
+
+         exit when not J.Backward;
+      end loop;
+
+      Test_Support.Assert (not J.Has_Element);
+      Test_Support.Assert (C = 0);
+      Test_Support.Assert (not J.Backward);
+      Test_Support.Assert (not J.Has_Element);
+      Test_Support.Assert (J.First_Character_Index = 0);
+      Test_Support.Assert (J.Last_Character_Index = 0);
+      Test_Support.Assert (not J.Has_Line_Terminator);
+   end Test_Backward;
 
    ------------------
    -- Test_Forward --
@@ -271,6 +335,22 @@ procedure Test_Line_Iterators is
       end if;
    end Test_Forward;
 
+   ---------------------------
+   -- Test_Forward_Backward --
+   ---------------------------
+
+   procedure Test_Forward_Backward
+     (Source_String   : VSS.Strings.Virtual_String;
+      Expected_Result : Expected_Array;
+      Terminators     : VSS.Strings.Line_Terminator_Set;
+      Keep_Terminator : Boolean) is
+   begin
+      Test_Forward
+        (Source_String, Expected_Result, Terminators, Keep_Terminator);
+      Test_Backward
+        (Source_String, Expected_Result, Terminators, Keep_Terminator);
+   end Test_Forward_Backward;
+
    --------------------------
    -- Test_Forward_Restart --
    --------------------------
@@ -282,9 +362,6 @@ procedure Test_Line_Iterators is
       Keep_Terminator : Boolean;
       Restart_Line    : Positive)
    is
-      --  J : VSS.Strings.Line_Iterators.Line_Iterator :=
-      --    Source_String.First_Line (Terminators, Keep_Terminator);
-
       M : VSS.Strings.Markers.Character_Marker;
 
    begin
@@ -382,24 +459,27 @@ procedure Test_Line_Iterators is
    end Test_U902_007;
 
 begin
-   Test_Forward (Source_1, Expected_1_1, VSS.Strings.New_Line_Function, False);
-   Test_Forward (Source_1, Expected_1_2, VSS.Strings.New_Line_Function, True);
-   Test_Forward (Source_1, Expected_1_3, [others => True], False);
-   Test_Forward (Source_1, Expected_1_4, [others => True], True);
+   Test_Forward_Backward
+     (Source_1, Expected_1_1, VSS.Strings.New_Line_Function, False);
+   Test_Forward_Backward
+     (Source_1, Expected_1_2, VSS.Strings.New_Line_Function, True);
+   Test_Forward_Backward (Source_1, Expected_1_3, [others => True], False);
+   Test_Forward_Backward (Source_1, Expected_1_4, [others => True], True);
 
-   Test_Forward (CRLFCR, Expected_2_1, VSS.Strings.New_Line_Function, False);
-   Test_Forward
+   Test_Forward_Backward
+     (CRLFCR, Expected_2_1, VSS.Strings.New_Line_Function, False);
+   Test_Forward_Backward
      (CRLFCR,
       Expected_2_2,
       [VSS.Strings.CR | VSS.Strings.LF => True, others => False],
       False);
-   Test_Forward
+   Test_Forward_Backward
      (CRLFCR,
       Expected_2_3,
       [VSS.Strings.CRLF => True, others => False],
       False);
 
-   Test_Forward
+   Test_Forward_Backward
      (Pack,
       Expected_3,
       [VSS.Strings.CR | VSS.Strings.LF | VSS.Strings.CRLF => True,

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,9 +11,12 @@ with System.Storage_Elements;
 limited with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
-package VSS.Implementation.Strings is
+package VSS.Implementation.Strings
+  with Preelaborate
+is
 
-   pragma Preelaborate;
+   use type VSS.Unicode.UTF8_Code_Unit_Offset;
+   use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
    type Character_Offset is range -2 ** 30 .. 2 ** 30 - 1;
    subtype Character_Count is Character_Offset
@@ -62,6 +65,10 @@ package VSS.Implementation.Strings is
    --
    --  UTF8_Offset and UTF16_Offset components are put into the beginning to
    --  allow compiler to optimize operations on them with SIMD instructions.
+
+   Position_Before_First_Character : constant
+     VSS.Implementation.Strings.Cursor :=
+       (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
 
    function Is_Invalid (Self : Cursor) return Boolean;
    --  Return True when cursor has special invalid value.

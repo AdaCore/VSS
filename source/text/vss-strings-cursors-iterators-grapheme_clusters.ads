@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2024, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -46,9 +46,6 @@ package VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    --  Set iterator to point after the last grapheme cluster of the given
    --  string.
 
-   function Backward (Self : in out Grapheme_Cluster_Iterator) return Boolean;
-   --  Move iterator to previous grapheme cluster.
-
 private
 
    type Grapheme_Cluster_Iterator is new Abstract_Segment_Iterator with record
@@ -64,6 +61,9 @@ private
       Inserted : VSS.Implementation.Strings.Cursor_Offset);
 
    overriding function Forward
+     (Self : in out Grapheme_Cluster_Iterator) return Boolean;
+
+   overriding function Backward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean;
 
    overriding function Has_Element

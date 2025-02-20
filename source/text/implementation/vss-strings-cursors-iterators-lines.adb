@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2024, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -320,6 +320,30 @@ package body VSS.Strings.Cursors.Iterators.Lines is
       Dummy := Handler.Forward (Position);
       Self.Lookup_Line_Boundaries (Position, Terminators, Keep_Terminator);
    end Set_At_First;
+
+   -----------------
+   -- Set_At_Last --
+   -----------------
+
+   procedure Set_At_Last
+     (Self            : in out Line_Iterator;
+      On              : VSS.Strings.Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+   is
+      Handler  : constant not null
+        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
+          VSS.Implementation.Strings.Constant_Handler (On.Data);
+      Position : aliased VSS.Implementation.Strings.Cursor;
+      Dummy    : Boolean;
+
+   begin
+      Self.Reconnect (On'Unrestricted_Access);
+
+      Handler.After_Last_Character (Position);
+      Dummy := Handler.Backward (Position);
+      Self.Lookup_Line_Boundaries (Position, Terminators, Keep_Terminator);
+   end Set_At_Last;
 
    ---------------------
    -- String_Modified --

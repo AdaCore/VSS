@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -83,10 +83,11 @@ package VSS.Strings.Cursors.Iterators.Lines is
       Keep_Terminator : Boolean             := False);
    --  Initialize iterator to point at the line at the given position.
 
-   --  function At_Last
-   --    (Item            : VSS.Strings.Virtual_String'Class;
-   --     Terminators     : Line_Terminator_Set := New_Line_Function;
-   --     Keep_Terminator : Boolean := False) return Line_Iterator;
+   procedure Set_At_Last
+     (Self            : in out Line_Iterator;
+      On              : VSS.Strings.Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False);
    --  Create iterator pointing to the last line of the given string.
 
    --  function After_Last

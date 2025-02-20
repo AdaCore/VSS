@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -350,7 +350,6 @@ package body VSS.Strings is
          Result.Set_At_First (Self, Terminators, Keep_Terminator);
       end return;
    end At_First_Line;
-
    -------------------
    -- At_First_Word --
    -------------------
@@ -415,6 +414,21 @@ package body VSS.Strings is
          Result.Set_At_Last (Self);
       end return;
    end At_Last_Grapheme_Cluster;
+
+   ------------------
+   -- At_Last_Line --
+   ------------------
+
+   function At_Last_Line
+     (Self            : Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator is
+   begin
+      return Result : VSS.Strings.Cursors.Iterators.Lines.Line_Iterator do
+         Result.Set_At_Last (Self, Terminators, Keep_Terminator);
+      end return;
+   end At_Last_Line;
 
    ------------------
    -- At_Last_Word --

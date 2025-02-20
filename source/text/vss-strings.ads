@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -180,11 +180,15 @@ package VSS.Strings is
       return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
    --  Return iterator pointing to the line at given position.
 
-   --  function At_Last_Line
-   --    (Self            : Virtual_String'Class;
-   --     Terminators     : Line_Terminator_Set := New_Line_Function;
-   --     Keep_Terminator : Boolean := False)
-   --     return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+   function At_Last_Line
+     (Self            : Virtual_String'Class;
+      Terminators     : Line_Terminator_Set := New_Line_Function;
+      Keep_Terminator : Boolean := False)
+      return VSS.Strings.Cursors.Iterators.Lines.Line_Iterator;
+   --  Return iterator pointing to the last logincs line of the string. Last
+   --  logical line is a text before the last line terminator sequence when it
+   --  ends text, or a text after last line terminator sequence when it is not
+   --  ends text.
 
    overriding function "="
      (Left  : Virtual_String;

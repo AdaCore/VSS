@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2021, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -31,6 +31,10 @@ package VSS.Strings.Cursors.Iterators is
    function Forward
      (Self : in out Abstract_Segment_Iterator) return Boolean is abstract;
    --  Move cursor to the next segment
+
+   function Backward
+     (Self : in out Abstract_Segment_Iterator) return Boolean is abstract;
+   --  Move cursor to the previous segment
 
    function Has_Element
      (Self : Abstract_Segment_Iterator) return Boolean is abstract;

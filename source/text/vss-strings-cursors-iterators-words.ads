@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -12,9 +12,6 @@ package VSS.Strings.Cursors.Iterators.Words is
    pragma Preelaborate;
 
    type Word_Iterator is new Abstract_Segment_Iterator with private;
-
-   function Backward (Self : in out Word_Iterator) return Boolean;
-   --  Move iterator to previous word.
 
    function On_Whitespace (Self : Word_Iterator'Class) return Boolean;
    --  Returns True when current text element is sequence of horizontal
@@ -68,6 +65,8 @@ private
       Inserted : VSS.Implementation.Strings.Cursor_Offset);
 
    overriding function Forward (Self : in out Word_Iterator) return Boolean;
+
+   overriding function Backward (Self : in out Word_Iterator) return Boolean;
 
    overriding function Has_Element (Self : Word_Iterator) return Boolean;
 

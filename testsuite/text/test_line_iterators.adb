@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -282,9 +282,6 @@ procedure Test_Line_Iterators is
       Keep_Terminator : Boolean;
       Restart_Line    : Positive)
    is
-      --  J : VSS.Strings.Line_Iterators.Line_Iterator :=
-      --    Source_String.First_Line (Terminators, Keep_Terminator);
-
       M : VSS.Strings.Markers.Character_Marker;
 
    begin

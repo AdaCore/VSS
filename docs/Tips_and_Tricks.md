@@ -5,8 +5,8 @@
 
 Sometimes source text might have different kinds of line terminator sequences
 (VSS supports LF, CR, CRLF, NEL, VT, FF, LS, PS as line terminator sequences),
-but application might expected to use only one of them. It can be done by
-sequence of calls of `Split_Lines`.`Join_Lines` subprograms.
+but the application might expect to use only one of them. It can be done by
+a sequence of calls to `Split_Lines`.`Join_Lines` subprograms:
 
 
 ```ada

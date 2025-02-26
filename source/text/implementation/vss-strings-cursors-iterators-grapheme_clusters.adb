@@ -19,6 +19,16 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    use all type VSS.Implementation.UCD_Core.GCB_Values;
    use all type VSS.Implementation.UCD_Core.INCB_Values;
 
+   function Get_Data (X : VSS.Strings.Magic_String_Access)
+     return VSS.Implementation.Strings.String_Data
+        with No_Inline;
+   --  This function is a workaround for a bug in GCC 14 for AArch64 CPUs.
+   --  Under heavy optimization, the compiler generates buggy code in the
+   --  `Forward` function. The bug is reportedly resolved in GCC 15. This
+   --  workaround function should be removed after switching to GCC 15, as
+   --  it causes a performance penalty. See details in
+   --  https://github.com/AdaCore/ada_language_server/issues/1218
+
    procedure Lookup_Grapheme_Cluster_Boundaries
      (Self     : in out Grapheme_Cluster_Iterator'Class;
       Position : VSS.Implementation.Strings.Cursor);
@@ -471,7 +481,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
       end if;
 
-      Data    := VSS.Strings.Magic_String_Access (Self.Owner).Data;
+      Data    := Get_Data (VSS.Strings.Magic_String_Access (Self.Owner));
       Handler := VSS.Implementation.Strings.Constant_Handler (Data);
 
       Self.First_Position := Self.Last_Position;
@@ -550,6 +560,16 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          end if;
       end loop;
    end Forward;
+
+   --------------
+   -- Get_Data --
+   --------------
+
+   function Get_Data (X : VSS.Strings.Magic_String_Access)
+     return VSS.Implementation.Strings.String_Data is
+   begin
+      return X.Data;
+   end Get_Data;
 
    -----------------
    -- Has_Element --

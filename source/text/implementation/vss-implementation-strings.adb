@@ -12,8 +12,6 @@ with VSS.Implementation.Text_Handlers.Nul;
 package body VSS.Implementation.Strings is
 
    use type System.Storage_Elements.Integer_Address;
-   use type VSS.Unicode.UTF16_Code_Unit_Offset;
-   use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
    package Address_To_Text_Handler_Conversions is
      new System.Address_To_Access_Conversions

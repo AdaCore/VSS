@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -139,8 +139,8 @@ procedure Test_JSON_Pull_Reader is
    Input  : aliased Tests_Text_Streams.Memory_UTF8_Input_Stream;
    Count  : Natural := 0;
    Output : VSS.Text_Streams.File_Output.File_Output_Text_Stream;
-   Error  : VSS.Text_Streams.Output_Text_Stream'Class
-     renames VSS.Text_Streams.Standards.Standard_Error;
+   Error  : VSS.Text_Streams.Output_Text_Stream'Class :=
+     VSS.Text_Streams.Standards.Standard_Error;
 
 begin
    Command_Line.Initialize;

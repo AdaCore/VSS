@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -32,6 +32,20 @@ package VSS.XML.XmlAda_Readers is
    --  subpograms of the configured handlers.
    --
    --  This subprogram accepts XmlAda's input source.
+
+   procedure Enable_Namespace_Feature (Self : in out XmlAda_Reader'Class);
+   --  Enables `namespace` feature of the XmlAda's reader.
+
+   procedure Disable_Namespace_Feature (Self : in out XmlAda_Reader'Class);
+   --  Disables `namespace` feature of the XmlAda's reader.
+
+   procedure Enable_Namespace_Prefixes_Feature
+     (Self : in out XmlAda_Reader'Class);
+   --  Enables `namespace-prefixes` feature of the XmlAda's reader.
+
+   procedure Disable_Namespace_Prefixes_Feature
+     (Self : in out XmlAda_Reader'Class);
+   --  Disables `namespace-prefixes` feature of the XmlAda's reader.
 
 private
 

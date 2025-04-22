@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -88,16 +88,16 @@ private
      (Self    : in out XML_Template_Processor;
       Success : in out Boolean);
 
-   --  procedure Start_Prefix_Mapping
-   --    (Self    : in out SAX_Content_Handler;
-   --     Prefix  : VSS.Strings.Virtual_String;
-   --     URI     : VSS.IRIs.IRI;
-   --     Success : in out Boolean) is null;
-   --
-   --  procedure End_Prefix_Mapping
-   --    (Self    : in out SAX_Content_Handler;
-   --     Prefix  : VSS.Strings.Virtual_String;
-   --     Success : in out Boolean) is null;
+   overriding procedure Start_Prefix_Mapping
+     (Self    : in out XML_Template_Processor;
+      Prefix  : VSS.Strings.Virtual_String;
+      URI     : VSS.IRIs.IRI;
+      Success : in out Boolean);
+
+   overriding procedure End_Prefix_Mapping
+     (Self    : in out XML_Template_Processor;
+      Prefix  : VSS.Strings.Virtual_String;
+      Success : in out Boolean);
 
    overriding procedure Start_Element
      (Self       : in out XML_Template_Processor;

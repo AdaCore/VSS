@@ -74,6 +74,7 @@ include:
       rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
           when: manual
+          allow_failure: true
       save-component: true
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
@@ -86,6 +87,7 @@ include:
       rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
           when: manual
+          allow_failure: true
       save-component: true
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
@@ -98,6 +100,7 @@ include:
       rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
           when: manual
+          allow_failure: true
       save-component: true
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
@@ -111,6 +114,7 @@ include:
       rules:
         - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
           when: manual
+          allow_failure: true
       save-component: true
 
 # Downstream testing
@@ -168,6 +172,7 @@ build_and_test:windows:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
+      allow_failure: true
   services:
      - image:e3-windows-core-2022
      - cpu:8

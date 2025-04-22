@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -54,6 +54,46 @@ package body VSS.XML.XmlAda_Readers is
          raise Sax.Readers.XML_Fatal_Error;
       end if;
    end Comment;
+
+   -------------------------------
+   -- Disable_Namespace_Feature --
+   -------------------------------
+
+   procedure Disable_Namespace_Feature (Self : in out XmlAda_Reader'Class) is
+   begin
+      Self.Dispatcher.Set_Feature (Sax.Readers.Namespace_Feature, False);
+   end Disable_Namespace_Feature;
+
+   ----------------------------------------
+   -- Disable_Namespace_Prefixes_Feature --
+   ----------------------------------------
+
+   procedure Disable_Namespace_Prefixes_Feature
+     (Self : in out XmlAda_Reader'Class) is
+   begin
+      Self.Dispatcher.Set_Feature
+        (Sax.Readers.Namespace_Prefixes_Feature, False);
+   end Disable_Namespace_Prefixes_Feature;
+
+   ------------------------------
+   -- Enable_Namespace_Feature --
+   ------------------------------
+
+   procedure Enable_Namespace_Feature (Self : in out XmlAda_Reader'Class) is
+   begin
+      Self.Dispatcher.Set_Feature (Sax.Readers.Namespace_Feature, True);
+   end Enable_Namespace_Feature;
+
+   ---------------------------------------
+   -- Enable_Namespace_Prefixes_Feature --
+   ---------------------------------------
+
+   procedure Enable_Namespace_Prefixes_Feature
+     (Self : in out XmlAda_Reader'Class) is
+   begin
+      Self.Dispatcher.Set_Feature
+        (Sax.Readers.Namespace_Prefixes_Feature, True);
+   end Enable_Namespace_Prefixes_Feature;
 
    ---------------
    -- End_Cdata --

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -55,6 +55,9 @@ package VSS.Characters.Latin is
 
    Digit_Nine             : constant Virtual_Character :=
      Virtual_Character'Val (16#0039#);
+   Colon                  :  constant Virtual_Character :=
+     Virtual_Character'Val (16#003A#);
+
 
    Less_Than_Sign         : constant Virtual_Character :=
      Virtual_Character'Val (16#003C#);

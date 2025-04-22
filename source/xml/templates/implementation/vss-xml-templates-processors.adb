@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -134,6 +134,24 @@ package body VSS.XML.Templates.Processors is
       end if;
    end End_Element;
 
+   ------------------------
+   -- End_Prefix_Mapping --
+   ------------------------
+
+   overriding procedure End_Prefix_Mapping
+     (Self    : in out XML_Template_Processor;
+      Prefix  : VSS.Strings.Virtual_String;
+      Success : in out Boolean) is
+   begin
+      if Self.Depth /= 0 then
+         raise Program_Error;
+         --  Not implemented
+
+      else
+         Self.Content.End_Prefix_Mapping (Prefix, Success);
+      end if;
+   end End_Prefix_Mapping;
+
    ----------------------------
    -- Processing_Instruction --
    ----------------------------
@@ -239,5 +257,24 @@ package body VSS.XML.Templates.Processors is
          end if;
       end if;
    end Start_Element;
+
+   --------------------------
+   -- Start_Prefix_Mapping --
+   --------------------------
+
+   overriding procedure Start_Prefix_Mapping
+     (Self    : in out XML_Template_Processor;
+      Prefix  : VSS.Strings.Virtual_String;
+      URI     : VSS.IRIs.IRI;
+      Success : in out Boolean) is
+   begin
+      if Self.Depth /= 0 then
+         raise Program_Error;
+         --  Not implemented
+
+      else
+         Self.Content.Start_Prefix_Mapping (Prefix, URI, Success);
+      end if;
+   end Start_Prefix_Mapping;
 
 end VSS.XML.Templates.Processors;

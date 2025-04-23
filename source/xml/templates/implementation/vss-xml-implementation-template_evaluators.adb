@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -329,7 +329,7 @@ package body VSS.XML.Implementation.Template_Evaluators is
 
             Current := @ - 1;
 
-            if Self.Current.Element /= Current
+            if Self.Current.Element /= Element
               or else not Self.Current.Omit_Tag
             then
                if Self.Content /= null then

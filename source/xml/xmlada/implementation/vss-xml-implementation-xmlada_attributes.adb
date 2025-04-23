@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -7,8 +7,11 @@
 with Sax.Symbols;
 
 with VSS.Strings.Conversions;
+with VSS.XML.Namespaces;
 
 package body VSS.XML.Implementation.XmlAda_Attributes is
+
+   XMLNS_Prefix : constant VSS.Strings.Virtual_String := "xmlns";
 
    ----------------
    -- Get_Length --
@@ -44,15 +47,29 @@ package body VSS.XML.Implementation.XmlAda_Attributes is
 
    overriding function Get_URI
      (Self  : XmlAda_Attributes;
-      Index : Positive) return VSS.IRIs.IRI is
+      Index : Positive) return VSS.IRIs.IRI
+   is
+      use type VSS.Strings.Virtual_String;
+
    begin
       if Index <= Sax.Readers.Get_Length (Self.Attributes) then
-         return
-           VSS.IRIs.To_IRI
-             (VSS.Strings.Conversions.To_Virtual_String
+         declare
+            NS : constant VSS.Strings.Virtual_String :=
+              VSS.Strings.Conversions.To_Virtual_String
                 (Sax.Symbols.Get
                    (Sax.Readers.Get_Name
-                      (Self.Attributes, Index).NS).all));
+                      (Self.Attributes, Index).NS).all);
+
+         begin
+            if NS = XMLNS_Prefix then
+               --  XmlAda doesn't report URI for 'xmlns:<bla>' attributes.
+
+               return VSS.XML.Namespaces.XMLNS_Namespace;
+
+            else
+               return VSS.IRIs.To_IRI (NS);
+            end if;
+         end;
 
       else
          return VSS.IRIs.Empty_IRI;

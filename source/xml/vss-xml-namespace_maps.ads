@@ -41,7 +41,7 @@ package VSS.XML.Namespace_Maps is
    function URI
      (Self   : XML_Namespace_Map'Class;
       Prefix : VSS.Strings.Virtual_String) return VSS.IRIs.IRI;
-   --  Retutn URI mapped to given prefix for current element.
+   --  Return URI mapped to given prefix for current element.
 
 private
 

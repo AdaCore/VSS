@@ -4,8 +4,8 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
---  This package provides support to map XML namespace prefixes to XML
---  namespace URIs and back.
+--  This package provides support for mapping XML namespace prefixes to XML
+--  namespace URIs and vice versa.
 
 private with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Vectors;

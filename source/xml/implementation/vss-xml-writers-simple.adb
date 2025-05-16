@@ -537,7 +537,7 @@ package body VSS.XML.Writers.Simple is
                      Self.Output.Put (C, Success);
 
                   elsif C = VSS.Characters.Latin.Ampersand then
-                     raise Program_Error;
+                     Self.Write (Ampersand_Reference, Success);
 
                   elsif C = VSS.Characters.Latin.Less_Than_Sign then
                      Self.Write (Less_Than_Sign_Reference, Success);

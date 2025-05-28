@@ -825,6 +825,8 @@ package body JSON_Schema.Writers.Types is
             New_Line;
             Put ("Length : Natural := 0;");
             New_Line;
+            Put ("Is_Null : Boolean := True;");
+            New_Line;
             Put ("end record;");
             New_Line;
             New_Line;
@@ -1461,6 +1463,18 @@ package body JSON_Schema.Writers.Types is
                New_Line;
             end if;
 
+            Put ("function Is_Null (Self : ");
+            Put (Item);
+            Put ("_Vector) return Boolean");
+
+            if Kind = Implemenetation then
+               Put (" is (Self.Is_Null)");
+            end if;
+
+            Put (";");
+            New_Line;
+            New_Line;
+
             Put ("function Length (Self : ");
             Put (Item);
             Put ("_Vector) return Natural");
@@ -1475,7 +1489,7 @@ package body JSON_Schema.Writers.Types is
 
             Put ("procedure Clear (Self : in out ");
             Put (Item);
-            Put ("_Vector)");
+            Put ("_Vector; Is_Null : Boolean := True)");
 
             if Kind = Implemenetation then
                Put (" is");
@@ -1483,6 +1497,8 @@ package body JSON_Schema.Writers.Types is
                Put ("begin");
                New_Line;
                Put ("   Self.Length := 0;");
+               New_Line;
+               Put ("   Self.Is_Null := Is_Null;");
                New_Line;
                Put ("end Clear");
             end if;
@@ -1517,6 +1533,8 @@ package body JSON_Schema.Writers.Types is
                Put ("begin");
                New_Line;
                Put ("if Self.Length = 0 then");
+               New_Line;
+               Put ("Self.Is_Null := False;");
                New_Line;
                Put ("Self.Data := new ");
                Put (Item);

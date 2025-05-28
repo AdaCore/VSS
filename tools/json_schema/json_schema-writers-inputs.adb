@@ -811,6 +811,12 @@ package body JSON_Schema.Writers.Inputs is
 
                Put ("if Success and Reader.Is_Start_Array then"); New_Line;
                Put ("Reader.Read_Next;"); New_Line;
+               Put (Field_Name);
+               Put (".Clear");
+               if Type_Name /= "Virtual_String_Vector" then
+                  Put (" (Is_Null => False)");
+               end if;
+               Put (";"); New_Line;
                Put ("while Success and not Reader.Is_End_Array loop");
                New_Line;
                Put ("declare"); New_Line;

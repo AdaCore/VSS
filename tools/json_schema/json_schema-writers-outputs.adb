@@ -643,9 +643,9 @@ package body JSON_Schema.Writers.Outputs is
          New_Line;
 
       elsif not Required and Type_Name.Ends_With ("_Vector") then
-         Put ("if Value.");
+         Put ("if not Value.");
          Put (Field_Name);
-         Put (".Length > 0 then");
+         Put (".Is_Null then");
          New_Line;
 
          Write_Key_And_Value (Field_Name, Type_Name, "");

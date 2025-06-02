@@ -411,6 +411,13 @@ package body VSS.Command_Line.Parsers is
          Index := Index + 1;
       end loop;
 
+      if Natural (Self.Positional_Options_Values.Length)
+         < Self.Required_Positional_Options
+      then
+         Self.Error_Message := "missing required positional options";
+         Success            := False;
+      end if;
+
       return Success;
    end Parse;
 
@@ -713,6 +720,17 @@ package body VSS.Command_Line.Parsers is
 
       Item := Item.Tail_After (Iterator);
    end Remove_Prefix;
+
+   --------------------------------
+   -- Require_Positional_Options --
+   --------------------------------
+
+   procedure Require_Positional_Options
+      (Self  : in out Command_Line_Parser'Class;
+       Count : Natural) is
+   begin
+      Self.Required_Positional_Options := Count;
+   end Require_Positional_Options;
 
    ------------------------------
    -- Unknown_Option_Arguments --

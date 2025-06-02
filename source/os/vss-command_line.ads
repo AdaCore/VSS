@@ -51,6 +51,9 @@ package VSS.Command_Line is
 
    procedure Add_Option (Option : Abstract_Option'Class);
 
+   procedure Require_Positional_Options (Count : Natural);
+   --   Make the parser fail if any positional options aren't provided.
+
    procedure Add_Help_Option;
    --  Adds builtin definition of the option to display help information. This
    --  option is handled automatically.

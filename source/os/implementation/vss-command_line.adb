@@ -184,6 +184,15 @@ package body VSS.Command_Line is
       GNAT.OS_Lib.OS_Exit (0);
    end Report_Message;
 
+   --------------------------------
+   -- Require_Positional_Options --
+   --------------------------------
+
+   procedure Require_Positional_Options (Count : Natural) is
+   begin
+      Parser.Require_Positional_Options (Count);
+   end Require_Positional_Options;
+
    -----------------
    -- Unique_Name --
    -----------------

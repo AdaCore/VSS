@@ -24,6 +24,11 @@ package VSS.Command_Line.Parsers is
       Option : Abstract_Option'Class);
    --  Add command line option.
 
+   procedure Require_Positional_Options
+      (Self  : in out Command_Line_Parser'Class;
+       Count : Natural);
+   --   Make the parser fail if any positional options aren't provided.
+
    function Parse
      (Self      : in out Command_Line_Parser'Class;
       Arguments : VSS.String_Vectors.Virtual_String_Vector) return Boolean;
@@ -129,6 +134,8 @@ private
       Defined_Positional_Options   : Positional_Option_Vectors.Vector;
       Defined_Multivalue_Positional_Option :
         Multivalue_Positional_Option_Holders.Holder;
+
+      Required_Positional_Options : Natural := 0;
 
       Error_Message                : VSS.Strings.Virtual_String;
       Only_Positional              : Boolean := False;

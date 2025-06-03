@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -88,7 +88,7 @@ package VSS.Regular_Expressions is
       return Regular_Expression_Match;
    --  Perform a regular expression match of the Subject starting from given
    --  position (From) against the regexp. Take Options (if provided) into
-   --  account. The beginning of a line assertion (`^`) matches From position
+   --  account. The beginning of a line assertion (^) matches From position
    --  even if Subject has character before it.
 
    ------------------------------

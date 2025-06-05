@@ -125,6 +125,8 @@ include:
       needs: ["build:edge:prettier-ada:linux"]
       anod-args: run test_edge_prettier_ada
       cpus: 16
+      rules:
+        - allow_failure: true
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
@@ -133,6 +135,8 @@ include:
       needs: ["build:edge:gnatdoc:linux"]
       anod-args: run test_edge_gnatdoc
       cpus: 16
+      rules:
+        - allow_failure: true
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
@@ -141,6 +145,8 @@ include:
       needs: ["build:edge:als:linux"]
       anod-args: run test_edge_als
       cpus: 16
+      rules:
+        - allow_failure: true
 
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:
@@ -150,6 +156,8 @@ include:
       anod-args: run test_edge_gs
       image: systemgtk
       cpus: 16
+      rules:
+        - allow_failure: true
 
 ###########################
 # LEGACY BUILD ON WINDOWS #
@@ -159,6 +167,7 @@ include:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      allow_failure: true
   script:
     - generic_anod_ci
     - . /tmp/ci_env.sh

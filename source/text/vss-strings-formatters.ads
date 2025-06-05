@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -32,5 +32,6 @@ package VSS.Strings.Formatters is
      (Self : Abstract_Formatter)
       return VSS.Strings.Virtual_String is abstract;
    --  Name of the parameter.
+   --  @private
 
 end VSS.Strings.Formatters;

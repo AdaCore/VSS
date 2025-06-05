@@ -43,7 +43,7 @@ package VSS.Command_Line.Parsers is
    function Is_Specified
      (Self   : Command_Line_Parser'Class;
       Option : Abstract_Option'Class) return Boolean;
-   --  Return True when given option has been specified the command line.
+   --  Return True when given option has been specified on the command line.
 
    function Value
      (Self   : Command_Line_Parser'Class;

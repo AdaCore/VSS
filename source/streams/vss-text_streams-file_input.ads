@@ -67,4 +67,8 @@ private
    overriding function Error_Message
      (Self : File_Input_Text_Stream) return VSS.Strings.Virtual_String;
 
+   procedure Populate_Buffer
+      (Self    : in out File_Input_Text_Stream;
+       Success : out Boolean);
+
 end VSS.Text_Streams.File_Input;

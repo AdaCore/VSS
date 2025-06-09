@@ -66,51 +66,11 @@ package body VSS.Text_Streams.File_Input is
       Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean) is
    begin
-      if Self.Buffer.Is_Empty then
-         if Self.Stream = Interfaces.C_Streams.NULL_Stream then
-            Self.Error := "File is not open";
-            Item       := VSS.Characters.Virtual_Character'Base'Last;
-            Success    := False;
+      Self.Populate_Buffer (Success);
 
-            return;
-         end if;
-
-         declare
-            use type Ada.Streams.Stream_Element_Offset;
-            use type Interfaces.C_Streams.size_t;
-
-            Data : Ada.Streams.Stream_Element_Array (1 .. 128);
-            Size : Interfaces.C_Streams.size_t;
-
-         begin
-            Size :=
-              Interfaces.C_Streams.fread
-                (Data (Data'First)'Address, 0, 1, Data'Length, Self.Stream);
-
-            if Size /= 0 then
-               --  Some data has been read, decode it.
-
-               Self.Buffer :=
-                 Self.Decoder.Decode
-                   (Data
-                      (Data'First
-                         .. Data'First
-                              + Ada.Streams.Stream_Element_Offset (Size) - 1),
-                    False);
-
-            elsif Interfaces.C_Streams.feof (Self.Stream) /= 0 then
-               --  End of file has been reached, let decoder know that no more
-               --  data available. Decoder will return REPLACEMENT CHARACTER
-               --  if some data has beed accumulated but can't be decoded.
-
-               Self.Buffer :=
-                 Self.Decoder.Decode
-                   (Data (Data'First .. Data'First - 1), True);
-
-            elsif Interfaces.C_Streams.ferror (Self.Stream) /= 0 then
-               Self.Error := "File IO error";
-            end if;
-         end;
+      if not Success then
+         Item       := VSS.Characters.Virtual_Character'Base'Last;
+         return;
       end if;
 
       if Self.Buffer.Is_Empty then
@@ -226,6 +186,63 @@ package body VSS.Text_Streams.File_Input is
          Self.Open (Name);
       end if;
    end Open;
+
+   ---------------------
+   -- Populate_Buffer --
+   ---------------------
+
+   procedure Populate_Buffer
+      (Self    : in out File_Input_Text_Stream;
+       Success : out Boolean) is
+   begin
+      if Self.Buffer.Is_Empty then
+         if Self.Stream = Interfaces.C_Streams.NULL_Stream then
+            Self.Error := "File is not open";
+            Success    := False;
+
+            return;
+         end if;
+
+         declare
+            use type Ada.Streams.Stream_Element_Offset;
+            use type Interfaces.C_Streams.size_t;
+
+            Data : Ada.Streams.Stream_Element_Array (1 .. 128);
+            Size : Interfaces.C_Streams.size_t;
+
+         begin
+            Size :=
+              Interfaces.C_Streams.fread
+                (Data (Data'First)'Address, 0, 1, Data'Length, Self.Stream);
+
+            if Size /= 0 then
+               --  Some data has been read, decode it.
+
+               Self.Buffer :=
+                 Self.Decoder.Decode
+                   (Data
+                      (Data'First
+                         .. Data'First
+                              + Ada.Streams.Stream_Element_Offset (Size) - 1),
+                    False);
+
+            elsif Interfaces.C_Streams.feof (Self.Stream) /= 0 then
+               --  End of file has been reached, let decoder know that no more
+               --  data available. Decoder will return REPLACEMENT CHARACTER
+               --  if some data has beed accumulated but can't be decoded.
+
+               Self.Buffer :=
+                 Self.Decoder.Decode
+                   (Data (Data'First .. Data'First - 1), True);
+
+            elsif Interfaces.C_Streams.ferror (Self.Stream) /= 0 then
+               Self.Error := "File IO error";
+            end if;
+         end;
+      end if;
+
+      Success := True;
+   end Populate_Buffer;
 
    ------------------
    -- Set_Encoding --

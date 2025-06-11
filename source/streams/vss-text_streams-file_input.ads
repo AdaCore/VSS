@@ -34,9 +34,11 @@ package VSS.Text_Streams.File_Input is
    --  Encoding can be set only when file is not open.
 
    procedure Get_Line
-      (Self    : in out File_Input_Text_Stream'Class;
-       Line    : out VSS.Strings.Virtual_String'Class;
-       Success : out Boolean);
+      (Self        : in out File_Input_Text_Stream'Class;
+       Line        : out VSS.Strings.Virtual_String'Class;
+       Success     : out Boolean;
+       Terminators : VSS.Strings.Line_Terminator_Set :=
+         VSS.Strings.New_Line_Function);
 
    procedure Close (Self : in out File_Input_Text_Stream'Class);
    --  Close file.

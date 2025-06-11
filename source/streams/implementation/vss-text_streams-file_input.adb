@@ -98,9 +98,11 @@ package body VSS.Text_Streams.File_Input is
    --------------
 
    procedure Get_Line
-      (Self    : in out File_Input_Text_Stream'Class;
-       Line    : out VSS.Strings.Virtual_String'Class;
-       Success : out Boolean)
+      (Self        : in out File_Input_Text_Stream'Class;
+       Line        : out VSS.Strings.Virtual_String'Class;
+       Success     : out Boolean;
+       Terminators : VSS.Strings.Line_Terminator_Set :=
+         VSS.Strings.New_Line_Function)
    is
 
       use type VSS.Characters.Virtual_Character;
@@ -120,7 +122,9 @@ package body VSS.Text_Streams.File_Input is
          At_EOL : Boolean := False;
       begin
          loop
-            if Last_Character.Element = VSS.Characters.Latin.Line_Feed then
+            if Self.Buffer.Slice (First_Character, Last_Character)
+              .Ends_With (Terminators)
+            then
                At_EOL := True;
                exit;
             end if;

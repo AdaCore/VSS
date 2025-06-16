@@ -15,13 +15,6 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
    In_Place_Storage_Capacity : constant := 16 - 1;
    --  Number of code units can be stored in place
 
-   subtype In_Place_UTF8_Code_Unit_Count is
-     VSS.Unicode.UTF8_Code_Unit_Count range 0 .. In_Place_Storage_Capacity;
-
-   subtype In_Place_Character_Count is
-     VSS.Implementation.Strings.Character_Count
-       range 0 .. In_Place_Storage_Capacity;
-
    type Static_UTF8_Handler is new Variable_UTF8_Text with record
       Storage :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array

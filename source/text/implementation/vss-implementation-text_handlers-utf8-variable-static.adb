@@ -62,10 +62,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
       else
          --  Data can't be stored in the static storage and need to be
          --  converted into dynamic storage.
-         Unsafe_Convert_To_Dynamic
-           (Self,
-            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
-            Self.Size + L);
+         Unsafe_Convert_To_Dynamic (Self, Self.Size + L);
 
          declare
             Overlay : Variable.Dynamic.Dynamic_UTF8_Handler
@@ -136,9 +133,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
                --  the dynamic storage to append text.
 
                Unsafe_Convert_To_Dynamic
-                 (Self,
-                  VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
-                  Self.Size + Suffix_Dynamic.Pointer.Size);
+                 (Self, Self.Size + Suffix_Dynamic.Pointer.Size);
 
                Handler := VSS.Implementation.Strings.Variable_Handler (Data);
                Handler.Append (Data, Suffix, Offset);
@@ -170,9 +165,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
                --  converted into a dynamic text storage.
 
                Unsafe_Convert_To_Dynamic
-                 (Self,
-                  VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity * 4),
-                  Self.Size + Suffix_Static.Size);
+                 (Self, Self.Size + Suffix_Static.Size);
 
                Handler := VSS.Implementation.Strings.Variable_Handler (Data);
                Handler.Append (Data, Suffix, Offset);
@@ -374,7 +367,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
             VSS.Implementation.UTF8_Encoding.Encode (Code, L, U1, U2, U3, U4);
 
             if Self.Storage'Last < Self.Size + L then
-               Unsafe_Initialize (Self, 0, Self.Size + L);
+               Unsafe_Initialize (Self, Self.Size + L);
 
                VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
                  (Self).From_Wide_Wide_String (Item, Success);
@@ -451,10 +444,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
          --  Data can't be stored "in place" and need to be converted into
          --  shared data.
 
-         Unsafe_Convert_To_Dynamic
-           (Self,
-            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
-            Self.Size + L);
+         Unsafe_Convert_To_Dynamic (Self, Self.Size + L);
 
          declare
             Text : Variable.Dynamic.Dynamic_UTF8_Handler
@@ -633,10 +623,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
          --  into dynamic storage, and call handler of the dynamic storage to
          --  complete operation.
 
-         Unsafe_Convert_To_Dynamic
-           (Self,
-            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
-            Self.Size + Size);
+         Unsafe_Convert_To_Dynamic (Self, Self.Size + Size);
 
          declare
             Text : Variable.Dynamic.Dynamic_UTF8_Handler
@@ -716,9 +703,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
          --  complete operation.
 
          Unsafe_Convert_To_Dynamic
-           (Self,
-            VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity * 4),
-            Self.Size - Replace_Size + By_Size);
+           (Self, Self.Size - Replace_Size + By_Size);
 
          declare
             Text : Variable.Dynamic.Dynamic_UTF8_Handler

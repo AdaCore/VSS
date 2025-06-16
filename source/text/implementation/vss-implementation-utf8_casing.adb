@@ -103,7 +103,7 @@ package body VSS.Implementation.UTF8_Casing is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Handler.all, 0, Self.Pointer.Size);
+           (Handler.all, Self.Pointer.Size);
       end;
 
       case Mapping is
@@ -198,7 +198,7 @@ package body VSS.Implementation.UTF8_Casing is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Handler.all, 0, Self.Size);
+           (Handler.all, Self.Size);
       end;
 
       case Mapping is
@@ -420,7 +420,7 @@ package body VSS.Implementation.UTF8_Casing is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Text.all, 0, 0);
+           (Text.all, 0);
 
          Get_Case_Mapping
            (Code,

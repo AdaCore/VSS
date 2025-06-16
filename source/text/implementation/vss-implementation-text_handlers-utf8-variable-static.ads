@@ -28,7 +28,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
           (0 .. In_Place_Storage_Capacity) := [others => 0];
       Size    : In_Place_UTF8_Code_Unit_Count := 0;
       Length  : In_Place_Character_Count      := 0;
-   end record with Pack, Object_Size => 192;
+   end record with Pack, Object_Size => 256;
 
    overriding procedure Reference
      (Self : in out Static_UTF8_Handler) is null;

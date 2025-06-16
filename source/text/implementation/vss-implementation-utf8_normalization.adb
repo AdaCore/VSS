@@ -2025,7 +2025,7 @@ package body VSS.Implementation.UTF8_Normalization is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Result_Text.all, 0, Self.Pointer.Size);
+           (Result_Text.all, Self.Pointer.Size);
       end;
 
       case Form is
@@ -2083,7 +2083,7 @@ package body VSS.Implementation.UTF8_Normalization is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Result_Text.all, 0, Self.Size);
+           (Result_Text.all, Self.Size);
       end;
 
       case Form is

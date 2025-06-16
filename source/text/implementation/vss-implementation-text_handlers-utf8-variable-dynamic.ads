@@ -190,15 +190,13 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    --  that.
 
    function Allocate
-     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+     (Size : VSS.Unicode.UTF8_Code_Unit_Count)
       return UTF8_String_Data_Access;
    --  Allocate storage block to store at least given amount of the data.
 
    procedure Reallocate
-     (Data     : in out UTF8_String_Data_Access;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+     (Data : in out UTF8_String_Data_Access;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count);
    --  Reallocates storage block to store at least given amount of the data.
    --  Content of the data will be copied, and old storage block will be
    --  unreferenced (and deallocated if it is no longer used).

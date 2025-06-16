@@ -65,10 +65,9 @@ is
    --  this operation.
 
    procedure Unsafe_Initialize
-     (Text     : in out
+     (Text : in out
         VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
-      Capacity : VSS.Implementation.Strings.Character_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+      Size : VSS.Unicode.UTF8_Code_Unit_Count);
    --  Initialize UTF-8 text storage. It is either static or dynamic,
    --  depending from the requested capacity and/or size, which is larger.
    --
@@ -105,11 +104,10 @@ private
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
    procedure Unsafe_Convert_To_Dynamic
-     (Text     : in out
+     (Text : in out
         VSS.Implementation.Text_Handlers.UTF8.Variable.Static
           .Static_UTF8_Handler;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+      Size : VSS.Unicode.UTF8_Code_Unit_Count);
    --  Convert static text data into a dynamically allocated one.
    --  Use expected Capacity and Size to allocate a storage block, then copy
    --  text content to the allocated block.

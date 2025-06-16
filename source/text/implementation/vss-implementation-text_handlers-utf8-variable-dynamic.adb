@@ -42,9 +42,8 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    --  counter reach zero.
 
    procedure Mutate
-     (Data     : in out UTF8_String_Data_Access;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count);
+     (Data : in out UTF8_String_Data_Access;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count);
    --  Reallocate storage block when it is shared or not enough to store given
    --  amount of data.
 
@@ -86,14 +85,10 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    --------------
 
    function Allocate
-     (Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+     (Size : VSS.Unicode.UTF8_Code_Unit_Count)
       return UTF8_String_Data_Access is
    begin
-      return
-        new UTF8_String_Data
-              (Aligned_Capacity
-                 (VSS.Unicode.UTF8_Code_Unit_Count'Max (Capacity, Size)));
+      return new UTF8_String_Data (Aligned_Capacity (Size));
    end Allocate;
 
    ------------
@@ -118,10 +113,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
       Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
       Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
 
-      Mutate
-        (Self.Pointer,
-         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
-         Self.Pointer.Size + L);
+      Mutate (Self.Pointer, Self.Pointer.Size + L);
 
       VSS.Implementation.UTF8_Encoding.Unchecked_Store
         (Self.Pointer.Storage, Self.Pointer.Size, L, U1, U2, U3, U4);
@@ -157,10 +149,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
               renames Static.Static_UTF8_Handler (Suffix_Handler.all);
 
          begin
-            Mutate
-              (Self.Pointer,
-               VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
-               Self.Pointer.Size + Suffix_Static.Size);
+            Mutate (Self.Pointer, Self.Pointer.Size + Suffix_Static.Size);
 
             Internal_Append
               (Storage        => Self.Pointer.Storage,
@@ -181,9 +170,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
 
          begin
             Mutate
-              (Self.Pointer,
-               VSS.Unicode.UTF8_Code_Unit_Count (Data.Capacity) * 4,
-               Self.Pointer.Size + Suffix_Dynamic.Pointer.Size);
+              (Self.Pointer, Self.Pointer.Size + Suffix_Dynamic.Pointer.Size);
 
             Internal_Append
               (Storage        => Self.Pointer.Storage,
@@ -395,7 +382,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
                --  There is no enough storage to store character, reallocate
                --  memory.
 
-               Reallocate (Pointer, 0, Pointer.Size + L);
+               Reallocate (Pointer, Pointer.Size + L);
             end if;
 
             VSS.Implementation.UTF8_Encoding.Unchecked_Store
@@ -452,10 +439,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
       Offset.UTF8_Offset  := Offset.UTF8_Offset + L;
       Offset.UTF16_Offset := Offset.UTF16_Offset + (if L = 4 then 2 else 1);
 
-      Mutate
-        (Self.Pointer,
-         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
-         Self.Pointer.Size + L);
+      Mutate (Self.Pointer, Self.Pointer.Size + L);
 
       Self.Pointer.Storage
         (From.UTF8_Offset + L .. Self.Pointer.Size + L) :=
@@ -496,17 +480,16 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    ------------
 
    procedure Mutate
-     (Data     : in out UTF8_String_Data_Access;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
+     (Data : in out UTF8_String_Data_Access;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count) is
    begin
       if Data = null then
-         Data := Allocate (Capacity, Size);
+         Data := Allocate (Size);
 
       elsif not System.Atomic_Counters.Is_One (Data.Counter)
         or else Size > Data.Bulk
       then
-         Reallocate (Data, Capacity, Size);
+         Reallocate (Data, Size);
       end if;
    end Mutate;
 
@@ -515,23 +498,20 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    ----------------
 
    procedure Reallocate
-     (Data     : in out UTF8_String_Data_Access;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+     (Data : in out UTF8_String_Data_Access;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count)
    is
       Minimal_Capacity : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-        (if Capacity >= Size
-         then Capacity
-         else (if Data = null
-               then Size
-               else (if Data.Bulk > Size
-                     then Size
-                     else Size + Size / Growth_Factor)));
+        (if Data = null
+           then Size
+           else (if Data.Bulk > Size
+                   then Size
+                   else Size + Size / Growth_Factor));
 
       Aux : UTF8_String_Data_Access := Data;
 
    begin
-      Data := Allocate (0, Minimal_Capacity);
+      Data := Allocate (Minimal_Capacity);
 
       if Aux /= null then
          declare
@@ -604,7 +584,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
               with Address => Target_Data.Storage'Address;
 
          begin
-            Pointer := Allocate (0, Size);
+            Pointer := Allocate (Size);
             Pointer.Storage (0 .. Size - 1) :=
               Self.Pointer.Storage (From.UTF8_Offset .. After.UTF8_Offset - 1);
             Pointer.Size   := Size;
@@ -724,10 +704,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
       Size    : VSS.Unicode.UTF8_Code_Unit_Count;
       Length  : VSS.Implementation.Strings.Character_Count) is
    begin
-      Mutate
-        (Self.Pointer,
-         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
-         Self.Pointer.Size + Size);
+      Mutate (Self.Pointer, Self.Pointer.Size + Size);
 
       Self.Pointer.Storage (Into + Size .. Self.Pointer.Size + Size) :=
         Self.Pointer.Storage (Into .. Self.Pointer.Size);
@@ -770,10 +747,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
         Self.Pointer.Size + By_Size - Replace_Size;
 
    begin
-      Mutate
-        (Self.Pointer,
-         VSS.Unicode.UTF8_Code_Unit_Count (Self.Unsafe_Capacity) * 4,
-         New_Size);
+      Mutate (Self.Pointer, New_Size);
 
       Self.Pointer.Storage (Replace_From + By_Size .. New_Size) :=
         Self.Pointer.Storage

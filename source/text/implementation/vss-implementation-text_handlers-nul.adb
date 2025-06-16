@@ -24,6 +24,9 @@ package body VSS.Implementation.Text_Handlers.Nul is
        (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
    --  These are only two possible positions of the cursor for null string.
 
+   Code_Point_Max_Encoded_Length : constant := 4;
+   --  Maximum number of code units to encode single code point.
+
    --------------------------
    -- After_Last_Character --
    --------------------------
@@ -45,7 +48,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
    begin
       VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-        (Self, 1, 0);
+        (Self, Code_Point_Max_Encoded_Length);
       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).Append (Code, Offset);
    end Append;
@@ -150,7 +153,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Success : out Boolean) is
    begin
       VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-        (Self, 0, Item'Length);
+        (Self, Item'Length);
 
       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).From_UTF_8_String (Item, Success);
@@ -166,7 +169,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Success : out Boolean) is
    begin
       VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-        (Self, 0, Item'Length);
+        (Self, Item'Length);
       --  Request text data storage size enough to store ASCII text. Storage
       --  will reallocated when necessary. It helps to use static storage when
       --  possible.
@@ -207,7 +210,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
 
    begin
       VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-        (Self, 1, 0);
+        (Self, Code_Point_Max_Encoded_Length);
       Text.Insert (From, Item, Offset);
    end Insert;
 

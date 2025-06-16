@@ -223,7 +223,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
                  with Address => Data.Storage'Address;
 
             begin
-               Pointer := UTF8.Variable.Dynamic.Allocate (0, Size);
+               Pointer := UTF8.Variable.Dynamic.Allocate (Size);
 
                Pointer.Storage (0 .. Size - 1) :=
                  Source_Storage

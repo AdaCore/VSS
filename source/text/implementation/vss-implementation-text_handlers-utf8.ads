@@ -30,11 +30,10 @@ is
    --  surrogates), otherwise optimized compare operations will return
    --  incorrect result.
 
-   not overriding function UTF8_Constant_Storage_Poiner
-     (Self : Abstract_UTF8_Text)
+   function UTF8_Constant_Storage_Poiner
+     (Self : Abstract_UTF8_Text'Class)
       return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
-          is abstract;
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
    --  Returns pointer to the first element in the text data storage.
 
    overriding function Is_Equal

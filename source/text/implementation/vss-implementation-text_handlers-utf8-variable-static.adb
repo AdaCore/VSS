@@ -559,18 +559,6 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
       end return;
    end To_UTF_8_String;
 
-   ----------------------------------
-   -- UTF8_Constant_Storage_Poiner --
-   ----------------------------------
-
-   overriding function UTF8_Constant_Storage_Poiner
-     (Self : Static_UTF8_Handler)
-      return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access is
-   begin
-      return Self.Storage (Self.Storage'First)'Unchecked_Access;
-   end UTF8_Constant_Storage_Poiner;
-
    -----------------------
    -- UTF8_Insert_Slice --
    -----------------------

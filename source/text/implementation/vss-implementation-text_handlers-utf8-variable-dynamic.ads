@@ -26,6 +26,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    --  Size of the text handler object is fixed.
 
    type Dynamic_UTF8_Handler is new Variable_UTF8_Text with record
+      Storage : VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
       Pointer : UTF8_String_Data_Access;
    end record with Object_Size => 256;
 
@@ -159,11 +160,6 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
       By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
       By_Length      : VSS.Implementation.Strings.Character_Count);
 
-   overriding function UTF8_Constant_Storage_Poiner
-     (Self : Dynamic_UTF8_Handler)
-      return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-
    --  Subprograms to help code refactoring, some of the will be moved to
    --  generic UTF8 fastpath string API, and some moved to the body after
    --  that.
@@ -174,8 +170,10 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
    --  Allocate storage block to store at least given amount of the data.
 
    procedure Reallocate
-     (Data : in out UTF8_String_Data_Access;
-      Size : VSS.Unicode.UTF8_Code_Unit_Count);
+     (Storage : in out
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
+      Data    : in out UTF8_String_Data_Access;
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count);
    --  Reallocates storage block to store at least given amount of the data.
    --  Content of the data will be copied, and old storage block will be
    --  unreferenced (and deallocated if it is no longer used).

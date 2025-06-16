@@ -6,6 +6,7 @@
 
 pragma Ada_2022;
 
+with Ada.Tags;
 with Interfaces;
 
 with VSS.Implementation.GCC;
@@ -234,6 +235,8 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
                Dynamic.Length := After_Last.Index - First.Index;
                Pointer.Storage (Dynamic.Size) := 16#00#;
 
+               Dynamic.Storage :=
+                 Pointer.Storage (Pointer.Storage'First)'Unchecked_Access;
                Dynamic.Pointer := Pointer;
             end;
          end if;
@@ -373,5 +376,39 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
          end if;
       end;
    end Unchecked_Forward;
+
+   ----------------------------------
+   -- UTF8_Constant_Storage_Poiner --
+   ----------------------------------
+
+   function UTF8_Constant_Storage_Poiner
+     (Self : Abstract_UTF8_Text'Class)
+      return not null
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
+   is
+      use type Ada.Tags.Tag;
+
+      pragma Warnings (Off, """Overlay"" overlays smaller object");
+      Overlay : constant Variable.Static.Static_UTF8_Handler
+        with Import, Convention => Ada, Address => Self'Address;
+      pragma Warnings (On, """Overlay"" overlays smaller object");
+
+   begin
+      if Self'Tag = Variable.Static.Static_UTF8_Handler'Tag then
+         return Overlay.Storage (Overlay.Storage'First)'Unchecked_Access;
+
+      else
+         declare
+            Storage :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
+                with Import,
+                     Convention => Ada,
+                     Address    => Overlay.Storage'Address;
+
+         begin
+            return Storage;
+         end;
+      end if;
+   end UTF8_Constant_Storage_Poiner;
 
 end VSS.Implementation.Text_Handlers.UTF8;

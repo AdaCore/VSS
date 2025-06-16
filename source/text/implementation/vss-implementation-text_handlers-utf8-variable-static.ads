@@ -135,9 +135,4 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
       By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
       By_Length      : VSS.Implementation.Strings.Character_Count);
 
-   overriding function UTF8_Constant_Storage_Poiner
-     (Self : Static_UTF8_Handler)
-      return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-
 end VSS.Implementation.Text_Handlers.UTF8.Variable.Static;

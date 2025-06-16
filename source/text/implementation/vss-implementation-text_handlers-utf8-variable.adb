@@ -126,7 +126,8 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
 
       begin
          if Target.Size + Size > Target.Pointer.Bulk then
-            Dynamic.Reallocate (Target.Pointer, Target.Size + Size);
+            Dynamic.Reallocate
+              (Target.Storage, Target.Pointer, Target.Size + Size);
          end if;
 
          Target.Pointer.Storage
@@ -190,6 +191,8 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
          Overlay :=
            (Length  => Text_Length,
             Size    => Text_Size,
+            Storage =>
+              Pointer.Storage (Pointer.Storage'First)'Unchecked_Access,
             Pointer => Pointer);
       end;
    end Unsafe_Convert_To_Dynamic;
@@ -223,6 +226,9 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
 
          begin
             Overlay.Pointer := Variable.Dynamic.Allocate (Size);
+            Overlay.Storage :=
+              Overlay.Pointer.Storage
+                (Overlay.Pointer.Storage'First)'Unchecked_Access;
          end;
       end if;
    end Unsafe_Initialize;

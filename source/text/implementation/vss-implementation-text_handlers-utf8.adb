@@ -28,7 +28,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
      (Self  : Abstract_UTF8_Text;
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
-      if Other in Abstract_UTF8_Text'Class then
+      if Other.Is_UTF8 then
          declare
             Self_Pointer  : constant
               VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
@@ -72,7 +72,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
      (Self  : Abstract_UTF8_Text;
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
-      if Other in Abstract_UTF8_Text'Class then
+      if Other.Is_UTF8 then
          declare
             Self_Pointer  : constant
               VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
@@ -116,7 +116,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
      (Self  : Abstract_UTF8_Text;
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
-      if Other in Abstract_UTF8_Text'Class then
+      if Other.Is_UTF8 then
          declare
             Self_Pointer  : constant
               VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=

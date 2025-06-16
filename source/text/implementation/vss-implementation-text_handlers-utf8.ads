@@ -75,4 +75,7 @@ private
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
    --  Common code of Split_Lines subprogram for on heap and inline handlers.
 
+   overriding function Is_UTF8
+     (Self : Abstract_UTF8_Text) return Boolean is (True);
+
 end VSS.Implementation.Text_Handlers.UTF8;

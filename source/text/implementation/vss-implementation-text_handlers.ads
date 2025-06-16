@@ -267,4 +267,9 @@ package VSS.Implementation.Text_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
+   not overriding function Is_UTF8
+     (Self : Abstract_Text_Handler) return Boolean is (False);
+   --  Returns `True` when object's type is derived from `Abstract_UTF8_Text`
+   --  type.
+
 end VSS.Implementation.Text_Handlers;

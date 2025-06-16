@@ -14,13 +14,6 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
 
    type UTF8_String_Data (Bulk : VSS.Unicode.UTF8_Code_Unit_Count) is record
       Counter : System.Atomic_Counters.Atomic_Counter;
-
-      Size    : VSS.Unicode.UTF8_Code_Unit_Count           := 0;
-      --  Number of code units in the buffer.
-
-      Length  : VSS.Implementation.Strings.Character_Count := 0;
-      --  Length of the string in Unicode Code Points.
-
       Storage :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (0 .. Bulk);
       --  Buffer to store string's data. First unused code unit is set to
@@ -34,7 +27,7 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
 
    type Dynamic_UTF8_Handler is new Variable_UTF8_Text with record
       Pointer : UTF8_String_Data_Access;
-   end record with Object_Size => 192;
+   end record with Object_Size => 256;
 
    overriding procedure Reference (Self : in out Dynamic_UTF8_Handler)
      with Pre => Self.Pointer /= null;
@@ -43,11 +36,6 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
      with Post => Self.Pointer = null;
 
    overriding function Is_Empty (Self : Dynamic_UTF8_Handler) return Boolean
-     with Pre => Self.Pointer /= null;
-
-   overriding function Length
-     (Self : Dynamic_UTF8_Handler)
-      return VSS.Implementation.Strings.Character_Count
      with Pre => Self.Pointer /= null;
 
    overriding function Element
@@ -171,19 +159,10 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic is
       By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
       By_Length      : VSS.Implementation.Strings.Character_Count);
 
-   overriding function UTF8_Size
-     (Self : Dynamic_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count;
-
    overriding function UTF8_Constant_Storage_Poiner
      (Self : Dynamic_UTF8_Handler)
       return not null
         VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-
-   overriding procedure UTF8_Constant_Storage_And_Size
-     (Self    : Dynamic_UTF8_Handler;
-      Pointer : out
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-      Size    : out VSS.Unicode.UTF8_Code_Unit_Count);
 
    --  Subprograms to help code refactoring, some of the will be moved to
    --  generic UTF8 fastpath string API, and some moved to the body after

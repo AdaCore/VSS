@@ -75,11 +75,11 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
          begin
             VSS.Implementation.UTF8_Encoding.Unchecked_Store
               (Pointer.Storage,
-               Pointer.Size, L, U1, U2, U3, U4);
+               Self.Size, L, U1, U2, U3, U4);
 
-            Pointer.Size   := @ + L;
-            Pointer.Length := @ + 1;
-            Pointer.Storage (Pointer.Size) := 16#00#;
+            Self.Size                   := @ + L;
+            Self.Length                 := @ + 1;
+            Pointer.Storage (Self.Size) := 16#00#;
          end;
       end if;
    end Append;
@@ -116,15 +116,15 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
 
          begin
             if Self.Storage'Last
-                 >= Self.Size + Suffix_Dynamic.Pointer.Size
+                 >= Self.Size + Suffix_Dynamic.Size
             then
                Internal_Append
                  (Storage        => Self.Storage,
                   Length         => Self.Length,
                   Size           => Self.Size,
                   Suffix_Storage => Suffix_Dynamic.Pointer.Storage,
-                  Suffix_Length  => Suffix_Dynamic.Pointer.Length,
-                  Suffix_Size    => Suffix_Dynamic.Pointer.Size,
+                  Suffix_Length  => Suffix_Dynamic.Length,
+                  Suffix_Size    => Suffix_Dynamic.Size,
                   Offset         => Offset);
 
             else
@@ -133,7 +133,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
                --  the dynamic storage to append text.
 
                Unsafe_Convert_To_Dynamic
-                 (Self, Self.Size + Suffix_Dynamic.Pointer.Size);
+                 (Self, Self.Size + Suffix_Dynamic.Size);
 
                Handler := VSS.Implementation.Strings.Variable_Handler (Data);
                Handler.Append (Data, Suffix, Offset);
@@ -452,15 +452,15 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
 
          begin
             Text.Pointer.Storage
-              (From.UTF8_Offset + L .. Text.Pointer.Size + L) :=
-                 Text.Pointer.Storage (From.UTF8_Offset .. Text.Pointer.Size);
+              (From.UTF8_Offset + L .. Text.Size + L) :=
+                 Text.Pointer.Storage (From.UTF8_Offset .. Text.Size);
 
             VSS.Implementation.UTF8_Encoding.Unchecked_Store
               (Text.Pointer.Storage, From.UTF8_Offset, L, U1, U2, U3, U4);
 
-            Text.Pointer.Size   := @ + L;
-            Text.Pointer.Length := @ + 1;
-            Text.Pointer.Storage (Text.Pointer.Size) := 16#00#;
+            Text.Size   := @ + L;
+            Text.Length := @ + 1;
+            Text.Pointer.Storage (Text.Size) := 16#00#;
          end;
       end if;
    end Insert;
@@ -473,17 +473,6 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
    begin
       return Self.Length = 0;
    end Is_Empty;
-
-   ------------
-   -- Length --
-   ------------
-
-   overriding function Length
-     (Self : Static_UTF8_Handler)
-      return VSS.Implementation.Strings.Character_Count is
-   begin
-      return Self.Length;
-   end Length;
 
    -----------
    -- Slice --
@@ -569,20 +558,6 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
          end loop;
       end return;
    end To_UTF_8_String;
-
-   ------------------------------------
-   -- UTF8_Constant_Storage_And_Size --
-   ------------------------------------
-
-   overriding procedure UTF8_Constant_Storage_And_Size
-     (Self    : Static_UTF8_Handler;
-      Pointer : out
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-      Size    : out VSS.Unicode.UTF8_Code_Unit_Count) is
-   begin
-      Pointer := Self.Storage (Self.Storage'First)'Unchecked_Access;
-      Size    := Self.Size;
-   end UTF8_Constant_Storage_And_Size;
 
    ----------------------------------
    -- UTF8_Constant_Storage_Poiner --
@@ -721,15 +696,5 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
          end;
       end if;
    end UTF8_Replace_Slice;
-
-   ---------------
-   -- UTF8_Size --
-   ---------------
-
-   overriding function UTF8_Size
-     (Self : Static_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count is
-   begin
-      return Self.Size;
-   end UTF8_Size;
 
 end VSS.Implementation.Text_Handlers.UTF8.Variable.Static;

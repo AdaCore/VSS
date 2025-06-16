@@ -14,8 +14,14 @@ package VSS.Implementation.Text_Handlers.UTF8
 is
 
    type Abstract_UTF8_Text is
-     abstract new VSS.Implementation.Text_Handlers.Abstract_Text_Handler
-       with null record;
+     abstract new VSS.Implementation.Text_Handlers.Abstract_Text_Handler  with
+   record
+      Size    : VSS.Unicode.UTF8_Code_Unit_Count           := 0;
+      --  Number of code units in the buffer.
+
+      Length  : VSS.Implementation.Strings.Character_Count := 0;
+      --  Length of the string in Unicode Code Points.
+   end record;
    --  This type provides direct access to underlying text storage and its
    --  size. It implements some operations that doesn't require modifications
    --  of the text.
@@ -24,25 +30,12 @@ is
    --  surrogates), otherwise optimized compare operations will return
    --  incorrect result.
 
-   not overriding function UTF8_Size
-     (Self : Abstract_UTF8_Text) return VSS.Unicode.UTF8_Code_Unit_Count
-        is abstract;
-   --  Return number of code units in the given text
-
    not overriding function UTF8_Constant_Storage_Poiner
      (Self : Abstract_UTF8_Text)
       return not null
         VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
           is abstract;
    --  Returns pointer to the first element in the text data storage.
-
-   not overriding procedure UTF8_Constant_Storage_And_Size
-     (Self    : Abstract_UTF8_Text;
-      Pointer : out
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-      Size    : out VSS.Unicode.UTF8_Code_Unit_Count) is abstract;
-   --  Returns pointer to the first element of the text storage and size of the
-   --  storage.
 
    overriding function Is_Equal
      (Self  : Abstract_UTF8_Text;
@@ -53,6 +46,10 @@ is
    overriding function Is_Less_Or_Equal
      (Self  : Abstract_UTF8_Text;
       Other : Abstract_Text_Handler'Class) return Boolean;
+
+   overriding function Length
+     (Self : Abstract_UTF8_Text)
+      return VSS.Implementation.Strings.Character_Count;
 
 private
 

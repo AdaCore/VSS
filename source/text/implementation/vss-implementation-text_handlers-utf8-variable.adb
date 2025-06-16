@@ -125,21 +125,21 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
            renames Variable.Dynamic.Dynamic_UTF8_Handler (Target_Handler.all);
 
       begin
-         if Target.Pointer.Size + Size > Target.Pointer.Bulk then
-            Dynamic.Reallocate (Target.Pointer, Target.Pointer.Size + Size);
+         if Target.Size + Size > Target.Pointer.Bulk then
+            Dynamic.Reallocate (Target.Pointer, Target.Size + Size);
          end if;
 
          Target.Pointer.Storage
-           (Target.Pointer.Size .. Target.Pointer.Size + Size - 1) :=
+           (Target.Size .. Target.Size + Size - 1) :=
               Storage (From .. From + Size - 1);
-         Target.Pointer.Size   := @ + Size;
-         Target.Pointer.Length := @ + Length;
+         Target.Size   := @ + Size;
+         Target.Length := @ + Length;
 
          if Terminator then
-            Target.Pointer.Storage (Target.Pointer.Size) := 16#00#;
+            Target.Pointer.Storage (Target.Size) := 16#00#;
          end if;
 
-         Target_Size := Target.Pointer.Size;
+         Target_Size := Target.Size;
       end;
    end Unchecked_Append;
 
@@ -172,20 +172,25 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
           .Static_UTF8_Handler;
       Size : VSS.Unicode.UTF8_Code_Unit_Count)
    is
-      Pointer : constant Variable.Dynamic.UTF8_String_Data_Access :=
+      Text_Size   : constant VSS.Unicode.UTF8_Code_Unit_Count           :=
+        Text.Size;
+      Text_Length : constant VSS.Implementation.Strings.Character_Count :=
+        Text.Length;
+      Pointer     : constant Variable.Dynamic.UTF8_String_Data_Access :=
         Variable.Dynamic.Allocate (Size);
 
    begin
       Pointer.Storage (0 .. Text.Size) := Text.Storage (0 .. Text.Size);
-      Pointer.Length                   := Text.Length;
-      Pointer.Size                     := Text.Size;
 
       declare
          Overlay : Variable.Dynamic.Dynamic_UTF8_Handler := (others => <>)
            with Address => Text'Address;
 
       begin
-         Overlay := (Pointer => Pointer);
+         Overlay :=
+           (Length  => Text_Length,
+            Size    => Text_Size,
+            Pointer => Pointer);
       end;
    end Unsafe_Convert_To_Dynamic;
 

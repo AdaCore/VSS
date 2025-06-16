@@ -2025,28 +2025,28 @@ package body VSS.Implementation.UTF8_Normalization is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Result_Text.all, Self.Pointer.Size);
+           (Result_Text.all, Self.Size);
       end;
 
       case Form is
          when VSS.Implementation.Normalization_Form_D =>
             VSS.Implementation.UTF8_Normalization.Decompose
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
                Result);
 
          when VSS.Implementation.Normalization_Form_C =>
             VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Normalization_UTF8.Canonical_Index,
                Result);
 
          when VSS.Implementation.Normalization_Form_KD =>
             VSS.Implementation.UTF8_Normalization.Decompose
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Normalization_UTF8
                .Compatibility_Index,
                Result);
@@ -2054,7 +2054,7 @@ package body VSS.Implementation.UTF8_Normalization is
          when VSS.Implementation.Normalization_Form_KC =>
             VSS.Implementation.UTF8_Normalization.Decompose_And_Compose
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Normalization_UTF8
                .Compatibility_Index,
                Result);
@@ -2309,27 +2309,27 @@ package body VSS.Implementation.UTF8_Normalization is
 
          begin
             if Delete_Size = 0 then
-               Target_Size := Target.Pointer.Size;
+               Target_Size := Target.Size;
 
-            elsif Delete_From + Delete_Size = Target.Pointer.Size then
+            elsif Delete_From + Delete_Size = Target.Size then
                --  End of string is deleted, no data moved, update size and
                --  length only.
 
-               Target.Pointer.Size   := @ - Delete_Size;
-               Target.Pointer.Length := @ - Delete_Length;
+               Target.Size   := @ - Delete_Size;
+               Target.Length := @ - Delete_Length;
 
-               Target_Size := Target.Pointer.Size;
+               Target_Size := Target.Size;
 
             else
                Target.Pointer.Storage
-                 (Delete_From .. Target.Pointer.Size - Delete_Size - 1) :=
+                 (Delete_From .. Target.Size - Delete_Size - 1) :=
                    Target.Pointer.Storage
-                     (Delete_From + Delete_Size .. Target.Pointer.Size - 1);
+                     (Delete_From + Delete_Size .. Target.Size - 1);
 
-               Target.Pointer.Size   := @ - Delete_Size;
-               Target.Pointer.Length := @ - Delete_Length;
+               Target.Size   := @ - Delete_Size;
+               Target.Length := @ - Delete_Length;
 
-               Target_Size := Target.Pointer.Size;
+               Target_Size := Target.Size;
             end if;
          end;
       end if;
@@ -2362,7 +2362,7 @@ package body VSS.Implementation.UTF8_Normalization is
          From    => From,
          Size    => Size,
          Length  => Length);
-      Target_Size := Target_Text.UTF8_Size;
+      Target_Size := Target_Text.Size;
    end Unchecked_Insert;
 
    --------------------------
@@ -2420,7 +2420,7 @@ package body VSS.Implementation.UTF8_Normalization is
          By_From        => Insert_From,
          By_Size        => Insert_Size,
          By_Length      => Insert_Length);
-      Target_Size := Target_Text.UTF8_Size;
+      Target_Size := Target_Text.Size;
    end Unchecked_Replace;
 
 end VSS.Implementation.UTF8_Normalization;

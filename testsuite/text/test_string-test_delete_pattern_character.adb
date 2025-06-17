@@ -11,7 +11,7 @@ begin
 
    declare
       SN : VSS.Strings.Virtual_String;
-      SE : VSS.Strings.Virtual_String := "";
+      SE : constant VSS.Strings.Virtual_String := "";
 
    begin
       Test_Support.Assert (SN.Delete (' ').Is_Empty);

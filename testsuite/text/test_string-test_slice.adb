@@ -162,11 +162,11 @@ begin
    declare
       use type VSS.Strings.Character_Count;
 
-      SS : VSS.Strings.Virtual_String := "body ";
+      SS : constant VSS.Strings.Virtual_String := "body ";
       --  Static storage
-      SR : VSS.Strings.Virtual_String := "package body ";
+      SR : constant VSS.Strings.Virtual_String := "package body ";
       --  Reported case: static storage of max size on 64bit platform
-      SD : VSS.Strings.Virtual_String := "package body Name ";
+      SD : constant VSS.Strings.Virtual_String := "package body Name ";
       --  Dynamic storage
       R  : VSS.Strings.Virtual_String;
 

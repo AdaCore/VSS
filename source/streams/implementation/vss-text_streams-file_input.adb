@@ -14,6 +14,8 @@ with VSS.Strings.Conversions;
 with VSS.Strings.Formatters.Strings;
 with VSS.Strings.Templates;
 
+with VSS.Characters.Latin;
+
 package body VSS.Text_Streams.File_Input is
 
    use type Interfaces.C_Streams.FILEs;
@@ -66,51 +68,11 @@ package body VSS.Text_Streams.File_Input is
       Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean) is
    begin
-      if Self.Buffer.Is_Empty then
-         if Self.Stream = Interfaces.C_Streams.NULL_Stream then
-            Self.Error := "File is not open";
-            Item       := VSS.Characters.Virtual_Character'Base'Last;
-            Success    := False;
+      Self.Populate_Buffer (Success);
 
-            return;
-         end if;
-
-         declare
-            use type Ada.Streams.Stream_Element_Offset;
-            use type Interfaces.C_Streams.size_t;
-
-            Data : Ada.Streams.Stream_Element_Array (1 .. 128);
-            Size : Interfaces.C_Streams.size_t;
-
-         begin
-            Size :=
-              Interfaces.C_Streams.fread
-                (Data (Data'First)'Address, 0, 1, Data'Length, Self.Stream);
-
-            if Size /= 0 then
-               --  Some data has been read, decode it.
-
-               Self.Buffer :=
-                 Self.Decoder.Decode
-                   (Data
-                      (Data'First
-                         .. Data'First
-                              + Ada.Streams.Stream_Element_Offset (Size) - 1),
-                    False);
-
-            elsif Interfaces.C_Streams.feof (Self.Stream) /= 0 then
-               --  End of file has been reached, let decoder know that no more
-               --  data available. Decoder will return REPLACEMENT CHARACTER
-               --  if some data has beed accumulated but can't be decoded.
-
-               Self.Buffer :=
-                 Self.Decoder.Decode
-                   (Data (Data'First .. Data'First - 1), True);
-
-            elsif Interfaces.C_Streams.ferror (Self.Stream) /= 0 then
-               Self.Error := "File IO error";
-            end if;
-         end;
+      if not Success then
+         Item       := VSS.Characters.Virtual_Character'Base'Last;
+         return;
       end if;
 
       if Self.Buffer.Is_Empty then
@@ -130,6 +92,69 @@ package body VSS.Text_Streams.File_Input is
          end;
       end if;
    end Get;
+
+   --------------
+   -- Get_Line --
+   --------------
+
+   procedure Get_Line
+      (Self        : in out File_Input_Text_Stream'Class;
+       Line        : out VSS.Strings.Virtual_String'Class;
+       Success     : out Boolean;
+       Terminators : VSS.Strings.Line_Terminator_Set :=
+         VSS.Strings.New_Line_Function)
+   is
+
+      use type VSS.Characters.Virtual_Character;
+
+      function Exfiltrate_From_Buffer return Boolean;
+
+      function Exfiltrate_From_Buffer return Boolean
+      is
+         First_Character : constant
+           VSS.Strings.Character_Iterators.Character_Iterator :=
+             Self.Buffer.At_First_Character;
+
+         Last_Character :
+           VSS.Strings.Character_Iterators.Character_Iterator :=
+             Self.Buffer.At_First_Character;
+
+         At_EOL : Boolean := False;
+      begin
+         loop
+            if Self.Buffer.Slice (First_Character, Last_Character)
+              .Ends_With (Terminators)
+            then
+               At_EOL := True;
+               exit;
+            end if;
+
+            exit when not Last_Character.Forward;
+         end loop;
+
+         Line.Append (Self.Buffer.Slice (First_Character, Last_Character));
+         Self.Buffer.Delete (First_Character, Last_Character);
+         return At_EOL;
+      end Exfiltrate_From_Buffer;
+
+   begin
+      Self.Populate_Buffer (Success);
+      if Self.Buffer.Is_Empty then
+         Success := False;
+      end if;
+
+      Line.Clear;
+
+      loop
+         exit when Exfiltrate_From_Buffer;
+
+         Self.Populate_Buffer (Success);
+
+         if not Success then
+            return;
+         end if;
+      end loop;
+   end Get_Line;
 
    ---------------
    -- Has_Error --
@@ -226,6 +251,63 @@ package body VSS.Text_Streams.File_Input is
          Self.Open (Name);
       end if;
    end Open;
+
+   ---------------------
+   -- Populate_Buffer --
+   ---------------------
+
+   procedure Populate_Buffer
+      (Self    : in out File_Input_Text_Stream;
+       Success : out Boolean) is
+   begin
+      if Self.Buffer.Is_Empty then
+         if Self.Stream = Interfaces.C_Streams.NULL_Stream then
+            Self.Error := "File is not open";
+            Success    := False;
+
+            return;
+         end if;
+
+         declare
+            use type Ada.Streams.Stream_Element_Offset;
+            use type Interfaces.C_Streams.size_t;
+
+            Data : Ada.Streams.Stream_Element_Array (1 .. 128);
+            Size : Interfaces.C_Streams.size_t;
+
+         begin
+            Size :=
+              Interfaces.C_Streams.fread
+                (Data (Data'First)'Address, 0, 1, Data'Length, Self.Stream);
+
+            if Size /= 0 then
+               --  Some data has been read, decode it.
+
+               Self.Buffer :=
+                 Self.Decoder.Decode
+                   (Data
+                      (Data'First
+                         .. Data'First
+                              + Ada.Streams.Stream_Element_Offset (Size) - 1),
+                    False);
+
+            elsif Interfaces.C_Streams.feof (Self.Stream) /= 0 then
+               --  End of file has been reached, let decoder know that no more
+               --  data available. Decoder will return REPLACEMENT CHARACTER
+               --  if some data has beed accumulated but can't be decoded.
+
+               Self.Buffer :=
+                 Self.Decoder.Decode
+                   (Data (Data'First .. Data'First - 1), True);
+
+            elsif Interfaces.C_Streams.ferror (Self.Stream) /= 0 then
+               Self.Error := "File IO error";
+            end if;
+         end;
+      end if;
+
+      Success := True;
+   end Populate_Buffer;
 
    ------------------
    -- Set_Encoding --

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -35,6 +35,7 @@ procedure Test_String_Vector is
    procedure Test_Join_Lines;
    procedure Test_Is_Empty;
    procedure Test_Append_Vector;
+   procedure Test_Concatenation_Vector;
    procedure Test_Clear;
    procedure Test_Contains;
    procedure Test_Delete;
@@ -115,6 +116,25 @@ procedure Test_String_Vector is
       Test_Support.Assert (V2.Last_Index = 1);
       Test_Support.Assert (V2.Length = 1);
    end Test_Clear;
+
+   -------------------------------
+   -- Test_Concatenation_Vector --
+   -------------------------------
+
+   procedure Test_Concatenation_Vector is
+      V1 : constant VSS.String_Vectors.Virtual_String_Vector := ["a", "b"];
+      V2 : constant VSS.String_Vectors.Virtual_String_Vector := ["c"];
+      R  : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      R := V1 & V2;
+
+      Test_Support.Assert (not R.Is_Empty);
+      Test_Support.Assert (R.Length = 3);
+      Test_Support.Assert (R (1) = "a");
+      Test_Support.Assert (R (2) = "b");
+      Test_Support.Assert (R (3) = "c");
+   end Test_Concatenation_Vector;
 
    -------------------
    -- Test_Contains --
@@ -541,6 +561,8 @@ procedure Test_String_Vector is
       Test_Support.Run_Testcase (Test_Contains'Access, "Contains");
       Test_Support.Run_Testcase (Test_Delete'Access, "Delete");
       Test_Support.Run_Testcase (Test_Prepend'Access, "Prepend");
+      Test_Support.Run_Testcase
+        (Test_Concatenation_Vector'Access, "Concatenation of vectors");
    end Test_Virtual_String_Vector;
 
 begin

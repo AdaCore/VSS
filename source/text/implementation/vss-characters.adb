@@ -401,4 +401,16 @@ package body VSS.Characters is
       return Wide_Wide_Character (Self) in VSS.Unicode.Scalar_Value_Character;
    end Is_Valid_Virtual_Character;
 
+   -----------------------
+   -- To_Virtual_String --
+   -----------------------
+
+   function To_Virtual_String
+     (Self : Virtual_Character) return VSS.Strings.Virtual_String is
+   begin
+      return Result : VSS.Strings.Virtual_String do
+         Result.Append (Self);
+      end return;
+   end To_Virtual_String;
+
 end VSS.Characters;

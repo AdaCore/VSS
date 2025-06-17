@@ -168,4 +168,9 @@ package VSS.Characters is
    --  Return True when character belong to Format type, which includes
    --  characters with general category Control.
 
+   function To_Virtual_String
+     (Self : Virtual_Character) return VSS.Strings.Virtual_String;
+   --  Convert character into string containing single instance of given
+   --  character.
+
 end VSS.Characters;

@@ -1228,6 +1228,19 @@ package body VSS.Strings is
       end return;
    end To_Virtual_String;
 
+   ------------------------------
+   -- To_Virtual_String_Vector --
+   ------------------------------
+
+   function To_Virtual_String_Vector
+     (Self : Virtual_String'Class)
+      return VSS.String_Vectors.Virtual_String_Vector is
+   begin
+      return Result : VSS.String_Vectors.Virtual_String_Vector do
+         Result.Append (Self);
+      end return;
+   end To_Virtual_String_Vector;
+
    ---------------
    -- Transform --
    ---------------

@@ -1,8 +1,10 @@
 --
---  Copyright (C) 2021-2024, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
+
+pragma Ada_2022;
 
 with VSS.Implementation.Character_Codes;
 with VSS.Implementation.Text_Handlers;
@@ -65,51 +67,51 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    Forward_GCB_Rules : constant array
      (VSS.Implementation.UCD_Core.GCB_Values,
       VSS.Implementation.UCD_Core.GCB_Values) of GCB_Action :=
-     (GCB_CN  => (others => Break),                     --  Rule GB4
+     [GCB_CN  => [others => Break],                     --  Rule GB4
       GCB_CR  =>
-        (GCB_LF => No_Break,                            --  Rule GB3
-         others => Break),                              --  Rule GB4
+        [GCB_LF => No_Break,                            --  Rule GB3
+         others => Break],                              --  Rule GB4
       GCB_L   =>
-        (GCB_CN | GCB_CR | GCB_LF         => Break,     --  Rule GB5
+        [GCB_CN | GCB_CR | GCB_LF         => Break,     --  Rule GB5
          GCB_L | GCB_V | GCB_LV | GCB_LVT => No_Break,  --  Rule GB6
          GCB_EX | GCB_ZWJ                 => No_Break,  --  Rule GB9
          GCB_SM                           => No_Break,  --  Rule GB9a
-         others                           => Unspecified),
-      GCB_LF  => (others => Break),                     --  Rule GB4
+         others                           => Unspecified],
+      GCB_LF  => [others => Break],                     --  Rule GB4
       GCB_LV  =>
-        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+        [GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
          GCB_V | GCB_T            => No_Break,          --  Rule GB7
          GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
          GCB_SM                   => No_Break,          --  Rule GB9a
-         others                   => Unspecified),
+         others                   => Unspecified],
       GCB_LVT =>
-        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+        [GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
          GCB_T                    => No_Break,          --  Rule GB8
          GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
          GCB_SM                   => No_Break,          --  Rule GB9a
-         others                   => Unspecified),
+         others                   => Unspecified],
       GCB_PP  =>
-        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+        [GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
          GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
          GCB_SM                   => No_Break,          --  Rule GB9a
-         others                   => No_Break),         --  Rule GB9b
+         others                   => No_Break],         --  Rule GB9b
       GCB_T =>
-        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+        [GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
          GCB_T                    => No_Break,          --  Rule GB8
          GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
          GCB_SM                   => No_Break,          --  Rule GB9a
-         others                   => Unspecified),
+         others                   => Unspecified],
       GCB_V   =>
-        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+        [GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
          GCB_V | GCB_T            => No_Break,          --  Rule GB7
          GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
          GCB_SM                   => No_Break,          --  Rule GB9a
-         others                   => Unspecified),
+         others                   => Unspecified],
       GCB_EX | GCB_RI | GCB_SM | GCB_XX | GCB_ZWJ =>
-        (GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
+        [GCB_CN | GCB_CR | GCB_LF => Break,             --  Rule GB5
          GCB_EX | GCB_ZWJ         => No_Break,          --  Rule GB9
          GCB_SM                   => No_Break,          --  Rule GB9a
-         others                   => Unspecified));
+         others                   => Unspecified]];
 
    -------------------
    -- Apply_ExtPict --

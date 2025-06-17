@@ -103,14 +103,14 @@ package body VSS.Implementation.UTF8_Casing is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Handler.all, 0, Self.Pointer.Size);
+           (Handler.all, Self.Size);
       end;
 
       case Mapping is
          when Simple_Lowercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Lowercase_Index,
                Result);
 
@@ -126,28 +126,28 @@ package body VSS.Implementation.UTF8_Casing is
          when Simple_Uppercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Uppercase_Index,
                Result);
 
          when Simple_Case_Folding =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Simple_Case_Folding_Index,
                Result);
 
          when NFKC_Casefold =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Simple
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.NFKC_Casefold_Index,
                Result);
 
          when Lowercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Full
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Lowercase_Index,
                True,
                Result);
@@ -165,7 +165,7 @@ package body VSS.Implementation.UTF8_Casing is
          when Uppercase =>
             VSS.Implementation.UTF8_Casing.Convert_Case_Full
               (Self.Pointer.Storage,
-               Self.Pointer.Size,
+               Self.Size,
                VSS.Implementation.UCD_Casing_UTF8.Full_Uppercase_Index,
                False,
                Result);
@@ -198,7 +198,7 @@ package body VSS.Implementation.UTF8_Casing is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Handler.all, 0, Self.Size);
+           (Handler.all, Self.Size);
       end;
 
       case Mapping is
@@ -420,7 +420,7 @@ package body VSS.Implementation.UTF8_Casing is
 
       begin
          VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-           (Text.all, 0, 0);
+           (Text.all, 0);
 
          Get_Case_Mapping
            (Code,

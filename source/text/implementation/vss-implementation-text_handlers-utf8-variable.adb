@@ -115,7 +115,7 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
                return;
 
             else
-               Unsafe_Convert_To_Dynamic (Target, 0, Target.Size + Size);
+               Unsafe_Convert_To_Dynamic (Target, Target.Size + Size);
             end if;
          end;
       end if;
@@ -125,21 +125,22 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
            renames Variable.Dynamic.Dynamic_UTF8_Handler (Target_Handler.all);
 
       begin
-         if Target.Pointer.Size + Size > Target.Pointer.Bulk then
-            Dynamic.Reallocate (Target.Pointer, 0, Target.Pointer.Size + Size);
+         if Target.Size + Size > Target.Pointer.Bulk then
+            Dynamic.Reallocate
+              (Target.Storage, Target.Pointer, Target.Size + Size);
          end if;
 
          Target.Pointer.Storage
-           (Target.Pointer.Size .. Target.Pointer.Size + Size - 1) :=
+           (Target.Size .. Target.Size + Size - 1) :=
               Storage (From .. From + Size - 1);
-         Target.Pointer.Size   := @ + Size;
-         Target.Pointer.Length := @ + Length;
+         Target.Size   := @ + Size;
+         Target.Length := @ + Length;
 
          if Terminator then
-            Target.Pointer.Storage (Target.Pointer.Size) := 16#00#;
+            Target.Pointer.Storage (Target.Size) := 16#00#;
          end if;
 
-         Target_Size := Target.Pointer.Size;
+         Target_Size := Target.Size;
       end;
    end Unchecked_Append;
 
@@ -167,26 +168,32 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
    -------------------------------
 
    procedure Unsafe_Convert_To_Dynamic
-     (Text     : in out
+     (Text : in out
         VSS.Implementation.Text_Handlers.UTF8.Variable.Static
           .Static_UTF8_Handler;
-      Capacity : VSS.Unicode.UTF8_Code_Unit_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count)
+      Size : VSS.Unicode.UTF8_Code_Unit_Count)
    is
-      Pointer : constant Variable.Dynamic.UTF8_String_Data_Access :=
-        Variable.Dynamic.Allocate (Capacity, Size);
+      Text_Size   : constant VSS.Unicode.UTF8_Code_Unit_Count           :=
+        Text.Size;
+      Text_Length : constant VSS.Implementation.Strings.Character_Count :=
+        Text.Length;
+      Pointer     : constant Variable.Dynamic.UTF8_String_Data_Access :=
+        Variable.Dynamic.Allocate (Size);
 
    begin
       Pointer.Storage (0 .. Text.Size) := Text.Storage (0 .. Text.Size);
-      Pointer.Length                   := Text.Length;
-      Pointer.Size                     := Text.Size;
 
       declare
          Overlay : Variable.Dynamic.Dynamic_UTF8_Handler := (others => <>)
            with Address => Text'Address;
 
       begin
-         Overlay := (Pointer => Pointer);
+         Overlay :=
+           (Length  => Text_Length,
+            Size    => Text_Size,
+            Storage =>
+              Pointer.Storage (Pointer.Storage'First)'Unchecked_Access,
+            Pointer => Pointer);
       end;
    end Unsafe_Convert_To_Dynamic;
 
@@ -195,14 +202,11 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
    -----------------------
 
    procedure Unsafe_Initialize
-     (Text     : in out
+     (Text : in out
         VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
-      Capacity : VSS.Implementation.Strings.Character_Count;
-      Size     : VSS.Unicode.UTF8_Code_Unit_Count) is
+      Size : VSS.Unicode.UTF8_Code_Unit_Count) is
    begin
-      if Capacity * 4 <= Variable.Static.In_Place_Storage_Capacity
-        and Size <= Variable.Static.In_Place_Storage_Capacity
-      then
+      if Size <= Variable.Static.In_Place_Storage_Capacity then
          declare
             pragma Warnings (Off, """Overlay"" overlays smaller object");
             Overlay : Variable.Static.Static_UTF8_Handler  := (others => <>)
@@ -221,9 +225,10 @@ package body VSS.Implementation.Text_Handlers.UTF8.Variable is
             pragma Warnings (On, """Overlay"" overlays smaller object");
 
          begin
-            Overlay.Pointer :=
-              Variable.Dynamic.Allocate
-                (VSS.Unicode.UTF8_Code_Unit_Count (Capacity) * 4, Size);
+            Overlay.Pointer := Variable.Dynamic.Allocate (Size);
+            Overlay.Storage :=
+              Overlay.Pointer.Storage
+                (Overlay.Pointer.Storage'First)'Unchecked_Access;
          end;
       end if;
    end Unsafe_Initialize;

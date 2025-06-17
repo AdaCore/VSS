@@ -58,7 +58,6 @@ package VSS.Characters.Latin is
    Colon                  :  constant Virtual_Character :=
      Virtual_Character'Val (16#003A#);
 
-
    Less_Than_Sign         : constant Virtual_Character :=
      Virtual_Character'Val (16#003C#);
    Equals_Sign            : constant Virtual_Character :=

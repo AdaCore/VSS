@@ -6,6 +6,7 @@
 
 pragma Ada_2022;
 
+with Ada.Tags;
 with Interfaces;
 
 with VSS.Implementation.GCC;
@@ -28,31 +29,28 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
      (Self  : Abstract_UTF8_Text;
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
-      if Other in Abstract_UTF8_Text'Class then
+      if Other.Is_UTF8 then
          declare
-            Self_Pointer  :
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-            Self_Size     : VSS.Unicode.UTF8_Code_Unit_Count;
-            Other_Pointer :
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-            Other_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+            Self_Pointer  : constant
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+                Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
+            Other_Text    : Abstract_UTF8_Text'Class
+              renames Abstract_UTF8_Text'Class (Other);
+            Other_Pointer : constant
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+                Other_Text.UTF8_Constant_Storage_Poiner;
 
          begin
-            Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_And_Size
-              (Self_Pointer, Self_Size);
-            Abstract_UTF8_Text'Class (Other).UTF8_Constant_Storage_And_Size
-              (Other_Pointer, Other_Size);
-
             declare
                Self_Storage  : constant
                  VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self_Size - 1)
+                   (0 .. Self.Size - 1)
                  with Import,
                       Convention => Ada,
                       Address => Self_Pointer.all'Address;
                Other_Storage : constant
                  VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Size - 1)
+                   (0 .. Other_Text.Size - 1)
                  with Import,
                       Convention => Ada,
                       Address => Other_Pointer.all'Address;
@@ -75,31 +73,28 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
      (Self  : Abstract_UTF8_Text;
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
-      if Other in Abstract_UTF8_Text'Class then
+      if Other.Is_UTF8 then
          declare
-            Self_Pointer  :
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-            Self_Size     : VSS.Unicode.UTF8_Code_Unit_Count;
-            Other_Pointer :
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-            Other_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+            Self_Pointer  : constant
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+                Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
+            Other_Text    : Abstract_UTF8_Text'Class
+              renames Abstract_UTF8_Text'Class (Other);
+            Other_Pointer : constant
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+                Other_Text.UTF8_Constant_Storage_Poiner;
 
          begin
-            Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_And_Size
-              (Self_Pointer, Self_Size);
-            Abstract_UTF8_Text'Class (Other).UTF8_Constant_Storage_And_Size
-              (Other_Pointer, Other_Size);
-
             declare
                Self_Storage  : constant
                  VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self_Size - 1)
+                   (0 .. Self.Size - 1)
                  with Import,
                       Convention => Ada,
                       Address => Self_Pointer.all'Address;
                Other_Storage : constant
                  VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Size - 1)
+                   (0 .. Other_Text.Size - 1)
                  with Import,
                       Convention => Ada,
                       Address => Other_Pointer.all'Address;
@@ -122,31 +117,28 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
      (Self  : Abstract_UTF8_Text;
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
-      if Other in Abstract_UTF8_Text'Class then
+      if Other.Is_UTF8 then
          declare
-            Self_Pointer  :
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-            Self_Size     : VSS.Unicode.UTF8_Code_Unit_Count;
-            Other_Pointer :
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-            Other_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+            Self_Pointer  : constant
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+                Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
+            Other_Text    : Abstract_UTF8_Text'Class
+              renames Abstract_UTF8_Text'Class (Other);
+            Other_Pointer : constant
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+                Other_Text.UTF8_Constant_Storage_Poiner;
 
          begin
-            Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_And_Size
-              (Self_Pointer, Self_Size);
-            Abstract_UTF8_Text'Class (Other).UTF8_Constant_Storage_And_Size
-              (Other_Pointer, Other_Size);
-
             declare
                Self_Storage  : constant
                  VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self_Size - 1)
+                   (0 .. Self.Size - 1)
                  with Import,
                       Convention => Ada,
                       Address => Self_Pointer.all'Address;
                Other_Storage : constant
                  VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Size - 1)
+                   (0 .. Other_Text.Size - 1)
                  with Import,
                       Convention => Ada,
                       Address => Other_Pointer.all'Address;
@@ -160,6 +152,17 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
          return Abstract_Text_Handler (Self).Is_Less_Or_Equal (Other);
       end if;
    end Is_Less_Or_Equal;
+
+   ------------
+   -- Length --
+   ------------
+
+   overriding function Length
+     (Self : Abstract_UTF8_Text)
+      return VSS.Implementation.Strings.Character_Count is
+   begin
+      return Self.Length;
+   end Length;
 
    ------------------------
    -- Split_Lines_Common --
@@ -223,15 +226,17 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
                  with Address => Data.Storage'Address;
 
             begin
-               Pointer := UTF8.Variable.Dynamic.Allocate (0, Size);
+               Pointer := UTF8.Variable.Dynamic.Allocate (Size);
 
                Pointer.Storage (0 .. Size - 1) :=
                  Source_Storage
                    (First.UTF8_Offset .. After_Last.UTF8_Offset - 1);
-               Pointer.Size   := Size;
-               Pointer.Length := After_Last.Index - First.Index;
-               Pointer.Storage (Pointer.Size) := 16#00#;
+               Dynamic.Size   := Size;
+               Dynamic.Length := After_Last.Index - First.Index;
+               Pointer.Storage (Dynamic.Size) := 16#00#;
 
+               Dynamic.Storage :=
+                 Pointer.Storage (Pointer.Storage'First)'Unchecked_Access;
                Dynamic.Pointer := Pointer;
             end;
          end if;
@@ -371,5 +376,39 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
          end if;
       end;
    end Unchecked_Forward;
+
+   ----------------------------------
+   -- UTF8_Constant_Storage_Poiner --
+   ----------------------------------
+
+   function UTF8_Constant_Storage_Poiner
+     (Self : Abstract_UTF8_Text'Class)
+      return not null
+        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
+   is
+      use type Ada.Tags.Tag;
+
+      pragma Warnings (Off, """Overlay"" overlays smaller object");
+      Overlay : constant Variable.Static.Static_UTF8_Handler
+        with Import, Convention => Ada, Address => Self'Address;
+      pragma Warnings (On, """Overlay"" overlays smaller object");
+
+   begin
+      if Self'Tag = Variable.Static.Static_UTF8_Handler'Tag then
+         return Overlay.Storage (Overlay.Storage'First)'Unchecked_Access;
+
+      else
+         declare
+            Storage :
+              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
+                with Import,
+                     Convention => Ada,
+                     Address    => Overlay.Storage'Address;
+
+         begin
+            return Storage;
+         end;
+      end if;
+   end UTF8_Constant_Storage_Poiner;
 
 end VSS.Implementation.Text_Handlers.UTF8;

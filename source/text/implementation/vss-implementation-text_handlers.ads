@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -267,13 +267,9 @@ package VSS.Implementation.Text_Handlers is
    --  terminators. Line terminator (character or combination of characters)
    --  are removed unless Keep_Terminator is set to True.
 
-   function Unsafe_Capacity
-     (Self : Abstract_Text_Handler'Class)
-      return VSS.Implementation.Strings.Character_Count;
-   --  Returns capacity of the text data, requested by the application for the
-   --  given text daya.
-   --
-   --  Implementation assume that given text data is inside of the String_Data
-   --  object.
+   not overriding function Is_UTF8
+     (Self : Abstract_Text_Handler) return Boolean is (False);
+   --  Returns `True` when object's type is derived from `Abstract_UTF8_Text`
+   --  type.
 
 end VSS.Implementation.Text_Handlers;

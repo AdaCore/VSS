@@ -12,23 +12,14 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
 
    pragma Preelaborate;
 
-   In_Place_Storage_Capacity : constant := 16 - 2 - 1;
+   In_Place_Storage_Capacity : constant := 16 - 1;
    --  Number of code units can be stored in place
-
-   subtype In_Place_UTF8_Code_Unit_Count is
-     VSS.Unicode.UTF8_Code_Unit_Count range 0 .. In_Place_Storage_Capacity;
-
-   subtype In_Place_Character_Count is
-     VSS.Implementation.Strings.Character_Count
-       range 0 .. In_Place_Storage_Capacity;
 
    type Static_UTF8_Handler is new Variable_UTF8_Text with record
       Storage :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
           (0 .. In_Place_Storage_Capacity) := [others => 0];
-      Size    : In_Place_UTF8_Code_Unit_Count := 0;
-      Length  : In_Place_Character_Count      := 0;
-   end record with Pack, Object_Size => 192;
+   end record with Pack, Object_Size => 256;
 
    overriding procedure Reference
      (Self : in out Static_UTF8_Handler) is null;
@@ -38,10 +29,6 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
 
    overriding function Is_Empty
      (Self : Static_UTF8_Handler) return Boolean;
-
-   overriding function Length
-     (Self : Static_UTF8_Handler)
-      return VSS.Implementation.Strings.Character_Count;
 
    overriding function Element
      (Self     : Static_UTF8_Handler;
@@ -147,19 +134,5 @@ package VSS.Implementation.Text_Handlers.UTF8.Variable.Static is
       By_From        : VSS.Unicode.UTF8_Code_Unit_Index;
       By_Size        : VSS.Unicode.UTF8_Code_Unit_Count;
       By_Length      : VSS.Implementation.Strings.Character_Count);
-
-   overriding function UTF8_Size
-     (Self : Static_UTF8_Handler) return VSS.Unicode.UTF8_Code_Unit_Count;
-
-   overriding function UTF8_Constant_Storage_Poiner
-     (Self : Static_UTF8_Handler)
-      return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-
-   overriding procedure UTF8_Constant_Storage_And_Size
-     (Self    : Static_UTF8_Handler;
-      Pointer : out
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access;
-      Size    : out VSS.Unicode.UTF8_Code_Unit_Count);
 
 end VSS.Implementation.Text_Handlers.UTF8.Variable.Static;

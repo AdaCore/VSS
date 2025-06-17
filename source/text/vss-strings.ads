@@ -450,6 +450,11 @@ package VSS.Strings is
       Transformer : VSS.Transformers.Abstract_Transformer'Class);
    --  Transform given text using given text transformer.
 
+   function To_Virtual_String_Vector
+     (Self : Virtual_String'Class)
+      return VSS.String_Vectors.Virtual_String_Vector;
+   --  Create string vector with single item of given string.
+
 private
 
    type Magic_String_Access is access all Virtual_String'Class;

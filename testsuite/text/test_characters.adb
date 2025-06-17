@@ -35,6 +35,9 @@ procedure Test_Characters is
    --  for them have expected values. Full coverage of all characters is done
    --  in other tests for some groups of properties.
 
+   procedure Test_To_Virtual_String;
+   --  Test conversion of the `Virtual_Character` into `Virtual_String`
+
    UCD_Loaded : Boolean := False;
 
    --------------------
@@ -273,6 +276,24 @@ procedure Test_Characters is
       end;
    end Test_Properties;
 
+   ----------------------------
+   -- Test_To_Virtual_String --
+   ----------------------------
+
+   procedure Test_To_Virtual_String is
+      use type VSS.Strings.Character_Count;
+      use type VSS.Strings.Virtual_String;
+
+      C : constant VSS.Characters.Virtual_Character := 'a';
+      S : VSS.Strings.Virtual_String;
+
+   begin
+      S := VSS.Characters.To_Virtual_String (C);
+      Test_Support.Assert (not S.Is_Empty);
+      Test_Support.Assert (S.Character_Length = 1);
+      Test_Support.Assert (S = "a");
+   end Test_To_Virtual_String;
+
    ---------------------
    -- Test_Well_Known --
    ---------------------
@@ -355,4 +376,6 @@ begin
      (Test_Properties'Access,
       "all-character-properties",
       "Test character's properties of all characters");
+   Test_Support.Run_Testcase
+     (Test_To_Virtual_String'Access, "To_Virtual_String");
 end Test_Characters;

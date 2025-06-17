@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,6 +11,8 @@ with VSS.String_Vectors;
 with Test_Support;
 
 procedure Test_String is
+
+   use type VSS.Strings.Virtual_String;
 
    procedure Test_Virtual_String;
    --  Run Virtual_String testsuite
@@ -24,6 +26,7 @@ procedure Test_String is
    procedure Test_Replace;
    procedure Test_Slice;
    procedure Test_Tail;
+   procedure Test_To_Virtual_String_Vector;
 
    procedure Test_V705_011;
    --  Test that Slice implementation fills null terminator at the end of the
@@ -44,9 +47,6 @@ procedure Test_String is
    ------------------
 
    procedure Test_Prepend is
-
-      use type VSS.Strings.Virtual_String;
-
       Single : constant Wide_Wide_String := ".";
       Short  : constant Wide_Wide_String := "1234567890";
       Long   : constant Wide_Wide_String := "abcdefghijklmnopqrstuvwxyz";
@@ -106,9 +106,6 @@ procedure Test_String is
    ------------------
 
    procedure Test_Replace is
-
-      use type VSS.Strings.Virtual_String;
-
    begin
       declare
          S  : VSS.Strings.Virtual_String := "Hello, bad world!";
@@ -167,9 +164,6 @@ procedure Test_String is
    ---------------
 
    procedure Test_Tail is
-
-      use type VSS.Strings.Virtual_String;
-
       S  : constant VSS.Strings.Virtual_String := "abcdefg";
       --  JF : VSS.Strings.Character_Iterators.Character_Iterator :=
       --    S.At_First_Character;
@@ -196,6 +190,21 @@ procedure Test_String is
       Test_Support.Assert (S.Tail_From (S.At_Last_Character) = "g");
       Test_Support.Assert (S.Tail_After (S.At_Last_Character).Is_Empty);
    end Test_Tail;
+
+   -----------------------------------
+   -- Test_To_Virtual_String_Vector --
+   -----------------------------------
+
+   procedure Test_To_Virtual_String_Vector is
+      S : constant VSS.Strings.Virtual_String := "a";
+      R : VSS.String_Vectors.Virtual_String_Vector;
+
+   begin
+      R := S.To_Virtual_String_Vector;
+      Test_Support.Assert (not R.Is_Empty);
+      Test_Support.Assert (R.Length = 1);
+      Test_Support.Assert (R (1) = S);
+   end Test_To_Virtual_String_Vector;
 
    -------------------
    -- Test_V705_011 --
@@ -239,6 +248,8 @@ procedure Test_String is
       Test_Support.Run_Testcase (Test_Replace'Access, "Replace");
       Test_Support.Run_Testcase (Test_Slice'Access, "Slice");
       Test_Support.Run_Testcase (Test_Tail'Access, "Tail");
+      Test_Support.Run_Testcase
+        (Test_To_Virtual_String_Vector'Access, "To_Virtual_String_Vector");
 
       Test_Support.Run_Testcase (Test_V705_011'Access, "V705_011 TN");
    end Test_Virtual_String;

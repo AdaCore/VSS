@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2024, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -16,8 +16,6 @@ with VSS.Strings.Line_Iterators;
 
 separate (Test_String)
 procedure Test_Slice is
-   use type VSS.Strings.Virtual_String;
-
    S  : constant VSS.Strings.Virtual_String :=
      VSS.Strings.To_Virtual_String ("ASCII Кириллица ⊗∬ 𝛻𝜕 ");
    S1 : constant VSS.Strings.Virtual_String :=

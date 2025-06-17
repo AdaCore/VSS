@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,6 +11,8 @@ with VSS.String_Vectors;
 with Test_Support;
 
 procedure Test_String is
+
+   use type VSS.Strings.Virtual_String;
 
    procedure Test_Virtual_String;
    --  Run Virtual_String testsuite
@@ -44,9 +46,6 @@ procedure Test_String is
    ------------------
 
    procedure Test_Prepend is
-
-      use type VSS.Strings.Virtual_String;
-
       Single : constant Wide_Wide_String := ".";
       Short  : constant Wide_Wide_String := "1234567890";
       Long   : constant Wide_Wide_String := "abcdefghijklmnopqrstuvwxyz";
@@ -106,9 +105,6 @@ procedure Test_String is
    ------------------
 
    procedure Test_Replace is
-
-      use type VSS.Strings.Virtual_String;
-
    begin
       declare
          S  : VSS.Strings.Virtual_String := "Hello, bad world!";
@@ -167,9 +163,6 @@ procedure Test_String is
    ---------------
 
    procedure Test_Tail is
-
-      use type VSS.Strings.Virtual_String;
-
       S  : constant VSS.Strings.Virtual_String := "abcdefg";
       --  JF : VSS.Strings.Character_Iterators.Character_Iterator :=
       --    S.At_First_Character;

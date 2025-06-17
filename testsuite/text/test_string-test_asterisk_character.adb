@@ -1,14 +1,11 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 separate (Test_String)
 procedure Test_Asterisk_Character is
-
-   use type VSS.Strings.Virtual_String;
-
 begin
    declare
       R : constant VSS.Strings.Virtual_String := 0 * 'A';

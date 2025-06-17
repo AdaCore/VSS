@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -10,6 +10,19 @@ with VSS.Implementation.Strings;
 package body VSS.String_Vectors is
 
    use type VSS.Implementation.String_Vectors.String_Vector_Data_Access;
+
+   ---------
+   -- "&" --
+   ---------
+
+   function "&"
+     (Left  : Virtual_String_Vector;
+      Right : Virtual_String_Vector) return Virtual_String_Vector is
+   begin
+      return Result : Virtual_String_Vector := Left do
+         Result.Append (Right);
+      end return;
+   end "&";
 
    ---------
    -- "=" --

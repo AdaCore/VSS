@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -37,6 +37,11 @@ package VSS.String_Vectors is
      (Left  : Virtual_String_Vector;
       Right : Virtual_String_Vector) return Boolean;
    --  Compare two string vectors.
+
+   function "&"
+     (Left  : Virtual_String_Vector;
+      Right : Virtual_String_Vector) return Virtual_String_Vector;
+   --  Concatenate two vectors.
 
    function Is_Empty (Self : Virtual_String_Vector'Class) return Boolean;
    --  Return True when string vector is empty.

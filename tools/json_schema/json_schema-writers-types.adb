@@ -1522,7 +1522,7 @@ package body JSON_Schema.Writers.Types is
                Put ("Init_Length : constant Positive :=");
                New_Line;
 
-               Put ("Positive'Max (1, 256 / ");
+               Put ("Positive'Max (2, 256 / ");
                Put (Element_Type);
                Put ("'Size);");
                New_Line;
@@ -1546,12 +1546,9 @@ package body JSON_Schema.Writers.Types is
                New_Line;
                Put ("new ");
                Put (Item);
-               Put ("_Array'");
-               Put ("(Self.Data.all");
+               Put ("_Array (1 .. 3 * Self.Length / 2);");
                New_Line;
-               Put (" & ");
-               Put (Item);
-               Put ("_Array'(1 .. Self.Length => <>));");
+               Put ("Self.Data (1 .. Self.Length) := Self_Data_Saved.all;");
                New_Line;
                Put ("Free (Self_Data_Saved);");
                New_Line;

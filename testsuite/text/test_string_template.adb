@@ -7,6 +7,7 @@
 with Interfaces;
 
 with VSS.Strings.Formatters.Generic_Integers;
+with VSS.Strings.Formatters.Generic_Modulars;
 with VSS.Strings.Formatters.Strings;
 with VSS.Strings.Templates;
 
@@ -19,6 +20,8 @@ procedure Test_String_Template is
    procedure Test_Multiple_Placeholer;
 
    procedure Test_Integer_Formatter;
+
+   procedure Test_Modular_Formatter;
 
    procedure Test_Formatters;
    --  Run testsuite of different formatter
@@ -34,6 +37,8 @@ procedure Test_String_Template is
    begin
       Test_Support.Run_Testcase
         (Test_Integer_Formatter'Access, "Generic_Integer_Formatter");
+      Test_Support.Run_Testcase
+        (Test_Modular_Formatter'Access, "Generic_Modular_Formatter");
    end Test_Formatters;
 
    ----------------------------
@@ -165,6 +170,117 @@ procedure Test_String_Template is
          Test_Support.Assert (Text = "0000_00EF");
       end;
    end Test_Integer_Formatter;
+
+   ----------------------------
+   -- Test_Modular_Formatter --
+   ----------------------------
+
+   procedure Test_Modular_Formatter is
+
+      use type VSS.Strings.Virtual_String;
+
+      package Modular_Formatters is
+        new VSS.Strings.Formatters.Generic_Modulars (Interfaces.Unsigned_128);
+
+   begin
+      --  Zero value.
+
+      declare
+         Value    : constant Interfaces.Unsigned_128 := 0;
+         Template : constant VSS.Strings.Templates.Virtual_String_Template :=
+           " {}";
+         Text     : constant VSS.Strings.Virtual_String :=
+           Template.Format (Modular_Formatters.Image (Value));
+         Image    : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             (Interfaces.Unsigned_128'Wide_Wide_Image (Value));
+
+      begin
+         Test_Support.Assert (Text = Image);
+      end;
+
+      --  Largest value.
+
+      declare
+         Value    : constant Interfaces.Unsigned_128 :=
+           Interfaces.Unsigned_128'Last;
+         Template : constant VSS.Strings.Templates.Virtual_String_Template :=
+           " {}";
+         Text     : constant VSS.Strings.Virtual_String :=
+           Template.Format (Modular_Formatters.Image (Value));
+         Image    : constant VSS.Strings.Virtual_String :=
+           VSS.Strings.To_Virtual_String
+             (Interfaces.Unsigned_128'Wide_Wide_Image (Value));
+
+      begin
+         Test_Support.Assert (Text = Image);
+      end;
+
+      --  Fixed width, without zero padding
+
+      declare
+         Value    : constant Interfaces.Unsigned_128 := 12345;
+         Template : constant VSS.Strings.Templates.Virtual_String_Template :=
+           "{:10}";
+         Text     : constant VSS.Strings.Virtual_String :=
+           Template.Format (Modular_Formatters.Image (Value));
+
+      begin
+         Test_Support.Assert (Text = "     12345");
+      end;
+
+      --  Fixed width, with zero padding
+
+      declare
+         Value    : constant Interfaces.Unsigned_128 := 12345;
+         Template : constant VSS.Strings.Templates.Virtual_String_Template :=
+           "{:010}";
+         Text     : constant VSS.Strings.Virtual_String :=
+           Template.Format (Modular_Formatters.Image (Value));
+
+      begin
+         Test_Support.Assert (Text = "0000012345");
+      end;
+
+      --  Fixed width, width overflow
+
+      declare
+         Value    : constant Interfaces.Unsigned_128 := 1234567890;
+         Template : constant VSS.Strings.Templates.Virtual_String_Template :=
+           "{:8}";
+         Text     : constant VSS.Strings.Virtual_String :=
+           Template.Format (Modular_Formatters.Image (Value));
+
+      begin
+         Test_Support.Assert (Text = "1234567890");
+      end;
+
+      --  Base, fixed width, grouping
+
+      declare
+         Value    : constant Interfaces.Unsigned_128 := 16#ABCD_1234#;
+         Template : constant VSS.Strings.Templates.Virtual_String_Template :=
+           "{:8#16_4}";
+         Text     : constant VSS.Strings.Virtual_String :=
+           Template.Format (Modular_Formatters.Image (Value));
+
+      begin
+         Test_Support.Assert (Text = "ABCD_1234");
+      end;
+
+      --  Base, fixed width, padding, grouping
+
+      declare
+         Value    : constant Interfaces.Unsigned_128 := 16#EF#;
+         Template : constant VSS.Strings.Templates.Virtual_String_Template :=
+           "{:08#16_4}";
+         Text     : constant VSS.Strings.Virtual_String :=
+           Template.Format (Modular_Formatters.Image (Value));
+
+      begin
+         Test_Support.Assert (Text = "0000_00EF");
+      end;
+   end Test_Modular_Formatter;
 
    ------------------------------
    -- Test_Multiple_Placeholer --

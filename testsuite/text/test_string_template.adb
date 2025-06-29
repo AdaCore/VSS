@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023, AdaCore
+--  Copyright (C) 2023-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -19,6 +19,22 @@ procedure Test_String_Template is
    procedure Test_Multiple_Placeholer;
 
    procedure Test_Integer_Formatter;
+
+   procedure Test_Formatters;
+   --  Run testsuite of different formatter
+
+   procedure Test_Template;
+   --  Run `Virtual_String_Template` testsuite
+
+   ---------------------
+   -- Test_Formatters --
+   ---------------------
+
+   procedure Test_Formatters is
+   begin
+      Test_Support.Run_Testcase
+        (Test_Integer_Formatter'Access, "Generic_Integer_Formatter");
+   end Test_Formatters;
 
    ----------------------------
    -- Test_Integer_Formatter --
@@ -204,8 +220,20 @@ procedure Test_String_Template is
       end;
    end Test_Single_Placeholer;
 
+   -------------------
+   -- Test_Template --
+   -------------------
+
+   procedure Test_Template is
+   begin
+      Test_Support.Run_Testcase
+        (Test_Single_Placeholer'Access, "single placeholder");
+      Test_Support.Run_Testcase
+        (Test_Multiple_Placeholer'Access, "multiple placeholders");
+   end Test_Template;
+
 begin
-   Test_Single_Placeholer;
-   Test_Multiple_Placeholer;
-   Test_Integer_Formatter;
+   Test_Support.Run_Testsuite
+     (Test_Template'Access, "Virtual_String_Template");
+   Test_Support.Run_Testsuite (Test_Formatters'Access, "Formatters");
 end Test_String_Template;

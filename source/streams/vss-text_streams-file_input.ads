@@ -38,7 +38,8 @@ package VSS.Text_Streams.File_Input is
        Line    : out VSS.Strings.Virtual_String'Class;
        Success : out Boolean;
        Terminators : VSS.Strings.Line_Terminator_Set :=
-         VSS.Strings.New_Line_Function);
+         VSS.Strings.New_Line_Function;
+       Keep_Terminator : Boolean := True);
 
    procedure Close (Self : in out File_Input_Text_Stream'Class);
    --  Close file.

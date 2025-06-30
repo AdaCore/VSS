@@ -101,7 +101,8 @@ package body VSS.Text_Streams.File_Input is
        Line        : out VSS.Strings.Virtual_String'Class;
        Success     : out Boolean;
        Terminators : VSS.Strings.Line_Terminator_Set :=
-         VSS.Strings.New_Line_Function)
+         VSS.Strings.New_Line_Function;
+       Keep_Terminator : Boolean := True)
    is
 
       use VSS.Characters.Latin;
@@ -113,6 +114,7 @@ package body VSS.Text_Streams.File_Input is
       procedure Read_Char;
 
       Char : VSS.Characters.Virtual_Character;
+      Line_Staging : Virtual_String'Class := "";
 
       procedure Read_Char is
       begin
@@ -130,7 +132,7 @@ package body VSS.Text_Streams.File_Input is
             end if;
          end if;
 
-         Line := Line & Char; -- GNAT complains about @ here.
+         Line_Staging := Line_Staging & Char; -- GNAT complains about @ here.
       end Read_Char;
 
       procedure Terminate_Line
@@ -159,8 +161,6 @@ package body VSS.Text_Streams.File_Input is
 
    begin
 
-      Line.Clear;
-
       --  We read the line one character at a time, noting and resolving the
       --  ambiguity of CRLF and CR both being potentially acceptable line
       --  endings by looking ahead when CR portends to end a line on its own.
@@ -169,10 +169,18 @@ package body VSS.Text_Streams.File_Input is
          Read_Char;
          exit when not Success;
 
-         if Line.Ends_With (Terminators) then
+         if Line_Staging.Ends_With (Terminators) then
             Terminate_Line;
+            if Keep_Terminator then
+               Line := Line_Staging;
+            end if;
+
             return;
          end if;
+
+         --   Only always copy the additions over to the output when we've
+         --   verified that we haven't just read in a terminator.
+         Line := Line_Staging;
 
          --  Check whether we're at the end of the file. If this is the case,
          --  then the buffer will be empty via Read_Char.

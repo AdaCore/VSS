@@ -382,13 +382,16 @@ package body VSS.HTML.Writers is
 
                   begin
                      if Is_ASCII_Whitespace (C) then
-                        if not Self.Text.Is_Empty then
-                           Omitted := True;
-                        end if;
+                        Omitted := True;
 
                      else
                         if Omitted then
-                           Self.Text.Append (VSS.Characters.Latin.Space);
+                           if not Self.Text.Is_Empty
+                             or Self.Current.Last_Child.Kind /= None
+                           then
+                              Self.Text.Append (VSS.Characters.Latin.Space);
+                           end if;
+
                            Omitted := False;
                         end if;
 
@@ -399,7 +402,8 @@ package body VSS.HTML.Writers is
 
                --  Omit trailing whitespace only before end of the tag.
 
-               if Omitted and Event.Kind /= End_Tag then
+               if Omitted and Event.Kind /= End_Tag and not Self.Text.Is_Empty
+               then
                   Self.Text.Append (VSS.Characters.Latin.Space);
                   Omitted := False;
                end if;

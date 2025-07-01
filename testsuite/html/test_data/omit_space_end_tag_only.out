@@ -1,4 +1,4 @@
 <!DOCTYPE html>
 <title>
       Test of omit of trailing whitespaces of text only before end tag
-    </title><p>Regular text, <strong>strong emphasis</strong>, <em>emphasis</em>, and <code>code spans</code>.
+    </title><p>Regular text, <strong>strong emphasis</strong>, <em>emphasis</em>, and <code>code spans</code> text.

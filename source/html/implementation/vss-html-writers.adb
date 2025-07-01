@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -396,6 +396,13 @@ package body VSS.HTML.Writers is
                      end if;
                   end;
                end loop;
+
+               --  Omit trailing whitespace only before end of the tag.
+
+               if Omitted and Event.Kind /= End_Tag then
+                  Self.Text.Append (VSS.Characters.Latin.Space);
+                  Omitted := False;
+               end if;
             end;
          end if;
       end if;

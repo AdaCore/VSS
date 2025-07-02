@@ -188,7 +188,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
          --  Check given assertion
 
          function Is_Word_Char (Char : VSS.Characters.Virtual_Character)
-           return Boolean is (Char in 'A' .. 'Z' | 'a' .. 'z' | '_');
+           return Boolean is (Char in 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_');
 
          ------------------------
          -- Is_Valid_Assertion --

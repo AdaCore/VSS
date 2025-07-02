@@ -710,8 +710,7 @@ package body VSS.Regular_Expressions.ECMA_Parser is
          use type Name_Sets.General_Category_Set;
 
          function Left return Node is
-           (if Value.Category = Name_Sets.Empty then Create_Empty
-            else Create_General_Category_Set (Value.Category));
+           (Create_General_Category_Set (Value.Category));
       begin
          if not Value.Has_Node then
             return Left;

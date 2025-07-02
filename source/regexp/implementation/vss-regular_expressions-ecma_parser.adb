@@ -19,6 +19,9 @@ package body VSS.Regular_Expressions.ECMA_Parser is
    is
       use type VSS.Characters.Virtual_Character;
 
+      Max_Nesting : constant Natural := 256;
+      Depth : Natural := 0;
+
       procedure Expect
         (Value : VSS.Characters.Virtual_Character;
          Ok    : in out Boolean);
@@ -249,6 +252,8 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                        else No_Word_Boundary));
 
                   Expect (Cursor.Element, Ok);
+
+                  Is_Atom := False;
 
                else
                   Atom_Escape (Value, Ok);
@@ -597,6 +602,13 @@ package body VSS.Regular_Expressions.ECMA_Parser is
       procedure Disjunction (Value : out Node_Or_Class; Ok : in out Boolean) is
          Right : Node_Or_Class;
       begin
+         Depth := Depth + 1;
+         if Depth = Max_Nesting then
+            Error := "Pattern nesting too deep";
+            Ok := False;
+            return;
+         end if;
+
          Alternative (Value, Ok);
 
          while Ok and then
@@ -610,6 +622,8 @@ package body VSS.Regular_Expressions.ECMA_Parser is
                Value := Value or Right;
             end if;
          end loop;
+
+         Depth := Depth - 1;
       end Disjunction;
 
       procedure Expect

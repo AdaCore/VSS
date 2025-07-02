@@ -13,10 +13,12 @@ procedure Test_Regexp is
    procedure Test_V406_018 is separate;
    procedure Test_V426_005 is separate;
    procedure Test_V615_026 is separate;
+   procedure Test_Assertion_Quantifier is separate;
 
 begin
    Test_V406_014;
    Test_V406_018;
    Test_V426_005;
    Test_V615_026;
+   Test_Assertion_Quantifier;
 end Test_Regexp;

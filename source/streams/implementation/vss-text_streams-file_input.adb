@@ -9,6 +9,7 @@ pragma Ada_2022;
 with Ada.Streams;
 with Interfaces.C;
 
+with VSS.Characters.Latin;
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
 with VSS.Strings.Formatters.Strings;
@@ -66,51 +67,11 @@ package body VSS.Text_Streams.File_Input is
       Item    : out VSS.Characters.Virtual_Character'Base;
       Success : in out Boolean) is
    begin
-      if Self.Buffer.Is_Empty then
-         if Self.Stream = Interfaces.C_Streams.NULL_Stream then
-            Self.Error := "File is not open";
-            Item       := VSS.Characters.Virtual_Character'Base'Last;
-            Success    := False;
+      Self.Populate_Buffer (Success);
 
-            return;
-         end if;
-
-         declare
-            use type Ada.Streams.Stream_Element_Offset;
-            use type Interfaces.C_Streams.size_t;
-
-            Data : Ada.Streams.Stream_Element_Array (1 .. 128);
-            Size : Interfaces.C_Streams.size_t;
-
-         begin
-            Size :=
-              Interfaces.C_Streams.fread
-                (Data (Data'First)'Address, 0, 1, Data'Length, Self.Stream);
-
-            if Size /= 0 then
-               --  Some data has been read, decode it.
-
-               Self.Buffer :=
-                 Self.Decoder.Decode
-                   (Data
-                      (Data'First
-                         .. Data'First
-                              + Ada.Streams.Stream_Element_Offset (Size) - 1),
-                    False);
-
-            elsif Interfaces.C_Streams.feof (Self.Stream) /= 0 then
-               --  End of file has been reached, let decoder know that no more
-               --  data available. Decoder will return REPLACEMENT CHARACTER
-               --  if some data has beed accumulated but can't be decoded.
-
-               Self.Buffer :=
-                 Self.Decoder.Decode
-                   (Data (Data'First .. Data'First - 1), True);
-
-            elsif Interfaces.C_Streams.ferror (Self.Stream) /= 0 then
-               Self.Error := "File IO error";
-            end if;
-         end;
+      if not Success then
+         Item       := VSS.Characters.Virtual_Character'Base'Last;
+         return;
       end if;
 
       if Self.Buffer.Is_Empty then
@@ -130,6 +91,106 @@ package body VSS.Text_Streams.File_Input is
          end;
       end if;
    end Get;
+
+   --------------
+   -- Get_Line --
+   --------------
+
+   procedure Get_Line
+      (Self        : in out File_Input_Text_Stream'Class;
+       Line        : out VSS.Strings.Virtual_String'Class;
+       Success     : out Boolean;
+       Terminators : VSS.Strings.Line_Terminator_Set :=
+         VSS.Strings.New_Line_Function;
+       Keep_Terminator : Boolean := True)
+   is
+
+      use VSS.Characters.Latin;
+      use VSS.Strings;
+
+      use type VSS.Characters.Virtual_Character;
+
+      procedure Terminate_Line;
+      procedure Read_Char;
+
+      Char : VSS.Characters.Virtual_Character;
+      Line_Staging : Virtual_String'Class := "";
+
+      procedure Read_Char is
+      begin
+         Get (Self, Char, Success);
+         if not Success then
+            return;
+         end if;
+
+         --  Go ahead and refill the buffer in case we need lookahead. Later
+         --  on, this will disambiguate the cases of an empty buffer or EOF.
+         if Self.Buffer.Is_Empty then
+            Self.Populate_Buffer (Success);
+            if not Success then
+               return;
+            end if;
+         end if;
+
+         Line_Staging := Line_Staging & Char; -- GNAT complains about @ here.
+      end Read_Char;
+
+      procedure Terminate_Line
+      is
+         LF_Prefix : constant VSS.Strings.Virtual_String := "" & Line_Feed;
+      begin
+
+         --  Only one case can be ambiguous, and that's when both CR ∈
+         --  Terminators and CRLF ∈ Terminators. Because we only read one
+         --  character at a time, we'll see Char = CR and at least one byte
+         --  avaliable to read when facing this case, and we'll go on to
+         --  check lookahead.
+         if Char /= Carriage_Return or else
+           Self.Buffer.Is_Empty or else
+           not Terminators (CR) or else
+           not Terminators (CRLF)
+         then
+            return;
+         end if;
+
+         if Self.Buffer.Starts_With (LF_Prefix) then
+            Read_Char;
+         end if;
+
+      end Terminate_Line;
+
+   begin
+
+      --  We read the line one character at a time, noting and resolving the
+      --  ambiguity of CRLF and CR both being potentially acceptable line
+      --  endings by looking ahead when CR portends to end a line on its own.
+
+      loop
+         Read_Char;
+         exit when not Success;
+
+         if Line_Staging.Ends_With (Terminators) then
+            Terminate_Line;
+            if Keep_Terminator then
+               Line := Line_Staging;
+            end if;
+
+            return;
+         end if;
+
+         --   Only always copy the additions over to the output when we've
+         --   verified that we haven't just read in a terminator.
+         Line := Line_Staging;
+
+         --  Check whether we're at the end of the file. If this is the case,
+         --  then the buffer will be empty via Read_Char.
+         if Self.Buffer.Is_Empty then
+            return;
+         end if;
+
+      end loop;
+
+   end Get_Line;
 
    ---------------
    -- Has_Error --
@@ -226,6 +287,63 @@ package body VSS.Text_Streams.File_Input is
          Self.Open (Name);
       end if;
    end Open;
+
+   ---------------------
+   -- Populate_Buffer --
+   ---------------------
+
+   procedure Populate_Buffer
+      (Self    : in out File_Input_Text_Stream;
+       Success : out Boolean) is
+   begin
+      if Self.Buffer.Is_Empty then
+         if Self.Stream = Interfaces.C_Streams.NULL_Stream then
+            Self.Error := "File is not open";
+            Success    := False;
+
+            return;
+         end if;
+
+         declare
+            use type Ada.Streams.Stream_Element_Offset;
+            use type Interfaces.C_Streams.size_t;
+
+            Data : Ada.Streams.Stream_Element_Array (1 .. 128);
+            Size : Interfaces.C_Streams.size_t;
+
+         begin
+            Size :=
+              Interfaces.C_Streams.fread
+                (Data (Data'First)'Address, 0, 1, Data'Length, Self.Stream);
+
+            if Size /= 0 then
+               --  Some data has been read, decode it.
+
+               Self.Buffer :=
+                 Self.Decoder.Decode
+                   (Data
+                      (Data'First
+                         .. Data'First
+                              + Ada.Streams.Stream_Element_Offset (Size) - 1),
+                    False);
+
+            elsif Interfaces.C_Streams.feof (Self.Stream) /= 0 then
+               --  End of file has been reached, let decoder know that no more
+               --  data available. Decoder will return REPLACEMENT CHARACTER
+               --  if some data has beed accumulated but can't be decoded.
+
+               Self.Buffer :=
+                 Self.Decoder.Decode
+                   (Data (Data'First .. Data'First - 1), True);
+
+            elsif Interfaces.C_Streams.ferror (Self.Stream) /= 0 then
+               Self.Error := "File IO error";
+            end if;
+         end;
+      end if;
+
+      Success := True;
+   end Populate_Buffer;
 
    ------------------
    -- Set_Encoding --

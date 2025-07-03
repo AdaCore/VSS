@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -98,6 +98,8 @@ package body VSS.JSON.Push_Readers.Simple is
                if Self.Content /= null then
                   Self.Content.End_Document (Success);
                   Process_Custom_Error;
+
+                  exit;
                end if;
 
             when VSS.JSON.Streams.Comment =>

@@ -6,409 +6,450 @@
 
 pragma Ada_2022;
 
-with Ada.Tags;
-with Interfaces;
-
-with VSS.Implementation.GCC;
-with VSS.Implementation.Line_Iterators;
-with VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;
-with VSS.Implementation.Text_Handlers.UTF8.Variable.Static;
+--  with Ada.Tags;
+--  with Interfaces;
+--
+--  with VSS.Implementation.GCC;
+--  with VSS.Implementation.Line_Iterators;
+--  with VSS.Implementation.Text_Handlers.UTF8.Variable.Dynamic;
+--  with VSS.Implementation.Text_Handlers.UTF8.Variable.Static;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 with VSS.Strings;
 
 package body VSS.Implementation.Text_Handlers.UTF8 is
 
-   use type VSS.Unicode.UTF16_Code_Unit_Offset;
-   use type VSS.Unicode.UTF8_Code_Unit_Offset;
-   use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+   --  use type VSS.Unicode.UTF16_Code_Unit_Offset;
+   --  use type VSS.Unicode.UTF8_Code_Unit_Offset;
+   --  use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+   --
+   --  --------------
+   --  -- Is_Equal --
+   --  --------------
+   --
+   --  overriding function Is_Equal
+   --    (Self  : Abstract_UTF8_Text;
+   --     Other : Abstract_Text_Handler'Class) return Boolean is
+   --  begin
+   --     if Other.Is_UTF8 then
+   --        declare
+   --           Self_Pointer  : constant
+   --             VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+   --               Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
+   --           Other_Text    : Abstract_UTF8_Text'Class
+   --             renames Abstract_UTF8_Text'Class (Other);
+   --           Other_Pointer : constant
+   --             VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+   --               Other_Text.UTF8_Constant_Storage_Poiner;
+   --
+   --        begin
+   --           declare
+   --              Self_Storage  : constant
+   --                VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+   --                  (0 .. Self.Size - 1)
+   --                with Import,
+   --                     Convention => Ada,
+   --                     Address => Self_Pointer.all'Address;
+   --              Other_Storage : constant
+   --                VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+   --                  (0 .. Other_Text.Size - 1)
+   --                with Import,
+   --                     Convention => Ada,
+   --                     Address => Other_Pointer.all'Address;
+   --
+   --           begin
+   --              return Self_Storage = Other_Storage;
+   --           end;
+   --        end;
+   --
+   --     else
+   --        return Abstract_Text_Handler (Self).Is_Equal (Other);
+   --     end if;
+   --  end Is_Equal;
+   --
+   --  -------------
+   --  -- Is_Less --
+   --  -------------
+   --
+   --  overriding function Is_Less
+   --    (Self  : Abstract_UTF8_Text;
+   --     Other : Abstract_Text_Handler'Class) return Boolean is
+   --  begin
+   --     if Other.Is_UTF8 then
+   --        declare
+   --           Self_Pointer  : constant
+   --             VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+   --               Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
+   --           Other_Text    : Abstract_UTF8_Text'Class
+   --             renames Abstract_UTF8_Text'Class (Other);
+   --           Other_Pointer : constant
+   --             VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+   --               Other_Text.UTF8_Constant_Storage_Poiner;
+   --
+   --        begin
+   --           declare
+   --              Self_Storage  : constant
+   --                VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+   --                  (0 .. Self.Size - 1)
+   --                with Import,
+   --                     Convention => Ada,
+   --                     Address => Self_Pointer.all'Address;
+   --              Other_Storage : constant
+   --                VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+   --                  (0 .. Other_Text.Size - 1)
+   --                with Import,
+   --                     Convention => Ada,
+   --                     Address => Other_Pointer.all'Address;
+   --
+   --           begin
+   --              return Self_Storage < Other_Storage;
+   --           end;
+   --        end;
+   --
+   --     else
+   --        return Abstract_Text_Handler (Self).Is_Less (Other);
+   --     end if;
+   --  end Is_Less;
+   --
+   --  ----------------------
+   --  -- Is_Less_Or_Equal --
+   --  ----------------------
+   --
+   --  overriding function Is_Less_Or_Equal
+   --    (Self  : Abstract_UTF8_Text;
+   --     Other : Abstract_Text_Handler'Class) return Boolean is
+   --  begin
+   --     if Other.Is_UTF8 then
+   --        declare
+   --           Self_Pointer  : constant
+   --             VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+   --               Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
+   --           Other_Text    : Abstract_UTF8_Text'Class
+   --             renames Abstract_UTF8_Text'Class (Other);
+   --           Other_Pointer : constant
+   --             VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
+   --               Other_Text.UTF8_Constant_Storage_Poiner;
+   --
+   --        begin
+   --           declare
+   --              Self_Storage  : constant
+   --                VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+   --                  (0 .. Self.Size - 1)
+   --                with Import,
+   --                     Convention => Ada,
+   --                     Address => Self_Pointer.all'Address;
+   --              Other_Storage : constant
+   --                VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+   --                  (0 .. Other_Text.Size - 1)
+   --                with Import,
+   --                     Convention => Ada,
+   --                     Address => Other_Pointer.all'Address;
+   --
+   --           begin
+   --              return Self_Storage <= Other_Storage;
+   --           end;
+   --        end;
+   --
+   --     else
+   --        return Abstract_Text_Handler (Self).Is_Less_Or_Equal (Other);
+   --     end if;
+   --  end Is_Less_Or_Equal;
+   --
+   --  ------------
+   --  -- Length --
+   --  ------------
+   --
+   --  overriding function Length
+   --    (Self : Abstract_UTF8_Text)
+   --     return VSS.Implementation.Strings.Character_Count is
+   --  begin
+   --     return Self.Length;
+   --  end Length;
+   --
+   --  ----------------------------------
+   --  -- UTF8_Constant_Storage_Poiner --
+   --  ----------------------------------
+   --
+   --  function UTF8_Constant_Storage_Poiner
+   --    (Self : Abstract_UTF8_Text'Class)
+   --     return not null
+   --       VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
+   --  is
+   --     use type Ada.Tags.Tag;
+   --
+   --     pragma Warnings (Off, """Overlay"" overlays smaller object");
+   --     Overlay : constant Variable.Static.Static_UTF8_Handler
+   --       with Import, Convention => Ada, Address => Self'Address;
+   --     pragma Warnings (On, """Overlay"" overlays smaller object");
+   --
+   --  begin
+   --     if Self'Tag = Variable.Static.Static_UTF8_Handler'Tag then
+   --        return Overlay.Storage (Overlay.Storage'First)'Unchecked_Access;
+   --
+   --     else
+   --        declare
+   --           Storage :
+   --             VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
+   --               with Import,
+   --                    Convention => Ada,
+   --                    Address    => Overlay.Storage'Address;
+   --
+   --        begin
+   --           return Storage;
+   --        end;
+   --     end if;
+   --  end UTF8_Constant_Storage_Poiner;
+
+   --------------------------
+   -- After_Last_Character --
+   --------------------------
+
+   overriding procedure After_Last_Character
+     (Self     : UTF8_Text;
+      Position : in out VSS.Implementation.Strings.Cursor) is
+   begin
+      Position :=
+        (Index        => Self.Data.Length + 1,
+         UTF8_Offset  => Self.Data.Size,
+         UTF16_Offset => 0);
+   end After_Last_Character;
+
+   ------------
+   -- Append --
+   ------------
+
+   overriding procedure Append
+     (Self   : in out UTF8_Text;
+      Code   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+        (Self.Data, Code, Offset);
+   end Append;
 
    --------------
-   -- Is_Equal --
+   -- Backward --
    --------------
 
-   overriding function Is_Equal
-     (Self  : Abstract_UTF8_Text;
-      Other : Abstract_Text_Handler'Class) return Boolean is
+   overriding function Backward
+     (Self     : UTF8_Text;
+      Position : in out VSS.Implementation.Strings.Cursor) return Boolean is
    begin
-      if Other.Is_UTF8 then
-         declare
-            Self_Pointer  : constant
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
-                Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
-            Other_Text    : Abstract_UTF8_Text'Class
-              renames Abstract_UTF8_Text'Class (Other);
-            Other_Pointer : constant
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
-                Other_Text.UTF8_Constant_Storage_Poiner;
-
-         begin
-            declare
-               Self_Storage  : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self.Size - 1)
-                 with Import,
-                      Convention => Ada,
-                      Address => Self_Pointer.all'Address;
-               Other_Storage : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Text.Size - 1)
-                 with Import,
-                      Convention => Ada,
-                      Address => Other_Pointer.all'Address;
-
-            begin
-               return Self_Storage = Other_Storage;
-            end;
-         end;
+      if Position.Index = 0 then
+         return False;
 
       else
-         return Abstract_Text_Handler (Self).Is_Equal (Other);
+         VSS.Implementation.UTF8_Strings.Unchecked_Backward
+           (Self.Data, Position);
       end if;
-   end Is_Equal;
+
+      return Position.Index > 0;
+   end Backward;
+
+   ----------------------------
+   -- Before_First_Character --
+   ----------------------------
+
+   overriding procedure Before_First_Character
+     (Self     : UTF8_Text;
+      Position : in out VSS.Implementation.Strings.Cursor)
+   is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+      use type VSS.Unicode.UTF16_Code_Unit_Offset;
+
+   begin
+      Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
+   end Before_First_Character;
+
+   ------------
+   -- Delete --
+   ------------
+
+   overriding procedure Delete
+     (Self : in out UTF8_Text;
+      From : VSS.Implementation.Strings.Cursor;
+      Size : VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      VSS.Implementation.UTF8_Strings.Mutable_Operations.Delete
+        (Self.Data, From, Size);
+   end Delete;
 
    -------------
-   -- Is_Less --
+   -- Element --
    -------------
 
-   overriding function Is_Less
-     (Self  : Abstract_UTF8_Text;
-      Other : Abstract_Text_Handler'Class) return Boolean is
+   overriding function Element
+     (Self     : UTF8_Text;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.Code_Point'Base is
    begin
-      if Other.Is_UTF8 then
-         declare
-            Self_Pointer  : constant
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
-                Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
-            Other_Text    : Abstract_UTF8_Text'Class
-              renames Abstract_UTF8_Text'Class (Other);
-            Other_Pointer : constant
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
-                Other_Text.UTF8_Constant_Storage_Poiner;
+      return VSS.Implementation.UTF8_Strings.Element (Self.Data, Position);
+   end Element;
 
-         begin
-            declare
-               Self_Storage  : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self.Size - 1)
-                 with Import,
-                      Convention => Ada,
-                      Address => Self_Pointer.all'Address;
-               Other_Storage : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Text.Size - 1)
-                 with Import,
-                      Convention => Ada,
-                      Address => Other_Pointer.all'Address;
+   -------------
+   -- Forward --
+   -------------
 
-            begin
-               return Self_Storage < Other_Storage;
-            end;
-         end;
+   overriding function Forward
+     (Self     : UTF8_Text;
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean is
+   begin
+      if Position.Index > Self.Data.Length then
+         return False;
 
       else
-         return Abstract_Text_Handler (Self).Is_Less (Other);
+         VSS.Implementation.UTF8_Strings.Unchecked_Forward
+           (Self.Data, Position);
       end if;
-   end Is_Less;
 
-   ----------------------
-   -- Is_Less_Or_Equal --
-   ----------------------
+      return Position.Index <= Self.Length;
+   end Forward;
 
-   overriding function Is_Less_Or_Equal
-     (Self  : Abstract_UTF8_Text;
-      Other : Abstract_Text_Handler'Class) return Boolean is
+   ---------------------------
+   -- From_Wide_Wide_String --
+   ---------------------------
+
+   overriding procedure From_Wide_Wide_String
+     (Self    : in out UTF8_Text;
+      Item    : Wide_Wide_String;
+      Success : out Boolean) is
    begin
-      if Other.Is_UTF8 then
-         declare
-            Self_Pointer  : constant
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
-                Abstract_UTF8_Text'Class (Self).UTF8_Constant_Storage_Poiner;
-            Other_Text    : Abstract_UTF8_Text'Class
-              renames Abstract_UTF8_Text'Class (Other);
-            Other_Pointer : constant
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access :=
-                Other_Text.UTF8_Constant_Storage_Poiner;
+      VSS.Implementation.UTF8_Strings.Mutable_Operations.From_Wide_Wide_String
+        (Self.Data, Item, Success);
+   end From_Wide_Wide_String;
 
-         begin
-            declare
-               Self_Storage  : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self.Size - 1)
-                 with Import,
-                      Convention => Ada,
-                      Address => Self_Pointer.all'Address;
-               Other_Storage : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Text.Size - 1)
-                 with Import,
-                      Convention => Ada,
-                      Address => Other_Pointer.all'Address;
+   -------------------
+   -- Has_Character --
+   -------------------
 
-            begin
-               return Self_Storage <= Other_Storage;
-            end;
-         end;
+   overriding function Has_Character
+     (Self     : UTF8_Text;
+      Position : VSS.Implementation.Strings.Cursor) return Boolean is
+   begin
+      return Position.Index in 1 .. Self.Data.Length;
+   end Has_Character;
 
-      else
-         return Abstract_Text_Handler (Self).Is_Less_Or_Equal (Other);
-      end if;
-   end Is_Less_Or_Equal;
+   ------------
+   -- Insert --
+   ------------
+
+   overriding procedure Insert
+     (Self   : in out UTF8_Text;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Unicode.Code_Point;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
+   begin
+      VSS.Implementation.UTF8_Strings.Mutable_Operations.Insert
+        (Self.Data, From, Item, Offset);
+   end Insert;
+
+   --------------
+   -- Is_Empty --
+   --------------
+
+   overriding function Is_Empty (Self : UTF8_Text) return Boolean is
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
+   begin
+      return Self.Data.Size = 0;
+   end Is_Empty;
 
    ------------
    -- Length --
    ------------
 
    overriding function Length
-     (Self : Abstract_UTF8_Text)
-      return VSS.Implementation.Strings.Character_Count is
+     (Self : UTF8_Text) return VSS.Implementation.Strings.Character_Count is
    begin
-      return Self.Length;
+      return Self.Data.Length;
    end Length;
 
-   ------------------------
-   -- Split_Lines_Common --
-   ------------------------
+   ---------------
+   -- Reference --
+   ---------------
 
-   procedure Split_Lines_Common
-     (Text            :
-        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+   overriding procedure Reference (Self : in out UTF8_Text) is
+   begin
+      VSS.Implementation.UTF8_Strings.Reference (Self.Data);
+   end Reference;
+
+   -----------------
+   -- Split_Lines --
+   -----------------
+
+   overriding procedure Split_Lines
+     (Self            : UTF8_Text;
       Data            : VSS.Implementation.Strings.String_Data;
-      Storage         : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean;
       Lines           : in out
-        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
-   is
-      procedure Append
-        (Source_Storage :
-           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         First          : VSS.Implementation.Strings.Cursor;
-         After_Last     : VSS.Implementation.Strings.Cursor);
-
-      ------------
-      -- Append --
-      ------------
-
-      procedure Append
-        (Source_Storage :
-           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-         First          : VSS.Implementation.Strings.Cursor;
-         After_Last     : VSS.Implementation.Strings.Cursor)
-      is
-         Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-           After_Last.UTF8_Offset - First.UTF8_Offset;
-         Data : VSS.Implementation.Strings.String_Data;
-
-      begin
-         if Size = 0 then
-            null;
-
-         elsif Size <= Variable.Static.In_Place_Storage_Capacity then
-            --  Static storage can be used.
-
-            declare
-               Static : Variable.Static.Static_UTF8_Handler := (others => <>)
-                 with Address => Data.Storage'Address;
-
-            begin
-               Static.Storage (0 .. Size - 1) :=
-                 Source_Storage
-                   (First.UTF8_Offset .. After_Last.UTF8_Offset - 1);
-               Static.Storage (Size) := 0;
-               Static.Size   := Size;
-               Static.Length := After_Last.Index - First.Index;
-            end;
-
-         else
-            declare
-               Pointer : Variable.Dynamic.UTF8_String_Data_Access;
-               Dynamic : Variable.Dynamic.Dynamic_UTF8_Handler :=
-                 (others => <>)
-                 with Address => Data.Storage'Address;
-
-            begin
-               Pointer := UTF8.Variable.Dynamic.Allocate (Size);
-
-               Pointer.Storage (0 .. Size - 1) :=
-                 Source_Storage
-                   (First.UTF8_Offset .. After_Last.UTF8_Offset - 1);
-               Dynamic.Size   := Size;
-               Dynamic.Length := After_Last.Index - First.Index;
-               Pointer.Storage (Dynamic.Size) := 16#00#;
-
-               Dynamic.Storage :=
-                 Pointer.Storage (Pointer.Storage'First)'Unchecked_Access;
-               Dynamic.Pointer := Pointer;
-            end;
-         end if;
-
-         VSS.Implementation.String_Vectors.Append_And_Move_Ownership
-           (Lines, Data);
-      end Append;
-
-      Initial    : VSS.Implementation.Strings.Cursor;
-      At_First   : aliased VSS.Implementation.Strings.Cursor;
-      At_Last    : aliased VSS.Implementation.Strings.Cursor;
-      After_Last : aliased VSS.Implementation.Strings.Cursor;
-      Terminator : VSS.Implementation.Strings.Cursor;
-      Dummy      : Boolean;
-
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access) is
    begin
-      VSS.Implementation.String_Vectors.Unreference (Lines);
-
-      Text.Before_First_Character (Initial);
-
-      while VSS.Implementation.Line_Iterators.Forward
-        (Data,
+      VSS.Implementation.UTF8_Strings.Split_Lines
+        (Self.Data,
+         Data,
          Terminators,
-         Initial,
-         At_First,
-         At_Last,
-         Terminator)
-      loop
-         Initial := At_Last;
+         Keep_Terminator,
+         Lines);
+   end Split_Lines;
 
-         if VSS.Implementation.Strings.Is_Invalid (Terminator) then
-            After_Last := At_Last;
-            Dummy      := Text.Forward (After_Last);
+   ---------------------
+   -- To_UTF_8_String --
+   ---------------------
 
-         elsif Keep_Terminator then
-            After_Last := At_Last;
-            Dummy      := Text.Forward (After_Last);
-
-         else
-            After_Last := Terminator;
-         end if;
-
-         Append (Storage, At_First, After_Last);
-      end loop;
-   end Split_Lines_Common;
-
-   ------------------------
-   -- Unchecked_Backward --
-   ------------------------
-
-   procedure Unchecked_Backward
-     (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Position : in out VSS.Implementation.Strings.Cursor) is
+   function To_UTF_8_String
+     (Self : UTF8_Text) return Ada.Strings.UTF_Encoding.UTF_8_String is
    begin
-      Position.Index        := Position.Index - 1;
-      Position.UTF8_Offset  := Position.UTF8_Offset - 1;
-      Position.UTF16_Offset := Position.UTF16_Offset - 1;
+      return VSS.Implementation.UTF8_Strings.To_UTF_8_String (Self.Data);
+   end To_UTF_8_String;
 
-      if Position.Index /= 0 then
-         loop
-            declare
-               Code : constant VSS.Unicode.UTF8_Code_Unit :=
-                 Storage (Position.UTF8_Offset);
+   -----------------
+   -- Unreference --
+   -----------------
 
-            begin
-               case Code is
-                  when 16#80# .. 16#BF# =>
-                     Position.UTF8_Offset  := Position.UTF8_Offset - 1;
-
-                  when 16#00# .. 16#7F#
-                     | 16#C2# .. 16#DF#
-                     | 16#E0# .. 16#EF# =>
-
-                     exit;
-
-                  when 16#F0# .. 16#F4# =>
-                     Position.UTF16_Offset := Position.UTF16_Offset - 1;
-                     exit;
-
-                  when others =>
-                     raise Program_Error with "string data is corrupted";
-               end case;
-            end;
-         end loop;
-      end if;
-   end Unchecked_Backward;
+   overriding procedure Unreference (Self : in out UTF8_Text) is
+   begin
+      VSS.Implementation.UTF8_Strings.Unreference (Self.Data);
+   end Unreference;
 
    -----------------------
-   -- Unchecked_Forward --
+   -- Unsafe_Initialize --
    -----------------------
 
-   procedure Unchecked_Forward
-     (Storage  : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Position : in out VSS.Implementation.Strings.Cursor)
-   is
-      pragma Suppress (Overflow_Check);
-      pragma Suppress (Range_Check);
-      --  These checks slowdown execution, but can happen on large text
-      --  data or invalid input only. Would be nice to verify that they
-      --  are impossible, or modify something to make them impossible.
-
+   procedure Unsafe_Initialize
+     (Text : in out
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class) is
    begin
-      Position.Index := @ + 1;
-
-      if Position.Index = 1 then
-         Position.UTF8_Offset  := 0;
-         Position.UTF16_Offset := 0;
-
-         return;
-      end if;
-
       declare
-         use type Interfaces.Integer_32;
-         use type VSS.Unicode.UTF8_Code_Unit;
-
-         --  This code is based on the fact that starting byte of the
-         --  multibyte sequence in UTF-8 has N most significant bits set
-         --  to one followed by zero bit. So, first byte of the sequence
-         --  is negated and number of leading zero bits is counting.
-
-         Code   : constant VSS.Unicode.UTF8_Code_Unit :=
-           Storage (Position.UTF8_Offset);
-         Length : constant Interfaces.Integer_32 :=
-           VSS.Implementation.GCC.clz (Interfaces.Unsigned_32 (not Code))
-             - 24;
+         pragma Warnings (Off, """Overlay"" overlays smaller object");
+         Overlay : UTF8_Text := (others => <>)
+           with Address => Text'Address;
+         pragma Warnings (On, """Overlay"" overlays smaller object");
 
       begin
-         if Code <= 16#7F# then
-            Position.UTF8_Offset  := @ + 1;
-            Position.UTF16_Offset := @ + 1;
-
-         else
-            Position.UTF8_Offset  :=
-              @ + VSS.Unicode.UTF8_Code_Unit_Offset (Length);
-            Position.UTF16_Offset :=
-              @ + VSS.Unicode.UTF16_Code_Unit_Offset (Length / 4 + 1);
-         end if;
+         null;
       end;
-   end Unchecked_Forward;
+   end Unsafe_Initialize;
 
-   ----------------------------------
-   -- UTF8_Constant_Storage_Poiner --
-   ----------------------------------
+   -----------------------
+   -- Unsafe_Initialize --
+   -----------------------
 
-   function UTF8_Constant_Storage_Poiner
-     (Self : Abstract_UTF8_Text'Class)
-      return not null
-        VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
-   is
-      use type Ada.Tags.Tag;
-
-      pragma Warnings (Off, """Overlay"" overlays smaller object");
-      Overlay : constant Variable.Static.Static_UTF8_Handler
-        with Import, Convention => Ada, Address => Self'Address;
-      pragma Warnings (On, """Overlay"" overlays smaller object");
-
+   procedure Unsafe_Initialize
+     (Text : in out
+        VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
+      Size : VSS.Unicode.UTF8_Code_Unit_Count) is
    begin
-      if Self'Tag = Variable.Static.Static_UTF8_Handler'Tag then
-         return Overlay.Storage (Overlay.Storage'First)'Unchecked_Access;
+      declare
+         pragma Warnings (Off, """Overlay"" overlays smaller object");
+         Overlay : UTF8_Text := (others => <>)
+           with Address => Text'Address;
+         pragma Warnings (On, """Overlay"" overlays smaller object");
 
-      else
-         declare
-            Storage :
-              VSS.Implementation.Interfaces_C.UTF8_Code_Unit_Constant_Access
-                with Import,
-                     Convention => Ada,
-                     Address    => Overlay.Storage'Address;
-
-         begin
-            return Storage;
-         end;
-      end if;
-   end UTF8_Constant_Storage_Poiner;
+      begin
+         VSS.Implementation.UTF8_Strings.Mutable_Operations.Initialize
+           (Overlay.Data, Size);
+      end;
+   end Unsafe_Initialize;
 
 end VSS.Implementation.Text_Handlers.UTF8;

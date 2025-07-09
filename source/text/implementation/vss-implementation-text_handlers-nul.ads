@@ -18,7 +18,7 @@ package VSS.Implementation.Text_Handlers.Nul is
 
    type Null_Handler is
      new VSS.Implementation.Text_Handlers.Abstract_Text_Handler
-       with null record with Object_Size => 256;
+       with null record with Object_Size => 384;
 
    overriding procedure Reference (Self : in out Null_Handler);
 

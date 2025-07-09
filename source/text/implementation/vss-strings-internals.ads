@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -10,6 +10,7 @@
 
 with VSS.Implementation.Referrers;
 with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings;
 
 package VSS.Strings.Internals is
 
@@ -28,6 +29,9 @@ package VSS.Strings.Internals is
    function To_Virtual_String
      (Item : in out VSS.Implementation.Strings.String_Data)
       return VSS.Strings.Virtual_String;
+   function To_Virtual_String
+     (Text : VSS.Implementation.UTF8_Strings.UTF8_String_Data)
+      return VSS.Strings.Virtual_String;
    --  Convert string data into virtual string. Data is references.
 
    function Data_Access_Constant
@@ -41,6 +45,9 @@ package VSS.Strings.Internals is
    procedure Set_By_Move
      (Self : in out VSS.Strings.Virtual_String'Class;
       To   : in out VSS.Implementation.Strings.String_Data);
+   procedure Set_By_Move
+     (Self : in out VSS.Strings.Virtual_String'Class;
+      To   : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Set given string to given data. Initial data of the Self is
    --  unreferenced, given data is copied and given value is reset.
 

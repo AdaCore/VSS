@@ -81,7 +81,7 @@ package VSS.Implementation.UTF8_Encoding is
    function Unchecked_Decode
      (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Offset  : VSS.Unicode.UTF8_Code_Unit_Index)
-      return VSS.Unicode.Code_Point;
+      return VSS.Unicode.Code_Point with Inline_Always;
    --  Decode UTF8 encoded character started at given offset
 
 end VSS.Implementation.UTF8_Encoding;

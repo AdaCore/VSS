@@ -479,6 +479,8 @@ package body VSS.Implementation.UTF8_Encoding is
       Offset  : VSS.Unicode.UTF8_Code_Unit_Index)
       return VSS.Unicode.Code_Point
    is
+      pragma Suppress_All;
+
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF8_Code_Unit;
       use type VSS.Unicode.UTF8_Code_Unit_Offset;

@@ -7,7 +7,7 @@
 --  This version of the package "convert" text handler object into the UTF-8
 --  encoded text on modification operations and redispatch operation.
 
-with VSS.Implementation.Text_Handlers.UTF8.Variable;
+with VSS.Implementation.Text_Handlers.UTF8;
 with VSS.Strings;
 
 package body VSS.Implementation.Text_Handlers.Nul is
@@ -47,7 +47,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Code   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset) is
    begin
-      VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
+      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
         (Self, Code_Point_Max_Encoded_Length);
       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).Append (Code, Offset);
@@ -152,7 +152,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Success : out Boolean) is
    begin
-      VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
+      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
         (Self, Item'Length);
 
       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
@@ -168,12 +168,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Item    : Wide_Wide_String;
       Success : out Boolean) is
    begin
-      VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
-        (Self, Item'Length);
-      --  Request text data storage size enough to store ASCII text. Storage
-      --  will reallocated when necessary. It helps to use static storage when
-      --  possible.
-
+      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize (Self);
       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).From_Wide_Wide_String (Item, Success);
    end From_Wide_Wide_String;
@@ -209,7 +204,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
                   (Self);
 
    begin
-      VSS.Implementation.Text_Handlers.UTF8.Variable.Unsafe_Initialize
+      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
         (Self, Code_Point_Max_Encoded_Length);
       Text.Insert (From, Item, Offset);
    end Insert;

@@ -114,11 +114,11 @@ is
    --  Note: Storage has 8 bytes alignment.
 
    type String_Data is record
-      Storage  : System.Storage_Elements.Storage_Array (0 .. 31) :=
+      Storage  : System.Storage_Elements.Storage_Array (0 .. 47) :=
         [others => 0];
    end record
      with Alignment   => 8,
-          Object_Size => 256;
+          Object_Size => 384;
 
    overriding function "="
      (Left  : String_Data;

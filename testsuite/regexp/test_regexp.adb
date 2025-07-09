@@ -14,6 +14,8 @@ procedure Test_Regexp is
    procedure Test_V426_005 is separate;
    procedure Test_V615_026 is separate;
    procedure Test_Assertion_Quantifier is separate;
+   procedure Test_Empty_Char_Class is separate;
+   procedure Test_B_On_Digit is separate;
 
    procedure Simple_Tests is
    begin
@@ -21,8 +23,14 @@ procedure Test_Regexp is
       Test_Support.Run_Testcase (Test_V406_018'Access, "V406_018");
       Test_Support.Run_Testcase (Test_V426_005'Access, "V426_005");
       Test_Support.Run_Testcase (Test_V615_026'Access, "V615_026");
+
       Test_Support.Run_Testcase
         (Test_Assertion_Quantifier'Access, "Assertion_Quantifier");
+
+      Test_Support.Run_Testcase
+        (Test_Empty_Char_Class'Access, "Empty_Char_Class");
+
+      Test_Support.Run_Testcase (Test_B_On_Digit'Access, "Slash_B_On_Digit");
    end Simple_Tests;
 
 begin

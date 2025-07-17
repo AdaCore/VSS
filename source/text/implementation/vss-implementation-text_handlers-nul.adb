@@ -152,8 +152,7 @@ package body VSS.Implementation.Text_Handlers.Nul is
       Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
       Success : out Boolean) is
    begin
-      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
-        (Self, Item'Length);
+      VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize (Self);
 
       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
         (Self).From_UTF_8_String (Item, Success);

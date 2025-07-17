@@ -20,6 +20,49 @@ is
      (Text     : in out UTF8_String_Data;
       Capacity : VSS.Unicode.UTF8_Code_Unit_Count);
 
+   type Verification_State is
+     (Initial,    --  ASCII or start of multibyte sequence
+      U31,        --  A0 .. BF | UT1
+      U33,        --  80 .. 9F | UT1
+      U41,        --  90 .. BF | UT2
+      U43,        --  80 .. 8F | UT2
+      UT1,        --  1 (80 .. BF)
+      UT2,        --  2 (80 .. BF)
+      UT3,        --  3 (80 .. BF)
+      Ill_Formed);
+   --  Unicode defines well-formed UTF-8 as
+   --
+   --  00 .. 7F
+   --  C2 .. DF | 80 .. BF
+   --  E0       | A0 .. BF | 80 .. BF
+   --  E1 .. EC | 80 .. BF | 80 .. BF
+   --  ED       | 80 .. 9F | 80 .. BF
+   --  EE .. EF | 80 .. BF | 80 .. BF
+   --  F0       | 90 .. BF | 80 .. BF | 80 .. BF
+   --  F1 .. F3 | 80 .. BF | 80 .. BF | 80 .. BF
+   --  F4       | 80 .. 8F | 80 .. BF | 80 .. BF
+
+   procedure Validate_And_Copy
+     (Source      : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Destination : out VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Length      : out VSS.Implementation.Strings.Character_Count;
+      Success     : out Boolean);
+   --  Validate UTF-8 encoding and copy validated part of the data to
+   --  Destination. Length is set to the length of the text in characters.
+   --  Success is set False when validation is failed and to True otherwise.
+
+   procedure Internal_Append
+     (Storage        : in out
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Length         : in out VSS.Implementation.Strings.Character_Count;
+      Size           : in out VSS.Unicode.UTF8_Code_Unit_Count;
+      Suffix_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Suffix_Length  : VSS.Implementation.Strings.Character_Count;
+      Suffix_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Offset         : in out VSS.Implementation.Strings.Cursor_Offset)
+     with Pre => Storage'Last >= Size + Suffix_Size;
+   --  Append one storage to another.
+
    ------------
    -- Append --
    ------------
@@ -96,6 +139,41 @@ is
    ------------
 
    procedure Append
+     (Text   : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      Suffix : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      New_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+        Text.Size + Suffix.Size;
+
+   begin
+      Mutate (Text, New_Size);
+
+      declare
+         Text_Storage   : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. New_Size)
+           with Import, Address => Text.Storage_Address;
+         Suffix_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. Suffix.Size)
+           with Import, Address => Suffix.Storage_Address;
+
+      begin
+         Internal_Append
+           (Storage        => Text_Storage,
+            Length         => Text.Length,
+            Size           => Text.Size,
+            Suffix_Storage => Suffix_Storage,
+            Suffix_Length  => Suffix.Length,
+            Suffix_Size    => Suffix.Size,
+            Offset         => Offset);
+      end;
+   end Append;
+
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append
      (Text        : in out UTF8_String_Data;
       Item_Data   : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Item_Length : VSS.Implementation.Strings.Character_Count)
@@ -108,7 +186,7 @@ is
 
       declare
          Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-           (0 .. Text.Size + New_Size)
+           (0 .. New_Size)
            with Import, Address => Text.Storage_Address;
 
       begin
@@ -150,6 +228,36 @@ is
          Text.Size   := New_Size;
       end;
    end Delete;
+
+   -----------------------
+   -- From_UTF_8_String --
+   -----------------------
+
+   procedure From_UTF_8_String
+     (Self    : in out UTF8_String_Data;
+      Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Success : out Boolean) is
+   begin
+      Initialize (Self, Item'Length);
+
+      declare
+         Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. Item'Length)
+           with Import, Address => Self.Storage_Address;
+         Length  : VSS.Implementation.Strings.Character_Count := 0;
+
+      begin
+         Validate_And_Copy (Item, Storage, Length, Success);
+
+         if Success then
+            Storage
+              (VSS.Unicode.UTF8_Code_Unit_Count (Item'Length)) := 16#00#;
+            --  GNAT 20240327: compiler crash without type conversion.
+            Self.Length := Length;
+            Self.Size   := Item'Length;
+         end if;
+      end;
+   end From_UTF_8_String;
 
    ---------------------------
    -- From_Wide_Wide_String --
@@ -325,6 +433,47 @@ is
       end;
    end Insert;
 
+   ---------------------
+   -- Internal_Append --
+   ---------------------
+
+   procedure Internal_Append
+     (Storage        : in out
+        VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Length         : in out VSS.Implementation.Strings.Character_Count;
+      Size           : in out VSS.Unicode.UTF8_Code_Unit_Count;
+      Suffix_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Suffix_Length  : VSS.Implementation.Strings.Character_Count;
+      Suffix_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
+      Offset         : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      use type VSS.Unicode.UTF8_Code_Unit;
+
+      Suffix_UTF16_Size : VSS.Unicode.UTF16_Code_Unit_Count :=
+        VSS.Unicode.UTF16_Code_Unit_Count (Suffix_Length);
+      --  Size of the suffix in UTF-16 code units. This is first approximation
+      --  only, it is corrected later.
+
+   begin
+      for J in 0 .. Suffix_Size loop
+         Storage (Size + J) := Suffix_Storage (J);
+
+         if (Suffix_Storage (J) and 2#1111_1000#) = 2#1111_0000# then
+            Suffix_UTF16_Size := Suffix_UTF16_Size + 1;
+            --  Encoded character occupy two UTF-16 code units.
+         end if;
+      end loop;
+
+      Size   := @ + Suffix_Size;
+      Length := @ + Suffix_Length;
+
+      Offset.Index_Offset := @ + Suffix_Length;
+      Offset.UTF8_Offset  := @ + Suffix_Size;
+      Offset.UTF16_Offset := @ + Suffix_UTF16_Size;
+
+      Storage (Size) := 16#00#;
+   end Internal_Append;
+
    ------------
    -- Mutate --
    ------------
@@ -374,6 +523,51 @@ is
          end;
       end if;
    end Mutate;
+
+   -----------
+   -- Slice --
+   -----------
+
+   procedure Slice
+     (Text   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Target : out VSS.Implementation.UTF8_Strings.UTF8_String_Data)
+   is
+      Text_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+        (0 .. Text.Size)
+        with Import, Address => Text.Storage_Address;
+      After        : VSS.Implementation.Strings.Cursor := To;
+      Size         : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length       : VSS.Implementation.Strings.Character_Count;
+
+   begin
+      if From.Index > To.Index then
+         return;
+      end if;
+
+      if To.Index <= Text.Length then
+         Unchecked_Forward (Text, After);
+      end if;
+
+      Size   := After.UTF8_Offset - From.UTF8_Offset;
+      Length := After.Index - From.Index;
+
+      Mutate (Target, Size);
+
+      declare
+         Target_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. Size)
+           with Import, Address => Target.Storage_Address;
+
+      begin
+         Target_Storage (0 .. Size - 1) :=
+           Text_Storage (From.UTF8_Offset .. After.UTF8_Offset - 1);
+         Target.Size   := Size;
+         Target.Length := Length;
+         Target_Storage (Target.Size) := 16#00#;
+      end;
+   end Slice;
 
    ----------------------
    -- Unchecked_Append --
@@ -588,5 +782,134 @@ is
 
       Target_Size := Target_Data.Size;
    end Unchecked_Replace;
+
+   -----------------------
+   -- Validate_And_Copy --
+   -----------------------
+
+   procedure Validate_And_Copy
+     (Source      : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Destination : out VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Length      : out VSS.Implementation.Strings.Character_Count;
+      Success     : out Boolean)
+   is
+      State : Verification_State := Initial;
+      Code  : VSS.Unicode.UTF8_Code_Unit;
+
+   begin
+      Length := 0;
+
+      for J in Source'Range loop
+         Code := Standard.Character'Pos (Source (J));
+
+         case State is
+            when Initial =>
+               Length := Length + 1;
+
+               case Code is
+                  when 16#00# .. 16#7F# =>
+                     null;
+
+                  when 16#C2# .. 16#DF# =>
+                     State := UT1;
+
+                  when 16#E0# =>
+                     State := U31;
+
+                  when 16#E1# .. 16#EC# =>
+                     State := UT2;
+
+                  when 16#ED# =>
+                     State := U33;
+
+                  when 16#EE# .. 16#EF# =>
+                     State := UT2;
+
+                  when 16#F0# =>
+                     State := U41;
+
+                  when 16#F1# .. 16#F3# =>
+                     State := UT3;
+
+                  when 16#F4# =>
+                     State := U43;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U31 =>
+               case Code is
+                  when 16#A0# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U33 =>
+               case Code is
+                  when 16#80# .. 16#9F# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U41 =>
+               case Code is
+                  when 16#90# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when U43 =>
+               case Code is
+                  when 16#80# .. 16#8F# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT1 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := Initial;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT2 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT1;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when UT3 =>
+               case Code is
+                  when 16#80# .. 16#BF# =>
+                     State := UT2;
+
+                  when others =>
+                     State := Ill_Formed;
+               end case;
+
+            when Ill_Formed =>
+               exit;
+         end case;
+
+         Destination
+           (VSS.Unicode.UTF8_Code_Unit_Count (J - Source'First)) := Code;
+      end loop;
+
+      Success := State = Initial;
+   end Validate_And_Copy;
 
 end VSS.Implementation.UTF8_Strings.Mutable_Operations;

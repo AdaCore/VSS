@@ -24,6 +24,11 @@ is
       Code : VSS.Unicode.Code_Point);
 
    procedure Append
+     (Text   : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      Suffix : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
+
+   procedure Append
      (Text        : in out UTF8_String_Data;
       Item_Data   : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Item_Length : VSS.Implementation.Strings.Character_Count);
@@ -39,6 +44,11 @@ is
       From : VSS.Implementation.Strings.Cursor;
       Size : VSS.Implementation.Strings.Cursor_Offset);
 
+   procedure From_UTF_8_String
+     (Self    : in out UTF8_String_Data;
+      Item    : Ada.Strings.UTF_Encoding.UTF_8_String;
+      Success : out Boolean);
+
    procedure From_Wide_Wide_String
      (Self    : in out UTF8_String_Data;
       Item    : Wide_Wide_String;
@@ -49,6 +59,12 @@ is
       Capacity : VSS.Unicode.UTF8_Code_Unit_Count)
      with Pre => Text.Storage_Address = System.Null_Address;
    --  Initialize text object and preserve given capacity
+
+   procedure Slice
+     (Text   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Target : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
 
    procedure Unchecked_Append
      (Target_Data : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data;

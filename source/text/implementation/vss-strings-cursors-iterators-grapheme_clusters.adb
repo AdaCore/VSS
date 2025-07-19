@@ -369,7 +369,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
       Text       : VSS.Implementation.UTF8_Strings.UTF8_String_Data
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Position   : aliased VSS.Implementation.Strings.Cursor;
-      Code       : VSS.Unicode.Code_Point;
+      Code       : VSS.Unicode.Code_Point'Base;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       Success    : Boolean with Unreferenced;
 
@@ -608,7 +608,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
         renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Position   : aliased VSS.Implementation.Strings.Cursor :=
         Self.First_Position;
-      Code       : VSS.Unicode.Code_Point;
+      Code       : VSS.Unicode.Code_Point'Base;
       Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
       State      : Emoji_State := (others => False);
 

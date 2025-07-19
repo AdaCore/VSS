@@ -6,9 +6,6 @@
 
 pragma Ada_2022;
 
-with System.Storage_Elements;
-
-limited with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package VSS.Implementation.Strings
@@ -29,12 +26,6 @@ is
    No_Character : constant VSS.Unicode.Code_Point_Unit :=
      VSS.Unicode.Code_Point_Unit'Last;
    --  Special value to return when there is no character at given position.
-
-   type Variable_Text_Handler_Access is
-     access all VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
-   type Constant_Text_Handler_Access is
-     access constant
-       VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class;
 
    ------------
    -- Cursor --
@@ -101,57 +92,5 @@ is
    --  Fixup position of the cursor on delete operation at the given position
    --  and size. Return False and set position to invalid value when position
    --  of the cursor has been deleted.
-
-   -----------------
-   -- String_Data --
-   -----------------
-
-   --  String_Data is an raw storage for the associated text data.
-   --  Storage contains an instance of the one of types derived from
-   --  the Abstract_Text_Handler type.
-   --
-   --  Note: data layout is optimized for x86-64 CPU.
-   --  Note: Storage has 8 bytes alignment.
-
-   type String_Data is record
-      Storage  : System.Storage_Elements.Storage_Array (0 .. 47) :=
-        [others => 0];
-   end record
-     with Alignment   => 8,
-          Object_Size => 384;
-
-   overriding function "="
-     (Left  : String_Data;
-      Right : String_Data) return Boolean;
-   --  Compare Left and Right string values.
-
-   pragma Warnings (Off, "aggregate not fully initialized");
-   Null_String_Data : constant String_Data := (others => <>);
-   pragma Warnings (On, "aggregate not fully initialized");
-   --  Data for "null" string. It is used around the code when null string
-   --  need to be provided, to avoid compiler's warnings about uninitialized
-   --  components. Some components are expected to be not initialized by
-   --  default. Also, System.Null_Address is not static expression and can't be
-   --  used here for initialization.
-
-   function Variable_Handler
-     (Data : in out String_Data) return not null Variable_Text_Handler_Access
-        with Inline_Always;
-   function Constant_Handler
-     (Data : String_Data) return not null Constant_Text_Handler_Access
-        with Inline_Always;
-   --  Return string handler for given string data.
-   --
-   --  Call of Variable_Handler initializes string data when it is not
-   --  initialized.
-
-   procedure Reference (Data : in out String_Data) with Inline;
-   --  Reference given string data. It is wrapper around Handler and call of
-   --  its Reference subprogram when handler is not null.
-
-   procedure Unreference (Data : in out String_Data) with Inline;
-   --  Unreference given string data. It is wrapper around Handler and call of
-   --  its Unreference subprogram when handler is not null. Data is set to
-   --  "null" value before exit for safety.
 
 end VSS.Implementation.Strings;

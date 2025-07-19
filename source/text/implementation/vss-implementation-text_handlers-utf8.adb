@@ -7,7 +7,6 @@
 pragma Ada_2022;
 
 with Ada.Tags;
-with System;
 
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Implementation.UTF8_Strings.Mutable_Operations;
@@ -245,7 +244,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
 
    overriding function Is_Empty (Self : UTF8_Text) return Boolean is
    begin
-      return Self.Data.Size = 0;
+      return VSS.Implementation.UTF8_Strings.Is_Empty (Self.Data);
    end Is_Empty;
 
    --------------
@@ -360,10 +359,8 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
    -------------
 
    overriding function Is_Null (Self : UTF8_Text) return Boolean is
-      use type System.Address;
-
    begin
-      return Self.Data.Storage_Address = System.Null_Address;
+      return VSS.Implementation.UTF8_Strings.Is_Null (Self.Data);
    end Is_Null;
 
    ------------

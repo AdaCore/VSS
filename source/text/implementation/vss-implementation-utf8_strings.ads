@@ -42,6 +42,12 @@ is
 
    procedure Unreference (Self : in out UTF8_String_Data);
 
+   function Is_Empty (Self : UTF8_String_Data) return Boolean with Inline;
+   --  Return True when string is empty (null string is an empty string).
+
+   function Is_Null (Self : UTF8_String_Data) return Boolean with Inline;
+   --  Return True when string is null.
+
    procedure Unchecked_Forward
      (Self     : UTF8_String_Data;
       Position : in out VSS.Implementation.Strings.Cursor)

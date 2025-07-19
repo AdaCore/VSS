@@ -51,6 +51,26 @@ package body VSS.Implementation.UTF8_Strings is
           (Storage, Position.UTF8_Offset);
    end Element;
 
+   --------------
+   -- Is_Empty --
+   --------------
+
+   function Is_Empty (Self : UTF8_String_Data) return Boolean is
+   begin
+      return Self.Size = 0;
+   end Is_Empty;
+
+   -------------
+   -- Is_Null --
+   -------------
+
+   function Is_Null (Self : UTF8_String_Data) return Boolean is
+      use type System.Address;
+
+   begin
+      return Self.Storage_Address = System.Null_Address;
+   end Is_Null;
+
    ------------
    -- Is_SSO --
    ------------

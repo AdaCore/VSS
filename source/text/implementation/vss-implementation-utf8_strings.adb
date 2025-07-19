@@ -17,6 +17,7 @@ package body VSS.Implementation.UTF8_Strings is
 
    use type VSS.Implementation.Strings.Character_Offset;
    use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+   use type VSS.Unicode.Code_Point;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
@@ -44,6 +45,65 @@ package body VSS.Implementation.UTF8_Strings is
         VSS.Implementation.UTF8_Encoding.Unchecked_Decode
           (Storage, Position.UTF8_Offset);
    end Element;
+
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   function Ends_With
+     (Text : UTF8_String_Data; Suffix : UTF8_String_Data) return Boolean is
+   begin
+      if Suffix.Size = 0 then
+         return True;
+
+      elsif Text.Size < Suffix.Size then
+         return False;
+      end if;
+
+      declare
+         Text_Storage   : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Text.Size - 1)
+           with Import, Address => Text.Storage_Address;
+         Suffix_Storage : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Suffix.Size - 1)
+           with Import, Address => Suffix.Storage_Address;
+
+      begin
+         return
+           Text_Storage (Text.Size - Suffix.Size .. Text.Size - 1)
+             = Suffix_Storage;
+      end;
+   end Ends_With;
+
+   ---------------
+   -- Ends_With --
+   ---------------
+
+   function Ends_With
+     (Text   : UTF8_String_Data;
+      Suffix : VSS.Unicode.Code_Point) return Boolean is
+   begin
+      if Text.Size = 0 then
+         return False;
+      end if;
+
+      declare
+         Text_Storage : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Text.Size - 1)
+           with Import, Address => Text.Storage_Address;
+         Offset       : VSS.Unicode.UTF8_Code_Unit_Offset := Text.Size;
+         Code         : VSS.Unicode.Code_Point;
+
+      begin
+         VSS.Implementation.UTF8_Encoding.Unchecked_Backward_Decode
+           (Text_Storage, Offset, Code);
+
+         return Code = Suffix;
+      end;
+   end Ends_With;
 
    --------------
    -- Is_Empty --
@@ -303,6 +363,61 @@ package body VSS.Implementation.UTF8_Strings is
          end;
       end loop;
    end Split_Lines;
+
+   -----------------
+   -- Starts_With --
+   -----------------
+
+   function Starts_With
+     (Text : UTF8_String_Data; Prefix : UTF8_String_Data) return Boolean is
+   begin
+      if Prefix.Size = 0 then
+         return True;
+
+      elsif Text.Size < Prefix.Size then
+         return False;
+      end if;
+
+      declare
+         Text_Storage   : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Prefix.Size - 1)
+           with Import, Address => Text.Storage_Address;
+         Prefix_Storage : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Prefix.Size - 1)
+           with Import, Address => Prefix.Storage_Address;
+
+      begin
+         return Text_Storage = Prefix_Storage;
+      end;
+   end Starts_With;
+
+   -----------------
+   -- Starts_With --
+   -----------------
+
+   function Starts_With
+     (Text   : UTF8_String_Data;
+      Prefix : VSS.Unicode.Code_Point) return Boolean is
+   begin
+      if Text.Size = 0 then
+         return False;
+      end if;
+
+      declare
+         Text_Storage : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. VSS.Implementation.UTF8_Encoding
+                     .Code_Point_Max_Encoded_Length - 1)
+           with Import, Address => Text.Storage_Address;
+
+      begin
+         return
+           VSS.Implementation.UTF8_Encoding.Unchecked_Decode (Text_Storage, 0)
+              = Prefix;
+      end;
+   end Starts_With;
 
    ---------------------
    -- To_UTF_8_String --

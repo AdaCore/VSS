@@ -64,6 +64,23 @@ is
    --  Returns `True` when `Left` string is less than `Right`, or strings
    --  are equal.
 
+   function Starts_With
+     (Text : UTF8_String_Data; Prefix : UTF8_String_Data) return Boolean;
+   --  Return True when string starts with given prefix.
+
+   function Starts_With
+     (Text : UTF8_String_Data; Prefix : VSS.Unicode.Code_Point) return Boolean;
+   --  Return True when string starts with given prefix.
+
+   function Ends_With
+     (Text : UTF8_String_Data; Suffix : UTF8_String_Data) return Boolean;
+   --  Return True when string ends with given suffix.
+
+   function Ends_With
+     (Text   : UTF8_String_Data;
+      Suffix : VSS.Unicode.Code_Point) return Boolean;
+   --  Return True when string ends with given suffix.
+
    procedure Unchecked_Forward
      (Self     : UTF8_String_Data;
       Position : in out VSS.Implementation.Strings.Cursor)

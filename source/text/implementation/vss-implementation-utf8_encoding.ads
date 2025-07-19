@@ -19,6 +19,9 @@ package VSS.Implementation.UTF8_Encoding is
      array (VSS.Unicode.UTF8_Code_Unit_Count range <>)
        of aliased VSS.Unicode.UTF8_Code_Unit with Pack;
 
+   Code_Point_Max_Encoded_Length : constant := 4;
+   --  Maximum number of code units to encode single code point.
+
    pragma Warnings (Off, "aspect ""PRE"" not enforced on inlined subprogram");
    procedure Encode
      (Code   : VSS.Unicode.Code_Point;

@@ -14,43 +14,13 @@ class Virtual_String_Printer(base):
         self._val = val
 
     def to_string(self):
-        text_type = gdb.lookup_type(
-            "vss.implementation.text_handlers.abstract_text_handler"
-        )
-        utf8_type = gdb.lookup_type(
-            "vss.implementation.text_handlers.utf8.abstract_utf8_text"
-        )
-        utf8static_type = gdb.lookup_type(
-            "vss.implementation.text_handlers.utf8.variable.static.static_utf8_handler"
-        )
-        utf8dynamic_type = gdb.lookup_type(
-            "vss.implementation.text_handlers.utf8.variable.dynamic.dynamic_utf8_handler"
-        )
-
-        storage = self._val["data"]["storage"]
-
-        if all(byte == 0 for byte in storage.bytes):
+        unit_type = gdb.lookup_type("vss.unicode.utf8_code_unit").pointer()
+        storage = self._val["data"]["storage_address"].cast(unit_type)
+        size = self._val["data"]["size"]
+        if storage.address == 0:
             # "null" string
             return ""
-
-        text = reinterpret_tagged(storage.cast(text_type))
-
-        # GDB 16.1 GNAT Pro 20250616w unable to lookup `size` component declared by the
-        # parent tagged type. `u8text` is used to workaround.
-
-        if text.type == utf8static_type:
-            u8text = storage.cast(utf8_type)
-            text = reinterpret_tagged(storage.cast(utf8_type))
-            return text["storage"].lazy_string(encoding="utf-8", length=u8text["size"])
-
-        elif text.type == utf8dynamic_type:
-            u8text = storage.cast(utf8_type)
-            text = reinterpret_tagged(storage.cast(utf8_type))
-            data = text["pointer"].dereference()
-            return data["storage"].lazy_string(encoding="utf-8", length=u8text["size"])
-
-        else:
-            raise TypeError("<UNKNOWN TYPE>")
+        return storage.lazy_string(encoding="utf-8", length=size)
 
     def display_hint(self):
         return "string"

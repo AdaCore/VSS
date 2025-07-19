@@ -16,6 +16,7 @@ with VSS.Strings;
 
 package body VSS.Implementation.UTF8_Strings is
 
+   use type System.Address;
    use type VSS.Implementation.Strings.Character_Offset;
    use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
    use type VSS.Unicode.Code_Point;
@@ -465,8 +466,6 @@ package body VSS.Implementation.UTF8_Strings is
    -------------
 
    function Is_Null (Self : UTF8_String_Data) return Boolean is
-      use type System.Address;
-
    begin
       return Self.Storage_Address = System.Null_Address;
    end Is_Null;
@@ -538,7 +537,9 @@ package body VSS.Implementation.UTF8_Strings is
    procedure Reference (Self : in out UTF8_String_Data) is
    begin
       if Is_SSO (Self) then
-         Self.Storage_Address := Self.Manager'Address;
+         if Self.Storage_Address /= System.Null_Address then
+            Self.Storage_Address := Self.Manager'Address;
+         end if;
 
       else
          declare

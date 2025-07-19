@@ -208,17 +208,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    --------------
 
    function Backward
-     (Self : in out Grapheme_Cluster_Iterator) return Boolean
-   is
-      Text             : VSS.Implementation.UTF8_Strings.UTF8_String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Right            : VSS.Implementation.Strings.Cursor;
-      Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Left             : aliased VSS.Implementation.Strings.Cursor;
-      Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Success          : Boolean;
-      Done             : Boolean := False;
-
+     (Self : in out Grapheme_Cluster_Iterator) return Boolean is
    begin
       if Self.Owner = null then
          --  Uninitialized iterator.
@@ -226,134 +216,148 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
       end if;
 
-      Self.Last_Position := Self.First_Position;
-      Success :=
-        VSS.Implementation.UTF8_Strings.Backward (Text, Self.Last_Position);
+      declare
+         Text             : VSS.Implementation.UTF8_Strings.UTF8_String_Data
+           renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
+         Right            : VSS.Implementation.Strings.Cursor;
+         Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+         Left             : aliased VSS.Implementation.Strings.Cursor;
+         Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
+         Success          : Boolean;
+         Done             : Boolean := False;
 
-      if not Success then
-         --  Start of the line has been reached.
+      begin
+         Self.Last_Position := Self.First_Position;
+         Success :=
+           VSS.Implementation.UTF8_Strings.Backward (Text, Self.Last_Position);
 
-         Self.First_Position := Self.Last_Position;
+         if not Success then
+            --  Start of the line has been reached.
 
-         return False;
+            Self.First_Position := Self.Last_Position;
 
-      else
-         Left            := Self.Last_Position;
-         Left_Properties :=
-           Extract_Core_Data
-             (VSS.Implementation.UTF8_Strings.Element (Text, Left));
+            return False;
 
-         loop
-            Right            := Left;
-            Right_Properties := Left_Properties;
+         else
+            Left            := Self.Last_Position;
+            Left_Properties :=
+              Extract_Core_Data
+                (VSS.Implementation.UTF8_Strings.Element (Text, Left));
 
-            Success := VSS.Implementation.UTF8_Strings.Backward (Text, Left);
+            loop
+               Right            := Left;
+               Right_Properties := Left_Properties;
 
-            if not Success then
-               --  Start of the string has been reached.
+               Success :=
+                 VSS.Implementation.UTF8_Strings.Backward (Text, Left);
 
-               Self.First_Position := Right;
+               if not Success then
+                  --  Start of the string has been reached.
 
-               return True;
-
-            else
-               Left_Properties :=
-                 Extract_Core_Data
-                   (VSS.Implementation.UTF8_Strings.Element (Text, Left));
-
-               if Left_Properties.GCB = GCB_CR
-                 and Right_Properties.GCB = GCB_LF
-               then
-                  --  Rule GB3.
-
-                  null;
-
-               elsif Left_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
-                  --  Rule GB4.
-
-                  Done := True;
-
-               elsif Right_Properties.GCB in  GCB_CN | GCB_CR | GCB_LF then
-                  --  Rule GB5.
-
-                  Done := True;
-
-               elsif Left_Properties.GCB = GCB_L
-                 and Right_Properties.GCB in GCB_L | GCB_V | GCB_LV | GCB_LVT
-               then
-                  --  Rule GB6.
-
-                  null;
-
-               elsif Left_Properties.GCB in GCB_LV | GCB_V
-                 and Right_Properties.GCB in GCB_V | GCB_T
-               then
-                  --  Rule GB7.
-
-                  null;
-
-               elsif Left_Properties.GCB in GCB_LVT | GCB_T
-                 and Right_Properties.GCB in GCB_T
-               then
-                  --  Rule GB8.
-
-                  null;
-
-               elsif Right_Properties.GCB in GCB_EX | GCB_ZWJ then
-                  --  Rule GB9.
-
-                  null;
-
-               elsif Right_Properties.GCB = GCB_SM then
-                  --  Rule 9a.
-
-                  null;
-
-               elsif Left_Properties.GCB = GCB_PP then
-                  --  Rule 9b.
-
-                  null;
-
-               elsif Left_Properties.InCB in INCB_Linker | INCB_Extend
-                 and then Right_Properties.InCB = INCB_Consonant
-                 and then Apply_InCB
-                   (Text, Left, Left_Properties.InCB = INCB_Linker)
-               then
-                  --  Rule 9c.
-
-                  null;
-
-               elsif Left_Properties.GCB = GCB_ZWJ
-                 and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Text, Left)
-               then
-                  --  Rule 11.
-
-                  null;
-
-               elsif Left_Properties.GCB = GCB_RI
-                 and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Text, Left)
-               then
-                  --  Rule GB12.
-                  --  Rule GB13.
-
-                  null;
-
-               else
-                  --  Rule GB999.
-
-                  Done := True;
-               end if;
-
-               if Done then
                   Self.First_Position := Right;
 
                   return True;
+
+               else
+                  Left_Properties :=
+                    Extract_Core_Data
+                      (VSS.Implementation.UTF8_Strings.Element (Text, Left));
+
+                  if Left_Properties.GCB = GCB_CR
+                    and Right_Properties.GCB = GCB_LF
+                  then
+                     --  Rule GB3.
+
+                     null;
+
+                  elsif Left_Properties.GCB in GCB_CN | GCB_CR | GCB_LF then
+                     --  Rule GB4.
+
+                     Done := True;
+
+                  elsif Right_Properties.GCB in  GCB_CN | GCB_CR | GCB_LF then
+                     --  Rule GB5.
+
+                     Done := True;
+
+                  elsif Left_Properties.GCB = GCB_L
+                    and Right_Properties.GCB
+                          in GCB_L | GCB_V | GCB_LV | GCB_LVT
+                  then
+                     --  Rule GB6.
+
+                     null;
+
+                  elsif Left_Properties.GCB in GCB_LV | GCB_V
+                    and Right_Properties.GCB in GCB_V | GCB_T
+                  then
+                     --  Rule GB7.
+
+                     null;
+
+                  elsif Left_Properties.GCB in GCB_LVT | GCB_T
+                    and Right_Properties.GCB in GCB_T
+                  then
+                     --  Rule GB8.
+
+                     null;
+
+                  elsif Right_Properties.GCB in GCB_EX | GCB_ZWJ then
+                     --  Rule GB9.
+
+                     null;
+
+                  elsif Right_Properties.GCB = GCB_SM then
+                     --  Rule 9a.
+
+                     null;
+
+                  elsif Left_Properties.GCB = GCB_PP then
+                     --  Rule 9b.
+
+                     null;
+
+                  elsif Left_Properties.InCB in INCB_Linker | INCB_Extend
+                    and then Right_Properties.InCB = INCB_Consonant
+                    and then Apply_InCB
+                      (Text, Left, Left_Properties.InCB = INCB_Linker)
+                  then
+                     --  Rule 9c.
+
+                     null;
+
+                  elsif Left_Properties.GCB = GCB_ZWJ
+                    and then Right_Properties.ExtPict
+                    and then Apply_ExtPict (Text, Left)
+                  then
+                     --  Rule 11.
+
+                     null;
+
+                  elsif Left_Properties.GCB = GCB_RI
+                    and then Right_Properties.GCB = GCB_RI
+                    and then Apply_RI (Text, Left)
+                  then
+                     --  Rule GB12.
+                     --  Rule GB13.
+
+                     null;
+
+                  else
+                     --  Rule GB999.
+
+                     Done := True;
+                  end if;
+
+                  if Done then
+                     Self.First_Position := Right;
+
+                     return True;
+                  end if;
                end if;
-            end if;
-         end loop;
-      end if;
+            end loop;
+         end if;
+      end;
    end Backward;
 
    -------------------
@@ -362,17 +366,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
 
    function Display_Width
      (Self : Grapheme_Cluster_Iterator'Class)
-      return VSS.Strings.Display_Cell_Count
-   is
-      use all type VSS.Implementation.UCD_Core.EA_Values;
-
-      Text       : VSS.Implementation.UTF8_Strings.UTF8_String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Position   : aliased VSS.Implementation.Strings.Cursor;
-      Code       : VSS.Unicode.Code_Point'Base;
-      Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Success    : Boolean with Unreferenced;
-
+      return VSS.Strings.Display_Cell_Count is
    begin
       if Self.Owner = null then
          --  Uninitialized iterator.
@@ -380,53 +374,66 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return 0;
       end if;
 
-      if Self.First_Position.Index not in 1 .. Text.Length then
-         --  Iterator doesn't point to any grapheme cluster.
+      declare
+         use all type VSS.Implementation.UCD_Core.EA_Values;
 
-         return 0;
-      end if;
+         Text       : VSS.Implementation.UTF8_Strings.UTF8_String_Data
+           renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
+         Position   : aliased VSS.Implementation.Strings.Cursor;
+         Code       : VSS.Unicode.Code_Point'Base;
+         Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+         Success    : Boolean with Unreferenced;
 
-      --  Lookup for the wide/fullwidth character in the grapheme cluster.
+      begin
+         if Self.First_Position.Index not in 1 .. Text.Length then
+            --  Iterator doesn't point to any grapheme cluster.
 
-      Position := Self.First_Position;
-      Code     := VSS.Implementation.UTF8_Strings.Element (Text, Position);
-
-      loop
-         Properties := Extract_Core_Data (Code);
-
-         if Properties.EA in EA_W | EA_F then
-            return 2;
+            return 0;
          end if;
 
-         exit when
-           not VSS.Implementation.UTF8_Strings.Forward_Element
-                 (Text, Position, Code);
-         exit when Position.Index > Self.Last_Position.Index;
-      end loop;
+         --  Lookup for the wide/fullwidth character in the grapheme cluster.
 
-      --  Emoji_Presentation characters has wide width, and has been processed
-      --  above. However, some combinations of non-Emoji_Presentation
-      --  characters forms emoji, thus occupy two cell.
+         Position := Self.First_Position;
+         Code     := VSS.Implementation.UTF8_Strings.Element (Text, Position);
 
-      if not Self.Is_Emoji then
-         return 1;
-      end if;
+         loop
+            Properties := Extract_Core_Data (Code);
 
-      if Self.First_Position.Index = Self.Last_Position.Index then
-         --  Single emoji character without Emoji_Presenataion property has
-         --  default text representation and occupy single cell.
+            if Properties.EA in EA_W | EA_F then
+               return 2;
+            end if;
 
-         Position   := Self.First_Position;
-         Code       :=
-           VSS.Implementation.UTF8_Strings.Element (Text, Position);
-         Properties := Extract_Core_Data (Code);
+            exit when
+            not VSS.Implementation.UTF8_Strings.Forward_Element
+              (Text, Position, Code);
+            exit when Position.Index > Self.Last_Position.Index;
+         end loop;
 
-         if not Properties.EPres then
+         --  Emoji_Presentation characters has wide width, and has
+         --  been processed above. However, some combinations of
+         --  non-Emoji_Presentation characters forms emoji, thus occupy
+         --  two cell.
+
+         if not Self.Is_Emoji then
             return 1;
          end if;
-      end if;
 
-      return 2;
+         if Self.First_Position.Index = Self.Last_Position.Index then
+            --  Single emoji character without Emoji_Presenataion property has
+            --  default text representation and occupy single cell.
+
+            Position   := Self.First_Position;
+            Code       :=
+              VSS.Implementation.UTF8_Strings.Element (Text, Position);
+            Properties := Extract_Core_Data (Code);
+
+            if not Properties.EPres then
+               return 1;
+            end if;
+         end if;
+
+         return 2;
+      end;
    end Display_Width;
 
    -----------------------
@@ -460,16 +467,6 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    overriding function Forward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean
    is
-      Text             : VSS.Implementation.UTF8_Strings.UTF8_String_Data
-        renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
-      Left             : VSS.Implementation.Strings.Cursor;
-      Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Right            : aliased VSS.Implementation.Strings.Cursor;
-      Right_Code       : VSS.Unicode.Code_Point'Base;
-      Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
-      Success          : Boolean;
-      Done             : Boolean := False;
-
    begin
       if Self.Owner = null then
          --  Uninitialized iterator.
@@ -477,85 +474,99 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
          return False;
       end if;
 
-      Self.First_Position := Self.Last_Position;
-      Success :=
-        VSS.Implementation.UTF8_Strings.Forward_Element
-          (Text, Self.First_Position, Right_Code);
+      declare
+         Text             : VSS.Implementation.UTF8_Strings.UTF8_String_Data
+           renames VSS.Strings.Magic_String_Access (Self.Owner).Data;
+         Left             : VSS.Implementation.Strings.Cursor;
+         Left_Properties  : VSS.Implementation.UCD_Core.Core_Data_Record;
+         Right            : aliased VSS.Implementation.Strings.Cursor;
+         Right_Code       : VSS.Unicode.Code_Point'Base;
+         Right_Properties : VSS.Implementation.UCD_Core.Core_Data_Record;
+         Success          : Boolean;
+         Done             : Boolean := False;
 
-      if not Success then
-         --  End of the string has been reached.
-         --  XXX Should Last_Position be set to After_Last_Character?
-
-         return False;
-      end if;
-
-      Right            := Self.First_Position;
-      Right_Properties := Extract_Core_Data (Right_Code);
-
-      loop
-         Left            := Right;
-         Left_Properties := Right_Properties;
-
+      begin
+         Self.First_Position := Self.Last_Position;
          Success :=
            VSS.Implementation.UTF8_Strings.Forward_Element
-             (Text, Right, Right_Code);
+             (Text, Self.First_Position, Right_Code);
 
          if not Success then
-            --  End of line has been reached
-            --  Rule GB2
+            --  End of the string has been reached.
+            --  XXX Should Last_Position be set to After_Last_Character?
 
-            Self.Last_Position := Left;
-
-            return True;
+            return False;
          end if;
 
+         Right            := Self.First_Position;
          Right_Properties := Extract_Core_Data (Right_Code);
 
-         case Forward_GCB_Rules (Left_Properties.GCB, Right_Properties.GCB) is
-            when Break =>
-               Done := True;
+         loop
+            Left            := Right;
+            Left_Properties := Right_Properties;
 
-            when No_Break =>
-               null;
+            Success :=
+              VSS.Implementation.UTF8_Strings.Forward_Element
+                (Text, Right, Right_Code);
 
-            when Unspecified =>
-               if Left_Properties.InCB in INCB_Linker | INCB_Extend
-                 and then Right_Properties.InCB = INCB_Consonant
-                 and then Apply_InCB
-                   (Text, Left, Left_Properties.InCB = INCB_Linker)
-               then
-                  --  Rule GB9c.
+            if not Success then
+               --  End of line has been reached
+               --  Rule GB2
 
-                  null;
+               Self.Last_Position := Left;
 
-               elsif Left_Properties.GCB = GCB_ZWJ
-                 and then Right_Properties.ExtPict
-                 and then Apply_ExtPict (Text, Left)
-               then
-                  --  Rule GB11.
+               return True;
+            end if;
 
-                  null;
+            Right_Properties := Extract_Core_Data (Right_Code);
 
-               elsif Left_Properties.GCB = GCB_RI
-                 and then Right_Properties.GCB = GCB_RI
-                 and then Apply_RI (Text, Left)
-               then
-                  --  Rule GB12.
-                  --  Rule GB13.
-
-                  null;
-
-               else
+            case Forward_GCB_Rules (Left_Properties.GCB, Right_Properties.GCB)
+            is
+               when Break =>
                   Done := True;
-               end if;
-         end case;
 
-         if Done then
-            Self.Last_Position := Left;
+               when No_Break =>
+                  null;
 
-            return True;
-         end if;
-      end loop;
+               when Unspecified =>
+                  if Left_Properties.InCB in INCB_Linker | INCB_Extend
+                    and then Right_Properties.InCB = INCB_Consonant
+                    and then Apply_InCB
+                      (Text, Left, Left_Properties.InCB = INCB_Linker)
+                  then
+                     --  Rule GB9c.
+
+                     null;
+
+                  elsif Left_Properties.GCB = GCB_ZWJ
+                    and then Right_Properties.ExtPict
+                    and then Apply_ExtPict (Text, Left)
+                  then
+                     --  Rule GB11.
+
+                     null;
+
+                  elsif Left_Properties.GCB = GCB_RI
+                    and then Right_Properties.GCB = GCB_RI
+                    and then Apply_RI (Text, Left)
+                  then
+                     --  Rule GB12.
+                     --  Rule GB13.
+
+                     null;
+
+                  else
+                     Done := True;
+                  end if;
+            end case;
+
+            if Done then
+               Self.Last_Position := Left;
+
+               return True;
+            end if;
+         end loop;
+      end;
    end Forward;
 
    -----------------

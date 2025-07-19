@@ -15,7 +15,6 @@ with VSS.Strings;
 package body VSS.Implementation.Text_Handlers.UTF8 is
 
    use type Ada.Tags.Tag;
-   use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
@@ -256,32 +255,9 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
       if Other'Tag = UTF8_Text'Tag then
-         declare
-            Other_Text : UTF8_Text renames UTF8_Text (Other);
-
-         begin
-            if Self.Data.Size /= Other_Text.Data.Size then
-               return False;
-
-            elsif Self.Data.Size = 0 then
-               return True;
-
-            else
-               declare
-                  Self_Storage  : constant
-                    VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                      (0 .. Self.Data.Size - 1)
-                    with Import, Address => Self.Data.Storage_Address;
-                  Other_Storage : constant
-                    VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                      (0 .. Other_Text.Data.Size - 1)
-                    with Import, Address => Other_Text.Data.Storage_Address;
-
-               begin
-                  return Self_Storage = Other_Storage;
-               end;
-            end if;
-         end;
+         return
+           VSS.Implementation.UTF8_Strings.Is_Equal
+             (Self.Data, UTF8_Text (Other).Data);
 
       else
          return Abstract_Text_Handler (Self).Is_Equal (Other);
@@ -297,24 +273,9 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
       if Other'Tag = UTF8_Text'Tag then
-         declare
-            Other_Text : UTF8_Text renames UTF8_Text (Other);
-
-         begin
-            declare
-               Self_Storage  : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self.Data.Size - 1)
-                 with Import, Address => Self.Data.Storage_Address;
-               Other_Storage : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Text.Data.Size - 1)
-                 with Import, Address => Other_Text.Data.Storage_Address;
-
-            begin
-               return Self_Storage < Other_Storage;
-            end;
-         end;
+         return
+           VSS.Implementation.UTF8_Strings.Is_Less
+             (Self.Data, UTF8_Text (Other).Data);
 
       else
          return Abstract_Text_Handler (Self).Is_Less (Other);
@@ -330,24 +291,9 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
       Other : Abstract_Text_Handler'Class) return Boolean is
    begin
       if Other'Tag = UTF8_Text'Tag then
-         declare
-            Other_Text : UTF8_Text renames UTF8_Text (Other);
-
-         begin
-            declare
-               Self_Storage  : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Self.Data.Size - 1)
-                 with Import, Address => Self.Data.Storage_Address;
-               Other_Storage : constant
-                 VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-                   (0 .. Other_Text.Data.Size - 1)
-                 with Import, Address => Other_Text.Data.Storage_Address;
-
-            begin
-               return Self_Storage <= Other_Storage;
-            end;
-         end;
+         return
+           VSS.Implementation.UTF8_Strings.Is_Less_Or_Equal
+             (Self.Data, UTF8_Text (Other).Data);
 
       else
          return Abstract_Text_Handler (Self).Is_Less_Or_Equal (Other);

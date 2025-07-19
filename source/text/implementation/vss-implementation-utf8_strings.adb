@@ -16,6 +16,7 @@ with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 package body VSS.Implementation.UTF8_Strings is
 
    use type VSS.Implementation.Strings.Character_Offset;
+   use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
@@ -59,6 +60,94 @@ package body VSS.Implementation.UTF8_Strings is
    begin
       return Self.Size = 0;
    end Is_Empty;
+
+   --------------
+   -- Is_Equal --
+   --------------
+
+   function Is_Equal
+     (Left : UTF8_String_Data; Right : UTF8_String_Data) return Boolean is
+   begin
+      if Left.Size /= Right.Size then
+         return False;
+
+      elsif Left.Size = 0 then
+         return True;
+
+      else
+         declare
+            Left_Storage  : constant
+              VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                (0 .. Left.Size - 1)
+              with Import, Address => Left.Storage_Address;
+            Right_Storage : constant
+              VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                (0 .. Right.Size - 1)
+              with Import, Address => Right.Storage_Address;
+
+         begin
+            return Left_Storage = Right_Storage;
+         end;
+      end if;
+   end Is_Equal;
+
+   -------------
+   -- Is_Less --
+   -------------
+
+   function Is_Less
+     (Left : UTF8_String_Data; Right : UTF8_String_Data) return Boolean is
+   begin
+      if Is_Empty (Left) then
+         return not Is_Empty (Right);
+
+      elsif Is_Empty (Right) then
+         return False;
+      end if;
+
+      declare
+         Left_Storage  : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Left.Size - 1)
+           with Import, Address => Left.Storage_Address;
+         Right_Storage : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Right.Size - 1)
+           with Import, Address => Right.Storage_Address;
+
+      begin
+         return Left_Storage < Right_Storage;
+      end;
+   end Is_Less;
+
+   ----------------------
+   -- Is_Less_Or_Equal --
+   ----------------------
+
+   function Is_Less_Or_Equal
+     (Left : UTF8_String_Data; Right : UTF8_String_Data) return Boolean is
+   begin
+      if Is_Empty (Left) then
+         return True;
+
+      elsif Is_Empty (Right) then
+         return False;
+      end if;
+
+      declare
+         Left_Storage  : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Left.Size - 1)
+           with Import, Address => Left.Storage_Address;
+         Right_Storage : constant
+           VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+             (0 .. Right.Size - 1)
+           with Import, Address => Right.Storage_Address;
+
+      begin
+         return Left_Storage <= Right_Storage;
+      end;
+   end Is_Less_Or_Equal;
 
    -------------
    -- Is_Null --

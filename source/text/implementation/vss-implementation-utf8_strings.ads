@@ -48,6 +48,22 @@ is
    function Is_Null (Self : UTF8_String_Data) return Boolean with Inline;
    --  Return True when string is null.
 
+   function Is_Equal
+     (Left : UTF8_String_Data; Right : UTF8_String_Data) return Boolean;
+   --  Compare two strings for binary equivalence of code point sequences.
+   --  Returns `True` when strings are equal.
+
+   function Is_Less
+     (Left : UTF8_String_Data; Right : UTF8_String_Data) return Boolean;
+   --  Compare two strings for binary equivalence of code point sequences.
+   --  Returns `True` when `Left` string is less than `Right`
+
+   function Is_Less_Or_Equal
+     (Left : UTF8_String_Data; Right : UTF8_String_Data) return Boolean;
+   --  Compare two strings for binary equivalence of code point sequences.
+   --  Returns `True` when `Left` string is less than `Right`, or strings
+   --  are equal.
+
    procedure Unchecked_Forward
      (Self     : UTF8_String_Data;
       Position : in out VSS.Implementation.Strings.Cursor)

@@ -84,4 +84,11 @@ package VSS.Implementation.UTF8_Encoding is
       return VSS.Unicode.Code_Point with Inline_Always;
    --  Decode UTF8 encoded character started at given offset
 
+   procedure Unchecked_Backward_Decode
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point);
+   --  Change offset to the point of the previous character and decode
+   --  character at this position.
+
 end VSS.Implementation.UTF8_Encoding;

@@ -20,13 +20,6 @@ package body VSS.Implementation.UTF8_Strings is
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
-   procedure Unchecked_Backward_Decode
-     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
-      Code    : out VSS.Unicode.Code_Point);
-   --  Change offset to the point of the previous character and decode
-   --  character at this position.
-
    -------------
    -- Element --
    -------------
@@ -383,45 +376,6 @@ package body VSS.Implementation.UTF8_Strings is
    -------------------------------
 
    procedure Unchecked_Backward_Decode
-     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
-      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
-      Code    : out VSS.Unicode.Code_Point) is
-   begin
-      Offset := Offset - 1;
-
-      loop
-         declare
-            Code : constant VSS.Unicode.UTF8_Code_Unit := Storage (Offset);
-
-         begin
-            case Code is
-               when 16#80# .. 16#BF# =>
-                  Offset  := Offset - 1;
-
-               when 16#00# .. 16#7F#
-                  | 16#C2# .. 16#DF#
-                  | 16#E0# .. 16#EF# =>
-
-                  exit;
-
-               when 16#F0# .. 16#F4# =>
-                  exit;
-
-               when others =>
-                  raise Program_Error with "string data is corrupted";
-            end case;
-         end;
-      end loop;
-
-      Code :=
-        VSS.Implementation.UTF8_Encoding.Unchecked_Decode (Storage, Offset);
-   end Unchecked_Backward_Decode;
-
-   -------------------------------
-   -- Unchecked_Backward_Decode --
-   -------------------------------
-
-   procedure Unchecked_Backward_Decode
      (Text   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Offset : in out VSS.Unicode.UTF8_Code_Unit_Index;
       Code   : out VSS.Unicode.Code_Point)
@@ -431,7 +385,8 @@ package body VSS.Implementation.UTF8_Strings is
         with Import, Address => Text.Storage_Address;
 
    begin
-      Unchecked_Backward_Decode (Storage, Offset, Code);
+      VSS.Implementation.UTF8_Encoding.Unchecked_Backward_Decode
+        (Storage, Offset, Code);
    end Unchecked_Backward_Decode;
 
    ------------------------------

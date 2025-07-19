@@ -470,8 +470,58 @@ is
       Item   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset)
    is
-      pragma Unreferenced (Offset);
-      --  XXX `Offset` computation is not implemented
+      function UTF16_Size
+        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array)
+         return VSS.Unicode.UTF16_Code_Unit_Count;
+
+      ----------------
+      -- UTF16_Size --
+      ----------------
+
+      function UTF16_Size
+        (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array)
+         return VSS.Unicode.UTF16_Code_Unit_Count
+      is
+         Position : VSS.Unicode.UTF8_Code_Unit_Count  := 0;
+         Result   : VSS.Unicode.UTF16_Code_Unit_Count := 0;
+
+      begin
+         while Position <= Storage'Last loop
+            case Storage (Position) is
+               when 16#00# .. 16#7F# =>
+                  --  1x UTF8 code units sequence
+                  --  => 1x UTF16 code units sequence
+
+                  Position := @ + 1;
+                  Result   := @ + 1;
+
+               when 16#C2# .. 16#DF# =>
+                  --  2x UTF8 code units sequence
+                  --  => 1x UTF16 code units sequence
+
+                  Position := @ + 2;
+                  Result   := @ + 1;
+
+               when 16#E0# .. 16#EF# =>
+                  --  3x UTF8 code units sequence
+                  --  => 1x UTF16 code units sequence
+
+                  Position := @ + 3;
+                  Result   := @ + 1;
+
+               when 16#F0# .. 16#F4# =>
+                  --  4x code units sequence
+                  --  => 2x UTF16 code units sequence
+
+                  Position := @ + 3;
+                  Result   := @ + 2;
+               when others =>
+                  raise Program_Error;
+            end case;
+         end loop;
+
+         return Result;
+      end UTF16_Size;
 
       New_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
         Text.Size + Item.Size;
@@ -508,6 +558,10 @@ is
 
          Text.Size   := @ + Item.Size;
          Text.Length := @ + Item.Length;
+
+         Offset.Index_Offset := @ + Item.Length;
+         Offset.UTF8_Offset  := @ + Item.Size;
+         Offset.UTF16_Offset := @ + UTF16_Size (Item_Storage);
       end;
    end Insert;
 

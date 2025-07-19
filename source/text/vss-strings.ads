@@ -13,7 +13,7 @@ with Ada.Strings.Text_Buffers;
 
 with VSS.Characters;
 private with VSS.Implementation.Referrers;
-private with VSS.Implementation.Strings;
+private with VSS.Implementation.UTF8_Strings;
 limited with VSS.String_Vectors;
 limited with VSS.Strings.Cursors.Iterators.Characters;
 limited with VSS.Strings.Cursors.Iterators.Grapheme_Clusters;
@@ -192,19 +192,19 @@ package VSS.Strings is
 
    overriding function "="
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean;
+      Right : Virtual_String) return Boolean with Inline;
    function "<"
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean;
+      Right : Virtual_String) return Boolean with Inline;
    function "<="
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean;
+      Right : Virtual_String) return Boolean with Inline;
    function ">"
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean;
+      Right : Virtual_String) return Boolean with Inline;
    function ">="
      (Left  : Virtual_String;
-      Right : Virtual_String) return Boolean;
+      Right : Virtual_String) return Boolean with Inline;
    --  Compare two strings in binary order of code points.
 
    function "&"
@@ -228,7 +228,7 @@ package VSS.Strings is
       Right : Virtual_String) return VSS.String_Vectors.Virtual_String_Vector;
    --  Returns vector with given number of given string.
 
-   procedure Clear (Self : in out Virtual_String'Class);
+   procedure Clear (Self : in out Virtual_String'Class) with Inline;
    --  Remove all data.
 
    procedure Append
@@ -388,7 +388,7 @@ package VSS.Strings is
 
    function Starts_With
      (Self   : Virtual_String'Class;
-      Prefix : Virtual_String'Class) return Boolean;
+      Prefix : Virtual_String'Class) return Boolean with Inline;
    --  Return True when Self starts with Prefix.
 
    function Starts_With
@@ -401,12 +401,12 @@ package VSS.Strings is
 
    function Ends_With
      (Self   : Virtual_String'Class;
-      Suffix : Virtual_String'Class) return Boolean;
+      Suffix : Virtual_String'Class) return Boolean with Inline;
    --  Return True when Self has given Suffix.
 
    function Ends_With
      (Self   : Virtual_String'Class;
-      Suffix : VSS.Characters.Virtual_Character) return Boolean;
+      Suffix : VSS.Characters.Virtual_Character) return Boolean with Inline;
    --  Return True when Self has given Suffix.
 
    function Ends_With
@@ -472,7 +472,7 @@ private
 
    type Virtual_String is
      new VSS.Implementation.Referrers.Magic_String_Base with record
-      Data : aliased VSS.Implementation.Strings.String_Data;
+      Data : aliased VSS.Implementation.UTF8_Strings.UTF8_String_Data;
    end record
      with Read      => Read,
           Write     => Write;

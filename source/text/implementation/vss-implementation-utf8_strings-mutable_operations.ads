@@ -39,6 +39,12 @@ is
       Item   : VSS.Unicode.Code_Point;
       Offset : in out VSS.Implementation.Strings.Cursor_Offset);
 
+   procedure Insert
+     (Text   : in out UTF8_String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset);
+
    procedure Delete
      (Text : in out UTF8_String_Data;
       From : VSS.Implementation.Strings.Cursor;
@@ -59,6 +65,13 @@ is
       Capacity : VSS.Unicode.UTF8_Code_Unit_Count)
      with Pre => Text.Storage_Address = System.Null_Address;
    --  Initialize text object and preserve given capacity
+
+   procedure Initialize
+     (Text   : in out UTF8_String_Data;
+      Data   : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Length : VSS.Implementation.Strings.Character_Count)
+     with Pre => Text.Storage_Address = System.Null_Address;
+   --  Initialize text object by given data
 
    procedure Unchecked_Append
      (Target_Data : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data;

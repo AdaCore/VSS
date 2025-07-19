@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -25,7 +25,7 @@ private
      (Self        : in out ShiftJIS_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
-      Target      : out VSS.Implementation.Strings.String_Data);
+      Text        : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
 
    overriding function Has_Error (Self : ShiftJIS_Decoder) return Boolean;
 

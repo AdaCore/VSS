@@ -6,7 +6,6 @@
 
 --  Case conversion of UTF-8 encoded text data
 
-with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Casing_UTF8;
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Implementation.UTF8_Strings;
@@ -29,7 +28,7 @@ package VSS.Implementation.UTF8_Casing is
    procedure Get_Case_Mapping
      (Code    : VSS.Unicode.Code_Point;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data);
+      Text    : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Fill given case mapping for the given character into Data.
 
    procedure Convert_Case

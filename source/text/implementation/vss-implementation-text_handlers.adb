@@ -577,12 +577,12 @@ package body VSS.Implementation.Text_Handlers is
       begin
          if Current.Index /= From.Index then
             Handler.Slice (From, Previous, Item);
-            VSS.Implementation.String_Vectors.Append (Items, Item);
+            --  VSS.Implementation.String_Vectors.Append (Items, Item);
             VSS.Implementation.Strings.Unreference (Item);
 
-         elsif Keep_Empty_Parts then
-            VSS.Implementation.String_Vectors.Append
-              (Items, VSS.Implementation.Strings.Null_String_Data);
+         --  elsif Keep_Empty_Parts then
+            --  VSS.Implementation.String_Vectors.Append
+              --  (Items, VSS.Implementation.Strings.Null_String_Data);
          end if;
       end Append;
 

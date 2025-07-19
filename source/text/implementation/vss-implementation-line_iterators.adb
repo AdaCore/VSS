@@ -4,7 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.Text_Handlers;
 with VSS.Unicode;
 
 package body VSS.Implementation.Line_Iterators is
@@ -22,7 +21,7 @@ package body VSS.Implementation.Line_Iterators is
    --------------
 
    function Backward
-     (Data                : VSS.Implementation.Strings.String_Data;
+     (Text                : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Terminators         : VSS.Strings.Line_Terminator_Set;
       Initial_Position    : VSS.Implementation.Strings.Cursor;
       First_Position      : aliased out VSS.Implementation.Strings.Cursor;
@@ -32,17 +31,15 @@ package body VSS.Implementation.Line_Iterators is
    is
       use type VSS.Unicode.Code_Point;
 
-      Handler : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Data);
-
-      Current_Position : VSS.Implementation.Strings.Cursor := Initial_Position;
-      Aux_Position     : VSS.Implementation.Strings.Cursor;
+      Current_Position : aliased VSS.Implementation.Strings.Cursor :=
+        Initial_Position;
+      Aux_Position     : aliased VSS.Implementation.Strings.Cursor;
       LF_Found         : Boolean := False;
       Dummy            : Boolean;
 
    begin
-      if not Handler.Backward (Current_Position) then
+      if not VSS.Implementation.UTF8_Strings.Backward (Text, Current_Position)
+      then
          --  There is no any characters before initial position.
 
          First_Position      :=
@@ -60,7 +57,7 @@ package body VSS.Implementation.Line_Iterators is
 
       declare
          C : constant VSS.Unicode.Code_Point :=
-           Handler.Element (Current_Position);
+           VSS.Implementation.UTF8_Strings.Element (Text, Current_Position);
 
       begin
          case C is
@@ -147,8 +144,10 @@ package body VSS.Implementation.Line_Iterators is
       if LF_Found then
          Aux_Position := Current_Position;
 
-         if Handler.Backward (Aux_Position) then
-            if Handler.Element (Aux_Position) = Carriage_Return then
+         if VSS.Implementation.UTF8_Strings.Backward (Text, Aux_Position) then
+            if VSS.Implementation.UTF8_Strings.Element (Text, Aux_Position)
+                  = Carriage_Return
+            then
                Current_Position    := Aux_Position;
                First_Position      := Aux_Position;
                Terminator_Position := Aux_Position;
@@ -156,10 +155,11 @@ package body VSS.Implementation.Line_Iterators is
          end if;
       end if;
 
-      while Handler.Backward (Current_Position) loop
+      while VSS.Implementation.UTF8_Strings.Backward (Text, Current_Position)
+      loop
          declare
             C : constant VSS.Unicode.Code_Point :=
-              Handler.Element (Current_Position);
+              VSS.Implementation.UTF8_Strings.Element (Text, Current_Position);
             D : Boolean with Unreferenced;
 
          begin
@@ -171,9 +171,11 @@ package body VSS.Implementation.Line_Iterators is
                   elsif Terminators (VSS.Strings.CRLF) then
                      Aux_Position := Current_Position;
 
-                     if Handler.Backward (Aux_Position) then
-                        if Handler.Element (Aux_Position)
-                             = Carriage_Return
+                     if VSS.Implementation.UTF8_Strings.Backward
+                       (Text, Aux_Position)
+                     then
+                        if VSS.Implementation.UTF8_Strings.Element
+                             (Text, Aux_Position) = Carriage_Return
                         then
                            exit;
                         end if;
@@ -217,7 +219,7 @@ package body VSS.Implementation.Line_Iterators is
    -------------
 
    function Forward
-     (Data                : VSS.Implementation.Strings.String_Data;
+     (Text                : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Terminators         : VSS.Strings.Line_Terminator_Set;
       Initial_Position    : VSS.Implementation.Strings.Cursor;
       First_Position      : aliased out VSS.Implementation.Strings.Cursor;
@@ -225,10 +227,6 @@ package body VSS.Implementation.Line_Iterators is
       Terminator_Position : out VSS.Implementation.Strings.Cursor)
       return Boolean
    is
-      Handler  : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Data);
-
       CR_Found : Boolean := False;
       Dummy    : Boolean;
 
@@ -237,19 +235,20 @@ package body VSS.Implementation.Line_Iterators is
       Last_Position       := Initial_Position;
       Terminator_Position := (others => <>);
 
-      if not Handler.Forward (First_Position) then
+      if not VSS.Implementation.UTF8_Strings.Forward (Text, First_Position)
+      then
          Last_Position       := Initial_Position;
          Terminator_Position := (others => <>);
 
          return False;
       end if;
 
-      while Handler.Forward (Last_Position) loop
+      while VSS.Implementation.UTF8_Strings.Forward (Text, Last_Position) loop
          declare
             use type VSS.Unicode.Code_Point;
 
             C : constant VSS.Unicode.Code_Point :=
-              Handler.Element (Last_Position);
+              VSS.Implementation.UTF8_Strings.Element (Text, Last_Position);
 
          begin
             if CR_Found then
@@ -258,7 +257,9 @@ package body VSS.Implementation.Line_Iterators is
                   --  CRLF are allowed.
 
                   CR_Found := False;
-                  Dummy    := Handler.Backward (Last_Position);
+                  Dummy    :=
+                    VSS.Implementation.UTF8_Strings.Backward
+                      (Text, Last_Position);
 
                   exit;
                end if;
@@ -334,7 +335,8 @@ package body VSS.Implementation.Line_Iterators is
             --  It is special case to handle single CR at the end of string
             --  when both CR and CRLF are allowed.
 
-            Dummy := Handler.Backward (Last_Position);
+            Dummy :=
+              VSS.Implementation.UTF8_Strings.Backward (Text, Last_Position);
 
          else
             --  CR at the end of the string is not a line terminator sequence.
@@ -349,7 +351,8 @@ package body VSS.Implementation.Line_Iterators is
          --  to the character after last character of the string. Thus, it
          --  should be moved one character backward.
 
-         Dummy := Handler.Backward (Last_Position);
+         Dummy :=
+           VSS.Implementation.UTF8_Strings.Backward (Text, Last_Position);
       end if;
 
       return True;

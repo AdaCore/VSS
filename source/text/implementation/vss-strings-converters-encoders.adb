@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with Ada.Unchecked_Deallocation;
 
-with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.Strings;
 with VSS.Strings.Converters.Encoders.UTF8;
 
 package body VSS.Strings.Converters.Encoders is
@@ -82,12 +82,9 @@ package body VSS.Strings.Converters.Encoders is
 
    not overriding procedure Encode
      (Self   : in out Abstract_Encoder;
-      Source : VSS.Implementation.Strings.String_Data;
+      Source : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Target : in out VSS.Stream_Element_Vectors.Stream_Element_Vector'Class)
    is
-      Handler  : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access
-          := VSS.Implementation.Strings.Constant_Handler (Source);
       Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
@@ -97,13 +94,15 @@ package body VSS.Strings.Converters.Encoders is
            (Zero_Width_No_Break_Space_Character, Target);
       end if;
 
-      Handler.Before_First_Character (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character
+        (Source, Position);
 
-      while Handler.Forward (Position)
+      while VSS.Implementation.UTF8_Strings.Forward (Source, Position)
         and not Abstract_Encoder'Class (Self).Has_Error
       loop
          Abstract_Encoder'Class (Self).Encode
-           (Handler.Element (Position), Target);
+           (VSS.Implementation.UTF8_Strings.Element
+              (Source, Position), Target);
       end loop;
    end Encode;
 

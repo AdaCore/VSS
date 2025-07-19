@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023-2024, AdaCore
+--  Copyright (C) 2023-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -10,7 +10,7 @@ with Interfaces;
 
 with VSS.Characters.Latin;
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.Strings;
 with VSS.Unicode;
 
 package body VSS.Strings.Formatters.Generic_Integers is
@@ -220,17 +220,17 @@ package body VSS.Strings.Formatters.Generic_Integers is
       type States is
         (Initial, Zero_Width_Base_Group, Width, Base, Group, Error);
 
-      Handler  : constant
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Format.Data);
       Position : aliased VSS.Implementation.Strings.Cursor;
       Code     : VSS.Unicode.Code_Point'Base;
       State    : States := Initial;
 
    begin
-      Handler.Before_First_Character (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character
+        (Format.Data, Position);
 
-      while Handler.Forward_Element (Position, Code) loop
+      while VSS.Implementation.UTF8_Strings.Forward_Element
+        (Format.Data, Position, Code)
+      loop
          case State is
             when Initial =>
                case Code is

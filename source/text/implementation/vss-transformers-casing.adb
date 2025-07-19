@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.Strings;
-with VSS.Implementation.Text_Handlers.UTF8;
 with VSS.Implementation.UTF8_Casing;
 with VSS.Implementation.UTF8_Strings;
 with VSS.Strings.Internals;
@@ -29,10 +27,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Lowercase,
          Aux);
 
@@ -59,10 +54,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Lowercase,
          Aux);
 
@@ -86,10 +78,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Simple_Lowercase,
          Aux);
 
@@ -116,10 +105,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Simple_Lowercase,
          Aux);
 
@@ -143,10 +129,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Simple_Uppercase,
          Aux);
 
@@ -173,10 +156,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Simple_Uppercase,
          Aux);
 
@@ -200,10 +180,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Uppercase,
          Aux);
 
@@ -230,10 +207,7 @@ package body VSS.Transformers.Casing is
       end if;
 
       VSS.Implementation.UTF8_Casing.Convert_Case
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.UTF8_Casing.Uppercase,
          Aux);
 

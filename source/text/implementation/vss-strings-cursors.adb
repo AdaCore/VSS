@@ -1,12 +1,11 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 pragma Ada_2022;
 
-with VSS.Implementation.Text_Handlers;
 with VSS.Strings.Cursors.Markers.Internals;
 
 package body VSS.Strings.Cursors is
@@ -76,8 +75,11 @@ package body VSS.Strings.Cursors is
    begin
       return Result : VSS.Strings.Virtual_String do
          if Self.Owner /= null then
-            VSS.Implementation.Strings.Constant_Handler (Owner.Data).Slice
-              (Self.First_Position, Self.Last_Position, Result.Data);
+            VSS.Implementation.UTF8_Strings.Slice
+              (Owner.Data,
+               Self.First_Position,
+               Self.Last_Position,
+               Result.Data);
          end if;
       end return;
    end Element;
@@ -95,8 +97,11 @@ package body VSS.Strings.Cursors is
    begin
       return Result : VSS.Strings.Virtual_String do
          if Self.Owner /= null then
-            VSS.Implementation.Strings.Constant_Handler (Owner.Data).Slice
-              (Self.First_Position, Self.Last_Position, Result.Data);
+            VSS.Implementation.UTF8_Strings.Slice
+              (Owner.Data,
+               Self.First_Position,
+               Self.Last_Position,
+               Result.Data);
          end if;
       end return;
    end Element;
@@ -213,8 +218,8 @@ package body VSS.Strings.Cursors is
 
       else
          return
-           VSS.Implementation.Strings.Constant_Handler
-             (String.Data).First_UTF16_Offset (Position);
+           VSS.Implementation.UTF8_Strings.First_UTF16_Offset
+             (String.Data, Position);
       end if;
    end First_UTF16_Offset;
 
@@ -278,17 +283,12 @@ package body VSS.Strings.Cursors is
       Position : VSS.Implementation.Strings.Cursor)
       return VSS.Unicode.UTF8_Code_Unit_Index
    is
+      pragma Unreferenced (String);
+
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
    begin
-      if Position.UTF8_Offset >= 0 then
-         return Position.UTF8_Offset;
-
-      else
-         return
-           VSS.Implementation.Strings.Constant_Handler
-             (String.Data).First_UTF8_Offset (Position);
-      end if;
+      return Position.UTF8_Offset;
    end First_UTF8_Offset;
 
    -----------------------
@@ -391,7 +391,6 @@ package body VSS.Strings.Cursors is
    overriding procedure Invalidate
      (Self : in out Character_Cursor_Limited_Base) is
    begin
-      Self.Handler  := null;
       Self.Position := (others => <>);
    end Invalidate;
 
@@ -523,8 +522,8 @@ package body VSS.Strings.Cursors is
       return VSS.Unicode.UTF16_Code_Unit_Index is
    begin
       return
-        VSS.Implementation.Strings.Constant_Handler
-          (String.Data).Last_UTF16_Offset (Position);
+        VSS.Implementation.UTF8_Strings.Last_UTF16_Offset
+          (String.Data, Position);
    end Last_UTF16_Offset;
 
    -----------------------
@@ -587,8 +586,8 @@ package body VSS.Strings.Cursors is
       return VSS.Unicode.UTF8_Code_Unit_Index is
    begin
       return
-        VSS.Implementation.Strings.Constant_Handler
-          (String.Data).Last_UTF8_Offset (Position);
+        VSS.Implementation.UTF8_Strings.Last_UTF8_Offset
+          (String.Data, Position);
    end Last_UTF8_Offset;
 
    ----------------------

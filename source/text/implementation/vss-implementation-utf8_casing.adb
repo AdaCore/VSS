@@ -6,16 +6,11 @@
 
 pragma Ada_2022;
 
+with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Casing;
 with VSS.Implementation.UTF8_Strings.Mutable_Operations;
-with VSS.Implementation.Text_Handlers.UTF8;
 
 package body VSS.Implementation.UTF8_Casing is
-
-   procedure Get_Case_Mapping
-     (Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Text    : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
 
    ------------------
    -- Convert_Case --
@@ -254,31 +249,6 @@ package body VSS.Implementation.UTF8_Casing is
          end;
       end loop;
    end Convert_Case_Simple;
-
-   ----------------------
-   -- Get_Case_Mapping --
-   ----------------------
-
-   procedure Get_Case_Mapping
-     (Code    : VSS.Unicode.Code_Point;
-      Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data) is
-   begin
-      declare
-         Text : constant not null
-           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-             VSS.Implementation.Strings.Variable_Handler (Data);
-
-      begin
-         VSS.Implementation.Text_Handlers.UTF8.Unsafe_Initialize
-           (Text.all, 0);
-
-         Get_Case_Mapping
-           (Code,
-            Mapping,
-            VSS.Implementation.Text_Handlers.UTF8.UTF8_Text (Text.all).Data);
-      end;
-   end Get_Case_Mapping;
 
    ----------------------
    -- Get_Case_Mapping --

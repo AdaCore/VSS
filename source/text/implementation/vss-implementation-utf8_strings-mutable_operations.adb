@@ -390,6 +390,29 @@ is
       end if;
    end Initialize;
 
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize
+     (Text   : in out UTF8_String_Data;
+      Data   : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Length : VSS.Implementation.Strings.Character_Count) is
+   begin
+      Initialize (Text, Data'Length - 1);
+
+      declare
+         Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. Data'Length)
+           with Import, Address => Text.Storage_Address;
+      begin
+         Storage (0 .. Data'Length - 1) := Data;
+         Text.Size   := Data'Length;
+         Text.Length := Length;
+         Storage (Text.Size) := 16#00#;
+      end;
+   end Initialize;
+
    ------------
    -- Insert --
    ------------
@@ -434,6 +457,57 @@ is
          Text.Size   := @ + L;
          Text.Length := @ + 1;
          Storage (Text.Size) := 16#00#;
+      end;
+   end Insert;
+
+   ------------
+   -- Insert --
+   ------------
+
+   procedure Insert
+     (Text   : in out UTF8_String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      Item   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      Offset : in out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      pragma Unreferenced (Offset);
+      --  XXX `Offset` computation is not implemented
+
+      New_Size : constant VSS.Unicode.UTF8_Code_Unit_Offset :=
+        Text.Size + Item.Size;
+
+   begin
+      if Item.Size = 0 then
+         return;
+      end if;
+
+      if Text.Size = 0 then
+         Text := Item;
+         VSS.Implementation.UTF8_Strings.Reference (Text);
+
+         return;
+      end if;
+
+      Mutate (Text, New_Size);
+
+      declare
+         Text_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. New_Size)
+           with Import, Address => Text.Storage_Address;
+         Item_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. Item.Size)
+           with Import, Address => Item.Storage_Address;
+
+      begin
+         Text_Storage
+           (From.UTF8_Offset + Item.Size .. Text.Size + Item.Size) :=
+           Text_Storage (From.UTF8_Offset .. Text.Size);
+         --  Move NUL terminator too.
+         Text_Storage (From.UTF8_Offset .. From.UTF8_Offset + Item.Size - 1) :=
+           Item_Storage (0 .. Item.Size - 1);
+
+         Text.Size   := @ + Item.Size;
+         Text.Length := @ + Item.Length;
       end;
    end Insert;
 

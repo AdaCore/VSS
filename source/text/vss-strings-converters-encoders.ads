@@ -89,7 +89,7 @@ private
 
    not overriding procedure Encode
      (Self   : in out Abstract_Encoder;
-      Source : VSS.Implementation.Strings.String_Data;
+      Source : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Target : in out VSS.Stream_Element_Vectors.Stream_Element_Vector'Class);
 
    not overriding function Has_Error

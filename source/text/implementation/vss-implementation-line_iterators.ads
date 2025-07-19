@@ -1,10 +1,11 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings;
 with VSS.Strings;
 
 package VSS.Implementation.Line_Iterators is
@@ -12,7 +13,7 @@ package VSS.Implementation.Line_Iterators is
    pragma Preelaborate;
 
    function Forward
-     (Data                : VSS.Implementation.Strings.String_Data;
+     (Text                : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Terminators         : VSS.Strings.Line_Terminator_Set;
       Initial_Position    : VSS.Implementation.Strings.Cursor;
       First_Position      : aliased out VSS.Implementation.Strings.Cursor;
@@ -28,7 +29,7 @@ package VSS.Implementation.Line_Iterators is
    --  of data).
 
    function Backward
-     (Data                : VSS.Implementation.Strings.String_Data;
+     (Text                : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Terminators         : VSS.Strings.Line_Terminator_Set;
       Initial_Position    : VSS.Implementation.Strings.Cursor;
       First_Position      : aliased out VSS.Implementation.Strings.Cursor;

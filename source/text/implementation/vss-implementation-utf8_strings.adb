@@ -9,9 +9,10 @@ pragma Ada_2022;
 with VSS.Implementation.GCC;
 with VSS.Implementation.Line_Iterators;
 with VSS.Implementation.Storage_Managers;
-with VSS.Implementation.Text_Handlers.UTF8;
+with VSS.Implementation.String_Vectors;
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Implementation.UTF8_Strings.Mutable_Operations;
+with VSS.Strings;
 
 package body VSS.Implementation.UTF8_Strings is
 
@@ -20,6 +21,137 @@ package body VSS.Implementation.UTF8_Strings is
    use type VSS.Unicode.Code_Point;
    use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
+
+   ------------
+   -- Adjust --
+   ------------
+
+   procedure Adjust (Self : in out UTF8_String_Data) is
+   begin
+      if Is_SSO (Self) then
+         Self.Storage_Address := Self.Manager'Address;
+      end if;
+   end Adjust;
+
+   --------------------------
+   -- After_Last_Character --
+   --------------------------
+
+   procedure After_Last_Character
+     (Self     : UTF8_String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor) is
+   begin
+      Position :=
+        (Index        => Self.Length + 1,
+         UTF8_Offset  => Self.Size,
+         UTF16_Offset => 0);
+   end After_Last_Character;
+
+   ------------------------
+   -- At_First_Character --
+   ------------------------
+
+   procedure At_First_Character
+     (Self     : UTF8_String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor)
+   is
+      pragma Unreferenced (Self);
+
+   begin
+      Position := (Index => 1, UTF8_Offset => 0, UTF16_Offset => 0);
+   end At_First_Character;
+
+   --------------
+   -- Backward --
+   --------------
+
+   function Backward
+     (Text     : UTF8_String_Data;
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean is
+   begin
+      if Position.Index = 0 then
+         return False;
+
+      else
+         Unchecked_Backward (Text, Position);
+      end if;
+
+      return Position.Index > 0;
+   end Backward;
+
+   ----------------------------
+   -- Before_First_Character --
+   ----------------------------
+
+   procedure Before_First_Character
+     (Self     : UTF8_String_Data;
+      Position : in out VSS.Implementation.Strings.Cursor)
+   is
+      pragma Unreferenced (Self);
+
+   begin
+      Position := (Index => 0, UTF8_Offset => -1, UTF16_Offset => -1);
+   end Before_First_Character;
+
+   ------------------
+   -- Compute_Size --
+   ------------------
+
+   procedure Compute_Size
+     (Text   : UTF8_String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Size   : out VSS.Implementation.Strings.Cursor_Offset)
+   is
+      From_Position : aliased VSS.Implementation.Strings.Cursor;
+      To_Position   : aliased VSS.Implementation.Strings.Cursor;
+      Success       : Boolean with Unreferenced;
+
+   begin
+      if From.Index > To.Index then
+         Size := (0, 0, 0);
+
+      else
+         if From.UTF8_Offset < 0 or From.UTF16_Offset < 0 then
+            --  Some of UTF* offset of From must be resolved first.
+
+            Before_First_Character (Text, From_Position);
+
+            while From_Position.Index /= From.Index
+              and then Forward (Text, From_Position)
+            loop
+               null;
+            end loop;
+
+         else
+            From_Position := From;
+         end if;
+
+         if To.UTF8_Offset < 0 or To.UTF16_Offset < 0 then
+            --  Some of UTF* offset of To must be resolved first.
+
+            To_Position := From_Position;
+
+            while To_Position.Index /= To.Index
+              and then Forward (Text, To_Position)
+            loop
+               null;
+            end loop;
+
+         else
+            To_Position := To;
+         end if;
+
+         Success := Forward (Text, To_Position);
+
+         Size.Index_Offset := To_Position.Index - From_Position.Index;
+         Size.UTF8_Offset  :=
+           To_Position.UTF8_Offset - From_Position.UTF8_Offset;
+         Size.UTF16_Offset :=
+           To_Position.UTF16_Offset - From_Position.UTF16_Offset;
+      end if;
+   end Compute_Size;
 
    -------------
    -- Element --
@@ -104,6 +236,132 @@ package body VSS.Implementation.UTF8_Strings is
          return Code = Suffix;
       end;
    end Ends_With;
+
+   ------------------------
+   -- First_UTF16_Offset --
+   ------------------------
+
+   function First_UTF16_Offset
+     (Text     : UTF8_String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      Aux : aliased VSS.Implementation.Strings.Cursor;
+
+   begin
+      if Position.UTF16_Offset >= 0 then
+         return Position.UTF16_Offset;
+
+      else
+         Before_First_Character (Text, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Forward (Text, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      return Aux.UTF16_Offset;
+   end First_UTF16_Offset;
+
+   -------------
+   -- Forward --
+   -------------
+
+   function Forward
+     (Text     : UTF8_String_Data;
+      Position : aliased in out VSS.Implementation.Strings.Cursor)
+      return Boolean is
+   begin
+      if Position.Index > Text.Length then
+         return False;
+
+      else
+         Unchecked_Forward (Text, Position);
+      end if;
+
+      return Position.Index <= Text.Length;
+   end Forward;
+
+   ---------------------
+   -- Forward_Element --
+   ---------------------
+
+   function Forward_Element
+     (Text     : UTF8_String_Data;
+      Position : aliased in out VSS.Implementation.Strings.Cursor;
+      Element  : out VSS.Unicode.Code_Point'Base) return Boolean
+   is
+      Storage : constant VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+        (0 .. Text.Size)
+        with Import, Address => Text.Storage_Address;
+      Code    : VSS.Unicode.Code_Point'Base :=
+        VSS.Implementation.Strings.No_Character;
+      Result  : Boolean := False;
+
+   begin
+      if Position.Index <= Text.Length then
+         Unchecked_Forward (Text, Position);
+
+         if Position.Index <= Text.Length then
+            Code :=
+              VSS.Implementation.UTF8_Encoding.Unchecked_Decode
+                (Storage, Position.UTF8_Offset);
+            Result := True;
+         end if;
+      end if;
+
+      Element := Code;
+
+      return Result;
+   end Forward_Element;
+
+   -------------------
+   -- Has_Character --
+   -------------------
+
+   function Has_Character
+     (Text     : UTF8_String_Data;
+      Position : VSS.Implementation.Strings.Cursor) return Boolean is
+   begin
+      return Position.Index in 1 .. Text.Length;
+   end Has_Character;
+
+   ----------
+   -- Hash --
+   ----------
+
+   procedure Hash
+     (Text      : UTF8_String_Data;
+      Generator : in out VSS.Implementation.FNV_Hash.FNV_1a_Generator)
+   is
+      Position : aliased VSS.Implementation.Strings.Cursor;
+      Code     : VSS.Unicode.Code_Point;
+
+   begin
+      Before_First_Character (Text, Position);
+
+      while Forward (Text, Position) loop
+         Code := Element (Text, Position);
+
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+         Code := Code / 16#0000_0100#;
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+         Code := Code / 16#0000_0100#;
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+         Code := Code / 16#0000_0100#;
+         VSS.Implementation.FNV_Hash.Hash
+           (Generator,
+            System.Storage_Elements.Storage_Element (Code and 16#0000_00FF#));
+      end loop;
+   end Hash;
 
    --------------
    -- Is_Empty --
@@ -224,6 +482,55 @@ package body VSS.Implementation.UTF8_Strings is
       return Self.Flags = 0;
    end Is_SSO;
 
+   -----------------------
+   -- Last_UTF16_Offset --
+   -----------------------
+
+   function Last_UTF16_Offset
+     (Text     : UTF8_String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF16_Code_Unit_Index
+   is
+      Aux   : aliased VSS.Implementation.Strings.Cursor;
+      Dummy : Boolean;
+
+   begin
+      if Position.UTF16_Offset >= 0 then
+         Aux := Position;
+
+      else
+         Before_First_Character (Text, Aux);
+
+         while Aux.Index /= Position.Index
+           and then Forward (Text, Aux)
+         loop
+            null;
+         end loop;
+      end if;
+
+      Dummy := Forward (Text, Aux);
+
+      return Aux.UTF16_Offset - 1;
+   end Last_UTF16_Offset;
+
+   ----------------------
+   -- Last_UTF8_Offset --
+   ----------------------
+
+   function Last_UTF8_Offset
+     (Text     : UTF8_String_Data;
+      Position : VSS.Implementation.Strings.Cursor)
+      return VSS.Unicode.UTF8_Code_Unit_Index
+   is
+      Aux   : aliased VSS.Implementation.Strings.Cursor := Position;
+      Dummy : Boolean;
+
+   begin
+      Dummy := Forward (Text, Aux);
+
+      return Aux.UTF8_Offset - 1;
+   end Last_UTF8_Offset;
+
    ---------------
    -- Reference --
    ---------------
@@ -293,13 +600,70 @@ package body VSS.Implementation.UTF8_Strings is
       end;
    end Slice;
 
+   -----------
+   -- Split --
+   -----------
+
+   procedure Split
+     (Text             : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      Separator        : VSS.Unicode.Code_Point;
+      Keep_Empty_Parts : Boolean;
+      Items            : in out
+        VSS.Implementation.String_Vectors.String_Vector_Data_Access)
+   is
+      procedure Append;
+      --  Append found substring to the results
+
+      Current  : aliased VSS.Implementation.Strings.Cursor;
+      Previous : VSS.Implementation.Strings.Cursor;
+      From     : aliased VSS.Implementation.Strings.Cursor;
+      Success  : Boolean with Unreferenced;
+
+      ------------
+      -- Append --
+      ------------
+
+      procedure Append is
+         Item : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+
+      begin
+         if Current.Index /= From.Index then
+            Slice (Text, From, Previous, Item);
+            VSS.Implementation.String_Vectors.Append_And_Move_Ownership
+              (Items, Item);
+
+         elsif Keep_Empty_Parts then
+            VSS.Implementation.String_Vectors.Append (Items, Item);
+         end if;
+      end Append;
+
+   begin
+      Before_First_Character (Text, From);
+      Success := Forward (Text, From);
+
+      Before_First_Character (Text, Current);
+      Previous := Current;
+
+      while Forward (Text, Current) loop
+         if Element (Text, Current) = Separator then
+            Append;
+
+            From    := Current;
+            Success := Forward (Text, From);
+         end if;
+
+         Previous := Current;
+      end loop;
+
+      Append;
+   end Split;
+
    -----------------
    -- Split_Lines --
    -----------------
 
    procedure Split_Lines
      (Text            : UTF8_String_Data;
-      Data            : VSS.Implementation.Strings.String_Data;
       Terminators     : VSS.Strings.Line_Terminator_Set;
       Keep_Terminator : Boolean;
       Lines           : in out
@@ -316,7 +680,7 @@ package body VSS.Implementation.UTF8_Strings is
       VSS.Implementation.String_Vectors.Unreference (Lines);
 
       while VSS.Implementation.Line_Iterators.Forward
-        (Data,
+        (Text,
          Terminators,
          Initial,
          At_First,
@@ -340,26 +704,26 @@ package body VSS.Implementation.UTF8_Strings is
          end if;
 
          declare
-            Size      : constant VSS.Unicode.UTF8_Code_Unit_Count :=
-              After_Last.UTF8_Offset - At_First.UTF8_Offset;
-            Storage   : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
-              (0 .. Text.Size)
+            Storage   : constant
+              VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+                (0 .. Text.Size)
               with Import, Address => Text.Storage_Address;
-            Line_Data : VSS.Implementation.Strings.String_Data;
-            Line_Text : VSS.Implementation.Text_Handlers.UTF8.UTF8_Text :=
-              (others => <>)
-              with Address => Line_Data.Storage'Address;
+            Line_Text : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
 
          begin
-            if Size /= 0 then
-               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
-                 (Line_Text.Data,
+            if After_Last.UTF8_Offset - At_First.UTF8_Offset = 0 then
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Initialize
+                 (Line_Text, 0);
+
+            else
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Initialize
+                 (Line_Text,
                   Storage (At_First.UTF8_Offset .. After_Last.UTF8_Offset - 1),
                   After_Last.Index - At_First.Index);
             end if;
 
             VSS.Implementation.String_Vectors.Append_And_Move_Ownership
-              (Lines, Line_Data);
+              (Lines, Line_Text);
          end;
       end loop;
    end Split_Lines;

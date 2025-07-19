@@ -5,7 +5,7 @@
 --
 
 with VSS.Strings.Internals;
-with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings;
 
 package body VSS.String_Vectors is
 
@@ -30,13 +30,13 @@ package body VSS.String_Vectors is
 
    overriding function "="
      (Left  : Virtual_String_Vector;
-      Right : Virtual_String_Vector) return Boolean
-   is
-      use type VSS.Implementation.Strings.String_Data;
+      Right : Virtual_String_Vector) return Boolean is
    begin
       if Left.Length = Right.Length then
          for J in 1 .. Left.Length loop
-            if Left.Data.Data (J) /= Right.Data.Data (J) then
+            if VSS.Implementation.UTF8_Strings.Is_Equal
+              (Left.Data.Data (J), Right.Data.Data (J))
+            then
                return False;
             end if;
          end loop;
@@ -315,18 +315,14 @@ package body VSS.String_Vectors is
      (Self           : Virtual_String_Vector'Class;
       Terminator     : VSS.Strings.Line_Terminator;
       Terminate_Last : Boolean := True)
-      return VSS.Strings.Virtual_String
-   is
-      Data : VSS.Implementation.Strings.String_Data;
-
+      return VSS.Strings.Virtual_String is
    begin
-      VSS.Implementation.String_Vectors.Join_Lines
-        (Self.Data, Data, Terminator, Terminate_Last);
-
-      return Result : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Internals.To_Virtual_String (Data)
-      do
-         VSS.Implementation.Strings.Unreference (Data);
+      return Result : VSS.Strings.Virtual_String do
+         VSS.Implementation.String_Vectors.Join_Lines
+           (Self.Data,
+            VSS.Strings.Internals.Data_Access_Variable (Result).all,
+            Terminator,
+            Terminate_Last);
       end return;
    end Join_Lines;
 

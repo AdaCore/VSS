@@ -362,12 +362,13 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
       Lines           : in out
         VSS.Implementation.String_Vectors.String_Vector_Data_Access) is
    begin
-      VSS.Implementation.UTF8_Strings.Split_Lines
-        (Self.Data,
-         Data,
-         Terminators,
-         Keep_Terminator,
-         Lines);
+      raise Program_Error;
+      --  VSS.Implementation.UTF8_Strings.Split_Lines
+      --    (Self.Data,
+      --     Data,
+      --     Terminators,
+      --     Keep_Terminator,
+      --     Lines);
    end Split_Lines;
 
    ---------------------

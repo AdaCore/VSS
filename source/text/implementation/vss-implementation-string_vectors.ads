@@ -1,20 +1,21 @@
 --
---  Copyright (C) 2020-2022, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with System.Atomic_Counters;
 
-with VSS.Implementation.Strings;
-with VSS.Strings;
+with VSS.Implementation.UTF8_Strings;
+limited with VSS.Strings;
 
 package VSS.Implementation.String_Vectors is
 
    pragma Preelaborate;
 
    type String_Data_Array is
-     array (Positive range <>) of VSS.Implementation.Strings.String_Data;
+     array (Positive range <>)
+       of VSS.Implementation.UTF8_Strings.UTF8_String_Data;
 
    type String_Vector_Data (Bulk : Natural) is record
       Counter : System.Atomic_Counters.Atomic_Counter;
@@ -30,18 +31,18 @@ package VSS.Implementation.String_Vectors is
 
    procedure Append
      (Self : in out String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data);
+      Item : VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Appends "copy" of the given string to the end of the string vector.
 
    procedure Append_And_Move_Ownership
      (Self : in out String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data);
+      Item : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Appends given string to the end of the string vector with moving of the
    --  ownership of the string to the string vector.
 
    procedure Prepend
      (Self : in out String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data);
+      Item : VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Prepend "copy" of the given string to the end of the string vector.
 
    procedure Delete
@@ -52,19 +53,19 @@ package VSS.Implementation.String_Vectors is
    procedure Replace
      (Self  : in out not null String_Vector_Data_Access;
       Index : Positive;
-      Item  : VSS.Implementation.Strings.String_Data);
+      Item  : VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Replace a vector item with a given string.
 
    procedure Join_Lines
      (Self           : String_Vector_Data_Access;
-      Result         : in out VSS.Implementation.Strings.String_Data;
+      Result         : out VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Terminator     : VSS.Strings.Line_Terminator;
       Terminate_Last : Boolean);
    --  Join string vector's strings using given Terminator.
 
    function Contains
      (Self : String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data) return Boolean;
+      Item : VSS.Implementation.UTF8_Strings.UTF8_String_Data) return Boolean;
    --  Return True when given string is present in vector.
 
 end VSS.Implementation.String_Vectors;

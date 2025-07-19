@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.Strings;
-with VSS.Implementation.Text_Handlers.UTF8;
 with VSS.Implementation.UTF8_Normalization;
 with VSS.Implementation.UTF8_Strings;
 with VSS.Strings.Internals;
@@ -25,10 +23,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_C,
          Aux);
 
@@ -51,10 +46,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_C,
          Aux);
 
@@ -74,10 +66,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_D,
          Aux);
 
@@ -100,10 +89,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_D,
          Aux);
 
@@ -123,10 +109,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_KC,
          Aux);
 
@@ -149,10 +132,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_KC,
          Aux);
 
@@ -172,10 +152,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_KD,
          Aux);
 
@@ -198,10 +175,7 @@ package body VSS.Transformers.Normalization is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_KD,
          Aux);
 

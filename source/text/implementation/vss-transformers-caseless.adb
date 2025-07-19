@@ -4,8 +4,6 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.Strings;
-with VSS.Implementation.Text_Handlers.UTF8;
 with VSS.Implementation.UTF8_Casing;
 with VSS.Implementation.UTF8_Normalization;
 with VSS.Implementation.UTF8_Strings;
@@ -32,10 +30,7 @@ package body VSS.Transformers.Caseless is
       end if;
 
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_D,
          Aux_NFD);
       VSS.Implementation.UTF8_Casing.Convert_Case
@@ -70,10 +65,7 @@ package body VSS.Transformers.Caseless is
 
    begin
       VSS.Implementation.UTF8_Normalization.Normalize
-        (VSS.Implementation.Text_Handlers.UTF8.UTF8_Text'Class
-           (VSS.Implementation.Strings.Constant_Handler
-                (VSS.Strings.Internals.Data_Access_Constant
-                     (Item).all).all).Data,
+        (VSS.Strings.Internals.Data_Access_Constant (Item).all,
          VSS.Implementation.Normalization_Form_D,
          Aux_NFD);
       VSS.Implementation.UTF8_Casing.Convert_Case

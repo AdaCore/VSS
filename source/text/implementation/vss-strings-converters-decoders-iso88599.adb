@@ -1,10 +1,11 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
-with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 
 package body VSS.Strings.Converters.Decoders.ISO88599 is
 
@@ -16,7 +17,7 @@ package body VSS.Strings.Converters.Decoders.ISO88599 is
      (Self        : in out ISO88599_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
-      Target      : out VSS.Implementation.Strings.String_Data)
+      Text        : out VSS.Implementation.UTF8_Strings.UTF8_String_Data)
    is
       pragma Unreferenced (Self);
       pragma Unreferenced (End_Of_Data);
@@ -26,9 +27,6 @@ package body VSS.Strings.Converters.Decoders.ISO88599 is
       Index  : Ada.Streams.Stream_Element_Offset := Source'First;
       Byte   : Ada.Streams.Stream_Element;
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Text   : constant not null
-        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       loop
@@ -38,25 +36,32 @@ package body VSS.Strings.Converters.Decoders.ISO88599 is
 
          case Byte is
             when 16#D0# =>
-               Text.Append (16#011E#, Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, 16#011E#, Offset);
 
             when 16#DD# =>
-               Text.Append (16#0130#, Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, 16#0130#, Offset);
 
             when 16#DE# =>
-               Text.Append (16#015E#, Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, 16#015E#, Offset);
 
             when 16#F0# =>
-               Text.Append (16#011F#, Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, 16#011F#, Offset);
 
             when 16#FD# =>
-               Text.Append (16#0131#, Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, 16#0131#, Offset);
 
             when 16#FE# =>
-               Text.Append (16#015F#, Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, 16#015F#, Offset);
 
             when others =>
-               Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, VSS.Unicode.Code_Point (Byte), Offset);
          end case;
 
          Index := Index + 1;

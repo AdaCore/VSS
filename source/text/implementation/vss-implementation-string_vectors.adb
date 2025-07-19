@@ -214,8 +214,15 @@ package body VSS.Implementation.String_Vectors is
 
       begin
          for J in 1 .. Self.Last loop
-            VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
-              (Result, Self.Data (J), Offset);
+            declare
+               Element : VSS.Implementation.UTF8_Strings.UTF8_String_Data :=
+                 Self.Data (J);
+
+            begin
+               VSS.Implementation.UTF8_Strings.Adjust (Element);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Result, Element, Offset);
+            end;
 
             if J /= Self.Last or Terminate_Last then
                VSS.Implementation.UTF8_Strings.Mutable_Operations.Append

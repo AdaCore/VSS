@@ -34,11 +34,20 @@ package body VSS.String_Vectors is
    begin
       if Left.Length = Right.Length then
          for J in 1 .. Left.Length loop
-            if VSS.Implementation.UTF8_Strings.Is_Equal
-              (Left.Data.Data (J), Right.Data.Data (J))
-            then
-               return False;
-            end if;
+            declare
+               L : VSS.Implementation.UTF8_Strings.UTF8_String_Data :=
+                 Left.Data.Data (J);
+               R : VSS.Implementation.UTF8_Strings.UTF8_String_Data :=
+                 Right.Data.Data (J);
+
+            begin
+               VSS.Implementation.UTF8_Strings.Adjust (L);
+               VSS.Implementation.UTF8_Strings.Adjust (R);
+
+               if not VSS.Implementation.UTF8_Strings.Is_Equal (L, R) then
+                  return False;
+               end if;
+            end;
          end loop;
 
          return True;

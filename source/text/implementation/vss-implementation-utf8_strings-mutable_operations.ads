@@ -60,12 +60,6 @@ is
      with Pre => Text.Storage_Address = System.Null_Address;
    --  Initialize text object and preserve given capacity
 
-   procedure Slice
-     (Text   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
-      From   : VSS.Implementation.Strings.Cursor;
-      To     : VSS.Implementation.Strings.Cursor;
-      Target : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
-
    procedure Unchecked_Append
      (Target_Data : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Target_Size : out VSS.Unicode.UTF8_Code_Unit_Count;

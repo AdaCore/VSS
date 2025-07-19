@@ -75,6 +75,13 @@ is
    function To_UTF_8_String
      (Self : UTF8_String_Data) return Ada.Strings.UTF_Encoding.UTF_8_String;
 
+   procedure Slice
+     (Text   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Result : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
+   --  Return slice of the string.
+
    procedure Split_Lines
      (Text            : UTF8_String_Data;
       Data            : VSS.Implementation.Strings.String_Data;
@@ -84,6 +91,8 @@ is
         VSS.Implementation.String_Vectors.String_Vector_Data_Access);
 
 private
+
+   Default_UTF8_String_Data : constant UTF8_String_Data := (others => <>);
 
    SSO_Max_Size : constant := 15;
    --  XXX 64bit only !!!

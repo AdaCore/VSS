@@ -399,7 +399,7 @@ package body VSS.Implementation.Text_Handlers.UTF8 is
       Unsafe_Initialize
         (VSS.Implementation.Strings.Variable_Handler (Target).all);
 
-      VSS.Implementation.UTF8_Strings.Mutable_Operations.Slice
+      VSS.Implementation.UTF8_Strings.Slice
         (Self.Data,
          From,
          To,

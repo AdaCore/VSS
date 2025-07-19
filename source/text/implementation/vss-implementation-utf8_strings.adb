@@ -84,6 +84,53 @@ package body VSS.Implementation.UTF8_Strings is
       end if;
    end Reference;
 
+   -----------
+   -- Slice --
+   -----------
+
+   procedure Slice
+     (Text   : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+      From   : VSS.Implementation.Strings.Cursor;
+      To     : VSS.Implementation.Strings.Cursor;
+      Result : out VSS.Implementation.UTF8_Strings.UTF8_String_Data)
+   is
+      Text_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+        (0 .. Text.Size)
+        with Import, Address => Text.Storage_Address;
+      After        : VSS.Implementation.Strings.Cursor := To;
+      Size         : VSS.Unicode.UTF8_Code_Unit_Count;
+      Length       : VSS.Implementation.Strings.Character_Count;
+
+   begin
+      if From.Index > To.Index then
+         Result := Default_UTF8_String_Data;
+
+         return;
+      end if;
+
+      if To.Index <= Text.Length then
+         Unchecked_Forward (Text, After);
+      end if;
+
+      Size   := After.UTF8_Offset - From.UTF8_Offset;
+      Length := After.Index - From.Index;
+
+      Mutable_Operations.Initialize (Result, Size);
+
+      declare
+         Result_Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
+           (0 .. Size)
+           with Import, Address => Result.Storage_Address;
+
+      begin
+         Result_Storage (0 .. Size - 1) :=
+           Text_Storage (From.UTF8_Offset .. After.UTF8_Offset - 1);
+         Result.Size   := Size;
+         Result.Length := Length;
+         Result_Storage (Result.Size) := 16#00#;
+      end;
+   end Slice;
+
    -----------------
    -- Split_Lines --
    -----------------

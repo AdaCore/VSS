@@ -147,6 +147,10 @@ is
         Text.Size + Suffix.Size;
 
    begin
+      if Suffix.Size = 0 then
+         return;
+      end if;
+
       Mutate (Text, New_Size);
 
       declare

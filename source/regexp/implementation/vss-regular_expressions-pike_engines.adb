@@ -11,8 +11,8 @@ with Ada.Unchecked_Deallocation;
 
 with VSS.Characters.Latin;
 with VSS.Characters.Punctuations;
-with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings;
 with VSS.Regular_Expressions.ECMA_Parser;
 with VSS.Regular_Expressions.Matches;
 with VSS.Strings.Character_Iterators;
@@ -112,8 +112,8 @@ package body VSS.Regular_Expressions.Pike_Engines is
         (Thread_State_List_Pair, Thread_State_List_Pair_Access);
 
       procedure Step_Backward
-        (Text : VSS.Strings.Virtual_String'Class;
-         Cursor : in out VSS.Implementation.Strings.Cursor);
+        (Text   : VSS.Strings.Virtual_String'Class;
+         Cursor : aliased in out VSS.Implementation.Strings.Cursor);
       --  Shift Cursor one character backward in string Text
 
       procedure Append_State
@@ -187,8 +187,9 @@ package body VSS.Regular_Expressions.Pike_Engines is
            return Boolean;
          --  Check given assertion
 
-         function Is_Word_Char (Char : VSS.Characters.Virtual_Character)
-           return Boolean is (Char in 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_');
+         function Is_Word_Char
+           (Char : VSS.Characters.Virtual_Character) return Boolean is
+             (Char in 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_');
 
          ------------------------
          -- Is_Valid_Assertion --
@@ -373,23 +374,18 @@ package body VSS.Regular_Expressions.Pike_Engines is
 
       procedure Step_Backward
         (Text   : VSS.Strings.Virtual_String'Class;
-         Cursor : in out VSS.Implementation.Strings.Cursor)
+         Cursor : aliased in out VSS.Implementation.Strings.Cursor)
       is
+         Data    : VSS.Implementation.UTF8_Strings.UTF8_String_Data
+           renames VSS.Strings.Internals.Data_Access_Constant (Text).all;
          Ignore  : Boolean;
-
-         Data    : constant
-           VSS.Strings.Internals.String_Data_Constant_Access :=
-             VSS.Strings.Internals.Data_Access_Constant (Text);
-         Handler : constant
-           VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-             VSS.Implementation.Strings.Constant_Handler (Data.all);
 
       begin
          if VSS.Implementation.Strings.Is_Invalid (Cursor) then
             null;
 
          else
-            Ignore := Handler.Backward (Cursor);
+            Ignore := VSS.Implementation.UTF8_Strings.Backward (Data, Cursor);
          end if;
       end Step_Backward;
 
@@ -445,7 +441,7 @@ package body VSS.Regular_Expressions.Pike_Engines is
                      UTF8_Offset  => Final_Tags (Index).UTF8_Offset,
                      UTF16_Offset => Final_Tags (Index).UTF16_Offset);
 
-                  To   : VSS.Implementation.Strings.Cursor :=
+                  To   : aliased VSS.Implementation.Strings.Cursor :=
                     (Index        => Final_Tags (Index + 1).Index,
                      UTF8_Offset  => Final_Tags (Index + 1).UTF8_Offset,
                      UTF16_Offset => Final_Tags (Index + 1).UTF16_Offset);

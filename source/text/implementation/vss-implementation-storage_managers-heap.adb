@@ -12,6 +12,14 @@ package body VSS.Implementation.Storage_Managers.Heap
   with Preelaborate
 is
 
+   Growth_Factor            : constant := 32;
+   --  The growth factor controls how much extra space is allocated when
+   --  we have to increase the size of an allocated unbounded string. By
+   --  allocating extra space, we avoid the need to reallocate on every
+   --  append, particularly important when a string is built up by repeated
+   --  append operations of small pieces. This is expressed as a factor so
+   --  32 means add 1/32 of the length of the string as growth space.
+
    Minimal_Allocation_Block : constant := Standard'Maximum_Alignment;
    --  Allocation will be done by a multiple of Minimal_Allocation_Block.
    --  This causes no memory loss as most (all?) malloc implementations are
@@ -151,8 +159,10 @@ is
         or Old_Shared.Capacity < Capacity
       then
          declare
-            New_Shared : constant not null UTF8_Shared_Segment_Access :=
-              new UTF8_Shared_Segment (Aligned_Capacity (Capacity));
+            New_Capacity : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+              Capacity + Capacity / Growth_Factor;
+            New_Shared   : constant not null UTF8_Shared_Segment_Access :=
+              new UTF8_Shared_Segment (Aligned_Capacity (New_Capacity));
 
          begin
             New_Shared.Data (0 .. Old_Shared.Capacity) := Old_Shared.Data;

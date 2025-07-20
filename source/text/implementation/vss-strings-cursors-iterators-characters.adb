@@ -62,8 +62,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       end if;
 
       return
-        VSS.Implementation.UTF8_Strings.Forward
-          (VSS.Strings.Magic_String_Access (Self.Owner).Data, Self.Position);
+        VSS.Implementation.UTF8_Strings.Forward (Self.Data, Self.Position);
    end Forward;
 
    -------------
@@ -82,9 +81,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       if Self.Owner /= null then
          Result :=
            VSS.Implementation.UTF8_Strings.Forward_Element
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Self.Position,
-              Code);
+             (Self.Data, Self.Position, Code);
       end if;
 
       Element := VSS.Characters.Virtual_Character'Base'Val (Code);
@@ -102,8 +99,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       if Self.Owner /= null then
          return
            VSS.Implementation.UTF8_Strings.Has_Character
-             (VSS.Strings.Magic_String_Access (Self.Owner).Data,
-              Self.Position);
+             (Self.Data, Self.Position);
       end if;
 
       return False;
@@ -118,8 +114,9 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
+      Self.Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
       VSS.Implementation.UTF8_Strings.After_Last_Character
-        (VSS.Strings.Magic_String_Access (Self.Owner).Data, Self.Position);
+        (Self.Data, Self.Position);
    end Set_After_Last;
 
    ------------
@@ -137,6 +134,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       Get_Owner_And_Position (Position, Cursor_Owner, Cursor_Position);
 
       Self.Reconnect (Cursor_Owner);
+      Self.Data     := VSS.Strings.Magic_String_Access (Self.Owner).Data;
       Self.Position := Cursor_Position;
    end Set_At;
 
@@ -152,11 +150,11 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
+      Self.Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
       VSS.Implementation.UTF8_Strings.Before_First_Character
-        (VSS.Strings.Magic_String_Access (Self.Owner).Data, Self.Position);
+        (Self.Data, Self.Position);
       Dummy :=
-        VSS.Implementation.UTF8_Strings.Forward
-          (VSS.Strings.Magic_String_Access (Self.Owner).Data, Self.Position);
+        VSS.Implementation.UTF8_Strings.Forward (Self.Data, Self.Position);
    end Set_At_First;
 
    -----------------
@@ -171,11 +169,11 @@ package body VSS.Strings.Cursors.Iterators.Characters is
 
    begin
       Self.Reconnect (On'Unrestricted_Access);
+      Self.Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
       VSS.Implementation.UTF8_Strings.After_Last_Character
-        (VSS.Strings.Magic_String_Access (Self.Owner).Data, Self.Position);
+        (Self.Data, Self.Position);
       Dummy :=
-        VSS.Implementation.UTF8_Strings.Backward
-          (VSS.Strings.Magic_String_Access (Self.Owner).Data, Self.Position);
+        VSS.Implementation.UTF8_Strings.Backward (Self.Data, Self.Position);
    end Set_At_Last;
 
    ----------------------
@@ -187,8 +185,9 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       On   : VSS.Strings.Virtual_String'Class) is
    begin
       Self.Reconnect (On'Unrestricted_Access);
+      Self.Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
       VSS.Implementation.UTF8_Strings.Before_First_Character
-        (VSS.Strings.Magic_String_Access (Self.Owner).Data, Self.Position);
+        (Self.Data, Self.Position);
    end Set_Before_First;
 
    ---------------------
@@ -206,6 +205,7 @@ package body VSS.Strings.Cursors.Iterators.Characters is
       then
          VSS.Implementation.Strings.Fixup_Insert
            (Self.Position, Start, Inserted);
+         Self.Data := VSS.Strings.Magic_String_Access (Self.Owner).Data;
 
       else
          Self.Invalidate;

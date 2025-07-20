@@ -166,9 +166,17 @@ package body VSS.Implementation.String_Vectors is
       end if;
 
       for J in Self.Data'First .. Self.Last loop
-         if VSS.Implementation.UTF8_Strings.Is_Equal (Self.Data (J), Item) then
-            return True;
-         end if;
+         declare
+            L : VSS.Implementation.UTF8_Strings.UTF8_String_Data :=
+              Self.Data (J);
+
+         begin
+            VSS.Implementation.UTF8_Strings.Adjust (L);
+
+            if VSS.Implementation.UTF8_Strings.Is_Equal (L, Item) then
+               return True;
+            end if;
+         end;
       end loop;
 
       return False;

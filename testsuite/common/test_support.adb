@@ -169,7 +169,12 @@ package body Test_Support is
         Ada.Strings.Unbounded.To_Unbounded_String (Message);
 
       Controller.Active_Testcase.Traceback :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Location);
+        Ada.Strings.Unbounded.To_Unbounded_String (Message);
+      Ada.Strings.Unbounded.Append
+        (Controller.Active_Testcase.Traceback, Ada.Characters.Latin_1.LF);
+      Ada.Strings.Unbounded.Append
+        (Controller.Active_Testcase.Traceback,
+         Ada.Strings.Unbounded.To_Unbounded_String (Location));
 
       raise Test_Failed with "at "
               & Location

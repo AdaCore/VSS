@@ -21,12 +21,12 @@ INSTALL_LIBRARY_DIR    ?= $(DESTDIR)$(LIBDIR)
 INSTALL_ALI_DIR        ?= $(INSTALL_LIBRARY_DIR)/vss/$*
 
 GPRBUILD_FLAGS = -p -j0 $(GPRFLAGS) \
-	-XVSS_BUILD_PROFILE=$(word 1, $(subst -, ,$*)) \
-	-XVSS_LIBRARY_TYPE=$(word 2, $(subst -, ,$*))
+	-XVSS_BUILD_PROFILE=$(word 1, $(subst _, ,$*)) \
+	-XVSS_LIBRARY_TYPE=$(word 2, $(subst _, ,$*))
 GPRINSTALL_FLAGS = $(GPRFLAGS) \
-	-XVSS_BUILD_PROFILE=$(word 1, $(subst -, ,$*)) \
-	-XVSS_LIBRARY_TYPE=$(word 2, $(subst -, ,$*)) \
-	--build-name=$(word 2, $(subst -, ,$*)) \
+	-XVSS_BUILD_PROFILE=$(word 1, $(subst _, ,$*)) \
+	-XVSS_LIBRARY_TYPE=$(word 2, $(subst _, ,$*)) \
+	--build-name=$(word 2, $(subst _, ,$*)) \
 	--build-var=LIBRARY_TYPE --build-var=VSS_LIBRARY_TYPE \
 	--prefix=$(PREFIX) --exec-subdir=$(INSTALL_EXEC_DIR) \
 	--lib-subdir=$(INSTALL_ALI_DIR) --project-subdir=$(INSTALL_PROJECT_DIR) \
@@ -44,11 +44,11 @@ endif
 
 .NOTPARALLEL:
 
-all: build-libs-development-relocatable
+all: build-libs-development_relocatable
 
 build-all-libs: \
-	build-libs-release-relocatable build-libs-release-static \
-	build-libs-validation-relocatable build-libs-validation-static
+	build-libs-release_relocatable build-libs-release_static build-libs-release_static-pic \
+	build-libs-validation_relocatable build-libs-validation_static build-libs-validation_static-pic
 
 build-libs-%:
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr
@@ -57,11 +57,11 @@ build-libs-%:
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml_templates.gpr
-	gprbuild -XXMLADA_BUILD=$(word 2, $(subst -, ,$*)) $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr
+	gprbuild -XXMLADA_BUILD=$(word 2, $(subst _, ,$*)) $(GPRBUILD_FLAGS) gnat/vss_xml_xmlada.gpr
 
-install: install-libs-development-relocatable
+install: install-libs-development_relocatable
 
-install-all-libs: install-libs-release-static install-libs-release-relocatable
+install-all-libs: install-libs-release_static install-libs-release_static-pic install-libs-release_relocatable
 
 install-libs-%:
 	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr --install-name=vss_gnat
@@ -70,9 +70,9 @@ install-libs-%:
 	gprinstall $(GPRINSTALL_FLAGS)/regexp -f -p -P gnat/vss_regexp.gpr --install-name=vss_regexp
 	gprinstall $(GPRINSTALL_FLAGS)/xml -f -p -P gnat/vss_xml.gpr --install-name=vss_xml
 	gprinstall $(GPRINSTALL_FLAGS)/xml_templates -f -p -P gnat/vss_xml_templates.gpr --install-name=vss_xml_templates
-	gprinstall -XXMLADA_BUILD=$(word 2, $(subst -, ,$*)) $(GPRINSTALL_FLAGS)/xml_xmlada -f -p -P gnat/vss_xml_xmlada.gpr --install-name=vss_xml_xmlada
+	gprinstall -XXMLADA_BUILD=$(word 2, $(subst _, ,$*)) $(GPRINSTALL_FLAGS)/xml_xmlada -f -p -P gnat/vss_xml_xmlada.gpr --install-name=vss_xml_xmlada
 
-misc: misc-validation-static
+misc: misc-validation_static
 
 misc-%: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat gnat/tools/json_schema.gpr
@@ -80,15 +80,15 @@ misc-%: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat examples/blogs/json_1/blog_1.gpr
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat examples/command_line/command/command_line_command.gpr
 
-generate: generate-development-static
+generate: generate-development_static
 
 generate-%:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr
-	.objs/$(word 1, $(subst -, ,$*))/tools/gen_ucd data/ucd .objs/ucd.ada
+	.objs/$(word 1, $(subst _, ,$*))/tools/gen_ucd data/ucd .objs/ucd.ada
 	rm -f source/text/ucd/*.ad[sb]
 	gnatchop -gnat2022 .objs/ucd.ada source/text/ucd
 
-build-tests: build-tests-validation-static
+build-tests: build-tests-validation_static
 
 build-tests-%:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_text_tests.gpr

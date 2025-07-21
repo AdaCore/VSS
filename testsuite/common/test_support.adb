@@ -171,8 +171,6 @@ package body Test_Support is
       Controller.Active_Testcase.Traceback :=
         Ada.Strings.Unbounded.To_Unbounded_String (Location);
 
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-
       raise Test_Failed with "at "
               & Location
               & (if Message /= "" then " " & Message else "");
@@ -340,6 +338,8 @@ package body Test_Support is
            Ada.Strings.Unbounded.To_Unbounded_String
              (Ada.Exceptions.Exception_Information (E));
 
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+
          End_Testcase;
    end Run_Testcase;
 
@@ -386,8 +386,6 @@ package body Test_Support is
 
       Controller.Active_Testcase.Message :=
         Ada.Strings.Unbounded.To_Unbounded_String (Message);
-
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
       raise Test_Skipped;
    end Skip;

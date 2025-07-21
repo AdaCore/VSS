@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2023, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
@@ -29,10 +29,10 @@ abstract project VSS_Common is
    Ada_Coverage_Switches := ();
    Linker_Options := ();
 
-   Library_Dir      := "../.libs/" & "/" & Library_Kind;
-   Object_Dir       := "../.objs/" & "/" & Library_Kind;
-   Tests_Object_Dir := "../../.objs/" & "/tests";
-   Tools_Object_Dir := "../../.objs/" & "/tools";
+   Library_Dir      := "../.libs/" & VSS_Config.Build_Profile & "/" & Library_Kind;
+   Object_Dir       := "../.objs/" & VSS_Config.Build_Profile & "/" & Library_Kind;
+   Tests_Object_Dir := "../../.objs/" & VSS_Config.Build_Profile & "/tests";
+   Tools_Object_Dir := "../../.objs/" & VSS_Config.Build_Profile & "/tools";
 
    Common_Ada_Compiler_Switches :=
      ("-gnatW8");   --  Wide character encoding method UTF-8
@@ -45,7 +45,10 @@ abstract project VSS_Common is
          VSS_Ada_Compiler_Switches := ("-g");
 
       when "validation" =>
-         VSS_Ada_Compiler_Switches := ();
+         VSS_Ada_Compiler_Switches :=
+           (
+             "-gnaty-B"  --  check no use of AND/OR for boolean expressions
+           );
 
       when "development" =>
          VSS_Ada_Compiler_Switches :=

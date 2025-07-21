@@ -1,8 +1,13 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
+
+--  Note, `Virtual_String_Vector`'s internal data structure doesn't adjust
+--  internal `UTF8_String_Data` items to improve performance, thus these
+--  internal elements can't be used by the applciation without call to
+--  `Adjust` first.
 
 pragma Ada_2022;
 
@@ -10,7 +15,9 @@ with Ada.Unchecked_Deallocation;
 with System.Storage_Elements;
 
 with VSS.Implementation.Character_Codes;
-with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
+with VSS.Strings;
 with VSS.Unicode;
 
 package body VSS.Implementation.String_Vectors is
@@ -80,7 +87,8 @@ package body VSS.Implementation.String_Vectors is
       subtype Empty_String_Vector_Data is String_Vector_Data (0);
 
       Element_Size : constant System.Storage_Elements.Storage_Count :=
-        VSS.Implementation.Strings.String_Data'Max_Size_In_Storage_Elements;
+        VSS.Implementation.UTF8_Strings
+          .UTF8_String_Data'Max_Size_In_Storage_Elements;
 
       Static_Size  : constant System.Storage_Elements.Storage_Count :=
         Empty_String_Vector_Data'Max_Size_In_Storage_Elements;
@@ -108,7 +116,7 @@ package body VSS.Implementation.String_Vectors is
 
    procedure Append
      (Self : in out String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data) is
+      Item : VSS.Implementation.UTF8_Strings.UTF8_String_Data) is
    begin
       if Self = null then
          Mutate (Self, 1, 0);
@@ -120,7 +128,7 @@ package body VSS.Implementation.String_Vectors is
       Self.Last := Self.Last + 1;
       Self.Data (Self.Last) := Item;
 
-      VSS.Implementation.Strings.Reference (Self.Data (Self.Last));
+      VSS.Implementation.UTF8_Strings.Reference (Self.Data (Self.Last));
    end Append;
 
    -------------------------------
@@ -129,7 +137,7 @@ package body VSS.Implementation.String_Vectors is
 
    procedure Append_And_Move_Ownership
      (Self : in out String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data) is
+      Item : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data) is
    begin
       if Self = null then
          Mutate (Self, 1, 0);
@@ -140,6 +148,8 @@ package body VSS.Implementation.String_Vectors is
 
       Self.Last := Self.Last + 1;
       Self.Data (Self.Last) := Item;
+      --  No call of `Adjust`, see note.
+      Item := (others => <>);
    end Append_And_Move_Ownership;
 
    --------------
@@ -148,22 +158,25 @@ package body VSS.Implementation.String_Vectors is
 
    function Contains
      (Self : String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data) return Boolean
-   is
-      Item_Text : VSS.Implementation.Text_Handlers.Abstract_Text_Handler'Class
-        renames VSS.Implementation.Strings.Constant_Handler (Item).all;
-
+      Item : VSS.Implementation.UTF8_Strings.UTF8_String_Data)
+      return Boolean is
    begin
       if Self = null then
          return False;
       end if;
 
       for J in Self.Data'First .. Self.Last loop
-         if Item_Text.Is_Equal
-              (VSS.Implementation.Strings.Constant_Handler (Self.Data (J)).all)
-         then
-            return True;
-         end if;
+         declare
+            L : VSS.Implementation.UTF8_Strings.UTF8_String_Data :=
+              Self.Data (J);
+
+         begin
+            VSS.Implementation.UTF8_Strings.Adjust (L);
+
+            if VSS.Implementation.UTF8_Strings.Is_Equal (L, Item) then
+               return True;
+            end if;
+         end;
       end loop;
 
       return False;
@@ -180,7 +193,7 @@ package body VSS.Implementation.String_Vectors is
       if Index <= Self.Last then
          Mutate (Self, Self.Last, 0);
 
-         VSS.Implementation.Strings.Unreference (Self.Data (Index));
+         VSS.Implementation.UTF8_Strings.Unreference (Self.Data (Index));
 
          Self.Data (Index .. Self.Last - 1) :=
            Self.Data (Index + 1 .. Self.Last);
@@ -194,12 +207,10 @@ package body VSS.Implementation.String_Vectors is
 
    procedure Join_Lines
      (Self           : String_Vector_Data_Access;
-      Result         : in out VSS.Implementation.Strings.String_Data;
+      Result         : out VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Terminator     : VSS.Strings.Line_Terminator;
       Terminate_Last : Boolean) is
    begin
-      VSS.Implementation.Strings.Unreference (Result);
-
       if Self = null then
          return;
       end if;
@@ -208,21 +219,28 @@ package body VSS.Implementation.String_Vectors is
          use type VSS.Strings.Line_Terminator;
 
          Offset : VSS.Implementation.Strings.Cursor_Offset;
-         Text   : constant not null
-           VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-             VSS.Implementation.Strings.Variable_Handler (Result);
 
       begin
          for J in 1 .. Self.Last loop
-            Text.Append (Result, Self.Data (J), Offset);
+            declare
+               Element : VSS.Implementation.UTF8_Strings.UTF8_String_Data :=
+                 Self.Data (J);
+
+            begin
+               VSS.Implementation.UTF8_Strings.Adjust (Element);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Result, Element, Offset);
+            end;
 
             if J /= Self.Last or Terminate_Last then
-               Text.Append
-                 (Line_Terminator_To_Code_Point (Terminator), Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Result, Line_Terminator_To_Code_Point (Terminator), Offset);
 
                if Terminator = VSS.Strings.CRLF then
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Line_Feed, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Result,
+                     VSS.Implementation.Character_Codes.Line_Feed,
+                     Offset);
                end if;
             end if;
          end loop;
@@ -256,7 +274,7 @@ package body VSS.Implementation.String_Vectors is
 
             if not System.Atomic_Counters.Is_One (Old.Counter) then
                for Data of Self.Data (1 .. Self.Last) loop
-                  VSS.Implementation.Strings.Reference (Data);
+                  VSS.Implementation.UTF8_Strings.Reference (Data);
                end loop;
 
                Unreference (Old);
@@ -274,7 +292,7 @@ package body VSS.Implementation.String_Vectors is
 
    procedure Prepend
      (Self : in out String_Vector_Data_Access;
-      Item : VSS.Implementation.Strings.String_Data) is
+      Item : VSS.Implementation.UTF8_Strings.UTF8_String_Data) is
    begin
       if Self = null then
          Mutate (Self, 1, 0);
@@ -287,7 +305,7 @@ package body VSS.Implementation.String_Vectors is
       Self.Last := Self.Last + 1;
       Self.Data (1) := Item;
 
-      VSS.Implementation.Strings.Reference (Self.Data (1));
+      VSS.Implementation.UTF8_Strings.Reference (Self.Data (1));
    end Prepend;
 
    ---------------
@@ -308,12 +326,12 @@ package body VSS.Implementation.String_Vectors is
    procedure Replace
      (Self  : in out not null String_Vector_Data_Access;
       Index : Positive;
-      Item  : VSS.Implementation.Strings.String_Data) is
+      Item  : VSS.Implementation.UTF8_Strings.UTF8_String_Data) is
    begin
       Mutate (Self, Self.Last, 0);
-      VSS.Implementation.Strings.Unreference (Self.Data (Index));
+      VSS.Implementation.UTF8_Strings.Unreference (Self.Data (Index));
       Self.Data (Index) := Item;
-      VSS.Implementation.Strings.Reference (Self.Data (Index));
+      VSS.Implementation.UTF8_Strings.Reference (Self.Data (Index));
    end Replace;
 
    -----------------
@@ -325,7 +343,7 @@ package body VSS.Implementation.String_Vectors is
       if Self /= null then
          if System.Atomic_Counters.Decrement (Self.Counter) then
             for J in 1 .. Self.Last loop
-               VSS.Implementation.Strings.Unreference (Self.Data (J));
+               VSS.Implementation.UTF8_Strings.Unreference (Self.Data (J));
             end loop;
 
             Free (Self);

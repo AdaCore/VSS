@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -8,7 +8,8 @@ pragma Ada_2022;
 
 with Interfaces;
 
-with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 
 with VSS.Strings.Converters.Decoders.GB18030.Indices;
 with VSS.Strings.Converters.Decoders.GB18030.Ranges;
@@ -36,7 +37,7 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
      (Self        : in out GB18030_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
-      Target      : out VSS.Implementation.Strings.String_Data)
+      Text        : out VSS.Implementation.UTF8_Strings.UTF8_String_Data)
    is
       use type Ada.Streams.Stream_Element;
       use type Ada.Streams.Stream_Element_Offset;
@@ -48,9 +49,6 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
       Third  : Ada.Streams.Stream_Element        := Self.Third;
       Byte   : Ada.Streams.Stream_Element;
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Text   : constant not null
-        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -71,7 +69,8 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  Text.Append (Replacement_Character, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, Replacement_Character, Offset);
                end if;
             end if;
 
@@ -100,11 +99,13 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                            exit;
 
                         else
-                           Text.Append (Replacement_Character, Offset);
+                           VSS.Implementation.UTF8_Strings.Mutable_Operations
+                             .Append (Text, Replacement_Character, Offset);
                         end if;
 
                      else
-                        Text.Append (Code, Offset);
+                        VSS.Implementation.UTF8_Strings.Mutable_Operations
+                          .Append (Text, Code, Offset);
                      end if;
                   end;
 
@@ -124,14 +125,15 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                         exit;
 
                      else
-                        Text.Append (Replacement_Character, Offset);
+                        VSS.Implementation.UTF8_Strings.Mutable_Operations
+                          .Append (Text, Replacement_Character, Offset);
                      end if;
 
                      Self.First  := First;
                      Self.Second := Second;
                      Self.Third  := Third;
 
-                     Self.Decode (Buffer, False, Target);
+                     Self.Decode (Buffer, False, Text);
 
                      First  := Self.First;
                      Second := Self.Second;
@@ -159,14 +161,15 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                         exit;
 
                      else
-                        Text.Append (Replacement_Character, Offset);
+                        VSS.Implementation.UTF8_Strings.Mutable_Operations
+                          .Append (Text, Replacement_Character, Offset);
                      end if;
 
                      Self.First  := First;
                      Self.Second := Second;
                      Self.Third  := Third;
 
-                     Self.Decode (Buffer, False, Target);
+                     Self.Decode (Buffer, False, Text);
 
                      First  := Self.First;
                      Second := Self.Second;
@@ -188,7 +191,8 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                      First := 0;
 
                      if Code /= 0 then
-                        Text.Append (Code, Offset);
+                        VSS.Implementation.UTF8_Strings.Mutable_Operations
+                          .Append (Text, Code, Offset);
 
                      else
                         if Byte in ASCII_Byte_Range then
@@ -201,7 +205,8 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                            exit;
 
                         else
-                           Text.Append (Replacement_Character, Offset);
+                           VSS.Implementation.UTF8_Strings.Mutable_Operations
+                             .Append (Text, Replacement_Character, Offset);
                         end if;
                      end if;
                   end;
@@ -210,10 +215,12 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
          else
             case Byte is
                when ASCII_Byte_Range =>
-                  Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, VSS.Unicode.Code_Point (Byte), Offset);
 
                when 16#80# =>
-                  Text.Append (16#20AC#, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, 16#20AC#, Offset);
 
                when 16#81# .. 16#FE# =>
                   First := Byte;
@@ -225,7 +232,8 @@ package body VSS.Strings.Converters.Decoders.GB18030 is
                      exit;
 
                   else
-                     Text.Append (Replacement_Character, Offset);
+                     VSS.Implementation.UTF8_Strings.Mutable_Operations
+                       .Append (Text, Replacement_Character, Offset);
                   end if;
             end case;
          end if;

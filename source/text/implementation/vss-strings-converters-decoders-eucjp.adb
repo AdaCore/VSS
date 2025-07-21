@@ -1,13 +1,13 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with Interfaces;
 
-with VSS.Implementation.Text_Handlers;
-
+with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 with VSS.Strings.Converters.Decoders.EUCJP.JIS0212;
 with VSS.Strings.Converters.Decoders.Index_JIS0208;
 
@@ -21,7 +21,7 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
      (Self        : in out EUCJP_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
-      Target      : out VSS.Implementation.Strings.String_Data)
+      Text        : out VSS.Implementation.UTF8_Strings.UTF8_String_Data)
    is
       use type Ada.Streams.Stream_Element;
       use type Ada.Streams.Stream_Element_Offset;
@@ -32,9 +32,6 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
       Lead    : Ada.Streams.Stream_Element        := Self.Lead;
       Byte    : Ada.Streams.Stream_Element;
       Offset  : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Text    : constant not null
-        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       if Self.Error and Self.Flags (Stop_On_Error) then
@@ -51,7 +48,8 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                Self.Error := True;
 
                if not Self.Flags (Stop_On_Error) then
-                  Text.Append (Replacement_Character, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, Replacement_Character, Offset);
                end if;
             end if;
 
@@ -63,8 +61,10 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
          if Lead = 16#8E# and Byte in 16#A1# .. 16#DF# then
             Lead := 0;
 
-            Text.Append
-              (16#FF61# - 16#A1# + VSS.Unicode.Code_Point (Byte), Offset);
+            VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+              (Text,
+               16#FF61# - 16#A1# + VSS.Unicode.Code_Point (Byte),
+               Offset);
 
          elsif Lead = 16#8F# and Byte in 16#A1# .. 16#FE# then
             JIS0212 := True;
@@ -99,7 +99,8 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                JIS0212 := False;
 
                if Code /= 0 then
-                  Text.Append (Code, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, Code, Offset);
 
                else
                   if Byte in ASCII_Byte_Range then
@@ -112,7 +113,8 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                      exit;
 
                   else
-                     Text.Append (Replacement_Character, Offset);
+                     VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                       (Text, Replacement_Character, Offset);
                   end if;
                end if;
             end;
@@ -124,13 +126,16 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
 
             case Byte is
                when 16#5C# =>
-                  Text.Append (16#A5#, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, 16#A5#, Offset);
 
                when 16#7E# =>
-                  Text.Append (16#203E#, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, 16#203E#, Offset);
 
                when others =>
-                  Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text, VSS.Unicode.Code_Point (Byte), Offset);
             end case;
 
          elsif Byte in 16#8E# | 16#8F# | 16#A1# .. 16#FE# then
@@ -143,7 +148,8 @@ package body VSS.Strings.Converters.Decoders.EUCJP is
                exit;
 
             else
-               Text.Append (Replacement_Character, Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, Replacement_Character, Offset);
             end if;
          end if;
 

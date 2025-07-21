@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -34,10 +34,12 @@ package body VSS.Strings.Internals is
 
    procedure Set_By_Move
      (Self : in out VSS.Strings.Virtual_String'Class;
-      To   : in out VSS.Implementation.Strings.String_Data) is
+      To   : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data) is
    begin
-      VSS.Implementation.Strings.Unreference (Self.Data);
+      VSS.Implementation.UTF8_Strings.Unreference (Self.Data);
+
       Self.Data := To;
+      VSS.Implementation.UTF8_Strings.Adjust (Self.Data);
       To := (others => <>);
    end Set_By_Move;
 
@@ -57,13 +59,12 @@ package body VSS.Strings.Internals is
    -----------------------
 
    function To_Virtual_String
-     (Item : in out VSS.Implementation.Strings.String_Data)
+     (Text : VSS.Implementation.UTF8_Strings.UTF8_String_Data)
       return VSS.Strings.Virtual_String is
    begin
       return Result : VSS.Strings.Virtual_String do
-         Result.Data := Item;
-
-         VSS.Implementation.Strings.Reference (Result.Data);
+         Result.Data := Text;
+         VSS.Implementation.UTF8_Strings.Reference (Result.Data);
       end return;
    end To_Virtual_String;
 

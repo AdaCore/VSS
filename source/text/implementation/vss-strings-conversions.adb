@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -12,8 +12,8 @@ with Ada.Strings.Wide_Wide_Unbounded.VSS_Aux;
 pragma Warnings (On, ".* is an internal GNAT unit");
 
 with VSS.Implementation.Strings;
-with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.UTF8_Encoding;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 with VSS.Unicode;
 
 package body VSS.Strings.Conversions is
@@ -28,9 +28,6 @@ package body VSS.Strings.Conversions is
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      Text     : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : aliased VSS.Implementation.Strings.Cursor;
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
@@ -39,17 +36,16 @@ package body VSS.Strings.Conversions is
       Last     : Natural := Into'First - 1;
 
    begin
-      Text.After_Last_Character (Position);
-
-      if Into'Length /= Text.First_UTF8_Offset (Position) then
+      if Into'Length /= Item.Data.Size then
          raise Constraint_Error;
       end if;
 
-      Text.Before_First_Character (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character
+        (Item.Data, Position);
 
-      while Text.Forward (Position) loop
+      while VSS.Implementation.UTF8_Strings.Forward (Item.Data, Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
-           (Text.Element (Position),
+           (VSS.Implementation.UTF8_Strings.Element (Item.Data, Position),
             Length,
             U_Buffer (1),
             U_Buffer (2),
@@ -87,9 +83,6 @@ package body VSS.Strings.Conversions is
       Last : out Natural;
       Into : out Ada.Strings.UTF_Encoding.UTF_8_String)
    is
-      Text     : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : aliased VSS.Implementation.Strings.Cursor;
       U_Buffer :
         VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array (1 .. 4);
@@ -103,19 +96,16 @@ package body VSS.Strings.Conversions is
          return;
       end if;
 
-      Text.After_Last_Character (Position);
-
-      if Natural (Text.First_UTF8_Offset (Position))
-           > Into'Last - From + 1
-      then
+      if Natural (Item.Data.Size) > Into'Last - From + 1 then
          raise Constraint_Error;
       end if;
 
-      Text.Before_First_Character (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character
+        (Item.Data, Position);
 
-      while Text.Forward (Position) loop
+      while VSS.Implementation.UTF8_Strings.Forward (Item.Data, Position) loop
          VSS.Implementation.UTF8_Encoding.Encode
-           (Text.Element (Position),
+           (VSS.Implementation.UTF8_Strings.Element (Item.Data, Position),
             Length,
             U_Buffer (1),
             U_Buffer (2),
@@ -137,9 +127,6 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class;
       Into : out Wide_Wide_String)
    is
-      Handler  : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
@@ -151,11 +138,13 @@ package body VSS.Strings.Conversions is
          return;
       end if;
 
-      Handler.Before_First_Character (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character
+        (Item.Data, Position);
 
-      while Handler.Forward (Position) loop
+      while VSS.Implementation.UTF8_Strings.Forward (Item.Data, Position) loop
          Into (Into'First + Integer (Position.Index) - 1) :=
-           Wide_Wide_Character'Val (Handler.Element (Position));
+           Wide_Wide_Character'Val
+             (VSS.Implementation.UTF8_Strings.Element (Item.Data, Position));
       end loop;
    end Set_Wide_Wide_String;
 
@@ -181,9 +170,6 @@ package body VSS.Strings.Conversions is
       Last : out Natural;
       Into : out Wide_Wide_String)
    is
-      Handler  : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Item.Data);
       Position : aliased VSS.Implementation.Strings.Cursor;
 
    begin
@@ -197,12 +183,14 @@ package body VSS.Strings.Conversions is
          raise Constraint_Error;
       end if;
 
-      Handler.Before_First_Character (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character
+        (Item.Data, Position);
 
-      while Handler.Forward (Position) loop
+      while VSS.Implementation.UTF8_Strings.Forward (Item.Data, Position) loop
          Last := Last + 1;
          Into (Last) :=
-           Wide_Wide_Character'Val (Handler.Element (Position));
+           Wide_Wide_Character'Val
+             (VSS.Implementation.UTF8_Strings.Element (Item.Data, Position));
       end loop;
    end Set_Wide_Wide_String;
 
@@ -214,11 +202,9 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class)
       return Ada.Strings.Unbounded.Unbounded_String
    is
-      Text     : constant not null
-        VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-          VSS.Implementation.Strings.Constant_Handler (Item.Data);
+      use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
       Position : aliased VSS.Implementation.Strings.Cursor;
-      Success  : Boolean;
 
       procedure Set (S : out String);
 
@@ -234,11 +220,13 @@ package body VSS.Strings.Conversions is
          Last     : Natural := 0;
 
       begin
-         Text.Before_First_Character (Position);
+         VSS.Implementation.UTF8_Strings.Before_First_Character
+           (Item.Data, Position);
 
-         while Text.Forward (Position) loop
+         while VSS.Implementation.UTF8_Strings.Forward (Item.Data, Position)
+         loop
             VSS.Implementation.UTF8_Encoding.Encode
-              (Text.Element (Position),
+              (VSS.Implementation.UTF8_Strings.Element (Item.Data, Position),
                Length,
                U_Buffer (1),
                U_Buffer (2),
@@ -255,14 +243,11 @@ package body VSS.Strings.Conversions is
       end Set;
 
    begin
-      Text.After_Last_Character (Position);
-      Success := Text.Backward (Position);
-
       return Result : Ada.Strings.Unbounded.Unbounded_String do
-         if Success then
+         if Item.Data.Size /= 0 then
             Ada.Strings.Unbounded.VSS_Aux.Set_String
               (Result,
-               Natural (Text.Last_UTF8_Offset (Position)) + 1,
+               Natural (Item.Data.Size),
                Set'Access);
          end if;
       end return;
@@ -306,9 +291,7 @@ package body VSS.Strings.Conversions is
      (Item : Virtual_String'Class)
       return Ada.Strings.UTF_Encoding.UTF_8_String is
    begin
-      return
-        VSS.Implementation.Strings.Constant_Handler
-          (Item.Data).To_UTF_8_String;
+      return VSS.Implementation.UTF8_Strings.To_UTF_8_String (Item.Data);
    end To_UTF_8_String;
 
    -----------------------
@@ -322,18 +305,12 @@ package body VSS.Strings.Conversions is
 
    begin
       return Result : Virtual_String do
-         declare
-            Text : constant not null
-              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-                VSS.Implementation.Strings.Variable_Handler (Result.Data);
+         VSS.Implementation.UTF8_Strings.Mutable_Operations.From_UTF_8_String
+           (Result.Data, Item, Success);
 
-         begin
-            Text.From_UTF_8_String (Item, Success);
-
-            if not Success then
-               raise Constraint_Error with "Ill-formed UTF-8 data";
-            end if;
-         end;
+         if not Success then
+            raise Constraint_Error with "Ill-formed UTF-8 data";
+         end if;
       end return;
    end To_Virtual_String;
 
@@ -354,18 +331,12 @@ package body VSS.Strings.Conversions is
 
          Ada.Strings.Unbounded.Aux.Get_String (Item, Data, Last);
 
-         declare
-            Text : constant not null
-              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-                VSS.Implementation.Strings.Variable_Handler (Result.Data);
+         VSS.Implementation.UTF8_Strings.Mutable_Operations.From_UTF_8_String
+           (Result.Data, Data (1 .. Last), Success);
 
-         begin
-            Text.From_UTF_8_String (Data (1 .. Last), Success);
-
-            if not Success then
-               raise Constraint_Error with "Ill-formed UTF-8 data";
-            end if;
-         end;
+         if not Success then
+            raise Constraint_Error with "Ill-formed UTF-8 data";
+         end if;
       end return;
    end To_Virtual_String;
 
@@ -389,18 +360,12 @@ package body VSS.Strings.Conversions is
          Ada.Strings.Wide_Wide_Unbounded.Aux.Get_Wide_Wide_String
            (Item, Data, Last);
 
-         declare
-            Text : constant not null
-              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-                VSS.Implementation.Strings.Variable_Handler (Result.Data);
+         VSS.Implementation.UTF8_Strings.Mutable_Operations
+           .From_Wide_Wide_String (Result.Data, Data (1 .. Last), Success);
 
-         begin
-            Text.From_Wide_Wide_String (Data (1 .. Last), Success);
-
-            if not Success then
-               raise Constraint_Error with "Ill-formed UTF-32 data";
-            end if;
-         end;
+         if not Success then
+            raise Constraint_Error with "Ill-formed UTF-32 data";
+         end if;
       end return;
    end To_Virtual_String;
 

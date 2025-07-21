@@ -6,6 +6,8 @@
 
 package body VSS.Implementation.UTF8_Encoding is
 
+   use type VSS.Unicode.UTF8_Code_Unit_Offset;
+
    ------------
    -- Decode --
    ------------
@@ -18,7 +20,6 @@ package body VSS.Implementation.UTF8_Encoding is
       Error   : out UTF8_Decode_Error)
    is
       use type VSS.Unicode.Code_Point;
-      use type VSS.Unicode.UTF8_Code_Unit_Index;
 
       procedure Report_Error (E : UTF8_Decode_Error);
 
@@ -470,6 +471,44 @@ package body VSS.Implementation.UTF8_Encoding is
       end case;
    end Encode;
 
+   -------------------------------
+   -- Unchecked_Backward_Decode --
+   -------------------------------
+
+   procedure Unchecked_Backward_Decode
+     (Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
+      Offset  : in out VSS.Unicode.UTF8_Code_Unit_Index;
+      Code    : out VSS.Unicode.Code_Point) is
+   begin
+      Offset := Offset - 1;
+
+      loop
+         declare
+            Code : constant VSS.Unicode.UTF8_Code_Unit := Storage (Offset);
+
+         begin
+            case Code is
+               when 16#80# .. 16#BF# =>
+                  Offset  := Offset - 1;
+
+               when 16#00# .. 16#7F#
+                  | 16#C2# .. 16#DF#
+                  | 16#E0# .. 16#EF# =>
+
+                  exit;
+
+               when 16#F0# .. 16#F4# =>
+                  exit;
+
+               when others =>
+                  raise Program_Error with "string data is corrupted";
+            end case;
+         end;
+      end loop;
+
+      Code := Unchecked_Decode (Storage, Offset);
+   end Unchecked_Backward_Decode;
+
    ----------------------
    -- Unchecked_Decode --
    ----------------------
@@ -479,9 +518,10 @@ package body VSS.Implementation.UTF8_Encoding is
       Offset  : VSS.Unicode.UTF8_Code_Unit_Index)
       return VSS.Unicode.Code_Point
    is
+      pragma Suppress_All;
+
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF8_Code_Unit;
-      use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
       U1 : VSS.Unicode.Code_Point := VSS.Unicode.Code_Point (Storage (Offset));
       U2 : VSS.Unicode.Code_Point;
@@ -545,7 +585,6 @@ package body VSS.Implementation.UTF8_Encoding is
    is
       use type VSS.Unicode.Code_Point;
       use type VSS.Unicode.UTF8_Code_Unit;
-      use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
       U1 : VSS.Unicode.Code_Point := VSS.Unicode.Code_Point (Storage (Offset));
       U2 : VSS.Unicode.Code_Point;
@@ -613,10 +652,7 @@ package body VSS.Implementation.UTF8_Encoding is
       Unit_1  : VSS.Unicode.UTF8_Code_Unit;
       Unit_2  : VSS.Unicode.UTF8_Code_Unit;
       Unit_3  : VSS.Unicode.UTF8_Code_Unit;
-      Unit_4  : VSS.Unicode.UTF8_Code_Unit)
-   is
-      use type VSS.Unicode.UTF8_Code_Unit_Offset;
-
+      Unit_4  : VSS.Unicode.UTF8_Code_Unit) is
    begin
       Storage (From) := Unit_1;
 

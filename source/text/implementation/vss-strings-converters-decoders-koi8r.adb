@@ -6,7 +6,8 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 
 package body VSS.Strings.Converters.Decoders.KOI8R is
 
@@ -152,7 +153,7 @@ package body VSS.Strings.Converters.Decoders.KOI8R is
      (Self        : in out KOI8R_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
-      Target      : out VSS.Implementation.Strings.String_Data)
+      Text        : out VSS.Implementation.UTF8_Strings.UTF8_String_Data)
    is
       pragma Unreferenced (Self);
       pragma Unreferenced (End_Of_Data);
@@ -162,9 +163,6 @@ package body VSS.Strings.Converters.Decoders.KOI8R is
       Index  : Ada.Streams.Stream_Element_Offset := Source'First;
       Byte   : Ada.Streams.Stream_Element;
       Offset : VSS.Implementation.Strings.Cursor_Offset := (0, 0, 0);
-      Text   : constant not null
-        VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-          VSS.Implementation.Strings.Variable_Handler (Target);
 
    begin
       loop
@@ -174,10 +172,12 @@ package body VSS.Strings.Converters.Decoders.KOI8R is
 
          case Byte is
             when Mapping'Range =>
-               Text.Append (Mapping (Byte), Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, Mapping (Byte), Offset);
 
             when others =>
-               Text.Append (VSS.Unicode.Code_Point (Byte), Offset);
+               VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                 (Text, VSS.Unicode.Code_Point (Byte), Offset);
          end case;
 
          Index := Index + 1;

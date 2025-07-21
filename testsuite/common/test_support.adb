@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2023, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -74,6 +74,10 @@ package body Test_Support is
 
    procedure Write_JUnit_XML (File : String);
 
+   function Escape_Attribute_Value
+     (Item : Ada.Strings.Unbounded.Unbounded_String)
+      return Ada.Strings.Unbounded.Unbounded_String;
+
    ------------
    -- Assert --
    ------------
@@ -124,6 +128,28 @@ package body Test_Support is
       Controller.Testsuite_Set.Testsuites.Append (Controller.Active_Testsuite);
       Controller.Active_Testsuite := (Name => <>, Testcases => <>);
    end End_Testsuite;
+
+   ----------------------------
+   -- Escape_Attribute_Value --
+   ----------------------------
+
+   function Escape_Attribute_Value
+     (Item : Ada.Strings.Unbounded.Unbounded_String)
+      return Ada.Strings.Unbounded.Unbounded_String is
+   begin
+      return Result : Ada.Strings.Unbounded.Unbounded_String do
+         for J in 1 .. Ada.Strings.Unbounded.Length (Item) loop
+            case Ada.Strings.Unbounded.Element (Item, J) is
+               when '&' =>
+                  Ada.Strings.Unbounded.Append (Result, "&amp;");
+
+               when others =>
+                  Ada.Strings.Unbounded.Append
+                    (Result, Ada.Strings.Unbounded.Element (Item, J));
+            end case;
+         end loop;
+      end return;
+   end Escape_Attribute_Value;
 
    ----------
    -- Fail --
@@ -441,7 +467,9 @@ package body Test_Support is
             Ada.Text_IO.Put (Output, "  <testcase name='");
 
             Ada.Text_IO.Put
-              (Output, Ada.Strings.Unbounded.To_String (Testcase.Name));
+              (Output,
+               Ada.Strings.Unbounded.To_String
+                 (Escape_Attribute_Value (Testcase.Name)));
 
             Ada.Text_IO.Put (Output, "' assertions='");
             Ada.Text_IO.Put

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021-2022, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -70,7 +70,8 @@ private
      (Self        : in out Abstract_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
-      Target      : out VSS.Implementation.Strings.String_Data) is abstract;
+      Text        : out VSS.Implementation.UTF8_Strings.UTF8_String_Data)
+        is abstract;
    --  Decode Source chunk of the data and append result to Target.
 
    not overriding function Has_Error

@@ -24,7 +24,7 @@ private
      (Self        : in out ISO88598_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
-      Target      : out VSS.Implementation.Strings.String_Data);
+      Text        : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
 
    overriding function Has_Error (Self : ISO88598_Decoder) return Boolean;
 

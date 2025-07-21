@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -9,16 +9,16 @@
 --  This package is for internal use only.
 
 with VSS.Implementation.Referrers;
-with VSS.Implementation.Strings;
+with VSS.Implementation.UTF8_Strings;
 
 package VSS.Strings.Internals is
 
    pragma Preelaborate;
 
    type String_Data_Constant_Access is
-     access constant VSS.Implementation.Strings.String_Data;
+     access constant VSS.Implementation.UTF8_Strings.UTF8_String_Data;
    type String_Data_Variable_Access is
-     access all VSS.Implementation.Strings.String_Data;
+     access all VSS.Implementation.UTF8_Strings.UTF8_String_Data;
    --  This type intended to be used for "hack" code only to use internal
    --  low level string processing API to improve performance of critical
    --  part of the code. It was initially defined to avoid performance penalty
@@ -26,7 +26,7 @@ package VSS.Strings.Internals is
    --  value.
 
    function To_Virtual_String
-     (Item : in out VSS.Implementation.Strings.String_Data)
+     (Text : VSS.Implementation.UTF8_Strings.UTF8_String_Data)
       return VSS.Strings.Virtual_String;
    --  Convert string data into virtual string. Data is references.
 
@@ -40,7 +40,7 @@ package VSS.Strings.Internals is
 
    procedure Set_By_Move
      (Self : in out VSS.Strings.Virtual_String'Class;
-      To   : in out VSS.Implementation.Strings.String_Data);
+      To   : in out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Set given string to given data. Initial data of the Self is
    --  unreferenced, given data is copied and given value is reset.
 

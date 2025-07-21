@@ -59,7 +59,9 @@ package VSS.Strings.Cursors.Iterators.Characters is
 
 private
 
-   type Character_Iterator is new Abstract_Character_Iterator with null record;
+   type Character_Iterator is new Abstract_Character_Iterator with record
+      Data : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
+   end record;
 
    overriding procedure String_Modified
      (Self     : in out Character_Iterator;

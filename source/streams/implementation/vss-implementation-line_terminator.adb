@@ -1,12 +1,12 @@
 --
---  Copyright (C) 2023-2024, AdaCore
+--  Copyright (C) 2023-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
 with VSS.Implementation.Character_Codes;
 with VSS.Implementation.Strings;
-with VSS.Implementation.Text_Handlers;
+with VSS.Implementation.UTF8_Strings.Mutable_Operations;
 with VSS.Strings.Internals;
 
 package body VSS.Implementation.Line_Terminator is
@@ -24,50 +24,61 @@ package body VSS.Implementation.Line_Terminator is
    begin
       return Result : VSS.Strings.Virtual_String do
          declare
-            Text : constant not null
-              VSS.Implementation.Strings.Variable_Text_Handler_Access :=
-                VSS.Implementation.Strings.Variable_Handler
-                  (VSS.Strings.Internals.Data_Access_Variable (Result).all);
+            Text : VSS.Implementation.UTF8_Strings.UTF8_String_Data
+              renames VSS.Strings.Internals.Data_Access_Variable (Result).all;
 
          begin
             case Terminator is
                when VSS.Strings.CR =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Carriage_Return,
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Carriage_Return,
                      Offset);
 
                when VSS.Strings.LF =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Line_Feed, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Line_Feed,
+                     Offset);
 
                when VSS.Strings.CRLF =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Carriage_Return,
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Carriage_Return,
                      Offset);
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Line_Feed, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Line_Feed,
+                     Offset);
 
                when VSS.Strings.NEL =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Next_Line, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Next_Line,
+                     Offset);
 
                when VSS.Strings.VT =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Line_Tabulation,
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Line_Tabulation,
                      Offset);
 
                when VSS.Strings.FF =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Form_Feed, Offset);
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Form_Feed,
+                     Offset);
 
                when VSS.Strings.LS =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Line_Separator,
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Line_Separator,
                      Offset);
 
                when VSS.Strings.PS =>
-                  Text.Append
-                    (VSS.Implementation.Character_Codes.Paragraph_Separator,
+                  VSS.Implementation.UTF8_Strings.Mutable_Operations.Append
+                    (Text,
+                     VSS.Implementation.Character_Codes.Paragraph_Separator,
                      Offset);
             end case;
          end;

@@ -6,10 +6,10 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.Text_Handlers;
 with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Core;
 with VSS.Implementation.UTF8_Casing;
+with VSS.Implementation.UTF8_Strings;
 with VSS.Locales;
 with VSS.Strings.Internals;
 
@@ -151,18 +151,12 @@ package body VSS.Characters is
    is
       pragma Unreferenced (Locale);
 
-      Data : VSS.Implementation.Strings.String_Data;
-
    begin
-      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
-        (Virtual_Character'Pos (Self),
-         VSS.Implementation.UTF8_Casing.Lowercase,
-         Data);
-
-      return Result : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Internals.To_Virtual_String (Data)
-      do
-         VSS.Implementation.Strings.Unreference (Data);
+      return Result : VSS.Strings.Virtual_String do
+         VSS.Implementation.UTF8_Casing.Get_Case_Mapping
+           (Virtual_Character'Pos (Self),
+            VSS.Implementation.UTF8_Casing.Lowercase,
+            VSS.Strings.Internals.Data_Access_Variable (Result).all);
       end return;
    end Get_Lowercase_Mapping;
 
@@ -173,7 +167,7 @@ package body VSS.Characters is
    function Get_Simple_Case_Folding
      (Self : Virtual_Character) return Virtual_Character
    is
-      Data     : VSS.Implementation.Strings.String_Data;
+      Text     : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
@@ -181,17 +175,14 @@ package body VSS.Characters is
       VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
          VSS.Implementation.UTF8_Casing.Simple_Case_Folding,
-         Data);
+         Text);
 
-      VSS.Implementation.Strings.Constant_Handler
-        (Data).Before_First_Character (Position);
-      Success :=
-        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character (Text, Position);
+      Success := VSS.Implementation.UTF8_Strings.Forward (Text, Position);
 
       return
         Virtual_Character'Val
-          (VSS.Implementation.Strings.Constant_Handler
-             (Data).Element (Position));
+          (VSS.Implementation.UTF8_Strings.Element (Text, Position));
    end Get_Simple_Case_Folding;
 
    ----------------------------------
@@ -201,7 +192,7 @@ package body VSS.Characters is
    function Get_Simple_Lowercase_Mapping
      (Self : Virtual_Character) return Virtual_Character
    is
-      Data     : VSS.Implementation.Strings.String_Data;
+      Text     : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
@@ -209,17 +200,14 @@ package body VSS.Characters is
       VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
          VSS.Implementation.UTF8_Casing.Simple_Lowercase,
-         Data);
+         Text);
 
-      VSS.Implementation.Strings.Constant_Handler
-        (Data).Before_First_Character (Position);
-      Success :=
-        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character (Text, Position);
+      Success := VSS.Implementation.UTF8_Strings.Forward (Text, Position);
 
       return
         Virtual_Character'Val
-          (VSS.Implementation.Strings.Constant_Handler
-             (Data).Element (Position));
+          (VSS.Implementation.UTF8_Strings.Element (Text, Position));
    end Get_Simple_Lowercase_Mapping;
 
    ----------------------------------
@@ -229,7 +217,7 @@ package body VSS.Characters is
    function Get_Simple_Titlecase_Mapping
      (Self : Virtual_Character) return Virtual_Character
    is
-      Data     : VSS.Implementation.Strings.String_Data;
+      Text     : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
@@ -237,17 +225,14 @@ package body VSS.Characters is
       VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
          VSS.Implementation.UTF8_Casing.Simple_Titlecase,
-         Data);
+         Text);
 
-      VSS.Implementation.Strings.Constant_Handler
-        (Data).Before_First_Character (Position);
-      Success :=
-        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character (Text, Position);
+      Success := VSS.Implementation.UTF8_Strings.Forward (Text, Position);
 
       return
         Virtual_Character'Val
-          (VSS.Implementation.Strings.Constant_Handler
-             (Data).Element (Position));
+          (VSS.Implementation.UTF8_Strings.Element (Text, Position));
    end Get_Simple_Titlecase_Mapping;
 
    ----------------------------------
@@ -257,7 +242,7 @@ package body VSS.Characters is
    function Get_Simple_Uppercase_Mapping
      (Self : Virtual_Character) return Virtual_Character
    is
-      Data     : VSS.Implementation.Strings.String_Data;
+      Text     : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Position : aliased VSS.Implementation.Strings.Cursor;
       Success  : Boolean with Unreferenced;
 
@@ -265,17 +250,14 @@ package body VSS.Characters is
       VSS.Implementation.UTF8_Casing.Get_Case_Mapping
         (Virtual_Character'Pos (Self),
          VSS.Implementation.UTF8_Casing.Simple_Uppercase,
-         Data);
+         Text);
 
-      VSS.Implementation.Strings.Constant_Handler
-        (Data).Before_First_Character (Position);
-      Success :=
-        VSS.Implementation.Strings.Constant_Handler (Data).Forward (Position);
+      VSS.Implementation.UTF8_Strings.Before_First_Character (Text, Position);
+      Success := VSS.Implementation.UTF8_Strings.Forward (Text, Position);
 
       return
         Virtual_Character'Val
-          (VSS.Implementation.Strings.Constant_Handler
-             (Data).Element (Position));
+          (VSS.Implementation.UTF8_Strings.Element (Text, Position));
    end Get_Simple_Uppercase_Mapping;
 
    ---------------------------
@@ -298,18 +280,12 @@ package body VSS.Characters is
    is
       pragma Unreferenced (Locale);
 
-      Data : VSS.Implementation.Strings.String_Data;
-
    begin
-      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
-        (Virtual_Character'Pos (Self),
-         VSS.Implementation.UTF8_Casing.Titlecase,
-         Data);
-
-      return Result : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Internals.To_Virtual_String (Data)
-      do
-         VSS.Implementation.Strings.Unreference (Data);
+      return Result : VSS.Strings.Virtual_String do
+         VSS.Implementation.UTF8_Casing.Get_Case_Mapping
+           (Virtual_Character'Pos (Self),
+            VSS.Implementation.UTF8_Casing.Titlecase,
+            VSS.Strings.Internals.Data_Access_Variable (Result).all);
       end return;
    end Get_Titlecase_Mapping;
 
@@ -345,18 +321,12 @@ package body VSS.Characters is
    is
       pragma Unreferenced (Locale);
 
-      Data : VSS.Implementation.Strings.String_Data;
-
    begin
-      VSS.Implementation.UTF8_Casing.Get_Case_Mapping
-        (Virtual_Character'Pos (Self),
-         VSS.Implementation.UTF8_Casing.Uppercase,
-         Data);
-
-      return Result : constant VSS.Strings.Virtual_String :=
-        VSS.Strings.Internals.To_Virtual_String (Data)
-      do
-         VSS.Implementation.Strings.Unreference (Data);
+      return Result : VSS.Strings.Virtual_String do
+         VSS.Implementation.UTF8_Casing.Get_Case_Mapping
+           (Virtual_Character'Pos (Self),
+            VSS.Implementation.UTF8_Casing.Uppercase,
+            VSS.Strings.Internals.Data_Access_Variable (Result).all);
       end return;
    end Get_Uppercase_Mapping;
 

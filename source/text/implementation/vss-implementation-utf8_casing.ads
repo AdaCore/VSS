@@ -6,9 +6,9 @@
 
 --  Case conversion of UTF-8 encoded text data
 
-with VSS.Implementation.Strings;
 with VSS.Implementation.UCD_Casing_UTF8;
 with VSS.Implementation.UTF8_Encoding;
+with VSS.Implementation.UTF8_Strings;
 with VSS.Unicode;
 
 package VSS.Implementation.UTF8_Casing is
@@ -28,13 +28,13 @@ package VSS.Implementation.UTF8_Casing is
    procedure Get_Case_Mapping
      (Code    : VSS.Unicode.Code_Point;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Data    : out VSS.Implementation.Strings.String_Data);
+      Text    : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Fill given case mapping for the given character into Data.
 
    procedure Convert_Case
-     (Data    : VSS.Implementation.Strings.String_Data;
+     (Text    : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Mapping : VSS.Implementation.UTF8_Casing.Case_Mapping;
-      Result  : out VSS.Implementation.Strings.String_Data);
+      Result  : out VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Do case conversion of the string.
 
    procedure Convert_Case_Simple
@@ -42,7 +42,8 @@ package VSS.Implementation.UTF8_Casing is
       Source_Size    : VSS.Unicode.UTF8_Code_Unit_Count;
       Mapping        :
         VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
-      Result_Data    : in out VSS.Implementation.Strings.String_Data);
+      Result_Data    : in out
+        VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Common code for simple case conversions.
 
    procedure Convert_Case_Full
@@ -51,7 +52,8 @@ package VSS.Implementation.UTF8_Casing is
       Mapping        :
         VSS.Implementation.UCD_Casing_UTF8.Mapping_Data_Offset_Array;
       To_Lower       : Boolean;
-      Result_Data    : in out VSS.Implementation.Strings.String_Data);
+      Result_Data    : in out
+        VSS.Implementation.UTF8_Strings.UTF8_String_Data);
    --  Common code for full case conversions.
 
    function Get_Simplified_Case_Mapping_Information

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023-2024, AdaCore
+--  Copyright (C) 2023-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -47,7 +47,7 @@ procedure Test_Transformer is
          W3C_I18N_File := VSS.Application.Arguments.Element (J);
 
          Test_Support.Run_Testcase
-           (Test_Casing_Minimal'Access,
+           (Test_Casing_W3C_I18N'Access,
             "W3C I18N case conversions ("
             & VSS.Strings.Conversions.To_UTF_8_String (W3C_I18N_File)
             & ")");

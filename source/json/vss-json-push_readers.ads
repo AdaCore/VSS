@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -12,7 +12,7 @@ package VSS.JSON.Push_Readers is
 
    type JSON_Push_Reader is limited interface;
 
-   not overriding procedure Set_Content_Handler
+   procedure Set_Content_Handler
      (Self : in out JSON_Push_Reader;
       To   : VSS.JSON.Content_Handlers.JSON_Content_Handler_Access)
       is abstract;

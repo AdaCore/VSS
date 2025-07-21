@@ -6,7 +6,7 @@
 
 pragma Ada_2022;
 
-with VSS.Implementation.Storage_Managers.Heap;
+with VSS.Implementation.Text_Storages.Heap;
 
 package body VSS.Implementation.UTF8_Strings.Mutable_Operations
   with Preelaborate
@@ -286,7 +286,7 @@ is
       else
          declare
             Manager :
-              VSS.Implementation.Storage_Managers.Heap.Heap_Storage_Manager
+              VSS.Implementation.Text_Storages.Heap.Heap_Storage
               with Import, Address => Self.Manager'Address;
 
          begin
@@ -377,7 +377,7 @@ is
       else
          declare
             Manager :
-              VSS.Implementation.Storage_Managers.Heap.Heap_Storage_Manager :=
+              VSS.Implementation.Text_Storages.Heap.Heap_Storage :=
                 (others => <>)
               with Address => Text.Manager'Address;
 
@@ -632,9 +632,9 @@ is
                  VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
                    (0 .. SSO_Max_Size) := Storage;
                Manager     :
-                 VSS.Implementation.Storage_Managers.Heap
-                   .Heap_Storage_Manager := (others => <>)
-                   with Address => Text.Manager'Address;
+                 VSS.Implementation.Text_Storages.Heap.Heap_Storage :=
+                   (others => <>)
+                 with Address => Text.Manager'Address;
 
             begin
                Manager.Initialize
@@ -646,11 +646,11 @@ is
       else
          declare
             Manager :
-              VSS.Implementation.Storage_Managers.Abstract_Storage_Manager
+              VSS.Implementation.Text_Storages.Abstract_Text_Storage
                 with Import, Address => Text.Manager'Address;
 
          begin
-            VSS.Implementation.Storage_Managers.Abstract_Storage_Manager'Class
+            VSS.Implementation.Text_Storages.Abstract_Text_Storage'Class
               (Manager).Mutate (Text.Storage_Address, Capacity);
          end;
       end if;

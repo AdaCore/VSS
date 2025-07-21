@@ -8,7 +8,7 @@ pragma Ada_2022;
 
 with VSS.Implementation.GCC;
 with VSS.Implementation.Line_Iterators;
-with VSS.Implementation.Storage_Managers;
+with VSS.Implementation.Text_Storages;
 with VSS.Implementation.String_Vectors;
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Implementation.UTF8_Strings.Mutable_Operations;
@@ -544,11 +544,11 @@ package body VSS.Implementation.UTF8_Strings is
       else
          declare
             Manager :
-              VSS.Implementation.Storage_Managers.Abstract_Storage_Manager
+              VSS.Implementation.Text_Storages.Abstract_Text_Storage
               with Import, Address => Self.Manager'Address;
 
          begin
-            VSS.Implementation.Storage_Managers.Abstract_Storage_Manager'Class
+            VSS.Implementation.Text_Storages.Abstract_Text_Storage'Class
               (Manager).Reference;
          end;
       end if;
@@ -953,11 +953,11 @@ package body VSS.Implementation.UTF8_Strings is
       if not Is_SSO (Self) then
          declare
             Manager :
-              VSS.Implementation.Storage_Managers.Abstract_Storage_Manager
+              VSS.Implementation.Text_Storages.Abstract_Text_Storage
               with Import, Address => Self.Manager'Address;
 
          begin
-            VSS.Implementation.Storage_Managers.Abstract_Storage_Manager'Class
+            VSS.Implementation.Text_Storages.Abstract_Text_Storage'Class
               (Manager).Unreference;
          end;
       end if;

@@ -8,7 +8,7 @@ with Ada.Unchecked_Deallocation;
 with System.Address_To_Access_Conversions;
 with System.Atomic_Counters;
 
-package body VSS.Implementation.Storage_Managers.Heap
+package body VSS.Implementation.Text_Storages.Heap
   with Preelaborate
 is
 
@@ -45,10 +45,10 @@ is
    --  sequential operations which extends size of the buffer.
 
    function Get_Shared
-     (Self : Heap_Storage_Manager'Class) return UTF8_Shared_Segment_Access;
+     (Self : Heap_Storage'Class) return UTF8_Shared_Segment_Access;
 
    procedure Set_Shared
-     (Self   : in out Heap_Storage_Manager'Class;
+     (Self   : in out Heap_Storage'Class;
       Shared : UTF8_Shared_Segment_Access);
 
    procedure Unreference (Shared : in out UTF8_Shared_Segment_Access);
@@ -77,7 +77,7 @@ is
    --------------
 
    overriding function Capacity
-     (Self : in out Heap_Storage_Manager)
+     (Self : in out Heap_Storage)
       return VSS.Unicode.UTF8_Code_Unit_Count is
    begin
       if Self.Pointer = System.Null_Address then
@@ -93,7 +93,7 @@ is
    ----------------
 
    function Get_Shared
-     (Self : Heap_Storage_Manager'Class) return UTF8_Shared_Segment_Access
+     (Self : Heap_Storage'Class) return UTF8_Shared_Segment_Access
    is
       package Conversions is
         new System.Address_To_Access_Conversions (UTF8_Shared_Segment);
@@ -108,7 +108,7 @@ is
    ----------------
 
    procedure Initialize
-     (Self            : in out Heap_Storage_Manager'Class;
+     (Self            : in out Heap_Storage'Class;
       Storage_Address : out System.Address;
       Capacity        : VSS.Unicode.UTF8_Code_Unit_Count)
    is
@@ -125,7 +125,7 @@ is
    ----------------
 
    procedure Initialize
-     (Self            : in out Heap_Storage_Manager'Class;
+     (Self            : in out Heap_Storage'Class;
       Storage_Address : out System.Address;
       Data            : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
       Capacity        : VSS.Unicode.UTF8_Code_Unit_Count)
@@ -144,7 +144,7 @@ is
    ------------
 
    overriding procedure Mutate
-     (Self            : in out Heap_Storage_Manager;
+     (Self            : in out Heap_Storage;
       Storage_Address : in out System.Address;
       Capacity        : VSS.Unicode.UTF8_Code_Unit_Count)
    is
@@ -173,7 +173,7 @@ is
    -- Reference --
    ---------------
 
-   overriding procedure Reference (Self : in out Heap_Storage_Manager) is
+   overriding procedure Reference (Self : in out Heap_Storage) is
       pragma Suppress (Access_Check);
 
       Shared : constant UTF8_Shared_Segment_Access := Self.Get_Shared;
@@ -189,7 +189,7 @@ is
    ----------------
 
    procedure Set_Shared
-     (Self   : in out Heap_Storage_Manager'Class;
+     (Self   : in out Heap_Storage'Class;
       Shared : UTF8_Shared_Segment_Access)
    is
       package Conversions is
@@ -223,7 +223,7 @@ is
    -- Unreference --
    -----------------
 
-   overriding procedure Unreference (Self : in out Heap_Storage_Manager) is
+   overriding procedure Unreference (Self : in out Heap_Storage) is
       pragma Suppress (Access_Check);
 
       Shared : UTF8_Shared_Segment_Access := Self.Get_Shared;
@@ -233,4 +233,4 @@ is
       Unreference (Shared);
    end Unreference;
 
-end VSS.Implementation.Storage_Managers.Heap;
+end VSS.Implementation.Text_Storages.Heap;

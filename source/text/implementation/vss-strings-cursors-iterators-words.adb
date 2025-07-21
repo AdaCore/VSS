@@ -263,7 +263,7 @@ package body VSS.Strings.Cursors.Iterators.Words is
    -- Backward --
    --------------
 
-   function Backward (Self : in out Word_Iterator) return Boolean is
+   overriding function Backward (Self : in out Word_Iterator) return Boolean is
    begin
       raise Program_Error;
       return Self.Backward;

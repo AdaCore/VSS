@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2024, AdaCore
+--  Copyright (C) 2024-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -8,6 +8,9 @@ with Ada.Characters.Wide_Wide_Latin_1;
 with Ada.Wide_Wide_Text_IO;
 
 with VSS.Characters;
+pragma Warnings
+  (Off, "unit ""VSS.Strings.Character_Iterators"" is not referenced");
+--  GNAT 20250720 reports warning
 with VSS.Strings.Character_Iterators;
 with VSS.Strings.Conversions;
 with VSS.Unicode;

@@ -11,7 +11,7 @@ package body Test_U816_022 is
       S : VSS.Strings.Virtual_String :=
         VSS.Strings.To_Virtual_String (Item.Text.all);
       J : VSS.Strings.Character_Iterators.Character_Iterator :=
-        S.First_Character;
+        S.At_First_Character;
       D : Boolean with Unreferenced;
       R : VSS.Strings.Virtual_String;
 
@@ -22,7 +22,7 @@ package body Test_U816_022 is
          end if;
       end loop;
 
-      R := S.Slice (J, S.Last_Character);
+      R := S.Slice (J, S.At_Last_Character);
    end Run_Test_Iteration;
 
 end Test_U816_022;

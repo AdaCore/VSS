@@ -181,7 +181,7 @@ package body Test_Support is
    --------------
 
    overriding procedure Finalize (Self : in out Test_Information) is
-      JUnit_XML_Variable : constant String := "XUNIT_XML_PATH";
+      JUnit_XML_Variable : constant String := "XUNIT_XML_DIR";
 
       Verbose            : constant Boolean :=
         (for some J in 1 .. Ada.Command_Line.Argument_Count =>

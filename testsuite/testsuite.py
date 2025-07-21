@@ -22,7 +22,7 @@ class VSSLegacyDriver(ClassicTestDriver):
         root_dir = dirname(dirname(abspath(__file__)))
 
         self.xunit_dir = join(root_dir, "xunit")
-        self.env.environ["XUNIT_XML_PATH"] = self.xunit_dir
+        self.env.environ["XUNIT_XML_DIR"] = self.xunit_dir
 
         mkdir(self.xunit_dir)
         self.shell(

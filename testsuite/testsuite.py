@@ -41,9 +41,6 @@ class VSSLegacyDriver(ClassicTestDriver):
         for xunit_file in xunit_files:
             importer.run(xunit_file)
 
-        if index.has_failures:
-            self.push_failure("Some test failed.")
-
         for entry in index.entries.values():
             self.push_result(entry.load())
 

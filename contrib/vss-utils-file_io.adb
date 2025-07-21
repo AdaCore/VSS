@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2021, AdaCore
+--  Copyright (C) 2021-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -58,7 +58,7 @@ package body VSS.Utils.File_IO is
    begin
       Decoder.Initialize
         (VSS.Strings.Conversions.To_Virtual_String (Encoding),
-         (VSS.Strings.Converters.Stateless => True, others => False));
+         [VSS.Strings.Converters.Stateless => True, others => False]);
 
       if not Decoder.Is_Valid then
          --  Encoding is not supported.

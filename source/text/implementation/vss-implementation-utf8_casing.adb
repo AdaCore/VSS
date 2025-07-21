@@ -23,10 +23,6 @@ package body VSS.Implementation.UTF8_Casing is
    is
       use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-      --  Handler : constant not null
-      --    VSS.Implementation.Strings.Constant_Text_Handler_Access :=
-      --      VSS.Implementation.Strings.Constant_Handler (Data);
-
    begin
       VSS.Implementation.UTF8_Strings.Mutable_Operations.Initialize
         (Result, Text.Size);

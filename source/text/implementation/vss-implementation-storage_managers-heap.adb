@@ -34,10 +34,6 @@ is
         (0 .. Capacity);
    end record;
 
-   --  package Conversions is
-   --    new System.Address_To_Access_Conversions (UTF8_Shared_Segment);
-   --
-   --  subtype UTF8_Shared_Segment_Access is Conversions.Object_Pointer;
    type UTF8_Shared_Segment_Access is access all UTF8_Shared_Segment;
 
    function Aligned_Capacity

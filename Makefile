@@ -15,10 +15,10 @@ GPRDIR                 ?= $(PREFIX)/share/gpr
 LIBDIR                 ?= $(PREFIX)/lib
 BINDIR                 ?= $(PREFIX)/bin
 INSTALL_PROJECT_DIR    ?= $(DESTDIR)$(GPRDIR)
-INSTALL_INCLUDE_DIR    ?= $(DESTDIR)$(PREFIX)/include/vss/$*
+INSTALL_INCLUDE_DIR    ?= $(DESTDIR)$(PREFIX)/include/vss
 INSTALL_EXEC_DIR       ?= $(DESTDIR)$(BINDIR)
 INSTALL_LIBRARY_DIR    ?= $(DESTDIR)$(LIBDIR)
-INSTALL_ALI_DIR        ?= $(INSTALL_LIBRARY_DIR)/vss/$*
+INSTALL_ALI_DIR        ?= $(INSTALL_LIBRARY_DIR)/vss/$(word 2, $(subst _, ,$*))
 
 GPRBUILD_FLAGS = -p -j0 $(GPRFLAGS) \
 	-XVSS_BUILD_PROFILE=$(word 1, $(subst _, ,$*)) \

@@ -66,7 +66,7 @@ private
 
    type Decoder_Access is access all Abstract_Decoder'Class;
 
-   not overriding procedure Decode
+   procedure Decode
      (Self        : in out Abstract_Decoder;
       Source      : Ada.Streams.Stream_Element_Array;
       End_Of_Data : Boolean;
@@ -74,13 +74,13 @@ private
         is abstract;
    --  Decode Source chunk of the data and append result to Target.
 
-   not overriding function Has_Error
+   function Has_Error
      (Self : Abstract_Decoder) return Boolean is abstract;
 
-   not overriding function Error_Message
+   function Error_Message
      (Self : Abstract_Decoder) return VSS.Strings.Virtual_String is abstract;
 
-   not overriding procedure Reset_State
+   procedure Reset_State
      (Self : in out Abstract_Decoder) is abstract;
 
    type Virtual_String_Decoder is

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -21,7 +21,7 @@ procedure Test_V615_026 is
    M : VSS.Regular_Expressions.Regular_Expression_Match;
 
    X : constant VSS.Regular_Expressions.Match_Options :=
-     (VSS.Regular_Expressions.Anchored_Match => True);
+     [VSS.Regular_Expressions.Anchored_Match => True];
 
    ABC : constant VSS.Strings.Virtual_String := "abc";
    BCD : constant VSS.Strings.Virtual_String := "bcd";

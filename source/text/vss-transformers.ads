@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2023-2024, AdaCore
+--  Copyright (C) 2023-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -14,12 +14,12 @@ package VSS.Transformers is
 
    type Abstract_Transformer is limited interface;
 
-   not overriding function Transform
+   function Transform
      (Self : Abstract_Transformer;
       Item : VSS.Strings.Virtual_String'Class)
       return VSS.Strings.Virtual_String is abstract;
 
-   not overriding procedure Transform
+   procedure Transform
      (Self : Abstract_Transformer;
       Item : in out VSS.Strings.Virtual_String'Class) is abstract;
 

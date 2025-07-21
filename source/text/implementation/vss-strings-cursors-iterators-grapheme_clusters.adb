@@ -207,7 +207,7 @@ package body VSS.Strings.Cursors.Iterators.Grapheme_Clusters is
    -- Backward --
    --------------
 
-   function Backward
+   overriding function Backward
      (Self : in out Grapheme_Cluster_Iterator) return Boolean is
    begin
       if Self.Owner = null then

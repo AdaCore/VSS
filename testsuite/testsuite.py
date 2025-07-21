@@ -2,20 +2,52 @@
 
 from os import environ
 from os.path import abspath, dirname, join
+from pathlib import Path
 import sys
 
+from e3.fs import mkdir
 from e3.testsuite import Testsuite
 from e3.testsuite.driver.classic import ClassicTestDriver
 from e3.testsuite.driver.diff import DiffTestDriver
+from e3.testsuite.report.index import ReportIndex
+from e3.testsuite.report.xunit import XUnitImporter
 
 
 class VSSLegacyDriver(ClassicTestDriver):
     """Legacy driver, it run "make check" to execute VSS tests."""
 
+    xunit_dir = None
+
     def run(self):
         root_dir = dirname(dirname(abspath(__file__)))
 
-        self.shell(args=["make", "check"], cwd=root_dir, analyze_output=True)
+        self.xunit_dir = join(root_dir, "xunit")
+        self.env.environ["XUNIT_XML_PATH"] = self.xunit_dir
+
+        mkdir(self.xunit_dir)
+        self.shell(
+            args=["make", "check"],
+            cwd=root_dir,
+            env=self.env.environ,
+            analyze_output=True,
+        )
+
+    def analyze(self):
+        xunit_files = list(Path(self.xunit_dir).glob("*.xml"))
+
+        index = ReportIndex(self.xunit_dir)
+        importer = XUnitImporter(index)
+
+        for xunit_file in xunit_files:
+            importer.run(xunit_file)
+
+        if index.has_failures:
+            self.push_failure("Some test failed.")
+
+        for entry in index.entries.values():
+            self.push_result(entry.load())
+
+        return super().analyze()
 
 
 class VSSGDBPPDriver(DiffTestDriver):

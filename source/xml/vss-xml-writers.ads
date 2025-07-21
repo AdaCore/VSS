@@ -18,11 +18,11 @@ is
      and VSS.XML.Content_Handlers.SAX_Content_Handler
      and VSS.XML.Lexical_Handlers.SAX_Lexical_Handler;
 
-   not overriding procedure Set_Output_Stream
+   procedure Set_Output_Stream
      (Self   : in out XML_Writer;
       Stream : VSS.Text_Streams.Output_Text_Stream_Access) is abstract;
 
-   not overriding procedure Set_Error_Handler
+   procedure Set_Error_Handler
      (Self : in out XML_Writer;
       To   : VSS.XML.Error_Handlers.SAX_Error_Handler_Access) is abstract;
 

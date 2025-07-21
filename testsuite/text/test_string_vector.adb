@@ -4,6 +4,9 @@
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
 
+pragma Warnings
+  (Off, "unit ""VSS.Strings.Character_Iterators"" is not referenced");
+--  GNAT 20250720 reports warning
 with VSS.Strings.Character_Iterators;
 with VSS.String_Vectors;
 with VSS.Strings;

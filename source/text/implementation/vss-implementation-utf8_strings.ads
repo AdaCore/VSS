@@ -197,7 +197,7 @@ is
       return Boolean;
    --  Move cursor one character backward. Return True on success.
 
-   function "="
+   overriding function "="
      (Left  : UTF8_String_Data;
       Right : UTF8_String_Data) return Boolean is abstract;
 

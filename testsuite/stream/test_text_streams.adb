@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2020, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -27,7 +27,7 @@ procedure Test_Text_Streams is
       Success : Boolean := True;
 
       Expected : constant Ada.Streams.Stream_Element_Array :=
-        (1  => 16#41#,
+        [1  => 16#41#,
          2  => 16#D0#,
          3  => 16#91#,
          4  => 16#E0#,
@@ -36,7 +36,7 @@ procedure Test_Text_Streams is
          7  => 16#F0#,
          8  => 16#90#,
          9  => 16#8C#,
-         10 => 16#88#);
+         10 => 16#88#];
 
    begin
       Stream.Put ('A', Success);

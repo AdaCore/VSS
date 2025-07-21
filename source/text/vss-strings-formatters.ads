@@ -22,13 +22,13 @@ package VSS.Strings.Formatters is
 
    type Abstract_Formatter is limited interface;
 
-   not overriding function Format
+   function Format
      (Self   : Abstract_Formatter;
       Format : Format_Information)
       return VSS.Strings.Virtual_String is abstract;
    --  Format value using given format specification.
 
-   not overriding function Name
+   function Name
      (Self : Abstract_Formatter)
       return VSS.Strings.Virtual_String is abstract;
    --  Name of the parameter.

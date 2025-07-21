@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -77,28 +77,28 @@ private
 
    type Encoder_Access is access all Abstract_Encoder'Class;
 
-   not overriding procedure Initialize
+   procedure Initialize
      (Self  : in out Abstract_Encoder;
       Flags : Converter_Flags) is abstract;
 
-   not overriding procedure Encode
+   procedure Encode
      (Self   : in out Abstract_Encoder;
       Source : VSS.Unicode.Code_Point;
       Target : in out VSS.Stream_Element_Vectors.Stream_Element_Vector'Class)
         is abstract;
 
-   not overriding procedure Encode
+   procedure Encode
      (Self   : in out Abstract_Encoder;
       Source : VSS.Implementation.UTF8_Strings.UTF8_String_Data;
       Target : in out VSS.Stream_Element_Vectors.Stream_Element_Vector'Class);
 
-   not overriding function Has_Error
+   function Has_Error
      (Self : Abstract_Encoder) return Boolean is abstract;
 
-   not overriding function Error_Message
+   function Error_Message
      (Self : Abstract_Encoder) return VSS.Strings.Virtual_String is abstract;
 
-   not overriding procedure Reset_State (Self : in out Abstract_Encoder);
+   procedure Reset_State (Self : in out Abstract_Encoder);
 
    type Virtual_String_Encoder is
      new Ada.Finalization.Limited_Controlled with record

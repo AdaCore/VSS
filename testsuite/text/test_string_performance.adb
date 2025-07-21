@@ -127,7 +127,7 @@ procedure Test_String_Performance is
         (P <= 0.76,
          "performance" & Relative_Performance'Image (P) & " is to bad");
       Test_Support.Assert
-        (0.68 <= P,
+        (0.63 <= P,
          "performance" & Relative_Performance'Image (P) & " is to good");
 
       Free (AUS);

@@ -1,6 +1,6 @@
 
 all:
-	gprbuild -p -P test.gpr -XBUILD_PROFILE=release
+	gprbuild -p -P test.gpr -XBUILD_PROFILE=release -XLIBRARY_TYPE=static
 
 run: all
 	valgrind --tool=callgrind .objs/main

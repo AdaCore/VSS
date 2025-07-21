@@ -169,9 +169,12 @@ package body Test_Support is
         Ada.Strings.Unbounded.To_Unbounded_String (Message);
 
       Controller.Active_Testcase.Traceback :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Location);
-
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+        Ada.Strings.Unbounded.To_Unbounded_String (Message);
+      Ada.Strings.Unbounded.Append
+        (Controller.Active_Testcase.Traceback, Ada.Characters.Latin_1.LF);
+      Ada.Strings.Unbounded.Append
+        (Controller.Active_Testcase.Traceback,
+         Ada.Strings.Unbounded.To_Unbounded_String (Location));
 
       raise Test_Failed with "at "
               & Location
@@ -183,7 +186,7 @@ package body Test_Support is
    --------------
 
    overriding procedure Finalize (Self : in out Test_Information) is
-      JUnit_XML_Variable : constant String := "XUNIT_XML_PATH";
+      JUnit_XML_Variable : constant String := "XUNIT_XML_DIR";
 
       Verbose            : constant Boolean :=
         (for some J in 1 .. Ada.Command_Line.Argument_Count =>
@@ -340,6 +343,8 @@ package body Test_Support is
            Ada.Strings.Unbounded.To_Unbounded_String
              (Ada.Exceptions.Exception_Information (E));
 
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+
          End_Testcase;
    end Run_Testcase;
 
@@ -386,8 +391,6 @@ package body Test_Support is
 
       Controller.Active_Testcase.Message :=
         Ada.Strings.Unbounded.To_Unbounded_String (Message);
-
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
 
       raise Test_Skipped;
    end Skip;

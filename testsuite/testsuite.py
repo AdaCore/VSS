@@ -22,7 +22,7 @@ class VSSLegacyDriver(ClassicTestDriver):
         root_dir = dirname(dirname(abspath(__file__)))
 
         self.xunit_dir = join(root_dir, "xunit")
-        self.env.environ["XUNIT_XML_PATH"] = self.xunit_dir
+        self.env.environ["XUNIT_XML_DIR"] = self.xunit_dir
 
         mkdir(self.xunit_dir)
         self.shell(
@@ -40,9 +40,6 @@ class VSSLegacyDriver(ClassicTestDriver):
 
         for xunit_file in xunit_files:
             importer.run(xunit_file)
-
-        if index.has_failures:
-            self.push_failure("Some test failed.")
 
         for entry in index.entries.values():
             self.push_result(entry.load())

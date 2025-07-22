@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -17,6 +17,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set);
    --  Generate types for all named schemas in Map if they not present in Done
    --  already. Include names of generated type in Done set.
@@ -28,6 +29,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set);
    --  Generate a type for single named Schema. Generate Optional_ type if
    --  corresponding type is included in Optional_Types set. Update Done as
@@ -38,6 +40,7 @@ package body JSON_Schema.Writers.Types is
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set;
       Required       : Boolean;
       Root_Package   : VSS.Strings.Virtual_String;
@@ -53,6 +56,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set);
    --  The same for "type: object" schema
 
@@ -73,6 +77,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set);
    --  The same for "allOf:[]" schema
 
@@ -83,6 +88,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set);
    --  The same for "anyOf:[]" schema
 
@@ -157,7 +163,8 @@ package body JSON_Schema.Writers.Types is
       Header         : VSS.String_Vectors.Virtual_String_Vector;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
-      Array_Types    : Readers.Schema_Map);
+      Array_Types    : Readers.Schema_Map;
+      Keep_Extra     : Boolean);
    --  Write package specification with type declarations
 
    function Field_Type
@@ -297,7 +304,8 @@ package body JSON_Schema.Writers.Types is
       Root_Package : VSS.Strings.Virtual_String;
       Enum_Package : VSS.Strings.Virtual_String;
       Header       : VSS.String_Vectors.Virtual_String_Vector;
-      Holders      : VSS.String_Vectors.Virtual_String_Vector)
+      Holders      : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra   : Boolean)
    is
       Optional_Types : String_Sets.Set;
       Array_Types    : Readers.Schema_Map;
@@ -318,13 +326,15 @@ package body JSON_Schema.Writers.Types is
 
       Write_Type_Package
         (Map, Root_Package, Enum_Package, Header, Holders,
-         Optional_Types, Array_Types);
+         Optional_Types, Array_Types, Keep_Extra);
 
       JSON_Schema.Writers.Outputs.Generate_Writers
-        (Map, Root_Package, Enum_Package, Header, Holders, Optional_Types);
+        (Map, Root_Package, Enum_Package, Header, Holders, Optional_Types,
+         Keep_Extra);
 
       JSON_Schema.Writers.Inputs.Generate_Readers
-        (Map, Root_Package, Enum_Package, Header, Holders, Optional_Types);
+        (Map, Root_Package, Enum_Package, Header, Holders, Optional_Types,
+         Keep_Extra);
    end Write;
 
    --------------------------
@@ -336,6 +346,7 @@ package body JSON_Schema.Writers.Types is
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set;
       Required       : Boolean;
       Root_Package   : VSS.Strings.Virtual_String;
@@ -358,6 +369,7 @@ package body JSON_Schema.Writers.Types is
                Enum_Package,
                Holders,
                Optional_Types,
+               Keep_Extra,
                Done);
          end if;
       end loop;
@@ -436,6 +448,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set)
    is
       use type VSS.Strings.Virtual_String;
@@ -460,6 +473,7 @@ package body JSON_Schema.Writers.Types is
             Property,
             Map,
             Optional_Types,
+            Keep_Extra,
             Done,
             Property.Schema.Required.Contains (Property.Name),
             Root_Package, Enum_Package, Holders);
@@ -491,6 +505,7 @@ package body JSON_Schema.Writers.Types is
                Enum_Package,
                Holders,
                Optional_Types,
+               Keep_Extra,
                Done);
          end if;
 
@@ -505,6 +520,7 @@ package body JSON_Schema.Writers.Types is
                   Enum_Package,
                   Holders,
                   Optional_Types,
+                  Keep_Extra,
                   Done);
             end if;
          end loop;
@@ -688,6 +704,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set)
    is
       use type Definitions.Simple_Types;
@@ -702,17 +719,17 @@ package body JSON_Schema.Writers.Types is
          Done.Insert (Name);
          Write_Union_Type
            (Name, Map, Root_Package, Enum_Package, Holders,
-            Optional_Types, Done);
+            Optional_Types, Keep_Extra, Done);
       elsif not Schema.All_Of.Is_Empty then
          Done.Insert (Name);
          Write_Derived_Type
            (Name, Map, Root_Package, Enum_Package, Holders,
-            Optional_Types, Done);
+            Optional_Types, Keep_Extra, Done);
       elsif not Schema.Properties.Is_Empty then
          Done.Insert (Name);
          Write_Record_Type
            (Name, Map, Root_Package, Enum_Package, Holders,
-            Optional_Types, Done);
+            Optional_Types, Keep_Extra, Done);
       elsif Schema.Kind.Last_Index = 1
         and then Schema.Kind.First_Element = Definitions.An_Object
       then
@@ -739,6 +756,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set) is
    begin
       for Cursor in Map.Iterate loop
@@ -748,7 +766,7 @@ package body JSON_Schema.Writers.Types is
          begin
             Write_Named_Type
               (Name, Map, Root_Package, Enum_Package, Holders,
-               Optional_Types, Done);
+               Optional_Types, Keep_Extra, Done);
          end;
       end loop;
    end Write_Named_Types;
@@ -1015,6 +1033,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set)
    is
       use type VSS.Strings.Virtual_String;
@@ -1037,6 +1056,7 @@ package body JSON_Schema.Writers.Types is
                   Enum_Package,
                   Holders,
                   Optional_Types,
+                  Keep_Extra,
                   Done);
             end if;
          end if;
@@ -1058,6 +1078,13 @@ package body JSON_Schema.Writers.Types is
             Is_Holder_Field (Name, Property.Name, Holders));
       end loop;
 
+      if Keep_Extra and
+        (Schema.Additional_Properties = null or else
+           not Schema.Additional_Properties.Is_False)
+      then
+         Put ("Additional_Properties : Any_Object;");
+      end if;
+
       Put ("end record;");
       New_Line;
       New_Line;
@@ -1074,7 +1101,8 @@ package body JSON_Schema.Writers.Types is
       Header         : VSS.String_Vectors.Virtual_String_Vector;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
-      Array_Types    : Readers.Schema_Map)
+      Array_Types    : Readers.Schema_Map;
+      Keep_Extra     : Boolean)
    is
       Done : String_Sets.Set;
    begin
@@ -1223,7 +1251,8 @@ package body JSON_Schema.Writers.Types is
       end if;
 
       Write_Named_Types
-        (Map, Root_Package, Enum_Package, Holders, Optional_Types, Done);
+        (Map, Root_Package, Enum_Package, Holders, Optional_Types, Keep_Extra,
+         Done);
 
       Write_Vector_Operations (Array_Types, Specification);
       Write_Holders_Operations (Map, Holders, Specification);
@@ -1266,6 +1295,7 @@ package body JSON_Schema.Writers.Types is
       Enum_Package   : VSS.Strings.Virtual_String;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
       Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean;
       Done           : in out String_Sets.Set)
    is
       use type VSS.Strings.Virtual_String;
@@ -1284,6 +1314,7 @@ package body JSON_Schema.Writers.Types is
             Property,
             Map,
             Optional_Types,
+            Keep_Extra,
             Done,
             Property.Schema.Required.Contains (Property.Name),
             Root_Package, Enum_Package, Holders);
@@ -1308,6 +1339,7 @@ package body JSON_Schema.Writers.Types is
                Enum_Package,
                Holders,
                Optional_Types,
+               Keep_Extra,
                Done);
          end if;
       end loop;

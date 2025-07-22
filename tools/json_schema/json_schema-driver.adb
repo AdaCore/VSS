@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2024, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -41,6 +41,9 @@ procedure JSON_Schema.Driver is
    --  should be used instead of type.
    Root_Type    : VSS.Strings.Virtual_String;
    --  Root type - Generate a type for root schema with given name
+   Additional_Properties : Boolean;
+   --  Keep extra properties in objects when corresponding schema has
+   --  Additional_Properties /= false.
 
    ------------------------
    -- Parse_Command_Line --
@@ -80,6 +83,8 @@ procedure JSON_Schema.Driver is
             Is_Holder := True;
          elsif Item = "--root-type" then
             Is_Root_Type := True;
+         elsif Item = "--additional-properties" then
+            Additional_Properties := True;
          else
             Arg := Item;
          end if;
@@ -140,6 +145,8 @@ begin
          "dependency");
       Ada.Wide_Wide_Text_IO.Put_Line
         ("  --root-type <type> - A type for the root schema");
+      Ada.Wide_Wide_Text_IO.Put_Line
+        ("  --additional-properties - Keep additional properties (false)");
       return;
    end if;
 
@@ -178,5 +185,10 @@ begin
    end if;
 
    JSON_Schema.Writers.Types.Write
-     (Other, Root_Package, Enum_Package, Header, Holders);
+     (Map          => Other,
+      Root_Package => Root_Package,
+      Enum_Package => Enum_Package,
+      Header       => Header,
+      Holders      => Holders,
+      Keep_Extra   => Additional_Properties);
 end JSON_Schema.Driver;

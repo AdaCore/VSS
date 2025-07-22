@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -18,20 +18,23 @@ package body JSON_Schema.Writers.Inputs is
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : Schema_Name;
       Kind         : Declaration_Kind;
-      Holders      : VSS.String_Vectors.Virtual_String_Vector);
+      Holders      : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra   : Boolean);
 
    procedure Write_Anonymous_Type
      (Enclosing_Type : Schema_Name;
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
-      Holders        : VSS.String_Vectors.Virtual_String_Vector);
+      Holders        : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra     : Boolean);
 
    procedure Write_Object_Reader
-     (Map     : JSON_Schema.Readers.Schema_Map;
-      Name    : Schema_Name;
-      Suffix  : VSS.Strings.Virtual_String;
-      Schema  : Schema_Access;
-      Holders : VSS.String_Vectors.Virtual_String_Vector);
+     (Map        : JSON_Schema.Readers.Schema_Map;
+      Name       : Schema_Name;
+      Suffix     : VSS.Strings.Virtual_String;
+      Schema     : Schema_Access;
+      Holders    : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra : Boolean);
 
    procedure Write_Union_Reader
      (Map          : JSON_Schema.Readers.Schema_Map;
@@ -61,7 +64,8 @@ package body JSON_Schema.Writers.Inputs is
       Enum_Package   : VSS.Strings.Virtual_String;
       Header         : VSS.String_Vectors.Virtual_String_Vector;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
-      Optional_Types : String_Sets.Set)
+      Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -294,7 +298,8 @@ package body JSON_Schema.Writers.Inputs is
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
             Specification,
-            Holders);
+            Holders,
+            Keep_Extra);
       end loop;
 
       Put ("end ");
@@ -377,7 +382,8 @@ package body JSON_Schema.Writers.Inputs is
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
             Implemenetation,
-            Holders);
+            Holders,
+            Keep_Extra);
       end loop;
 
       Put ("end ");
@@ -404,7 +410,8 @@ package body JSON_Schema.Writers.Inputs is
      (Enclosing_Type : Schema_Name;
       Property       : JSON_Schema.Property;
       Map            : JSON_Schema.Readers.Schema_Map;
-      Holders        : VSS.String_Vectors.Virtual_String_Vector)
+      Holders        : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra     : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -416,7 +423,8 @@ package body JSON_Schema.Writers.Inputs is
 
       procedure Anonymous_Schema_Reader (Property : JSON_Schema.Property) is
       begin
-         Write_Anonymous_Type (Enclosing_Type, Property, Map, Holders);
+         Write_Anonymous_Type
+           (Enclosing_Type, Property, Map, Holders, Keep_Extra);
       end Anonymous_Schema_Reader;
 
       Schema : Schema_Access renames Property.Schema;
@@ -437,7 +445,8 @@ package body JSON_Schema.Writers.Inputs is
 
       if not Schema.All_Of.Is_Empty or not Schema.Properties.Is_Empty then
          Write_Object_Reader
-           (Map, Enclosing_Type, "_" & Property.Name, Schema, Holders);
+           (Map, Enclosing_Type, "_" & Property.Name, Schema, Holders,
+            Keep_Extra);
       else
          Put ("Input_Any_Value (Reader, Value, Success);");
          New_Line;
@@ -561,7 +570,8 @@ package body JSON_Schema.Writers.Inputs is
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : Schema_Name;
       Kind         : Declaration_Kind;
-      Holders      : VSS.String_Vectors.Virtual_String_Vector)
+      Holders      : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra   : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -578,7 +588,7 @@ package body JSON_Schema.Writers.Inputs is
 
       procedure Anonymous_Schema_Reader (Property : JSON_Schema.Property) is
       begin
-         Write_Anonymous_Type (Name, Property, Map, Holders);
+         Write_Anonymous_Type (Name, Property, Map, Holders, Keep_Extra);
       end Anonymous_Schema_Reader;
 
       -------------------------------
@@ -637,7 +647,7 @@ package body JSON_Schema.Writers.Inputs is
       end if;
 
       if not Schema.All_Of.Is_Empty or not Schema.Properties.Is_Empty then
-         Write_Object_Reader (Map, Name, "", Schema, Holders);
+         Write_Object_Reader (Map, Name, "", Schema, Holders, Keep_Extra);
       elsif Is_Union_Type (Schema) then
          Write_Union_Reader (Map, Name, Enum_Package);
       else
@@ -657,11 +667,12 @@ package body JSON_Schema.Writers.Inputs is
    -------------------------
 
    procedure Write_Object_Reader
-     (Map     : JSON_Schema.Readers.Schema_Map;
-      Name    : Schema_Name;
-      Suffix  : VSS.Strings.Virtual_String;
-      Schema  : Schema_Access;
-      Holders : VSS.String_Vectors.Virtual_String_Vector)
+     (Map        : JSON_Schema.Readers.Schema_Map;
+      Name       : Schema_Name;
+      Suffix     : VSS.Strings.Virtual_String;
+      Schema     : Schema_Access;
+      Holders    : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -689,6 +700,7 @@ package body JSON_Schema.Writers.Inputs is
          Put (" =>  --  ");
          Put (Property.Name);
          New_Line;
+         Put ("Reader.Read_Next;"); New_Line;
 
          Write_Record_Component (Enclosing, Map, Property, Required, Holders);
 
@@ -708,14 +720,31 @@ package body JSON_Schema.Writers.Inputs is
       Put (Type_Name);
       Put ("_Minimal_Perfect_Hash.Get_Index (Reader.Key_Name);"); New_Line;
       Put ("begin"); New_Line;
-      Put ("Reader.Read_Next;"); New_Line;
       New_Line;
       Put ("case Index is"); New_Line;
 
       Writers.Each_Property (Map, Name, Schema, Write_When_Clause'Access);
 
       Put ("when others =>"); New_Line;
-      Put ("Reader.Skip_Current_Value;"); New_Line;
+
+      if Keep_Extra and
+        (Schema.Additional_Properties = null or else
+           not Schema.Additional_Properties.Is_False)
+      then
+         --  Copy key name
+         Put ("Value.Additional_Properties.Append");
+         Put (" ((VSS.JSON.Streams.Key_Name, Reader.Key_Name));");
+         New_Line;
+         Put ("Reader.Read_Next;"); New_Line;
+         --  Copy value
+         Put ("Input_Any_Value");
+         Put (" (Reader, Value.Additional_Properties, Success);");
+         New_Line;
+      else
+         Put ("Reader.Read_Next;"); New_Line;
+         Put ("Reader.Skip_Current_Value;"); New_Line;
+      end if;
+
       Put ("end case;"); New_Line;
       Put ("end;"); New_Line;
       Put ("else"); New_Line;

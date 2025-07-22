@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2022-2023, AdaCore
+--  Copyright (C) 2022-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 --
@@ -11,7 +11,8 @@ package body JSON_Schema.Writers.Outputs is
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : Schema_Name;
       Kind         : Declaration_Kind;
-      Holders      : VSS.String_Vectors.Virtual_String_Vector);
+      Holders      : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra   : Boolean);
 
    procedure Write_Anonymous_Type
      (Enclosing_Type : Schema_Name;
@@ -46,7 +47,8 @@ package body JSON_Schema.Writers.Outputs is
       Enum_Package   : VSS.Strings.Virtual_String;
       Header         : VSS.String_Vectors.Virtual_String_Vector;
       Holders        : VSS.String_Vectors.Virtual_String_Vector;
-      Optional_Types : String_Sets.Set)
+      Optional_Types : String_Sets.Set;
+      Keep_Extra     : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -183,7 +185,7 @@ package body JSON_Schema.Writers.Outputs is
          Write_Named_Type
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
-            Specification, Holders);
+            Specification, Holders, Keep_Extra);
       end loop;
 
       Put ("end ");
@@ -248,7 +250,7 @@ package body JSON_Schema.Writers.Outputs is
          Write_Named_Type
            (Map, Enum_Package,
             JSON_Schema.Readers.Schema_Maps.Key (Cursor),
-            Implemenetation, Holders);
+            Implemenetation, Holders, Keep_Extra);
       end loop;
 
       Put ("end ");
@@ -356,7 +358,8 @@ package body JSON_Schema.Writers.Outputs is
       Enum_Package : VSS.Strings.Virtual_String;
       Name         : Schema_Name;
       Kind         : Declaration_Kind;
-      Holders      : VSS.String_Vectors.Virtual_String_Vector)
+      Holders      : VSS.String_Vectors.Virtual_String_Vector;
+      Keep_Extra   : Boolean)
    is
       use type VSS.Strings.Virtual_String;
 
@@ -468,6 +471,15 @@ package body JSON_Schema.Writers.Outputs is
                Schema.Required.Contains (Property.Name),
                Holders);
          end loop;
+
+         if Keep_Extra and
+           (Schema.Additional_Properties = null or else
+              not Schema.Additional_Properties.Is_False)
+         then
+            Put ("Output_Any_Value (Handler, Value.Additional_Properties);");
+            New_Line;
+         end if;
+
          Put ("Handler.End_Object;");
          New_Line;
       else

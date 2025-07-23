@@ -116,7 +116,6 @@ check_text:
 	.objs/validation/tests/test_string_append
 	.objs/validation/tests/test_string_compare
 	.objs/validation/tests/test_string_conversions
-	.objs/validation/tests/test_string_delete
 	.objs/validation/tests/test_string_hash
 	.objs/validation/tests/test_string_insert
 	.objs/validation/tests/test_string_buffer

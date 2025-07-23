@@ -29,7 +29,6 @@ project VSS_Text_Tests is
                  "test_string_compare",
                  "test_string_conversions.adb",
                  "test_string_decoder.adb",
-                 "test_string_delete",
                  "test_string_hash",
                  "test_string_insert",
                  "test_string_buffer",

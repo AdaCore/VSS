@@ -218,6 +218,8 @@ is
          return;
       end if;
 
+      Mutate (Text, Text.Size);
+
       declare
          Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
            (0 .. Text.Size)

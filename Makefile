@@ -88,7 +88,7 @@ generate-%:
 	rm -f source/text/ucd/*.ad[sb]
 	gnatchop -gnat2022 .objs/ucd.ada source/text/ucd
 
-build-tests: build-tests-validation_static
+build-tests: build-tests-validation_static build-performance-release_static
 
 build-tests-%:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_text_tests.gpr
@@ -97,6 +97,9 @@ build-tests-%:
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_stream_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_regexp_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_html_tests.gpr
+
+build-performance-%:
+	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_text_performance.gpr
 
 check: build-tests check_text check_json check_regexp check_html
 
@@ -143,7 +146,7 @@ endif
 	.objs/validation/tests/test_string_decoder koi8-r false testsuite/text/converters/all_bytes.bin testsuite/text/converters/koi8r-utf8.txt
 	.objs/validation/tests/test_string_decoder EUC-JP false testsuite/text/converters/eucjp_chars.eucjp testsuite/text/converters/eucjp_chars-utf8.txt
 	.objs/validation/tests/test_string_decoder shift-jis false testsuite/text/converters/sjis_chars.sjis testsuite/text/converters/sjis_chars-utf8.txt
-	.objs/validation/tests/test_string_performance
+	.objs/release/tests/test_string_performance
 
 check_json:
 	.objs/validation/tests/test_json_content_handler

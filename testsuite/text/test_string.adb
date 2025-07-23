@@ -19,6 +19,7 @@ procedure Test_String is
 
    procedure Test_Ampersand_Character;
    procedure Test_Asterisk_Character;
+   procedure Test_Delete;
    procedure Test_Delete_Pattern_Character;
    procedure Test_Ends_With;
    procedure Test_Prepend;
@@ -37,6 +38,8 @@ procedure Test_String is
    procedure Test_Ampersand_Character is separate;
 
    procedure Test_Asterisk_Character is separate;
+
+   procedure Test_Delete is separate;
 
    procedure Test_Delete_Pattern_Character is separate;
 
@@ -151,6 +154,36 @@ procedure Test_String is
 
          Test_Support.Assert (S = "xyz");
       end;
+
+      --  VSS#278
+      --
+      --  Runtime exception was raised due to attempt to mutate shared text
+      --  segment with shrinking its size.
+
+      declare
+         S          : VSS.Strings.Virtual_String :=
+           "      Ada_With_Private_Absent,";
+         SB         : constant VSS.Strings.Virtual_String := S;
+         S_Iterator : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_First_Character;
+         E_Iterator : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_Last_Character;
+
+      begin
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+
+         Test_Support.Assert (E_Iterator.Backward);
+
+         S.Replace (S_Iterator, E_Iterator, "…");
+
+         Test_Support.Assert (SB = "      Ada_With_Private_Absent,");
+         Test_Support.Assert (S = "      …,");
+      end;
    end Test_Replace;
 
    ----------------
@@ -239,6 +272,7 @@ procedure Test_String is
         (Test_Ampersand_Character'Access, "& Virtual_Character");
       Test_Support.Run_Testcase
         (Test_Asterisk_Character'Access, "Natural * Virtual_Character");
+      Test_Support.Run_Testcase (Test_Delete'Access, "Delete slice");
       Test_Support.Run_Testcase
         (Test_Delete_Pattern_Character'Access,
          "Delete Virtual_Character Pattern");

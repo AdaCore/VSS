@@ -13,7 +13,6 @@ package body VSS.Implementation.UTF8_Strings.Mutable_Operations
 is
 
    use type VSS.Implementation.Strings.Character_Offset;
-   use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
    procedure Mutate
@@ -218,6 +217,8 @@ is
       if Size.Index_Offset = 0 then
          return;
       end if;
+
+      Mutate (Text, Text.Size);
 
       declare
          Storage : VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array
@@ -651,7 +652,7 @@ is
 
          begin
             VSS.Implementation.Text_Storages.Abstract_Text_Storage'Class
-              (Manager).Mutate (Text.Storage_Address, Capacity);
+              (Manager).Mutate (Text.Storage_Address, Text.Size, Capacity);
          end;
       end if;
    end Mutate;

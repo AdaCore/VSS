@@ -38,9 +38,11 @@ is
    not overriding procedure Mutate
      (Self            : in out Abstract_Text_Storage;
       Storage_Address : in out System.Address;
+      Size            : VSS.Unicode.UTF8_Code_Unit_Count;
       Capacity        : VSS.Unicode.UTF8_Code_Unit_Count) is null;
    --  Mutate data:
    --    * make data modificable
    --    * reserve requested additional space
+   --    * copy `Size` code units when reallocated
 
 end VSS.Implementation.Text_Storages;

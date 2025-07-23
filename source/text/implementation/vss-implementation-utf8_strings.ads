@@ -19,21 +19,26 @@ with VSS.Implementation.FNV_Hash;
 with VSS.Implementation.Strings;
 limited with VSS.Implementation.String_Vectors;
 limited with VSS.Strings;
+with VSS.Implementation.Text_Storages;
 with VSS.Unicode;
 
 package VSS.Implementation.UTF8_Strings
   with Preelaborate
 is
 
+   use type System.Storage_Elements.Storage_Offset;
+
    type UTF8_String_Data is record
-      Manager         : System.Storage_Elements.Storage_Array (0 .. 15) :=
+      Manager         : System.Storage_Elements.Storage_Array
+        (0 .. VSS.Implementation.Text_Storages
+                .Abstract_Text_Storage'Max_Size_In_Storage_Elements - 1) :=
         [others => 0];
-      Flags           : Interfaces.Unsigned_32                          := 0;
-      Size            : VSS.Unicode.UTF8_Code_Unit_Count                := 0;
+      Flags           : Interfaces.Unsigned_32                           := 0;
+      Size            : VSS.Unicode.UTF8_Code_Unit_Count                 := 0;
       --  Number of code units in the buffer.
-      Storage_Address : System.Address                                  :=
+      Storage_Address : System.Address                                   :=
         System.Null_Address;
-      Length          : VSS.Implementation.Strings.Character_Count      := 0;
+      Length          : VSS.Implementation.Strings.Character_Count       := 0;
       --  Length of the string in Unicode Code Points.
    end record with Preelaborable_Initialization;
       --  Alignment   => 8,
@@ -222,10 +227,15 @@ is
 
 private
 
-   Default_UTF8_String_Data : constant UTF8_String_Data := (others => <>);
+   use type VSS.Unicode.UTF8_Code_Unit_Offset;
 
-   SSO_Max_Size : constant := 15;
-   --  XXX 64bit only !!!
+   SSO_Max_Size : constant VSS.Unicode.UTF8_Code_Unit_Count :=
+     VSS.Implementation.Text_Storages
+       .Abstract_Text_Storage'Max_Size_In_Storage_Elements - 1;
+   --  Maximum length of the UTF8 code unit sequence with short string
+   --  optimization is used.
+
+   Default_UTF8_String_Data : constant UTF8_String_Data := (others => <>);
 
    function Is_SSO (Self : UTF8_String_Data) return Boolean;
 

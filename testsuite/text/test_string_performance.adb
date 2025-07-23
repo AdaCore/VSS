@@ -124,10 +124,10 @@ procedure Test_String_Performance is
 
       Test_Support.Assert (USC = VSC);
       Test_Support.Assert
-        (P <= 0.76,
+        (P <= 0.64,
          "performance" & Relative_Performance'Image (P) & " is to bad");
       Test_Support.Assert
-        (0.63 <= P,
+        (0.51 <= P,
          "performance" & Relative_Performance'Image (P) & " is to good");
 
       Free (AUS);

@@ -13,7 +13,6 @@ package body VSS.Implementation.UTF8_Strings.Mutable_Operations
 is
 
    use type VSS.Implementation.Strings.Character_Offset;
-   use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
    procedure Mutate

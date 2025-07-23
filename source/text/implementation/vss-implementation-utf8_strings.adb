@@ -8,7 +8,6 @@ pragma Ada_2022;
 
 with VSS.Implementation.GCC;
 with VSS.Implementation.Line_Iterators;
-with VSS.Implementation.Text_Storages;
 with VSS.Implementation.String_Vectors;
 with VSS.Implementation.UTF8_Encoding;
 with VSS.Implementation.UTF8_Strings.Mutable_Operations;
@@ -20,7 +19,6 @@ package body VSS.Implementation.UTF8_Strings is
    use type VSS.Implementation.Strings.Character_Offset;
    use type VSS.Implementation.UTF8_Encoding.UTF8_Code_Unit_Array;
    use type VSS.Unicode.Code_Point;
-   use type VSS.Unicode.UTF8_Code_Unit_Offset;
    use type VSS.Unicode.UTF16_Code_Unit_Offset;
 
    ------------

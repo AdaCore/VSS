@@ -151,6 +151,36 @@ procedure Test_String is
 
          Test_Support.Assert (S = "xyz");
       end;
+
+      --  VSS#278
+      --
+      --  Runtime exception was raised due to attempt to mutate shared text
+      --  segment with shrinking its size.
+
+      declare
+         S          : VSS.Strings.Virtual_String :=
+           "      Ada_With_Private_Absent,";
+         SB         : constant VSS.Strings.Virtual_String := S;
+         S_Iterator : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_First_Character;
+         E_Iterator : VSS.Strings.Character_Iterators.Character_Iterator :=
+           S.At_Last_Character;
+
+      begin
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+         Test_Support.Assert (S_Iterator.Forward);
+
+         Test_Support.Assert (E_Iterator.Backward);
+
+         S.Replace (S_Iterator, E_Iterator, "…");
+
+         Test_Support.Assert (SB = "      Ada_With_Private_Absent,");
+         Test_Support.Assert (S = "      …,");
+      end;
    end Test_Replace;
 
    ----------------

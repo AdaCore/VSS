@@ -146,6 +146,7 @@ is
    overriding procedure Mutate
      (Self            : in out Heap_Storage;
       Storage_Address : in out System.Address;
+      Size            : VSS.Unicode.UTF8_Code_Unit_Count;
       Capacity        : VSS.Unicode.UTF8_Code_Unit_Count)
    is
       Old_Shared : UTF8_Shared_Segment_Access := Self.Get_Shared;
@@ -161,7 +162,7 @@ is
               new UTF8_Shared_Segment (Aligned_Capacity (New_Capacity));
 
          begin
-            New_Shared.Data (0 .. Old_Shared.Capacity) := Old_Shared.Data;
+            New_Shared.Data (0 .. Size) := Old_Shared.Data (0 .. Size);
             Self.Set_Shared (New_Shared);
             Storage_Address := New_Shared.Data (New_Shared.Data'First)'Address;
             Unreference (Old_Shared);

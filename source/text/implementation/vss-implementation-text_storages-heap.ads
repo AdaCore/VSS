@@ -44,6 +44,7 @@ is
    overriding procedure Mutate
      (Self            : in out Heap_Storage;
       Storage_Address : in out System.Address;
+      Size            : VSS.Unicode.UTF8_Code_Unit_Count;
       Capacity        : VSS.Unicode.UTF8_Code_Unit_Count);
 
 end VSS.Implementation.Text_Storages.Heap;

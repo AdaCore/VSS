@@ -652,7 +652,7 @@ is
 
          begin
             VSS.Implementation.Text_Storages.Abstract_Text_Storage'Class
-              (Manager).Mutate (Text.Storage_Address, Capacity);
+              (Manager).Mutate (Text.Storage_Address, Text.Size, Capacity);
          end;
       end if;
    end Mutate;

@@ -1370,7 +1370,7 @@ package body VSS.Implementation.UTF8_Normalization is
 
                      loop
                         if Has_Decomposition (Source_Info) then
-                           if Starter_Info.First_CCC = CCC_NR then
+                           if Source_Info.First_CCC = CCC_NR then
                               VSS.Implementation.UTF8_Strings
                                 .Mutable_Operations.Unchecked_Append
                                   (Result_Data,
@@ -1402,7 +1402,17 @@ package body VSS.Implementation.UTF8_Normalization is
 
                         else
                            if Source_Info.CCC = CCC_NR then
-                              raise Program_Error;
+                              VSS.Implementation.UTF8_Strings
+                                .Mutable_Operations.Unchecked_Append
+                                  (Result_Data,
+                                   Result_Size,
+                                   Source_Storage,
+                                   Source_Current_Offset,
+                                   Source_Next_Offset - Source_Current_Offset,
+                                   1);
+                              Last_CCC := Source_Info.CCC;
+
+                              exit;
 
                            elsif Last_CCC <= Source_Info.CCC then
                               VSS.Implementation.UTF8_Strings

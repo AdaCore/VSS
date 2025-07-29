@@ -1,0 +1,127 @@
+--
+--  Copyright (C) 2020-2025, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  This file is stub to build VSS outside of the Alire environment. Alire will
+--  overwrite it during builds.
+--
+--  Set of switches for all build modes are the same with Alire. Project
+--  specific switches should be added in VSS_Extras_Common project file.
+--
+--  Note, to enforce compatibility of the library code with Ada2012 dialect
+--  "-gnat2012" switch is used here; and all compilation units that use Ada2022
+--  are explicitly marked by "pragma Ada_2022;". Alire defaults to Ada2022 and
+--  override this setting.
+
+abstract project Vss_Extras_Config is
+   Crate_Version := "wavefront";
+   Crate_Name := "vss";
+
+   Alire_Host_OS := "linux";
+
+   Alire_Host_Arch := "x86_64";
+
+   Alire_Host_Distro := "ubuntu";
+   External_Ada_Compiler_Switches := External_As_List ("ADAFLAGS", " ");
+   Development_Ada_Compiler_Switches :=
+          (
+            "-Og" -- Optimize for debug
+           ,"-ffunction-sections" -- Separate ELF section for each function
+           ,"-fdata-sections" -- Separate ELF section for each variable
+           ,"-g" -- Generate debug info
+           ,"-gnatwa" -- Enable all warnings
+           ,"-gnatw.X" -- Disable warnings for No_Exception_Propagation
+           ,"-gnatVa" -- All validity checks
+           ,"-gnaty3" -- Specify indentation level of 3
+           ,"-gnatya" -- Check attribute casing
+           ,"-gnatyA" -- Use of array index numbers in array attributes
+           ,"-gnatyB" -- Check Boolean operators
+           ,"-gnatyb" -- Blanks not allowed at statement end
+           ,"-gnatyc" -- Check comments
+           ,"-gnaty-d" -- Disable check no DOS line terminators present
+           ,"-gnatye" -- Check end/exit labels
+           ,"-gnatyf" -- No form feeds or vertical tabs
+           ,"-gnatyh" -- No horizontal tabs
+           ,"-gnatyi" -- Check if-then layout
+           ,"-gnatyI" -- check mode IN keywords
+           ,"-gnatyk" -- Check keyword casing
+           ,"-gnatyl" -- Check layout
+           ,"-gnatym" -- Check maximum line length
+           ,"-gnatyn" -- Check casing of entities in Standard
+           ,"-gnatyO" -- Check that overriding subprograms are explicitly marked as such
+           ,"-gnatyp" -- Check pragma casing
+           ,"-gnatyr" -- Check identifier references casing
+           ,"-gnatyS" -- Check no statements after THEN/ELSE
+           ,"-gnatyt" -- Check token spacing
+           ,"-gnatyu" -- Check unnecessary blank lines
+           ,"-gnatyx" -- Check extra parentheses
+           ,"-gnat2012" -- Ada 2012 Mode, see comment.
+          );
+   Validation_Ada_Compiler_Switches :=
+          (
+            "-O3" -- Optimize for performance
+           ,"-gnatn" -- Enable inlining
+           ,"-ffunction-sections" -- Separate ELF section for each function
+           ,"-fdata-sections" -- Separate ELF section for each variable
+           ,"-g" -- Generate debug info
+           ,"-gnato" -- Enable numeric overflow checking
+           ,"-gnatwa" -- Enable all warnings
+           ,"-gnatw.X" -- Disable warnings for No_Exception_Propagation
+           ,"-gnatVa" -- All validity checks
+           ,"-gnatwe" -- Warnings as errors
+           ,"-gnata" -- Enable assertions and contracts
+           ,"-gnaty3" -- Specify indentation level of 3
+           ,"-gnatya" -- Check attribute casing
+           ,"-gnatyA" -- Use of array index numbers in array attributes
+           ,"-gnatyB" -- Check Boolean operators
+           ,"-gnatyb" -- Blanks not allowed at statement end
+           ,"-gnatyc" -- Check comments
+           ,"-gnaty-d" -- Disable check no DOS line terminators present
+           ,"-gnatye" -- Check end/exit labels
+           ,"-gnatyf" -- No form feeds or vertical tabs
+           ,"-gnatyh" -- No horizontal tabs
+           ,"-gnatyi" -- Check if-then layout
+           ,"-gnatyI" -- check mode IN keywords
+           ,"-gnatyk" -- Check keyword casing
+           ,"-gnatyl" -- Check layout
+           ,"-gnatym" -- Check maximum line length
+           ,"-gnatyn" -- Check casing of entities in Standard
+           ,"-gnatyO" -- Check that overriding subprograms are explicitly marked as such
+           ,"-gnatyp" -- Check pragma casing
+           ,"-gnatyr" -- Check identifier references casing
+           ,"-gnatyS" -- Check no statements after THEN/ELSE
+           ,"-gnatyt" -- Check token spacing
+           ,"-gnatyu" -- Check unnecessary blank lines
+           ,"-gnatyx" -- Check extra parentheses
+           ,"-gnat2012" -- Ada 2012 Mode, see comment.
+          );
+   Release_Ada_Compiler_Switches :=
+          (
+            "-O3" -- Optimize for performance
+           ,"-gnatn" -- Enable inlining
+           ,"-ffunction-sections" -- Separate ELF section for each function
+           ,"-fdata-sections" -- Separate ELF section for each variable
+           ,"-gnat2012" -- Ada 2012 Mode, see comment.
+          );
+
+   type Max_Supported_Integer_Size_Kind is ("128", "64");
+   Max_Supported_Integer_Size : Max_Supported_Integer_Size_Kind :=
+     external ("VSS_MAX_SUPPORTED_INTEGER_SIZE", "128");
+
+   type Build_Profile_Kind is ("release", "validation", "development");
+   Build_Profile : Build_Profile_Kind :=
+     external ("VSS_BUILD_PROFILE", external ("BUILD_PROFILE", "development"));
+
+   Ada_Compiler_Switches := ();
+   case Build_Profile is
+     when "release" =>
+        Ada_Compiler_Switches := External_Ada_Compiler_Switches & Release_Ada_Compiler_Switches;
+     when "validation" =>
+        Ada_Compiler_Switches := External_Ada_Compiler_Switches & Validation_Ada_Compiler_Switches;
+     when "development" =>
+        Ada_Compiler_Switches := External_Ada_Compiler_Switches & Development_Ada_Compiler_Switches;
+   end case;
+
+end Vss_Extras_Config;

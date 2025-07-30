@@ -19,9 +19,30 @@ project VSS_OS is
 
    for Object_Dir use VSS_Extras_Common.Object_Dir;
    for Library_Dir use VSS_Extras_Common.Library_Dir;
+
+   OS_Source_Dirs := ();
+   OS_Library_Options := ();
+
+   case VSS_Extras_Common.OS_API is
+      when "unix" | "osx" =>
+         null;
+
+      when "Windows_NT" =>
+         OS_Source_Dirs := ("../source/os/windows");
+         case VSS_Extras_Common.Library_Kind is
+            when "relocatable" =>
+               OS_Library_Options := ("-luserenv");
+               --  `userenv` has been added explicitly to fix link failure.
+            when others=>
+               null;
+         end case;
+   end case;
+
+   for Library_Options use OS_Library_Options;
+
    for Source_Dirs use
      ("../source/os",
-      "../source/os/implementation");
+      "../source/os/implementation") & OS_Source_Dirs;
 
    package Compiler renames VSS_Extras_Common.Compiler;
 

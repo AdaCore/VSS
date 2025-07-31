@@ -1,42 +1,42 @@
 --
---  Copyright (C) 2020-2024, AdaCore
+--  Copyright (C) 2020-2025, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 --  VSS: JSON processing subproject
 
-with "../config/vss_config";
-with "vss_common";
-with "vss_text";
+with "../config/vss_extras_config.gpr";
+with "vss_extras_common.gpr";
+with "vss_text.gpr";
 
 project VSS_JSON is
 
    for Languages use ("Ada");
 
    for Library_Name use "vss-json";
-   for Library_Kind use VSS_Common.Library_Kind;
+   for Library_Kind use VSS_Extras_Common.Library_Kind;
 
-   for Object_Dir use VSS_Common.Object_Dir;
-   for Library_Dir use VSS_Common.Library_Dir;
+   for Object_Dir use VSS_Extras_Common.Object_Dir;
+   for Library_Dir use VSS_Extras_Common.Library_Dir;
    for Source_Dirs use
      ("../source/json",
       "../source/json/implementation");
 
    package Compiler is
-      for Switches ("Ada") use VSS_Common.Ada_Compiler_Switches;
+      for Switches ("Ada") use VSS_Extras_Common.Ada_Compiler_Switches;
 
       --  XXX GNAT 20240411 workaround
       for Switches ("vss-json-implementation-numbers-tables.ads")
-        use VSS_Common.Ada_Compiler_Switches & ("-gnaty-t");
+        use VSS_Extras_Common.Ada_Compiler_Switches & ("-gnaty-t");
       --  XXX GNAT 20240411 workaround
    end Compiler;
 
-   package Linker renames VSS_Common.Linker;
+   package Linker renames VSS_Extras_Common.Linker;
 
    package Naming is
       for Implementation ("VSS.JSON.Implementation.Arithmetic_64")
-        use "vss-json-implementation-arithmetic_64__" & Vss_Config.Max_Supported_Integer_Size & ".adb";
+        use "vss-json-implementation-arithmetic_64__" & Vss_Extras_Config.Max_Supported_Integer_Size & ".adb";
    end Naming;
 
 end VSS_JSON;

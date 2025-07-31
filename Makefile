@@ -51,8 +51,7 @@ build-all-libs: \
 	build-libs-validation_relocatable build-libs-validation_static build-libs-validation_static-pic
 
 build-libs-%:
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_gnat.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/vss_text.gpr
+	gprbuild $(GPRBUILD_FLAGS) gnat/vss_os.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_json.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_regexp.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/vss_xml.gpr
@@ -64,8 +63,7 @@ install: install-libs-development_relocatable
 install-all-libs: install-libs-release_static install-libs-release_static-pic install-libs-release_relocatable
 
 install-libs-%:
-	gprinstall $(GPRINSTALL_FLAGS)/gnat -f -p -P gnat/vss_gnat.gpr --install-name=vss_gnat
-	gprinstall $(GPRINSTALL_FLAGS)/text -f -p -P gnat/vss_text.gpr --install-name=vss_text
+	gprinstall $(GPRINSTALL_FLAGS)/os -f -p -P gnat/vss_os.gpr --install-name=vss_os
 	gprinstall $(GPRINSTALL_FLAGS)/json -f -p -P gnat/vss_json.gpr --install-name=vss_json
 	gprinstall $(GPRINSTALL_FLAGS)/regexp -f -p -P gnat/vss_regexp.gpr --install-name=vss_regexp
 	gprinstall $(GPRINSTALL_FLAGS)/xml -f -p -P gnat/vss_xml.gpr --install-name=vss_xml
@@ -80,52 +78,18 @@ misc-%: # Check compilation of other projects
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat examples/blogs/json_1/blog_1.gpr
 	gprbuild $(GPRBUILD_FLAGS) -aPgnat examples/command_line/command/command_line_command.gpr
 
-generate: generate-development_static
-
-generate-%:
-	gprbuild $(GPRBUILD_FLAGS) gnat/tools/gen_ucd.gpr
-	.objs/$(word 1, $(subst _, ,$*))/tools/gen_ucd data/ucd .objs/ucd.ada
-	rm -f source/text/ucd/*.ad[sb]
-	gnatchop -gnat2022 .objs/ucd.ada source/text/ucd
-
-build-tests: build-tests-validation_static build-performance-release_static
+build-tests: build-tests-validation_static
 
 build-tests-%:
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_text_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_os_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_json_tests.gpr
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_stream_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_regexp_tests.gpr
 	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_html_tests.gpr
-
-build-performance-%:
-	gprbuild $(GPRBUILD_FLAGS) gnat/tests/vss_text_performance.gpr
 
 check: build-tests check_text check_json check_regexp check_html
 
 check_text:
-	.objs/validation/tests/test_characters data/ucd
-	.objs/validation/tests/test_character_iterators
-	.objs/validation/tests/test_character_markers
-	.objs/validation/tests/test_converters
-	.objs/validation/tests/test_grapheme_cluster_iterators data/ucd data/emoji
-	.objs/validation/tests/test_line_iterators
-	.objs/validation/tests/test_stream_element_vector
-	.objs/validation/tests/test_text_streams
-	.objs/validation/tests/test_file_text_streams testsuite/stream/test_file_text_stream/vss.197.in.txt /tmp/vss.197.out.txt && diff -u --strip-trailing-cr /tmp/vss.197.out.txt testsuite/stream/test_file_text_stream/vss.197.out.txt
-	.objs/validation/tests/test_string_append
-	.objs/validation/tests/test_string_compare
-	.objs/validation/tests/test_string_conversions
-	.objs/validation/tests/test_string_hash
-	.objs/validation/tests/test_string_insert
-	.objs/validation/tests/test_string_buffer
-	.objs/validation/tests/test_string_split
-	.objs/validation/tests/test_string_split_lines
-	.objs/validation/tests/test_string
-	.objs/validation/tests/test_string_template
-	.objs/validation/tests/test_string_vector
-	.objs/validation/tests/test_transformer data/ucd testsuite/text/w3c-i18n-tests-casing/*.txt
-	.objs/validation/tests/test_word_iterators data/ucd
+	.objs/validation/tests/test_file_text_streams testsuite/os/test_file_text_stream/vss.197.in.txt /tmp/vss.197.out.txt && diff -u --strip-trailing-cr /tmp/vss.197.out.txt testsuite/os/test_file_text_stream/vss.197.out.txt
 	.objs/validation/tests/test_standard_paths
 ifeq ($(OS),Windows_NT)
 	cmd.exe \/c "testsuite\\run_test_application_arguments.bat"
@@ -134,18 +98,6 @@ else
 endif
 	VSS_ENV1="A$(VSS_PS)B$(VSS_PS)C" .objs/validation/tests/test_environment
 	.objs/validation/tests/test_command_line_parser
-	.objs/validation/tests/test_string_decoder iso-8859-1 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88591-utf8.txt
-	.objs/validation/tests/test_string_decoder iso-8859-2 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88592-utf8.txt
-	.objs/validation/tests/test_string_decoder iso-8859-5 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88595-utf8.txt
-	.objs/validation/tests/test_string_decoder iso-8859-6 true testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88596-utf8.txt
-	.objs/validation/tests/test_string_decoder iso-8859-7 true testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88597-utf8.txt
-	.objs/validation/tests/test_string_decoder iso-8859-8 true testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88598-utf8.txt
-	.objs/validation/tests/test_string_decoder iso-8859-9 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso88599-utf8.txt
-	.objs/validation/tests/test_string_decoder iso-8859-15 false testsuite/text/converters/all_bytes.bin testsuite/text/converters/iso885915-utf8.txt
-	.objs/validation/tests/test_string_decoder koi8-r false testsuite/text/converters/all_bytes.bin testsuite/text/converters/koi8r-utf8.txt
-	.objs/validation/tests/test_string_decoder EUC-JP false testsuite/text/converters/eucjp_chars.eucjp testsuite/text/converters/eucjp_chars-utf8.txt
-	.objs/validation/tests/test_string_decoder shift-jis false testsuite/text/converters/sjis_chars.sjis testsuite/text/converters/sjis_chars-utf8.txt
-	.objs/release/tests/test_string_performance
 
 check_json:
 	.objs/validation/tests/test_json_content_handler

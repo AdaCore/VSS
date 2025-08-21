@@ -1,0 +1,4 @@
+CSS3 Text, text transform: Armenian ligatures, uppercase
+uppercase
+և ﬓ ﬔ ﬕ ﬖ ﬗ
+ԵՒ ՄՆ ՄԵ ՄԻ ՎՆ ՄԽ

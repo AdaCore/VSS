@@ -1,0 +1,14 @@
+all_bytes.bin -text
+eucjp_chars-utf8.txt -text
+eucjp_chars.eucjp -text
+iso88591-utf8.txt -text
+iso885915-utf8.txt -text
+iso88592-utf8.txt -text
+iso88595-utf8.txt -text
+iso88596-utf8.txt -text
+iso88597-utf8.txt -text
+iso88598-utf8.txt -text
+iso88599-utf8.txt -text
+koi8r-utf8.txt -text
+sjis_chars-utf8.txt -text
+sjis_chars.sjis -text

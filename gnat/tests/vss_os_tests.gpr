@@ -1,27 +1,23 @@
 --
---  Copyright (C) 2022-2025, AdaCore
+--  Copyright (C) 2022-2023, AdaCore
 --
 --  SPDX-License-Identifier: Apache-2.0
 --
 
 --  VSS: text processing subproject tests
 
-with "vss_text.gpr";
-
-with "../vss_extras_common.gpr";
-with "../vss_os.gpr";
-with "vss_test_common.gpr";
+with "../vss_common";
+with "../vss_text";
+with "vss_test_common";
 
 project VSS_OS_Tests is
 
    for Languages use ("Ada");
-   for Object_Dir use VSS_Extras_Common.Tests_Object_Dir;
+   for Object_Dir use VSS_Common.Tests_Object_Dir;
    for Source_Dirs use ("../../testsuite/os");
    for Main use
      ("test_application_arguments.adb",
       "test_command_line_parser.adb",
-      "test_environment.adb",
-      "test_file_text_streams.adb",
       "test_standard_paths.adb");
 
    package Compiler renames VSS_Test_Common.Compiler;

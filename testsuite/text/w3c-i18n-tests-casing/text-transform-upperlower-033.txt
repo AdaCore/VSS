@@ -1,0 +1,4 @@
+CSS3 Text, text transform: Latin ligatures, uppercase
+uppercase
+ﬀ ﬁ ﬂ ﬃ ﬄ ﬅ ﬆ
+FF FI FL FFI FFL ST ST

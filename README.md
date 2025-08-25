@@ -1,7 +1,6 @@
 # VSS
 
 [![Build](https://github.com/AdaCore/VSS/actions/workflows/main.yml/badge.svg)](https://github.com/AdaCore/VSS/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/AdaCore/VSS/branch/master/graph/badge.svg)](https://codecov.io/gh/AdaCore/VSS)
 [![alire](https://img.shields.io/endpoint?url=https://alire.ada.dev/badges/vss.json)](https://alire.ada.dev/crates/vss.html)
 
 Virtual String System - a high level string and text processing library.

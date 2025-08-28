@@ -1,10 +1,24 @@
 # VSS
 
 [![Build](https://github.com/AdaCore/VSS/actions/workflows/main.yml/badge.svg)](https://github.com/AdaCore/VSS/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/AdaCore/VSS/branch/master/graph/badge.svg)](https://codecov.io/gh/AdaCore/VSS)
 [![alire](https://img.shields.io/endpoint?url=https://alire.ada.dev/badges/vss.json)](https://alire.ada.dev/crates/vss.html)
 
-A high level string and text processing library.
+Virtual String System - a high level string and text processing library.
+
+## Deprecation
+
+This repository is deprecated. VSS has been split into smaller more focused
+projects:
+
+* [`vss-text`](https://github.com/AdaCore/vss-text): a library for Unicode text
+  processing.
+* [`vss-extra`](https://github.com/AdaCore/vss-extra): libraries for handling
+  JSON, Regexp, XML and other features based on `vss-text`. This will be
+  further split into smaller projects.
+
+This repository is kept as a read-only historic snapshot that will no longer
+evolve. Please refer to the above projects to continue using their
+corresponding features, and to be informed of upcoming changes.
 
 ## The objectives
 
@@ -34,12 +48,14 @@ that supports them.
 ## Install
 
 ### Build from sources
+
 Prefered way to install is to download sources and run
 
     make all install PREFIX=/path/to/install
 
-### Using `alire`
-Or you can use [alire](https://alire.ada.dev/) library manager:
+### Using `Alire`
+
+Or you can use [Alire](https://alire.ada.dev/) library manager:
 
     alr get --build vss
 
@@ -47,7 +63,7 @@ Then you can use it as dependency in the project file:
 
     with "vss_text.gpr";
 
-For use JSON streaming API:
+For the JSON streaming API:
 
     with "vss_json.gpr";
 

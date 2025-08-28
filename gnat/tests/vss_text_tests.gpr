@@ -1,0 +1,51 @@
+--
+--  Copyright (C) 2020-2025, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+--  VSS: text processing subproject tests
+
+with "../vss_common";
+with "../vss_text";
+with "vss_test_common";
+
+project VSS_Text_Tests is
+
+   for Languages use ("Ada");
+   for Object_Dir use VSS_Common.Tests_Object_Dir;
+   for Source_Dirs use
+     ("../../testsuite/text",
+      "../../tools/ucd");
+   for Main use ("test_characters.adb",
+                 "test_character_iterators.adb",
+                 "test_character_markers.adb",
+                 "test_converters.adb",
+                 "test_environment.adb",
+                 "test_grapheme_cluster_iterators.adb",
+                 "test_line_iterators.adb",
+                 "test_string",
+                 "test_string_append",
+                 "test_string_compare",
+                 "test_string_conversions.adb",
+                 "test_string_decoder.adb",
+                 "test_string_hash",
+                 "test_string_insert",
+                 "test_string_buffer",
+                 "test_string_split",
+                 "test_string_split_lines",
+                 "test_string_template",
+                 "test_string_vector",
+                 "test_transformer",
+                 "test_word_iterators");
+
+   package Compiler is
+      for Switches ("Ada") use VSS_Test_Common.Ada_Compiler_Switches;
+      for Switches ("hello_world_data.adb") use ("-g", "-O2", "-gnat2022");
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Wb", "-Es");
+   end Binder;
+
+end VSS_Text_Tests;

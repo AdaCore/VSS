@@ -1,0 +1,3604 @@
+### 8
+        (Node : Ada_Node'Class) return Private_Type_Def
+### 5
+     (Node : Defining_Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Package_Body
+### 5
+     (Node : Basic_Decl'Class) return Text_Type
+### 5
+     (Node : Contract_Cases'Class) return Contract_Case_Assoc_List
+### 8
+        (Node : Ada_Node'Class) return Op_Minus
+### 5
+     (Node : Contract_Case_Assoc'Class) return Expr
+### 5
+     (Node : Ada_Node'Class) return Analysis_Unit
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      Sym : Unbounded_Text_Type) return Ada_Node
+### 5
+     (Node : Requeue_Stmt'Class) return Name
+### 5
+     (Node : Compilation_Unit'Class) return Compilation_Unit_Array
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Iter_Type
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Generic_Subp_Instantiation
+### 5
+     (Node : Private_Type_Def'Class) return Abstract_Node
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return For_Loop_Spec
+### 5
+     (Self : Discrete_Range)
+### 6
+      return Expr'Class
+### 8
+        (Node : Ada_Node'Class) return Enum_Literal_Decl_List
+### 6
+      ;
+### 5
+     (Node : Number_Decl'Class) return Defining_Name_List
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Discriminant_Choice_List
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : If_Stmt'Class) return Stmt_List
+### 5
+     (Node : Generic_Package_Renaming_Decl'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Base_Type_Access_Def
+### 5
+     (Node : Ada_Node) return Ada.Containers.Hash_Type
+### 8
+        (Node : Ada_Node'Class) return Accept_Stmt_With_Stmts
+### 8
+        (Node : Ada_Node'Class) return Unconstrained_Array_Indices
+### 5
+     (Node : Entry_Decl'Class) return Overriding_Node
+### 8
+        (Node : Ada_Node'Class) return Abort_Absent
+### 8
+        (Node : Ada_Node'Class) return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Subunit
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      Sloc : Source_Location) return Relative_Position
+### 5
+     (Node : Variant_Part'Class) return Identifier
+### 5
+     (Node : Basic_Decl'Class) return Text_Type
+### 5
+     (Node : Variant'Class) return Component_List
+### 5
+     (Node : Defining_Name'Class;
+### 6
+      Root : Ada_Node'Class;
+### 6
+      Origin : Ada_Node'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Ref_Result_Array
+### 5
+     (Node : Subunit'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return Op_Mod
+### 5
+     (Node : Subtype_Indication'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Null_Record_Def
+### 5
+     (Node : Requeue_Stmt'Class) return Abort_Node
+### 8
+        (Node : Ada_Node'Class) return Membership_Expr
+### 5
+     (Node : Protected_Def'Class) return Private_Part
+### 5
+     (Self : Substitution)
+### 6
+      return Basic_Decl'Class
+### 5
+     (Node : Call_Expr'Class) return Boolean
+### 5
+     (Node : Package_Renaming_Decl'Class) return Basic_Decl
+### 8
+        (Node : Ada_Node'Class) return Discriminant_Constraint
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Iterated_Assoc'Class) return Expr
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Real_Type_Def
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Context : Analysis_Context'Class) return Symbol_Table
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Include_Discriminants : Boolean := True;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Shape_Array
+### 8
+        (Node : Ada_Node'Class) return Compilation_Unit
+### 5
+     (Node : Base_Type_Decl'Class) return Boolean
+### 6
+         with Iterable => (First       => Discriminant_Spec_List_First,
+### 6
+                           Next        => Discriminant_Spec_List_Next,
+### 6
+                           Has_Element => Discriminant_Spec_List_Has_Element,
+### 6
+                           Element     => Discriminant_Spec_List_Element)
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Begin_Block
+### 5
+     (Node : For_Loop_Spec'Class) return For_Loop_Var_Decl
+### 8
+        (Node : Ada_Node'Class) return Basic_Assoc_List
+### 5
+     (Node : Allocator'Class) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Abort_Present
+### 8
+        (Node : Entry_Decl'Class) return Ada_Overriding_Node
+### 8
+        (Node : Ada_Node'Class) return Synchronized_Node
+### 8
+        (Node : Ada_Node'Class) return Select_When_Part_List
+### 8
+        (Node : Ada_Node'Class) return Quantifier_Some
+### 5
+     (Node : Derived_Type_Def'Class) return Synchronized_Node
+### 8
+        (Node : Ada_Node'Class) return Pragma_Node_List
+### 5
+     (Node : Defining_Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Defining_Name
+### 5
+     (Node : Task_Def'Class) return Private_Part
+### 5
+     (Node : Defining_Name'Class;
+### 6
+      Units : Analysis_Unit_Array;
+### 6
+      Follow_Renamings : Boolean := False;
+### 6
+      Imprecise_Fallback : Boolean := False) return Ref_Result_Array
+### 8
+        (Node : Ada_Node'Class) return Others_Designator
+### 11
+           (Node : Contract_Case_Assoc_List; Cursor : Positive)
+### 12
+            return Contract_Case_Assoc'Class
+### 5
+     (Node : Single_Task_Decl'Class) return Single_Task_Type_Decl
+### 5
+     (Node : Component_Clause'Class) return Range_Spec
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Mod_Int_Type_Def
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Raise_Expr'Class) return Expr
+### 5
+     (Node : Compilation_Unit'Class) return Pragma_Node_List
+### 6
+      ;
+### 9
+         array (Positive range <>) of Substitution;
+### 8
+        (Node : Ada_Node'Class) return Interface_Kind_Limited
+### 5
+     (Self : Ref_Result)
+### 6
+      return Base_Id'Class
+### 11
+           (Node : Pragma_Node_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Generic_Package_Instantiation
+### 6
+      ;
+### 5
+     (Node : Pragma_Argument_Assoc'Class) return Identifier
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Extended_Return_Stmt
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Entry_Decl
+### 6
+      ;
+### 5
+     (Node : Known_Discriminant_Part'Class) return Discriminant_Spec_List
+### 5
+     (Node : Aspect_Spec'Class) return Aspect_Assoc_List
+### 5
+     (Node : Aspect_Assoc'Class) return Expr
+### 5
+     (Context : Analysis_Context'Class;
+### 6
+      Name    : Text_Type;
+### 6
+      Kind    : Analysis_Unit_Kind;
+### 6
+      Charset : String := "";
+### 6
+      Reparse : Boolean := False) return Analysis_Unit
+### 8
+        (Node : Ada_Node'Class) return Compilation_Unit_List
+### 5
+     (Node : Base_Type_Decl'Class) return Base_Formal_Param_Decl_Array
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class) return Base_Type_Decl
+### 5
+     (Context  : Analysis_Context'Class;
+### 6
+      Filename : String;
+### 6
+      Charset  : String := "";
+### 6
+      Reparse  : Boolean := False;
+### 6
+      Rule     : Grammar_Rule := Default_Grammar_Rule) return Analysis_Unit
+### 5
+     (Node : Generic_Subp_Instantiation'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return Bin_Op
+### 5
+     (Node : Generic_Package_Decl'Class) return Generic_Package_Internal
+### 6
+      ;
+### 5
+     (Node : For_Loop_Spec'Class) return Iter_Type
+### 8
+        (Node : Ada_Node'Class) return Assoc_List
+### 8
+        (Node : Ada_Node'Class) return All_Present
+### 8
+        (Node : Ada_Node'Class) return While_Loop_Stmt
+### 8
+        (Node : Ada_Node'Class) return Abstract_State_Decl_Expr
+### 5
+     (Node : Enum_Literal_Decl'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Terminate_Alternative
+### 11
+           (Node : Elsif_Expr_Part_List; Cursor : Positive)
+### 12
+            return Elsif_Expr_Part'Class
+### 5
+     (Node : Discriminant_Spec'Class) return Defining_Name_List
+### 11
+           (Node : Identifier_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Variant_List; Cursor : Positive)
+### 12
+            return Variant'Class
+### 11
+           (Node : Identifier_List'Class; Index : Positive)
+### 12
+            return Identifier
+### 5
+     (Node : Use_Package_Clause'Class) return Name_List
+### 5
+     (Node : Basic_Decl'Class) return Defining_Name_Array
+### 5
+     (Node : Decl_Expr'Class) return Basic_Decl_List
+### 8
+        (Node : Subp_Spec'Class) return Ada_Subp_Kind
+### 11
+           (Node : Contract_Case_Assoc_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Op_Gte
+### 5
+     (Node : Ada_Node'Class) return Token_Reference
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      Value : Big_Integer) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Not_Null_Absent
+### 5
+     (Node : Record_Type_Def'Class) return Limited_Node
+### 5
+     (Node : Compilation_Unit'Class) return Unbounded_Text_Type_Array
+### 5
+     (Node : Protected_Body'Class) return Defining_Name
+### 5
+     (Self : Refd_Decl)
+### 6
+      return Basic_Decl'Class
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Formal_Param_Holder'Class) return Base_Formal_Param_Decl_Array
+### 6
+         with Iterable => (First       => Basic_Assoc_List_First,
+### 6
+                           Next        => Basic_Assoc_List_Next,
+### 6
+                           Has_Element => Basic_Assoc_List_Has_Element,
+### 6
+                           Element     => Basic_Assoc_List_Element)
+### 6
+      ;
+### 5
+     (Node : Multi_Abstract_State_Decl'Class) return Abstract_State_Decl_List
+### 8
+        (Node : Ada_Node'Class) return Discrete_Subtype_Indication
+### 8
+        (Node : Ada_Node'Class) return Constraint
+### 5
+     (Node : If_Expr'Class) return Expr
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Is_Subscript : Boolean := False;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 5
+     (Node : Generic_Package_Decl'Class) return Package_Body
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 5
+     (Node : Extended_Return_Stmt'Class) return Extended_Return_Stmt_Object_Decl
+### 11
+           (Node : Expr_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Expr_List'Class; Index : Positive)
+### 12
+            return Expr
+### 5
+     (Node : Aggregate_Assoc'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Single_Tok_Node
+### 5
+     (Node : Entry_Body'Class) return Declarative_Part
+### 5
+     (Node : Classic_Subp_Decl'Class) return Overriding_Node
+### 8
+        (Node : Ada_Node'Class) return Subp_Kind_Procedure
+### 5
+     (Node : Name'Class) return Single_Tok_Node
+### 8
+        (Node : Ada_Node'Class) return Reverse_Node
+### 5
+     (Node : With_Clause'Class) return Name_List
+### 11
+           (Node : Variant_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Public_Part
+### 8
+        (Node : Ada_Node'Class) return Paren_Abstract_State_Decl
+### 5
+     (Node : Defining_Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Defining_Name
+### 5
+     (Node : Task_Body'Class) return Handled_Stmts
+### 5
+     (Node : Expr'Class) return Text_Type
+### 5
+     (Node : Subtype_Indication'Class) return Not_Null
+### 5
+     (Node : Select_When_Part'Class) return Expr
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Limited_Node
+### 5
+     (Node : Quantified_Expr'Class) return Quantifier
+### 8
+        (Node : Ada_Node'Class) return Incomplete_Tagged_Type_Decl
+### 11
+           (Node : Case_Expr_Alternative_List; Cursor : Positive) return Boolean
+### 6
+      ;
+### 5
+     (Node : Bin_Op'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Generic_Formal_Part
+### 6
+         with Iterable => (First       => Contract_Case_Assoc_List_First,
+### 6
+                           Next        => Contract_Case_Assoc_List_Next,
+### 6
+                           Has_Element => Contract_Case_Assoc_List_Has_Element,
+### 6
+                           Element     => Contract_Case_Assoc_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Exit_Stmt
+### 5
+     (Node : Package_Body_Stub'Class) return Defining_Name
+### 5
+     (Node : Attribute_Ref'Class) return Ada_Node
+### 5
+     (Node : Interface_Type_Def'Class) return Interface_Kind
+### 11
+           (Node : Aspect_Assoc_List; Cursor : Positive)
+### 12
+            return Aspect_Assoc'Class
+### 6
+      ;
+### 6
+         with Iterable => (First       => Ada_Node_List_First,
+### 6
+                           Next        => Ada_Node_List_Next,
+### 6
+                           Has_Element => Ada_Node_List_Has_Element,
+### 6
+                           Element     => Ada_Node_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Case_Stmt_Alternative
+### 5
+     (Context       : Analysis_Context'Class;
+### 6
+      Unit_Filename : String) return Boolean
+### 5
+     (Node : Generic_Subp_Instantiation'Class) return Overriding_Node
+### 5
+     (Provider : Unit_Provider_Interface'Class) return Unit_Provider_Reference
+### 6
+         with Iterable => (First       => Identifier_List_First,
+### 6
+                           Next        => Identifier_List_Next,
+### 6
+                           Has_Element => Identifier_List_Has_Element,
+### 6
+                           Element     => Identifier_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Base_Subp_Spec
+### 5
+     (Node : Object_Decl'Class) return Basic_Decl
+### 8
+        (Node : Ada_Node'Class) return Aspect_Assoc_List
+### 8
+        (Node : Ada_Node'Class) return Aliased_Node
+### 8
+        (Node : Ada_Node'Class) return Use_Type_Clause
+### 5
+     (Node : Accept_Stmt'Class) return Expr
+### 5
+     (Node : Ada_Node'Class) return Token_Iterator
+### 5
+     (Node : Derived_Type_Def'Class) return Abstract_Node
+### 8
+        (Node : Ada_Node'Class) return Op_Pow
+### 8
+        (Node : Ada_Node'Class) return Op_Concat
+### 5
+     (Node : Record_Rep_Clause'Class) return Ada_Node_List
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Case_Stmt_Alternative'Class) return Alternatives_List
+### 9
+         array (Positive range <>) of Ref_Result;
+### 5
+     (Self : Param_Actual)
+### 6
+      return Expr'Class
+### 6
+         with Iterable => (First       => Case_Stmt_Alternative_List_First,
+### 6
+                           Next        => Case_Stmt_Alternative_List_Next,
+### 6
+                           Has_Element => Case_Stmt_Alternative_List_Has_Element,
+### 6
+                           Element     => Case_Stmt_Alternative_List_Element)
+### 6
+      ;
+### 5
+     (Node : Param_Spec'Class) return Type_Expr
+### 5
+     (Node : Base_Subp_Spec'Class) return Type_Expr
+### 8
+        (Node : Ada_Node'Class) return Elsif_Stmt_Part_List
+### 6
+      ;
+### 11
+           (Node : Name_List; Cursor : Positive)
+### 12
+            return Name'Class
+### 5
+     (Unit : Analysis_Unit'Class; Sloc : Source_Location)
+### 6
+      return Token_Reference
+### 5
+     (Node : Membership_Expr'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Delay_Stmt
+### 5
+     (Unit    : Analysis_Unit'Class;
+### 6
+      Charset : String := "";
+### 6
+      Buffer  : String)
+### 5
+     (Context : Analysis_Context'Class; Timeout : Natural)
+### 11
+           (Node : Aspect_Assoc_List; Cursor : Positive) return Positive
+### 5
+     (Node : Generic_Subp_Renaming_Decl'Class) return Name
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 5
+     (Node : Generic_Decl'Class) return Generic_Formal_Part
+### 11
+           (Node : Enum_Literal_Decl_List; Cursor : Positive)
+### 12
+            return Enum_Literal_Decl'Class
+### 8
+        (Node : Ada_Node'Class) return Formal_Subp_Decl
+### 5
+     (Node : Entry_Index_Spec'Class) return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Target_Name
+### 5
+     (Node : End_Name'Class) return Basic_Decl
+### 11
+           (Node : Elsif_Stmt_Part_List; Cursor : Positive) return Boolean
+### 5
+     (Node : Name'Class) return Unbounded_Text_Type
+### 11
+           (Node : Elsif_Stmt_Part_List'Class; Index : Positive)
+### 12
+            return Elsif_Stmt_Part
+### 8
+        (Node : Ada_Node'Class) return Subp_Body
+### 5
+     (Node  : Ada_Node'Class;
+### 6
+      Visit : access function (Node : Ada_Node'Class)
+### 31
+                               return Visit_Status)
+### 5
+     return Visit_Status
+### 8
+        (Node : Ada_Node'Class) return Record_Type_Def
+### 5
+     (Node : Digits_Constraint'Class) return Range_Spec
+### 8
+        (Node : Ada_Node'Class) return Protected_Body
+### 8
+        (Node : Un_Op'Class) return Ada_Op
+### 8
+        (Node : Ada_Node'Class) return Package_Renaming_Decl
+### 5
+     (Node : Decimal_Fixed_Point_Def'Class) return Range_Spec
+### 8
+        (Node : Subp_Body_Stub'Class) return Ada_Overriding_Node
+### 5
+     (Node : Expr'Class) return Base_Type_Decl
+### 6
+      ;
+### 5
+     (Node : Component_Def'Class) return Type_Expr
+### 8
+        (Node : Ada_Node'Class) return Name_List
+### 5
+     (Node : Record_Type_Def'Class) return Abstract_Node
+### 8
+        (Node : Ada_Node'Class) return Iterated_Assoc
+### 5
+     (Self : Substitution)
+### 6
+      return Base_Type_Decl'Class
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Goto_Stmt
+### 6
+      ;
+### 9
+         array (Positive range <>) of Type_Decl;
+### 5
+     (Node : Begin_Block'Class) return Handled_Stmts
+### 9
+         array (Positive range <>) of Defining_Name;
+### 8
+        (Node : Ada_Node'Class) return Formal_Discrete_Type_Def
+### 9
+         array (Positive range <>) of Base_Formal_Param_Decl;
+### 8
+        (Node : Ada_Node'Class) return Enum_Type_Def
+### 5
+     (Node : Base_Package_Decl'Class) return End_Name
+### 5
+     (Node : Ordinary_Fixed_Point_Def'Class) return Range_Spec
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : At_Clause'Class) return Expr
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Constant_Present
+### 5
+     (Node : Goto_Stmt'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return Cond_Expr
+### 5
+     (Node : Generic_Subp_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Base_Subp_Body
+### 8
+        (Node : Ada_Node'Class) return Base_Loop_Stmt
+### 8
+        (Node : Ada_Node'Class) return Type_Decl
+### 5
+     (Node : Exception_Handler'Class) return Stmt_List
+### 8
+        (Node : Ada_Node'Class) return Access_To_Subp_Def
+### 5
+     (Node : Anonymous_Type'Class) return Anonymous_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Until_Absent
+### 8
+        (Node : Ada_Node'Class) return Ada_List
+### 5
+     (Node : Name'Class) return Base_Type_Decl
+### 5
+     (Node : Name'Class;
+### 6
+      Seq : Boolean := True;
+### 6
+      Seq_From : Ada_Node'Class := No_Ada_Node) return Ada_Node_Array
+### 5
+     (Node : Ada_Node'Class) return Natural
+### 5
+     (Node : Name'Class) return Boolean
+### 5
+     (Node : With_Clause'Class) return Limited_Node
+### 5
+     (Node : Basic_Decl'Class) return Boolean
+### 5
+     (Node : Delay_Stmt'Class) return Until_Node
+### 8
+        (Node : Ada_Node'Class) return Param_Assoc
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Name : Unbounded_Text_Type) return Aspect_Assoc
+### 5
+     (Node : Synchronized_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Op_Not
+### 11
+           (Node : Select_When_Part_List; Cursor : Positive)
+### 12
+            return Select_When_Part'Class
+### 8
+        (Node : Ada_Node'Class) return Number_Decl
+### 5
+     (Node : Reverse_Node'Class) return Boolean
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 9
+         array (Positive range <>) of Unbounded_Text_Type;
+### 5
+     (Node : Protected_Type_Decl'Class) return Parent_List
+### 6
+         with Iterable => (First       => Param_Spec_List_First,
+### 6
+                           Next        => Param_Spec_List_Next,
+### 6
+                           Has_Element => Param_Spec_List_Has_Element,
+### 6
+                           Element     => Param_Spec_List_Element)
+### 6
+      ;
+### 5
+     (Node : Begin_Block'Class) return End_Name
+### 6
+      ;
+### 6
+      ;
+### 11
+           (Node : Basic_Decl_List'Class; Index : Positive)
+### 12
+            return Basic_Decl
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Param_Spec'Class) return Defining_Name_List
+### 5
+     (Self : Discriminant_Values)
+### 6
+      return Identifier'Class
+### 8
+        (Node : Ada_Node'Class) return Error_Decl
+### 6
+      ;
+### 5
+     (Self : Aspect)
+### 6
+      return Expr'Class
+### 8
+        (Node : Ada_Node'Class) return Discriminant_Spec_List
+### 5
+     (Node : Attribute_Def_Clause'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return Decl_Expr
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Incomplete_Tagged_Type_Decl'Class) return Abstract_Node
+### 6
+      ;
+### 5
+     (Node : Type_Decl'Class) return Type_Def
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 8
+        (Node : Object_Decl'Class) return Ada_Mode
+### 8
+        (Node : Ada_Node'Class) return Base_Aggregate
+### 5
+     (Node : Type_Expr'Class) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Until_Present
+### 8
+        (Node : Ada_Node'Class) return Abort_Stmt
+### 5
+     (Node : Formal_Subp_Decl'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Synth_Anonymous_Type_Decl
+### 5
+     (Node  : Ada_Node'Class;
+### 6
+      Visit : access function (Node : Ada_Node'Class)
+### 31
+                               return Visit_Status)
+### 8
+        (Node : Ada_Node'Class) return Single_Task_Decl
+### 8
+        (Node : Ada_Node'Class) return Range_Constraint
+### 5
+     (Node : Derived_Type_Def'Class) return Parent_List
+### 8
+        (Node : Ada_Node'Class) return Private_Part
+### 5
+     (Node : Basic_Decl'Class) return Boolean
+### 5
+     (Node : String_Literal'Class) return Text_Type
+### 8
+        (Node : Ada_Node'Class) return Op
+### 5
+     (Node : Component_Decl'Class) return Expr
+### 5
+     (Node : Ada_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Mode_In
+### 5
+     (Node : Range_Constraint'Class) return Range_Spec
+### 8
+        (Node : Ada_Node'Class) return Interface_Kind_Task
+### 5
+     (Node : Case_Expr'Class) return Case_Expr_Alternative_List
+### 8
+        (Node : Ada_Node'Class) return Generic_Package_Renaming_Decl
+### 5
+     (Node : Pragma_Node'Class) return Base_Assoc_List
+### 8
+        (Node : Ada_Node'Class) return Floating_Point_Def
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Body_Node'Class) return Basic_Decl
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Loop_Stmt'Class) return Stmt_List
+### 6
+      ;
+### 5
+     (Node : Library_Item'Class) return Private_Node
+### 11
+           (Node : Basic_Assoc_List; Cursor : Positive) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Decl_List
+### 8
+        (Node : Ada_Node'Class) return Component_Def
+### 6
+         with Iterable => (First       => Enum_Literal_Decl_List_First,
+### 6
+                           Next        => Enum_Literal_Decl_List_Next,
+### 6
+                           Has_Element => Enum_Literal_Decl_List_Has_Element,
+### 6
+                           Element     => Enum_Literal_Decl_List_Element)
+### 6
+      ;
+### 5
+     (Node : Generic_Subp_Internal'Class) return Subp_Spec
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Bracket_Aggregate
+### 8
+        (Node : Ada_Node'Class) return Attribute_Ref
+### 8
+        (Node : Ada_Node'Class) return Type_Expr
+### 5
+     (Node : Enum_Type_Def'Class) return Enum_Literal_Decl_List
+### 8
+        (Node : Ada_Node'Class) return With_Private_Absent
+### 5
+     (Node : Access_To_Subp_Def'Class) return Subp_Spec
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Refd_Decl
+### 8
+        (Node : Ada_Node'Class) return Task_Type_Decl
+### 5
+     (Node : Dotted_Name'Class) return Base_Id
+### 11
+           (Node : Discriminant_Spec_List; Cursor : Positive) return Boolean
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Defining_Name
+### 11
+           (Node : Discriminant_Spec_List'Class; Index : Positive)
+### 12
+            return Discriminant_Spec
+### 5
+     (Node : Name'Class;
+### 6
+      Sym : Unbounded_Text_Type) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Range_Spec
+### 5
+     (Node : Basic_Decl'Class) return Unbounded_Text_Type_Array
+### 5
+     (Node : Use_Type_Clause'Class) return Name_List
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Follow_Generic : Boolean := False) return Base_Subp_Spec
+### 8
+        (Node : Ada_Node'Class) return Private_Present
+### 11
+           (Node : Defining_Name_List; Cursor : Positive)
+### 12
+            return Defining_Name'Class
+### 8
+        (Node : Ada_Node'Class) return Overriding_Unspecified
+### 5
+     (Node : Subp_Spec'Class) return Type_Expr
+### 8
+        (Node : Ada_Node'Class) return Op_Lte
+### 5
+     (Node : Contract_Case_Assoc'Class) return Ada_Node
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 6
+      ;
+### 5
+     (Node : Component_Def'Class) return Aliased_Node
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class) return Analysis_Unit
+### 5
+     (Node : Renaming_Clause'Class) return Name
+### 5
+     (Node : Compilation_Unit'Class) return Compilation_Unit_Array
+### 5
+     (Node : Ada_Node'Class) return Declarative_Part
+### 5
+     (Self : Token_Iterator; Tok : Token_Reference) return Token_Reference
+### 5
+     (Node : Private_Node'Class) return Boolean
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 11
+           (Node : Basic_Decl_List; Cursor : Positive) return Positive
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Enum_Literal_Decl
+### 5
+     (Node : Base_Formal_Param_Holder'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl_Array
+### 5
+     (Node : Not_Null'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Identifier_List
+### 5
+     (Node : If_Stmt'Class) return Expr
+### 6
+      ;
+### 5
+     (Node : Generic_Package_Instantiation'Class) return Assoc_List
+### 5
+     (Node : Object_Decl'Class) return Aliased_Node
+### 8
+        (Node : Ada_Node'Class) return Accept_Stmt
+### 8
+        (Node : Ada_Node'Class) return Unconstrained_Array_Index_List
+### 8
+        (Node : Ada_Node'Class) return Abort_Node
+### 5
+     (Node : Entry_Completion_Formal_Params'Class) return Params
+### 5
+     (Node : Classic_Subp_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Base_Subp_Body
+### 8
+        (Node : Ada_Node'Class) return Subtype_Decl
+### 5
+     (Node : Ada_Node'Class) return Source_Location_Range
+### 11
+           (Node : Defining_Name_List; Cursor : Positive) return Positive
+### 5
+     (Node : Task_Def'Class) return Parent_List
+### 5
+     (Node : Defining_Name'Class) return Basic_Decl
+### 5
+     (Node : Subtype_Decl'Class) return Subtype_Indication
+### 5
+     (Node : Subtype_Indication'Class) return Constraint
+### 5
+     (Node : Single_Protected_Decl'Class) return Parent_List
+### 8
+        (Node : Ada_Node'Class) return Null_Record_Aggregate
+### 8
+        (Node : Ada_Node'Class) return Loop_Stmt
+### 5
+     (Node : Quantified_Expr'Class) return Expr
+### 5
+     (Self : Token_Iterator; Tok : Token_Reference) return Token_Reference
+### 5
+     (Node : Protected_Def'Class) return Public_Part
+### 8
+        (Node : Ada_Node'Class) return Int_Literal
+### 5
+     (Self : Shape)
+### 6
+      return Base_Formal_Param_Decl_Array
+### 5
+     (Node : Call_Expr'Class) return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Generic_Instantiation
+### 11
+           (Node : Param_Spec_List; Cursor : Positive) return Boolean
+### 5
+     (Node : Package_Renaming_Decl'Class) return Basic_Decl
+### 5
+     (Node : Body_Node'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl
+### 6
+      ;
+### 5
+     (Node : Iterated_Assoc'Class) return For_Loop_Spec
+### 8
+        (Node : Ada_Node'Class) return Contract_Cases
+### 5
+     (Context : Analysis_Context'Class) return Boolean
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Classwide_Type_Decl
+### 6
+      Unit_Provider_References.Null_Ref;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Block_Stmt
+### 5
+     (Provider : Unit_Provider_Interface;
+### 6
+      Name     : Text_Type;
+### 6
+      Kind     : Analysis_Unit_Kind) return String
+### 6
+      ;
+### 5
+     (Node : Floating_Point_Def'Class) return Range_Spec
+### 8
+        (Node : Ada_Node'Class) return Assign_Stmt
+### 5
+     (Node : Allocator'Class) return Ada_Node
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Refd_Decl
+### 5
+     (Node  : Ada_Node'Class;
+### 6
+      Index : Positive)
+### 6
+      return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Select_When_Part
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Refd_Def
+### 8
+        (Node : Ada_Node'Class) return Quantifier_All
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Body_Node
+### 8
+        (Node : Ada_Node'Class) return Pragma_Node
+### 5
+     (Node : Task_Def'Class) return Public_Part
+### 8
+        (Node : Ada_Node'Class) return Ordinary_Fixed_Point_Def
+### 5
+     (Node : Single_Protected_Decl'Class) return Protected_Def
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class) return Ada_Node_Array
+### 6
+      ;
+### 5
+     (Node : Component_Clause'Class) return Expr
+### 11
+           (Node : Compilation_Unit_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Compilation_Unit_List'Class; Index : Positive)
+### 12
+            return Compilation_Unit
+### 5
+     (Node : Raise_Expr'Class) return Name
+### 5
+     (Node : Compilation_Unit'Class) return Ada_Node
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Interface_Kind
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 11
+           (Node : Pragma_Node_List; Cursor : Positive)
+### 12
+            return Pragma_Node'Class
+### 8
+        (Node : Ada_Node'Class) return Generic_Package_Decl
+### 9
+         array (Positive range <>) of Generic_Instantiation;
+### 5
+     (Node : Paren_Expr'Class) return Expr
+### 9
+         array (Positive range <>) of Basic_Decl;
+### 9
+         array (Positive range <>) of Doc_Annotation;
+### 8
+        (Node : Ada_Node'Class) return Expr_Function
+### 6
+      ;
+### 5
+     (Self : Completion_Item)
+### 6
+      return Boolean
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Entry_Completion_Formal_Params
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Membership_Expr'Class) return Expr_Alternatives_List
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Context : Analysis_Context'Class) return Unit_Provider_Reference
+### 5
+     (Node : Aspect_Assoc'Class) return Name
+### 5
+     (Node : Base_Type_Decl'Class) return Base_Type_Decl
+### 5
+     (Node : Generic_Subp_Instantiation'Class) return Defining_Name
+### 5
+     (Node : Generic_Instantiation'Class) return Basic_Decl
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 8
+        (Node : Ada_Node'Class) return All_Absent
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      P : Basic_Decl'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return While_Loop_Spec
+### 8
+        (Node : Ada_Node'Class) return Abstract_State_Decl
+### 5
+     (Node : Entry_Spec'Class) return Params
+### 5
+     (Node : Access_Def'Class) return Not_Null
+### 8
+        (Node : Ada_Node'Class) return Task_Def
+### 5
+     (Node        : Ada_Node'Class;
+### 6
+      Line_Prefix : String := "")
+### 5
+     (Node : Abstract_Node'Class) return Boolean
+### 5
+     (Node : Discriminant_Constraint'Class) return Assoc_List
+### 5
+     (Node : Discriminant_Assoc'Class) return Expr
+### 5
+     (Node : Until_Node'Class) return Boolean
+### 11
+           (Node : Unconstrained_Array_Index_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Unconstrained_Array_Index_List'Class; Index : Positive)
+### 12
+            return Unconstrained_Array_Index
+### 5
+     (Node : Decl_Block'Class) return End_Name
+### 5
+     (Node : Subp_Spec'Class) return Subp_Kind
+### 8
+        (Node : Ada_Node'Class) return Op_Gt
+### 5
+     (Node : Ada_Node'Class) return Token_Reference
+### 8
+        (Node : Ada_Node'Class) return Not_Null
+### 5
+     (Node : Protected_Node'Class) return Boolean
+### 6
+      ;
+### 5
+     (Node : Body_Node'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl
+### 5
+     (Node : Package_Body'Class) return Handled_Stmts
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Mod_Int_Type_Def'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Discrete_Base_Subtype_Decl
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Constrained_Subtype_Indication
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : If_Expr'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Case_Expr_Alternative_List
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Body_Node
+### 8
+        (Node : Ada_Node'Class) return Array_Type_Def
+### 5
+     (Node : Expr_Function'Class) return Expr
+### 5
+     (Node : Explicit_Deref'Class) return Name
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 5
+     (Node : Aggregate_Assoc'Class) return Alternatives_List
+### 8
+        (Node : Ada_Node'Class) return Name
+### 5
+     (Node : Entry_Body'Class) return Expr
+### 5
+     (Node : Basic_Subp_Decl'Class) return Base_Subp_Spec
+### 8
+        (Node : Ada_Node'Class) return Subp_Kind_Function
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Return_Stmt
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl
+### 8
+        (Node : Ada_Node'Class) return Protected_Type_Decl
+### 5
+     (Node : Delta_Constraint'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Params
+### 5
+     (Node : Task_Body'Class) return Declarative_Part
+### 8
+        (Node : Ada_Node'Class) return Op_Or_Else
+### 5
+     (Node : Constrained_Array_Indices'Class) return Constraint_List
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      With_Self : Boolean := True) return Ada_Node_Array
+### 5
+     (Node : Select_Stmt'Class) return Stmt_List
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Library_Item
+### 6
+      ;
+### 5
+     (Node : Qual_Expr'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Incomplete_Type_Decl
+### 8
+        (Node : Bin_Op'Class) return Ada_Op
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Generic_Formal_Package
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Param_Spec'Class) return Mode
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Exception_Handler
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Package_Body'Class) return End_Name
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Elsif_Expr_Part_List
+### 5
+     (Node : Attribute_Ref'Class) return Identifier
+### 5
+     (Node : Int_Literal'Class) return Big_Integer
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Case_Stmt
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Go_To_Incomplete : Boolean := True) return Base_Type_Decl
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Base_Subp_Body
+### 5
+     (Node : Object_Decl'Class) return Renaming_Clause
+### 8
+        (Node : Ada_Node'Class) return Aspect_Assoc
+### 8
+        (Node : Ada_Node'Class) return Aggregate_Assoc
+### 8
+        (Node : Ada_Node'Class) return Use_Package_Clause
+### 8
+        (Node : Ada_Node'Class) return Basic_Subp_Decl
+### 5
+     (Node : Accept_Stmt'Class) return Identifier
+### 8
+        (Node : Ada_Node'Class) return Tagged_Absent
+### 11
+           (Node : Identifier_List; Cursor : Positive)
+### 12
+            return Identifier'Class
+### 5
+     (Node : Delta_Constraint'Class) return Range_Spec
+### 8
+        (Node : Ada_Node'Class) return Op_Plus
+### 11
+           (Node : Contract_Case_Assoc_List; Cursor : Positive) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Op_And_Then
+### 8
+        (Node : Ada_Node'Class) return Multi_Abstract_State_Decl
+### 5
+     (Node : Record_Rep_Clause'Class) return Expr
+### 5
+     (Node : Case_Stmt'Class) return Case_Stmt_Alternative_List
+### 11
+           (Node : Case_Expr_Alternative_List'Class; Index : Positive)
+### 12
+            return Case_Expr_Alternative
+### 5
+     (Self : Refd_Def)
+### 6
+      return Ref_Result_Kind
+### 5
+     (Self : Param_Actual)
+### 6
+      return Defining_Name'Class
+### 8
+        (Node : Param_Spec'Class) return Ada_Mode
+### 6
+      ;
+### 5
+     (Node : Base_Subp_Body'Class) return Subp_Spec
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Elsif_Stmt_Part
+### 3
+      case Kind is
+### 3
+         when Child =>
+### 3
+            Node : Ada_Node;
+### 3
+         when Trivia =>
+### 3
+            Trivia : Token_Reference;
+### 3
+      end case;
+### 3
+   end record;
+### 5
+     (Node : Limited_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Defining_Name_List
+### 8
+        (Node : Ada_Node'Class) return Constant_Node
+### 5
+     (Node : Generic_Subp_Renaming_Decl'Class) return Defining_Name
+### 5
+     (Node : For_Loop_Var_Decl'Class) return Subtype_Indication
+### 11
+           (Node : Expr_List; Cursor : Positive)
+### 12
+            return Expr'Class
+### 5
+     (Node : Basic_Assoc'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Defining_Name_Array
+### 8
+        (Node : Ada_Node'Class) return Classic_Subp_Decl
+### 5
+     (Node : Entry_Index_Spec'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Tagged_Present
+### 5
+     (Node : End_Name'Class) return Name
+### 5
+     (Node : Name'Class) return Unbounded_Text_Type_Array
+### 5
+     (Node : Elsif_Stmt_Part'Class) return Stmt_List
+### 11
+           (Node : Elsif_Expr_Part_List; Cursor : Positive) return Boolean
+### 8
+        (Node : Ada_Node'Class) return String_Literal
+### 11
+           (Node : Elsif_Expr_Part_List'Class; Index : Positive)
+### 12
+            return Elsif_Expr_Part
+### 8
+        (Node : Ada_Node'Class) return Record_Rep_Clause
+### 11
+           (Node : Identifier_List; Cursor : Positive) return Positive
+### 11
+           (Node : Variant_List; Cursor : Positive) return Boolean
+### 5
+     (Node : Digits_Constraint'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Protected_Absent
+### 5
+     (Node : Un_Op'Class) return Op
+### 8
+        (Node : Ada_Node'Class) return Package_Decl
+### 5
+     (Node : Decimal_Fixed_Point_Def'Class) return Expr
+### 5
+     (Node : Subp_Body_Stub'Class) return Overriding_Node
+### 5
+     (Node : Ada_Node'Class) return Text_Type
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Multi_Dim_Array_Assoc
+### 5
+     (Node : Ada_Node'Class) return Unbounded_Text_Type_Array
+### 5
+     (Node : Compilation_Unit'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Iter_Type_Of
+### 8
+        (Node : Ada_Node'Class) return Generic_Subp_Renaming_Decl
+### 5
+     (Node : Private_Type_Def'Class) return Tagged_Node
+### 6
+         with Iterable => (First       => Pragma_Node_List_First,
+### 6
+                           Next        => Pragma_Node_List_Next,
+### 6
+                           Has_Element => Pragma_Node_List_Has_Element,
+### 6
+                           Element     => Pragma_Node_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return For_Loop_Var_Decl
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Enum_Subp_Spec
+### 5
+     (Node : Base_Package_Decl'Class) return Private_Part
+### 5
+     (Node : Ordinary_Fixed_Point_Def'Class) return Expr
+### 5
+     (Node : At_Clause'Class) return Base_Id
+### 8
+        (Node : Ada_Node'Class) return Constant_Absent
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Call_Stmt
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 5
+     (Node : Generic_Subp_Decl'Class) return Generic_Subp_Internal
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Base_Formal_Param_Holder
+### 8
+        (Node : Ada_Node'Class) return Base_Type_Decl
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 11
+           (Node : Expr_List; Cursor : Positive) return Positive
+### 5
+     (Node : Exception_Handler'Class) return Alternatives_List
+### 8
+        (Node : Ada_Node'Class) return Access_Def
+### 8
+        (Node : Ada_Node'Class) return Until_Node
+### 8
+        (Node : Ada_Node'Class) return Basic_Decl
+### 5
+     (Node : Ada_Node'Class) return Natural
+### 5
+     (Node : While_Loop_Spec'Class) return Expr
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl_Array
+### 5
+     (Node : Basic_Decl'Class) return Boolean
+### 5
+     (Node : Subunit'Class) return Basic_Decl
+### 5
+     (Node : Expr'Class;
+### 6
+      Env : Substitution_Array) return Big_Integer
+### 8
+        (Node : Ada_Node'Class) return Op_Neq
+### 8
+        (Node : Ada_Node'Class) return Null_Subp_Decl
+### 5
+     (Node : Return_Stmt'Class) return Expr
+### 5
+     (Node : Ada_Node'Class) return Generic_Instantiation_Array
+### 6
+         with Iterable => (First       => Select_When_Part_List_First,
+### 6
+                           Next        => Select_When_Part_List_Next,
+### 6
+                           Has_Element => Select_When_Part_List_Has_Element,
+### 6
+                           Element     => Select_When_Part_List_Element)
+### 6
+      ;
+### 9
+         array (Positive range <>) of Analysis_Unit;
+### 6
+      ;
+### 5
+     (Node : Protected_Type_Decl'Class) return Discriminant_Part
+### 5
+     (Node : Cond_Expr'Class) return Expr_Array
+### 5
+     (Node : Param_Assoc'Class) return Expr
+### 6
+      ;
+### 5
+     (Self : Aspect)
+### 6
+      return Ada_Node'Class
+### 8
+        (Node : Ada_Node'Class) return Discriminant_Spec
+### 8
+        (Node : Ada_Node'Class) return Decl_Block
+### 5
+     (Node : Incomplete_Type_Decl'Class) return Discriminant_Part
+### 5
+     (Node : Type_Decl'Class) return Discriminant_Part
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 5
+     (Node : Object_Decl'Class) return Mode
+### 5
+     (Node : Type_Expr'Class) return Name
+### 5
+     (Node : Entry_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Entry_Body
+### 8
+        (Node : Ada_Node'Class) return Simple_Stmt
+### 8
+        (Node : Ada_Node'Class) return Synchronized_Present
+### 5
+     (Node        : Ada_Node'Class;
+### 6
+      Show_Slocs  : Boolean := True;
+### 6
+      Line_Prefix : String := "")
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Single_Protected_Decl
+### 8
+        (Node : Ada_Node'Class) return Raise_Stmt
+### 5
+     (Node : Derived_Type_Def'Class) return Subtype_Indication
+### 8
+        (Node : Ada_Node'Class) return Private_Absent
+### 5
+     (Node : Type_Access_Def'Class) return All_Node
+### 5
+     (Node : Basic_Decl'Class) return Aspect_Spec
+### 5
+     (Node : Task_Type_Decl'Class) return Task_Def
+### 6
+      ;
+### 5
+     (Node : Component_Decl'Class) return Component_Def
+### 5
+     (Node : Ada_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Mode_Default
+### 5
+     (Node : Raise_Stmt'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Interface_Kind_Synchronized
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Case_Expr'Class) return Expr
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Generic_Renaming_Decl
+### 5
+     (Node : Pragma_Node'Class) return Identifier
+### 8
+        (Node : Ada_Node'Class) return Extended_Return_Stmt_Object_Decl
+### 6
+         with Iterable => (First       => Basic_Decl_List_First,
+### 6
+                           Next        => Basic_Decl_List_Next,
+### 6
+                           Has_Element => Basic_Decl_List_Has_Element,
+### 6
+                           Element     => Basic_Decl_List_Element)
+### 6
+      ;
+### 5
+     (Node : Base_Loop_Stmt'Class) return Loop_Spec
+### 6
+      ;
+### 5
+     (Node : Named_Stmt'Class) return Composite_Stmt
+### 5
+     (Node : Ada_Node'Class) return Children_Array
+### 6
+      ;
+### 11
+           (Node : Name_List; Cursor : Positive) return Boolean
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Assoc_List'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Param_Actual_Array
+### 5
+     (Node : Label_Decl'Class) return Defining_Name
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Assign_Stmt'Class) return Expr
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Component_Decl
+### 5
+     (Node : Generic_Subp_Instantiation'Class) return Ada_Node
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Box_Expr
+### 5
+     (Node : For_Loop_Spec'Class) return Reverse_Node
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Attribute_Def_Clause
+### 8
+        (Node : Ada_Node'Class) return Anonymous_Expr_Decl
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Enum_Rep_Clause
+### 5
+     (Node : Enum_Rep_Clause'Class) return Base_Aggregate
+### 8
+        (Node : Ada_Node'Class) return With_Private
+### 11
+           (Node : Enum_Literal_Decl_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Enum_Literal_Decl_List'Class; Index : Positive)
+### 12
+            return Enum_Literal_Decl
+### 11
+           (Node : Elsif_Stmt_Part_List; Cursor : Positive) return Positive
+### 5
+     (Node : Dotted_Name'Class) return Name
+### 5
+     (Node : Discriminant_Spec'Class) return Expr
+### 5
+     (Node : Name'Class) return Boolean
+### 11
+           (Node : Ada_Node_List; Cursor : Positive) return Boolean
+### 5
+     (Node : Basic_Decl'Class) return Type_Expr
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl_Array
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Overriding_Overriding
+### 5
+     (Node : Subp_Spec'Class) return Params
+### 8
+        (Node : Ada_Node'Class) return Op_Lt
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 6
+      ;
+### 5
+     (Node : Record_Type_Def'Class) return Base_Record_Def
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Compilation_Unit'Class) return Compilation_Unit_Array
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Protected_Body'Class) return End_Name
+### 6
+      ;
+### 11
+           (Node : Basic_Decl_List; Cursor : Positive)
+### 12
+            return Basic_Decl'Class
+### 6
+      ;
+### 6
+      ;
+### 6
+         with Iterable => (First       => Compilation_Unit_List_First,
+### 6
+                           Next        => Compilation_Unit_List_Next,
+### 6
+                           Has_Element => Compilation_Unit_List_Has_Element,
+### 6
+                           Element     => Compilation_Unit_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Enum_Lit_Synth_Type_Expr
+### 6
+      ;
+### 5
+     (Node : Base_Formal_Param_Holder'Class) return Integer
+### 5
+     (Node : Named_Stmt_Decl'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Discriminant_Assoc
+### 6
+      ;
+### 6
+      ;
+### 11
+           (Node : Basic_Assoc_List'Class; Index : Positive)
+### 12
+            return Basic_Assoc
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : If_Expr'Class) return Expr
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Dim : Integer;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 5
+     (Node : Generic_Package_Instantiation'Class) return Name
+### 6
+         with Iterable => (First       => Defining_Name_List_First,
+### 6
+                           Next        => Defining_Name_List_Next,
+### 6
+                           Has_Element => Defining_Name_List_Has_Element,
+### 6
+                           Element     => Defining_Name_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Object_Decl'Class) return Defining_Name_List
+### 8
+        (Node : Ada_Node'Class) return Composite_Stmt
+### 5
+     (Node : All_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Unconstrained_Array_Index
+### 8
+        (Node : Ada_Node'Class) return Identifier
+### 5
+     (Node : Entry_Body'Class) return End_Name
+### 5
+     (Node : Classic_Subp_Decl'Class) return Subp_Spec
+### 8
+        (Node : Ada_Node'Class) return Subp_Spec
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Reverse_Present
+### 8
+        (Node : Ada_Node'Class) return Quantified_Expr
+### 8
+        (Node : Ada_Node'Class) return Parent_List
+### 5
+     (Node : Task_Body_Stub'Class) return Defining_Name
+### 5
+     (Node : Defining_Name'Class) return Name
+### 5
+     (Node : Subtype_Indication'Class) return Name
+### 5
+     (Node : Single_Protected_Decl'Class) return Defining_Name
+### 11
+           (Node : Select_When_Part_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Select_When_Part_List'Class; Index : Positive)
+### 12
+            return Select_When_Part
+### 8
+        (Node : Ada_Node'Class) return Null_Literal
+### 8
+        (Node : Ada_Node'Class) return Limited_Present
+### 5
+     (Node : Quantified_Expr'Class) return For_Loop_Spec
+### 8
+        (Node : Ada_Node'Class) return Num_Literal
+### 5
+     (Node : Protected_Body_Stub'Class) return Defining_Name
+### 5
+     (Node : Call_Expr'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return Generic_Formal_Type_Decl
+### 5
+     (Self : Doc_Annotation)
+### 6
+      return Text_Type
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Expr_List
+### 6
+         with Iterable => (First       => Case_Expr_Alternative_List_First,
+### 6
+                           Next        => Case_Expr_Alternative_List_Next,
+### 6
+                           Has_Element => Case_Expr_Alternative_List_Has_Element,
+### 6
+                           Element     => Case_Expr_Alternative_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Package_Renaming_Decl'Class) return Renaming_Clause
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 11
+           (Node : Base_Assoc_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Base_Assoc_List'Class; Index : Positive)
+### 12
+            return Base_Assoc
+### 5
+     (Node : Interface_Type_Def'Class) return Parent_List
+### 8
+        (Node : Ada_Node'Class) return Contract_Case_Assoc_List
+### 8
+        (Node : Ada_Node'Class) return Char_Literal
+### 6
+      ;
+### 5
+     (Unit_Provider_Interface'Class, Do_Release);
+### 8
+        (Node : Ada_Node'Class) return Basic_Decl_List
+### 5
+     (Node : Floating_Point_Def'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Aspect_Spec
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Record_Rep_Clause
+### 8
+        (Node : Ada_Node'Class) return Aliased_Present
+### 5
+     (Node : Allocator'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return Variant_List
+### 5
+     (Node : Accept_Stmt_With_Stmts'Class) return Handled_Stmts
+### 11
+           (Node : Discriminant_Spec_List; Cursor : Positive)
+### 12
+            return Discriminant_Spec'Class
+### 8
+        (Node : Ada_Node'Class) return Select_Stmt
+### 8
+        (Node : Ada_Node'Class) return Quantifier
+### 5
+     (Node : Derived_Type_Def'Class) return Limited_Node
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      From_Node : Ada_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Pragma_Argument_Assoc
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl_Array
+### 8
+        (Node : Ada_Node'Class) return Op_Xor
+### 8
+        (Node : Ada_Node'Class) return Op_Double_Dot
+### 6
+      ;
+### 5
+     (Node : Component_Clause'Class) return Identifier
+### 5
+     (Node : Compilation_Unit'Class) return Ada_Node_List
+### 11
+           (Node : Case_Stmt_Alternative_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Case_Stmt_Alternative_List'Class; Index : Positive)
+### 12
+            return Case_Stmt_Alternative
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Paren_Abstract_State_Decl'Class) return Ada_Node
+### 9
+         array (Positive range <>) of Expr;
+### 6
+      ;
+### 11
+           (Node : Param_Spec_List'Class; Index : Positive)
+### 12
+            return Param_Spec
+### 8
+        (Node : Ada_Node'Class) return Expr_Alternatives_List
+### 9
+         array (Positive range <>) of Discriminant_Values;
+### 6
+      ;
+### 5
+     (Self : Completion_Item)
+### 6
+      return Basic_Decl'Class
+### 8
+        (Node : Ada_Node'Class) return Entry_Body
+### 8
+        (Node : Membership_Expr'Class) return Ada_Op
+### 8
+        (Node : Ada_Node'Class) return Derived_Type_Def
+### 11
+           (Node : Basic_Assoc_List; Cursor : Positive) return Positive
+### 5
+     (Node : Array_Type_Def'Class) return Component_Def
+### 6
+         with Iterable => (First       => Elsif_Expr_Part_List_First,
+### 6
+                           Next        => Elsif_Expr_Part_List_Next,
+### 6
+                           Has_Element => Elsif_Expr_Part_List_Has_Element,
+### 6
+                           Element     => Elsif_Expr_Part_List_Element)
+### 6
+      ;
+### 8
+        (Node : Generic_Subp_Instantiation'Class) return Ada_Subp_Kind
+### 5
+     (Node : Ada_Node'Class) return Boolean
+### 5
+     (Node : Generic_Formal_Part'Class) return Ada_Node_List
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 8
+        (Node : Ada_Node'Class) return All_Node
+### 5
+     (Node : Base_Type_Decl'Class) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Variant_Part
+### 8
+        (Node : Ada_Node'Class) return Abstract_Present
+### 5
+     (Node : Entry_Spec'Class) return Ada_Node
+### 5
+     (Node : Accept_Stmt_With_Stmts'Class) return End_Name
+### 8
+        (Node : Ada_Node'Class) return Task_Body_Stub
+### 5
+     (Node : Abort_Stmt'Class) return Name_List
+### 8
+        (Node : Ada_Node'Class) return Subp_Decl
+### 11
+           (Node : Discriminant_Spec_List; Cursor : Positive) return Positive
+### 5
+     (Node : Discriminant_Assoc'Class) return Discriminant_Choice_List
+### 5
+     (Node : Unconstrained_Array_Indices'Class) return Unconstrained_Array_Index_List
+### 5
+     (Node : Unconstrained_Array_Index'Class) return Subtype_Indication
+### 5
+     (Node : Decl_Block'Class) return Handled_Stmts
+### 5
+     (Node : Subp_Renaming_Decl'Class) return Renaming_Clause
+### 5
+     (Self : Text_Buffer_Ifc; Line_Number : Positive) return Text_Type
+### 8
+        (Node : Ada_Node'Class) return Op_Eq
+### 5
+     (Node : Component_List'Class) return Variant_Part
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Named_Stmt_Decl
+### 5
+     (Node : Record_Type_Def'Class) return Tagged_Node
+### 8
+        (Node : Ada_Node'Class) return Label
+### 6
+      with Iterable => (First       => First_Token,
+### 6
+                        Next        => Next_Token,
+### 6
+                        Has_Element => Has_Element,
+### 6
+                        Element     => Element);
+### 8
+        (Node : Ada_Node'Class) return If_Expr
+### 8
+        (Node : Ada_Node'Class) return Generic_Formal
+### 5
+     (Node : Base_Record_Def'Class) return Component_List
+### 5
+     (Node : Package_Body'Class) return Declarative_Part
+### 8
+        (Node : Ada_Node'Class) return Digits_Constraint
+### 8
+        (Node : Ada_Node'Class) return Subtype_Indication
+### 6
+         with Iterable => (First       => Expr_List_First,
+### 6
+                           Next        => Expr_List_Next,
+### 6
+                           Has_Element => Expr_List_Has_Element,
+### 6
+                           Element     => Expr_List_Element)
+### 6
+      ;
+### 5
+     (Node : Handled_Stmts'Class) return Ada_Node_List
+### 6
+      ;
+### 5
+     (Context  : Analysis_Context'Class;
+### 6
+      Filename : String;
+### 6
+      Charset  : String := "";
+### 6
+      Buffer   : String;
+### 6
+      Rule     : Grammar_Rule := Default_Grammar_Rule) return Analysis_Unit
+### 8
+        (Node : Ada_Node'Class) return Case_Expr_Alternative
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Base_Record_Def
+### 8
+        (Node : Ada_Node'Class) return Array_Indices
+### 5
+     (Node : Exit_Stmt'Class) return Expr
+### 5
+     (Node : Base_Type_Decl'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Alternatives_List
+### 5
+     (Node : Entry_Body'Class) return Entry_Completion_Formal_Params
+### 8
+        (Node : Ada_Node'Class) return Subp_Kind
+### 5
+     (Node : Name'Class) return Base_Formal_Param_Holder
+### 5
+     (Node : Name'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Requeue_Stmt
+### 5
+     (Node : With_Clause'Class) return Private_Node
+### 5
+     (Node : Basic_Decl'Class) return Unbounded_Text_Type
+### 8
+        (Node : Ada_Node'Class) return Protected_Present
+### 5
+     (Node : Delay_Stmt'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Param_Spec_List
+### 5
+     (Node : Task_Body'Class) return Defining_Name
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl
+### 8
+        (Node : Ada_Node'Class) return Op_Or
+### 5
+     (Node : Constant_Node'Class) return Boolean
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 5
+     (Node : Select_Stmt'Class) return Stmt_List
+### 5
+     (Node : Ada_Node'Class) return Ada_Node
+### 11
+           (Node : Compilation_Unit_List; Cursor : Positive)
+### 12
+            return Compilation_Unit'Class
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      Units : Analysis_Unit_Array;
+### 6
+      Transitive : Boolean) return Analysis_Unit_Array
+### 8
+        (Node : Ada_Node'Class) return Label_Decl
+### 6
+      ;
+### 5
+     (Node : Qual_Expr'Class) return Name
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return If_Stmt
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Bin_Op'Class) return Op
+### 8
+        (Node : Ada_Node'Class) return Generic_Formal_Obj_Decl
+### 11
+           (Node : Param_Spec_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Exception_Decl
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Elsif_Expr_Part
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Attribute_Ref'Class) return Name
+### 6
+      ;
+### 5
+     (Node : Index_Constraint'Class) return Constraint_List
+### 6
+         with Iterable => (First       => Elsif_Stmt_Part_List_First,
+### 6
+                           Next        => Elsif_Stmt_Part_List_Next,
+### 6
+                           Has_Element => Elsif_Stmt_Part_List_Has_Element,
+### 6
+                           Element     => Elsif_Stmt_Part_List_Element)
+### 6
+      ;
+### 5
+     (Node : Object_Decl'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Basic_Assoc
+### 8
+        (Node : Ada_Node'Class) return Use_Clause
+### 8
+        (Node : Ada_Node'Class) return Abstract_Absent
+### 5
+     (Node : Abstract_State_Decl_Expr'Class) return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Tagged_Node
+### 5
+     (Node : Derived_Type_Def'Class) return With_Private
+### 11
+           (Node : Unconstrained_Array_Index_List; Cursor : Positive)
+### 12
+            return Unconstrained_Array_Index'Class
+### 5
+     (Node : Defining_Name'Class;
+### 6
+      Units : Analysis_Unit_Array;
+### 6
+      Follow_Renamings : Boolean := False;
+### 6
+      Imprecise_Fallback : Boolean := False) return Ref_Result_Array
+### 5
+     (Node : Subp_Body'Class) return Handled_Stmts
+### 8
+        (Node : Ada_Node'Class) return Op_And
+### 11
+           (Node : Compilation_Unit_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Mode_Out
+### 5
+     (Node : Compilation_Unit'Class;
+### 6
+      Name : Unbounded_Text_Type) return Boolean
+### 5
+     (Node : Record_Rep_Clause'Class) return Name
+### 5
+     (Node : Case_Stmt'Class) return Expr
+### 5
+     (Node : Case_Expr_Alternative'Class) return Expr
+### 5
+     (Self : Refd_Def)
+### 6
+      return Defining_Name'Class
+### 11
+           (Node : Pragma_Node_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Pragma_Node_List'Class; Index : Positive)
+### 12
+            return Pragma_Node
+### 8
+        (Node : Base_Subp_Body'Class) return Ada_Overriding_Node
+### 6
+      ;
+### 5
+     (Node : Base_Package_Decl'Class) return Defining_Name
+### 6
+         with Iterable => (First       => Aspect_Assoc_List_First,
+### 6
+                           Next        => Aspect_Assoc_List_Next,
+### 6
+                           Has_Element => Aspect_Assoc_List_Has_Element,
+### 6
+                           Element     => Aspect_Assoc_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Library_Item'Class) return Basic_Decl
+### 8
+        (Node : Ada_Node'Class) return Defining_Name
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Concrete_Formal_Subp_Decl
+### 8
+        (Node : Generic_Subp_Renaming_Decl'Class) return Ada_Subp_Kind
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Expected_Type : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Bracket_Delta_Aggregate
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Other_Type : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl_Array
+### 5
+     (Node : For_Loop_Var_Decl'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Base_Assoc_List
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 5
+     (Node : Exception_Decl'Class) return Renaming_Clause
+### 5
+     (Node : Base_Aggregate'Class) return Assoc_List
+### 5
+     (Node : Elsif_Stmt_Part'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Stmt_List
+### 5
+     (Node : Elsif_Expr_Part'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Record_Def
+### 11
+           (Node : Unconstrained_Array_Index_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Protected_Node
+### 5
+     (Node : Type_Access_Def'Class) return Subtype_Indication
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Name : Unbounded_Text_Type;
+### 6
+      Imprecise_Fallback : Boolean := False) return Attribute_Def_Clause
+### 8
+        (Node : Ada_Node'Class) return Package_Body_Stub
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl
+### 5
+     (Node : Decimal_Fixed_Point_Def'Class) return Expr
+### 5
+     (Node : Expr'Class) return Basic_Decl
+### 5
+     (Node : Subp_Body'Class) return End_Name
+### 11
+           (Node : Contract_Case_Assoc_List'Class; Index : Positive)
+### 12
+            return Contract_Case_Assoc
+### 5
+     (Node : Ada_Node'Class) return Boolean
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Defining_Name
+### 5
+     (Node : Component_Def'Class) return Constant_Node
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Compilation_Unit'Class) return Basic_Decl
+### 5
+     (Node : Ada_Node'Class) return Completion_Item_Iterator
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Iter_Type_In
+### 5
+     (Self : Shape)
+### 6
+      return Discriminant_Values_Array
+### 8
+        (Node : Ada_Node'Class) return Generic_Subp_Internal
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return For_Loop_Stmt
+### 5
+     (Node : Base_Subp_Spec'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Self : Discrete_Range)
+### 6
+      return Expr'Class
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Enum_Rep_Clause
+### 6
+      ;
+### 5
+     (Node : Base_Package_Decl'Class) return Public_Part
+### 5
+     (Node : Number_Decl'Class) return Expr
+### 5
+     (Unit : Analysis_Unit'Class; D : Diagnostic) return String
+### 5
+     (Node : If_Stmt'Class) return Elsif_Stmt_Part_List
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Call_Expr
+### 5
+     (Node : Generic_Package_Renaming_Decl'Class) return Name
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Base_Formal_Param_Decl
+### 5
+     (Node : Object_Decl'Class) return Constant_Node
+### 8
+        (Node : Ada_Node'Class) return Anonymous_Type_Access_Def
+### 5
+     (Node : Exception_Handler'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Type_Def
+### 8
+        (Node : Ada_Node'Class) return Unknown_Discriminant_Part
+### 8
+        (Node : Ada_Node'Class) return Expr
+### 5
+     (Node : Variant_Part'Class) return Variant_List
+### 5
+     (Node : Basic_Decl'Class) return Text_Type
+### 11
+           (Node : Variant_List'Class; Index : Positive)
+### 12
+            return Variant
+### 5
+     (Node : Subunit'Class) return Body_Node
+### 5
+     (Node : Expr'Class) return Big_Integer
+### 8
+        (Node : Ada_Node'Class) return Op_Mult
+### 8
+        (Node : Ada_Node'Class) return Null_Stmt
+### 5
+     (Self : Substitution)
+### 6
+      return Big_Integer
+### 5
+     (Node : Protected_Def'Class) return End_Name
+### 11
+           (Node : Case_Expr_Alternative_List; Cursor : Positive)
+### 12
+            return Case_Expr_Alternative'Class
+### 5
+     (Node : Call_Stmt'Class) return Name
+### 9
+         array (Positive range <>) of Param_Spec;
+### 9
+         array (Positive range <>) of Compilation_Unit;
+### 9
+         array (Positive range <>) of Ada_Node;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Param_Assoc'Class) return Ada_Node
+### 6
+      ;
+### 5
+     (Self : Completion_Item)
+### 6
+      return Boolean
+### 5
+     (Self : Aspect)
+### 6
+      return Boolean
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Discriminant_Part
+### 8
+        (Node : Ada_Node'Class) return Decimal_Fixed_Point_Def
+### 5
+     (Node : If_Stmt'Class) return Stmt_List
+### 5
+     (Node : Base_Type_Decl'Class) return Discrete_Range
+### 5
+     (Node : Anonymous_Expr_Decl'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Stmt
+### 5
+     (Node : Entry_Decl'Class) return Entry_Spec
+### 8
+        (Node : Ada_Node'Class) return Synchronized_Absent
+### 8
+        (Node : Ada_Node'Class) return Signed_Int_Type_Def
+### 8
+        (Node : Ada_Node'Class) return Raise_Expr
+### 8
+        (Node : Ada_Node'Class) return Private_Node
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Name : Unbounded_Text_Type) return Pragma_Node
+### 5
+     (Node : Task_Def'Class) return End_Name
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Name : Unbounded_Text_Type;
+### 6
+      Imprecise_Fallback : Boolean := False) return Aspect
+### 8
+        (Node : Ada_Node'Class) return Overriding_Node
+### 5
+     (Node : Expr'Class) return Ada_Node_Array
+### 5
+     (Node : Expr'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 5
+     (Node : Task_Type_Decl'Class) return Discriminant_Part
+### 6
+         with Iterable => (First       => Variant_List_First,
+### 6
+                           Next        => Variant_List_Next,
+### 6
+                           Has_Element => Variant_List_Has_Element,
+### 6
+                           Element     => Variant_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Component_Decl'Class) return Defining_Name_List
+### 8
+        (Node : Ada_Node'Class) return Mode
+### 5
+     (Node : Raise_Stmt'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return Interface_Kind_Protected
+### 9
+         array (Positive range <>) of Shape;
+### 11
+           (Node : Case_Expr_Alternative_List; Cursor : Positive) return Positive
+### 5
+     (Self : Ref_Result)
+### 6
+      return Ref_Result_Kind
+### 8
+        (Node : Ada_Node'Class) return Generic_Package_Internal
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Pragma_Argument_Assoc'Class) return Expr
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Subp_Spec'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Object_Decl
+### 8
+        (Node : Ada_Node'Class) return Entry_Index_Spec
+### 5
+     (Node : Named_Stmt'Class) return Named_Stmt_Decl
+### 5
+     (Unit : Analysis_Unit; Line_Number : Positive) return Text_Type
+### 5
+     (Node : Label'Class) return Label_Decl
+### 5
+     (Node : Assign_Stmt'Class) return Name
+### 11
+           (Node : Aspect_Assoc_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Aspect_Assoc_List'Class; Index : Positive)
+### 12
+            return Aspect_Assoc
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Context  : Analysis_Context'Class;
+### 6
+      Filename : String;
+### 6
+      Error    : Text_Type;
+### 6
+      Charset  : String := "";
+### 6
+      Rule     : Grammar_Rule := Default_Grammar_Rule) return Analysis_Unit
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Component_Clause
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 5
+     (Node : Generic_Subp_Instantiation'Class) return Assoc_List
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Body_Stub
+### 6
+      ;
+### 8
+        (Node : For_Loop_Spec'Class) return Ada_Iter_Type
+### 8
+        (Node : Ada_Node'Class) return At_Clause
+### 8
+        (Node : Ada_Node'Class) return Allocator
+### 5
+     (Node : Enum_Rep_Clause'Class) return Name
+### 8
+        (Node : Ada_Node'Class) return With_Clause
+### 8
+        (Node : Ada_Node'Class) return Abstract_State_Decl_List
+### 5
+     (Node : Enum_Literal_Decl'Class) return Type_Decl
+### 5
+     (Node : Access_To_Subp_Def'Class) return Protected_Node
+### 8
+        (Node : Ada_Node'Class) return Type_Access_Def
+### 11
+           (Node : Elsif_Stmt_Part_List; Cursor : Positive)
+### 12
+            return Elsif_Stmt_Part'Class
+### 11
+           (Node : Elsif_Expr_Part_List; Cursor : Positive) return Positive
+### 5
+     (Node : Discriminant_Spec'Class) return Type_Expr
+### 5
+     (Node : Name'Class) return Defining_Name
+### 5
+     (Node : Use_Type_Clause'Class) return All_Node
+### 5
+     (Node : Basic_Decl'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Overriding_Not_Overriding
+### 5
+     (Node : Decl_Expr'Class) return Expr
+### 5
+     (Node : Subp_Spec'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Op_In
+### 5
+     (Node : Ada_Node'Class) return Integer
+### 8
+        (Node : Ada_Node'Class) return Not_Null_Present
+### 5
+     (Node : Compilation_Unit'Class) return Analysis_Unit_Kind
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Protected_Body'Class) return Declarative_Part
+### 5
+     (Self : Refd_Decl)
+### 6
+      return Ref_Result_Kind
+### 9
+         array (Positive range <>) of Param_Actual;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Entry_Spec
+### 6
+         with Iterable => (First       => Base_Assoc_List_First,
+### 6
+                           Next        => Base_Assoc_List_Next,
+### 6
+                           Has_Element => Base_Assoc_List_Has_Element,
+### 6
+                           Element     => Base_Assoc_List_Element)
+### 6
+      ;
+### 5
+     (Node : Base_Formal_Param_Holder'Class) return Integer
+### 11
+           (Node : Name_List'Class; Index : Positive)
+### 12
+            return Name
+### 8
+        (Node : Ada_Node'Class) return Discrete_Subtype_Name
+### 8
+        (Node : Ada_Node'Class) return Constraint_List
+### 5
+     (Context : Analysis_Context'Class; Discard : Boolean)
+### 5
+     (Node : If_Expr'Class) return Elsif_Expr_Part_List
+### 5
+     (Node : Generic_Package_Instantiation'Class) return Defining_Name
+### 5
+     (Node : Extended_Return_Stmt'Class) return Handled_Stmts
+### 8
+        (Node : Ada_Node'Class) return Abstract_Subp_Decl
+### 5
+     (Node : Aliased_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Un_Op
+### 8
+        (Node : Ada_Node'Class) return Base_Id
+### 5
+     (Node : Entry_Body'Class) return Handled_Stmts
+### 8
+        (Node : Classic_Subp_Decl'Class) return Ada_Overriding_Node
+### 8
+        (Node : Ada_Node'Class) return Subp_Renaming_Decl
+### 5
+     (Node : Name'Class) return Boolean
+### 5
+     (Node : With_Private'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Reverse_Absent
+### 8
+        (Node : Ada_Node'Class) return Qual_Expr
+### 8
+        (Node : Ada_Node'Class) return Paren_Expr
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Name : Unbounded_Text_Type) return Expr
+### 5
+     (Node : Task_Body'Class) return End_Name
+### 5
+     (Node : Declarative_Part'Class) return Ada_Node_List
+### 5
+     (Node : Expr'Class;
+### 6
+      Env : Substitution_Array) return Text_Type
+### 5
+     (Node : Expr'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 5
+     (Node : Signed_Int_Type_Def'Class) return Range_Spec
+### 6
+      ;
+### 5
+     (Node : Select_When_Part'Class) return Stmt_List
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      Unit : Analysis_Unit'Class) return Basic_Decl
+### 8
+        (Node : Ada_Node'Class) return Null_Component_Decl
+### 8
+        (Node : Ada_Node'Class) return Limited_Absent
+### 8
+        (Node : Quantified_Expr'Class) return Ada_Quantifier
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Index_Constraint
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Body_Stub'Class) return Unbounded_Text_Type_Array
+### 8
+        (Node : Ada_Node'Class) return Generic_Formal_Subp_Decl
+### 5
+     (Node : Base_Subp_Spec'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Base_Type_Decl
+### 5
+     (Self : Doc_Annotation)
+### 6
+      return Text_Type
+### 8
+        (Node : Ada_Node'Class) return Explicit_Deref
+### 5
+     (Self : Completion_Item_Iterator;
+### 6
+      Item : out Completion_Item) return Boolean
+### 5
+     (Node : Package_Renaming_Decl'Class) return Defining_Name
+### 6
+         with Iterable => (First       => Name_List_First,
+### 6
+                           Next        => Name_List_Next,
+### 6
+                           Has_Element => Name_List_Has_Element,
+### 6
+                           Element     => Name_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Formal_Param_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Assoc'Class) return Expr
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Interface_Type_Def'Class) return Ada_Interface_Kind
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Contract_Case_Assoc
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Case_Stmt_Alternative_List
+### 6
+      ;
+### 8
+        (Node : Generic_Subp_Instantiation'Class) return Ada_Overriding_Node
+### 5
+     (Charset       : String := Default_Charset;
+### 6
+      File_Reader   : File_Reader_Reference := No_File_Reader_Reference;
+### 6
+      Unit_Provider : Unit_Provider_Reference := No_Unit_Provider_Reference;
+### 6
+      With_Trivia   : Boolean := True;
+### 6
+      Tab_Stop      : Positive := 8)
+### 6
+      return Analysis_Context
+### 5
+     (Provider    : Unit_Provider_Interface;
+### 6
+      Context     : Analysis_Context'Class;
+### 6
+      Name        : Text_Type;
+### 6
+      Kind        : Analysis_Unit_Kind;
+### 6
+      Charset     : String := "";
+### 6
+      Reparse     : Boolean := False) return Analysis_Unit'Class
+### 8
+        (Node : Ada_Node'Class) return Base_Subtype_Decl
+### 5
+     (Node : Object_Decl'Class) return Basic_Decl
+### 8
+        (Node : Ada_Node'Class) return Aspect_Clause
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Aliased_Absent
+### 8
+        (Node : Ada_Node'Class) return Variant
+### 5
+     (Node : Accept_Stmt'Class) return Entry_Completion_Formal_Params
+### 2
+  (Token   : Token_Reference;
+### 3
+   Version : Language_Version) return Boolean
+### 5
+     (Node : Ada_Node'Class;
+### 6
+      Sloc : Source_Location) return Ada_Node
+### 5
+     (Node : Name'Class;
+### 6
+      N : Name'Class) return Boolean
+### 5
+     (Node            : Ada_Node'Class;
+### 6
+      Index           : Positive;
+### 6
+      Index_In_Bounds : out Boolean;
+### 6
+      Result          : out Ada_Node)
+### 11
+           (Node : Ada_Node_List; Cursor : Positive)
+### 12
+            return Ada_Node'Class
+### 5
+     (Node : Basic_Decl'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Op_Rem
+### 8
+        (Node : Ada_Node'Class) return Op_Div
+### 6
+         with Iterable => (First       => Unconstrained_Array_Index_List_First,
+### 6
+                           Next        => Unconstrained_Array_Index_List_Next,
+### 6
+                           Has_Element => Unconstrained_Array_Index_List_Has_Element,
+### 6
+                           Element     => Unconstrained_Array_Index_List_Element)
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Char_Literal'Class) return Character_Type
+### 5
+     (Node : Case_Stmt_Alternative'Class) return Stmt_List
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Params'Class) return Param_Spec_List
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Param_Spec'Class) return Expr
+### 5
+     (Node : Base_Subp_Spec'Class) return Param_Spec_Array
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return End_Name
+### 11
+           (Node : Name_List; Cursor : Positive) return Positive
+### 5
+     (Node : Membership_Expr'Class) return Op
+### 8
+        (Node : Ada_Node'Class) return Delta_Constraint
+### 6
+      ;
+### 11
+           (Node : Basic_Assoc_List; Cursor : Positive)
+### 12
+            return Basic_Assoc'Class
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Array_Type_Def'Class) return Array_Indices
+### 5
+     (Node : Generic_Subp_Instantiation'Class) return Subp_Kind
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class) return Boolean
+### 6
+      ;
+### 5
+     (Node : Generic_Formal'Class) return Basic_Decl
+### 11
+           (Node : Enum_Literal_Decl_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Abstract_Formal_Subp_Decl
+### 5
+     (Node : Entry_Spec'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Task_Body
+### 5
+     (Node : Entry_Body'Class) return Defining_Name
+### 5
+     (Node : Abort_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Subp_Body_Stub
+### 8
+        (Node : Ada_Node'Class) return Relation_Op
+### 11
+           (Node : Ada_Node_List; Cursor : Positive) return Positive
+### 5
+     (Node : Discrete_Subtype_Name'Class) return Discrete_Subtype_Indication
+### 8
+        (Node : Ada_Node'Class) return Protected_Body_Stub
+### 5
+     (Node : Un_Op'Class) return Expr
+### 5
+     (Node : Decl_Block'Class) return Declarative_Part
+### 5
+     (Node : Subp_Body_Stub'Class) return Subp_Spec
+### 5
+     (Node : Expr'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 5
+     (Node : Component_List'Class) return Ada_Node_List
+### 8
+        (Node : Ada_Node'Class) return Named_Stmt
+### 5
+     (Node : Ada_Node'Class) return Ada_Node_Kind_Type
+### 8
+        (Node : Ada_Node'Class) return Known_Discriminant_Part
+### 8
+        (Node : Ada_Node'Class) return Handled_Stmts
+### 5
+     (Node : Private_Type_Def'Class) return Limited_Node
+### 11
+           (Node : Basic_Decl_List; Cursor : Positive) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Generic_Decl
+### 9
+         array (Positive range <>) of Base_Type_Decl;
+### 5
+     (Node : Base_Subp_Spec'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Base_Type_Decl_Array
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Base_Package_Decl'Class) return Package_Body
+### 6
+      ;
+### 5
+     (Node : Package_Body'Class) return Defining_Name
+### 6
+      ;
+### 11
+           (Node : Base_Assoc_List; Cursor : Positive)
+### 12
+            return Base_Assoc'Class
+### 8
+        (Node : Ada_Node'Class) return Constrained_Array_Indices
+### 5
+     (Node : Handled_Stmts'Class) return Stmt_List
+### 5
+     (Context  : Analysis_Context'Class;
+### 6
+      Filename : String;
+### 6
+      Charset  : String := "";
+### 6
+      Buffer   : Ada.Strings.Unbounded.Unbounded_String;
+### 6
+      Rule     : Grammar_Rule := Default_Grammar_Rule) return Analysis_Unit
+### 6
+      ;
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Case_Expr
+### 8
+        (Node : Ada_Node'Class) return Base_Package_Decl
+### 8
+        (Node : Ada_Node'Class) return Anonymous_Type_Decl
+### 5
+     (Node : Exit_Stmt'Class) return Name
+### 5
+     (Node : Anonymous_Type_Access_Def'Class) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Ada_Node_List
+### 5
+     (Node : Entry_Body'Class) return Entry_Index_Spec
+### 5
+     (Node : Name'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 5
+     (Node : Ada_Node'Class) return Natural
+### 5
+     (Node : Name'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Renaming_Clause
+### 5
+     (Node : Basic_Decl'Class) return Single_Tok_Node
+### 8
+        (Node : Ada_Node'Class) return Protected_Def
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Units : Analysis_Unit_Array;
+### 6
+      Imprecise_Fallback : Boolean := False) return Basic_Decl_Array
+### 11
+           (Node : Defining_Name_List; Cursor : Positive) return Boolean
+### 11
+           (Node : Defining_Name_List'Class; Index : Positive)
+### 12
+            return Defining_Name
+### 5
+     (Node : Basic_Decl'Class;
+### 6
+      Name : Unbounded_Text_Type;
+### 6
+      Imprecise_Fallback : Boolean := False) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Param_Spec
+### 5
+     (Node : Tagged_Node'Class) return Boolean
+### 8
+        (Node : Ada_Node'Class) return Op_Not_In
+### 11
+           (Node : Select_When_Part_List; Cursor : Positive) return Positive
+### 6
+      ;
+### 5
+     (Node : Select_Stmt'Class) return Select_When_Part_List
+### 6
+      ;
+### 5
+     (Node : Ada_Node'Class) return Basic_Decl
+### 5
+     (Self : Token_Iterator; Tok : Token_Reference) return Boolean
+### 11
+           (Node : Case_Stmt_Alternative_List; Cursor : Positive)
+### 12
+            return Case_Stmt_Alternative'Class
+### 5
+     (Node : Protected_Type_Decl'Class) return Protected_Def
+### 6
+      ;
+### 5
+     (Node : Bin_Op'Class) return Expr
+### 6
+      ;
+### 11
+           (Node : Param_Spec_List; Cursor : Positive)
+### 12
+            return Param_Spec'Class
+### 6
+      ;
+### 5
+     (Self : Discriminant_Values)
+### 6
+      return Alternatives_List'Class
+### 5
+     (Node : Param_Spec'Class) return Aliased_Node
+### 8
+        (Node : Ada_Node'Class) return Error_Stmt
+### 6
+      ;
+### 8
+        (Node : Ada_Node'Class) return Dotted_Name
+### 11
+           (Node : Base_Assoc_List; Cursor : Positive) return Positive
+### 5
+     (Node : Attribute_Def_Clause'Class) return Expr
+### 5
+     (Node : Type_Decl'Class;
+### 6
+      Only_Inherited : Boolean := False) return Basic_Decl_Array
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Units : Analysis_Unit_Array;
+### 6
+      Imprecise_Fallback : Boolean := False) return Type_Decl_Array
+### 5
+     (Node : Object_Decl'Class) return Type_Expr
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Root : Ada_Node'Class;
+### 6
+      Origin : Ada_Node'Class;
+### 6
+      Imprecise_Fallback : Boolean := False) return Type_Decl_Array
+### 8
+        (Node : Ada_Node'Class) return Aggregate
+### 5
+     (Node : Type_Expr'Class;
+### 6
+      Origin_Node : Ada_Node'Class) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Update_Attribute_Ref
+### 8
+        (Node : Ada_Node'Class) return Abstract_Node
+### 5
+     (Node : Abstract_State_Decl'Class) return Defining_Name
+### 8
+        (Node : Ada_Node'Class) return Synthetic_Renaming_Clause
+### 5
+     (Node : Derived_Type_Def'Class) return Base_Record_Def
+### 5
+     (Node : Type_Access_Def'Class) return Constant_Node
+### 5
+     (Node : Basic_Decl'Class) return Doc_Annotation_Array
+### 5
+     (Node : Subp_Body'Class) return Declarative_Part
+### 8
+        (Node : Ada_Node'Class) return Op_Abs
+### 8
+        (Node : Ada_Node'Class) return Mode_In_Out
+### 5
+     (Node : Range_Spec'Class) return Expr
+### 11
+           (Node : Case_Stmt_Alternative_List; Cursor : Positive) return Positive
+### 8
+        (Node : Ada_Node'Class) return Interface_Type_Def
+### 5
+     (Node : Case_Expr_Alternative'Class) return Alternatives_List
+### 8
+        (Node : Ada_Node'Class) return Generic_Subp_Decl
+### 5
+     (Node : Pragma_Node'Class) return Basic_Decl_Array
+### 5
+     (Node : Base_Subtype_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 8
+        (Node : Ada_Node'Class) return Loop_Spec
+### 5
+     (Node : Base_Subp_Body'Class) return Overriding_Node
+### 5
+     (Node : Base_Loop_Stmt'Class) return End_Name
+### 8
+        (Node : Ada_Node'Class) return Declarative_Part
+### 8
+        (Node : Ada_Node'Class) return Component_List
+### 6
+      ;
+### 6
+      ;
+### 5
+     (Node : Generic_Subp_Renaming_Decl'Class) return Subp_Kind
+### 8
+        (Node : Ada_Node'Class) return Delta_Aggregate
+### 6
+      ;
+### 5
+     (Node : Base_Type_Decl'Class;
+### 6
+      Origin : Ada_Node'Class := No_Ada_Node) return Base_Type_Decl
+### 5
+     (Node : For_Loop_Spec'Class) return Ada_Node
+### 8
+        (Node : Ada_Node'Class) return Base_Assoc
+### 8
+        (Node : Ada_Node'Class) return Anonymous_Type
+### 8
+        (Node : Ada_Node'Class) return With_Private_Present
+### 5
+     (Node : Exception_Decl'Class) return Defining_Name_List
+### 5
+     (Node : Base_Aggregate'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Single_Task_Type_Decl
+### 5
+     (Node : Elsif_Expr_Part'Class) return Expr
+### 8
+        (Node : Ada_Node'Class) return Real_Literal
+### 5
+     (Node : Basic_Decl'Class) return Text_Type
+### 5
+     (Node : Variant'Class) return Alternatives_List

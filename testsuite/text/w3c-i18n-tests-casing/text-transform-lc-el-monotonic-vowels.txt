@@ -1,0 +1,4 @@
+CSS3 Text, text transform: lowercase, monotonic Greek vowels
+lowercase
+Α Ε Η Ι Ο Υ Ω Ά Έ Ή Ό Ί Ύ Ώ
+α ε η ι ο υ ω ά έ ή ό ί ύ ώ

@@ -1,0 +1,27 @@
+--
+--  Copyright (C) 2020-2023, AdaCore
+--
+--  SPDX-License-Identifier: Apache-2.0
+--
+
+with "../vss_common";
+with "../vss_text";
+with "vss_test_common";
+
+project VSS_Stream_Tests is
+
+   for Languages use ("Ada");
+   for Object_Dir use VSS_Common.Tests_Object_Dir;
+   for Source_Dirs use ("../../testsuite/stream");
+   for Main use
+     ("test_file_text_streams.adb",
+      "test_stream_element_vector.adb",
+      "test_text_streams.adb");
+
+   package Compiler renames VSS_Test_Common.Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Wb");
+   end Binder;
+
+end VSS_Stream_Tests;

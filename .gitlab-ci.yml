@@ -27,9 +27,20 @@ include:
     inputs:
       job-name: build:edge
       anod-args: run build_edge --latest
-      linux: true
-      windows: true
       save-component: true
+
+#  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+#    inputs:
+#      job-name: build:edge:windows
+#      anod-args: run build_edge --latest
+#      cpu:8
+#      image: e3-windows-core-2022
+#      save-component: true
+#        #    variables:
+#        #      ACI_TRACK: edge
+#    services:
+#      - platform:x86_64-windows-2022
+#      - image:e3-windows-core-2022
 
 # Testing (stable & edge)
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
@@ -147,3 +158,31 @@ include:
       cpus: 16
       rules:
         - allow_failure: true
+
+###########################
+# LEGACY BUILD ON WINDOWS #
+###########################
+
+.build_and_test:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      allow_failure: true
+  script:
+    - generic_anod_ci
+    - . /tmp/ci_env.sh
+    # Build & test using anod
+    - anod build vss $ACI_TRACK_QUALIFIER --latest
+    - anod test vss $ACI_TRACK_QUALIFIER --latest
+    - testsuite_reports
+
+build_and_test:windows:
+  extends: .build_and_test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+      allow_failure: true
+  services:
+     - image:e3-windows-core-2022
+     - cpu:8
+     - platform:x86_64-windows-2022

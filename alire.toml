@@ -1,5 +1,23 @@
 name = "vss"
-description = "Advanced string and text manipulation with Unicode support"
+description = "Virtual String System - a high level string and text processing library"
+
+long-description = """
+## Deprecation
+
+This crate is deprecated. VSS has been split into smaller more focused
+projects:
+
+* [`vss_text`](https://alire.ada.dev/crates/vss_text): a library for Unicode text
+  processing.
+* [`vss_extra`](https://alire.ada.dev/crates/vss_extra): libraries for handling
+  JSON, Regexp, XML and other features based on `vss_text`. This will be
+  further split into smaller projects.
+
+This crate is kept as a read-only historic snapshot that will no longer
+evolve. Please refer to the above crates to continue using their
+corresponding features, and to be informed of upcoming changes.
+"""
+
 version = "25.0.0-dev"
 tags = ["unicode", "json", "text"]
 
